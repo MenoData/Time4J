@@ -656,6 +656,9 @@ public final class TimestampInterval
      * <p>Obtains a stream iterating over every timestamp which is the result of addition of given duration
      * to start until the end of this interval is reached. </p>
      *
+     * <p>The stream size is limited to {@code Integer.MAX_VALUE - 1} else an {@code ArithmeticException}
+     * will be thrown. </p>
+     *
      * @param   duration    duration which has to be added to the start multiple times
      * @throws  IllegalArgumentException if the duration is not positive
      * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
@@ -667,6 +670,9 @@ public final class TimestampInterval
     /*[deutsch]
      * <p>Erzeugt einen {@code Stream}, der jeweils einen Zeitstempel als Vielfaches der Dauer angewandt auf
      * den Start und bis zum Ende dieses Intervalls geht. </p>
+     *
+     * <p>Die Gr&ouml;&szlig;e des {@code Stream} ist maximal {@code Integer.MAX_VALUE - 1}, ansonsten wird
+     * eine {@code ArithmeticException} geworfen. </p>
      *
      * @param   duration    duration which has to be added to the start multiple times
      * @throws  IllegalArgumentException if the duration is not positive
@@ -694,26 +700,30 @@ public final class TimestampInterval
      * <p>Obtains a stream iterating over every timestamp which is the result of addition of given duration
      * to start until the end is reached. </p>
      *
-     * <p>This static method avoids the costs of constructing an instance of {@code TimestampInterval}. </p>
+     * <p>This static method avoids the costs of constructing an instance of {@code TimestampInterval}.
+     * The stream size is limited to {@code Integer.MAX_VALUE - 1} else an {@code ArithmeticException}
+     * will be thrown. </p>
      *
      * @param   duration    duration which has to be added to the start multiple times
      * @param   start       start boundary - inclusive
      * @param   end         end boundary - exclusive
      * @throws  IllegalArgumentException if start is after end or if the duration is not positive
-     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @return  stream consisting of distinct timestamps which are the result of adding the duration to the start
      * @since   4.18
      */
     /*[deutsch]
      * <p>Erzeugt einen {@code Stream}, der jeweils einen Zeitstempel als Vielfaches der Dauer angewandt auf
      * den Start und bis zum Ende geht. </p>
      *
-     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. </p>
+     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. Die Gr&ouml;&szlig;e des
+     * {@code Stream} ist maximal {@code Integer.MAX_VALUE - 1}, ansonsten wird eine {@code ArithmeticException}
+     * geworfen. </p>
      *
      * @param   duration    duration which has to be added to the start multiple times
      * @param   start       start boundary - inclusive
      * @param   end         end boundary - exclusive
      * @throws  IllegalArgumentException if start is after end or if the duration is not positive
-     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @return  stream consisting of distinct timestamps which are the result of adding the duration to the start
      * @since   4.18
      */
     public static Stream<PlainTimestamp> stream(
@@ -740,7 +750,13 @@ public final class TimestampInterval
             secs += item.getUnit().getLength() * item.getAmount();
         }
 
-        double est = (ClockUnit.SECONDS.between(start, end) / secs); // first estimate
+        double est; // first estimate
+
+        if (secs < 1.0) {
+            est = (ClockUnit.NANOS.between(start, end) / (secs * 1_000_000_000));
+        } else {
+            est = (ClockUnit.SECONDS.between(start, end) / secs);
+        }
 
         if (Double.compare(est, Integer.MAX_VALUE) >= 0) {
             throw new ArithmeticException();

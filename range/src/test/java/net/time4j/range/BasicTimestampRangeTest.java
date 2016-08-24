@@ -5,21 +5,17 @@ import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
 import net.time4j.PlainTimestamp;
-
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.time.Instant;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.stream.Collectors;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 
@@ -439,6 +435,24 @@ public class BasicTimestampRangeTest {
     public void streamInfinite() {
         PlainTimestamp tsp = PlainTimestamp.of(2016, 1, 1, 0, 0);
         TimestampInterval.since(tsp).stream(Duration.of(1, CalendarUnit.DAYS));
+    }
+
+    @Test
+    public void streamSizeLimit() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0, 0);
+        PlainTimestamp end = start.plus(Integer.MAX_VALUE - 1, ClockUnit.NANOS);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        assertThat(
+            (int) interval.stream(Duration.of(1, ClockUnit.NANOS)).spliterator().getExactSizeIfKnown(),
+            is(Integer.MAX_VALUE - 1));
+    }
+
+    @Test(expected=ArithmeticException.class)
+    public void streamOverflow() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 5, 1, 23, 0, 3);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        interval.stream(Duration.of(1, ClockUnit.NANOS));
     }
 
 }
