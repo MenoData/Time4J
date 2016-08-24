@@ -742,7 +742,7 @@ public final class TimestampInterval
 
         double est = (ClockUnit.SECONDS.between(start, end) / secs); // first estimate
 
-        if (Double.compare(est, Integer.MAX_VALUE) > 0) {
+        if (Double.compare(est, Integer.MAX_VALUE) >= 0) {
             throw new ArithmeticException();
         }
 
@@ -758,7 +758,7 @@ public final class TimestampInterval
 
         if (!backwards) {
             do {
-                size = n + 1;
+                size = Math.addExact(n, 1);
                 n++;
             } while (start.plus(duration.multipliedBy(n)).isBefore(end));
         }
