@@ -24,6 +24,7 @@ package net.time4j.range;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainTime;
+import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -40,6 +41,8 @@ import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.NANOS;
@@ -427,6 +430,134 @@ public final class ClockInterval
         }
 
         return new ClockInterval(s, e);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every clock time which is the result of addition of given duration
+     * to start until the end of this interval is reached. </p>
+     *
+     * <p>The stream size is limited to {@code Integer.MAX_VALUE - 1} else an {@code ArithmeticException}
+     * will be thrown. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
+     * @throws  IllegalStateException if this interval has no canonical form
+     * @return  stream consisting of distinct clock times which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(Duration, PlainTime, PlainTime)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils eine Uhrzeit als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende dieses Intervalls geht. </p>
+     *
+     * <p>Die Gr&ouml;&szlig;e des {@code Stream} ist maximal {@code Integer.MAX_VALUE - 1}, ansonsten wird
+     * eine {@code ArithmeticException} geworfen. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
+     * @throws  IllegalStateException if this interval has no canonical form
+     * @return  stream consisting of distinct clock times which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(Duration, PlainTime, PlainTime)
+     * @since   4.18
+     */
+    public Stream<PlainTime> stream(Duration<ClockUnit> duration) {
+
+        ClockInterval interval = this.toCanonical();
+        return ClockInterval.stream(duration, interval.getStartAsClockTime(), interval.getEndAsClockTime());
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every clock time which is the result of addition of given duration
+     * to start until the end is reached. </p>
+     *
+     * <p>This static method avoids the costs of constructing an instance of {@code ClockInterval}.
+     * The stream size is limited to {@code Integer.MAX_VALUE - 1} else an {@code ArithmeticException}
+     * will be thrown. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - exclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct clock times which are the result of adding the duration to the start
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils eine Uhrzeit als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende geht. </p>
+     *
+     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. Die Gr&ouml;&szlig;e des
+     * {@code Stream} ist maximal {@code Integer.MAX_VALUE - 1}, ansonsten wird eine {@code ArithmeticException}
+     * geworfen. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - exclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct clock times which are the result of adding the duration to the start
+     * @since   4.18
+     */
+    public static Stream<PlainTime> stream(
+        Duration<ClockUnit> duration,
+        PlainTime start,
+        PlainTime end
+    ) {
+
+        if (!duration.isPositive()) {
+            throw new IllegalArgumentException("Duration must be positive: " + duration);
+        }
+
+        int comp = start.compareTo(end);
+
+        if (comp > 0) {
+            throw new IllegalArgumentException("Start after end: " + start + "/" + end);
+        } else if (comp == 0) {
+            return Stream.empty();
+        }
+
+        double secs = 0.0;
+
+        for (TimeSpan.Item<ClockUnit> item : duration.getTotalLength()) {
+            secs += item.getUnit().getLength() * item.getAmount();
+        }
+
+        double est; // first estimate
+
+        if (secs < 1.0) {
+            est = (ClockUnit.NANOS.between(start, end) / (secs * 1_000_000_000));
+        } else {
+            est = (ClockUnit.SECONDS.between(start, end) / secs);
+        }
+
+        if (Double.compare(est, Integer.MAX_VALUE) >= 0) {
+            throw new ArithmeticException();
+        }
+
+        int n = (int) Math.floor(est);
+        boolean backwards = false;
+
+        while ((n > 0) && !start.plus(duration.multipliedBy(n)).isBefore(end)) {
+            n--;
+            backwards = true;
+        }
+
+        int size = n + 1;
+
+        if (!backwards) {
+            do {
+                size = Math.addExact(n, 1);
+                n++;
+            } while (start.plus(duration.multipliedBy(n)).isBefore(end));
+        }
+
+        if (size == 1) {
+            return Stream.of(start); // short-cut
+        }
+
+        return IntStream.range(0, size).mapToObj(index -> start.plus(duration.multipliedBy(index)));
 
     }
 
