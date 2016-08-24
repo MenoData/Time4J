@@ -1,6 +1,9 @@
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
+import net.time4j.Duration;
+import net.time4j.IsoUnit;
 import net.time4j.PlainTimestamp;
 
 import org.junit.Test;
@@ -9,6 +12,10 @@ import org.junit.runners.JUnit4;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -250,7 +257,7 @@ public class BasicTimestampRangeTest {
             TimestampInterval.between(start1, end1).hashCode(),
             not(
                 TimestampInterval.between(start2, end2)
-                .withClosedEnd().hashCode()));
+                    .withClosedEnd().hashCode()));
         assertThat(
             TimestampInterval.between(start1, end1).hashCode(),
             is(TimestampInterval.between(start1, end1).hashCode()));
@@ -324,6 +331,114 @@ public class BasicTimestampRangeTest {
         assertThat(
             interval.move(12, ClockUnit.HOURS),
             is(expected));
+    }
+
+    @Test
+    public void stream1() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 6, 2, 16, 0);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.of(1, (IsoUnit) CalendarUnit.MONTHS).plus(4, ClockUnit.HOURS);
+
+        List<PlainTimestamp> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(PlainTimestamp.of(2014, 6, 2, 3, 0));
+
+        List<PlainTimestamp> result = interval.stream(duration).collect(Collectors.toList());
+        assertThat(result, is(expected));
+    }
+
+    @Test
+    public void stream2() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 6, 2, 16, 0).plus(1, ClockUnit.NANOS);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.of(1, (IsoUnit) CalendarUnit.MONTHS).plus(17, ClockUnit.HOURS);
+
+        List<PlainTimestamp> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(PlainTimestamp.of(2014, 6, 2, 16, 0));
+
+        List<PlainTimestamp> result = interval.stream(duration).parallel().collect(Collectors.toList());
+        assertThat(result, is(expected));
+    }
+
+    @Test
+    public void stream3() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 6, 2, 16, 0);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.of(1, (IsoUnit) CalendarUnit.MONTHS).plus(17, ClockUnit.HOURS);
+
+        List<PlainTimestamp> result = interval.stream(duration).parallel().collect(Collectors.toList());
+        assertThat(result, is(Collections.singletonList(start)));
+    }
+
+    @Test
+    public void stream4() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = start.plus(2, ClockUnit.NANOS);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.of(1, ClockUnit.NANOS);
+
+        List<PlainTimestamp> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(start.plus(1, ClockUnit.NANOS));
+
+        List<PlainTimestamp> result = interval.stream(duration).parallel().collect(Collectors.toList());
+        assertThat(result, is(expected));
+    }
+
+    @Test
+    public void stream5() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = start.plus(1, ClockUnit.NANOS);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.of(1, ClockUnit.NANOS);
+
+        List<PlainTimestamp> result = interval.stream(duration).parallel().collect(Collectors.toList());
+        assertThat(result, is(Collections.singletonList(start)));
+    }
+
+    @Test
+    public void stream6() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        TimestampInterval interval = TimestampInterval.between(start, start);
+        Duration<?> duration = Duration.of(1, ClockUnit.NANOS);
+
+        List<PlainTimestamp> result = interval.stream(duration).parallel().collect(Collectors.toList());
+        assertThat(result, is(Collections.emptyList()));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void streamWithEmptyDuration() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 6, 2, 16, 0);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.ofZero();
+        interval.stream(duration);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void streamWithNegativeDuration() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 6, 2, 16, 0);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        Duration<?> duration = Duration.of(1, CalendarUnit.MONTHS).inverse();
+        interval.stream(duration);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void streamWithStartAfterEnd() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 0);
+        PlainTimestamp end = PlainTimestamp.of(2014, 5, 1, 16, 0);
+        TimestampInterval.stream(Duration.of(1, CalendarUnit.DAYS), start, end);
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void streamInfinite() {
+        PlainTimestamp tsp = PlainTimestamp.of(2016, 1, 1, 0, 0);
+        TimestampInterval.since(tsp).stream(Duration.of(1, CalendarUnit.DAYS));
     }
 
 }

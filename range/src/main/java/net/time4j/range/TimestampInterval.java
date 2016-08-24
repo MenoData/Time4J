@@ -33,6 +33,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
@@ -54,6 +55,8 @@ import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static net.time4j.PlainDate.*;
 import static net.time4j.range.IntervalEdge.CLOSED;
@@ -646,6 +649,125 @@ public final class TimestampInterval
         }
 
         return new TimestampInterval(s, e);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every timestamp which is the result of addition of given duration
+     * to start until the end of this interval is reached. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @return  stream consisting of distinct timestamps which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(Duration, PlainTimestamp, PlainTimestamp)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils einen Zeitstempel als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende dieses Intervalls geht. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @return  stream consisting of distinct timestamps which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(Duration, PlainTimestamp, PlainTimestamp)
+     * @since   4.18
+     */
+    public Stream<PlainTimestamp> stream(Duration<?> duration) {
+
+        TimestampInterval interval = this.toCanonical();
+        PlainTimestamp start = interval.getStartAsTimestamp();
+        PlainTimestamp end = interval.getEndAsTimestamp();
+
+        if ((start == null) || (end == null)) {
+            throw new IllegalStateException("Streaming is not supported for infinite intervals.");
+        }
+
+        return TimestampInterval.stream(duration, start, end);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every timestamp which is the result of addition of given duration
+     * to start until the end is reached. </p>
+     *
+     * <p>This static method avoids the costs of constructing an instance of {@code TimestampInterval}. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - exclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils einen Zeitstempel als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende geht. </p>
+     *
+     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - exclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct dates which are the result of adding the duration to the start
+     * @since   4.18
+     */
+    public static Stream<PlainTimestamp> stream(
+        Duration<?> duration,
+        PlainTimestamp start,
+        PlainTimestamp end
+    ) {
+
+        if (!duration.isPositive()) {
+            throw new IllegalArgumentException("Duration must be positive: " + duration);
+        }
+
+        int comp = start.compareTo(end);
+
+        if (comp > 0) {
+            throw new IllegalArgumentException("Start after end: " + start + "/" + end);
+        } else if (comp == 0) {
+            return Stream.empty();
+        }
+
+        double secs = 0.0;
+
+        for (TimeSpan.Item<? extends IsoUnit> item : duration.getTotalLength()) {
+            secs += item.getUnit().getLength() * item.getAmount();
+        }
+
+        double est = (ClockUnit.SECONDS.between(start, end) / secs); // first estimate
+
+        if (Double.compare(est, Integer.MAX_VALUE) > 0) {
+            throw new ArithmeticException();
+        }
+
+        int n = (int) Math.floor(est);
+        boolean backwards = false;
+
+        while ((n > 0) && !start.plus(duration.multipliedBy(n)).isBefore(end)) {
+            n--;
+            backwards = true;
+        }
+
+        int size = n + 1;
+
+        if (!backwards) {
+            do {
+                size = n + 1;
+                n++;
+            } while (start.plus(duration.multipliedBy(n)).isBefore(end));
+        }
+
+        if (size == 1) {
+            return Stream.of(start); // short-cut
+        }
+
+        return IntStream.range(0, size).mapToObj(index -> start.plus(duration.multipliedBy(index)));
 
     }
 

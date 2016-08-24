@@ -746,6 +746,7 @@ public final class DateInterval
      * to start until the end of this interval is reached. </p>
      *
      * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
      * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @return  stream consisting of distinct dates which are the result of adding the duration to the start
      * @see     #toCanonical()
@@ -757,6 +758,7 @@ public final class DateInterval
      * den Start und bis zum Ende dieses Intervalls geht. </p>
      *
      * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
      * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @return  stream consisting of distinct dates which are the result of adding the duration to the start
      * @see     #toCanonical()
