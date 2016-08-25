@@ -1068,12 +1068,12 @@ public final class MachineTime<U>
      * Schematic algorithm:
      *
      * <pre>
-     *      byte header = (7 << 2);
+     *      byte header = (7 &lt;&lt; 2);
      *      if (scale == TimeScale.UTC) header |= 1;
-     *      if (this.getFraction() > 0) header |= 2;
+     *      if (this.getFraction() &gt; 0) header |= 2;
      *      out.writeByte(header);
      *      out.writeLong(getSeconds());
-     *      if (this.getFraction() > 0) {
+     *      if (this.getFraction() &gt; 0) {
      *          out.writeInt(getFraction());
      *      }
      * </pre>
