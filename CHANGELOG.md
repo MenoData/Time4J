@@ -20,6 +20,7 @@
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
 - AM/PM-element not sensible for output context [#529]
+- Inconsistent TimeSpan-behaviour of negative MachineTime [#540]
 
 ### Changed
 - New leap second at end of year 2016 [#517]
