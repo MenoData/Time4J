@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MachineTime.java) is part of project Time4J.
  *
@@ -21,8 +21,7 @@
 
 package net.time4j.range;
 
-import net.time4j.*;
-import net.time4j.base.MathUtils;
+import net.time4j.SI;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
@@ -96,10 +95,8 @@ public final class MachineTime<U>
 
     private static final int MRD = 1000000000;
 
-    private static final MachineTime<TimeUnit> POSIX_ZERO =
-        new MachineTime<>(0, 0, POSIX);
-    private static final MachineTime<SI> UTC_ZERO =
-        new MachineTime<>(0, 0, UTC);
+    private static final MachineTime<TimeUnit> POSIX_ZERO = new MachineTime<>(0, 0, POSIX);
+    private static final MachineTime<SI> UTC_ZERO = new MachineTime<>(0, 0, UTC);
 
     /**
      * Metric on the POSIX scale (without leap seconds).
@@ -148,12 +145,17 @@ public final class MachineTime<U>
 
         while (fraction < 0) {
             fraction += MRD;
-            secs = MathUtils.safeSubtract(secs, 1);
+            secs = Math.subtractExact(secs, 1);
         }
 
         while (fraction >= MRD) {
             fraction -= MRD;
-            secs = MathUtils.safeAdd(secs, 1);
+            secs = Math.addExact(secs, 1);
+        }
+
+        if ((secs < 0) && (fraction > 0)) {
+            secs++;
+            fraction -= MRD;
         }
 
         this.seconds =  secs;
@@ -167,10 +169,6 @@ public final class MachineTime<U>
     /**
      * <p>Creates a machine time duration on the POSIX scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
      * @param   amount of units
      * @param   unit    helps to interprete given amount
      * @return  new machine time duration
@@ -179,10 +177,6 @@ public final class MachineTime<U>
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der POSIX-Skala. </p>
-     *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
      *
      * @param   amount of units
      * @param   unit    helps to interprete given amount
@@ -197,28 +191,24 @@ public final class MachineTime<U>
 
         if (unit.compareTo(TimeUnit.SECONDS) >= 0) {
             long secs =
-                MathUtils.safeMultiply(
+                Math.multiplyExact(
                     amount,
                     TimeUnit.SECONDS.convert(1, unit));
             return ofPosixUnits(secs, 0);
         }
 
         long total =
-            MathUtils.safeMultiply(
+            Math.multiplyExact(
                 amount,
                 TimeUnit.NANOSECONDS.convert(1, unit));
-        long secs = MathUtils.floorDivide(total, MRD);
-        int fraction = MathUtils.floorModulo(total, MRD);
+        long secs = Math.floorDiv(total, MRD);
+        int fraction = (int) Math.floorMod(total, MRD);
         return ofPosixUnits(secs, fraction);
 
     }
 
     /**
      * <p>Creates a machine time duration on the UTC scale. </p>
-     *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
      *
      * @param   amount of units
      * @param   unit    helps to interprete given amount
@@ -227,10 +217,6 @@ public final class MachineTime<U>
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
-     *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
      *
      * @param   amount of units
      * @param   unit    helps to interprete given amount
@@ -246,8 +232,8 @@ public final class MachineTime<U>
             case SECONDS:
                 return ofSIUnits(amount, 0);
             case NANOSECONDS:
-                long secs = MathUtils.floorDivide(amount, MRD);
-                int fraction = MathUtils.floorModulo(amount, MRD);
+                long secs = Math.floorDiv(amount, MRD);
+                int fraction = (int) Math.floorMod(amount, MRD);
                 return ofSIUnits(secs, fraction);
             default:
                 throw new UnsupportedOperationException(unit.name());
@@ -258,10 +244,6 @@ public final class MachineTime<U>
     /**
      * <p>Creates a machine time duration on the POSIX scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
      * @param   seconds     POSIX-seconds
      * @param   fraction    nanosecond part
      * @return  new machine time duration
@@ -270,10 +252,6 @@ public final class MachineTime<U>
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der POSIX-Skala. </p>
-     *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
      *
      * @param   seconds     POSIX-seconds
      * @param   fraction    nanosecond part
@@ -297,10 +275,6 @@ public final class MachineTime<U>
     /**
      * <p>Creates a machine time duration on the UTC scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
      * @param   seconds     SI-seconds
      * @param   fraction    nanosecond part
      * @return  new machine time duration
@@ -309,10 +283,6 @@ public final class MachineTime<U>
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
-     *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
      *
      * @param   seconds     SI-seconds
      * @param   fraction    nanosecond part
@@ -334,26 +304,18 @@ public final class MachineTime<U>
     }
 
     /**
-     * <p>Creates a machine time duration on the UTC scale. </p>
+     * <p>Creates a machine time duration on the POSIX scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
-     * @param   seconds     decimal SI-seconds
+     * @param   seconds     decimal POSIX-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @throws  IllegalArgumentException if the argument is infinite or NaN
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
+     * <p>Erzeugt eine Dauer als Maschinenzeit auf der POSIX-Skala. </p>
      *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
-     *
-     * @param   seconds     decimal SI-seconds
+     * @param   seconds     decimal POSIX-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @throws  IllegalArgumentException if the argument is infinite or NaN
@@ -372,25 +334,17 @@ public final class MachineTime<U>
     }
 
     /**
-     * <p>Creates a machine time duration on the UTC scale. </p>
+     * <p>Creates a machine time duration on the POSIX scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
-     * @param   seconds     decimal SI-seconds
+     * @param   seconds     decimal POSIX-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
+     * <p>Erzeugt eine Dauer als Maschinenzeit auf der POSIX-Skala. </p>
      *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
-     *
-     * @param   seconds     decimal SI-seconds
+     * @param   seconds     decimal POSIX-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
      * @since   2.0
@@ -410,10 +364,6 @@ public final class MachineTime<U>
     /**
      * <p>Creates a machine time duration on the UTC scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
@@ -422,10 +372,6 @@ public final class MachineTime<U>
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
-     *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
      *
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
@@ -448,10 +394,6 @@ public final class MachineTime<U>
     /**
      * <p>Creates a machine time duration on the UTC scale. </p>
      *
-     * <p>If there is a subsecond fraction then the result will be
-     * normalized such that the nanosecond part is always in the range
-     * {@code 0-999999999}. </p>
-     *
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
      * @throws  ArithmeticException in case of numerical overflow
@@ -459,10 +401,6 @@ public final class MachineTime<U>
      */
     /*[deutsch]
      * <p>Erzeugt eine Dauer als Maschinenzeit auf der UTC-Skala. </p>
-     *
-     * <p>Wenn es einen Sekundenbruchteil gibt, dann wird das Ergebnis
-     * immer so normalisiert sein, da&szlig; der Nanosekundenteil in
-     * den Bereich {@code 0-999999999} f&auml;llt. </p>
      *
      * @param   seconds     decimal SI-seconds
      * @return  new machine time duration
@@ -482,38 +420,62 @@ public final class MachineTime<U>
     }
 
     /**
-     * <p>Yields the seconds of this duration. </p>
+     * <p>Yields the normalized seconds of this duration. </p>
+     *
+     * <p>The normalization happens in case of a negative duration such that any fraction part
+     * falls into the range {@code 0-999999999}. In this case, following expression is NOT true:
+     * {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
      *
      * @return  long
+     * @see     #getFraction()
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Liefert die Sekunden dieser Dauer. </p>
+     * <p>Liefert die normalisierten Sekunden dieser Dauer. </p>
+     *
+     * <p>Die Normalisierung geschieht im Fall einer negativen Dauer so, da&szlig; ein Sekundenbruchteil
+     * immer in den Bereich {@code 0-999999999} f&auml;llt. In diesem Fall ist folgender Ausdruck NICHT
+     * wahr: {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
      *
      * @return  long
+     * @see     #getFraction()
      * @since   2.0
      */
     public long getSeconds() {
 
-        return this.seconds;
+        long secs = this.seconds;
+
+        if (this.nanos < 0) {
+            secs--;
+        }
+
+        return secs;
 
     }
 
     /**
-     * <p>Yields the nanosecond fraction of this duration. </p>
+     * <p>Yields the normalized nanosecond fraction of this duration. </p>
      *
      * @return  nanosecond in range {@code 0-999999999}
+     * @see     #getSeconds()
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Liefert den Nanosekundenteil dieser Dauer. </p>
+     * <p>Liefert den normalisierten Nanosekundenteil dieser Dauer. </p>
      *
      * @return  nanosecond in range {@code 0-999999999}
+     * @see     #getSeconds()
      * @since   2.0
      */
     public int getFraction() {
 
-        return this.nanos;
+        int n = this.nanos;
+
+        if (n < 0) {
+            n += MRD;
+        }
+
+        return n;
 
     }
 
@@ -546,7 +508,7 @@ public final class MachineTime<U>
             tmp.add(Item.of(Math.abs(this.seconds), unit));
         }
 
-        if (this.nanos > 0) {
+        if (this.nanos != 0) {
             Object u =
                 ((this.scale == UTC) ? SI.NANOSECONDS : TimeUnit.NANOSECONDS);
             U unit = cast(u);
@@ -569,7 +531,7 @@ public final class MachineTime<U>
             ((this.scale == POSIX) && TimeUnit.NANOSECONDS.equals(unit))
             || ((this.scale == UTC) && SI.NANOSECONDS.equals(unit))
         ) {
-            return (this.nanos > 0);
+            return (this.nanos != 0);
         }
 
         return false;
@@ -588,7 +550,7 @@ public final class MachineTime<U>
             ((this.scale == POSIX) && TimeUnit.NANOSECONDS.equals(unit))
             || ((this.scale == UTC) && SI.NANOSECONDS.equals(unit))
         ) {
-            return this.nanos;
+            return Math.abs(this.nanos);
         }
 
         return 0;
@@ -598,16 +560,14 @@ public final class MachineTime<U>
     @Override
     public boolean isNegative() {
 
-        return (this.seconds < 0);
+        return ((this.seconds < 0) || (this.nanos < 0));
 
     }
 
     @Override
     public boolean isPositive() {
 
-        return (
-            (this.seconds > 0)
-            || ((this.seconds == 0) && (this.nanos > 0)));
+        return ((this.seconds > 0) || (this.nanos > 0));
 
     }
 
@@ -649,32 +609,32 @@ public final class MachineTime<U>
 
             if (u.compareTo(TimeUnit.SECONDS) >= 0) {
                 s =
-                    MathUtils.safeAdd(
+                    Math.addExact(
                         s,
-                        MathUtils.safeMultiply(
+                        Math.multiplyExact(
                             amount,
                             TimeUnit.SECONDS.convert(1, u))
                     );
             } else {
                 long total =
-                    MathUtils.safeAdd(
+                    Math.addExact(
                         f,
-                        MathUtils.safeMultiply(
+                        Math.multiplyExact(
                             amount,
                             TimeUnit.NANOSECONDS.convert(1, u))
                     );
-                s = MathUtils.safeAdd(s, MathUtils.floorDivide(total, MRD));
-                f = MathUtils.floorModulo(total, MRD);
+                s = Math.addExact(s, Math.floorDiv(total, MRD));
+                f = (int) Math.floorMod(total, MRD);
             }
         } else {
             switch (SI.class.cast(unit)) {
                 case SECONDS:
-                    s = MathUtils.safeAdd(s, amount);
+                    s = Math.addExact(s, amount);
                     break;
                 case NANOSECONDS:
-                    long total = MathUtils.safeAdd(f, amount);
-                    s = MathUtils.safeAdd(s, MathUtils.floorDivide(total, MRD));
-                    f = MathUtils.floorModulo(total, MRD);
+                    long total = Math.addExact(f, amount);
+                    s = Math.addExact(s, Math.floorDiv(total, MRD));
+                    f = (int) Math.floorMod(total, MRD);
                     break;
                 default:
                     throw new UnsupportedOperationException(unit.toString());
@@ -709,7 +669,7 @@ public final class MachineTime<U>
             return duration;
         }
 
-        long s = MathUtils.safeAdd(this.seconds, duration.seconds);
+        long s = Math.addExact(this.seconds, duration.seconds);
         int f = this.nanos + duration.nanos;
         return new MachineTime<>(s, f, this.scale);
 
@@ -739,7 +699,7 @@ public final class MachineTime<U>
         U unit
     ) {
 
-        return this.plus(MathUtils.safeNegate(amount), unit);
+        return this.plus(Math.negateExact(amount), unit);
 
     }
 
@@ -768,7 +728,7 @@ public final class MachineTime<U>
             return duration.inverse();
         }
 
-        long s = MathUtils.safeSubtract(this.seconds, duration.seconds);
+        long s = Math.subtractExact(this.seconds, duration.seconds);
         int f = this.nanos - duration.nanos;
         return new MachineTime<>(s, f, this.scale);
 
@@ -792,7 +752,7 @@ public final class MachineTime<U>
 
         if (this.isNegative()) {
             return new MachineTime<>(
-                MathUtils.safeNegate(this.seconds), -this.nanos, this.scale);
+                Math.negateExact(this.seconds), -this.nanos, this.scale);
         } else {
             return this;
         }
@@ -821,7 +781,7 @@ public final class MachineTime<U>
         }
 
         return new MachineTime<>(
-            MathUtils.safeNegate(this.seconds), -this.nanos, this.scale);
+            Math.negateExact(this.seconds), -this.nanos, this.scale);
 
     }
 
@@ -904,18 +864,8 @@ public final class MachineTime<U>
             return time.plus(this.seconds, s).plus(this.nanos, f);
         }
         
-        Object t = time;
-        
-        if (t instanceof Moment) {
-            Moment moment = (Moment) t;
-            Moment result =
-                moment.plus(this.seconds, SI.SECONDS)
-                      .plus(this.nanos, SI.NANOSECONDS);
-            return cast(result);
-        }
-
         throw new UnsupportedOperationException(
-            "Use 'Moment.plus(MachineTime<SI>)' instead.");
+            "Use 'Moment.plusReal(MachineTime<SI>)' instead.");
 
     }
 
@@ -928,18 +878,8 @@ public final class MachineTime<U>
             return time.minus(this.seconds, s).minus(this.nanos, f);
         }
         
-        Object t = time;
-        
-        if (t instanceof Moment) {
-            Moment moment = (Moment) t;
-            Moment result =
-                moment.minus(this.seconds, SI.SECONDS)
-                      .minus(this.nanos, SI.NANOSECONDS);
-            return cast(result);
-        }
-
         throw new UnsupportedOperationException(
-            "Use 'Moment.minus(MachineTime<SI>)' instead.");
+            "Use 'Moment.minusReal(MachineTime<SI>)' instead.");
 
     }
 
@@ -1069,14 +1009,12 @@ public final class MachineTime<U>
     }
 
     /**
-     * <p>Converts this machine time duration into a decimal number of
-     * seconds. </p>
+     * <p>Converts this machine time duration into a decimal number of seconds. </p>
      *
      * @return  BigDecimal
      */
     /*[deutsch]
-     * <p>Wandelt diese maschinelle Dauer in einen dezimalen Sekundenbetrag
-     * um. </p>
+     * <p>Wandelt diese maschinelle Dauer in einen dezimalen Sekundenbetrag um. </p>
      *
      * @return  BigDecimal
      */
@@ -1092,22 +1030,14 @@ public final class MachineTime<U>
 
         if (this.isNegative()) {
             sb.append('-');
-            long s = this.seconds;
-            if (this.nanos > 0) {
-                s++;
-            }
-            sb.append(Math.abs(s));
+            sb.append(Math.abs(this.seconds));
         } else {
             sb.append(this.seconds);
         }
 
-        if (this.nanos > 0) {
+        if (this.nanos != 0) {
             sb.append('.');
-            int f = this.nanos;
-            if (this.isNegative()) {
-                f = MRD - f;
-            }
-            String fraction = String.valueOf(f);
+            String fraction = String.valueOf(Math.abs(this.nanos));
             for (int i = 9 - fraction.length(); i > 0; i--) {
                 sb.append('0');
             }
@@ -1137,15 +1067,15 @@ public final class MachineTime<U>
      * Schematic algorithm:
      *
      * <pre>
-           byte header = (7 &lt;&lt; 2);
-           if (scale == TimeScale.UTC) header |= 1;
-           if (this.getFraction() &gt; 0) header |= 2;
-           out.writeByte(header);
-           out.writeLong(getSeconds());
-           if (this.getFraction() &gt; 0) {
-               out.writeInt(getFraction());
-           }
-      </pre>
+     *      byte header = (7 &lt;&lt; 2);
+     *      if (scale == TimeScale.UTC) header |= 1;
+     *      if (this.getFraction() &gt; 0) header |= 2;
+     *      out.writeByte(header);
+     *      out.writeLong(getSeconds());
+     *      if (this.getFraction() &gt; 0) {
+     *          out.writeInt(getFraction());
+     *      }
+     * </pre>
      *
      * @return  replacement object in serialization graph
      */
