@@ -270,9 +270,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
         try {
             return timeSpan.addTo(this.getContext());
         } catch (IllegalArgumentException iae) {
-            ArithmeticException ex =
-                new ArithmeticException(
-                    "Result beyond boundaries of time axis.");
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
             ex.initCause(iae);
             throw ex;
         }
@@ -314,9 +312,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
         try {
             return timeSpan.subtractFrom(this.getContext());
         } catch (IllegalArgumentException iae) {
-            ArithmeticException ex =
-                new ArithmeticException(
-                    "Result beyond boundaries of time axis.");
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
             ex.initCause(iae);
             throw ex;
         }
@@ -389,11 +385,9 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
         }
 
         try {
-            return this.getRule(unit).addTo(this.getContext(), amount);
+            return this.getChronology().getRule(unit).addTo(this.getContext(), amount);
         } catch (IllegalArgumentException iae) {
-            ArithmeticException ex =
-                new ArithmeticException(
-                    "Result beyond boundaries of time axis.");
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
             ex.initCause(iae);
             throw ex;
         }
@@ -538,7 +532,7 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
         U unit
     ) {
 
-        return this.getRule(unit).between(this.getContext(), end);
+        return this.getChronology().getRule(unit).between(this.getContext(), end);
 
     }
 
@@ -680,12 +674,5 @@ public abstract class TimePoint<U, T extends TimePoint<U, T>>
      */
     @Override
     protected abstract TimeAxis<U, T> getChronology();
-
-    // Einheitsregel
-    private UnitRule<T> getRule(U unit) {
-
-        return this.getChronology().getRule(unit);
-
-    }
 
 }

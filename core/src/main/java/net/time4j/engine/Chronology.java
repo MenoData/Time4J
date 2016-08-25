@@ -29,6 +29,7 @@ import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -104,7 +105,7 @@ public class Chronology<T extends ChronoEntity<T>>
         Map<ChronoElement<?>, IntElementRule<T>> tmpRules = new HashMap<>();
 
         for (ChronoElement<?> element : this.ruleMap.keySet()) {
-            if (element.getType() == Integer.class) {
+            if ((element.getType() == Integer.class) && isSingleton(element)) {
                 Object rule = this.ruleMap.get(element);
                 if (rule instanceof IntElementRule) {
                     tmpRules.put(element, (IntElementRule<T>) rule);
@@ -112,7 +113,9 @@ public class Chronology<T extends ChronoEntity<T>>
             }
         }
 
-        this.intRules = Collections.unmodifiableMap(tmpRules);
+        Map<ChronoElement<?>, IntElementRule<T>> intRules = new IdentityHashMap<>(tmpRules.size());
+        intRules.putAll(tmpRules);
+        this.intRules = intRules;
 
     }
 
@@ -491,6 +494,16 @@ public class Chronology<T extends ChronoEntity<T>>
         }
 
         return null;
+
+    }
+
+    private static boolean isSingleton(ChronoElement<?> element) {
+
+        if (element instanceof BasicElement) {
+            return BasicElement.class.cast(element).isSingleton();
+        }
+
+        return false;
 
     }
 

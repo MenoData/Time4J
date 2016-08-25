@@ -26,6 +26,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -81,12 +82,20 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         T min,
         T max,
         CalendarSystem<T> calendarSystem, // optional
-        TimeLine<T> timeline // optional
+        TimeLine<T> timeline, // optional
+        boolean useEnumUnits
     ) {
         super(chronoType, merger, ruleMap, extensions);
 
+        Map<U, UnitRule<T>> uRules = unitRules;
+
+        if (useEnumUnits) {
+            uRules = new IdentityHashMap<>(unitRules.size());
+            uRules.putAll(unitRules);
+        }
+
         this.unitType = unitType;
-        this.unitRules = Collections.unmodifiableMap(unitRules);
+        this.unitRules = uRules;
         this.unitLengths = Collections.unmodifiableMap(unitLengths);
         this.convertibleUnits = Collections.unmodifiableMap(convertibleUnits);
         this.baseUnits = Collections.unmodifiableMap(baseUnits);
@@ -140,7 +149,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      */
     public Set<U> getRegisteredUnits() {
 
-        return this.unitRules.keySet();
+        return Collections.unmodifiableSet(this.unitRules.keySet());
 
     }
 
@@ -515,16 +524,18 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             throw new NullPointerException("Missing chronological unit.");
         }
 
-        if (this.isRegistered(unit)) {
-            return this.unitRules.get(unit);
-        } else if (unit instanceof BasicUnit) {
-            UnitRule<T> rule = BasicUnit.class.cast(unit).derive(this);
-            if (rule != null) {
-                return rule;
+        UnitRule<T> rule = this.unitRules.get(unit);
+
+        if (rule == null) {
+            if (unit instanceof BasicUnit) {
+                rule = BasicUnit.class.cast(unit).derive(this);
+            }
+            if (rule == null) {
+                throw new RuleNotFoundException(this, unit);
             }
         }
 
-        throw new RuleNotFoundException(this, unit);
+        return rule;
 
     }
 
@@ -594,6 +605,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         private final T max;
         private final CalendarSystem<T> calendarSystem;
         private TimeLine<T> timeline = null;
+        private boolean useEnumUnits = true;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -941,6 +953,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                 throw new IllegalArgumentException("Infinite: " + length);
             }
 
+            this.useEnumUnits = this.useEnumUnits && (unit instanceof Enum);
             this.unitRules.put(unit, rule);
             this.unitLengths.put(unit, length);
             Set<U> set = new HashSet<>(convertibleUnits);
@@ -1020,7 +1033,8 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
                     this.min,
                     this.max,
                     this.calendarSystem,
-                    this.timeline
+                    this.timeline,
+                    this.useEnumUnits
                 );
 
             Chronology.register(engine);
@@ -1166,7 +1180,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing value.");
+                throw new IllegalArgumentException("Missing value.");
             }
 
             return value;
