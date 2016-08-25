@@ -308,10 +308,23 @@ public class MachineTimeTest {
     }
 
     @Test
+    public void getPartialAmount() {
+        assertThat(
+            MachineTime.ofSIUnits(-1, -123456789).getPartialAmount(SI.SECONDS),
+            is(1L));
+        assertThat(
+            MachineTime.ofSIUnits(-2, MRD -123456789).getPartialAmount(SI.SECONDS),
+            is(1L));
+    }
+
+    @Test
     public void getSeconds() {
         assertThat(
             MachineTime.ofSIUnits(1, 123456789).getSeconds(),
             is(1L));
+        assertThat(
+            MachineTime.ofSIUnits(-1, -123456789).getSeconds(),
+            is(-2L));
     }
 
     @Test
@@ -319,6 +332,9 @@ public class MachineTimeTest {
         assertThat(
             MachineTime.ofSIUnits(1, 123456789).getFraction(),
             is(123456789));
+        assertThat(
+            MachineTime.ofSIUnits(-1, -123456789).getFraction(),
+            is(MRD - 123456789));
     }
 
     @Test
@@ -346,12 +362,19 @@ public class MachineTimeTest {
             MachineTime.ofPosixUnits(1, 1).contains(TimeUnit.SECONDS),
             is(true));
         assertThat(
-            MachineTime.of(1, TimeUnit.MILLISECONDS)
-                .contains(TimeUnit.MILLISECONDS),
+            MachineTime.ofPosixUnits(0, -1).contains(TimeUnit.SECONDS),
             is(false));
         assertThat(
-            MachineTime.of(1, TimeUnit.MICROSECONDS)
-                .contains(TimeUnit.MICROSECONDS),
+            MachineTime.ofPosixUnits(0, -1000000000).contains(TimeUnit.SECONDS),
+            is(true));
+        assertThat(
+            MachineTime.ofPosixUnits(0, -1000000000).contains(TimeUnit.NANOSECONDS),
+            is(false));
+        assertThat(
+            MachineTime.of(1, TimeUnit.MILLISECONDS).contains(TimeUnit.MILLISECONDS),
+            is(false));
+        assertThat(
+            MachineTime.of(1, TimeUnit.MICROSECONDS).contains(TimeUnit.MICROSECONDS),
             is(false));
         assertThat(
             MachineTime.ofPosixUnits(1, 1).contains(TimeUnit.NANOSECONDS),
