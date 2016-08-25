@@ -2103,6 +2103,11 @@ public final class Moment
         private long extractValue() {
 
             Object obj = ValueOperator.class.cast(this.delegate).getValue();
+
+            if (obj == null) {
+                throw new IllegalArgumentException("Missing new element value.");
+            }
+
             return Number.class.cast(obj).longValue();
 
         }
@@ -2352,6 +2357,10 @@ public final class Moment
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing elapsed seconds.");
+            }
+
             return Moment.of(
                 value.longValue(),
                 context.getNanosecond(),
@@ -2492,6 +2501,10 @@ public final class Moment
             Integer value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing fraction value.");
+            }
 
             if (LeapSeconds.getInstance().isEnabled()) {
                 return Moment.of(
@@ -2811,6 +2824,10 @@ public final class Moment
             TimeUnit value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing precision.");
+            }
 
             Moment result;
 

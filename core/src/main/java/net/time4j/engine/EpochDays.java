@@ -388,6 +388,10 @@ public enum EpochDays
             Long value
         ) {
 
+            if (value == null) {
+                return false;
+            }
+
             long days =
                 MathUtils.safeSubtract(
                     EpochDays.UNIX.transform(value.longValue(), this.element),
@@ -407,6 +411,10 @@ public enum EpochDays
             Long value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing epoch day value.");
+            }
 
             long utcDays =
                 MathUtils.safeSubtract(

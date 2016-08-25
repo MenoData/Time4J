@@ -1283,6 +1283,10 @@ public final class EthiopianTime
             PlainTime value,
             boolean lenient
         ) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing time value.");
+            }
+
             return EthiopianTime.from(value);
         }
 
@@ -1317,7 +1321,7 @@ public final class EthiopianTime
             int h = context.hour24;
 
             if (value == null) {
-                throw new NullPointerException("Missing am/pm-value.");
+                throw new IllegalArgumentException("Missing am/pm-value.");
             } else if (value == Meridiem.AM) {
                 if (h >= 12) {
                     h -= 12;
@@ -1482,6 +1486,10 @@ public final class EthiopianTime
             EthiopianTime context,
             Integer value
         ) {
+            if (value == null) {
+                return false;
+            }
+
             return (
                 (this.getMinimum(context).compareTo(value) <= 0)
                 && (this.getMaximum(context).compareTo(value) >= 0)
@@ -1494,6 +1502,10 @@ public final class EthiopianTime
             Integer value,
             boolean lenient
         ) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
+
             int v = value.intValue();
 
             switch (this.index) {

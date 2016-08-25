@@ -705,6 +705,10 @@ final class HistoricIntegerElement
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing historic element value.");
+            }
+
             HistoricDate newHD = this.adjust(context, value.intValue());
             return context.with(PlainDate.COMPONENT, this.history.convert(newHD));
 

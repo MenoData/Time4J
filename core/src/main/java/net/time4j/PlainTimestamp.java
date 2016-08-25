@@ -1563,13 +1563,14 @@ public final class PlainTimestamp
             V value
         ) {
 
+            if (value == null) {
+                return false;
+            }
+
             if (this.element.isDateElement()) {
                 return context.date.isValid(this.element, value);
             } else if (this.element.isTimeElement()) {
                 if (Number.class.isAssignableFrom(this.element.getType())) {
-                    if (value == null) {
-                        return false;
-                    }
                     long min = this.toNumber(this.element.getDefaultMinimum());
                     long max = this.toNumber(this.element.getDefaultMaximum());
                     long val = this.toNumber(value);
@@ -1596,6 +1597,10 @@ public final class PlainTimestamp
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
+
             if (value.equals(this.getValue(context))) {
                 return context;
             } else if (lenient) { // nur auf numerischen Elementen definiert
@@ -1613,15 +1618,13 @@ public final class PlainTimestamp
                     long max = this.toNumber(this.element.getDefaultMaximum());
                     long val = this.toNumber(value);
                     if ((min > val) || (max < val)) {
-                        throw new IllegalArgumentException(
-                            "Out of range: " + value);
+                        throw new IllegalArgumentException("Out of range: " + value);
                     }
                 } else if (
                     this.element.equals(WALL_TIME)
                     && value.equals(PlainTime.MAX)
                 ) {
-                    throw new IllegalArgumentException(
-                        "Out of range: " + value);
+                    throw new IllegalArgumentException("Out of range: " + value);
                 }
 
                 PlainTime time = context.time.with(this.element, value);

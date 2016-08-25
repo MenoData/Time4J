@@ -127,7 +127,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfDayNull() {
         this.utc.with(MINUTE_OF_DAY.newValue(null).atUTC());
     }
@@ -156,7 +156,7 @@ public class MomentPropertiesTest {
             is(this.utc.minus(1, SI.SECONDS)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withSecondOfDayNull() {
         this.utc.with(SECOND_OF_DAY.newValue(null).atUTC());
     }
@@ -188,7 +188,7 @@ public class MomentPropertiesTest {
                     .minus(1, SI.SECONDS)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMilliOfDayNull() {
         this.utc.with(MILLI_OF_DAY.newValue(null).atUTC());
     }
@@ -220,7 +220,7 @@ public class MomentPropertiesTest {
                     .minus(1, SI.SECONDS)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfDayNull() {
         this.utc.with(MICRO_OF_DAY.newValue(null).atUTC());
     }
@@ -252,7 +252,7 @@ public class MomentPropertiesTest {
                     .minus(1, SI.SECONDS)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withNanoOfDayNull() {
         this.utc.with(NANO_OF_DAY.newValue(null).atUTC());
     }
@@ -279,7 +279,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withIsoHourNull() {
         this.utc.with(ISO_HOUR.newValue(null).atUTC());
     }
@@ -308,7 +308,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfHourNull() {
         this.utc.with(MINUTE_OF_HOUR.newValue(null).atUTC());
     }
@@ -337,7 +337,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withSecondOfMinuteNull() {
         this.utc.with(SECOND_OF_MINUTE.newValue(null).atUTC());
     }
@@ -367,7 +367,7 @@ public class MomentPropertiesTest {
             is(this.utc.plus((999 - 123) * MIO, SI.NANOSECONDS)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMilliOfSecondNull() {
         this.utc.with(MILLI_OF_SECOND.newValue(null).atUTC());
     }
@@ -396,7 +396,7 @@ public class MomentPropertiesTest {
             is(this.utc.plus((999999 - 123456) * 1000, SI.NANOSECONDS)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfSecondNull() {
         this.utc.with(MICRO_OF_SECOND.newValue(null).atUTC());
     }
@@ -425,7 +425,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withNanoOfSecondNull() {
         this.utc.with(NANO_OF_SECOND.newValue(null).atUTC());
     }
@@ -457,7 +457,7 @@ public class MomentPropertiesTest {
                     .inTimezone(ZonalOffset.UTC)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfAmPmNull() {
         this.utc.with(CLOCK_HOUR_OF_AMPM.newValue(null).atUTC());
     }
@@ -486,7 +486,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfDayNull() {
         this.utc.with(CLOCK_HOUR_OF_DAY.newValue(null).atUTC());
     }
@@ -515,7 +515,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfAmPmNull() {
         this.utc.with(DIGITAL_HOUR_OF_AMPM.newValue(null).atUTC());
     }
@@ -544,7 +544,7 @@ public class MomentPropertiesTest {
             is(this.utc));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfDayNull() {
         this.utc.with(DIGITAL_HOUR_OF_DAY.newValue(null).atUTC());
     }

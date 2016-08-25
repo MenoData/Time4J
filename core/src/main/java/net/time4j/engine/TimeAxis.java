@@ -1172,7 +1172,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing value.");
+                throw new IllegalArgumentException("Missing value.");
             }
 
             return value;

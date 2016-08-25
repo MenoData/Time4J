@@ -2619,7 +2619,7 @@ public final class PlainDate
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing date value.");
+                throw new IllegalArgumentException("Missing date value.");
             }
 
             return value;
@@ -2731,6 +2731,10 @@ public final class PlainDate
             Integer value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
 
             return this.withValue(context, value.intValue(), lenient);
 
@@ -3011,6 +3015,10 @@ public final class PlainDate
             V value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
 
             switch (this.index) {
                 case EnumElement.MONTH:

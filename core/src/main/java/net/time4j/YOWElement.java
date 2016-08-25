@@ -453,6 +453,10 @@ final class YOWElement
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
+
             PlainDate date = context.get(CALENDAR_DATE);
             date = setYearOfWeekdate(date, value.intValue());
             return context.with(CALENDAR_DATE, date);

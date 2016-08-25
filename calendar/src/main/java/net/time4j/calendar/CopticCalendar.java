@@ -1116,6 +1116,10 @@ public final class CopticCalendar
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing month.");
+            }
+
             int m = value.getValue();
             int dmax = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, context.cyear, m);
             int d = Math.min(context.cdom, dmax);
@@ -1248,6 +1252,10 @@ public final class CopticCalendar
             Weekday value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing weekday.");
+            }
 
             Weekmodel model = Weekmodel.of(Weekday.SATURDAY, 1);
             int oldValue = context.getDayOfWeek().getValue(model);

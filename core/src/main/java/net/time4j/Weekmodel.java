@@ -1253,6 +1253,10 @@ public final class Weekmodel
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing weekday.");
+            }
+
             PlainDate date = context.get(CALENDAR_DATE);
             long utcDays = date.getDaysSinceUTC();
             Weekday current = getDayOfWeek(utcDays);
@@ -1538,22 +1542,17 @@ public final class Weekmodel
             boolean lenient
         ) {
 
-            int v = value.intValue();
             PlainDate date = context.get(CALENDAR_DATE);
 
-            if (
-                !lenient
-                && !this.isValid(context, value)
-            ) {
+            if ((value == null) || (!lenient && !this.isValid(context, value))) {
                 throw new IllegalArgumentException(
-                    "Invalid value: " + v + " (context=" + context + ")");
+                    "Invalid value: " + value + " (context=" + context + ")");
             }
 
             return context.with(
                 CALENDAR_DATE,
-                this.setCalendarWeek(date, v)
+                this.setCalendarWeek(date, value.intValue())
             );
-
 
         }
 
@@ -1823,20 +1822,16 @@ public final class Weekmodel
             boolean lenient
         ) {
 
-            int v = value.intValue();
             PlainDate date = context.get(CALENDAR_DATE);
 
-            if (
-                !lenient
-                && !this.isValid(context, value)
-            ) {
+            if ((value == null) || (!lenient && !this.isValid(context, value))) {
                 throw new IllegalArgumentException(
-                    "Invalid value: " + v + " (context=" + context + ")");
+                    "Invalid value: " + value + " (context=" + context + ")");
             }
 
             return context.with(
                 CALENDAR_DATE,
-                this.setWeek(date, v)
+                this.setWeek(date, value.intValue())
             );
 
         }

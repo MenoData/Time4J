@@ -2220,7 +2220,7 @@ public final class PlainTime
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing time value.");
+                throw new IllegalArgumentException("Missing time value.");
             }
 
             return value;
@@ -2299,6 +2299,10 @@ public final class PlainTime
             ClockUnit value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing precision value.");
+            }
 
             int ordinal = value.ordinal();
 
@@ -2396,7 +2400,7 @@ public final class PlainTime
             int h = ((context.hour == 24) ? 0 : context.hour);
 
             if (value == null) {
-                throw new NullPointerException("Missing am/pm-value.");
+                throw new IllegalArgumentException("Missing am/pm-value.");
             } else if (value == Meridiem.AM) {
                 if (h >= 12) {
                     h -= 12;
@@ -2561,7 +2565,7 @@ public final class PlainTime
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing element value.");
+                throw new IllegalArgumentException("Missing element value.");
             } else if (lenient) {
                 return this.withValueInLenientMode(context, value.intValue());
             } else if (!this.isValid(context, value)) {
@@ -2864,7 +2868,7 @@ public final class PlainTime
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing element value.");
+                throw new IllegalArgumentException("Missing element value.");
             } else if (lenient) {
                 return this.withValueInLenientMode(context, value.longValue());
             } else if (!this.isValid(context, value)) {
@@ -3040,6 +3044,10 @@ public final class PlainTime
             BigDecimal bd,
             boolean lenient
         ) {
+
+            if (bd == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
 
             int h, m, s, f;
             long hv;

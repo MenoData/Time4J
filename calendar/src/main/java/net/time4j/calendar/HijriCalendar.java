@@ -1508,6 +1508,10 @@ public final class HijriCalendar
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing month.");
+            }
+
             int m = value.getValue();
             int dmax = context.getCalendarSystem().getLengthOfMonth(HijriEra.ANNO_HEGIRAE, context.hyear, m);
             int d = Math.min(context.hdom, dmax);
@@ -1640,6 +1644,10 @@ public final class HijriCalendar
             Weekday value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing weekday.");
+            }
 
             Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
             int oldValue = context.getDayOfWeek().getValue(model);
