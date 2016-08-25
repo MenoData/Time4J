@@ -242,6 +242,11 @@ public class DateCreationTest {
     }
 
     @Test
+    public void hasCalendarSystem() {
+        assertThat(PlainDate.axis().hasCalendarSystem(), is(true));
+    }
+
+    @Test
     public void ofEpochDays1() {
         assertThat(
             PlainDate.of(0, EpochDays.UTC),

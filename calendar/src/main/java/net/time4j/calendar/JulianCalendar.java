@@ -1113,6 +1113,10 @@ public final class JulianCalendar
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
+
             switch (this.index) {
                 case YEAR_INDEX:
                     int y = value.intValue();
@@ -1334,6 +1338,10 @@ public final class JulianCalendar
             HistoricDate value
         ) {
 
+            if (value == null) {
+                return false;
+            }
+
             return CALSYS.isValid(value.getEra(), value.getYearOfEra(), value.getMonth(), value.getDayOfMonth());
 
         }
@@ -1344,6 +1352,10 @@ public final class JulianCalendar
             HistoricDate value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing historic date value.");
+            }
 
             return JulianCalendar.of(value.getEra(), value.getYearOfEra(), value.getMonth(), value.getDayOfMonth());
 
@@ -1407,6 +1419,10 @@ public final class JulianCalendar
             Weekday value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing weekday.");
+            }
 
             Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
             int oldValue = context.getDayOfWeek().getValue(model);

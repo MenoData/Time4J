@@ -1234,6 +1234,10 @@ public final class EthiopianCalendar
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing month.");
+            }
+
             int m = value.getValue();
             int dmax = CALSYS.getLengthOfMonth(context.getEra(), context.getYear(), m);
             int d = Math.min(context.edom, dmax);
@@ -1501,6 +1505,10 @@ public final class EthiopianCalendar
             Weekday value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing weekday.");
+            }
 
             Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
             int oldValue = context.getDayOfWeek().getValue(model);

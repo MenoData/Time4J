@@ -28,6 +28,7 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.IntElementRule;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.NumericalElement;
 
@@ -382,32 +383,14 @@ final class YOWElement
     }
 
     private static class ERule<T extends ChronoEntity<T>>
-        implements ElementRule<T, Integer> {
+        implements IntElementRule<T> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
         public Integer getValue(T context) {
 
-            PlainDate date = context.get(CALENDAR_DATE);
-            int year = date.getYear();
-            int dayOfYear = date.getDayOfYear();
-            int wCurrent = getFirstCalendarWeekAsDayOfYear(date, 0);
-
-            if (wCurrent <= dayOfYear) {
-                if (((dayOfYear - wCurrent) / 7) + 1 >= 53) {
-                    int wNext =
-                        getFirstCalendarWeekAsDayOfYear(date, 1)
-                        + getLengthOfYear(date, 0);
-                    if (wNext <= dayOfYear) {
-                        year++;
-                    }
-                }
-            } else {
-                year--;
-            }
-
-            return Integer.valueOf(year);
+            return Integer.valueOf(this.getInt(context));
 
         }
 
@@ -450,6 +433,10 @@ final class YOWElement
             Integer value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
 
             PlainDate date = context.get(CALENDAR_DATE);
             date = setYearOfWeekdate(date, value.intValue());
@@ -504,6 +491,52 @@ final class YOWElement
             }
 
             return date.withDaysSinceUTC(unixDays - 2 * 365);
+
+        }
+
+        @Override
+        public int getInt(T context) {
+
+            PlainDate date = context.get(CALENDAR_DATE);
+            int year = date.getYear();
+            int dayOfYear = date.getDayOfYear();
+            int wCurrent = getFirstCalendarWeekAsDayOfYear(date, 0);
+
+            if (wCurrent <= dayOfYear) {
+                if (
+                    (((dayOfYear - wCurrent) / 7) + 1 >= 53)
+                    && (getFirstCalendarWeekAsDayOfYear(date, 1) + getLengthOfYear(date, 0) <= dayOfYear)
+                ) {
+                    year++;
+                }
+            } else {
+                year--;
+            }
+
+            return year;
+
+        }
+
+        @Override
+        public boolean isValid(
+            T context,
+            int value
+        ) {
+
+            return ((value >= GregorianMath.MIN_YEAR) && (value <= GregorianMath.MAX_YEAR));
+
+        }
+
+        @Override
+        public T withValue(
+            T context,
+            int value,
+            boolean lenient
+        ) {
+
+            PlainDate date = context.get(CALENDAR_DATE);
+            date = setYearOfWeekdate(date, value);
+            return context.with(CALENDAR_DATE, date);
 
         }
 

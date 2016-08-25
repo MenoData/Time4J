@@ -326,10 +326,9 @@ public enum EpochDays
      * @param   calsys      calendar system
      * @return  new element rule for this epoch reference
      */
-    <D extends ChronoEntity<D>>
-    ElementRule<D, Long> derive(CalendarSystem<D> calsys) {
+    <D extends ChronoEntity<D>> ElementRule<D, Long> derive(CalendarSystem<D> calsys) {
 
-        return new Rule<D>(this, calsys);
+        return new Rule<>(this, calsys);
 
     }
 
@@ -380,6 +379,10 @@ public enum EpochDays
             Long value
         ) {
 
+            if (value == null) {
+                return false;
+            }
+
             long days =
                 MathUtils.safeSubtract(
                     EpochDays.UNIX.transform(value.longValue(), this.element),
@@ -399,6 +402,10 @@ public enum EpochDays
             Long value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing epoch day value.");
+            }
 
             long utcDays =
                 MathUtils.safeSubtract(

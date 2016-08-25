@@ -176,7 +176,7 @@ public class TimePropertiesTest {
             is(value));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withWallTimeNull() {
         PlainTime.of(18, 44).with(WALL_TIME, null);
     }
@@ -287,7 +287,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(18, 44, 30, 123456789)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withPrecisionNull() {
         PlainTime.of(18, 44, 30, 123456789).with(PRECISION, null);
     }
@@ -363,7 +363,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(18, 44)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withAmPmNull() {
         PlainTime.of(18, 44).with(AM_PM_OF_DAY, null);
     }
@@ -451,7 +451,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(6, 44)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfDayNull() {
         PlainTime.of(18, 44).with(DIGITAL_HOUR_OF_DAY, null);
     }
@@ -550,7 +550,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(6)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfAmPmNull() {
         PlainTime.of(18, 44).with(DIGITAL_HOUR_OF_AMPM, null);
     }
@@ -646,7 +646,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(1, 44)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfDayNull() {
         PlainTime.of(18, 44).with(CLOCK_HOUR_OF_DAY, null);
     }
@@ -748,7 +748,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(0)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfAmPmNull() {
         PlainTime.of(18, 44).with(CLOCK_HOUR_OF_AMPM, null);
     }
@@ -862,7 +862,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withIsoHourNull() {
         PlainTime.of(18, 44).with(ISO_HOUR, null);
     }
@@ -957,7 +957,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfHourNull() {
         PlainTime.of(18, 44).with(MINUTE_OF_HOUR, null);
     }
@@ -1052,7 +1052,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withSecondOfMinuteNull() {
         PlainTime.of(18, 44).with(SECOND_OF_MINUTE, null);
     }
@@ -1162,7 +1162,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfDayNull() {
         PlainTime.of(18, 44).with(MINUTE_OF_DAY, null);
     }
@@ -1258,7 +1258,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withSecondOfDayNull() {
         PlainTime.of(18, 44).with(SECOND_OF_DAY, null);
     }
@@ -1351,7 +1351,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMilliOfSecondNull() {
         PlainTime.of(18, 44).with(MILLI_OF_SECOND, null);
     }
@@ -1456,7 +1456,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMilliOfDayNull() {
         PlainTime.of(18, 44).with(MILLI_OF_DAY, null);
     }
@@ -1549,7 +1549,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfSecondNull() {
         PlainTime.of(18, 44).with(MICRO_OF_SECOND, null);
     }
@@ -1654,7 +1654,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfDayNull() {
         PlainTime.of(18, 44).with(MICRO_OF_DAY, null);
     }
@@ -1754,7 +1754,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withNanoOfSecondNull() {
         PlainTime.of(18, 44).with(NANO_OF_SECOND, null);
     }
@@ -1851,7 +1851,7 @@ public class TimePropertiesTest {
             is(PlainTime.of(24)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withNanoOfDayNull() {
         PlainTime.of(18, 44).with(NANO_OF_DAY, null);
     }

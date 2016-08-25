@@ -126,7 +126,7 @@ public class DatePropertiesTest {
             is(value));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withCalendarDateNull() {
         PlainDate.of(2000, 1).with(CALENDAR_DATE, null);
     }
@@ -207,7 +207,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(-999999999, 2, 28)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withYearNull() {
         PlainDate.of(2000, 1).with(YEAR, null);
     }
@@ -303,7 +303,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(1996, 1, 2))); // 1996-W01-2
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withYearOfWeekdateNull() {
         PlainDate.of(2000, 1).with(YEAR_OF_WEEKDATE, null);
     }
@@ -374,7 +374,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2014, 12, 31)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withQuarterOfYearNull() {
         PlainDate.of(2000, 1).with(QUARTER_OF_YEAR, null);
     }
@@ -434,7 +434,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2012, 2, 29)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMonthOfYearNull() {
         PlainDate.of(2000, 1).with(MONTH_OF_YEAR, null);
     }
@@ -500,7 +500,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2014, 11, 30)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMonthAsNumberNull() {
         PlainDate.of(2000, 1).with(MONTH_AS_NUMBER, null);
     }
@@ -579,7 +579,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2012, 2, 7)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withWeekdayInMonthNull() {
         PlainDate.of(2012, 2, 28).with(WEEKDAY_IN_MONTH, null);
     }
@@ -683,7 +683,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2012, 2, 1)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDayOfMonthNull() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_MONTH, null);
     }
@@ -762,7 +762,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2012, 1, 1)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDayOfYearNull() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_YEAR, null);
     }
@@ -857,7 +857,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2013, 1, 6)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDayOfWeekNull() {
         PlainDate.of(2000, 1).with(DAY_OF_WEEK, null);
     }
@@ -953,7 +953,7 @@ public class DatePropertiesTest {
             is(PlainDate.of(2012, 9, 30)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDayOfQuarterNull() {
         PlainDate.of(2012, 2, 28).with(DAY_OF_QUARTER, null);
     }

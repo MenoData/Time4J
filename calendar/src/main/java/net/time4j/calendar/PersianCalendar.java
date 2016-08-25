@@ -1176,6 +1176,10 @@ public final class PersianCalendar
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing month.");
+            }
+
             int m = value.getValue();
             int dmax = CALSYS.getLengthOfMonth(PersianEra.ANNO_PERSICO, context.pyear, m);
             int d = Math.min(context.pdom, dmax);
@@ -1308,6 +1312,10 @@ public final class PersianCalendar
             Weekday value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing weekday.");
+            }
 
             Weekmodel model = Weekmodel.of(Weekday.SATURDAY, 1);
             int oldValue = context.getDayOfWeek().getValue(model);

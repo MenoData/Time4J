@@ -35,6 +35,7 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.IntElementRule;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.ThreetenAdapter;
@@ -238,11 +239,11 @@ public final class PlainTimestamp
                     DAYS)
                 .appendElement(
                     YEAR,
-                    FieldRule.of(YEAR),
+                    new IntFieldRule(YEAR),
                     YEARS)
                 .appendElement(
                     YEAR_OF_WEEKDATE,
-                    FieldRule.of(YEAR_OF_WEEKDATE),
+                    new IntFieldRule(YEAR_OF_WEEKDATE),
                     Weekcycle.YEARS)
                 .appendElement(
                     QUARTER_OF_YEAR,
@@ -254,11 +255,11 @@ public final class PlainTimestamp
                     MONTHS)
                 .appendElement(
                     MONTH_AS_NUMBER,
-                    FieldRule.of(MONTH_AS_NUMBER),
+                    new IntFieldRule(MONTH_AS_NUMBER),
                     MONTHS)
                 .appendElement(
                     DAY_OF_MONTH,
-                    FieldRule.of(DAY_OF_MONTH),
+                    new IntFieldRule(DAY_OF_MONTH),
                     DAYS)
                 .appendElement(
                     DAY_OF_WEEK,
@@ -266,15 +267,15 @@ public final class PlainTimestamp
                     DAYS)
                 .appendElement(
                     DAY_OF_YEAR,
-                    FieldRule.of(DAY_OF_YEAR),
+                    new IntFieldRule(DAY_OF_YEAR),
                     DAYS)
                 .appendElement(
                     DAY_OF_QUARTER,
-                    FieldRule.of(DAY_OF_QUARTER),
+                    new IntFieldRule(DAY_OF_QUARTER),
                     DAYS)
                 .appendElement(
                     WEEKDAY_IN_MONTH,
-                    FieldRule.of(WEEKDAY_IN_MONTH),
+                    new IntFieldRule(WEEKDAY_IN_MONTH),
                     WEEKS)
                 .appendElement(
                     WALL_TIME,
@@ -284,55 +285,55 @@ public final class PlainTimestamp
                     FieldRule.of(AM_PM_OF_DAY))
                 .appendElement(
                     CLOCK_HOUR_OF_AMPM,
-                    FieldRule.of(CLOCK_HOUR_OF_AMPM),
+                    new IntFieldRule(CLOCK_HOUR_OF_AMPM),
                     HOURS)
                 .appendElement(
                     CLOCK_HOUR_OF_DAY,
-                    FieldRule.of(CLOCK_HOUR_OF_DAY),
+                    new IntFieldRule(CLOCK_HOUR_OF_DAY),
                     HOURS)
                 .appendElement(
                     DIGITAL_HOUR_OF_AMPM,
-                    FieldRule.of(DIGITAL_HOUR_OF_AMPM),
+                    new IntFieldRule(DIGITAL_HOUR_OF_AMPM),
                     HOURS)
                 .appendElement(
                     DIGITAL_HOUR_OF_DAY,
-                    FieldRule.of(DIGITAL_HOUR_OF_DAY),
+                    new IntFieldRule(DIGITAL_HOUR_OF_DAY),
                     HOURS)
                 .appendElement(
                     ISO_HOUR,
-                    FieldRule.of(ISO_HOUR),
+                    new IntFieldRule(ISO_HOUR),
                     HOURS)
                 .appendElement(
                     MINUTE_OF_HOUR,
-                    FieldRule.of(MINUTE_OF_HOUR),
+                    new IntFieldRule(MINUTE_OF_HOUR),
                     MINUTES)
                 .appendElement(
                     MINUTE_OF_DAY,
-                    FieldRule.of(MINUTE_OF_DAY),
+                    new IntFieldRule(MINUTE_OF_DAY),
                     MINUTES)
                 .appendElement(
                     SECOND_OF_MINUTE,
-                    FieldRule.of(SECOND_OF_MINUTE),
+                    new IntFieldRule(SECOND_OF_MINUTE),
                     SECONDS)
                 .appendElement(
                     SECOND_OF_DAY,
-                    FieldRule.of(SECOND_OF_DAY),
+                    new IntFieldRule(SECOND_OF_DAY),
                     SECONDS)
                 .appendElement(
                     MILLI_OF_SECOND,
-                    FieldRule.of(MILLI_OF_SECOND),
+                    new IntFieldRule(MILLI_OF_SECOND),
                     MILLIS)
                 .appendElement(
                     MICRO_OF_SECOND,
-                    FieldRule.of(MICRO_OF_SECOND),
+                    new IntFieldRule(MICRO_OF_SECOND),
                     MICROS)
                 .appendElement(
                     NANO_OF_SECOND,
-                    FieldRule.of(NANO_OF_SECOND),
+                    new IntFieldRule(NANO_OF_SECOND),
                     NANOS)
                 .appendElement(
                     MILLI_OF_DAY,
-                    FieldRule.of(MILLI_OF_DAY),
+                    new IntFieldRule(MILLI_OF_DAY),
                     MILLIS)
                 .appendElement(
                     MICRO_OF_DAY,
@@ -1520,7 +1521,7 @@ public final class PlainTimestamp
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final ChronoElement<V> element;
+        final ChronoElement<V> element;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1587,13 +1588,14 @@ public final class PlainTimestamp
             V value
         ) {
 
+            if (value == null) {
+                return false;
+            }
+
             if (this.element.isDateElement()) {
                 return context.date.isValid(this.element, value);
             } else if (this.element.isTimeElement()) {
                 if (Number.class.isAssignableFrom(this.element.getType())) {
-                    if (value == null) {
-                        return false;
-                    }
                     long min = this.toNumber(this.element.getDefaultMinimum());
                     long max = this.toNumber(this.element.getDefaultMaximum());
                     long val = this.toNumber(value);
@@ -1620,6 +1622,10 @@ public final class PlainTimestamp
             boolean lenient
         ) {
 
+            if (value == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
+
             if (value.equals(this.getValue(context))) {
                 return context;
             } else if (lenient) { // nur auf numerischen Elementen definiert
@@ -1637,15 +1643,13 @@ public final class PlainTimestamp
                     long max = this.toNumber(this.element.getDefaultMaximum());
                     long val = this.toNumber(value);
                     if ((min > val) || (max < val)) {
-                        throw new IllegalArgumentException(
-                            "Out of range: " + value);
+                        throw new IllegalArgumentException("Out of range: " + value);
                     }
                 } else if (
                     this.element.equals(WALL_TIME)
                     && value.equals(PlainTime.MAX)
                 ) {
-                    throw new IllegalArgumentException(
-                        "Out of range: " + value);
+                    throw new IllegalArgumentException("Out of range: " + value);
                 }
 
                 PlainTime time = context.time.with(this.element, value);
@@ -1676,6 +1680,85 @@ public final class PlainTimestamp
         private long toNumber(V value) {
 
             return Number.class.cast(value).longValue();
+
+        }
+
+    }
+
+    private static class IntFieldRule
+        extends FieldRule<Integer>
+        implements IntElementRule<PlainTimestamp> {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private IntFieldRule(ChronoElement<Integer> element) {
+            super(element);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public int getInt(PlainTimestamp context) {
+
+            if (this.element.isDateElement()) {
+                return context.date.getInt(this.element);
+            } else if (this.element.isTimeElement()) {
+                return context.time.getInt(this.element);
+            }
+
+            throw new ChronoException(
+                "Missing rule for: " + this.element.name());
+
+        }
+
+        @Override
+        public boolean isValid(
+            PlainTimestamp context,
+            int value
+        ) {
+
+            if (this.element.isDateElement()) {
+                return context.date.isValid(this.element, value);
+            } else if (this.element.isTimeElement()) {
+                int min = this.element.getDefaultMinimum().intValue();
+                int max = this.element.getDefaultMaximum().intValue();
+                return ((min <= value) && (max >= value));
+            }
+
+            throw new ChronoException(
+                "Missing rule for: " + this.element.name());
+
+        }
+
+        @Override
+        public PlainTimestamp withValue(
+            PlainTimestamp context,
+            int value,
+            boolean lenient
+        ) {
+
+            if (value == this.getInt(context)) {
+                return context;
+            } else if (lenient) { // nur auf numerischen Elementen definiert
+                IsoUnit unit = ENGINE.getBaseUnit(this.element);
+                long amount = MathUtils.safeSubtract((long) value, this.getInt(context));
+                return context.plus(amount, unit);
+            } else if (this.element.isDateElement()) {
+                PlainDate date = context.date.with(this.element, value);
+                return PlainTimestamp.of(date, context.time);
+            } else if (this.element.isTimeElement()) {
+                int min = this.element.getDefaultMinimum().intValue();
+                int max = this.element.getDefaultMaximum().intValue();
+                if ((min > value) || (max < value)) {
+                    throw new IllegalArgumentException("Out of range: " + value);
+                }
+                PlainTime time = context.time.with(this.element, value);
+                return PlainTimestamp.of(context.date, time);
+            }
+
+            throw new ChronoException(
+                "Missing rule for: " + this.element.name());
 
         }
 

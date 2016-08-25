@@ -34,6 +34,7 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
+import net.time4j.engine.IntElementRule;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.ThreetenAdapter;
 import net.time4j.engine.TimeAxis;
@@ -2254,7 +2255,7 @@ public final class PlainTime
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing time value.");
+                throw new IllegalArgumentException("Missing time value.");
             }
 
             return value;
@@ -2333,6 +2334,10 @@ public final class PlainTime
             ClockUnit value,
             boolean lenient
         ) {
+
+            if (value == null) {
+                throw new IllegalArgumentException("Missing precision value.");
+            }
 
             int ordinal = value.ordinal();
 
@@ -2430,7 +2435,7 @@ public final class PlainTime
             int h = ((context.hour == 24) ? 0 : context.hour);
 
             if (value == null) {
-                throw new NullPointerException("Missing am/pm-value.");
+                throw new IllegalArgumentException("Missing am/pm-value.");
             } else if (value == Meridiem.AM) {
                 if (h >= 12) {
                     h -= 12;
@@ -2491,7 +2496,7 @@ public final class PlainTime
     }
 
     private static class IntegerElementRule
-        implements ElementRule<PlainTime, Integer> {
+        implements IntElementRule<PlainTime> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -2527,63 +2532,7 @@ public final class PlainTime
         @Override
         public Integer getValue(PlainTime context) {
 
-            int ret;
-
-            switch (this.index) {
-                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
-                    ret = (context.hour % 12);
-                    if (ret == 0) {
-                        ret = 12;
-                    }
-                    break;
-                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
-                    ret = context.hour % 24;
-                    if (ret == 0) {
-                        ret = 24;
-                    }
-                    break;
-                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
-                    ret = (context.hour % 12);
-                    break;
-                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
-                    ret = context.hour % 24;
-                    break;
-                case IntegerTimeElement.ISO_HOUR:
-                    ret = context.hour;
-                    break;
-                case IntegerTimeElement.MINUTE_OF_HOUR:
-                    ret = context.minute;
-                    break;
-                case IntegerTimeElement.MINUTE_OF_DAY:
-                    ret = context.hour * 60 + context.minute;
-                    break;
-                case IntegerTimeElement.SECOND_OF_MINUTE:
-                    ret = context.second;
-                    break;
-                case IntegerTimeElement.SECOND_OF_DAY:
-                    ret =
-                        context.hour * 3600
-                        + context.minute * 60
-                        + context.second;
-                    break;
-                case IntegerTimeElement.MILLI_OF_SECOND:
-                    ret = (context.nano / MIO);
-                    break;
-                case IntegerTimeElement.MICRO_OF_SECOND:
-                    ret = (context.nano / KILO);
-                    break;
-                case IntegerTimeElement.NANO_OF_SECOND:
-                    ret = context.nano;
-                    break;
-                case IntegerTimeElement.MILLI_OF_DAY:
-                    ret = (int) (context.getNanoOfDay() / MIO);
-                    break;
-                default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
-            }
-
-            return Integer.valueOf(ret);
+            return Integer.valueOf(this.getInt(context));
 
         }
 
@@ -2595,70 +2544,10 @@ public final class PlainTime
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing element value.");
-            } else if (lenient) {
-                return this.withValueInLenientMode(context, value.intValue());
-            } else if (!this.isValid(context, value)) {
-                throw new IllegalArgumentException(
-                    "Value out of range: " + value);
+                throw new IllegalArgumentException("Missing element value.");
             }
 
-            int h = context.hour;
-            int m = context.minute;
-            int s = context.second;
-            int f = context.nano;
-            int v = value.intValue();
-
-            switch (this.index) {
-                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
-                    v = ((v == 12) ? 0 : v);
-                    h = (isAM(context) ? v : (v + 12));
-                    break;
-                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
-                    h = ((v == 24) ? 0 : v);
-                    break;
-                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
-                    h = (isAM(context) ? v : (v + 12));
-                    break;
-                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
-                    h = v;
-                    break;
-                case IntegerTimeElement.ISO_HOUR:
-                    h = v;
-                    break;
-                case IntegerTimeElement.MINUTE_OF_HOUR:
-                    m = v;
-                    break;
-                case IntegerTimeElement.MINUTE_OF_DAY:
-                    h = v / 60;
-                    m = v % 60;
-                    break;
-                case IntegerTimeElement.SECOND_OF_MINUTE:
-                    s = v;
-                    break;
-                case IntegerTimeElement.SECOND_OF_DAY:
-                    h = v / 3600;
-                    int remainder = v % 3600;
-                    m = remainder / 60;
-                    s = remainder % 60;
-                    break;
-                case IntegerTimeElement.MILLI_OF_SECOND:
-                    f = v * MIO + (context.nano % MIO);
-                    break;
-                case IntegerTimeElement.MICRO_OF_SECOND:
-                    f = v * KILO + (context.nano % KILO);
-                    break;
-                case IntegerTimeElement.NANO_OF_SECOND:
-                    f = v;
-                    break;
-                case IntegerTimeElement.MILLI_OF_DAY:
-                    return PlainTime.createFromMillis(v, context.nano % MIO);
-                default:
-                    throw new UnsupportedOperationException(
-                        this.element.name());
-            }
-
-            return PlainTime.of(h, m, s, f);
+            return this.withValue(context, value.intValue(), lenient);
 
         }
 
@@ -2672,41 +2561,7 @@ public final class PlainTime
                 return false;
             }
 
-            int v = value.intValue();
-
-            if ((v < this.min) || (v > this.max)) {
-                return false;
-            }
-
-            if (v == this.max) {
-                switch (this.index) {
-                    case IntegerTimeElement.ISO_HOUR:
-                        return context.isFullHour();
-                    case IntegerTimeElement.MINUTE_OF_DAY:
-                        return context.isFullMinute();
-                    case IntegerTimeElement.SECOND_OF_DAY:
-                        return (context.nano == 0);
-                    case IntegerTimeElement.MILLI_OF_DAY:
-                        return ((context.nano % MIO) == 0);
-                    default:
-                        // no-op
-                }
-            }
-
-            if (context.hour == 24) {
-                switch (this.index) {
-                    case IntegerTimeElement.MINUTE_OF_HOUR:
-                    case IntegerTimeElement.SECOND_OF_MINUTE:
-                    case IntegerTimeElement.MILLI_OF_SECOND:
-                    case IntegerTimeElement.MICRO_OF_SECOND:
-                    case IntegerTimeElement.NANO_OF_SECOND:
-                        return (v == 0);
-                    default:
-                        // no-op
-                }
-            }
-
-            return true;
+            return this.isValid(context, value.intValue());
 
         }
 
@@ -2744,18 +2599,18 @@ public final class PlainTime
         @Override
         public ChronoElement<?> getChildAtFloor(PlainTime context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(PlainTime context) {
 
-            return this.getChild(context);
+            return this.getChild();
 
         }
 
-        private ChronoElement<?> getChild(PlainTime context) {
+        private ChronoElement<?> getChild() {
 
             switch (this.index) {
                 case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
@@ -2787,7 +2642,7 @@ public final class PlainTime
                 || (this.element == DIGITAL_HOUR_OF_AMPM)
             ) {
                 return context.plus(
-                    MathUtils.safeSubtract(value, context.get(this.element)),
+                    MathUtils.safeSubtract(value, context.getInt(this.element)),
                     ClockUnit.HOURS);
             } else if (this.element == MINUTE_OF_HOUR) {
                 return context.plus(
@@ -2824,16 +2679,14 @@ public final class PlainTime
                 if ((remainder == 0) && context.isFullMinute()) {
                     return (value > 0) ? PlainTime.MAX : PlainTime.MIN;
                 } else {
-                    return this.withValue(
-                        context, Integer.valueOf(remainder), false);
+                    return this.withValue(context, remainder, false);
                 }
             } else if (this.element == SECOND_OF_DAY) {
                 int remainder = MathUtils.floorModulo(value, 86400);
                 if ((remainder == 0) && (context.nano == 0)) {
                     return (value > 0) ? PlainTime.MAX : PlainTime.MIN;
                 } else {
-                    return this.withValue(
-                        context, Integer.valueOf(remainder), false);
+                    return this.withValue(context, remainder, false);
                 }
             } else {
                 throw new UnsupportedOperationException(this.element.name());
@@ -2844,6 +2697,165 @@ public final class PlainTime
         private static boolean isAM(PlainTime context) {
 
             return ((context.hour < 12) || (context.hour == 24));
+
+        }
+
+        @Override
+        public int getInt(PlainTime context) {
+
+            int ret;
+
+            switch (this.index) {
+                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
+                    ret = (context.hour % 12);
+                    if (ret == 0) {
+                        ret = 12;
+                    }
+                    return ret;
+                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
+                    ret = context.hour % 24;
+                    if (ret == 0) {
+                        ret = 24;
+                    }
+                    return ret;
+                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
+                    return (context.hour % 12);
+                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
+                    return context.hour % 24;
+                case IntegerTimeElement.ISO_HOUR:
+                    return context.hour;
+                case IntegerTimeElement.MINUTE_OF_HOUR:
+                    return context.minute;
+                case IntegerTimeElement.MINUTE_OF_DAY:
+                    return context.hour * 60 + context.minute;
+                case IntegerTimeElement.SECOND_OF_MINUTE:
+                    return context.second;
+                case IntegerTimeElement.SECOND_OF_DAY:
+                    return context.hour * 3600 + context.minute * 60 + context.second;
+                case IntegerTimeElement.MILLI_OF_SECOND:
+                    return (context.nano / MIO);
+                case IntegerTimeElement.MICRO_OF_SECOND:
+                    return (context.nano / KILO);
+                case IntegerTimeElement.NANO_OF_SECOND:
+                    return context.nano;
+                case IntegerTimeElement.MILLI_OF_DAY:
+                    return (int) (context.getNanoOfDay() / MIO);
+                default:
+                    throw new UnsupportedOperationException(
+                        this.element.name());
+            }
+
+        }
+
+        @Override
+        public boolean isValid(
+            PlainTime context,
+            int value
+        ) {
+
+            if ((value < this.min) || (value > this.max)) {
+                return false;
+            }
+
+            if (value == this.max) {
+                switch (this.index) {
+                    case IntegerTimeElement.ISO_HOUR:
+                        return context.isFullHour();
+                    case IntegerTimeElement.MINUTE_OF_DAY:
+                        return context.isFullMinute();
+                    case IntegerTimeElement.SECOND_OF_DAY:
+                        return (context.nano == 0);
+                    case IntegerTimeElement.MILLI_OF_DAY:
+                        return ((context.nano % MIO) == 0);
+                    default:
+                        // no-op
+                }
+            }
+
+            if (context.hour == 24) {
+                switch (this.index) {
+                    case IntegerTimeElement.MINUTE_OF_HOUR:
+                    case IntegerTimeElement.SECOND_OF_MINUTE:
+                    case IntegerTimeElement.MILLI_OF_SECOND:
+                    case IntegerTimeElement.MICRO_OF_SECOND:
+                    case IntegerTimeElement.NANO_OF_SECOND:
+                        return (value == 0);
+                    default:
+                        // no-op
+                }
+            }
+
+            return true;
+
+        }
+
+        @Override
+        public PlainTime withValue(
+            PlainTime context,
+            int value,
+            boolean lenient
+        ) {
+
+            if (lenient) {
+                return this.withValueInLenientMode(context, value);
+            } else if (!this.isValid(context, value)) {
+                throw new IllegalArgumentException("Value out of range: " + value);
+            }
+
+            int h = context.hour;
+            int m = context.minute;
+            int s = context.second;
+            int f = context.nano;
+
+            switch (this.index) {
+                case IntegerTimeElement.CLOCK_HOUR_OF_AMPM:
+                    value = ((value == 12) ? 0 : value);
+                    h = (isAM(context) ? value : (value + 12));
+                    break;
+                case IntegerTimeElement.CLOCK_HOUR_OF_DAY:
+                    h = ((value == 24) ? 0 : value);
+                    break;
+                case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
+                    h = (isAM(context) ? value : (value + 12));
+                    break;
+                case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
+                    h = value;
+                    break;
+                case IntegerTimeElement.ISO_HOUR:
+                    h = value;
+                    break;
+                case IntegerTimeElement.MINUTE_OF_HOUR:
+                    m = value;
+                    break;
+                case IntegerTimeElement.MINUTE_OF_DAY:
+                    h = value / 60;
+                    m = value % 60;
+                    break;
+                case IntegerTimeElement.SECOND_OF_MINUTE:
+                    s = value;
+                    break;
+                case IntegerTimeElement.SECOND_OF_DAY:
+                    h = value / 3600;
+                    int remainder = value % 3600;
+                    m = remainder / 60;
+                    s = remainder % 60;
+                    break;
+                case IntegerTimeElement.MILLI_OF_SECOND:
+                    f = value * MIO + (context.nano % MIO);
+                    break;
+                case IntegerTimeElement.MICRO_OF_SECOND:
+                    f = value * KILO + (context.nano % KILO);
+                    break;
+                case IntegerTimeElement.NANO_OF_SECOND:
+                    f = value;
+                    break;
+                case IntegerTimeElement.MILLI_OF_DAY:
+                    return PlainTime.createFromMillis(value, context.nano % MIO);
+                default:
+                    throw new UnsupportedOperationException(this.element.name());
+            }
+
+            return PlainTime.of(h, m, s, f);
 
         }
 
@@ -2898,7 +2910,7 @@ public final class PlainTime
         ) {
 
             if (value == null) {
-                throw new NullPointerException("Missing element value.");
+                throw new IllegalArgumentException("Missing element value.");
             } else if (lenient) {
                 return this.withValueInLenientMode(context, value.longValue());
             } else if (!this.isValid(context, value)) {
@@ -3074,6 +3086,10 @@ public final class PlainTime
             BigDecimal bd,
             boolean lenient
         ) {
+
+            if (bd == null) {
+                throw new IllegalArgumentException("Missing element value.");
+            }
 
             int h, m, s, f;
             long hv;

@@ -193,7 +193,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 17, 45, 30)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withWallTimeNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(WALL_TIME, null);
     }
@@ -257,7 +257,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 21, 15)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withAmPmNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(AM_PM_OF_DAY, null);
     }
@@ -321,7 +321,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 23, 59, 30)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MINUTE_OF_DAY, null);
     }
@@ -390,7 +390,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 23, 59, 59)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withSecondOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(SECOND_OF_DAY, null);
     }
@@ -463,7 +463,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(date, time)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMilliOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MILLI_OF_DAY, null);
     }
@@ -536,7 +536,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(date, time)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MICRO_OF_DAY, null);
     }
@@ -609,7 +609,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(date, time)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withNanoOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(NANO_OF_DAY, null);
     }
@@ -679,7 +679,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 23, 15)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withIsoHourNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(ISO_HOUR, null);
     }
@@ -748,7 +748,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 9, 59, 30)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMinuteOfHourNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MINUTE_OF_HOUR, null);
     }
@@ -817,7 +817,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 9, 15, 59)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withSecondOfMinuteNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(SECOND_OF_MINUTE, null);
     }
@@ -890,7 +890,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(date, time)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMilliOfSecondNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MILLI_OF_SECOND, null);
     }
@@ -963,7 +963,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(date, time)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withMicroOfSecondNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(MICRO_OF_SECOND, null);
     }
@@ -1036,7 +1036,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(date, time)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withNanoOfSecondNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(NANO_OF_SECOND, null);
     }
@@ -1111,7 +1111,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 0, 15)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfAmPmNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(CLOCK_HOUR_OF_AMPM, null);
     }
@@ -1186,7 +1186,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 0, 15)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withClockHourOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(CLOCK_HOUR_OF_DAY, null);
     }
@@ -1262,7 +1262,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 11, 15)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfAmPmNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(DIGITAL_HOUR_OF_AMPM, null);
     }
@@ -1341,7 +1341,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 23, 15)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withDigitalHourOfDayNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(DIGITAL_HOUR_OF_DAY, null);
     }
@@ -1407,7 +1407,7 @@ public class TimestampPropertiesTest {
             is(PlainTimestamp.of(2014, 4, 21, 9, 15, 0)));
     }
 
-    @Test(expected=NullPointerException.class)
+    @Test(expected=IllegalArgumentException.class)
     public void withPrecisionNull() {
         PlainTimestamp.of(2014, 4, 21, 9, 15).with(PRECISION, null);
     }

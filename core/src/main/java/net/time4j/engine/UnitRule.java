@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UnitRule.java) is part of project Time4J.
  *
@@ -64,8 +64,8 @@ public interface UnitRule<T> {
      *
      * @param   timepoint   time point
      * @param   amount      count of units to be added to
-     * @return  result of addition as changed copy, given time point
-     *          remains unaffected
+     * @return  result of addition as changed copy, given time point remains unaffected
+     * @throws  IllegalArgumentException if boundary constraints are violated
      * @throws  ArithmeticException in case of numerical overflow
      * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
      * @see     TimePoint#minus(long, Object) TimePoint.minus(long, U)
@@ -83,8 +83,8 @@ public interface UnitRule<T> {
      *
      * @param   timepoint   time point
      * @param   amount      count of units to be added to
-     * @return  result of addition as changed copy, given time point
-     *          remains unaffected
+     * @return  result of addition as changed copy, given time point remains unaffected
+     * @throws  IllegalArgumentException if boundary constraints are violated
      * @throws  ArithmeticException in case of numerical overflow
      * @see     TimePoint#plus(long, Object) TimePoint.plus(long, U)
      * @see     TimePoint#minus(long, Object) TimePoint.minus(long, U)
