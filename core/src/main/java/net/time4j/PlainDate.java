@@ -1043,7 +1043,7 @@ public final class PlainDate
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
      * @see     #atStartOfDay(TZID)
-     * @since   4.18
+     * @since   3.22/4.18
      */
     /*[deutsch]
      * <p>Erzeugt einen Moment, der diesem Datum zur fr&uuml;hesten
@@ -1055,7 +1055,7 @@ public final class PlainDate
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
      * @see     #atStartOfDay(TZID)
-     * @since   4.18
+     * @since   3.22/4.18
      */
     public Moment atFirstMoment(TZID tzid) {
 
@@ -1073,7 +1073,7 @@ public final class PlainDate
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
      * @see     #atStartOfDay(String)
-     * @since   4.18
+     * @since   3.22/4.18
      */
     /*[deutsch]
      * <p>Erzeugt einen Moment, der diesem Datum zur fr&uuml;hesten
@@ -1085,7 +1085,7 @@ public final class PlainDate
      * @throws  UnsupportedOperationException if the underlying timezone
      *          repository does not expose any public transition history
      * @see     #atStartOfDay(String)
-     * @since   4.18
+     * @since   3.22/4.18
      */
     public Moment atFirstMoment(String tzid) {
 
