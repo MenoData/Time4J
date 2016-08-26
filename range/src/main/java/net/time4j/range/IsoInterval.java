@@ -186,7 +186,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the start boundary is infinite
      * @throws  IllegalArgumentException if new start is after end
      * @see     #withEnd(UnaryOperator)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
@@ -197,7 +197,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the start boundary is infinite
      * @throws  IllegalArgumentException if new start is after end
      * @see     #withEnd(UnaryOperator)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     public I withStart(UnaryOperator<T> operator) {
 
@@ -228,7 +228,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the end boundary is infinite
      * @throws  IllegalArgumentException if new end is before start
      * @see     #withStart(UnaryOperator)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
@@ -248,7 +248,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the end boundary is infinite
      * @throws  IllegalArgumentException if new end is before start
      * @see     #withStart(UnaryOperator)
-     * @since   3.22/4.18
+     * @since   4.18
      */
     public I withEnd(UnaryOperator<T> operator) {
 

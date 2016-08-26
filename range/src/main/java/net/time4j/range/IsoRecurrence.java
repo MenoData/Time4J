@@ -811,6 +811,7 @@ public class IsoRecurrence<I>
      * <p>Obtains an ordered stream of recurrent intervals. </p>
      *
      * @return  Stream
+     * @since   4.18
      * @see     Spliterator#DISTINCT
      * @see     Spliterator#IMMUTABLE
      * @see     Spliterator#NONNULL
@@ -822,6 +823,7 @@ public class IsoRecurrence<I>
      * <p>Erzeugt einen geordneten {@code Stream} von wiederkehrenden Intervallen. </p>
      *
      * @return  Stream
+     * @since   4.18
      * @see     Spliterator#DISTINCT
      * @see     Spliterator#IMMUTABLE
      * @see     Spliterator#NONNULL

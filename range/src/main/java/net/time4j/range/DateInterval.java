@@ -977,6 +977,42 @@ public final class DateInterval
     }
 
     /**
+     * <p>Creates a partitioning stream where every day of this interval is partitioned according to
+     * given partitioning rule. </p>
+     *
+     * <p>This method enables the easy construction of daily shop opening times or weekly work time schedules. </p>
+     *
+     * @param   rule        day partition rule
+     * @return  stream of timestamp intervals
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeden Tag dieses Intervalls entsprechend der angegebenen Regel
+     * in einzelne Tagesabschnitte zerlegt. </p>
+     *
+     * <p>Hiermit k&ouml;nnen t&auml;gliche Laden&ouml;ffnungszeiten oder w&ouml;chentliche Arbeitszeitschemata
+     * auf einfache Weise erstellt werden. </p>
+     *
+     * @param   rule        day partition rule
+     * @return  stream of timestamp intervals
+     * @since   4.18
+     */
+    public Stream<TimestampInterval> streamPartitioned(DayPartitionRule rule) {
+
+        return this.streamDaily().flatMap(
+            date ->
+                rule.getPartition(date).stream().map(
+                    partition ->
+                        TimestampInterval.between(
+                            date.at(partition.getStart().getTemporal()),
+                            date.at(partition.getEnd().getTemporal())
+                        )
+                )
+        );
+
+    }
+
+    /**
      * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
      *
      * @param   dateStyle       controlling the date format of output
@@ -1874,15 +1910,7 @@ public final class DateInterval
                 action.accept(date);
 
                 if (index < n) {
-                    int dom = date.getDayOfMonth();
-                    if (
-                        (dom < 28)
-                        || (dom < GregorianMath.getLengthOfMonth(date.getYear(), date.getMonth()))
-                    ) {
-                        date = PlainDate.of(date.getYear(), date.getMonth(), dom + 1);
-                    } else {
-                        date = date.plus(1, CalendarUnit.DAYS);
-                    }
+                    date = date.plus(1, CalendarUnit.DAYS);
                 }
             }
 
