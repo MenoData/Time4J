@@ -3,6 +3,7 @@ package net.time4j.range;
 import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
@@ -1088,6 +1089,8 @@ public class AlgebraTest {
 
         assertThat(a.intersects(b), is(false));
         assertThat(b.intersects(a), is(false));
+        assertThat(a.findIntersection(b).isPresent(), is(false));
+        assertThat(b.findIntersection(a).isPresent(), is(false));
     }
 
     @Test
@@ -1102,6 +1105,8 @@ public class AlgebraTest {
 
         assertThat(a.intersects(b), is(true));
         assertThat(b.intersects(a), is(true));
+        assertThat(a.findIntersection(b).get(), is(a));
+        assertThat(b.findIntersection(a).get(), is(a));
     }
 
     @Test
@@ -1113,9 +1118,12 @@ public class AlgebraTest {
 
         DateInterval a = DateInterval.between(startA, endA);
         DateInterval b = DateInterval.since(startB);
+        DateInterval c = DateInterval.between(startB, endA);
 
         assertThat(a.intersects(b), is(true));
         assertThat(b.intersects(a), is(true));
+        assertThat(a.findIntersection(b).get(), is(c));
+        assertThat(b.findIntersection(a).get(), is(c));
     }
 
     @Test
@@ -1127,9 +1135,12 @@ public class AlgebraTest {
 
         DateInterval a = DateInterval.between(startA, endA);
         DateInterval b = DateInterval.since(startB);
+        DateInterval c = DateInterval.atomic(startB);
 
         assertThat(a.intersects(b), is(true));
         assertThat(b.intersects(a), is(true));
+        assertThat(a.findIntersection(b).get(), is(c));
+        assertThat(b.findIntersection(a).get(), is(c));
     }
 
     @Test
@@ -1144,6 +1155,43 @@ public class AlgebraTest {
 
         assertThat(a.intersects(b), is(false));
         assertThat(b.intersects(a), is(false));
+        assertThat(a.findIntersection(b).isPresent(), is(false));
+        assertThat(b.findIntersection(a).isPresent(), is(false));
+    }
+
+    @Test
+    public void intersectsWhenOpenAndEmpty() {
+        PlainTime startA = PlainTime.of(6, 5);
+        PlainTime endA = PlainTime.of(12, 15);
+
+        PlainTime startB = PlainTime.of(12, 15);
+        PlainTime endB = PlainTime.of(17, 30);
+
+        ClockInterval a = ClockInterval.between(startA, endA);
+        ClockInterval b = ClockInterval.between(startB, endB);
+
+        assertThat(a.intersects(b), is(false));
+        assertThat(b.intersects(a), is(false));
+        assertThat(a.findIntersection(b).isPresent(), is(false));
+        assertThat(b.findIntersection(a).isPresent(), is(false));
+    }
+
+    @Test
+    public void intersectsWhenOpenAndNotEmpty() {
+        PlainTime startA = PlainTime.of(6, 5);
+        PlainTime endA = PlainTime.of(12, 15).plus(1, ClockUnit.NANOS);
+
+        PlainTime startB = PlainTime.of(12, 15);
+        PlainTime endB = PlainTime.of(17, 30);
+
+        ClockInterval a = ClockInterval.between(startA, endA);
+        ClockInterval b = ClockInterval.between(startB, endB);
+        ClockInterval c = ClockInterval.between(startB, endA);
+
+        assertThat(a.intersects(b), is(true));
+        assertThat(b.intersects(a), is(true));
+        assertThat(a.findIntersection(b).get(), is(c));
+        assertThat(b.findIntersection(a).get(), is(c));
     }
 
     @Test

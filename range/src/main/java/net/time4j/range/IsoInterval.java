@@ -32,6 +32,7 @@ import net.time4j.format.expert.ChronoPrinter;
 
 import java.io.IOException;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.function.UnaryOperator;
 
 
@@ -1872,6 +1873,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.19/4.15
+     * @see     #findIntersection(IsoInterval)
      * @see     #overlaps(IsoInterval)
      * @see     #isBefore(IsoInterval)
      * @see     #isAfter(IsoInterval)
@@ -1883,6 +1885,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.19/4.15
+     * @see     #findIntersection(IsoInterval)
      * @see     #overlaps(IsoInterval)
      * @see     #isBefore(IsoInterval)
      * @see     #isAfter(IsoInterval)
@@ -1894,6 +1897,78 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         }
 
         return !(this.isBefore(other) || this.isAfter(other));
+
+    }
+
+    /**
+     * <p>Obtains the intersection of this interval and other one if present. </p>
+     *
+     * @param   other   another interval which might have an intersection with this interval
+     * @return  a wrapper around the found intersection or an empty wrapper
+     * @see     Optional#isPresent()
+     * @see     #intersects(IsoInterval)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Schnittmenge dieses Intervalls mit dem angegebenen anderen Intervall, falls vorhanden. </p>
+     *
+     * @param   other   another interval which might have an intersection with this interval
+     * @return  a wrapper around the found intersection or an empty wrapper
+     * @see     Optional#isPresent()
+     * @see     #intersects(IsoInterval)
+     * @since   4.18
+     */
+    public Optional<I> findIntersection(I other) {
+
+        if (this.isEmpty() || other.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Boundary<T> s;
+        Boundary<T> e;
+
+        if (this.start.isInfinite()) {
+            s = other.getStart();
+        } else if (other.getStart().isInfinite()) {
+            s = this.start;
+        } else {
+            T t1 = this.getClosedFiniteStart();
+            T t2 = other.getClosedFiniteStart();
+            if ((t1 == null) || (t2 == null)) {
+                return Optional.empty();
+            }
+            s = (t1.isBefore(t2) ? Boundary.ofClosed(t2) : Boundary.ofClosed(t1));
+        }
+
+        if (this.end.isInfinite()) {
+            e = other.getEnd();
+        } else if (other.getEnd().isInfinite()) {
+            e = this.end;
+        } else if (this.getFactory().isCalendrical()) {
+            T t1 = this.getClosedFiniteEnd();
+            T t2 = other.getClosedFiniteEnd();
+            if ((t1 == null) || (t2 == null)) {
+                return Optional.empty();
+            }
+            e = (t1.isBefore(t2) ? Boundary.ofClosed(t1) : Boundary.ofClosed(t2));
+        } else {
+            T t1 = this.getOpenFiniteEnd();
+            T t2 = other.getOpenFiniteEnd();
+            if (t1 == null) {
+                e = ((t2 == null) ? Boundary.infiniteFuture() : Boundary.ofOpen(t2));
+            } else if (t2 == null) {
+                e = ((t1 == null) ? Boundary.infiniteFuture() : Boundary.ofOpen(t1));
+            } else {
+                e = (t1.isBefore(t2) ? Boundary.ofOpen(t1) : Boundary.ofOpen(t2));
+            }
+        }
+
+        if (Boundary.isAfter(s, e)) {
+            return Optional.empty();
+        } else {
+            I intersection = this.getFactory().between(s, e);
+            return (intersection.isEmpty() ? Optional.empty() : Optional.of(intersection));
+        }
 
     }
 
@@ -1955,26 +2030,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     /**
-     * <p>Liefert die Startbasis f&uuml;r Vergleiche. </p>
-     *
-     * @return  &auml;quivalenter Zeitpunkt bei geschlossener unterer Grenze
-     */
-    T getClosedFiniteStart() {
-
-        T temporal = this.start.getTemporal();
-
-        if (
-            (temporal != null)
-            && this.start.isOpen()
-        ) {
-            return this.getTimeLine().stepForward(temporal);
-        } else {
-            return temporal;
-        }
-
-    }
-
-    /**
      * <p>Liefert die Rechenbasis zur Ermittlung einer Dauer. </p>
      *
      * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
@@ -1995,29 +2050,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         }
 
     }
-
-//    /**
-//     * <p>Liefert die Endbasis f&uuml;r Vergleiche. </p>
-//     *
-//     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
-//     *          {@code null} wenn angewandt auf das geschlossene Maximum
-//     */
-/*
-    T getOpenFiniteEnd() {
-
-        T temporal = this.end.getTemporal();
-
-        if (
-            (temporal != null)
-            && this.end.isClosed()
-        ) {
-            return this.getTimeLine().stepForward(temporal);
-        } else {
-            return temporal;
-        }
-
-    }
-*/
 
     /**
      * <p>Yields the best available format pattern. </p>
@@ -2065,6 +2097,59 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  this instance
      */
     abstract I getContext();
+
+    /**
+     * <p>Liefert die Startbasis f&uuml;r Vergleiche. </p>
+     *
+     * @return  &auml;quivalenter Zeitpunkt bei geschlossener unterer Grenze
+     */
+    T getClosedFiniteStart() {
+
+        T temporal = this.start.getTemporal();
+
+        if ((temporal != null) && this.start.isOpen()) {
+            return this.getTimeLine().stepForward(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
+
+    /**
+     * <p>Liefert die Endbasis f&uuml;r Vergleiche. </p>
+     *
+     * @return  &auml;quivalenter Zeitpunkt bei geschlossener oberer Grenze oder
+     *          {@code null} wenn angewandt auf das offene Minimum
+     */
+    T getClosedFiniteEnd() {
+
+        T temporal = this.end.getTemporal();
+
+        if ((temporal != null) && this.end.isOpen()) {
+            return this.getTimeLine().stepBackwards(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
+
+    /**
+     * <p>Liefert die Endbasis f&uuml;r Vergleiche. </p>
+     *
+     * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
+     *          {@code null} wenn angewandt auf das geschlossene Maximum
+     */
+    T getOpenFiniteEnd() {
+
+        T temporal = this.end.getTemporal();
+
+        if ((temporal != null) && this.end.isClosed()) {
+            return this.getTimeLine().stepForward(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
 
     private TimeLine<T> getTimeLine() {
 
