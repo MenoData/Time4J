@@ -198,7 +198,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the start boundary is infinite
      * @throws  IllegalArgumentException if new start is after end
      * @see     #withEnd(ChronoOperator)
-     * @since   3.22/4.18
+     * @since   3.22
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
@@ -209,7 +209,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the start boundary is infinite
      * @throws  IllegalArgumentException if new start is after end
      * @see     #withEnd(ChronoOperator)
-     * @since   3.22/4.18
+     * @since   3.22
      */
     public I withStart(ChronoOperator<T> operator) {
 
@@ -240,7 +240,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the end boundary is infinite
      * @throws  IllegalArgumentException if new end is before start
      * @see     #withStart(ChronoOperator)
-     * @since   3.22/4.18
+     * @since   3.22
      */
     /*[deutsch]
      * <p>Liefert eine Kopie dieses Intervalls mit dem angegebenen Operator angewandt
@@ -260,7 +260,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @throws  IllegalStateException if the end boundary is infinite
      * @throws  IllegalArgumentException if new end is before start
      * @see     #withStart(ChronoOperator)
-     * @since   3.22/4.18
+     * @since   3.22
      */
     public I withEnd(ChronoOperator<T> operator) {
 
