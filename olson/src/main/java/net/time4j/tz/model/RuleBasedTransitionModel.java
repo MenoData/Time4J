@@ -39,6 +39,7 @@ import java.io.ObjectInputStream;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -193,7 +194,7 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getStartTransition(UnixTime ut) {
 
         long preModel = this.initial.getPosixTime();
 
@@ -236,20 +237,21 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
-
-        return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
-
-    }
-
-    @Override
-    public ZonalTransition findConflictTransition(
+    public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
         long localSecs = TransitionModel.toLocalSecs(localDate, localTime);
         return this.getConflictTransition(localDate, localSecs);
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findNextTransition(UnixTime ut) {
+
+        ZonalTransition transition = getNextTransition(ut.getPosixTime(), this.initial, this.rules);
+        return ((transition == null) ? Optional.empty() : Optional.of(transition));
 
     }
 

@@ -34,6 +34,7 @@ import java.io.ObjectOutput;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -92,40 +93,41 @@ final class CompositeTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getStartTransition(UnixTime ut) {
 
         if (ut.getPosixTime() < this.last.getPosixTime()) {
-            return this.arrayModel.findStartTransition(ut);
+            return this.arrayModel.getStartTransition(ut);
         } else {
-            ZonalTransition result = this.ruleModel.findStartTransition(ut);
-            return ((result == null) ? this.last : result);
+            ZonalTransition result = this.ruleModel.getStartTransition(ut);
+            return ((result == null) ?  this.last : result);
         }
 
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
-
-        ZonalTransition result = this.arrayModel.findNextTransition(ut);
-
-        if (result == null) {
-            result = this.ruleModel.findNextTransition(ut);
-        }
-
-        return result;
-
-    }
-
-    @Override
-    public ZonalTransition findConflictTransition(
+    public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return this.arrayModel.findConflictTransition(
+        return this.arrayModel.getConflictTransition(
             localDate,
             localTime,
-            this.ruleModel);
+            this.ruleModel
+        );
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findNextTransition(UnixTime ut) {
+
+        Optional<ZonalTransition> result = this.arrayModel.findNextTransition(ut);
+
+        if (!result.isPresent()) {
+            result = this.ruleModel.findNextTransition(ut);
+        }
+
+        return result;
 
     }
 

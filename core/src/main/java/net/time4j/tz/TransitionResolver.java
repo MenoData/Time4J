@@ -146,7 +146,7 @@ final class TransitionResolver
             throw new UnsupportedOperationException(NO_HISTORY);
         }
 
-        ZonalTransition conflict = history.findConflictTransition(date, time);
+        ZonalTransition conflict = history.getConflictTransition(date, time);
 
         if (conflict != null) {
             if (conflict.isGap()) {
@@ -210,7 +210,7 @@ final class TransitionResolver
             throw new UnsupportedOperationException(NO_HISTORY);
         }
 
-        ZonalTransition conflict = history.findConflictTransition(date, time);
+        ZonalTransition conflict = history.getConflictTransition(date, time);
 
         if (conflict != null) {
             int offset = conflict.getTotalOffset();

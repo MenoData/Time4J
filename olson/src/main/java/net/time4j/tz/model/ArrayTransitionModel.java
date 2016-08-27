@@ -37,6 +37,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -112,7 +113,7 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getStartTransition(UnixTime ut) {
 
         int index = search(ut.getPosixTime(), this.transitions);
 
@@ -124,24 +125,24 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
+    public ZonalTransition getConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime
+    ) {
+
+        return this.getConflictTransition(localDate, localTime, null);
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findNextTransition(UnixTime ut) {
 
         int index = search(ut.getPosixTime(), this.transitions);
 
         return (
             (index == this.transitions.length)
-            ? null
-            : this.transitions[index]);
-
-    }
-
-    @Override
-    public ZonalTransition findConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        return this.findConflictTransition(localDate, localTime, null);
+                ? Optional.empty()
+                : Optional.of(this.transitions[index]));
 
     }
 
@@ -225,7 +226,7 @@ final class ArrayTransitionModel
     }
 
     /**
-     * <p>Wird von {@link #findConflictTransition(GregorianDate, WallTime)}
+     * <p>Wird von {@link #getConflictTransition(GregorianDate, WallTime)}
      * aufgerufen. </p>
      *
      * @param   localDate   local date in timezone
@@ -234,7 +235,7 @@ final class ArrayTransitionModel
      * @return  conflict transition on the local time axis for gaps or
      *          overlaps else {@code null}
      */
-    ZonalTransition findConflictTransition(
+    ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime,
         RuleBasedTransitionModel ruleModel // from CompositeTransitionModel

@@ -38,6 +38,7 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -177,26 +178,10 @@ public abstract class TransitionModel
     }
 
     @Override
-    public final ZonalTransition getStartTransition(UnixTime ut) {
-
-        return this.findStartTransition(ut);
-
-    }
-
-    @Override
     public final ZonalTransition getNextTransition(UnixTime ut) {
 
-        return this.findNextTransition(ut);
-
-    }
-
-    @Override
-    public final ZonalTransition getConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        return this.findConflictTransition(localDate, localTime);
+        Optional<ZonalTransition> opt = this.findNextTransition(ut);
+        return (opt.isPresent() ? opt.get() : null);
 
     }
 

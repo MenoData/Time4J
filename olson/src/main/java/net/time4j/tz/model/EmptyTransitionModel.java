@@ -32,6 +32,7 @@ import java.io.IOException;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static net.time4j.tz.model.TransitionModel.NEW_LINE;
 
@@ -84,13 +85,6 @@ final class EmptyTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
     public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
@@ -101,33 +95,40 @@ final class EmptyTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getNextTransition(UnixTime ut) {
 
         return null;
 
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
+    public Optional<ZonalTransition> findStartTransition(UnixTime ut) {
 
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findPreviousTransition(UnixTime ut) {
-
-        return null;
+        return Optional.empty();
 
     }
 
     @Override
-    public ZonalTransition findConflictTransition(
+    public Optional<ZonalTransition> findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return null;
+        return Optional.empty();
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findNextTransition(UnixTime ut) {
+
+        return Optional.empty();
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findPreviousTransition(UnixTime ut) {
+
+        return Optional.empty();
 
     }
 

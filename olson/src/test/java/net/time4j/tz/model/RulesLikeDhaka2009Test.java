@@ -209,7 +209,7 @@ public class RulesLikeDhaka2009Test {
     @Test
     public void getConflictBeforeSummerTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 6, 19),
                 PlainTime.of(22, 59)
             ),
@@ -219,13 +219,13 @@ public class RulesLikeDhaka2009Test {
     @Test
     public void getConflictAtSummerTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 6, 19),
                 PlainTime.of(23, 0)
             ),
             is(SUMMER_2009));
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 6, 19),
                 PlainTime.of(23, 59)
             ),
@@ -235,7 +235,7 @@ public class RulesLikeDhaka2009Test {
     @Test
     public void getConflictAfterSummerTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 6, 19),
                 PlainTime.of(24, 0)
             ),
@@ -245,7 +245,7 @@ public class RulesLikeDhaka2009Test {
     @Test
     public void getConflictBeforeWinterTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 12, 31),
                 PlainTime.of(22, 59)
             ),
@@ -255,13 +255,13 @@ public class RulesLikeDhaka2009Test {
     @Test
     public void getConflictAtWinterTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 12, 31),
                 PlainTime.of(23, 0)
             ),
             is(WINTER_2009));
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 12, 31),
                 PlainTime.of(23, 59)
             ),
@@ -271,7 +271,7 @@ public class RulesLikeDhaka2009Test {
     @Test
     public void getConflictAfterWinterTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(2009, 12, 31),
                 PlainTime.of(24, 0)
             ),
@@ -286,7 +286,7 @@ public class RulesLikeDhaka2009Test {
                 .at(BDT)
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(WINTER_2008));
     }
 
@@ -294,7 +294,7 @@ public class RulesLikeDhaka2009Test {
     public void getStartTransition2() {
         Moment utc = PlainDate.of(2009, 6, 19).atTime(23, 0).at(BDT);
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(SUMMER_2009));
     }
 
@@ -306,7 +306,7 @@ public class RulesLikeDhaka2009Test {
                 .at(BDST)
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(SUMMER_2009));
     }
 
@@ -314,47 +314,47 @@ public class RulesLikeDhaka2009Test {
     public void getStartTransition4() {
         Moment utc = PlainDate.of(2009, 12, 31).atTime(24, 0).at(BDST);
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(WINTER_2009));
     }
 
     @Test
-    public void getNextTransition1() {
+    public void findNextTransition1() {
         Moment utc =
             PlainDate.of(2009, 6, 19)
                 .atTime(23, 0)
                 .at(BDT)
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.findNextTransition(utc).get(),
             is(SUMMER_2009));
     }
 
     @Test
-    public void getNextTransition2() {
+    public void findNextTransition2() {
         Moment utc = PlainDate.of(2009, 6, 19).atTime(23, 0).at(BDT);
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.findNextTransition(utc).get(),
             is(WINTER_2009));
     }
 
     @Test
-    public void getNextTransition3() {
+    public void findNextTransition3() {
         Moment utc =
             PlainDate.of(2009, 12, 31)
                 .atTime(24, 0)
                 .at(BDST)
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.findNextTransition(utc).get(),
             is(WINTER_2009));
     }
 
     @Test
-    public void getNextTransition4() {
+    public void findNextTransition4() {
         Moment utc = PlainDate.of(2009, 12, 31).atTime(24, 0).at(BDST);
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.findNextTransition(utc).get(),
             is(SUMMER_2010));
     }
 

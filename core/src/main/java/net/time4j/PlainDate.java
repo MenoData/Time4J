@@ -1756,8 +1756,7 @@ public final class PlainDate
                 + Timezone.getProviderInfo());
         }
 
-        ZonalTransition conflict =
-            history.findConflictTransition(this, PlainTime.MIN);
+        ZonalTransition conflict = history.getConflictTransition(this, PlainTime.MIN);
 
         if ((conflict != null) && conflict.isGap()) {
             long localSeconds =
@@ -1789,8 +1788,7 @@ public final class PlainDate
                 + Timezone.getProviderInfo());
         }
 
-        ZonalTransition conflict =
-            history.findConflictTransition(this, PlainTime.MIN);
+        ZonalTransition conflict = history.getConflictTransition(this, PlainTime.MIN);
 
         if ((conflict != null) && conflict.isGap()) {
             return Moment.of(conflict.getPosixTime(), TimeScale.POSIX);

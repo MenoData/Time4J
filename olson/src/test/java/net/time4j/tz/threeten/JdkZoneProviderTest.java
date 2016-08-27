@@ -116,7 +116,7 @@ public class JdkZoneProviderTest {
         PlainTime time = PlainTime.of(2);
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7200));
         ZonalTransition conflict =
-            zp.load("Europe/Berlin").findConflictTransition(date, time);
+            zp.load("Europe/Berlin").getConflictTransition(date, time);
         assertThat(
             conflict.getPosixTime(),
             is(m.getPosixTime()));
@@ -139,7 +139,7 @@ public class JdkZoneProviderTest {
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(6 * 3600));
 
         ZonalTransition conflict = // at first position in gap
-            history.findConflictTransition(date, time);
+            history.getConflictTransition(date, time);
 
         assertThat(
             conflict.getPosixTime(),
@@ -163,7 +163,7 @@ public class JdkZoneProviderTest {
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(6 * 3600));
 
         ZonalTransition conflict = // at late position in gap
-            history.findConflictTransition(date, time.plus(59, MINUTES));
+            history.getConflictTransition(date, time.plus(59, MINUTES));
 
         assertThat(
             conflict.getPosixTime(),
@@ -187,7 +187,7 @@ public class JdkZoneProviderTest {
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7 * 3600));
 
         ZonalTransition conflict = // at first ambivalent time
-            history.findConflictTransition(date, PlainTime.of(23, 0));
+            history.getConflictTransition(date, PlainTime.of(23, 0));
 
         assertThat(
             conflict.getPosixTime(),
@@ -211,7 +211,7 @@ public class JdkZoneProviderTest {
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7 * 3600));
 
         ZonalTransition conflict = // any ambivalent time
-            history.findConflictTransition(date, PlainTime.of(23, 30));
+            history.getConflictTransition(date, PlainTime.of(23, 30));
 
         assertThat(
             conflict.getPosixTime(),

@@ -31,6 +31,7 @@ import java.io.ObjectInputStream;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 
 
 /**
@@ -182,10 +183,7 @@ final class SingleOffsetTimezone
 
     // optional
     @Override
-    public ZonalTransition getConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
+    public ZonalTransition getStartTransition(UnixTime time) {
 
         return null;
 
@@ -193,7 +191,10 @@ final class SingleOffsetTimezone
 
     // optional
     @Override
-    public ZonalTransition getStartTransition(UnixTime time) {
+    public ZonalTransition getConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime
+    ) {
 
         return null;
 
@@ -208,33 +209,33 @@ final class SingleOffsetTimezone
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public Optional<ZonalTransition> findStartTransition(UnixTime ut) {
 
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
-
-        return null;
+        return Optional.empty();
 
     }
 
     @Override
-    public ZonalTransition findPreviousTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findConflictTransition(
+    public Optional<ZonalTransition> findConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return null;
+        return Optional.empty();
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findNextTransition(UnixTime ut) {
+
+        return Optional.empty();
+
+    }
+
+    @Override
+    public Optional<ZonalTransition> findPreviousTransition(UnixTime ut) {
+
+        return Optional.empty();
 
     }
 

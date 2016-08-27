@@ -118,7 +118,7 @@ final class HistorizedTimezone
     @Override
     public ZonalOffset getOffset(UnixTime ut) {
 
-        ZonalTransition t = this.history.findStartTransition(ut);
+        ZonalTransition t = this.history.getStartTransition(ut);
 
         return (
             (t == null)
@@ -131,7 +131,7 @@ final class HistorizedTimezone
     @Override
     public ZonalOffset getStandardOffset(UnixTime ut) {
 
-        ZonalTransition t = this.history.findStartTransition(ut);
+        ZonalTransition t = this.history.getStartTransition(ut);
 
         return (
             (t == null)
@@ -144,7 +144,7 @@ final class HistorizedTimezone
     @Override
     public ZonalOffset getDaylightSavingOffset(UnixTime ut){
 
-        ZonalTransition t = this.history.findStartTransition(ut);
+        ZonalTransition t = this.history.getStartTransition(ut);
 
         return (
             (t == null)
@@ -166,7 +166,7 @@ final class HistorizedTimezone
         if (offsets.size() == 1) {
             return offsets.get(0);
         } else {
-            ZonalTransition conflict = this.history.findConflictTransition(localDate, localTime);
+            ZonalTransition conflict = this.history.getConflictTransition(localDate, localTime);
             return ZonalOffset.ofTotalSeconds(conflict.getTotalOffset());
         }
 
@@ -178,8 +178,7 @@ final class HistorizedTimezone
         WallTime localTime
     ) {
 
-        ZonalTransition t =
-            this.history.findConflictTransition(localDate, localTime);
+        ZonalTransition t = this.history.getConflictTransition(localDate, localTime);
         return ((t != null) && t.isGap());
 
     }
@@ -187,7 +186,7 @@ final class HistorizedTimezone
     @Override
     public boolean isDaylightSaving(UnixTime ut) {
 
-        ZonalTransition t = this.history.findStartTransition(ut);
+        ZonalTransition t = this.history.getStartTransition(ut);
         return ((t != null) && t.isDaylightSaving());
 
     }

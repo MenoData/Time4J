@@ -76,41 +76,41 @@ public class CompositeTransitionModelTest {
 
     @Test
     public void getStartTransition1() {
-        assertThat(MODEL.findStartTransition(new UT(-1)), nullValue());
-        assertThat(MODEL_EXT.findStartTransition(new UT(-1)), nullValue());
-        assertThat(MODEL_SINGLE.findStartTransition(new UT(-1)), nullValue());
+        assertThat(MODEL.getStartTransition(new UT(-1)), nullValue());
+        assertThat(MODEL_EXT.getStartTransition(new UT(-1)), nullValue());
+        assertThat(MODEL_SINGLE.getStartTransition(new UT(-1)), nullValue());
     }
 
     @Test
     public void getStartTransition2() {
-        assertThat(MODEL.findStartTransition(new UT(0)), is(FIRST));
-        assertThat(MODEL_EXT.findStartTransition(new UT(0)), is(FIRST));
-        assertThat(MODEL_SINGLE.findStartTransition(new UT(0)), is(FIRST));
+        assertThat(MODEL.getStartTransition(new UT(0)), is(FIRST));
+        assertThat(MODEL_EXT.getStartTransition(new UT(0)), is(FIRST));
+        assertThat(MODEL_SINGLE.getStartTransition(new UT(0)), is(FIRST));
     }
 
     @Test
     public void getStartTransition3() {
         assertThat(
-            MODEL.findStartTransition(new UT(365 * 86400L - 1)),
+            MODEL.getStartTransition(new UT(365 * 86400L - 1)),
             is(FIRST));
         assertThat(
-            MODEL_EXT.findStartTransition(new UT(365 * 86400L - 1)),
+            MODEL_EXT.getStartTransition(new UT(365 * 86400L - 1)),
             is(FIRST));
         assertThat(
-            MODEL_SINGLE.findStartTransition(new UT(365 * 86400L - 1)),
+            MODEL_SINGLE.getStartTransition(new UT(365 * 86400L - 1)),
             is(FIRST));
     }
 
     @Test
     public void getStartTransition4() {
         assertThat(
-            MODEL.findStartTransition(new UT(365 * 86400L)),
+            MODEL.getStartTransition(new UT(365 * 86400L)),
             is(SECOND));
         assertThat(
-            MODEL_EXT.findStartTransition(new UT(365 * 86400L)),
+            MODEL_EXT.getStartTransition(new UT(365 * 86400L)),
             is(SECOND));
         assertThat(
-            MODEL_SINGLE.findStartTransition(new UT(365 * 86400L)),
+            MODEL_SINGLE.getStartTransition(new UT(365 * 86400L)),
             is(SECOND));
     }
 
@@ -118,11 +118,11 @@ public class CompositeTransitionModelTest {
     public void getStartTransition5() {
         ZonalTransition expected = THIRD;
         ZonalTransition zt =
-            MODEL.findStartTransition(new UT(FOURTH.getPosixTime() - 1));
+            MODEL.getStartTransition(new UT(FOURTH.getPosixTime() - 1));
         ZonalTransition ztExt =
-            MODEL_EXT.findStartTransition(new UT(FOURTH.getPosixTime() - 1));
+            MODEL_EXT.getStartTransition(new UT(FOURTH.getPosixTime() - 1));
         ZonalTransition ztSingle =
-            MODEL_SINGLE.findStartTransition(new UT(FOURTH.getPosixTime() - 1));
+            MODEL_SINGLE.getStartTransition(new UT(FOURTH.getPosixTime() - 1));
         assertThat(zt, is(expected));
         assertThat(ztExt, is(expected));
         assertThat(ztSingle, is(expected));
@@ -132,9 +132,9 @@ public class CompositeTransitionModelTest {
     public void getStartTransition6() {
         ZonalTransition expected = FOURTH;
         ZonalTransition zt =
-            MODEL.findStartTransition(new UT(FOURTH.getPosixTime()));
+            MODEL.getStartTransition(new UT(FOURTH.getPosixTime()));
         ZonalTransition ztExt =
-            MODEL_EXT.findStartTransition(new UT(FOURTH.getPosixTime()));
+            MODEL_EXT.getStartTransition(new UT(FOURTH.getPosixTime()));
         assertThat(zt, is(expected));
         assertThat(ztExt, is(expected));
         assertThat(zt == expected, is(false));
@@ -143,94 +143,94 @@ public class CompositeTransitionModelTest {
     }
 
     @Test
-    public void getPreviousTransition1() {
+    public void findPreviousTransition1() {
         ZonalTransition expected = THIRD; // from array
         ZonalTransition zt =
-            MODEL.findPreviousTransition(new UT(FOURTH.getPosixTime()));
+            MODEL.findPreviousTransition(new UT(FOURTH.getPosixTime())).get();
         assertThat(zt, is(expected));
     }
 
     @Test
-    public void getPreviousTransition2() {
+    public void findPreviousTransition2() {
         ZonalTransition expected = FOURTH; // rule-based
         ZonalTransition zt =
-            MODEL.findPreviousTransition(new UT(FOURTH.getPosixTime() + 1));
+            MODEL.findPreviousTransition(new UT(FOURTH.getPosixTime() + 1)).get();
         assertThat(zt, is(expected));
     }
 
     @Test
-    public void getNextTransition1() {
-        assertThat(MODEL.findNextTransition(new UT(-1)), is(FIRST));
-        assertThat(MODEL_EXT.findNextTransition(new UT(-1)), is(FIRST));
-        assertThat(MODEL_SINGLE.findNextTransition(new UT(-1)), is(FIRST));
+    public void findNextTransition1() {
+        assertThat(MODEL.findNextTransition(new UT(-1)).get(), is(FIRST));
+        assertThat(MODEL_EXT.findNextTransition(new UT(-1)).get(), is(FIRST));
+        assertThat(MODEL_SINGLE.findNextTransition(new UT(-1)).get(), is(FIRST));
     }
 
     @Test
-    public void getNextTransition2() {
-        assertThat(MODEL.findNextTransition(new UT(0)), is(SECOND));
-        assertThat(MODEL_EXT.findNextTransition(new UT(0)), is(SECOND));
-        assertThat(MODEL_SINGLE.findNextTransition(new UT(0)), is(SECOND));
+    public void findNextTransition2() {
+        assertThat(MODEL.findNextTransition(new UT(0)).get(), is(SECOND));
+        assertThat(MODEL_EXT.findNextTransition(new UT(0)).get(), is(SECOND));
+        assertThat(MODEL_SINGLE.findNextTransition(new UT(0)).get(), is(SECOND));
     }
 
     @Test
-    public void getNextTransition3() {
+    public void findNextTransition3() {
         assertThat(
-            MODEL.findNextTransition(new UT(THIRD.getPosixTime() - 1)),
+            MODEL.findNextTransition(new UT(THIRD.getPosixTime() - 1)).get(),
             is(THIRD));
         assertThat(
-            MODEL_EXT.findNextTransition(new UT(THIRD.getPosixTime() - 1)),
+            MODEL_EXT.findNextTransition(new UT(THIRD.getPosixTime() - 1)).get(),
             is(THIRD));
         assertThat(
-            MODEL_SINGLE.findNextTransition(new UT(THIRD.getPosixTime() - 1)),
+            MODEL_SINGLE.findNextTransition(new UT(THIRD.getPosixTime() - 1)).get(),
             is(THIRD));
     }
 
     @Test
-    public void getNextTransition4() {
+    public void findNextTransition4() {
         assertThat(
-            MODEL.findNextTransition(new UT(THIRD.getPosixTime())),
+            MODEL.findNextTransition(new UT(THIRD.getPosixTime())).get(),
             is(FOURTH));
         assertThat(
-            MODEL_EXT.findNextTransition(new UT(THIRD.getPosixTime())),
+            MODEL_EXT.findNextTransition(new UT(THIRD.getPosixTime())).get(),
             is(FOURTH));
         Moment m =
             PlainTimestamp.of(1973, 3, 1, 1, 0)
                 .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY))
                 .atUTC();
         assertThat(
-            MODEL_SINGLE.findNextTransition(new UT(THIRD.getPosixTime())),
+            MODEL_SINGLE.findNextTransition(new UT(THIRD.getPosixTime())).get(),
             is(new ZonalTransition(m.getPosixTime(), 7200, 7200, 3600)));
     }
 
     @Test
-    public void getNextTransition5() {
+    public void findNextTransition5() {
         assertThat(
-            MODEL.findNextTransition(new UT(FOURTH.getPosixTime() - 1)),
+            MODEL.findNextTransition(new UT(FOURTH.getPosixTime() - 1)).get(),
             is(FOURTH));
         assertThat(
-            MODEL_EXT.findNextTransition(new UT(FOURTH.getPosixTime() - 1)),
+            MODEL_EXT.findNextTransition(new UT(FOURTH.getPosixTime() - 1)).get(),
             is(FOURTH));
     }
 
     @Test
-    public void getNextTransition6() {
+    public void findNextTransition6() {
         assertThat(
-            MODEL.findNextTransition(new UT(FOURTH.getPosixTime())),
+            MODEL.findNextTransition(new UT(FOURTH.getPosixTime())).get(),
             is(FIFTH));
         assertThat(
-            MODEL_EXT.findNextTransition(new UT(FOURTH.getPosixTime())),
+            MODEL_EXT.findNextTransition(new UT(FOURTH.getPosixTime())).get(),
             is(FIFTH));
     }
 
     @Test
     public void getGapTransition1() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(0, 29, 59)),
             nullValue());
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(0, 29, 59)),
             nullValue());
@@ -239,12 +239,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getGapTransition2() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(0, 30)),
             is(FIRST));
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(0, 30)),
             is(FIRST));
@@ -253,12 +253,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getGapTransition3() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(1, 59, 59)),
             is(FIRST));
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(1, 59, 59)),
             is(FIRST));
@@ -267,12 +267,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getGapTransition4() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1970, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
@@ -281,13 +281,13 @@ public class CompositeTransitionModelTest {
     @Test
     public void getGapTransition5() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1973, 3, 1)
                     .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY)),
                 PlainTime.of(2, 0)),
             is(FIFTH));
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1973, 3, 1)
                     .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY)),
                 PlainTime.of(2, 0)),
@@ -297,12 +297,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getOverlapTransition1() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(0, 59, 59)),
             nullValue());
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(0, 59, 59)),
             nullValue());
@@ -311,12 +311,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getOverlapTransition2() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(1, 0)),
             is(SECOND));
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(1, 0)),
             is(SECOND));
@@ -325,12 +325,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getOverlapTransition3() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(1, 59, 59)),
             is(SECOND));
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(1, 59, 59)),
             is(SECOND));
@@ -339,12 +339,12 @@ public class CompositeTransitionModelTest {
     @Test
     public void getOverlapTransition4() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1971, 1, 1),
                 PlainTime.of(2, 0)),
             nullValue());
@@ -353,13 +353,13 @@ public class CompositeTransitionModelTest {
     @Test
     public void getOverlapTransition5() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1972, 10, 1)
                     .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY)),
                 PlainTime.of(2, 0)),
             is(FOURTH));
         assertThat(
-            MODEL_EXT.findConflictTransition(
+            MODEL_EXT.getConflictTransition(
                 PlainDate.of(1972, 10, 1)
                     .with(PlainDate.WEEKDAY_IN_MONTH.setToLast(Weekday.SUNDAY)),
                 PlainTime.of(2, 0)),

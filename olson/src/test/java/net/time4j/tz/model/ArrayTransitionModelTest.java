@@ -12,17 +12,16 @@ import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
-
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 
 
@@ -63,84 +62,84 @@ public class ArrayTransitionModelTest {
     @Test
     public void getStartTransition1() {
         assertThat(
-            MODEL.findStartTransition(new UT(-1)),
-            nullValue());
+            MODEL.findStartTransition(new UT(-1)).isPresent(),
+            is(false));
     }
 
     @Test
     public void getStartTransition2() {
         assertThat(
-            MODEL.findStartTransition(new UT(0)),
+            MODEL.findStartTransition(new UT(0)).get(),
             is(FIRST));
     }
 
     @Test
     public void getStartTransition3() {
         assertThat(
-            MODEL.findStartTransition(new UT(365 * 86400L - 1)),
+            MODEL.findStartTransition(new UT(365 * 86400L - 1)).get(),
             is(FIRST));
     }
 
     @Test
     public void getStartTransition4() {
         assertThat(
-            MODEL.findStartTransition(new UT(365 * 86400L)),
+            MODEL.findStartTransition(new UT(365 * 86400L)).get(),
             is(SECOND));
     }
 
     @Test
-    public void getNextTransition1() {
+    public void findNextTransition1() {
         assertThat(
-            MODEL.findNextTransition(new UT(-1)),
+            MODEL.findNextTransition(new UT(-1)).get(),
             is(FIRST));
     }
 
     @Test
-    public void getNextTransition2() {
+    public void findNextTransition2() {
         assertThat(
-            MODEL.findNextTransition(new UT(0)),
+            MODEL.findNextTransition(new UT(0)).get(),
             is(SECOND));
     }
 
     @Test
-    public void getNextTransition3() {
+    public void findNextTransition3() {
         assertThat(
-            MODEL.findNextTransition(new UT(FOURTH.getPosixTime() - 1)),
+            MODEL.findNextTransition(new UT(FOURTH.getPosixTime() - 1)).get(),
             is(FOURTH));
     }
 
     @Test
-    public void getNextTransition4() {
+    public void findNextTransition4() {
         assertThat(
-            MODEL.findNextTransition(new UT(FOURTH.getPosixTime())),
-            nullValue());
+            MODEL.findNextTransition(new UT(FOURTH.getPosixTime())).isPresent(),
+            is(false));
     }
 
     @Test
-    public void getPreviousTransition1() {
+    public void findPreviousTransition1() {
         assertThat(
-            MODEL.findPreviousTransition(new UT(0)),
-            nullValue());
+            MODEL.findPreviousTransition(new UT(0)).isPresent(),
+            is(false));
     }
 
     @Test
-    public void getPreviousTransition2() {
+    public void findPreviousTransition2() {
         assertThat(
-            MODEL.findPreviousTransition(new UT(1)),
+            MODEL.findPreviousTransition(new UT(1)).get(),
             is(FIRST));
     }
 
     @Test
-    public void getPreviousTransition3() {
+    public void findPreviousTransition3() {
         assertThat(
-            MODEL.findPreviousTransition(new UT(365 * 86400L)),
+            MODEL.findPreviousTransition(new UT(365 * 86400L)).get(),
             is(FIRST));
     }
 
     @Test
-    public void getPreviousTransition4() {
+    public void findPreviousTransition4() {
         assertThat(
-            MODEL.findPreviousTransition(new UT(365 * 86400L + 1)),
+            MODEL.findPreviousTransition(new UT(365 * 86400L + 1)).get(),
             is(SECOND));
     }
 
@@ -149,8 +148,9 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
-                PlainTime.of(0, 29, 59)),
-            nullValue());
+                PlainTime.of(0, 29, 59)
+            ).isPresent(),
+            is(false));
     }
 
     @Test
@@ -158,7 +158,7 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
-                PlainTime.of(0, 30)),
+                PlainTime.of(0, 30)).get(),
             is(FIRST));
     }
 
@@ -167,7 +167,7 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
-                PlainTime.of(1, 59, 59)),
+                PlainTime.of(1, 59, 59)).get(),
             is(FIRST));
     }
 
@@ -176,8 +176,9 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1970, 1, 1),
-                PlainTime.of(2, 0)),
-            nullValue());
+                PlainTime.of(2, 0)
+            ).isPresent(),
+            is(false));
     }
 
     @Test
@@ -185,8 +186,9 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
-                PlainTime.of(0, 59, 59)),
-            nullValue());
+                PlainTime.of(0, 59, 59)
+            ).isPresent(),
+            is(false));
     }
 
     @Test
@@ -194,7 +196,7 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
-                PlainTime.of(1, 0)),
+                PlainTime.of(1, 0)).get(),
             is(SECOND));
     }
 
@@ -203,7 +205,7 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
-                PlainTime.of(1, 59, 59)),
+                PlainTime.of(1, 59, 59)).get(),
             is(SECOND));
     }
 
@@ -212,8 +214,9 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 PlainDate.of(1971, 1, 1),
-                PlainTime.of(2, 0)),
-            nullValue());
+                PlainTime.of(2, 0)
+            ).isPresent(),
+            is(false));
     }
 
     @Test
@@ -230,7 +233,7 @@ public class ArrayTransitionModelTest {
         assertThat(
             MODEL.findConflictTransition(
                 tsp.getCalendarDate(),
-                tsp.getWallTime()),
+                tsp.getWallTime()).get(),
             is(THIRD));
     }
 
