@@ -24,6 +24,7 @@
 - AM/PM-element not sensible for output context [#529]
 - Inconsistent TimeSpan-behaviour of negative MachineTime [#540]
 - Inconsistent exception handling of with()-methods [#541]
+- Optimization of day-of-week-queries and date arithmetic in `PlainDate` [#543]
 
 ### Changed
 - New leap second at end of year 2016 [#517]
