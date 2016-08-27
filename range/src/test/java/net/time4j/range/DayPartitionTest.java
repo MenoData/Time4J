@@ -38,7 +38,7 @@ public class DayPartitionTest {
                     ClockInterval.between(PlainTime.of(9, 15), PlainTime.of(12, 45)))
                 .build();
 
-        List<ChronoInterval<PlainTimestamp>> intervals =
+        List<TimestampInterval> intervals =
             DateInterval.between(PlainDate.of(2016, 8, 25), PlainDate.of(2016, 9, 7))
                 .streamPartitioned(rule)
                 .collect(Collectors.toList());

@@ -316,7 +316,11 @@ public enum Weekday
      */
     public Weekday next() {
 
-        return this.roll(1);
+        int index = this.ordinal() + 1;
+        if (index == 7) {
+            index = 0;
+        }
+        return ENUMS[index];
 
     }
 

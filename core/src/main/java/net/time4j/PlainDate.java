@@ -175,11 +175,11 @@ public final class PlainDate
 
     /** Fr&uuml;hestm&ouml;gliches Datum [-999999999-01-01]. */
     static final PlainDate MIN =
-        new PlainDate(GregorianMath.MIN_YEAR, 1, 1);
+        new PlainDate(GregorianMath.MIN_YEAR, 1, 1, null);
 
     /** Sp&auml;testm&ouml;gliches Datum [+999999999-12-31]. */
     static final PlainDate MAX =
-        new PlainDate(GregorianMath.MAX_YEAR, 12, 31);
+        new PlainDate(GregorianMath.MAX_YEAR, 12, 31, null);
 
     /** Entspricht dem Jahr {@code -999999999}. */
     static final Integer MIN_YEAR =
@@ -722,18 +722,23 @@ public final class PlainDate
     private transient final byte month;
     private transient final byte dayOfMonth;
 
+    // race-single-check-idiom
+    private transient Weekday weekday = null;
+
     //~ Konstruktoren -----------------------------------------------------
 
     private PlainDate(
         int year,
         int month,
-        int dayOfMonth
+        int dayOfMonth,
+        Weekday weekday
     ) {
         super();
 
         this.year = year;
         this.month = (byte) month;
         this.dayOfMonth = (byte) dayOfMonth;
+        this.weekday = weekday;
 
     }
 
@@ -769,7 +774,7 @@ public final class PlainDate
         int dayOfMonth
     ) {
 
-        return of(year, month, dayOfMonth, true);
+        return PlainDate.create(year, month, dayOfMonth, null, true);
 
     }
 
@@ -799,7 +804,7 @@ public final class PlainDate
         int dayOfMonth
     ) {
 
-        return PlainDate.of(year, month.getValue(), dayOfMonth, true);
+        return PlainDate.create(year, month.getValue(), dayOfMonth, null, true);
 
     }
 
@@ -824,27 +829,7 @@ public final class PlainDate
         int dayOfYear
     ) {
 
-        if (dayOfYear < 1) {
-            throw new IllegalArgumentException(
-                "Day of year out of range: " + dayOfYear);
-        } else if (dayOfYear <= 31) {
-            return PlainDate.of(year, 1, dayOfYear);
-        }
-
-        int[] table = (
-            GregorianMath.isLeapYear(year)
-            ? DAY_OF_LEAP_YEAR_PER_MONTH
-            : DAY_OF_YEAR_PER_MONTH);
-
-        for (int i = (dayOfYear > table[6] ? 7 : 1); i < 12; i++) {
-            if (dayOfYear <= table[i]) {
-                int dom = dayOfYear - table[i - 1];
-                return PlainDate.of(year, i + 1, dom, false);
-            }
-        }
-
-        throw new IllegalArgumentException(
-            "Day of year out of range: " + dayOfYear);
+        return PlainDate.ofYearDay(year, dayOfYear, null);
 
     }
 
@@ -872,7 +857,7 @@ public final class PlainDate
         Weekday dayOfWeek
     ) {
 
-        return of(yearOfWeekdate, weekOfYear, dayOfWeek, true);
+        return PlainDate.ofWeekdate(yearOfWeekdate, weekOfYear, dayOfWeek, true);
 
     }
 
@@ -920,8 +905,7 @@ public final class PlainDate
         if (date instanceof PlainDate) {
             return (PlainDate) date;
         } else {
-            return PlainDate.of(
-                date.getYear(), date.getMonth(), date.getDayOfMonth());
+            return PlainDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
         }
 
     }
@@ -1208,13 +1192,14 @@ public final class PlainDate
      */
     public Weekday getDayOfWeek() {
 
-        return Weekday.valueOf(
-            GregorianMath.getDayOfWeek(
-                this.year,
-                this.month,
-                this.dayOfMonth
-            )
-        );
+        Weekday dow = this.weekday;
+
+        if (dow == null) {
+            dow = Weekday.valueOf(GregorianMath.getDayOfWeek(this.year, this.month, this.dayOfMonth));
+            this.weekday = dow;
+        }
+
+        return dow;
 
     }
 
@@ -1313,6 +1298,53 @@ public final class PlainDate
     public boolean isWeekend(Locale country) {
 
         return this.matches(Weekmodel.of(country).weekend());
+
+    }
+
+    /**
+     * <p>Adds given amount in units to this date and yields the result of addition. </p>
+     *
+     * <p>Covers the most important units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be added to this date (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoDateUnit)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Addiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * zu diesem Datum und liefert das Additionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten Zeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be added to this date (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoDateUnit)
+     * @since   4.18
+     */
+    public PlainDate plus(
+        long amount,
+        CalendarUnit unit
+    ) {
+
+        if (unit == null) {
+            throw new NullPointerException("Missing unit.");
+        } else if (amount == 0) {
+            return this;
+        }
+
+        try {
+            return PlainDate.doAdd(unit, this, amount, OverflowUnit.POLICY_PREVIOUS_VALID_DATE);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
 
     }
 
@@ -1877,12 +1909,7 @@ public final class PlainDate
             return this;
         }
 
-        return TRANSFORMER.transform(
-            MathUtils.safeAdd(
-                this.getDaysSinceUTC(),
-                dayOfWeek.getValue() - old.getValue()
-            )
-        );
+        return PlainDate.addDays(this, dayOfWeek.getValue() - old.getValue());
 
     }
 
@@ -1968,20 +1995,34 @@ public final class PlainDate
     ) {
 
         long dom = MathUtils.safeAdd(date.dayOfMonth, amount);
+        Weekday weekday = null;
+        boolean hasDOW = (date.weekday != null);
+
+        if (hasDOW) {
+            if (amount == 1) {
+                weekday = date.weekday.next();
+            } else if (amount == 7) {
+                weekday = date.weekday;
+            }
+        }
 
         if ((dom >= 1) && (dom <= 28)) {
-            return PlainDate.of(date.year, date.month, (int) dom);
+            if (hasDOW && (weekday == null)) {
+                weekday = date.weekday.roll((int) amount);
+            }
+            return PlainDate.create(date.year, date.month, (int) dom, weekday, false);
         }
 
         long doy = MathUtils.safeAdd(date.getDayOfYear(), amount);
 
         if ((doy >= 1) && (doy <= 365)) {
-            return PlainDate.of(date.year, (int) doy);
+            if (hasDOW && (weekday == null)) {
+                weekday = date.weekday.roll((int) amount);
+            }
+            return PlainDate.ofYearDay(date.year, (int) doy, weekday);
         }
 
-        long utcDays =
-            MathUtils.safeAdd(date.getDaysSinceUTC(), amount);
-        return TRANSFORMER.transform(utcDays);
+        return TRANSFORMER.transform(MathUtils.safeAdd(date.getDaysSinceUTC(), amount));
 
     }
 
@@ -2069,17 +2110,26 @@ public final class PlainDate
 
     }
 
-    private static PlainDate of(
+    private static String yowFailed(int yearOfWeekdate) {
+
+        return "YEAR_OF_WEEKDATE (ISO) out of range: " + yearOfWeekdate;
+
+    }
+
+    private static String woyFailed(int weekOfYear) {
+
+        return "WEEK_OF_YEAR (ISO) out of range: " + weekOfYear;
+
+    }
+
+    private static PlainDate ofWeekdate(
         int yearOfWeekdate,
         int weekOfYear,
         Weekday dayOfWeek,
         boolean validating
     ) {
 
-        if (
-            (weekOfYear < 1)
-            || (weekOfYear > 53)
-        ) {
+        if ((weekOfYear < 1) || (weekOfYear > 53)) {
             if (validating) {
                 throw new IllegalArgumentException(woyFailed(weekOfYear));
             } else {
@@ -2116,12 +2166,9 @@ public final class PlainDate
             }
         }
 
-        PlainDate result = PlainDate.of(y, doy);
+        PlainDate result = PlainDate.ofYearDay(y, doy, dayOfWeek);
 
-        if (
-            (weekOfYear == 53)
-            && (result.getWeekOfYear() != 53)
-        ) {
+        if ((weekOfYear == 53) && (result.getWeekOfYear() != 53)) {
             if (validating) {
                 throw new IllegalArgumentException(woyFailed(weekOfYear));
             } else {
@@ -2133,22 +2180,41 @@ public final class PlainDate
 
     }
 
-    private static String yowFailed(int yearOfWeekdate) {
+    private static PlainDate ofYearDay(
+        int year,
+        int dayOfYear,
+        Weekday weekday
+    ) {
 
-        return "YEAR_OF_WEEKDATE (ISO) out of range: " + yearOfWeekdate;
+        if (dayOfYear < 1) {
+            throw new IllegalArgumentException(
+                "Day of year out of range: " + dayOfYear);
+        } else if (dayOfYear <= 31) {
+            return PlainDate.of(year, 1, dayOfYear);
+        }
+
+        int[] table = (
+            GregorianMath.isLeapYear(year)
+                ? DAY_OF_LEAP_YEAR_PER_MONTH
+                : DAY_OF_YEAR_PER_MONTH);
+
+        for (int i = (dayOfYear > table[6] ? 7 : 1); i < 12; i++) {
+            if (dayOfYear <= table[i]) {
+                int dom = dayOfYear - table[i - 1];
+                return PlainDate.create(year, i + 1, dom, weekday, false);
+            }
+        }
+
+        throw new IllegalArgumentException(
+            "Day of year out of range: " + dayOfYear);
 
     }
 
-    private static String woyFailed(int weekOfYear) {
-
-        return "WEEK_OF_YEAR (ISO) out of range: " + weekOfYear;
-
-    }
-
-    private static PlainDate of(
+    private static PlainDate create(
         int year,
         int month,
         int dayOfMonth,
+        Weekday weekday,
         boolean validating
     ) {
 
@@ -2157,7 +2223,7 @@ public final class PlainDate
         }
 
         // TODO: konfigurierbaren Cache einbauen?
-        return new PlainDate(year, month, dayOfMonth);
+        return new PlainDate(year, month, dayOfMonth, weekday);
 
     }
 
@@ -2363,7 +2429,7 @@ public final class PlainDate
                             && validateMonth(entity, month)
                             && validateDayOfMonth(entity, year, month, dom)
                         ) {
-                            return PlainDate.of(year, month, dom, false);
+                            return PlainDate.create(year, month, dom, null, false);
                         } else {
                             return null;
                         }
@@ -2446,12 +2512,7 @@ public final class PlainDate
                     return null;
                 }
 
-                PlainDate date =
-                    PlainDate.of(
-                        yearOfWeekdate,
-                        weekOfYear,
-                        dayOfWeek,
-                        false);
+                PlainDate date = PlainDate.ofWeekdate(yearOfWeekdate, weekOfYear, dayOfWeek, false);
 
                 if (date == null) {
                     flagValidationError(
@@ -2610,17 +2671,15 @@ public final class PlainDate
                 return PlainDate.MAX;
             }
 
-            long mjd =
-                EpochDays.MODIFIED_JULIAN_DATE.transform(
-                    utcDays,
-                    EpochDays.UTC);
+            long mjd = EpochDays.MODIFIED_JULIAN_DATE.transform(utcDays, EpochDays.UTC);
             long packedDate = GregorianMath.toPackedDate(mjd);
 
-            return PlainDate.of(
+            return PlainDate.create(
                 GregorianMath.readYear(packedDate),
                 GregorianMath.readMonth(packedDate),
-                GregorianMath.readDayOfMonth(packedDate)
-            );
+                GregorianMath.readDayOfMonth(packedDate),
+                Weekmodel.getDayOfWeek(utcDays),
+                false);
 
         }
 

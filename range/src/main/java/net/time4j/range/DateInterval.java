@@ -1871,6 +1871,7 @@ public final class DateInterval
             this.startEpoch = startEpoch;
             this.endEpoch = endEpoch;
 
+            start.getDayOfWeek(); // trigger day-of-week-optimization
             this.current = ((startEpoch > endEpoch) ? null : start);
 
         }
@@ -1963,6 +1964,7 @@ public final class DateInterval
                 this.current = PlainDate.of(year, month, 1);
             }
 
+            this.current.getDayOfWeek(); // trigger day-of-week-optimization
             return split;
 
         }
