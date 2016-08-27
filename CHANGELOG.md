@@ -8,7 +8,7 @@
 - Add general parse methods for dates in ISO-8601-format [#520]
 - Iso8601Format....WALL_TIME now understands T17:45 [#521]
 - Embedded formatter should know outer format attributes and defaults [#522]
-- Add method findPreviousTransiton(UnixTime) to TransitionHistory [#523]
+- 4 new methods findXYZTransiton(...) to TransitionHistory [#523]
 - ChronoFormatter.Builder should define default values and global attributes [#531]
 - Add convenient methods to ChronoPrinter and ChronoParser [#532]
 - Make printing of ISO-formats configurable [#533]
@@ -17,6 +17,7 @@
 - Improve formatting of infinite intervals [#536]
 - New interval boundary manipulations based on operators [#538]
 - Determine first moment for given calendar date in time zone [#539]
+- Add method to determine intersection interval [#542]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
@@ -30,7 +31,7 @@
 
 ### Deprecated
 - 1 method in TextProvider deprecated due to missing output context [#529]
-- 3 methods in TransitionHistory deprecated and replaced by new better named methods [#523]
+- 1 methods in TransitionHistory deprecated and replaced by new better named method [#523]
 - 1 method in ChronoPrinter deprecated and replaced by new methods [#532]
 - 1 parse method in each of four iso-interval classes replaced by new one without ParseLog-parameter [#535]
 - 1 print method in IsoInterval (replaced by a new one with extra infinity style arg) [#536]
