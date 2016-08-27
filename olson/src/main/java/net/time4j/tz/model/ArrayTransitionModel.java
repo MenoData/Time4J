@@ -111,7 +111,7 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getStartTransition(UnixTime ut) {
 
         int index = search(ut.getPosixTime(), this.transitions);
 
@@ -123,7 +123,7 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
+    public ZonalTransition getNextTransition(UnixTime ut) {
 
         int index = search(ut.getPosixTime(), this.transitions);
 
@@ -135,12 +135,12 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition findConflictTransition(
+    public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return this.findConflictTransition(localDate, localTime, null);
+        return this.getConflictTransition(localDate, localTime, null);
 
     }
 
@@ -224,7 +224,7 @@ final class ArrayTransitionModel
     }
 
     /**
-     * <p>Wird von {@link #findConflictTransition(GregorianDate, WallTime)}
+     * <p>Wird von {@link #getConflictTransition(GregorianDate, WallTime)}
      * aufgerufen. </p>
      *
      * @param   localDate   local date in timezone
@@ -233,7 +233,7 @@ final class ArrayTransitionModel
      * @return  conflict transition on the local time axis for gaps or
      *          overlaps else {@code null}
      */
-    ZonalTransition findConflictTransition(
+    ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime,
         RuleBasedTransitionModel ruleModel // from CompositeTransitionModel

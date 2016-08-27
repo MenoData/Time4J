@@ -1723,7 +1723,7 @@ public final class PlainDate
         }
 
         ZonalTransition conflict =
-            history.findConflictTransition(this, PlainTime.MIN);
+            history.getConflictTransition(this, PlainTime.MIN);
 
         if ((conflict != null) && conflict.isGap()) {
             long localSeconds =
@@ -1756,7 +1756,7 @@ public final class PlainDate
         }
 
         ZonalTransition conflict =
-            history.findConflictTransition(this, PlainTime.MIN);
+            history.getConflictTransition(this, PlainTime.MIN);
 
         if ((conflict != null) && conflict.isGap()) {
             return Moment.of(conflict.getPosixTime(), TimeScale.POSIX);

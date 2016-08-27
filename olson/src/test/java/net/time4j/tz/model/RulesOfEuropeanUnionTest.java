@@ -228,7 +228,7 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getConflictBeforeSpringTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 3, 31),
                 PlainTime.of(1, 59)
             ),
@@ -238,13 +238,13 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getConflictAtSpringTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 3, 31),
                 PlainTime.of(2, 0)
             ),
             is(SPRING_1996));
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 3, 31),
                 PlainTime.of(2, 59)
             ),
@@ -254,7 +254,7 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getConflictAfterSpringTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 3, 31),
                 PlainTime.of(3, 0)
             ),
@@ -264,7 +264,7 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getConflictBeforeAutumnTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 10, 27),
                 PlainTime.of(1, 59)
             ),
@@ -274,13 +274,13 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getConflictAtAutumnTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 10, 27),
                 PlainTime.of(2, 0)
             ),
             is(AUTUMN_1996));
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 10, 27),
                 PlainTime.of(2, 59)
             ),
@@ -290,7 +290,7 @@ public class RulesOfEuropeanUnionTest {
     @Test
     public void getConflictAfterAutumnTransition() {
         assertThat(
-            MODEL.findConflictTransition(
+            MODEL.getConflictTransition(
                 PlainDate.of(1996, 10, 27),
                 PlainTime.of(3, 0)
             ),
@@ -305,7 +305,7 @@ public class RulesOfEuropeanUnionTest {
                 .atUTC()
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(AUTUMN_1995));
     }
 
@@ -313,7 +313,7 @@ public class RulesOfEuropeanUnionTest {
     public void getStartTransition2() {
         Moment utc = PlainDate.of(1996, 3, 31).atTime(1, 0).atUTC();
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(SPRING_1996));
     }
 
@@ -325,7 +325,7 @@ public class RulesOfEuropeanUnionTest {
                 .atUTC()
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(SPRING_1996));
     }
 
@@ -333,7 +333,7 @@ public class RulesOfEuropeanUnionTest {
     public void getStartTransition4() {
         Moment utc = PlainDate.of(1996, 10, 27).atTime(1, 0).atUTC();
         assertThat(
-            MODEL.findStartTransition(utc),
+            MODEL.getStartTransition(utc),
             is(AUTUMN_1996));
     }
 
@@ -345,7 +345,7 @@ public class RulesOfEuropeanUnionTest {
                 .atUTC()
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.getNextTransition(utc),
             is(SPRING_1996));
     }
 
@@ -353,7 +353,7 @@ public class RulesOfEuropeanUnionTest {
     public void getNextTransition2() {
         Moment utc = PlainDate.of(1996, 3, 31).atTime(1, 0).atUTC();
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.getNextTransition(utc),
             is(AUTUMN_1996));
     }
 
@@ -365,7 +365,7 @@ public class RulesOfEuropeanUnionTest {
                 .atUTC()
                 .minus(1, TimeUnit.SECONDS);
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.getNextTransition(utc),
             is(AUTUMN_1996));
     }
 
@@ -373,7 +373,7 @@ public class RulesOfEuropeanUnionTest {
     public void getNextTransition4() {
         Moment utc = PlainDate.of(1996, 10, 27).atTime(1, 0).atUTC();
         assertThat(
-            MODEL.findNextTransition(utc),
+            MODEL.getNextTransition(utc),
             is(SPRING_1997));
     }
 

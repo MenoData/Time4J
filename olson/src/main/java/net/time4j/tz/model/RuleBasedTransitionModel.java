@@ -194,7 +194,7 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getStartTransition(UnixTime ut) {
 
         long preModel = this.initial.getPosixTime();
 
@@ -237,14 +237,14 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
+    public ZonalTransition getNextTransition(UnixTime ut) {
 
         return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
 
     }
 
     @Override
-    public ZonalTransition findConflictTransition(
+    public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {

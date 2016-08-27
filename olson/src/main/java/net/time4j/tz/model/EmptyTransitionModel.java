@@ -100,37 +100,6 @@ final class EmptyTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findPreviousTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        return null;
-
-    }
-
-    @Override
     public List<ZonalOffset> getValidOffsets(
         GregorianDate localDate,
         WallTime localTime

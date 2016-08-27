@@ -26,7 +26,6 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.WallTime;
 
-import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
@@ -146,7 +145,7 @@ final class TransitionResolver
             throw new UnsupportedOperationException(NO_HISTORY);
         }
 
-        ZonalTransition conflict = history.findConflictTransition(date, time);
+        ZonalTransition conflict = history.getConflictTransition(date, time);
 
         if (conflict != null) {
             if (conflict.isGap()) {
@@ -210,7 +209,7 @@ final class TransitionResolver
             throw new UnsupportedOperationException(NO_HISTORY);
         }
 
-        ZonalTransition conflict = history.findConflictTransition(date, time);
+        ZonalTransition conflict = history.getConflictTransition(date, time);
 
         if (conflict != null) {
             int offset = conflict.getTotalOffset();

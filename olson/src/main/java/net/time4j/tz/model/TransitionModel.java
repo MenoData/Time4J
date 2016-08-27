@@ -25,7 +25,6 @@ import net.time4j.Moment;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
-import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
@@ -38,7 +37,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -172,37 +170,6 @@ public abstract class TransitionModel
     public boolean isEmpty() {
 
         return false;
-
-    }
-
-    @Override
-    public final ZonalTransition getStartTransition(UnixTime ut) {
-
-        return this.findStartTransition(ut);
-
-    }
-
-    @Override
-    public final ZonalTransition getNextTransition(UnixTime ut) {
-
-        return this.findNextTransition(ut);
-
-    }
-
-    @Override
-    public final ZonalTransition getConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        return this.findConflictTransition(localDate, localTime);
-
-    }
-
-    @Override
-    public final ZonalTransition findPreviousTransition(UnixTime ut) {
-
-        return this.findStartTransition(Moment.from(ut).minus(1, TimeUnit.NANOSECONDS));
 
     }
 

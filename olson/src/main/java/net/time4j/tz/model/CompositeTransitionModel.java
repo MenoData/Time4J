@@ -91,24 +91,24 @@ final class CompositeTransitionModel
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
+    public ZonalTransition getStartTransition(UnixTime ut) {
 
         if (ut.getPosixTime() < this.last.getPosixTime()) {
-            return this.arrayModel.findStartTransition(ut);
+            return this.arrayModel.getStartTransition(ut);
         } else {
-            ZonalTransition result = this.ruleModel.findStartTransition(ut);
+            ZonalTransition result = this.ruleModel.getStartTransition(ut);
             return ((result == null) ? this.last : result);
         }
 
     }
 
     @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
+    public ZonalTransition getNextTransition(UnixTime ut) {
 
-        ZonalTransition result = this.arrayModel.findNextTransition(ut);
+        ZonalTransition result = this.arrayModel.getNextTransition(ut);
 
         if (result == null) {
-            result = this.ruleModel.findNextTransition(ut);
+            result = this.ruleModel.getNextTransition(ut);
         }
 
         return result;
@@ -116,12 +116,12 @@ final class CompositeTransitionModel
     }
 
     @Override
-    public ZonalTransition findConflictTransition(
+    public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
-        return this.arrayModel.findConflictTransition(
+        return this.arrayModel.getConflictTransition(
             localDate,
             localTime,
             this.ruleModel);

@@ -207,37 +207,6 @@ final class SingleOffsetTimezone
     }
 
     @Override
-    public ZonalTransition findStartTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findNextTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findPreviousTransition(UnixTime ut) {
-
-        return null;
-
-    }
-
-    @Override
-    public ZonalTransition findConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        return null;
-
-    }
-
-    @Override
     public ZonalOffset getInitialOffset() {
 
         return this.offset;
