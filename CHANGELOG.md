@@ -11,6 +11,7 @@
 - New date-interval-method to convert to a moment interval [#534]
 - New interval boundary manipulations based on operators [#538]
 - Determine first moment for given calendar date in time zone [#539]
+- Enable parsing of literals with leading digits after numerical elements [#544]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
