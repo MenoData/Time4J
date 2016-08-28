@@ -187,7 +187,7 @@ public class CalendarMonthTest {
     }
 
     @Test
-    public void parse() throws ParseException {
+    public void parse1() throws ParseException {
         CalendarMonth expected = CalendarMonth.of(2012, Month.FEBRUARY);
         assertThat(
             ChronoFormatter.ofPattern(
@@ -197,6 +197,18 @@ public class CalendarMonthTest {
                 CalendarMonth.chronology()
             ).parse("201202"),
             is(expected));
+    }
+
+    @Test
+    public void parse2() throws ParseException {
+        assertThat(
+            ChronoFormatter.ofPattern(
+                "yyyyMM'00'",
+                PatternType.CLDR,
+                Locale.ROOT,
+                CalendarMonth.chronology()
+            ).parse("20150100"),
+            is(CalendarMonth.of(2015, Month.JANUARY)));
     }
 
     @Test

@@ -102,6 +102,9 @@ final class LiteralProcessor
         if ((literal < ' ') || (alt < ' ')) {
             throw new IllegalArgumentException(
                 "Literal must not start with non-printable char.");
+        } else if (Character.isDigit(literal) || Character.isDigit(alt)) {
+            throw new IllegalArgumentException(
+                "Literal must not be a decimal digit.");
         }
 
         this.caseInsensitive = true;
@@ -202,7 +205,7 @@ final class LiteralProcessor
             literal = attributes.get(this.attribute, Character.valueOf('\u0000')).charValue();
         }
 
-        if ((offset >= text.length()) || (literal == '\u0000')) {
+        if ((offset >= text.length()) || (literal == '\u0000') || Character.isDigit(literal)) {
             error = true;
         } else {
             c = text.charAt(offset);
@@ -360,7 +363,11 @@ final class LiteralProcessor
     @Override
     public boolean isNumerical() {
 
-        return false;
+        if (this.multi == null) {
+            return false;
+        }
+
+        return (this.getPrefixedDigitArea() == this.multi.length());
 
     }
 
@@ -378,6 +385,23 @@ final class LiteralProcessor
             this.attribute,
             attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue()
         );
+
+    }
+
+    // count of leading digits
+    int getPrefixedDigitArea() {
+
+        if (this.multi == null) {
+            return 0;
+        }
+
+        int digits = 0;
+
+        for (int i = 0, n = this.multi.length(); i < n && Character.isDigit(this.multi.charAt(i)); i++) {
+            digits++;
+        }
+
+        return digits;
 
     }
 
