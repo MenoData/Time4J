@@ -1349,6 +1349,41 @@ public final class PlainDate
     }
 
     /**
+     * <p>Subtracts given amount in units from this date and yields the result of subtraction. </p>
+     *
+     * <p>Covers the most important units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this date (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoDateUnit)
+     * @since   4.18
+     */
+    /*[deutsch]
+     * <p>Subtrahiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * von diesem Datum und liefert das Subtraktionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten Zeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this date (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoDateUnit)
+     * @since   4.18
+     */
+    public PlainDate minus(
+        long amount,
+        CalendarUnit unit
+    ) {
+
+        return this.plus(Math.negateExact(amount), unit);
+
+    }
+
+    /**
      * <p>Creates a new formatter which uses the given pattern in the
      * default locale for formatting and parsing plain dates. </p>
      *
