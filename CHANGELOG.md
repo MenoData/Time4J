@@ -1,4 +1,6 @@
-## [v4.18] not yet released
+## [v4.19] not yet released
+
+## [v4.18] published on 2016-08-28
 ### Added
 - Stream support for ISO-intervals [#537]
 - Recurrent intervals as defined in ISO-8601 [#488]
