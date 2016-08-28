@@ -3988,28 +3988,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /**
          * <p>Defines a literal element with exactly one char. </p>
          *
-         * <p>Usually the literal char is a punctuation mark or a
-         * letter symbol. Decimal digits as literal chars are not
-         * recommended, especially not after preceding numerical
-         * elements. </p>
+         * <p>Equivalent to {@link #addLiteral(String) addLiteral(String.valueOf(literal))}. </p>
          *
          * @param   literal         single literal char
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if the char represents
-         *          a non-printable ASCII-char
+         * @throws  IllegalArgumentException if the char represents a non-printable ASCII-char
          */
         /*[deutsch]
          * <p>Definiert ein Literalelement mit genau einem festen Zeichen. </p>
          *
-         * <p>In der Regel handelt es sich um ein Interpunktionszeichen oder
-         * ein Buchstabensymbol. Dezimalziffern als Literal werden nicht
-         * empfohlen, besonders nicht nach vorhergehenden numerischen
-         * Elementen. </p>
+         * <p>&Auml;quivalent zu {@link #addLiteral(String) addLiteral(String.valueOf(literal))}. </p>
          *
          * @param   literal         single literal char
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if the char represents
-         *          a non-printable ASCII-char
+         * @throws  IllegalArgumentException if the char represents a non-printable ASCII-char
          */
         public Builder<T> addLiteral(char literal) {
 
@@ -4021,30 +4013,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Defines a literal element with exactly one char which can also be an alternative char
          * during parsing. </p>
          *
-         * <p>Usually the literal char is a punctuation mark or a
-         * letter symbol. Decimal digits as literal chars are not
-         * recommended, especially not after preceding numerical
-         * elements. </p>
+         * <p>The literal char is a punctuation mark or a letter symbol.
+         * Decimal digits as literal chars are not permitted. </p>
          *
-         * @param   literal         single literal char (preferred in printing)
-         * @param   alt             alternative literal char for parsing
+         * @param   literal         single non-digit literal char (preferred in printing)
+         * @param   alt             alternative non-digit literal char for parsing
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if any char represents a non-printable ASCII-char
+         * @throws  IllegalArgumentException if any char represents a non-printable ASCII-char or a decimal digit
          * @since   3.1
          */
         /*[deutsch]
          * <p>Definiert ein Literalelement mit genau einem festen Zeichen, das beim Parsen
          * auch ein Alternativzeichen sein kann. </p>
          *
-         * <p>In der Regel handelt es sich um ein Interpunktionszeichen oder
-         * ein Buchstabensymbol. Dezimalziffern als Literal werden nicht
-         * empfohlen, besonders nicht nach vorhergehenden numerischen
-         * Elementen. </p>
+         * <p>Es handelt sich um ein Interpunktionszeichen oder ein Buchstabensymbol.
+         * Dezimalziffern als Literal sind nicht zugelassen. </p>
          *
-         * @param   literal         single literal char (preferred in printing)
-         * @param   alt             alternative literal char for parsing
+         * @param   literal         single non-digit literal char (preferred in printing)
+         * @param   alt             alternative non-digit literal char for parsing
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if any char represents a non-printable ASCII-char
+         * @throws  IllegalArgumentException if any char represents a non-printable ASCII-char or a decimal digit
          * @since   3.1
          */
         public Builder<T> addLiteral(
@@ -4060,32 +4048,56 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         /**
          * <p>Defines a literal element with any chars. </p>
          *
-         * <p>Usually the literal char sequence consists of punctuation
-         * marks or letter symbols. Leading decimal digits as literal
-         * chars are not recommended, especially not after preceding
-         * numerical elements. </p>
+         * <p>Usually the literal char sequence consists of punctuation marks or letter symbols.
+         * Exceptionally, digit chars are possible although such chars will only be parsed as
+         * literals and not associated with any chronological meaning. </p>
          *
          * @param   literal         literal char sequence
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given literal is empty
-         *          or starts with a non-printable ASCII-char
+         * @throws  IllegalArgumentException if given literal is empty or starts with a non-printable ASCII-char
          */
         /*[deutsch]
          * <p>Definiert ein Literalelement mit beliebigen Zeichen. </p>
          *
-         * <p>In der Regel handelt es sich um Interpunktionszeichen oder
-         * Buchstabensymbole. F&uuml;hrende Dezimalziffern als Literal werden
-         * nicht empfohlen, besonders nicht nach vorhergehenden numerischen
-         * Elementen. </p>
+         * <p>In der Regel handelt es sich um Interpunktionszeichen oder Buchstabensymbole.
+         * In Ausnahmef&auml;llen k&ouml;nnen es auch Ziffern sein, die dann aber eben nur
+         * als Literale und nicht chronologisch interpretiert werden. </p>
          *
          * @param   literal         literal char sequence
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given literal is empty
-         *          or starts with a non-printable ASCII-char
+         * @throws  IllegalArgumentException if given literal is empty or starts with a non-printable ASCII-char
          */
         public Builder<T> addLiteral(String literal) {
 
-            this.addProcessor(new LiteralProcessor(literal));
+            LiteralProcessor processor = new LiteralProcessor(literal);
+            int reserved = processor.getPrefixedDigitArea();
+
+            if (reserved > 0) {
+                FormatStep last = (
+                    this.steps.isEmpty()
+                        ? null
+                        : this.steps.get(this.steps.size() - 1)
+                );
+
+                if ((last != null) && last.isDecimal() && !last.isNewOrBlockStarted()) {
+                    throw new IllegalStateException(
+                        "Numerical literal can't be inserted after an element with decimal digits.");
+                }
+            }
+
+            if ((reserved == 0) || (this.reservedIndex == -1)) {
+                this.addProcessor(processor);
+            } else {
+                int ri = this.reservedIndex;
+                FormatStep numStep = this.steps.get(ri);
+                this.addProcessor(processor);
+
+                if (numStep.getSection() == this.steps.get(this.steps.size() - 1).getSection()) {
+                    this.reservedIndex = ri;
+                    this.steps.set(ri, numStep.reserve(reserved));
+                }
+            }
+
             return this;
 
         }
@@ -4099,7 +4111,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * Note: If given format attribute does not exist at runtime then
          * the formatting will fail. </p>
          *
-         * @param   attribute       attribute defining a literal char
+         * @param   attribute       attribute defining a literal char which must be a non-digit char
          * @return  this instance for method chaining
          */
         /*[deutsch]
@@ -4111,7 +4123,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * angegeben wird. Hinweis: Existiert das Formatattribut nicht zur
          * Laufzeit, wird die Formatierung scheitern. </p>
          *
-         * @param   attribute       attribute defining a literal char
+         * @param   attribute       attribute defining a literal char which must be a non-digit char
          * @return  this instance for method chaining
          */
         public Builder<T> addLiteral(AttributeKey<Character> attribute) {

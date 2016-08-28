@@ -54,12 +54,14 @@ import java.util.Set;
  * <p>Collection of different format patterns. </p>
  *
  * @author  Meno Hochschild
+ * @see     net.time4j.format.expert.ChronoFormatter.Builder#addPattern(String, PatternType)
  * @since   3.0
  */
 /*[deutsch]
  * <p>Sammlung von verschiedenen Standard-Formatmustern. </p>
  *
  * @author  Meno Hochschild
+ * @see     net.time4j.format.expert.ChronoFormatter.Builder#addPattern(String, PatternType)
  * @since   3.0
  */
 public enum PatternType
