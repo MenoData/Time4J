@@ -1,4 +1,6 @@
-## [v3.22] not yet released
+## [v3.23] not yet released
+
+## [v3.22] published on 2016-08-28
 ### Added
 - Recurrent intervals as defined in ISO-8601 [#488]
 - Add localized display names for `ChronoElement` [#515]
