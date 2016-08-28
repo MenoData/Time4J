@@ -122,7 +122,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * can apply following code to determine the exact variant-dependent range: </p>
  *
  * <pre>
- *     CalendarSystem<HijriCalendar> calsys =
+ *     CalendarSystem&lt;HijriCalendar&gt; calsys =
  *       HijriCalendar.family().getCalendarSystem(HijriCalendar.VARIANT_UMALQURA);
  *     long min = calsys.getMinimumSinceUTC(); // -32556
  *     long max = calsys.getMaximumSinceUTC(); // 38671
@@ -199,7 +199,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * Wertbereich zu bestimmen: </p>
  *
  * <pre>
- *     CalendarSystem<HijriCalendar> calsys =
+ *     CalendarSystem&lt;HijriCalendar&gt; calsys =
  *       HijriCalendar.family().getCalendarSystem(HijriCalendar.VARIANT_UMALQURA);
  *     long min = calsys.getMinimumSinceUTC(); // -32556
  *     long max = calsys.getMaximumSinceUTC(); // 38671
