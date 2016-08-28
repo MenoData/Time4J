@@ -18,6 +18,7 @@
 - New interval boundary manipulations based on operators [#538]
 - Determine first moment for given calendar date in time zone [#539]
 - Add method to determine intersection interval [#542]
+- Enable parsing of literals with leading digits after numerical elements [#544]
 
 ### Fixed
 - Prescan phase of iso interval parser sometimes incorrect [#530]
