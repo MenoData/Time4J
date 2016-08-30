@@ -1,4 +1,6 @@
 ## [v4.19] not yet released
+### Fixed
+- PUSH-FORWARD-strategy is not suitable for intervals [#545]
 
 ## [v4.18] published on 2016-08-28
 ### Added
