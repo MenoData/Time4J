@@ -250,7 +250,7 @@ public final class PlainDate
      * <pre>
      *  PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
      *  tsp = tsp.with(PlainDate.COMPONENT, PlainDate.of(2015, 1, 1));
-     *  System.out.println(tsp); // output: 2015-01-01T14:30
+     *  System.out.println(tsp); // Ausgabe: 2015-01-01T14:30
      * </pre>
      *
      * @since   1.2
@@ -267,19 +267,19 @@ public final class PlainDate
      *  import static net.time4j.PlainDate.YEAR;
      *
      *  PlainDate date = PlainDate.of(2012, 2, 29);
-     *  System.out.println(date.get(YEAR)); // Ausgabe: 2012
+     *  System.out.println(date.get(YEAR)); // output: 2012
      *
      *  date = date.with(YEAR, 2014);
-     *  System.out.println(date); // Ausgabe: 2014-02-28
+     *  System.out.println(date); // output: 2014-02-28
      *
      *  date = date.with(YEAR.incremented()); // n&auml;chstes Jahr
-     *  System.out.println(date); // Ausgabe: 2015-02-28
+     *  System.out.println(date); // output: 2015-02-28
      *
      *  date = date.with(YEAR.atCeiling()); // letzter Tag des Jahres
-     *  System.out.println(date); // Ausgabe: 2015-12-31
+     *  System.out.println(date); // output: 2015-12-31
      *
      *  date = date.with(YEAR.atFloor()); // erster Tag des Jahres
-     *  System.out.println(date); // Ausgabe: 2015-01-01
+     *  System.out.println(date); // output: 2015-01-01
      * </pre>
      *
      * <p>The term &quot;proleptic&quot; means that the rules of the gregorian
@@ -491,7 +491,7 @@ public final class PlainDate
      *
      *  PlainDate date = PlainDate.of(2012, 2, 29);
      *  date = date.with(MONTH_AS_NUMBER.setLenient(13);
-     *  System.out.println(date); // Ausgabe: 2013-01-29
+     *  System.out.println(date); // output: 2013-01-29
      * </pre>
      *
      * @see     #MONTH_OF_YEAR
@@ -540,8 +540,7 @@ public final class PlainDate
             'd');
 
     /**
-     * <p>Element with the day of week in the value range
-     * {@code MONDAY-SUNDAY}. </p>
+     * <p>Element with the day of week in the value range {@code MONDAY-SUNDAY}. </p>
      *
      * <p>A localized form is available by {@link Weekmodel#localDayOfWeek()}.
      * In US sunday is considered as first day of week, different from
@@ -551,8 +550,7 @@ public final class PlainDate
      * in a country like US. </p>
      */
     /*[deutsch]
-     * <p>Element mit dem Tag der Woche
-     * (Wertebereich {@code MONDAY-SUNDAY}). </p>
+     * <p>Element mit dem Tag der Woche (Wertebereich {@code MONDAY-SUNDAY}). </p>
      *
      * <p>Eine lokalisierte Form ist mittels {@link Weekmodel#localDayOfWeek()}
      * verf&uuml;gbar. In den USA z.B. ist der Sonntag der erste Tag der
@@ -571,8 +569,7 @@ public final class PlainDate
             'E');
 
     /**
-     * <p>Element with the day of year in the value range
-     * {@code 1-365/366}). </p>
+     * <p>Element with the day of year in the value range {@code 1-365/366}). </p>
      */
     /*[deutsch]
      * <p>Element mit dem Tag des Jahres (Wertebereich {@code 1-365/366}). </p>
