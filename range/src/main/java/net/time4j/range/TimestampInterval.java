@@ -38,6 +38,8 @@ import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.SignPolicy;
+import net.time4j.tz.GapResolver;
+import net.time4j.tz.OverlapResolver;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -279,7 +281,7 @@ public final class TimestampInterval
      */
     public MomentInterval inStdTimezone() {
 
-        return this.in(Timezone.ofSystem());
+        return this.in(SystemTimezoneHolder.get());
 
     }
 
@@ -293,6 +295,8 @@ public final class TimestampInterval
      * @since   2.0
      * @see     Timezone#of(TZID)
      * @see     #inStdTimezone()
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
      */
     /*[deutsch]
      * <p>Kombiniert dieses lokale Zeitstempelintervall mit der angegebenen
@@ -304,10 +308,12 @@ public final class TimestampInterval
      * @since   2.0
      * @see     Timezone#of(TZID)
      * @see     #inStdTimezone()
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
      */
     public MomentInterval inTimezone(TZID tzid) {
 
-        return this.in(Timezone.of(tzid));
+        return this.in(Timezone.of(tzid).with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET)));
 
     }
 
@@ -318,6 +324,7 @@ public final class TimestampInterval
      * @param   tz      timezone
      * @return  global timestamp intervall interpreted in given timezone
      * @since   2.0
+     * @deprecated  Will become an internal private method starting with v5.0, use {@link #inTimezone(TZID)} instead
      */
     /*[deutsch]
      * <p>Kombiniert dieses lokale Zeitstempelintervall mit der angegebenen
@@ -326,7 +333,10 @@ public final class TimestampInterval
      * @param   tz      timezone
      * @return  global timestamp intervall interpreted in given timezone
      * @since   2.0
+     * @deprecated  Will become an internal private method starting with v5.0, use {@link #inTimezone(TZID)} instead
      */
+    @Deprecated
+    // TODO: make the method package-private in v5.0
     public MomentInterval in(Timezone tz) {
 
         Boundary<Moment> b1;
@@ -1076,6 +1086,32 @@ public final class TimestampInterval
 
             builder.setDefault(element, defaultSupplier.get(element));
 
+        }
+
+    }
+
+    private static class SystemTimezoneHolder {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final Timezone SYS_TZ;
+
+        static {
+            if (Boolean.getBoolean("net.time4j.allow.system.tz.override")) {
+                SYS_TZ = null;
+            } else {
+                SYS_TZ = create();
+            }
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        static Timezone get() {
+            return ((SYS_TZ == null) ? create() : SYS_TZ);
+        }
+
+        private static Timezone create() {
+            return Timezone.ofSystem().with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET));
         }
 
     }

@@ -37,6 +37,9 @@ import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.SignPolicy;
+import net.time4j.tz.GapResolver;
+import net.time4j.tz.OverlapResolver;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 
@@ -271,6 +274,7 @@ public final class DateInterval
      * @return  global timestamp intervall interpreted in given timezone
      * @see     Timezone#with(TransitionStrategy)
      * @since   3.22/4.18
+     * @deprecated  Use {@link #inTimezone(TZID)} instead
      */
     /*[deutsch]
      * <p>Kombiniert dieses Datumsintervall mit der angegebenen
@@ -286,10 +290,48 @@ public final class DateInterval
      * @return  global timestamp intervall interpreted in given timezone
      * @see     Timezone#with(TransitionStrategy)
      * @since   3.22/4.18
+     * @deprecated  Use {@link #inTimezone(TZID)} instead
      */
+    @Deprecated
     public MomentInterval in(Timezone tz) {
 
         return this.toFullDays().in(tz);
+
+    }
+
+    /**
+     * <p>Converts this instance to a moment interval with date boundaries mapped
+     * to the midnight cycle in given time zone. </p>
+     *
+     * <p>The resulting interval is half-open if this interval is finite. Note that sometimes
+     * the moments of result intervals can deviate from midnight if midnight does not exist
+     * due to daylight saving effects. </p>
+     *
+     * @param   tzid        timezone identifier
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Kombiniert dieses Datumsintervall mit der angegebenen
+     * Zeitzone zu einem globalen UTC-Intervall, indem die Momente
+     * den Mitternachtszyklus abbilden. </p>
+     *
+     * <p>Das Ergebnisintervall ist halb-offen, wenn dieses Intervall endlich ist. Hinweis:
+     * Manchmal sind die Momentgrenzen von Mitternacht verschieden, n&auml;mlich dann, wenn
+     * wegen Sommerzeitumstellungen Mitternacht nicht vorhanden ist. </p>
+     *
+     * @param   tzid        timezone identifier
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
+     * @since   3.23/4.19
+     */
+    public MomentInterval inTimezone(TZID tzid) {
+
+        return this.toFullDays().in(
+            Timezone.of(tzid).with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET)));
 
     }
 
