@@ -3,6 +3,8 @@ package net.time4j.range;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.tz.olson.EUROPE;
+import net.time4j.tz.olson.PACIFIC;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -20,7 +22,7 @@ import static org.junit.Assert.assertThat;
 public class DayPartitionTest {
 
     @Test
-    public void doTest() {
+    public void simpleCase() {
         DayPartitionRule rule =
             new DayPartitionBuilder()
                 .addExclusion(Collections.singleton(PlainDate.of(2016, 8, 27)))
@@ -41,6 +43,7 @@ public class DayPartitionTest {
         List<TimestampInterval> intervals =
             DateInterval.between(PlainDate.of(2016, 8, 25), PlainDate.of(2016, 9, 7))
                 .streamPartitioned(rule)
+                .parallel()
                 .collect(Collectors.toList());
 
         List<ChronoInterval<PlainTimestamp>> expected = new ArrayList<>();
@@ -76,6 +79,102 @@ public class DayPartitionTest {
             TimestampInterval.between(PlainTimestamp.of(2016, 9, 6, 9, 15), PlainTimestamp.of(2016, 9, 6, 12, 45)));
         expected.add(
             TimestampInterval.between(PlainTimestamp.of(2016, 9, 7, 9, 0), PlainTimestamp.of(2016, 9, 7, 12, 30)));
+
+        assertThat(intervals, is(expected));
+    }
+
+    @Test
+    public void euCaseWithFullIntervalInGap() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(SUNDAY, ClockInterval.between(PlainTime.of(2, 10), PlainTime.of(2, 20)))
+                .addWeekdayRule(SUNDAY, ClockInterval.between(PlainTime.of(2, 30), PlainTime.of(3, 0)))
+                .addWeekdayRule(SATURDAY, ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(12, 0)))
+                .build();
+
+        List<MomentInterval> intervals =
+            DateInterval.between(PlainDate.of(2016, 3, 26), PlainDate.of(2016, 3, 28))
+                .streamPartitioned(rule, EUROPE.BERLIN)
+                .collect(Collectors.toList());
+
+        List<MomentInterval> expected = new ArrayList<>();
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2016, 3, 26, 10, 0).inTimezone(EUROPE.BERLIN),
+                PlainTimestamp.of(2016, 3, 26, 12, 0).inTimezone(EUROPE.BERLIN)));
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2016, 3, 28, 9, 0).inTimezone(EUROPE.BERLIN),
+                PlainTimestamp.of(2016, 3, 28, 12, 30).inTimezone(EUROPE.BERLIN)));
+
+        assertThat(intervals, is(expected));
+    }
+
+    @Test
+    public void euCaseWithPartialIntervalInGap() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(SUNDAY, ClockInterval.between(PlainTime.of(1, 10), PlainTime.of(2, 20)))
+                .addWeekdayRule(SUNDAY, ClockInterval.between(PlainTime.of(2, 30), PlainTime.of(3, 15)))
+                .addWeekdayRule(SATURDAY, ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(12, 0)))
+                .build();
+
+        List<MomentInterval> intervals =
+            DateInterval.between(PlainDate.of(2016, 3, 26), PlainDate.of(2016, 3, 28))
+                .streamPartitioned(rule, EUROPE.BERLIN)
+                .collect(Collectors.toList());
+
+        List<MomentInterval> expected = new ArrayList<>();
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2016, 3, 26, 10, 0).inTimezone(EUROPE.BERLIN),
+                PlainTimestamp.of(2016, 3, 26, 12, 0).inTimezone(EUROPE.BERLIN)));
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2016, 3, 27, 1, 10).inTimezone(EUROPE.BERLIN),
+                PlainTimestamp.of(2016, 3, 27, 3, 0).inTimezone(EUROPE.BERLIN)));
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2016, 3, 27, 3, 0).inTimezone(EUROPE.BERLIN),
+                PlainTimestamp.of(2016, 3, 27, 3, 15).inTimezone(EUROPE.BERLIN)));
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2016, 3, 28, 9, 0).inTimezone(EUROPE.BERLIN),
+                PlainTimestamp.of(2016, 3, 28, 12, 30).inTimezone(EUROPE.BERLIN)));
+
+        assertThat(intervals, is(expected));
+    }
+
+    @Test
+    public void samoaCase() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
+                .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(SATURDAY, ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(12, 0)))
+                .build();
+
+        List<MomentInterval> intervals =
+            DateInterval.between(PlainDate.of(2011, 12, 29), PlainDate.of(2011, 12, 31))
+                .streamPartitioned(rule, PACIFIC.APIA)
+                .collect(Collectors.toList());
+
+        List<MomentInterval> expected = new ArrayList<>();
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2011, 12, 29, 9, 0).inTimezone(PACIFIC.APIA),
+                PlainTimestamp.of(2011, 12, 29, 12, 30).inTimezone(PACIFIC.APIA)));
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2011, 12, 29, 14, 0).inTimezone(PACIFIC.APIA),
+                PlainTimestamp.of(2011, 12, 29, 19, 0).inTimezone(PACIFIC.APIA)));
+        expected.add(
+            MomentInterval.between(
+                PlainTimestamp.of(2011, 12, 31, 10, 0).inTimezone(PACIFIC.APIA),
+                PlainTimestamp.of(2011, 12, 31, 12, 0).inTimezone(PACIFIC.APIA)));
 
         assertThat(intervals, is(expected));
     }

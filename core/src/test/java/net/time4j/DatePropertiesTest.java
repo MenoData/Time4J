@@ -845,6 +845,12 @@ public class DatePropertiesTest {
         assertThat(
             PlainDate.of(2012, 2, 29).with(DAY_OF_WEEK, Weekday.SUNDAY),
             is(PlainDate.of(2012, 3, 4)));
+        assertThat(
+            PlainDate.of(2012, 2, 29).with(DAY_OF_WEEK, Weekday.SUNDAY).with(DAY_OF_WEEK, Weekday.SUNDAY),
+            is(PlainDate.of(2012, 3, 4)));
+        assertThat(
+            PlainDate.of(2012, 2, 29).with(DAY_OF_WEEK, Weekday.SUNDAY).with(DAY_OF_WEEK, Weekday.MONDAY),
+            is(PlainDate.of(2012, 2, 27)));
     }
 
     @Test

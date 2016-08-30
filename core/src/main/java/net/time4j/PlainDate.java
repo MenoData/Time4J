@@ -722,8 +722,8 @@ public final class PlainDate
     private transient final byte month;
     private transient final byte dayOfMonth;
 
-    // race-single-check-idiom
-    private transient Weekday weekday = null;
+    // racy-single-check-idiom not applicable due to value-type-constraints in future Java
+    private transient final Weekday weekday;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -1196,7 +1196,6 @@ public final class PlainDate
 
         if (dow == null) {
             dow = Weekday.valueOf(GregorianMath.getDayOfWeek(this.year, this.month, this.dayOfMonth));
-            this.weekday = dow;
         }
 
         return dow;
@@ -1940,11 +1939,16 @@ public final class PlainDate
 
         Weekday old = this.getDayOfWeek();
 
+        PlainDate date = (
+            (this.weekday == null)
+            ? new PlainDate(this.year, this.month, this.dayOfMonth, old)
+            : this);
+
         if (old == dayOfWeek) {
-            return this;
+            return date;
         }
 
-        return PlainDate.addDays(this, dayOfWeek.getValue() - old.getValue());
+        return PlainDate.addDays(date, dayOfWeek.getValue() - old.getValue());
 
     }
 

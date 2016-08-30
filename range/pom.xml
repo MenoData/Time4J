@@ -29,6 +29,12 @@
             <scope>compile</scope>
         </dependency>
         <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-olson</artifactId>
+            <version>[4.17,)</version>
+            <scope>test</scope>
+        </dependency>
+        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
         </dependency>

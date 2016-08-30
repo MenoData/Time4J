@@ -27,6 +27,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekcycle;
+import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.AttributeQuery;
@@ -44,6 +45,9 @@ import net.time4j.format.expert.IsoDateStyle;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.PatternType;
 import net.time4j.format.expert.SignPolicy;
+import net.time4j.tz.GapResolver;
+import net.time4j.tz.OverlapResolver;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 
@@ -478,6 +482,7 @@ public final class DateInterval
      * @return  global timestamp intervall interpreted in given timezone
      * @see     Timezone#with(TransitionStrategy)
      * @since   3.22/4.18
+     * @deprecated  Use {@link #inTimezone(TZID)} instead
      */
     /*[deutsch]
      * <p>Kombiniert dieses Datumsintervall mit der angegebenen
@@ -493,10 +498,48 @@ public final class DateInterval
      * @return  global timestamp intervall interpreted in given timezone
      * @see     Timezone#with(TransitionStrategy)
      * @since   3.22/4.18
+     * @deprecated  Use {@link #inTimezone(TZID)} instead
      */
+    @Deprecated
     public MomentInterval in(Timezone tz) {
 
         return this.toFullDays().in(tz);
+
+    }
+
+    /**
+     * <p>Converts this instance to a moment interval with date boundaries mapped
+     * to the midnight cycle in given time zone. </p>
+     *
+     * <p>The resulting interval is half-open if this interval is finite. Note that sometimes
+     * the moments of result intervals can deviate from midnight if midnight does not exist
+     * due to daylight saving effects. </p>
+     *
+     * @param   tzid        timezone identifier
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Kombiniert dieses Datumsintervall mit der angegebenen
+     * Zeitzone zu einem globalen UTC-Intervall, indem die Momente
+     * den Mitternachtszyklus abbilden. </p>
+     *
+     * <p>Das Ergebnisintervall ist halb-offen, wenn dieses Intervall endlich ist. Hinweis:
+     * Manchmal sind die Momentgrenzen von Mitternacht verschieden, n&auml;mlich dann, wenn
+     * wegen Sommerzeitumstellungen Mitternacht nicht vorhanden ist. </p>
+     *
+     * @param   tzid        timezone identifier
+     * @return  global timestamp intervall interpreted in given timezone
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
+     * @since   3.23/4.19
+     */
+    public MomentInterval inTimezone(TZID tzid) {
+
+        return this.toFullDays().in(
+            Timezone.of(tzid).with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET)));
 
     }
 
@@ -977,13 +1020,14 @@ public final class DateInterval
     }
 
     /**
-     * <p>Creates a partitioning stream where every day of this interval is partitioned according to
-     * given partitioning rule. </p>
+     * <p>Creates a partitioning stream of timestamp intervals where every day of this interval is partitioned
+     * according to given partitioning rule. </p>
      *
      * <p>This method enables the easy construction of daily shop opening times or weekly work time schedules. </p>
      *
      * @param   rule        day partition rule
      * @return  stream of timestamp intervals
+     * @see     #streamPartitioned(DayPartitionRule, TZID)
      * @since   4.18
      */
     /*[deutsch]
@@ -995,6 +1039,7 @@ public final class DateInterval
      *
      * @param   rule        day partition rule
      * @return  stream of timestamp intervals
+     * @see     #streamPartitioned(DayPartitionRule, TZID)
      * @since   4.18
      */
     public Stream<TimestampInterval> streamPartitioned(DayPartitionRule rule) {
@@ -1009,6 +1054,50 @@ public final class DateInterval
                         )
                 )
         );
+
+    }
+
+    /**
+     * <p>Creates a partitioning stream of moment intervals where every day of this interval is partitioned
+     * according to given partitioning rule. </p>
+     *
+     * <p>This method enables the easy construction of daily shop opening times or weekly work time schedules. </p>
+     *
+     * @param   rule        day partition rule
+     * @param   tzid        timezone identifier
+     * @return  stream of moment intervals
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #streamPartitioned(DayPartitionRule)
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeden Tag dieses Intervalls entsprechend der angegebenen Regel
+     * in einzelne Tagesabschnitte zerlegt und als Momentintervalle darstellt. </p>
+     *
+     * <p>Hiermit k&ouml;nnen t&auml;gliche Laden&ouml;ffnungszeiten oder w&ouml;chentliche Arbeitszeitschemata
+     * auf einfache Weise erstellt werden. </p>
+     *
+     * @param   rule        day partition rule
+     * @param   tzid        timezone identifier
+     * @return  stream of moment intervals
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     #streamPartitioned(DayPartitionRule)
+     * @see     GapResolver#NEXT_VALID_TIME
+     * @see     OverlapResolver#EARLIER_OFFSET
+     * @since   4.19
+     */
+    public Stream<MomentInterval> streamPartitioned(
+        DayPartitionRule rule,
+        TZID tzid
+    ) {
+
+        final Timezone tz = Timezone.of(tzid).with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET));
+
+        return this.streamPartitioned(rule)
+            .map(interval -> interval.in(tz))
+            .filter(interval -> !interval.isEmpty());
 
     }
 
@@ -1861,7 +1950,7 @@ public final class DateInterval
 
         }
 
-        DailySpliterator(
+        private DailySpliterator(
             PlainDate start,
             long startEpoch,
             long endEpoch
@@ -1871,8 +1960,10 @@ public final class DateInterval
             this.startEpoch = startEpoch;
             this.endEpoch = endEpoch;
 
-            start.getDayOfWeek(); // trigger day-of-week-optimization
-            this.current = ((startEpoch > endEpoch) ? null : start);
+            this.current = (
+                (startEpoch > endEpoch)
+                ? null
+                : start.with(PlainDate.DAY_OF_WEEK, Weekday.valueOf((int) Math.floorMod(startEpoch + 5, 7) + 1)));
 
         }
 
@@ -1951,6 +2042,7 @@ public final class DateInterval
             }
 
             Spliterator<PlainDate> split = new DailySpliterator(this.current, this.startEpoch, dateEpoch);
+            Weekday newWD = this.current.getDayOfWeek().roll((int) (dateEpoch - this.startEpoch + 1));
             this.startEpoch = dateEpoch + 1;
 
             if (allowHalfMonths) {
@@ -1964,7 +2056,7 @@ public final class DateInterval
                 this.current = PlainDate.of(year, month, 1);
             }
 
-            this.current.getDayOfWeek(); // trigger day-of-week-optimization
+            this.current = this.current.with(PlainDate.DAY_OF_WEEK, newWD); // trigger day-of-week-optimization
             return split;
 
         }
