@@ -824,6 +824,7 @@ public final class MachineTime<U>
      * @param   divisor     divisor
      * @return  changed copy of this duration
      * @see     RoundingMode#HALF_UP
+     * @deprecated Use {@link #dividedBy(long, RoundingMode) dividedBy(long, RoundingMode.HALF_UP} instead
      */
     /*[deutsch]
      * <p>Dividiert diese Dauer durch den angegebenen Teiler und
@@ -832,17 +833,42 @@ public final class MachineTime<U>
      * @param   divisor     Teiler
      * @return  ge&auml;nderte Kopie dieser Dauer
      * @see     RoundingMode#HALF_UP
+     * @deprecated Use {@link #dividedBy(long, RoundingMode) dividedBy(long, RoundingMode.HALF_UP} instead
      */
+    @Deprecated
     public MachineTime<U> dividedBy(long divisor) {
+
+        return this.dividedBy(divisor, RoundingMode.HALF_UP);
+
+    }
+
+    /**
+     * <p>Divides this duration by given divisor using given rounding mode. </p>
+     *
+     * @param   divisor         divisor
+     * @param   roundingMode    rounding mode to be used in division
+     * @return  changed copy of this duration
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Dividiert diese Dauer durch den angegebenen Teiler und benutzt die angegebene Rundung. </p>
+     *
+     * @param   divisor         divisor
+     * @param   roundingMode    rounding mode to be used in division
+     * @return  changed copy of this duration
+     * @since   3.23/4.19
+     */
+    public MachineTime<U> dividedBy(
+        long divisor,
+        RoundingMode roundingMode
+    ) {
 
         if (divisor == 1) {
             return this;
         }
 
         BigDecimal value =
-            this.toBigDecimal()
-                .setScale(9, RoundingMode.FLOOR)
-                .divide(new BigDecimal(divisor), RoundingMode.HALF_UP);
+            this.toBigDecimal().setScale(9, RoundingMode.FLOOR).divide(new BigDecimal(divisor), roundingMode);
         MachineTime<?> mt;
 
         if (this.scale == POSIX) {
@@ -858,28 +884,34 @@ public final class MachineTime<U>
     @Override
     public <T extends TimePoint<? super U, T>> T addTo(T time) {
 
+        U s, f;
+
         if (this.scale == POSIX) {
-            U s = cast(TimeUnit.SECONDS);
-            U f = cast(TimeUnit.NANOSECONDS);
-            return time.plus(this.seconds, s).plus(this.nanos, f);
+            s = cast(TimeUnit.SECONDS);
+            f = cast(TimeUnit.NANOSECONDS);
+        } else {
+            s = cast(SI.SECONDS);
+            f = cast(SI.NANOSECONDS);
         }
-        
-        throw new UnsupportedOperationException(
-            "Use 'Moment.plusReal(MachineTime<SI>)' instead.");
+
+        return time.plus(this.seconds, s).plus(this.nanos, f);
 
     }
 
     @Override
     public <T extends TimePoint<? super U, T>> T subtractFrom(T time) {
 
+        U s, f;
+
         if (this.scale == POSIX) {
-            U s = cast(TimeUnit.SECONDS);
-            U f = cast(TimeUnit.NANOSECONDS);
-            return time.minus(this.seconds, s).minus(this.nanos, f);
+            s = cast(TimeUnit.SECONDS);
+            f = cast(TimeUnit.NANOSECONDS);
+        } else {
+            s = cast(SI.SECONDS);
+            f = cast(SI.NANOSECONDS);
         }
-        
-        throw new UnsupportedOperationException(
-            "Use 'Moment.minusReal(MachineTime<SI>)' instead.");
+
+        return time.minus(this.seconds, s).minus(this.nanos, f);
 
     }
 
@@ -996,6 +1028,16 @@ public final class MachineTime<U>
 
     }
 
+    /**
+     * <p>Returns a format in technical notation including the name of the underlying time scale. </p>
+     *
+     * @return  String like &quot;-5s [POSIX]&quot; or &quot;4.123456789s [UTC]&quot;
+     */
+    /*[deutsch]
+     * <p>Returns a format in technical notation including the name of the underlying time scale. </p>
+     *
+     * @return  String like &quot;-5s [POSIX]&quot; or &quot;4.123456789s [UTC]&quot;
+     */
     @Override
     public String toString() {
 
