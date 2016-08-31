@@ -39,6 +39,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.RealTime;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeAxis;
@@ -953,10 +954,8 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if either this moment
-     *          or the result are before 1972
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
      * @throws  ArithmeticException in case of overflow
-     * @throws  IllegalArgumentException if new moment is out of range limits
      */
     /*[deutsch]
      * <p>Addiert einen Betrag in der angegegebenen SI-Zeiteinheit auf die
@@ -965,8 +964,7 @@ public final class Moment
      * @param   amount  amount in units to be added
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if either this moment
-     *          or the result are before 1972
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
      * @throws  ArithmeticException in case of overflow
      */
     public Moment plus(
@@ -1038,14 +1036,37 @@ public final class Moment
     }
 
     /**
+     * <p>Adds given real time to this timestamp on the UTC time scale. </p>
+     *
+     * @param   realTime    real time defined in UTC time space
+     * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Addiert die angegebene Realzeit zur UTC-Zeit dieses Zeitstempels. </p>
+     *
+     * @param   realTime    real time defined in UTC time space
+     * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
+     * @since   3.23/4.19
+     */
+    public Moment plus(RealTime<SI> realTime) {
+
+        return this.plus(realTime.getSeconds(), SI.SECONDS).plus(realTime.getFraction(), SI.NANOSECONDS);
+
+    }
+
+    /**
      * <p>Subtracts an amount of given SI-unit from this timestamp
      * on the UTC time scale. </p>
      *
      * @param   amount  amount in SI-units to be subtracted
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if either this moment
-     *          or the result are before 1972
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
      * @throws  ArithmeticException in case of overflow
      */
     /*[deutsch]
@@ -1055,8 +1076,7 @@ public final class Moment
      * @param   amount  amount in SI-units to be subtracted
      * @param   unit    time unit defined in UTC time space
      * @return  changed copy of this instance
-     * @throws  UnsupportedOperationException if either this moment
-     *          or the result are before 1972
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
      * @throws  ArithmeticException in case of overflow
      */
     public Moment minus(
@@ -1065,6 +1085,30 @@ public final class Moment
     ) {
 
         return this.plus(MathUtils.safeNegate(amount), unit);
+
+    }
+
+    /**
+     * <p>Subtracts given real time from this timestamp on the UTC time scale. </p>
+     *
+     * @param   realTime    real time defined in UTC time space
+     * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Subtrahiert die angegegebene Realzeit von der UTC-Zeit dieses Zeitstempels. </p>
+     *
+     * @param   realTime    real time defined in UTC time space
+     * @return  changed copy of this instance
+     * @throws  UnsupportedOperationException if either this moment or the result are before 1972
+     * @throws  ArithmeticException in case of overflow
+     * @since   3.23/4.19
+     */
+    public Moment minus(RealTime<SI> realTime) {
+
+        return this.minus(realTime.getSeconds(), SI.SECONDS).minus(realTime.getFraction(), SI.NANOSECONDS);
 
     }
 
