@@ -1,6 +1,13 @@
 ## [v4.19] not yet released
+### Added
+- Add rounding support for MachineTime.dividedBy(long) [#546]
+- Simple way needed to add MachineTime<SI> to a moment [#547]
+
 ### Fixed
 - PUSH-FORWARD-strategy is not suitable for intervals [#545]
+
+### Deprecated
+- One division method in MachineTime without rounding parameter [#546]
 
 ## [v4.18] published on 2016-08-28
 ### Added
