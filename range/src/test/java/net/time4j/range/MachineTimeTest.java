@@ -5,6 +5,7 @@ import net.time4j.SI;
 import net.time4j.scale.TimeScale;
 
 import java.math.BigDecimal;
+import java.math.RoundingMode;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -389,10 +390,77 @@ public class MachineTimeTest {
     }
 
     @Test
-    public void dividedBy() {
+    public void dividedByHalfUp() {
         assertThat(
-            MachineTime.ofSIUnits(7, 500000001).dividedBy(3),
+            MachineTime.ofSIUnits(7, 500000001).dividedBy(3, RoundingMode.HALF_UP),
             is(MachineTime.ofSIUnits(2, 500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000002).dividedBy(3, RoundingMode.HALF_UP),
+            is(MachineTime.ofSIUnits(2, 500000001)));
+    }
+
+    @Test
+    public void dividedByDown() {
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).dividedBy(3, RoundingMode.DOWN),
+            is(MachineTime.ofSIUnits(2, 500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).dividedBy(3, RoundingMode.DOWN),
+            is(MachineTime.ofSIUnits(2, 499999999)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).inverse().dividedBy(3, RoundingMode.DOWN),
+            is(MachineTime.ofSIUnits(-2, -500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).inverse().dividedBy(3, RoundingMode.DOWN),
+            is(MachineTime.ofSIUnits(-2, -499999999)));
+    }
+
+    @Test
+    public void dividedByUp() {
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).dividedBy(3, RoundingMode.UP),
+            is(MachineTime.ofSIUnits(2, 500000001)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).dividedBy(3, RoundingMode.UP),
+            is(MachineTime.ofSIUnits(2, 500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).inverse().dividedBy(3, RoundingMode.UP),
+            is(MachineTime.ofSIUnits(-2, -500000001)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).inverse().dividedBy(3, RoundingMode.UP),
+            is(MachineTime.ofSIUnits(-2, -500000000)));
+    }
+
+    @Test
+    public void dividedByFloor() {
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).dividedBy(3, RoundingMode.FLOOR),
+            is(MachineTime.ofSIUnits(2, 500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).dividedBy(3, RoundingMode.FLOOR),
+            is(MachineTime.ofSIUnits(2, 499999999)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).inverse().dividedBy(3, RoundingMode.FLOOR),
+            is(MachineTime.ofSIUnits(-2, -500000001)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).inverse().dividedBy(3, RoundingMode.FLOOR),
+            is(MachineTime.ofSIUnits(-2, -500000000)));
+    }
+
+    @Test
+    public void dividedByCeiling() {
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).dividedBy(3, RoundingMode.CEILING),
+            is(MachineTime.ofSIUnits(2, 500000001)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).dividedBy(3, RoundingMode.CEILING),
+            is(MachineTime.ofSIUnits(2, 500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 500000001).inverse().dividedBy(3, RoundingMode.CEILING),
+            is(MachineTime.ofSIUnits(-2, -500000000)));
+        assertThat(
+            MachineTime.ofSIUnits(7, 499999999).inverse().dividedBy(3, RoundingMode.CEILING),
+            is(MachineTime.ofSIUnits(-2, -499999999)));
     }
 
     @Test
