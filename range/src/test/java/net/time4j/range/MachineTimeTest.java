@@ -471,6 +471,7 @@ public class MachineTimeTest {
         assertThat(mt.getSeconds(), is(3L));
         assertThat(mt.getFraction(), is(1));
         assertThat(m1.plus(mt.getSeconds(), SI.SECONDS).plus(mt.getFraction(), SI.NANOSECONDS), is(m2));
+        assertThat(m1.plus(mt), is(m2));
     }
 
     @Test
@@ -480,6 +481,7 @@ public class MachineTimeTest {
         MachineTime<TimeUnit> mt = MachineTime.ON_POSIX_SCALE.between(m1, m2);
         assertThat(mt.getSeconds(), is(2L));
         assertThat(mt.getFraction(), is(1));
+        assertThat(m1.plus(mt.getSeconds(), TimeUnit.SECONDS).plus(mt.getFraction(), TimeUnit.NANOSECONDS), is(m2));
         assertThat(m1.plus(mt), is(m2));
     }
 

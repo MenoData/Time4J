@@ -21,12 +21,12 @@
 
 package net.time4j.range;
 
-import net.time4j.*;
+import net.time4j.SI;
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
+import net.time4j.engine.RealTime;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
-import net.time4j.engine.TimeSpan;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 
@@ -88,7 +88,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @see     SI#NANOSECONDS
  */
 public final class MachineTime<U>
-    implements TimeSpan<U>, Comparable<MachineTime<U>>, Serializable {
+    implements RealTime<U>, Comparable<MachineTime<U>>, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -420,28 +420,7 @@ public final class MachineTime<U>
 
     }
 
-    /**
-     * <p>Yields the normalized seconds of this duration. </p>
-     *
-     * <p>The normalization happens in case of a negative duration such that any fraction part
-     * falls into the range {@code 0-999999999}. In this case, following expression is NOT true:
-     * {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
-     *
-     * @return  long
-     * @see     #getFraction()
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert die normalisierten Sekunden dieser Dauer. </p>
-     *
-     * <p>Die Normalisierung geschieht im Fall einer negativen Dauer so, da&szlig; ein Sekundenbruchteil
-     * immer in den Bereich {@code 0-999999999} f&auml;llt. In diesem Fall ist folgender Ausdruck NICHT
-     * wahr: {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
-     *
-     * @return  long
-     * @see     #getFraction()
-     * @since   2.0
-     */
+    @Override
     public long getSeconds() {
 
         long secs = this.seconds;
@@ -454,20 +433,7 @@ public final class MachineTime<U>
 
     }
 
-    /**
-     * <p>Yields the normalized nanosecond fraction of this duration. </p>
-     *
-     * @return  nanosecond in range {@code 0-999999999}
-     * @see     #getSeconds()
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Liefert den normalisierten Nanosekundenteil dieser Dauer. </p>
-     *
-     * @return  nanosecond in range {@code 0-999999999}
-     * @see     #getSeconds()
-     * @since   2.0
-     */
+    @Override
     public int getFraction() {
 
         int n = this.nanos;
