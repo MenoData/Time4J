@@ -65,6 +65,7 @@ import java.math.BigDecimal;
 import java.time.LocalDateTime;
 import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
+import java.util.EnumMap;
 import java.util.EnumSet;
 import java.util.HashMap;
 import java.util.Locale;
@@ -72,7 +73,6 @@ import java.util.Map;
 import java.util.Set;
 
 import static net.time4j.CalendarUnit.*;
-import static net.time4j.ClockUnit.HOURS;
 import static net.time4j.ClockUnit.*;
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
@@ -196,11 +196,25 @@ public final class PlainTimestamp
     private static final PlainTimestamp MAX =
         new PlainTimestamp(PlainDate.MAX, WALL_TIME.getDefaultMaximum());
 
+    private static final Map<CalendarUnit, UnitRule<PlainTimestamp>> CALENDAR_UNIT_RULE_MAP;
+    private static final Map<ClockUnit, UnitRule<PlainTimestamp>> CLOCK_UNIT_RULE_MAP;
+
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final TimeAxis<IsoUnit, PlainTimestamp> ENGINE;
     private static final TimeMetric<IsoUnit, Duration<IsoUnit>> STD_METRIC;
 
     static {
+        Map<CalendarUnit, UnitRule<PlainTimestamp>> m1 = new EnumMap<>(CalendarUnit.class);
+        Map<ClockUnit, UnitRule<PlainTimestamp>> m2 = new EnumMap<>(ClockUnit.class);
+        for (CalendarUnit unit : CalendarUnit.values()) {
+            m1.put(unit, new CompositeUnitRule(unit));
+        }
+        for (ClockUnit unit : ClockUnit.values()) {
+            m2.put(unit, new CompositeUnitRule(unit));
+        }
+        CALENDAR_UNIT_RULE_MAP = m1;
+        CLOCK_UNIT_RULE_MAP = m2;
+
         Map<Object, ChronoElement<?>> children = new HashMap<>();
         children.put(CALENDAR_DATE, WALL_TIME);
         children.put(YEAR, MONTH_AS_NUMBER);
@@ -1186,6 +1200,170 @@ public final class PlainTimestamp
 
     }
 
+    /**
+     * <p>Adds given amount in units to this timestamp and yields the result of addition. </p>
+     *
+     * <p>Covers the most important calendar units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be added to this timestamp (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoUnit)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Addiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * zu diesem Zeitstempel und liefert das Additionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten kalendarischen Zeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be added to this timestamp (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoUnit)
+     * @since   4.19
+     */
+    public PlainTimestamp plus(
+        long amount,
+        CalendarUnit unit
+    ) {
+
+        if (unit == null) {
+            throw new NullPointerException("Missing unit.");
+        } else if (amount == 0) {
+            return this;
+        }
+
+        try {
+            return CALENDAR_UNIT_RULE_MAP.get(unit).addTo(this, amount);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
+
+    }
+
+    /**
+     * <p>Adds given amount in units to this timestamp and yields the result of addition. </p>
+     *
+     * <p>Covers the most important clock units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be added to this timestamp (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoUnit)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Addiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * zu diesem Zeitstempel und liefert das Additionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten Uhrzeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be added to this timestamp (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoUnit)
+     * @since   4.19
+     */
+    public PlainTimestamp plus(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        if (unit == null) {
+            throw new NullPointerException("Missing unit.");
+        } else if (amount == 0) {
+            return this;
+        }
+
+        try {
+            return CLOCK_UNIT_RULE_MAP.get(unit).addTo(this, amount);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
+
+    }
+
+    /**
+     * <p>Subtracts given amount in units from this timestamp and yields the result of subtraction. </p>
+     *
+     * <p>Covers the most important calendar units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this timestamp (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoUnit)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Subtrahiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * von diesem Zeitstempel und liefert das Subtraktionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten kalendarischen Zeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this timestamp (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoUnit)
+     * @since   4.19
+     */
+    public PlainTimestamp minus(
+        long amount,
+        CalendarUnit unit
+    ) {
+
+        return this.plus(Math.negateExact(amount), unit);
+
+    }
+
+    /**
+     * <p>Subtracts given amount in units from this timestamp and yields the result of subtraction. </p>
+     *
+     * <p>Covers the most important clock units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this timestamp (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoUnit)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Subtrahiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * von diesem Zeitstempel und liefert das Subtraktionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten Uhrzeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this timestamp (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoUnit)
+     * @since   4.19
+     */
+    public PlainTimestamp minus(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        return this.plus(Math.negateExact(amount), unit);
+
+    }
+
     @Override
     protected TimeAxis<IsoUnit, PlainTimestamp> getChronology() {
 
@@ -1256,7 +1434,7 @@ public final class PlainTimestamp
         for (CalendarUnit unit : CalendarUnit.values()) {
             builder.appendUnit(
                 unit,
-                new CompositeUnitRule(unit),
+                CALENDAR_UNIT_RULE_MAP.get(unit),
                 unit.getLength(),
                 (unit.compareTo(WEEKS) < 0) ? monthly : daily
             );
@@ -1271,7 +1449,7 @@ public final class PlainTimestamp
         for (ClockUnit unit : ClockUnit.values()) {
             builder.appendUnit(
                 unit,
-                new CompositeUnitRule(unit),
+                CLOCK_UNIT_RULE_MAP.get(unit),
                 unit.getLength(),
                 EnumSet.allOf(ClockUnit.class)
             );

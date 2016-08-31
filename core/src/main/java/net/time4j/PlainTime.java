@@ -1336,6 +1336,88 @@ public final class PlainTime
     }
 
     /**
+     * <p>Adds given amount in units to this clock time and yields the result of addition. </p>
+     *
+     * <p>Covers the most important units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be added to this clock time (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoTimeUnit)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Addiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * zu dieser Uhrzeit und liefert das Additionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten Zeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be added to this clock time (maybe negative)
+     * @param   unit        the unit to be used in addition
+     * @return  result of addition as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #plus(long, Object) plus(long, IsoTimeUnit)
+     * @since   4.19
+     */
+    public PlainTime plus(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        if (unit == null) {
+            throw new NullPointerException("Missing unit.");
+        } else if (amount == 0) {
+            return this;
+        }
+
+        try {
+            return ClockUnitRule.doAdd(PlainTime.class, unit, this, amount);
+        } catch (IllegalArgumentException iae) {
+            ArithmeticException ex = new ArithmeticException("Result beyond boundaries of time axis.");
+            ex.initCause(iae);
+            throw ex;
+        }
+
+    }
+
+    /**
+     * <p>Subtracts given amount in units from this clock time and yields the result of subtraction. </p>
+     *
+     * <p>Covers the most important units and is overloaded for performance reasons. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this clock time (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoTimeUnit)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Subtrahiert den angegebenen Betrag der entsprechenden Zeiteinheit
+     * von dieser Uhrzeit und liefert das Subtraktionsergebnis zur&uuml;ck. </p>
+     *
+     * <p>Deckt die wichtigsten Zeiteinheiten ab, die mit diesem Typ verwendet werden
+     * k&ouml;nnen und ist aus Performance-Gr&uuml;nden &uuml;berladen. </p>
+     *
+     * @param   amount      the amount of units to be subtracted from this clock time (maybe negative)
+     * @param   unit        the unit to be used in subtraction
+     * @return  result of subtraction as changed copy while this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #minus(long, Object) minus(long, IsoTimeUnit)
+     * @since   4.19
+     */
+    public PlainTime minus(
+        long amount,
+        ClockUnit unit
+    ) {
+
+        return this.plus(Math.negateExact(amount), unit);
+
+    }
+
+    /**
      * <p>Rolls this time by the given duration (as amount and unit) and
      * also counts possible day overflow. </p>
      *
