@@ -50,7 +50,6 @@ public interface RealTime<U>
      *
      * @return  long
      * @see     #getFraction()
-     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die normalisierten Sekunden dieser Dauer. </p>
@@ -61,7 +60,6 @@ public interface RealTime<U>
      *
      * @return  long
      * @see     #getFraction()
-     * @since   2.0
      */
     long getSeconds();
 
@@ -70,14 +68,12 @@ public interface RealTime<U>
      *
      * @return  nanosecond in range {@code 0-999999999}
      * @see     #getSeconds()
-     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert den normalisierten Nanosekundenteil dieser Dauer. </p>
      *
      * @return  nanosecond in range {@code 0-999999999}
      * @see     #getSeconds()
-     * @since   2.0
      */
     int getFraction();
 
