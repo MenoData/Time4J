@@ -289,6 +289,7 @@ public final class ChronoHistory
     private transient final TextElement<Integer> monthElement;
     private transient final TextElement<Integer> dayOfMonthElement;
     private transient final TextElement<Integer> dayOfYearElement;
+    private transient final ChronoElement<Integer> centuryElement;
     private transient final Set<ChronoElement<?>> elements;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -370,6 +371,13 @@ public final class ChronoHistory
             this,
             HistoricIntegerElement.DAY_OF_YEAR_INDEX
         );
+        this.centuryElement = new HistoricIntegerElement(
+            '\u0000',
+            1,
+            ((GregorianMath.MAX_YEAR - 1) / 100) + 1,
+            this,
+            HistoricIntegerElement.CENTURY_INDEX
+        );
 
         Set<ChronoElement<?>> set = new HashSet<ChronoElement<?>>();
         set.add(this.dateElement);
@@ -380,6 +388,7 @@ public final class ChronoHistory
         set.add(this.monthElement);
         set.add(this.dayOfMonthElement);
         set.add(this.dayOfYearElement);
+        set.add(this.centuryElement);
         this.elements = Collections.unmodifiableSet(set);
 
     }
@@ -1399,6 +1408,38 @@ public final class ChronoHistory
             default:
                 throw new UnsupportedOperationException(yearDefinition.name());
         }
+
+    }
+
+    /**
+     * <p>Defines the element for the century of a year in a given historic era. </p>
+     *
+     * <p>This element is applicable on all chronological types which have registered the element
+     * {@link PlainDate#COMPONENT}. The underlying year starts on first of January. As example,
+     * the 20th century lasted from year 1901 to year 2000. </p>
+     *
+     * @return  century-of-era-related element
+     * @since   3.23/4.19
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     * @see     #yearOfEra()
+     */
+    /*[deutsch]
+     * <p>Definiert das Element f&uuml;r das Jahrhundert einer historischen &Auml;ra. </p>
+     *
+     * <p>Dieses Element ist auf alle chronologischen Typen anwendbar, die das Element {@link PlainDate#COMPONENT}
+     * registriert haben. Das Jahr beginnt am ersten Januar. Zum Beispiel dauerte das 20. Jahrhundert vom Jahr
+     * 1901 bis zum Jahr 2000. </p>
+     *
+     * @return  century-of-era-related element
+     * @since   3.23/4.19
+     * @see     PlainDate
+     * @see     net.time4j.PlainTimestamp
+     * @see     #yearOfEra()
+     */
+    public ChronoElement<Integer> centuryOfEra() {
+
+        return this.centuryElement;
 
     }
 

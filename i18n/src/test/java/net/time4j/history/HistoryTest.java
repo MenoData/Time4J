@@ -2,6 +2,7 @@ package net.time4j.history;
 
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -389,6 +390,29 @@ public class HistoryTest {
         assertThat(
             date.with(history.yearOfEra(YearDefinition.BEFORE_NEW_YEAR), 1564),
             is(history.convert(HistoricDate.of(HistoricEra.AD, 1565, 4, 10))));
+    }
+
+    @Test
+    public void centuryOfEra() {
+        assertThat(
+            PlainDate.of(2000, 12, 31).get(ChronoHistory.PROLEPTIC_GREGORIAN.centuryOfEra()).intValue(),
+            is(20));
+        assertThat(
+            PlainDate.of(2000, 12, 31).with(ChronoHistory.PROLEPTIC_GREGORIAN.centuryOfEra(), 19),
+            is(PlainDate.of(1900, 12, 31)));
+        assertThat(
+            PlainDate.of(2001, 1, 1).get(ChronoHistory.PROLEPTIC_GREGORIAN.centuryOfEra()).intValue(),
+            is(21));
+        assertThat(
+            PlainDate.of(2001, 1, 1).with(ChronoHistory.PROLEPTIC_GREGORIAN.centuryOfEra(), 19),
+            is(PlainDate.of(1801, 1, 1)));
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.ENGLISH)
+                .addEnglishOrdinal(ChronoHistory.PROLEPTIC_GREGORIAN.centuryOfEra())
+                .addLiteral(" century")
+                .build();
+        assertThat(formatter.format(PlainDate.of(2000, 12, 31)), is("20th century"));
+        assertThat(formatter.format(PlainDate.of(2001, 1, 1)), is("21st century"));
     }
 
 }

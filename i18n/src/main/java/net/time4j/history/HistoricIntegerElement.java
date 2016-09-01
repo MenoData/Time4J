@@ -72,6 +72,7 @@ final class HistoricIntegerElement
     static final int DAY_OF_YEAR_INDEX = 5;
     static final int YEAR_AFTER_INDEX = 6;
     static final int YEAR_BEFORE_INDEX = 7;
+    static final int CENTURY_INDEX = 8;
 
     private static final long serialVersionUID = -6283098762945747308L;
 
@@ -226,7 +227,11 @@ final class HistoricIntegerElement
             } else {
                 return Integer.valueOf(month.getValue());
             }
-        } else if ((this.index == YEAR_AFTER_INDEX) || (this.index == YEAR_BEFORE_INDEX)) {
+        } else if (
+            (this.index == YEAR_AFTER_INDEX)
+            || (this.index == YEAR_BEFORE_INDEX)
+            || (this.index == CENTURY_INDEX)
+        ) {
             throw new ChronoException("Not parseable as text element: " + this.name());
         }
 
@@ -487,6 +492,8 @@ final class HistoricIntegerElement
                 return "YEAR_AFTER";
             case YEAR_BEFORE_INDEX:
                 return "YEAR_BEFORE";
+            case CENTURY_INDEX:
+                return "CENTURY_OF_ERA";
             default:
                 throw new UnsupportedOperationException("Unknown element index: " + index);
         }
@@ -509,6 +516,8 @@ final class HistoricIntegerElement
             return this.history.yearOfEra(YearDefinition.AFTER_NEW_YEAR);
         } else if (n.equals("YEAR_BEFORE")) {
             return this.history.yearOfEra(YearDefinition.BEFORE_NEW_YEAR);
+        } else if (n.equals("CENTURY_OF_ERA")) {
+            return this.history.centuryOfEra();
         } else {
             throw new InvalidObjectException("Unknown element: " + n);
         }
@@ -546,25 +555,35 @@ final class HistoricIntegerElement
             try {
                 PlainDate iso = context.get(PlainDate.COMPONENT);
                 HistoricDate date = this.history.convert(iso);
+                int value;
 
                 switch (this.index) {
                     case YEAR_OF_ERA_INDEX:
-                        return date.getYearOfEra();
+                        value = date.getYearOfEra();
+                        break;
                     case MONTH_INDEX:
-                        return date.getMonth();
+                        value = date.getMonth();
+                        break;
                     case DAY_OF_MONTH_INDEX:
-                        return date.getDayOfMonth();
+                        value = date.getDayOfMonth();
+                        break;
                     case DAY_OF_YEAR_INDEX:
                         long utc = iso.getDaysSinceEpochUTC();
                         int yoe = date.getYearOfEra(this.history.getNewYearStrategy());
                         HistoricDate newYear = this.history.getBeginOfYear(date.getEra(), yoe);
-                        return (int) (utc - this.history.convert(newYear).getDaysSinceEpochUTC() + 1);
+                        value = (int) (utc - this.history.convert(newYear).getDaysSinceEpochUTC() + 1);
+                        break;
                     case YEAR_AFTER_INDEX:
                     case YEAR_BEFORE_INDEX:
-                        return date.getYearOfEra(this.history.getNewYearStrategy());
+                        value = date.getYearOfEra(this.history.getNewYearStrategy());
+                        break;
+                    case CENTURY_INDEX:
+                        value = ((date.getYearOfEra() - 1) / 100) + 1;
+                        break;
                     default:
                         throw new UnsupportedOperationException("Unknown element index: " + this.index);
                 }
+                return Integer.valueOf(value);
             } catch (IllegalArgumentException iae) {
                 throw new ChronoException(iae.getMessage(), iae);
             }
@@ -581,6 +600,7 @@ final class HistoricIntegerElement
                     (this.index == YEAR_OF_ERA_INDEX)
                     || (this.index == YEAR_AFTER_INDEX)
                     || (this.index == YEAR_BEFORE_INDEX)
+                    || (this.index == CENTURY_INDEX)
                 ) {
                     if ((current.getEra() == HistoricEra.BYZANTINE) && (current.getMonth() >= 9)) {
                         return Integer.valueOf(0);
@@ -629,10 +649,14 @@ final class HistoricIntegerElement
                     case YEAR_OF_ERA_INDEX:
                     case YEAR_AFTER_INDEX:
                     case YEAR_BEFORE_INDEX:
+                    case CENTURY_INDEX:
                         if (current.getEra() == HistoricEra.BC) {
                             max = this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
                         } else {
                             max = this.history.convert(PlainDate.axis().getMaximum()).getYearOfEra();
+                        }
+                        if (this.index == CENTURY_INDEX) {
+                            max = ((max - 1) / 100) + 1;
                         }
                         return Integer.valueOf(max);
                     case MONTH_INDEX:
@@ -771,6 +795,12 @@ final class HistoricIntegerElement
                     } else {
                         throw new IllegalArgumentException("Out of range: " + value);
                     }
+                    break;
+                case CENTURY_INDEX:
+                    int y2 = (hd.getYearOfEra() % 100);
+                    int yearOfEra = ((value - 1) * 100) + ((y2 == 0) ? 100 : y2);
+                    result = HistoricDate.of(hd.getEra(), yearOfEra, hd.getMonth(), hd.getDayOfMonth(), yd, nys);
+                    result = this.history.adjustDayOfMonth(result);
                     break;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
