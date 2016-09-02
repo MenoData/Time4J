@@ -1,5 +1,6 @@
 ## [v3.23] not yet released
 ### Added
+- Add historic centuries [#507]
 - Add rounding support for MachineTime.dividedBy(long) [#546]
 - Simple way needed to add MachineTime<SI> to a moment [#547]
 
