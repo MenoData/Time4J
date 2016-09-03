@@ -6,6 +6,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Locale;
+
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -32,6 +34,32 @@ public class TZIDTest {
             ts.in(Timezone.of("Brazil/Acre"))
               .toZonalTimestamp("America/Rio_Branco"),
             is(ts));
+    }
+
+    @Test
+    public void getDisplayNameWithIllegalProvider() {
+        TZID tzid = new TZID() {
+            @Override
+            public String canonical() {
+                return "xyz~Europe/Berlin";
+            }
+        };
+        assertThat(
+            Timezone.getDisplayName(tzid, NameStyle.LONG_DAYLIGHT_TIME, Locale.ENGLISH),
+            is(tzid.canonical()));
+    }
+
+    @Test
+    public void getDisplayNameWithUnknownID() {
+        TZID tzid = new TZID() {
+            @Override
+            public String canonical() {
+                return "unknown";
+            }
+        };
+        assertThat(
+            Timezone.getDisplayName(tzid, NameStyle.LONG_DAYLIGHT_TIME, Locale.ENGLISH),
+            is(tzid.canonical()));
     }
 
 }
