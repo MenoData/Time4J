@@ -185,7 +185,11 @@ public abstract class Timezone
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
     private static final ConcurrentMap<String, ZoneModelProvider> PROVIDERS;
-    private static final ZoneNameProvider NAME_PROVIDER;
+
+    /**
+     * Default provider for tz-name-repository.
+     */
+    static final ZoneNameProvider NAME_PROVIDER;
 
     private static final Timezone SYSTEM_TZ_ORIGINAL;
 
