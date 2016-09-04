@@ -139,4 +139,14 @@ public class MilZoneProviderSPI
 
     }
 
+    @Override
+    public String getStdFormatPattern(
+        boolean zeroOffset,
+        Locale locale
+    ) {
+
+        return ""; // not relevant
+
+    }
+
 }

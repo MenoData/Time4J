@@ -235,6 +235,16 @@ public class ZoneNameProviderSPI
 
     }
 
+    @Override
+    public String getStdFormatPattern(
+        boolean zeroOffset,
+        Locale locale
+    ) {
+
+        return (zeroOffset ? "GMT" : "GMT\u00B1hh:mm");
+
+    }
+
     private static void addTerritory(
         Map<String, Set<String>> map,
         String country,

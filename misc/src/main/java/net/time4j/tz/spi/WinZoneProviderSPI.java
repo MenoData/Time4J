@@ -167,6 +167,16 @@ public class WinZoneProviderSPI
 
     }
 
+    @Override
+    public String getStdFormatPattern(
+        boolean zeroOffset,
+        Locale locale
+    ) {
+
+        return ""; // not relevant
+
+    }
+
     private static Map<String, String> idsToNames(String country) {
 
         Map<String, String> map = REPOSITORY.get(country);
