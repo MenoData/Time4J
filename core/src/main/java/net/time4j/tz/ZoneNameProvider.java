@@ -121,4 +121,35 @@ public interface ZoneNameProvider {
         Locale locale
     );
 
+    /**
+     * <p>Obtains a typical localized format pattern in minute precision. </p>
+     *
+     * <p>The character &quot;&#x00B1;&quot; represents a localized offset sign. And the double letters
+     * &quot;hh&quot; and &quot;mm&quot; represent localized digits of hour respective minute part of the
+     * offset. All other characters are to be interpreted as literals. Many locales return the format
+     * &quot;GMT&#x00B1;hh:mm&quot;. </p>
+     *
+     * @param   zeroOffset  Is the offset to be formatted equal to UTC?
+     * @param   locale      language setting
+     * @return  localized offset pattern
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt ein typisches sprachspezifisches Formatmuster in Minutengenauigkeit. </p>
+     *
+     * <p>Das Zeichen &quot;&#x00B1;&quot; repr&auml;sentiert ein lokalisiertes Vorzeichen. Und die
+     * gedoppelten Buchstaben &quot;hh&quot; und &quot;mm&quot; repr&auml;sentieren lokalisierte
+     * Dezimalziffern des Stunden- bzw. Minutenteils dieser Instanz. Alle anderen Zeichen m&uuml;ssen
+     * als Literale interpretiert werden. Viele Sprachen liefern das Format &quot;GMT&#x00B1;hh:mm&quot;. </p>
+     *
+     * @param   zeroOffset  Is the offset to be formatted equal to UTC?
+     * @param   locale      language setting
+     * @return  localized offset pattern
+     * @since   3.23/4.19
+     */
+    String getStdFormatPattern(
+        boolean zeroOffset,
+        Locale locale
+    );
+
 }

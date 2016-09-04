@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalOffset.java) is part of project Time4J.
  *
@@ -21,13 +21,12 @@
 
 package net.time4j.tz;
 
-
-import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.util.Locale;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -892,6 +891,47 @@ public final class ZonalOffset
     public static ZonalOffset parse(String canonical) {
 
         return parse(canonical, true);
+
+    }
+
+    /**
+     * <p>Obtains a typical localized format pattern in minute precision. </p>
+     *
+     * <p>The character &quot;&#x00B1;&quot; represents a localized offset sign. And the double letters
+     * &quot;hh&quot; and &quot;mm&quot; represent localized digits of hour respective minute part of the
+     * offset. All other characters are to be interpreted as literals. Many locales return the format
+     * &quot;GMT&#x00B1;hh:mm&quot;. </p>
+     *
+     * <p>This method is mainly designed for the internal use of the expert format engine of Time4J. </p>
+     *
+     * @param   locale  language setting
+     * @return  localized offset pattern
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt ein typisches sprachspezifisches Formatmuster in Minutengenauigkeit. </p>
+     *
+     * <p>Das Zeichen &quot;&#x00B1;&quot; repr&auml;sentiert ein lokalisiertes Vorzeichen. Und die
+     * gedoppelten Buchstaben &quot;hh&quot; und &quot;mm&quot; repr&auml;sentieren lokalisierte
+     * Dezimalziffern des Stunden- bzw. Minutenteils dieser Instanz. Alle anderen Zeichen m&uuml;ssen
+     * als Literale interpretiert werden. Viele Sprachen liefern das Standardformat &quot;GMT&#x00B1;hh:mm&quot;. </p>
+     *
+     * <p>Diese Methode ist haupts&auml;chlich f&uuml;r die interne Verwendung in der <i>expert</i>-Formatmaschine
+     * von Time4J gedacht. </p>
+     *
+     * @param   locale  language setting
+     * @return  localized offset pattern
+     * @since   3.23/4.19
+     */
+    public String getStdFormatPattern(Locale locale) {
+
+        boolean zeroOffset = ((this.total == 0) && (this.fraction == 0));
+
+        try {
+            return Timezone.NAME_PROVIDER.getStdFormatPattern(zeroOffset, locale);
+        } catch (Throwable t) { // can only happen if the provider is an outdated version
+            return (zeroOffset ? "GMT" : "GMT\u00B1hh:mm");
+        }
 
     }
 

@@ -192,7 +192,11 @@ public abstract class Timezone
     private static final ReferenceQueue<Timezone> QUEUE;
     private static final LinkedList<Timezone> LAST_USED;
     private static final ConcurrentMap<String, ZoneModelProvider> PROVIDERS;
-    private static final ZoneNameProvider NAME_PROVIDER;
+
+    /**
+     * Default provider for tz-name-repository.
+     */
+    static final ZoneNameProvider NAME_PROVIDER;
 
     private static final Timezone SYSTEM_TZ_ORIGINAL;
 
@@ -1895,6 +1899,16 @@ public abstract class Timezone
             }
 
             return "";
+
+        }
+
+        @Override
+        public String getStdFormatPattern(
+            boolean zeroOffset,
+            Locale locale
+        ) {
+
+            return (zeroOffset ? "GMT" : "GMT\u00B1hh:mm");
 
         }
 
