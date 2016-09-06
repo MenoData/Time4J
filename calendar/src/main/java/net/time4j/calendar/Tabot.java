@@ -221,7 +221,7 @@ public final class Tabot
     ) {
 
         return ResourceBundle.getBundle(
-            "calendar/ethiopic",
+            "names/ethiopic",
             locale,
             GenericTextProviderSPI.class.getClassLoader(),
             control);
