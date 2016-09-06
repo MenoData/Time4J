@@ -59,7 +59,7 @@ public final class IsoTextProviderSPI
     static {
         ResourceBundle rb =
             ResourceBundle.getBundle(
-                "calendar/" + ISO_CALENDAR_TYPE,
+                "names/" + ISO_CALENDAR_TYPE,
                 Locale.ROOT,
                 getDefaultLoader(),
                 UTF8ResourceControl.SINGLETON);
@@ -494,7 +494,7 @@ public final class IsoTextProviderSPI
 
         if (LANGUAGES.contains(LanguageMatch.getAlias(desired))) {
             return ResourceBundle.getBundle(
-                "calendar/" + ISO_CALENDAR_TYPE,
+                "names/" + ISO_CALENDAR_TYPE,
                 desired,
                 getDefaultLoader(),
                 UTF8ResourceControl.SINGLETON);
@@ -507,7 +507,7 @@ public final class IsoTextProviderSPI
     private static ResourceBundle getPatterns(Locale desired) {
 
         return ResourceBundle.getBundle(
-            "calendar/" + ISO_CALENDAR_TYPE,
+            "names/" + ISO_CALENDAR_TYPE,
             desired,
             getDefaultLoader(),
             UTF8ResourceControl.SINGLETON);
