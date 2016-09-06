@@ -69,7 +69,7 @@ public final class GenericTextProviderSPI
 
         ResourceBundle rb =
             ResourceBundle.getBundle(
-                "calendar/generic",
+                "names/generic",
                 Locale.ROOT,
                 getDefaultLoader(),
                 CONTROL);
@@ -272,7 +272,7 @@ public final class GenericTextProviderSPI
     ) {
 
         return ResourceBundle.getBundle(
-            "calendar/" + calendarType,
+            "names/" + calendarType,
             LANGUAGES.contains(desired.getLanguage()) ? desired : Locale.ROOT,
             getDefaultLoader(),
             CONTROL);

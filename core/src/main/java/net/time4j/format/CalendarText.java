@@ -309,7 +309,7 @@ public final class CalendarText {
         try {
             ResourceBundle rb =
                 ResourceBundle.getBundle(
-                    "calendar/" + calendarType,
+                    "names/" + calendarType,
                     locale,
                     p.getControl());
             for (String key : rb.keySet()) {
