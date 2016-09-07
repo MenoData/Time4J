@@ -21,6 +21,7 @@
 
 package net.time4j.tz.spi;
 
+import net.time4j.i18n.UTF8ResourceControl;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.ZoneNameProvider;
@@ -42,6 +43,7 @@ import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -61,9 +63,11 @@ public class ZoneNameProviderSPI
 
     private static final ConcurrentMap<Locale, Map<String, Map<NameStyle, String>>> NAMES =
         new ConcurrentHashMap<Locale, Map<String, Map<NameStyle, String>>>();
+
     private static final Set<String> GMT_ZONES;
     private static final Map<String, Set<String>> TERRITORIES;
     private static final Map<String, String> PRIMARIES;
+    private static final ResourceBundle.Control CONTROL;
 
     static {
         Set<String> gmtZones = new HashSet<String>();
@@ -137,6 +141,16 @@ public class ZoneNameProviderSPI
         addPrimary(primaries, "UA", EUROPE.KIEV);
         addPrimary(primaries, "UZ", ASIA.TASHKENT);
         PRIMARIES = Collections.unmodifiableMap(primaries);
+
+        CONTROL =
+            new UTF8ResourceControl() {
+                protected String getModuleName() {
+                    return "olson";
+                }
+                protected Class<?> getModuleRef() {
+                    return ZoneNameProviderSPI.class;
+                }
+            };
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -187,15 +201,15 @@ public class ZoneNameProviderSPI
     ) {
 
         if (GMT_ZONES.contains(tzid)) {
-            return "";
+            return ""; // falls back to canonical identifier (Z for ZonalOffset.UTC)
         }
 
-        Map<String, Map<NameStyle, String>> zonedNames = NAMES.get(locale);
+        Map<String, Map<NameStyle, String>> map = NAMES.get(locale);
 
-        if (zonedNames == null) {
+        if (map == null) {
             DateFormatSymbols symbols = DateFormatSymbols.getInstance(locale);
             String[][] zoneNames = symbols.getZoneStrings();
-            zonedNames = new HashMap<String, Map<NameStyle, String>>();
+            map = new HashMap<String, Map<NameStyle, String>>();
 
             for (String[] arr : zoneNames) {
                 Map<NameStyle, String> names = new EnumMap<NameStyle, String>(NameStyle.class);
@@ -203,17 +217,17 @@ public class ZoneNameProviderSPI
                 names.put(NameStyle.SHORT_STANDARD_TIME, arr[2]);
                 names.put(NameStyle.LONG_DAYLIGHT_TIME, arr[3]);
                 names.put(NameStyle.SHORT_DAYLIGHT_TIME, arr[4]);
-                zonedNames.put(arr[0], names);
+                map.put(arr[0], names);
             }
 
-            Map<String, Map<NameStyle, String>> old = NAMES.putIfAbsent(locale, zonedNames);
+            Map<String, Map<NameStyle, String>> old = NAMES.putIfAbsent(locale, map);
 
             if (old != null) {
-                zonedNames = old;
+                map = old;
             }
         }
 
-        Map<NameStyle, String> styledNames = zonedNames.get(tzid);
+        Map<NameStyle, String> styledNames = map.get(tzid);
 
         if (styledNames != null) {
             return styledNames.get(style);
@@ -241,7 +255,7 @@ public class ZoneNameProviderSPI
         Locale locale
     ) {
 
-        return (zeroOffset ? "GMT" : "GMT\u00B1hh:mm");
+        return getBundle(locale).getString(zeroOffset ? "utc-literal" : "offset-pattern");
 
     }
 
@@ -269,6 +283,22 @@ public class ZoneNameProviderSPI
     ) {
 
         map.put(country, tz.canonical());
+
+    }
+
+    /**
+     * <p>Gets a resource bundle for given calendar type and locale. </p>
+     *
+     * @param   desired         locale (language and/or country)
+     * @return  {@code ResourceBundle}
+     */
+    private static ResourceBundle getBundle(Locale desired) {
+
+        return ResourceBundle.getBundle(
+            "zones/tzname",
+            desired,
+            ZoneNameProviderSPI.class.getClassLoader(),
+            CONTROL);
 
     }
 

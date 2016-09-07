@@ -235,7 +235,9 @@ public abstract class ResourceLoader {
 
         URL url = moduleRef.getClassLoader().getResource(path);
 
-        if (noCache) {
+        if (url == null) {
+            throw new FileNotFoundException(path);
+        } else if (noCache) {
             URLConnection conn = url.openConnection();
             conn.setUseCaches(false);
             conn.connect(); // explicit for clarity
