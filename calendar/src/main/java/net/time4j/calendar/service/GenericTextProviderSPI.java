@@ -264,7 +264,7 @@ public final class GenericTextProviderSPI
      * @param   calendarType    calendar type (usually non-gregorian)
      * @param   desired         locale (language and/or country)
      * @return  {@code ResourceBundle}
-     * @see     3.10/4.7
+     * @since   3.10/4.7
      */
     static ResourceBundle getBundle(
         String calendarType,
