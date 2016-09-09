@@ -26,7 +26,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
-import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
@@ -36,6 +35,8 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
 import static net.time4j.tz.OffsetSign.BEHIND_UTC;
@@ -53,6 +54,9 @@ final class LocalizedGMTProcessor
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final char UNICODE_LRM = '\u200E';
+    private static final ZonalOffset PROTOTYPE = ZonalOffset.ofTotalSeconds(3600 * 18);
+    private static final ConcurrentMap<Locale, String> UTC_LITERALS = new ConcurrentHashMap<Locale, String>();
+    private static final ConcurrentMap<Locale, Info> STD_PATTERN_INFOS = new ConcurrentHashMap<Locale, Info>();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -116,7 +120,7 @@ final class LocalizedGMTProcessor
     ) throws IOException {
 
         int start = -1;
-        int printed;
+        int printed = 0;
 
         if (buffer instanceof CharSequence) {
             start = ((CharSequence) buffer).length();
@@ -157,73 +161,96 @@ final class LocalizedGMTProcessor
             quickPath
                 ? this.noPrefix
                 : attributes.get(Attributes.NO_GMT_PREFIX, Boolean.FALSE).booleanValue());
-        String gmtPrefix = (np ? "" : getGMTPrefix(loc));
-        buffer.append(gmtPrefix);
-        printed = gmtPrefix.length();
 
         int total = offset.getIntegralAmount();
         int fraction = offset.getFractionalAmount();
 
-        if (np || (total != 0) || (fraction != 0)) {
-            if (offset.getSign() == BEHIND_UTC) {
-                buffer.append(minus);
-                printed += minus.length();
-            } else {
-                buffer.append(plus);
-                printed += plus.length();
-            }
+        if (!np && (total == 0) && (fraction == 0)) {
+            String literal = getLiteralUTC(loc);
+            buffer.append(literal);
+            printed = literal.length();
+        } else {
+            Info info = getPatternInfo(loc);
 
-            int h = offset.getAbsoluteHours();
-            int m = offset.getAbsoluteMinutes();
-            int s = offset.getAbsoluteSeconds();
+            for (int p = 0, n = info.pattern.length(); p < n; p++) {
+                char c = info.pattern.charAt(p);
 
-            if ((h < 10) && !this.abbreviated) {
-                buffer.append(zeroChar);
-                printed++;
-            }
+                // literal
+                if ((info.start > p) || (info.end <= p)) {
+                    if (!np) {
+                        buffer.append(c);
+                        printed++;
+                    }
+                    continue;
+                }
 
-            String hours = String.valueOf(h);
+                // offset sign
+                if (offset.getSign() == BEHIND_UTC) {
+                    buffer.append(minus);
+                    printed += minus.length();
+                } else {
+                    buffer.append(plus);
+                    printed += plus.length();
+                }
 
-            for (int i = 0; i < hours.length(); i++) {
-                char digit = (char) (hours.charAt(i) - '0' + zeroChar);
-                buffer.append(digit);
-                printed++;
-            }
+                // hour part
+                int h = offset.getAbsoluteHours();
+                int m = offset.getAbsoluteMinutes();
+                int s = offset.getAbsoluteSeconds();
 
-            if ((m != 0) || (s != 0) || !this.abbreviated) {
-                buffer.append(':');
-                printed++;
-
-                if (m < 10) {
+                if ((h < 10) && !this.abbreviated) {
                     buffer.append(zeroChar);
                     printed++;
                 }
 
-                String minutes = String.valueOf(m);
+                String hours = String.valueOf(h);
 
-                for (int i = 0; i < minutes.length(); i++) {
-                    char digit = (char) (minutes.charAt(i) - '0' + zeroChar);
+                for (int i = 0; i < hours.length(); i++) {
+                    char digit = (char) (hours.charAt(i) - '0' + zeroChar);
                     buffer.append(digit);
                     printed++;
                 }
 
-                if (s != 0) {
-                    buffer.append(':');
-                    printed++;
+                // minute part
+                if ((m != 0) || (s != 0) || !this.abbreviated) {
+                    buffer.append(info.separator);
+                    printed += info.separator.length();
 
-                    if (s < 10) {
+                    if (m < 10) {
                         buffer.append(zeroChar);
                         printed++;
                     }
 
-                    String seconds = String.valueOf(s);
+                    String minutes = String.valueOf(m);
 
-                    for (int i = 0; i < seconds.length(); i++) {
-                        char digit = (char) (seconds.charAt(i) - '0' + zeroChar);
+                    for (int i = 0; i < minutes.length(); i++) {
+                        char digit = (char) (minutes.charAt(i) - '0' + zeroChar);
                         buffer.append(digit);
                         printed++;
                     }
+
+                    // second part
+                    if (s != 0) {
+                        buffer.append(info.separator);
+                        printed += info.separator.length();
+
+                        if (s < 10) {
+                            buffer.append(zeroChar);
+                            printed++;
+                        }
+
+                        String seconds = String.valueOf(s);
+
+                        for (int i = 0; i < seconds.length(); i++) {
+                            char digit = (char) (seconds.charAt(i) - '0' + zeroChar);
+                            buffer.append(digit);
+                            printed++;
+                        }
+                    }
+
                 }
+
+                p = (info.end - 1);
             }
         }
 
@@ -269,45 +296,11 @@ final class LocalizedGMTProcessor
             quickPath
                 ? this.caseInsensitive
                 : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
-
-        if (!np) {
-            String gmtPrefix = getGMTPrefix(loc);
-            String[] zeroOffsets = {"GMT", gmtPrefix, "UTC", "UT"};
-            boolean found = false;
-
-            for (String zeroOffset : zeroOffsets) {
-                int zl = zeroOffset.length();
-
-                if (len - pos >= zl) {
-                    String compare = text.subSequence(pos, pos + zl).toString();
-
-                    if (
-                        (ignoreCase && compare.equalsIgnoreCase(zeroOffset))
-                        || (!ignoreCase && compare.equals(zeroOffset))
-                    ) {
-                        found = true;
-                        pos += zl;
-                        break;
-                    }
-                }
-            }
-
-            if (!found) {
-                status.setError(
-                    start,
-                    "Missing prefix in localized time zone offset: " + gmtPrefix);
-                return;
-            } else if (pos >= len) {
-                parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
-                status.setPosition(pos);
-                return;
-            }
-        }
-
         char zeroChar = (
             quickPath
                 ? this.zeroDigit
                 : attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue());
+
         String plus = (quickPath ? this.plusSign : attributes.get(AttributeSet.PLUS_SIGN, "+"));
         String minus = (quickPath ? this.minusSign : attributes.get(AttributeSet.MINUS_SIGN, "-"));
 
@@ -316,116 +309,160 @@ final class LocalizedGMTProcessor
             minus = UNICODE_LRM + "\u002D";
         }
 
-        OffsetSign sign;
-        int parsedLen = LiteralProcessor.subSequenceEquals(text, pos, plus, ignoreCase);
+        Info info = getPatternInfo(loc);
+        int n = info.pattern.length();
+        ZonalOffset offset = null;
+        int old = pos;
 
-        if (parsedLen == -1) {
-            parsedLen = LiteralProcessor.subSequenceEquals(text, pos, minus, ignoreCase);
+        for (int p = 0; p < n; p++) {
+            char c = info.pattern.charAt(p);
+
+            // literal
+            if ((info.start > p) || (info.end <= p)) {
+                if (!np) {
+                    char test = (pos < len) ? text.charAt(pos) : '\u0000';
+                    if (
+                        (!ignoreCase && (c == test))
+                        || (ignoreCase && charEqualsIgnoreCase(c, test))
+                    ) {
+                        pos++;
+                    } else {
+                        int zl = parseUTC(text, len, old, loc, ignoreCase); // try other literal
+                        if (zl > 0) {
+                            parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
+                            status.setPosition(old + zl);
+                        } else {
+                            status.setError(
+                                start,
+                                "Literal mismatched in localized time zone offset.");
+                        }
+                        return;
+                    }
+                }
+                continue;
+            }
+
+            OffsetSign sign;
+            int parsedLen = LiteralProcessor.subSequenceEquals(text, pos, plus, ignoreCase);
 
             if (parsedLen == -1) {
-                if (np) {
-                    status.setError(
-                        start,
-                        "Missing sign in localized time zone offset.");
-                    return;
+                parsedLen = LiteralProcessor.subSequenceEquals(text, pos, minus, ignoreCase);
+
+                if (parsedLen == -1) {
+                    int zl = (np ? 0 : parseUTC(text, len, old, loc, ignoreCase)); // no sign => try UTC
+
+                    if (zl > 0) {
+                        parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
+                        status.setPosition(old + zl);
+                        return;
+                    } else {
+                        status.setError(
+                            start,
+                            "Missing sign in localized time zone offset.");
+                        return;
+                    }
                 } else {
-                    parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, ZonalOffset.UTC);
-                    status.setPosition(pos);
-                    return;
+                    sign = BEHIND_UTC;
                 }
             } else {
-                sign = BEHIND_UTC;
+                sign = AHEAD_OF_UTC;
             }
-        } else {
-            sign = AHEAD_OF_UTC;
-        }
 
-        pos += parsedLen;
-        int hours = parseHours(text, pos, zeroChar);
+            pos += parsedLen;
+            int hours = parseHours(text, pos, zeroChar);
 
-        if (hours == -1000) {
-            status.setError(
-                pos,
-                "Missing hour part in localized time zone offset.");
-            return;
-        }
+            if (hours == -1000) {
+                status.setError(
+                    pos,
+                    "Missing hour part in localized time zone offset.");
+                return;
+            }
 
-        if (hours < 0) {
-            hours = ~hours;
-            pos++;
-        } else {
-            pos += 2;
-        }
+            if (hours < 0) {
+                hours = ~hours;
+                pos++;
+            } else {
+                pos += 2;
+            }
 
-        if (pos >= len) {
-            if (this.abbreviated) {
+            if (pos >= len) {
+                if (this.abbreviated) {
+                    parsedResult.put(
+                        TimezoneElement.TIMEZONE_OFFSET,
+                        ZonalOffset.ofHours(sign, hours));
+                    status.setPosition(pos);
+                } else {
+                    status.setError(
+                        pos,
+                        "Missing minute part in localized time zone offset.");
+                }
+                return;
+            }
+
+            Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
+            int seplen = LiteralProcessor.subSequenceEquals(text, pos, info.separator, ignoreCase);
+
+            if (seplen != -1) {
+                pos += seplen;
+            } else if (this.abbreviated) {
                 parsedResult.put(
                     TimezoneElement.TIMEZONE_OFFSET,
                     ZonalOffset.ofHours(sign, hours));
                 status.setPosition(pos);
-            } else {
+                return;
+            } else if (leniency.isStrict()) {
+                status.setError(pos, "Mismatch of localized time zone offset separator.");
+                return;
+            }
+
+            int minutes = parseTwoDigits(text, pos, zeroChar);
+
+            if (minutes == -1000) {
                 status.setError(
                     pos,
-                    "Missing minute part in localized time zone offset.");
+                    "Minute part in localized time zone offset does not match expected pattern mm.");
+                return;
             }
-            return;
-        }
 
-        Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
+            pos += 2;
+            int seconds = 0;
 
-        if (text.charAt(pos) == ':') {
-            pos++;
-        } else if (this.abbreviated) {
-            parsedResult.put(
-                TimezoneElement.TIMEZONE_OFFSET,
-                ZonalOffset.ofHours(sign, hours));
-            status.setPosition(pos);
-            return;
-        } else if (leniency.isStrict()) {
-            status.setError(pos, "Colon expected in localized time zone offset.");
-            return;
-        }
+            if (pos < len) {
+                seplen = LiteralProcessor.subSequenceEquals(text, pos, info.separator, ignoreCase);
 
-        int minutes = parseTwoDigits(text, pos, zeroChar);
+                if (seplen != -1) {
+                    pos += seplen;
+                    seconds = parseTwoDigits(text, pos, zeroChar);
 
-        if (minutes == -1000) {
-            status.setError(
-                pos,
-                "Minute part in localized time zone offset "
-                + "does not match expected pattern mm.");
-            return;
-        }
-
-        pos += 2;
-        int seconds = 0;
-
-        if (pos < len) {
-            if (text.charAt(pos) == ':') {
-                pos++;
-                seconds = parseTwoDigits(text, pos, zeroChar);
-
-                if (seconds == -1000) {
-                    pos--;
-                } else {
-                    pos += 2;
+                    if (seconds == -1000) {
+                        pos -= seplen;
+                    } else {
+                        pos += 2;
+                    }
                 }
             }
-        }
 
-        ZonalOffset offset;
-
-        if ((seconds == 0) || (seconds == -1000)) {
-            offset = ZonalOffset.ofHoursMinutes(sign, hours, minutes);
-        } else {
-            int total = hours * 3600 + minutes * 60 + seconds;
-            if (sign == OffsetSign.BEHIND_UTC) {
-                total = -total;
+            if ((seconds == 0) || (seconds == -1000)) {
+                offset = ZonalOffset.ofHoursMinutes(sign, hours, minutes);
+            } else {
+                int total = hours * 3600 + minutes * 60 + seconds;
+                if (sign == OffsetSign.BEHIND_UTC) {
+                    total = -total;
+                }
+                offset = ZonalOffset.ofTotalSeconds(total);
             }
-            offset = ZonalOffset.ofTotalSeconds(total);
+
+            p = (info.end - 1);
         }
 
-        parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, offset);
-        status.setPosition(pos);
+        if (offset == null) {
+            status.setError(
+                pos,
+                "Unable to determine localized time zone offset.");
+        } else {
+            parsedResult.put(TimezoneElement.TIMEZONE_OFFSET, offset);
+            status.setPosition(pos);
+        }
 
     }
 
@@ -470,18 +507,6 @@ final class LocalizedGMTProcessor
 
     }
 
-    private static String getGMTPrefix(Locale locale) {
-
-        CalendarText ct = CalendarText.getIsoInstance(locale);
-
-        if (ct.getTextForms().isEmpty()) {
-            return "GMT";
-        }
-
-        return ct.getTextForms().get("prefixGMTOffset");
-
-    }
-
     private static ZonalOffset getOffset(
         ChronoDisplay formattable,
         AttributeQuery attributes
@@ -498,6 +523,36 @@ final class LocalizedGMTProcessor
         throw new IllegalArgumentException(
             "Cannot extract timezone offset from format attributes for: "
             + formattable);
+
+    }
+
+    private static int parseUTC(
+        CharSequence text,
+        int len,
+        int pos,
+        Locale loc,
+        boolean ignoreCase
+    ) {
+
+        String gmtPrefix = getLiteralUTC(loc);
+        String[] zeroOffsets = {"GMT", gmtPrefix, "UTC", "UT"};
+
+        for (String zeroOffset : zeroOffsets) {
+            int test = zeroOffset.length();
+
+            if (len - pos >= test) {
+                String compare = text.subSequence(pos, pos + test).toString();
+
+                if (
+                    (ignoreCase && compare.equalsIgnoreCase(zeroOffset))
+                    || (!ignoreCase && compare.equals(zeroOffset))
+                ) {
+                    return test;
+                }
+            }
+        }
+
+        return 0;
 
     }
 
@@ -560,6 +615,91 @@ final class LocalizedGMTProcessor
         }
 
         return total;
+
+    }
+
+    private static boolean charEqualsIgnoreCase(
+        char c1,
+        char c2
+    ) {
+
+        return (
+            (c1 == c2)
+            || (Character.toUpperCase(c1) == Character.toUpperCase(c2))
+            || (Character.toLowerCase(c1) == Character.toLowerCase(c2))
+        );
+
+    }
+
+    private static String getLiteralUTC(Locale locale) {
+
+        String pattern = UTC_LITERALS.get(locale);
+
+        if (pattern == null) {
+            pattern = ZonalOffset.UTC.getStdFormatPattern(locale);
+            String old = UTC_LITERALS.putIfAbsent(locale, pattern);
+            if (old != null) {
+                pattern = old;
+            }
+        }
+
+        return pattern;
+
+    }
+
+    private static Info getPatternInfo(Locale locale) {
+
+        Info info = STD_PATTERN_INFOS.get(locale);
+
+        if (info == null){
+            String offsetPattern = PROTOTYPE.getStdFormatPattern(locale);
+
+            for (int i = 0, n = offsetPattern.length(); i < n; i++) {
+                if (offsetPattern.charAt(i) == '\u00B1') {
+                    int sep1 = offsetPattern.indexOf("hh", i) + 2;
+                    int sep2 = offsetPattern.indexOf("mm", sep1);
+                    info = new Info(offsetPattern, offsetPattern.substring(sep1, sep2), i, sep2 + 2);
+                    Info old = STD_PATTERN_INFOS.putIfAbsent(locale, info);
+                    if (old != null) {
+                        info = old;
+                    }
+                    break;
+                }
+            }
+        }
+
+        assert (info != null);
+        return info;
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class Info {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final String pattern;
+        private final String separator;
+        private final int start;
+        private final int end;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Info(
+            String pattern,
+            String separator,
+            int start,
+            int end
+        ) {
+            super();
+
+            this.pattern = pattern;
+            this.separator = separator;
+            this.start = start;
+            this.end = end;
+
+        }
 
     }
 

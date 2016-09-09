@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CustomZoneTest.class,
         DaylightSavingRuleTest.class,
         JavaziTest.class,
+        LocalizedGMTOffsetTest.class,
         PredefinedIDTest.class,
         RulesLikeBerlin1947Test.class,
         RulesLikeDhaka2009Test.class,

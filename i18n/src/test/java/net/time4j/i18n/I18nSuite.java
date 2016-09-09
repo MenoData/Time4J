@@ -18,7 +18,6 @@ import org.junit.runners.Suite.SuiteClasses;
         FormatSuite.class,
         HistorySuite.class,
         IsoSanityTest.class,
-        LocalizedGMTOffsetTest.class,
         NameDisplayTest.class,
         NumberSymbolTest.class,
         PluralRulesTest.class,

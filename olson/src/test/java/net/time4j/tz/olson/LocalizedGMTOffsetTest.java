@@ -1,4 +1,4 @@
-package net.time4j.i18n;
+package net.time4j.tz.olson;
 
 import net.time4j.Moment;
 import net.time4j.format.Attributes;
@@ -26,6 +26,36 @@ public class LocalizedGMTOffsetTest {
  	public static Iterable<Object[]> data() {
  		return Arrays.asList(
             new Object[][] {
+                {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
+                    "sq",
+                    "UTC",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-06-30T23:59:60.123 Ora e Grenuiçit",
+                    false},
+                {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
+                    "sq",
+                    "Europe/Berlin",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-07-01T01:59:60.123 Ora e Grenuiçit: +02:00",
+                    false},
+                {"uuuu-MM-dd HH:mm:ss OOOO",
+                    "fa",
+                    "Asia/Tehran", // +04:30
+                    "2012-06-30T23:59:60Z",
+                    "۲۰۱۲-۰۷-۰۱ ۰۴:۲۹:۶۰ \u200E+\u200E۰۴:۳۰ گرینویچ",
+                    false},
+                {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
+                    "no",
+                    "Europe/Oslo",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-07-01T01:59:60.123 GMT+02.00",
+                    false},
+                {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
+                    "fr",
+                    "Europe/Paris",
+                    "2012-06-30T23:59:60,123000000Z",
+                    "2012-07-01T01:59:60.123 UTC+02:00",
+                    false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "in",
                     "Asia/Kolkata",
@@ -103,8 +133,6 @@ public class LocalizedGMTOffsetTest {
     private static Locale toLocale(String locale) {
         if (locale.startsWith("en")) {
             return Locale.UK;
-        } else if (locale.equals("us")) {
-            return Locale.US;
         } else if (locale.equals("in")) {
             return new Locale("en", "IN");
         } else if (locale.equals("ar")) {
