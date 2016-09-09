@@ -2783,8 +2783,7 @@ public final class Moment
                         result = test;
                     } else {
                         throw new IllegalArgumentException(
-                            "SECOND_OF_MINUTE parsed as invalid leapsecond: "
-                            + test);
+                            "SECOND_OF_MINUTE parsed as invalid leapsecond before " + test);
                     }
                 }
             }
