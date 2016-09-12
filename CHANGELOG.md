@@ -9,6 +9,9 @@
 - NPE in Timezone.getDisplayName(...) [#548]
 - Improved literal parsing in localized tz-offset [#549]
 
+### Changed
+- New method in ZoneNameProvider-interface [#549]
+
 ### Deprecated
 - One division method in MachineTime without rounding parameter [#546]
 
