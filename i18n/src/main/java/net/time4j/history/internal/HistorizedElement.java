@@ -27,7 +27,6 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.TextElement;
-import net.time4j.format.expert.ParseLog;
 
 import java.io.IOException;
 import java.text.ParsePosition;
