@@ -118,11 +118,10 @@ public class TabotTest {
                 .addLiteral(" (")
                 .addText(EthiopianCalendar.TABOT)
                 .addLiteral(')')
-                .build()
-                .with(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+                .build();
         assertThat(
             f.format(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 6, 25)),
-            is("25 የካቲት 2007 ዓ/ም (መርቆርዮስ)"));
+            is("25 የካቲት " + NumberSystem.ETHIOPIC.toNumeral(2007) + " ዓ/ም (መርቆርዮስ)"));
     }
 
 }

@@ -36,6 +36,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.NumberSystem;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -680,6 +681,7 @@ LOOP:
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
                 .startSection(Attributes.ZERO_DIGIT, '0')
                 .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
@@ -693,7 +695,7 @@ LOOP:
             builder.addLiteral('-');
         }
 
-        return builder.addFixedInteger(DAY_OF_MONTH, 2).endSection().build().with(Leniency.STRICT);
+        return builder.addFixedInteger(DAY_OF_MONTH, 2).endSection().endSection().build().with(Leniency.STRICT);
 
     }
 
@@ -702,6 +704,7 @@ LOOP:
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
                 .startSection(Attributes.ZERO_DIGIT, '0')
                 .addInteger(YEAR, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
@@ -709,7 +712,7 @@ LOOP:
             builder.addLiteral('-');
         }
 
-        return builder.addFixedInteger(DAY_OF_YEAR, 3).endSection().build().with(Leniency.STRICT);
+        return builder.addFixedInteger(DAY_OF_YEAR, 3).endSection().endSection().build().with(Leniency.STRICT);
 
     }
 
@@ -718,6 +721,7 @@ LOOP:
         ChronoFormatter.Builder<PlainDate> builder =
             ChronoFormatter
                 .setUp(PlainDate.class, Locale.ROOT)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
                 .startSection(Attributes.ZERO_DIGIT, '0')
                 .addInteger(YEAR_OF_WEEKDATE, 4, 9, SignPolicy.SHOW_WHEN_BIG_NUMBER);
 
@@ -732,7 +736,7 @@ LOOP:
             builder.addLiteral('-');
         }
 
-        return builder.addFixedNumerical(DAY_OF_WEEK, 1).endSection().build().with(Leniency.STRICT);
+        return builder.addFixedNumerical(DAY_OF_WEEK, 1).endSection().endSection().build().with(Leniency.STRICT);
 
     }
 
@@ -909,6 +913,7 @@ LOOP:
         IsoDecimalStyle decimalStyle
     ) {
 
+        builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
         builder.startSection(Attributes.ZERO_DIGIT, '0');
         builder.addFixedInteger(ISO_HOUR, 2);
         builder.startOptionalSection();
@@ -940,7 +945,7 @@ LOOP:
 
         builder.addFraction(NANO_OF_SECOND, 1, 9, false);
 
-        for (int i = 0; i < 4; i++) {
+        for (int i = 0; i < 5; i++) {
             builder.endSection();
         }
 
@@ -957,10 +962,12 @@ LOOP:
             throw new NullPointerException("Missing precision.");
         }
 
+        builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
         builder.startSection(Attributes.ZERO_DIGIT, '0');
         builder.addFixedInteger(ISO_HOUR, 2);
 
         if (precision == ClockUnit.HOURS) {
+            builder.endSection();
             builder.endSection();
             return;
         }
@@ -973,6 +980,7 @@ LOOP:
 
         if (precision == ClockUnit.MINUTES) {
             builder.endSection();
+            builder.endSection();
             return;
         }
 
@@ -983,6 +991,7 @@ LOOP:
         builder.addFixedInteger(SECOND_OF_MINUTE, 2);
 
         if (precision == ClockUnit.SECONDS) {
+            builder.endSection();
             builder.endSection();
             return;
         }
@@ -1006,6 +1015,7 @@ LOOP:
             builder.addFraction(NANO_OF_SECOND, 9, 9, false);
         }
 
+        builder.endSection();
         builder.endSection();
 
     }
