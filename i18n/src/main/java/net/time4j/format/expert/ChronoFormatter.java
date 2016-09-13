@@ -5108,8 +5108,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * from {@code 0}. The GMT-prefix can also be like &quot;UTC&quot;
          * or &quot;UT&quot; when parsing. A localized GMT-notation is
          * possible provided that the resource files
-         * &quot;iso8601.properties&quot; have an entry with the key
-         * &quot;prefixGMTOffset&quot;. If the format attribute
+         * &quot;tzname.properties&quot; have an entry with the key
+         * &quot;offset-pattern&quot;. If the format attribute
          * {@code Attributes.NO_GMT_PREFIX} is set to {@code true}
          * then the GMT-prefix will be suppressed. The format attribute
          * {@code Attributes.ZERO_DIGIT} (usually set indirect via the
@@ -5136,8 +5136,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * ist. Das GMT-Pr&auml;fix darf beim Parsen auch als &quot;UTC&quot;
          * oder &quot;UT&quot; vorliegen. Au&szlig;erdem ist eine lokalisierte
          * GMT-Notation m&ouml;glich, indem in den Ressourcendateien
-         * &quot;iso8601.properties&quot; ein Eintrag mit dem Schl&uuml;ssel
-         * &quot;prefixGMTOffset&quot; vorhanden ist. Wenn das Formatattribut
+         * &quot;tzname.properties&quot; ein Eintrag mit dem Schl&uuml;ssel
+         * &quot;offset-pattern&quot; vorhanden ist. Wenn das Formatattribut
          * {@code Attributes.NO_GMT_PREFIX} auf {@code true} gesetzt wird,
          * dann wird das GMT-Pr&auml;fix unterdr&uuml;ckt. Das Formatattribut
          * {@code Attributes.ZERO_DIGIT} (normalerweise nur implizit &uuml;ber die
@@ -5167,8 +5167,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Notes: The GMT-prefix can also be like &quot;UTC&quot;
          * or &quot;UT&quot; when parsing. A localized GMT-notation is
          * possible provided that the resource files
-         * &quot;iso8601.properties&quot; have an entry with the key
-         * &quot;prefixGMTOffset&quot;. If the format attribute
+         * &quot;tzname.properties&quot; have an entry with the key
+         * &quot;offset-pattern&quot;. If the format attribute
          * {@code Attributes.NO_GMT_PREFIX} is set to {@code true}
          * then the GMT-prefix will be suppressed. The format attribute
          * {@code Attributes.ZERO_DIGIT} (usually set indirect via the
@@ -5193,8 +5193,8 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
          * <p>Hinweise: Das GMT-Pr&auml;fix darf beim Parsen auch als
          * &quot;UTC&quot; oder &quot;UT&quot; vorliegen. Au&szlig;erdem
          * ist eine lokalisierte GMT-Notation m&ouml;glich, indem in den
-         * Ressourcendateien &quot;iso8601.properties&quot; ein Eintrag mit
-         * dem Schl&uuml;ssel &quot;prefixGMTOffset&quot; vorhanden ist. Wenn
+         * Ressourcendateien &quot;tzname.properties&quot; ein Eintrag mit
+         * dem Schl&uuml;ssel &quot;offset-pattern&quot; vorhanden ist. Wenn
          * das Formatattribut {@code Attributes.NO_GMT_PREFIX} auf {@code true}
          * gesetzt wird, dann wird das GMT-Pr&auml;fix unterdr&uuml;ckt. Das
          * Formatattribut {@code Attributes.ZERO_DIGIT} (normalerweise nur

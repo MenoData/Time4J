@@ -293,12 +293,10 @@ public enum PatternType
      *      <td>LOCALIZED_GMT_OFFSET</td>
      *      <td>O</td>
      *      <td>One symbol for the abbreviation or 4 symbols for the long
-     *      variant. The GMT-prefix can also be available in a localized
-     *      version from the resource file &quot;iso8601.properties&quot;,
-     *      given the key &quot;prefixGMTOffset&quot;. It can be suppressed by
-     *      help of the format attribute {@link Attributes#NO_GMT_PREFIX}. See also
-     *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()} or its short
-     *      counter part. </td>
+     *      variant. The GMT-prefix can be suppressed by help of the format
+     *      attribute {@link Attributes#NO_GMT_PREFIX}. See also
+     *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()}
+     *      or its short counter part. </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_ID</td>
@@ -323,6 +321,12 @@ public enum PatternType
      *  </tr>
      * </table>
      * </div>
+     *
+     * <p>Special notes for the Ethiopian calendar: </p>
+     *
+     * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour can be overridden
+     * on builder-level. And the clock time (symbol &quot;h&quot;) will use the Ethiopian time starting
+     * at 6 AM in the morning. </p>
      */
     /*[deutsch]
      * <p>Dieses Standardmuster ist auf viele Chronologien anwendbar und folgt der Norm
@@ -561,9 +565,7 @@ public enum PatternType
      *      <td>LOCALIZED_GMT_OFFSET</td>
      *      <td>O</td>
      *      <td>Ein Symbol f&uuml;r die Kurzform oder 4 Symbole f&uuml;r die
-     *      Langform. Das GMT-Pr&auml;fix kann auch lokalisiert aus der
-     *      &quot;iso8601.properties&quot;-Ressource stammen, zum Schl&uuml;ssel
-     *      &quot;prefixGMTOffset&quot;. Es kann mit Hilfe des Attributs
+     *      Langform. Das GMT-Pr&auml;fix kann mit Hilfe des Attributs
      *      {@link Attributes#NO_GMT_PREFIX} unterdr&uuml;ckt werden. Siehe auch
      *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()} oder
      *      sein kurzes Gegenst&uuml;ck. </td>
@@ -591,6 +593,13 @@ public enum PatternType
      *  </tr>
      * </table>
      * </div>
+     *
+     * <p>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </p>
+     *
+     * <p>Das &auml;thiopische Jahr wird in Amharic die &auml;thiopischen Numerale verwenden. Dieses
+     * Standardverhalten kann auf <i>builder</i>-Ebene &uuml;berschrieben werden. Und die Uhrzeit
+     * (Symbol &quot;h&quot;) wird die &auml;thiopische Variante mit 6 Uhr morgens als Tagesbeginn
+     * nutzen. </p>
      */
     CLDR,
 
@@ -936,6 +945,11 @@ public enum PatternType
      * </table>
      * </div>
      *
+     * <p>Special notes for the Ethiopian calendar: </p>
+     *
+     * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour
+     * can be overridden on builder-level. </p>
+     *
      * @since   3.5/4.3
      */
     /*[deutsch]
@@ -1013,6 +1027,11 @@ public enum PatternType
      * </table>
      * </div>
      *
+     * <p>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </p>
+     *
+     * <p>Das &auml;thiopische Jahr wird per Standard in Amharic die &auml;thiopischen Numerale verwenden.
+     * Diese Vorgabe kann auf <i>builder</i>-Ebene &uuml;berschrieben werden. </p>
+     *
      * @since   3.5/4.3
      */
     NON_ISO_DATE;
@@ -1066,7 +1085,7 @@ public enum PatternType
                 if (isISO(builder.getChronology())) {
                     throw new IllegalArgumentException("Choose CLDR or CLDR_24 for ISO-8601-chronology.");
                 }
-                return general(builder, symbol, count);
+                return general(builder, symbol, count, locale);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -1128,7 +1147,7 @@ public enum PatternType
         Chronology<?> chronology = builder.getChronology();
 
         if (isGeneralSymbol(symbol) && !isISO(chronology)) {
-            return this.general(builder, symbol, count);
+            return this.general(builder, symbol, count, locale);
         } else if ((symbol == 'h') && getCalendarType(chronology).equals("ethiopic")) {
             ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
             if (ethioHour == null) {
@@ -1651,7 +1670,8 @@ public enum PatternType
     private Map<ChronoElement<?>, ChronoElement<?>> general(
         ChronoFormatter.Builder<?> builder,
         char symbol,
-        int count
+        int count,
+        Locale locale
     ) {
 
         Set<ChronoElement<?>> elements = builder.getChronology().getRegisteredElements();
@@ -1691,10 +1711,18 @@ public enum PatternType
                 builder.endSection();
                 break;
             case 'y':
+                boolean hasSpecialAttribute = false;
+                if (locale.getLanguage().equals("am") && getCalendarType(builder.getChronology()).equals("ethiopic")) {
+                    hasSpecialAttribute = true;
+                    builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC);
+                }
                 if (count == 2) {
                     builder.addTwoDigitYear(intElement);
                 } else {
                     builder.addYear(intElement, count, false);
+                }
+                if (hasSpecialAttribute) {
+                    builder.endSection();
                 }
                 break;
             case 'r':
