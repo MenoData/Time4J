@@ -16,6 +16,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
@@ -49,6 +50,26 @@ import static org.junit.Assert.fail;
 
 @RunWith(JUnit4.class)
 public class MiscellaneousTest {
+
+    @Test
+    public void printArabicIndicMicroOfDay() {
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.setUp(PlainTime.axis(), new Locale("en"))
+                .addLongNumber(PlainTime.MICRO_OF_DAY, 11, 11, SignPolicy.SHOW_NEVER)
+                .build()
+                .with(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC_INDIC);
+        char zeroChar = NumberSystem.ARABIC_INDIC.getDigits().charAt(0);
+        StringBuilder zeroes = new StringBuilder();
+        for (int i = 0; i < 6; i++) {
+            zeroes.append(zeroChar);
+        }
+        assertThat(
+            f.format(PlainTime.midnightAtEndOfDay()),
+            is(NumberSystem.ARABIC_INDIC.toNumeral(86400) + zeroes.toString()));
+        assertThat(
+            f.getAttributes().get(Attributes.NUMBER_SYSTEM),
+            is(NumberSystem.ARABIC_INDIC));
+    }
 
     @Test
     public void testTagalog() throws ParseException {

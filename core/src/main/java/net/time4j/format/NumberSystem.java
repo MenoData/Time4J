@@ -190,12 +190,14 @@ public enum NumberSystem {
     /**
      * Ethiopic numerals (always positive).
      *
-     * <p>See also <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>. </p>
+     * <p>See also <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>.
+     * Attention: This enum is not a decimal system. </p>
      */
     /*[deutsch]
      * &Auml;thiopische Numerale (immer positiv).
      *
-     * <p>Siehe auch <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>. </p>
+     * <p>Siehe auch <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>.
+     * Achtung: Dieses Enum ist kein Dezimalsystem. </p>
      */
     ETHIOPIC() {
         @Override
