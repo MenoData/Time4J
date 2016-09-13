@@ -282,14 +282,18 @@ public final class Attributes
     /**
      * <p>Determines the number system. </p>
      *
-     * <p>If defined as non-arabic then the attribute for zero digit will be ignored. </p>
+     * <p>In case of changing the language setting this attribute will
+     * automatically be adjusted. The {@link #ZERO_DIGIT attribute for zero digit}
+     * can be set to another value however. </p>
      *
      * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Bestimmt das Zahlsystem. </p>
      *
-     * <p>Wenn als nicht-arabisch definiert, dann wird das Attribut f&uuml;r die Nullziffer ignoriert. </p>
+     * <p>Diese Einstellung wird bei jeder &Auml;nderung der Spracheinstellung
+     * automatisch angepasst. Das {@link #ZERO_DIGIT Attribut f&uuml;r die Nullziffer}
+     * kann aber abweichend konfiguriert werden. </p>
      *
      * @since   3.11/4.8
      */
@@ -299,16 +303,20 @@ public final class Attributes
     /**
      * <p>Determines the unicode char for the zero digit. </p>
      *
-     * <p>In case of changing the language setting this attribute will
-     * automatically be adjusted. Default value is the arab digit
-     * {@code 0} in ISO-8601 (corresponding to the ASCII-value 48). </p>
+     * <p>In case of changing the language setting or the (decimal) number system this attribute
+     * will automatically be adjusted to the default number system. For ISO-8601, the default
+     * value is the arab digit {@code 0} (corresponding to the ASCII-value 48). </p>
+     *
+     * @see     #NUMBER_SYSTEM
      */
     /*[deutsch]
      * <p>Legt das Unicode-Zeichen f&uuml;r die Null-Ziffer fest. </p>
      *
-     * <p>Diese Einstellung wird bei jeder &Auml;nderung der Spracheinstellung
-     * automatisch angepasst. Standardwert ist in ISO-8601 die arabische Ziffer
-     * {@code 0} (entsprechend dem ASCII-Wert 48). </p>
+     * <p>Diese Einstellung wird bei jeder &Auml;nderung der Spracheinstellung oder des
+     * (Dezimal-)Zahlsystems automatisch an das jeweilige Standard-Zahlsystem angepasst. Standardwert
+     * ist in ISO-8601 die arabische Ziffer {@code 0} (entsprechend dem ASCII-Wert 48). </p>
+     *
+     * @see     #NUMBER_SYSTEM
      */
     public static final AttributeKey<Character> ZERO_DIGIT =
         PredefinedKey.valueOf("ZERO_DIGIT", Character.class);
@@ -950,6 +958,11 @@ public final class Attributes
                         break;
                     default:
                         throw new UnsupportedOperationException(value.name());
+                }
+            } else if (compare == Attributes.NUMBER_SYSTEM) {
+                NumberSystem numsys = NumberSystem.class.cast(value);
+                if (numsys.isDecimal()) {
+                    this.set(Attributes.ZERO_DIGIT, numsys.getDigits().charAt(0));
                 }
             }
 

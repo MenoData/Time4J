@@ -29,11 +29,15 @@ import java.util.Locale;
 /**
  * <p>Defines the number system. </p>
  *
+ * <p>Attention: This enum can only handle non-negative integers. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.11/4.8
  */
 /*[deutsch]
  * <p>Definiert ein Zahlsystem. </p>
+ *
+ * <p>Achtung: Dieses Enum kann nur nicht-negative Ganzzahlen verarbeiten. </p>
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
@@ -43,33 +47,153 @@ public enum NumberSystem {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * Arabic numbers with digits 0-9 (default setting).
+     * Arabic numbers with the decimal digits 0-9 (default setting).
+     *
+     * <p>This number system is used worldwide. Direct conversion of negative integers is not supported. </p>
      */
     /*[deutsch]
-     * Arabische Zahlen mit den Ziffern 0-9 (Standardeinstellung).
+     * Arabische Zahlen mit den Dezimalziffern 0-9 (Standardeinstellung).
+     *
+     * <p>Dieses Zahlsystem wird weltweit verwendet. Die direkte Konversion von negativen Ganzzahlen
+     * wird jedoch nicht unterst&uuml;tzt. </p>
      */
     ARABIC() {
         @Override
         public String toNumeral(int number) {
+            if (number < 0) {
+                throw new IllegalArgumentException("Cannot convert: " + number);
+            }
             return Integer.toString(number);
         }
         @Override
         public int toInteger(String numeral, Leniency leniency) {
-            return Integer.parseInt(numeral);
+            int result = Integer.parseInt(numeral);
+            if (result < 0) {
+                throw new NumberFormatException("Cannot convert negative number: " + numeral);
+            }
+            return result;
         }
         @Override
         public boolean contains(char digit) {
             return ((digit >= '0') && (digit <= '9'));
         }
+        @Override
+        public String getDigits() {
+            return "0123456789";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
     },
 
     /**
-     * Ethiopic numerals.
+     * Arabic-Indic numbers (used in many Arabic countries).
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Arabisch-indische Zahlen (in vielen arabischen L&auml;ndern verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    ARABIC_INDIC() {
+        @Override
+        public String getDigits() {
+            return "٠١٢٣٤٥٦٧٨٩";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * Extended Arabic-Indic numbers (used for example in Iran).
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Erweiterte arabisch-indische Zahlen (zum Beispiel im Iran).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    ARABIC_INDIC_EXT() {
+        @Override
+        public String getDigits() {
+            return "۰۱۲۳۴۵۶۷۸۹";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * The Bengali digits used in parts of India.
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Die Bengalii-Ziffern (in Teilen von Indien verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    BENGALI() {
+        @Override
+        public String getDigits() {
+            return "০১২৩৪৫৬৭৮৯";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * The Devanagari digits used in parts of India.
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Die Devanagari-Ziffern (in Teilen von Indien verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    DEVANAGARI() {
+        @Override
+        public String getDigits() {
+            return "०१२३४५६७८९";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * Ethiopic numerals (always positive).
      *
      * <p>See also <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>. </p>
      */
     /*[deutsch]
-     * &Auml;thiopische Numerale.
+     * &Auml;thiopische Numerale (immer positiv).
      *
      * <p>Siehe auch <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>. </p>
      */
@@ -153,7 +277,7 @@ public enum NumberSystem {
                     if (hundred && (sum == 0)) {
                         sum = 1;
                     }
-                    total = add(total, sum, factor);
+                    total = addEthiopic(total, sum, factor);
                     if (hundred) {
                         factor *= 100;
                     } else {
@@ -163,7 +287,7 @@ public enum NumberSystem {
                     hundred = false;
                     thousand = true;
                 } else if (digit == ETHIOPIC_HUNDRED) {
-                    total = add(total, sum, factor);
+                    total = addEthiopic(total, sum, factor);
                     factor *= 100;
                     sum = 0;
                     hundred = true;
@@ -173,12 +297,48 @@ public enum NumberSystem {
             if ((hundred || thousand) && (sum == 0)) {
                 sum = 1;
             }
-            total = add(total, sum, factor);
+            total = addEthiopic(total, sum, factor);
             return total;
         }
         @Override
         public boolean contains(char digit) {
             return ((digit >= ETHIOPIC_ONE) && (digit <= ETHIOPIC_TEN_THOUSAND));
+        }
+        @Override
+        public String getDigits() {
+            return
+                "\u1369\u136A\u136B\u136C\u136D\u136E\u136F\u1370\u1371"
+                + "\u1372\u1373\u1374\u1375\u1376\u1377\u1378\u1379\u137A"
+                + "\u137B\u137C";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
+        }
+    },
+
+    /**
+     * The Gujarati digits used in parts of India.
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Die Gujarati-Ziffern (in Teilen von Indien verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    GUJARATI() {
+        @Override
+        public String getDigits() {
+            return "૦૧૨૩૪૫૬૭૮૯";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
         }
     },
 
@@ -249,7 +409,7 @@ public enum NumberSystem {
                                 j--;
                             } else { // next > value
                                 if (strict) {
-                                    if ((count > 1) || !isValidCombination(roman, test)) {
+                                    if ((count > 1) || !isValidRomanCombination(roman, test)) {
                                         throw new NumberFormatException("Not conform with modern usage: " + numeral);
                                     }
                                 }
@@ -281,6 +441,64 @@ public enum NumberSystem {
             char c = Character.toUpperCase(digit);
             return ((c == 'I') || (c == 'V') || (c == 'X') || (c == 'L') || (c == 'C') || (c == 'D') || (c == 'M'));
         }
+        @Override
+        public String getDigits() {
+            return "IVXLCDM";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
+        }
+    },
+
+    /**
+     * The Telugu digits used in parts of India.
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Die Telugu-Ziffern (in Teilen von Indien verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    TELUGU() {
+        @Override
+        public String getDigits() {
+            return "౦౧౨౩౪౫౬౭౮౯";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * The Thai digits used in Thailand (Siam).
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Die Thai-Ziffern (in Thailand verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    THAI() {
+        @Override
+        public String getDigits() {
+            return "๐๑๒๓๔๕๖๗๘๙";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
     };
 
     private static final char ETHIOPIC_ONE          = 0x1369; // 1, 2, ..., 8, 9
@@ -311,7 +529,18 @@ public enum NumberSystem {
      */
     public String toNumeral(int number) {
 
-        throw new AbstractMethodError();
+        if (this.isDecimal() && (number >= 0)) {
+            int delta = this.getDigits().charAt(0) - '0';
+            String standard = Integer.toString(number);
+            StringBuilder numeral = new StringBuilder();
+            for (int i = 0, n = standard.length(); i < n; i++) {
+                int codepoint = standard.charAt(i) + delta;
+                numeral.append((char) codepoint);
+            }
+            return numeral.toString();
+        } else {
+            throw new IllegalArgumentException("Cannot convert: " + number);
+        }
 
     }
 
@@ -320,7 +549,7 @@ public enum NumberSystem {
      *
      * @param   numeral      text numeral to be evaluated as number
      * @return  integer
-     * @throws  NumberFormatException if given number has wrong format
+     * @throws  IllegalArgumentException if given number has wrong format
      * @throws  ArithmeticException if int-range overflows
      * @since   3.11/4.8
      */
@@ -329,7 +558,7 @@ public enum NumberSystem {
      *
      * @param   numeral      text numeral to be evaluated as number
      * @return  integer
-     * @throws  NumberFormatException if given number has wrong format
+     * @throws  IllegalArgumentException if given number has wrong format
      * @throws  ArithmeticException if int-range overflows
      * @since   3.11/4.8
      */
@@ -348,7 +577,7 @@ public enum NumberSystem {
      * @param   numeral     text numeral to be evaluated as number
      * @param   leniency    determines how lenient the parsing of given numeral should be
      * @return  integer
-     * @throws  NumberFormatException if given number has wrong format
+     * @throws  IllegalArgumentException if given number has wrong format
      * @throws  ArithmeticException if int-range overflows
      * @since   3.15/4.12
      */
@@ -362,7 +591,7 @@ public enum NumberSystem {
      * @param   numeral     text numeral to be evaluated as number
      * @param   leniency    determines how lenient the parsing of given numeral should be
      * @return  integer
-     * @throws  NumberFormatException if given number has wrong format
+     * @throws  IllegalArgumentException if given number has wrong format
      * @throws  ArithmeticException if int-range overflows
      * @since   3.15/4.12
      */
@@ -371,7 +600,21 @@ public enum NumberSystem {
         Leniency leniency
     ) {
 
-        throw new AbstractMethodError();
+        if (this.isDecimal()) {
+            int delta = this.getDigits().charAt(0) - '0';
+            StringBuilder standard = new StringBuilder();
+            for (int i = 0, n = numeral.length(); i < n; i++) {
+                int codepoint = numeral.charAt(i) - delta;
+                standard.append((char) codepoint);
+            }
+            int result = Integer.parseInt(standard.toString());
+            if (result < 0) {
+                throw new NumberFormatException("Cannot convert negative number: " + numeral);
+            }
+            return result;
+        } else {
+            throw new NumberFormatException("Cannot convert: " + numeral);
+        }
 
     }
 
@@ -391,11 +634,62 @@ public enum NumberSystem {
      */
     public boolean contains(char digit) {
 
+        String digits = this.getDigits();
+
+        for (int i = 0, n = digits.length(); i < n; i++) {
+            if (digits.charAt(i) == digit) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
+     * <p>Defines all digit characters from the smallest to the largest one. </p>
+     *
+     * <p>Note: If letters are used as digits then the upper case will be used. </p>
+     *
+     * @return  String containing all valid digit characters in ascending order
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Definiert alle g&uuml;ltigen Ziffernsymbole von der kleinsten bis zur
+     * gr&ouml;&szlig;ten Ziffer. </p>
+     *
+     * <p>Hinweis: Wenn Buchstaben als Ziffern verwendet werden, dann wird
+     * die Gro&szlig;schreibung angewandt. </p>
+     *
+     * @return  String containing all valid digit characters in ascending order
+     * @since   3.23/4.19
+     */
+    public String getDigits() {
+
         throw new AbstractMethodError();
 
     }
 
-    private static int add(
+    /**
+     * <p>Does this number system describe a decimal system where the digits can be mapped to the range 0-9? </p>
+     *
+     * @return  boolean
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Beschreibt dieses Zahlensystem ein Dezimalsystem, dessen Ziffern sich auf den Bereich 0-9 abbilden
+     * lassen? </p>
+     *
+     * @return  boolean
+     * @since   3.23/4.19
+     */
+    public boolean isDecimal() {
+
+        throw new AbstractMethodError();
+
+    }
+
+    private static int addEthiopic(
         int total,
         int sum,
         int factor
@@ -428,7 +722,7 @@ public enum NumberSystem {
 
     }
 
-    private static boolean isValidCombination(
+    private static boolean isValidRomanCombination(
         char previous,
         char next
     ) {

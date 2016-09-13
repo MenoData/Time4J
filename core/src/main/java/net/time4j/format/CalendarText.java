@@ -911,26 +911,14 @@ public final class CalendarText {
      * <p>Yields the localized GMT-prefix which is used in the
      * <i>localized GMT format</i> of CLDR. </p>
      *
-     * <p>Note that using the GMT-notation is at least old-fashioned.
-     * Users should prefer the UTC-notation as combination of the
-     * &quot;UTC&quot;-literal and an ISO-8601-timezone-offset. This
-     * method is mainly a fit to the CLDR data. </p>
-     *
      * @param 	    locale 	language and country configuration
      * @return      localized GMT-String defaults to &quot;GMT&quot;
-     * @deprecated  Please avoid use of GMT-notation else you can use the expression
-     *              {@code CalendarText.getIsoInstance(locale).getTextForms().get("prefixGMTOffset")}
+     * @deprecated  Use {@link net.time4j.tz.ZonalOffset#getStdFormatPattern(Locale)} instead
      */
     @Deprecated
     public static String getGMTPrefix(Locale locale) {
 
-        CalendarText ct = CalendarText.getIsoInstance(locale);
-
-        if (ct.textForms.isEmpty()) {
-            return "GMT";
-        }
-
-        return ct.textForms.get("prefixGMTOffset");
+        return "GMT";
 
     }
 
