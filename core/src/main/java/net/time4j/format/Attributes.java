@@ -284,7 +284,13 @@ public final class Attributes
      *
      * <p>In case of changing the language setting this attribute will
      * automatically be adjusted. The {@link #ZERO_DIGIT attribute for zero digit}
-     * can be set to another value however. </p>
+     * will be adjusted, too (if the number system is decimal) but can be set to
+     * another value however. </p>
+     *
+     * <p>If a non-decimal number system like roman numbers is chosen then Time4J
+     * will ignore it for any other format component than ordinary integers. For
+     * example, zone offsets in format &#x00B1;hh:mm, fractional seconds, ordinals
+     * like &quot;1st&quot; or two-digit-years cannot be printed in roman numbers. </p>
      *
      * @since   3.11/4.8
      */
@@ -293,7 +299,15 @@ public final class Attributes
      *
      * <p>Diese Einstellung wird bei jeder &Auml;nderung der Spracheinstellung
      * automatisch angepasst. Das {@link #ZERO_DIGIT Attribut f&uuml;r die Nullziffer}
-     * kann aber abweichend konfiguriert werden. </p>
+     * wird auch angepasst (falls das Zahlsystem dezimal ist), kann aber abweichend
+     * konfiguriert werden. </p>
+     *
+     * <p>Wenn ein nicht-dezimales Zahlsystem wie die r&ouml;mischen Zahlen gew&auml;hlt wird,
+     * dann wird Time4J dieses Attribut ignorieren, sobald eine Formatkomponente betroffen ist,
+     * die nicht auf gew&ouml;hnlichen Integertypen basiert. Zum Beispiel k&ouml;nnen
+     * Zeitzonen-Offsets im Format &#x00B1;hh:mm, Sekundenbruchteile, Ordinalzahlen wie
+     * &quot;1st&quot; (englisch) oder zweistellige Jahresangaben nicht in r&ouml;mischen
+     * Zahlen dargestellt werden. </p>
      *
      * @since   3.11/4.8
      */

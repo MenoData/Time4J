@@ -211,6 +211,7 @@ class NumberProcessor<V>
             buffer.append(sb.toString());
             printed = sb.length();
         } else {
+            char defaultZeroChar = numsys.getDigits().charAt(0);
             Class<V> type = this.element.getType();
             boolean negative = false;
             String digits;
@@ -228,6 +229,7 @@ class NumberProcessor<V>
                         ? "9223372036854775808"
                         : Long.toString(Math.abs(v))
                 );
+                defaultZeroChar = '0';
             } else if (Enum.class.isAssignableFrom(type)) {
                 V value = formattable.get(this.element);
                 int v = -1;
@@ -252,7 +254,6 @@ class NumberProcessor<V>
             }
 
             if (numsys.isDecimal()) {
-                char defaultZeroChar = numsys.getDigits().charAt(0);
                 if (zeroChar != defaultZeroChar) {
                     int diff = zeroChar - defaultZeroChar;
                     char[] characters = digits.toCharArray();
