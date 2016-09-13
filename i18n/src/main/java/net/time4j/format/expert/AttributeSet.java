@@ -30,6 +30,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSymbolProvider;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 import net.time4j.i18n.LanguageMatch;
@@ -87,7 +88,7 @@ final class AttributeSet
     private static final ConcurrentMap<String, NumericalSymbols> NUMBER_SYMBOL_CACHE =
         new ConcurrentHashMap<String, NumericalSymbols>();
     private static final NumericalSymbols DEFAULT_NUMERICAL_SYMBOLS =
-        new NumericalSymbols('0', ISO_DECIMAL_SEPARATOR, "+", "-");
+        new NumericalSymbols(NumberSystem.ARABIC, '0', ISO_DECIMAL_SEPARATOR, "+", "-");
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -342,8 +343,8 @@ final class AttributeSet
     /**
      * <p>Setzt die Sprach- und L&auml;ndereinstellung. </p>
      *
-     * <p>Die Attribute {@link Attributes#ZERO_DIGIT}, {@link Attributes#DECIMAL_SEPARATOR}
-     * und {@link Attributes#LANGUAGE} werden automatisch mit angepasst. </p>
+     * <p>Die Attribute {@link Attributes#NUMBER_SYSTEM}, {@link Attributes#ZERO_DIGIT},
+     * {@link Attributes#DECIMAL_SEPARATOR} und {@link Attributes#LANGUAGE} werden automatisch mit angepasst. </p>
      *
      * @param   locale      new language and country setting
      * @return  this instance for method chaining
@@ -360,10 +361,10 @@ final class AttributeSet
 
         if (
             lang.isEmpty()
-            && country.isEmpty()
-        ) {
+                && country.isEmpty()
+            ) {
             locale = Locale.ROOT;
-            builder.set(Attributes.ZERO_DIGIT, '0');
+            builder.set(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
             builder.set(Attributes.DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
             plus = "+";
             minus = "-";
@@ -380,6 +381,7 @@ final class AttributeSet
                 try {
                     symbols =
                         new NumericalSymbols(
+                            NUMBER_SYMBOLS.getDefaultNumberSystem(locale),
                             NUMBER_SYMBOLS.getZeroDigit(locale),
                             NUMBER_SYMBOLS.getDecimalSeparator(locale),
                             NUMBER_SYMBOLS.getPlusSign(locale),
@@ -396,7 +398,8 @@ final class AttributeSet
                 }
             }
 
-            builder.set(Attributes.ZERO_DIGIT, symbols.zeroDigit);
+            builder.set(Attributes.NUMBER_SYSTEM, symbols.numsys);
+            builder.set(Attributes.ZERO_DIGIT, symbols.zeroDigit); // allow deviation
             builder.set(Attributes.DECIMAL_SEPARATOR, symbols.decimalSeparator);
             plus = symbols.plus;
             minus = symbols.minus;
@@ -441,6 +444,7 @@ final class AttributeSet
 
         //~ Instanzvariablen ----------------------------------------------
 
+        private final NumberSystem numsys;
         private final char zeroDigit;
         private final char decimalSeparator;
         private final String plus;
@@ -449,6 +453,7 @@ final class AttributeSet
         //~ Konstruktoren -------------------------------------------------
 
         NumericalSymbols(
+            NumberSystem numsys,
             char zeroDigit,
             char decimalSeparator,
             String plus,
@@ -456,6 +461,7 @@ final class AttributeSet
         ) {
             super();
 
+            this.numsys = numsys;
             this.zeroDigit = zeroDigit;
             this.decimalSeparator = decimalSeparator;
             this.plus = plus;

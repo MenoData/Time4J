@@ -22,6 +22,7 @@
 package net.time4j.i18n;
 
 import net.time4j.format.NumberSymbolProvider;
+import net.time4j.format.NumberSystem;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -121,6 +122,13 @@ public final class SymbolProviderSPI
             locale,
             "minus",
             NumberSymbolProvider.DEFAULT.getMinusSign(locale));
+
+    }
+
+    @Override
+    public NumberSystem getDefaultNumberSystem(Locale locale) {
+
+        return NumberSystem.ARABIC;
 
     }
 

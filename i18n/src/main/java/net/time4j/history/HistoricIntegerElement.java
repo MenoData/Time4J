@@ -111,7 +111,10 @@ final class HistoricIntegerElement
     ) throws IOException {
 
         NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
-        char zeroChar = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
+        char zeroChar = (
+            attributes.contains(Attributes.ZERO_DIGIT)
+            ? attributes.get(Attributes.ZERO_DIGIT).charValue()
+            : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
         this.print(context, buffer, attributes, numsys, zeroChar, 1, 9);
 
     }
@@ -149,26 +152,27 @@ final class HistoricIntegerElement
                     int yearOfDisplay = date.getYearOfEra(nys);
                     if (yearOfDisplay != yearOfEra) {
                         if (attributes.get(ChronoHistory.YEAR_DEFINITION, DUAL_DATING) == DUAL_DATING) {
-                            text = this.dual(numsys, yearOfDisplay, yearOfEra, minDigits);
+                            text = this.dual(numsys, zeroChar, yearOfDisplay, yearOfEra, minDigits);
                         } else {
                             yearOfEra = yearOfDisplay;
                         }
                     }
                 }
                 if (text == null) { // no dual format
-                    if (numsys == NumberSystem.ARABIC) {
-                        text = this.format(Integer.toString(yearOfEra), minDigits);
+                    if (numsys.isDecimal()) {
+                        text = pad(numsys.toNumeral(yearOfEra), minDigits, zeroChar);
                     } else {
                         text = numsys.toNumeral(yearOfEra);
                     }
                 }
-                if (numsys == NumberSystem.ARABIC) {
-                    if (zeroChar != '0') {
+                if (numsys.isDecimal()) {
+                    char defaultZeroChar = numsys.getDigits().charAt(0);
+                    if (zeroChar != defaultZeroChar) {
                         StringBuilder sb = new StringBuilder();
                         for (int i = 0, n = text.length(); i < n; i++) {
                             char c = text.charAt(i);
-                            if (c >= '0' && c <= '9') {
-                                int diff = zeroChar - '0';
+                            if (numsys.contains(c)) {
+                                int diff = zeroChar - defaultZeroChar;
                                 sb.append((char) (c + diff));
                             } else {
                                 sb.append(c); // - (minus) or / (slash)
@@ -236,14 +240,14 @@ final class HistoricIntegerElement
         }
 
         NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
-        char zero = attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue();
-        Leniency leniency = (
-            (numsys == NumberSystem.ARABIC)
-                ? null // not used
-                : attributes.get(Attributes.LENIENCY, Leniency.SMART));
+        char zeroChar = (
+            attributes.contains(Attributes.ZERO_DIGIT)
+                ? attributes.get(Attributes.ZERO_DIGIT).charValue()
+                : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
+        Leniency leniency = (numsys.isDecimal() ? Leniency.SMART : attributes.get(Attributes.LENIENCY, Leniency.SMART));
         int start = status.getIndex();
         int pos = start;
-        int value = parseNum(numsys, text, pos, status, zero, leniency);
+        int value = parseNum(numsys, zeroChar, text, pos, status, leniency);
         pos = status.getIndex();
 
         if ( // dual date check
@@ -255,7 +259,7 @@ final class HistoricIntegerElement
             && (attributes.get(ChronoHistory.YEAR_DEFINITION, DUAL_DATING) == DUAL_DATING)
         ) {
             int slash = pos;
-            int yoe = parseNum(numsys, text, pos + 1, status, zero, leniency);
+            int yoe = parseNum(numsys, zeroChar, text, pos + 1, status, leniency);
             int test = status.getIndex();
             if (test == pos + 1) { // we will now stop consuming more chars and ignore yoe-part
                 status.setIndex(pos);
@@ -266,7 +270,7 @@ final class HistoricIntegerElement
                     (this.history.getNewYearStrategy().rule(HistoricEra.AD, yod) == NewYearRule.CALCULUS_PISANUS)
                     ? 2 : 1);
                 int ancient = this.getAncientYear(yod, yoe, maxDeviation);
-                if ((numsys == NumberSystem.ARABIC) && (ancient != Integer.MAX_VALUE)) {
+                if (numsys.isDecimal() && (ancient != Integer.MAX_VALUE)) {
                     value = ancient;
                     if (parsedResult != null) {
                         parsedResult.with(StdHistoricalElement.YEAR_OF_DISPLAY, yod);
@@ -338,6 +342,7 @@ final class HistoricIntegerElement
 
     private String dual(
         NumberSystem numsys,
+        char zeroChar,
         int yearOfDisplay,
         int yearOfEra,
         int minDigits
@@ -348,30 +353,31 @@ final class HistoricIntegerElement
         sb.append('/');
 
         if (
-            (numsys == NumberSystem.ARABIC)
+            numsys.isDecimal()
             && (yearOfEra >= 100)
             && (MathUtils.floorDivide(yearOfDisplay, 100) == MathUtils.floorDivide(yearOfEra, 100))
         ) {
             int yoe2 = MathUtils.floorModulo(yearOfEra, 100);
             if (yoe2 < 10) {
-                sb.append('0');
+                sb.append(zeroChar);
             }
-            sb.append(yoe2);
+            sb.append(numsys.toNumeral(yoe2));
         } else {
             sb.append(numsys.toNumeral(yearOfEra));
         }
 
-        if (numsys == NumberSystem.ARABIC) {
-            return this.format(sb.toString(), minDigits);
+        if (numsys.isDecimal()) {
+            return pad(sb.toString(), minDigits, zeroChar);
         } else {
             return sb.toString();
         }
 
     }
 
-    private String format(
+    private static String pad(
         String digits,
-        int min
+        int min,
+        char zeroChar
     ) {
 
         int len = digits.length();
@@ -383,7 +389,7 @@ final class HistoricIntegerElement
         StringBuilder sb = new StringBuilder();
 
         for (int i = 0, n = min - len; i < n; i++) {
-            sb.append('0');
+            sb.append(zeroChar);
         }
 
         sb.append(digits);
@@ -420,29 +426,40 @@ final class HistoricIntegerElement
 
     private static int parseNum(
         NumberSystem numsys,
+        char zeroChar,
         CharSequence text,
         int offset,
         ParsePosition status,
-        char zero,
         Leniency leniency
     ) {
 
         int value = 0;
         int pos = offset;
 
-        if (numsys == NumberSystem.ARABIC) {
+        if (numsys.isDecimal()) {
             boolean negative = false;
 
-            if (text.charAt(pos) == '-') {
+            if ((numsys == NumberSystem.ARABIC) && (text.charAt(pos) == '-')) {
                 negative = true;
                 pos++;
             }
 
+            char defaultZeroChar = (leniency.isStrict() ? '\u0000' : numsys.getDigits().charAt(0));
+
             for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
-                int digit = text.charAt(i) - zero;
+                int digit = text.charAt(i) - zeroChar;
                 if ((digit >= 0) && (digit <= 9)) {
                     value = value * 10 + digit;
                     pos++;
+                } else if ((defaultZeroChar != '\u0000') && (zeroChar != defaultZeroChar)) { // smart or lax mode
+                    digit = text.charAt(i) - defaultZeroChar;
+                    if ((digit >= 0) && (digit <= 9)) {
+                        zeroChar = defaultZeroChar;
+                        value = value * 10 + digit;
+                        pos++;
+                    } else {
+                        break;
+                    }
                 } else {
                     break;
                 }
