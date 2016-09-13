@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSymbolProvider.java) is part of project Time4J.
  *
@@ -178,5 +178,25 @@ public interface NumberSymbolProvider {
      * @return  localized minus sign, possibly including RLM- or LRM-markers
      */
     String getMinusSign(Locale locale);
+
+    /**
+     * <p>Obtains the standard number system for given locale. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  default number system
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermitelt das Standardzahlsystem f&uuml;r die angegebene Sprache. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  default number system
+     * @since   3.23/4.19
+     */
+    default NumberSystem getDefaultNumberSystem(Locale locale) {
+
+        return NumberSystem.ARABIC; // worldwide standard
+
+    }
 
 }
