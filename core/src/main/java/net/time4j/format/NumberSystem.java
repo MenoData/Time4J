@@ -345,6 +345,56 @@ public enum NumberSystem {
     },
 
     /**
+     * Traditional number system used by Khmer people in Cambodia.
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Traditionelles Zahlsystem vom Khmer-Volk in Kambodscha verwendet.
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    KHMER() {
+        @Override
+        public String getDigits() {
+            return "០១២៣៤៥៦៧៨៩";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * The number system used in Myanmar (Burma).
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * Das traditionelle Zahlsystem von Myanmar (Burma).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.23/4.19
+     */
+    MYANMAR() {
+        @Override
+        public String getDigits() {
+            return "၀၁၂၃၄၅၆၇၈၉";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
      * Roman numerals in range 1-3999.
      *
      * <p>If the leniency is strict then parsing of Roman numerals will only follow modern usage.

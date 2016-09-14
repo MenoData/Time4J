@@ -43,6 +43,22 @@ public class DecimalNumberSystemTest {
             is('\u06F0'));
     }
 
+    @Test
+    public void khmer() {
+        assertThat(
+            NumberSystem.KHMER.toNumeral(1234567890),
+            is("១២៣៤៥៦៧៨៩០"));
+        assertThat(
+            NumberSystem.KHMER.toInteger("១២៣៤៥៦៧៨៩០"),
+            is(1234567890));
+        assertThat(
+            NumberSystem.KHMER.isDecimal(),
+            is(true));
+        assertThat(
+            NumberSystem.KHMER.getDigits().charAt(0),
+            is('\u17E0'));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void negativeNumberToNumeral() {
         NumberSystem.ARABIC_INDIC.toNumeral(-1234567890);

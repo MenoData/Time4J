@@ -715,10 +715,15 @@ public class PrettyTimeTest {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
             .inverse();
-        assertThat(
-            PrettyTime.of(new Locale("ar", "DZ"))
-                .print(duration, TextWidth.WIDE),
-            is("\u200E-15 سنة، \u200E-3 أشهر، \u200E-أسبوع، و\u200E-يومان"));
+        String actual = PrettyTime.of(new Locale("ar", "DZ")).print(duration, TextWidth.WIDE);
+        String expected = "\u200E-15 سنة، \u200E-3 أشهر، \u200E-أسبوع، و\u200E-يومان";
+//        assertThat(actual.length(), is(expected.length()));
+//        for (int i = 0; i < actual.length(); i++) {
+//            int codepoint1 = actual.charAt(i);
+//            int codepoint2 = expected.charAt(i);
+//            System.out.println(codepoint1 + " / " + codepoint2);
+//        }
+        assertThat(actual, is(expected));
     }
 
     @Test
