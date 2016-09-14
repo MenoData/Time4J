@@ -25,8 +25,10 @@ import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.NumberSystem;
 
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 import java.util.Set;
 
@@ -51,6 +53,8 @@ public final class SymbolProviderSPI
     public static final Set<String> SUPPORTED_LOCALES;
     public static final SymbolProviderSPI INSTANCE;
 
+    private static final Map<String, NumberSystem> CLDR_NAMES;
+
     static {
         ResourceBundle rb =
             ResourceBundle.getBundle(
@@ -64,6 +68,14 @@ public final class SymbolProviderSPI
         Collections.addAll(set, languages);
         SUPPORTED_LOCALES = Collections.unmodifiableSet(set);
         INSTANCE = new SymbolProviderSPI();
+
+        Map<String, NumberSystem> map = new HashMap<String, NumberSystem>();
+        map.put("latn", NumberSystem.ARABIC);
+        map.put("arab", NumberSystem.ARABIC_INDIC);
+        map.put("arabext", NumberSystem.ARABIC_INDIC_EXT);
+        map.put("deva", NumberSystem.DEVANAGARI);
+        map.put("mymr", NumberSystem.MYANMAR);
+        CLDR_NAMES = Collections.unmodifiableMap(map);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -128,7 +140,8 @@ public final class SymbolProviderSPI
     @Override
     public NumberSystem getDefaultNumberSystem(Locale locale) {
 
-        return NumberSystem.ARABIC;
+        String cldr = lookup(locale, "numsys", "latn");
+        return CLDR_NAMES.get(cldr);
 
     }
 

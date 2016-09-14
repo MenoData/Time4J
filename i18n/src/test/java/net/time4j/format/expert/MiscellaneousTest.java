@@ -67,8 +67,32 @@ public class MiscellaneousTest {
             f.format(PlainTime.midnightAtEndOfDay()),
             is(NumberSystem.ARABIC_INDIC.toNumeral(86400) + zeroes.toString()));
         assertThat(
+            f.with(new Locale("ar")).format(PlainTime.midnightAtEndOfDay()),
+            is(NumberSystem.ARABIC_INDIC.toNumeral(86400) + zeroes.toString()));
+    }
+
+    @Test
+    public void localizedStdNumberSystem() {
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.ofTimePattern("HH:mm", PatternType.CLDR, Locale.ENGLISH);
+        assertThat(
             f.getAttributes().get(Attributes.NUMBER_SYSTEM),
+            is(NumberSystem.ARABIC));
+        assertThat(
+            f.with(new Locale("ar")).getAttributes().get(Attributes.NUMBER_SYSTEM),
             is(NumberSystem.ARABIC_INDIC));
+        assertThat(
+            f.with(new Locale("ar", "DZ")).getAttributes().get(Attributes.NUMBER_SYSTEM),
+            is(NumberSystem.ARABIC));
+        assertThat(
+            f.with(new Locale("fa")).getAttributes().get(Attributes.NUMBER_SYSTEM),
+            is(NumberSystem.ARABIC_INDIC_EXT));
+        assertThat(
+            f.with(new Locale("my")).getAttributes().get(Attributes.NUMBER_SYSTEM),
+            is(NumberSystem.MYANMAR));
+        assertThat(
+            f.with(new Locale("ne")).getAttributes().get(Attributes.NUMBER_SYSTEM),
+            is(NumberSystem.DEVANAGARI));
     }
 
     @Test
