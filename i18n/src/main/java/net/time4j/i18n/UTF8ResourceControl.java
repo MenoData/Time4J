@@ -23,10 +23,8 @@ package net.time4j.i18n;
 
 import net.time4j.base.ResourceLoader;
 
-import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
-import java.io.InputStreamReader;
 import java.io.Reader;
 import java.net.URI;
 import java.util.Collections;
@@ -120,9 +118,7 @@ public class UTF8ResourceControl
                 Reader reader = null;
 
                 try {
-                    reader =
-                        new BufferedReader(
-                            new InputStreamReader(stream, "UTF-8"));
+                    reader = new UTF8ResourceReader(stream);
                     bundle = new UTF8ResourceBundle(reader, locale);
                 } finally {
                     if (reader != null) {
