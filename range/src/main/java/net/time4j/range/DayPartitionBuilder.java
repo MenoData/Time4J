@@ -34,12 +34,34 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Predicate;
 
 
 /**
  * <p>A mutable builder for creating day partition rules. </p>
  *
- * <p>This class enables the easy construction of daily shop opening times or weekly work time schedules. </p>
+ * <p>This class enables the easy construction of daily shop opening times or weekly work time schedules.
+ * Example: </p>
+ *
+ * <pre>
+ *     DayPartitionRule rule =
+ *      new DayPartitionBuilder()
+ *          .addExclusion(PlainDate.of(2016, 8, 27))
+ *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(16, 0)))
+ *          .addWeekdayRule(TUESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(WEDNESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
+ *          .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .build();
+ *
+ *      List<TimestampInterval> intervals = // determine all intervals for August and September in 2016
+ *          DateInterval.between(PlainDate.of(2016, 8, 1), PlainDate.of(2016, 9, 30))
+ *              .streamPartitioned(rule)
+ *              .parallel()
+ *              .collect(Collectors.toList());
+ * </pre>
  *
  * @author  Meno Hochschild
  * @see     DayPartitionRule
@@ -51,7 +73,27 @@ import java.util.Set;
  * <p>Dient der Erzeugung einer {@code DayPartitionRule}. </p>
  *
  * <p>Hiermit k&ouml;nnen t&auml;gliche Laden&ouml;ffnungszeiten oder w&ouml;chentliche Arbeitszeitschemata
- * auf einfache Weise erstellt werden. </p>
+ * auf einfache Weise erstellt werden. Beispiel: </p>
+ *
+ * <pre>
+ *     DayPartitionRule rule =
+ *      new DayPartitionBuilder()
+ *          .addExclusion(PlainDate.of(2016, 8, 27))
+ *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(16, 0)))
+ *          .addWeekdayRule(TUESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(WEDNESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
+ *          .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .build();
+ *
+ *      List<TimestampInterval> intervals = // ermittelt alle Intervalle f&uuml;r August und September 2016
+ *          DateInterval.between(PlainDate.of(2016, 8, 1), PlainDate.of(2016, 9, 30))
+ *              .streamPartitioned(rule)
+ *              .parallel()
+ *              .collect(Collectors.toList());
+ * </pre>
  *
  * @author  Meno Hochschild
  * @see     DayPartitionRule
@@ -63,6 +105,7 @@ public class DayPartitionBuilder {
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private final Predicate<PlainDate> activeFilter;
     private final Map<Weekday, List<ChronoInterval<PlainTime>>> weekdayRules;
     private final Map<PlainDate, List<ChronoInterval<PlainTime>>> exceptionRules;
     private final Set<PlainDate> exclusions;
@@ -70,14 +113,54 @@ public class DayPartitionBuilder {
     //~ Konstruktoren -----------------------------------------------------
 
     /**
-     * <p>Creates a new instance. </p>
+     * <p>Creates a new instance for building rules which are always active. </p>
      */
     /*[deutsch]
-     * <p>Erzeugt eine neue Instanz. </p>
+     * <p>Erzeugt eine neue Instanz zum Bauen von Regeln, die immer aktiv sind. </p>
      */
     public DayPartitionBuilder() {
         super();
 
+        this.activeFilter = (date) -> true;
+        this.weekdayRules = new EnumMap<>(Weekday.class);
+        this.exceptionRules = new HashMap<>();
+        this.exclusions = new HashSet<>();
+
+    }
+
+    /**
+     * <p>Creates a new instance with given filter. </p>
+     *
+     * <p>If only one rule is to be applied then setting an active filter has a similar effect as setting
+     * an exclusion date. However, if two or more rules with different filters are created then the new
+     * combined day-partition-rule (based on and-chaining) will not completely exclude certain dates
+     * only because of one partial rule with a special filter. </p>
+     *
+     * @param   activeFilter    determines when the rule to be created is active (should be stateless)
+     * @see     DayPartitionRule#and(DayPartitionRule)
+     * @since   4.19
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine neue Instanz. </p>
+     *
+     * <p>Wenn es nur um eine Regel gilt, dann hat das Setzen eines Aktivfilters eine &auml;hnliche Wirkung
+     * wie das Anwenden eines Ausschlu&szlig;datums. Allerdings gibt es einen Unterschied, wenn zwei oder
+     * mehr Regeln mit verschiedenen Filtern miteinander kombiniert werden. In letzterem Fall kennt die
+     * mit Hilfe von {@code and()}-Ausdr&uuml;cken kombinierte Regel nicht automatisch ein Ausschlu&szlig;datum,
+     * wenn der Filter nur einer Teilregel ein Datum ausschlie&szlig;t. </p>
+     *
+     * @param   activeFilter    determines when the rule to be created is active (should be stateless)
+     * @see     DayPartitionRule#and(DayPartitionRule)
+     * @since   4.19
+     */
+    public DayPartitionBuilder(Predicate<PlainDate> activeFilter) {
+        super();
+
+        if (activeFilter == null) {
+            throw new NullPointerException("Missing active filter.");
+        }
+
+        this.activeFilter = activeFilter;
         this.weekdayRules = new EnumMap<>(Weekday.class);
         this.exceptionRules = new HashMap<>();
         this.exclusions = new HashSet<>();
@@ -199,12 +282,16 @@ public class DayPartitionBuilder {
      *
      * @param   date    the calendar date to be excluded from creating day partitions
      * @return  this instance for method chaining
+     * @see     DayPartitionRule#isExcluded(PlainDate)
+     * @see     #addExclusion(Collection)
      */
     /*[deutsch]
      * <p>F&uuml;gt ein Ausschlu&szlig;datum hinzu. </p>
      *
      * @param   date    the calendar date to be excluded from creating day partitions
      * @return  this instance for method chaining
+     * @see     DayPartitionRule#isExcluded(PlainDate)
+     * @see     #addExclusion(Collection)
      */
     public DayPartitionBuilder addExclusion(PlainDate date) {
 
@@ -222,12 +309,16 @@ public class DayPartitionBuilder {
      *
      * @param   dates    collection of calendar dates to be excluded from creating day partitions
      * @return  this instance for method chaining
+     * @see     DayPartitionRule#isExcluded(PlainDate)
+     * @see     #addExclusion(PlainDate)
      */
     /*[deutsch]
      * <p>F&uuml;gt eine Menge von Ausschlu&szlig;datumsobjekten hinzu. </p>
      *
      * @param   dates    collection of calendar dates to be excluded from creating day partitions
      * @return  this instance for method chaining
+     * @see     DayPartitionRule#isExcluded(PlainDate)
+     * @see     #addExclusion(PlainDate)
      */
     public DayPartitionBuilder addExclusion(Collection<PlainDate> dates) {
 
@@ -255,7 +346,7 @@ public class DayPartitionBuilder {
         return new DayPartitionRule() {
             @Override
             public List<ChronoInterval<PlainTime>> getPartition(PlainDate date) {
-                if (!this.isExcluded(date)) {
+                if (!this.isExcluded(date) && activeFilter.test(date)) {
                     List<ChronoInterval<PlainTime>> partitions = eRules.get(date);
                     if (partitions == null) {
                         partitions = wRules.get(date.getDayOfWeek());

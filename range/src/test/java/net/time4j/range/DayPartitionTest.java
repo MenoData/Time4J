@@ -24,7 +24,7 @@ public class DayPartitionTest {
     @Test
     public void simpleCase() {
         DayPartitionRule rule =
-            new DayPartitionBuilder()
+            new DayPartitionBuilder((date) -> !date.equals(PlainDate.of(2016, 9, 2)))
                 .addExclusion(Collections.singleton(PlainDate.of(2016, 8, 27)))
                 .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
                 .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(16, 0)))
@@ -67,8 +67,6 @@ public class DayPartitionTest {
             TimestampInterval.between(PlainTimestamp.of(2016, 9, 1, 9, 0), PlainTimestamp.of(2016, 9, 1, 12, 30)));
         expected.add(
             TimestampInterval.between(PlainTimestamp.of(2016, 9, 1, 14, 0), PlainTimestamp.of(2016, 9, 1, 19, 0)));
-        expected.add(
-            TimestampInterval.between(PlainTimestamp.of(2016, 9, 2, 9, 0), PlainTimestamp.of(2016, 9, 2, 12, 30)));
         expected.add(
             TimestampInterval.between(PlainTimestamp.of(2016, 9, 3, 10, 0), PlainTimestamp.of(2016, 9, 3, 12, 0)));
         expected.add(

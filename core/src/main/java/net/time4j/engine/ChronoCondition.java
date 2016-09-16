@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoCondition.java) is part of project Time4J.
  *
@@ -46,6 +46,7 @@ import java.util.function.Predicate;
  * @author  Meno Hochschild
  * @see     ChronoEntity#matches(ChronoCondition)
  */
+@FunctionalInterface
 public interface ChronoCondition<T>
     extends Predicate<T> {
 
@@ -90,6 +91,7 @@ public interface ChronoCondition<T>
      * @return  {@code true} if given time context matches this condition
      *          else {@code false}
      */
+    @Override
     boolean test(T context);
 
 }
