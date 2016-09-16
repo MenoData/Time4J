@@ -4,6 +4,7 @@
 - Add rounding support for MachineTime.dividedBy(long) [#546]
 - Simple way needed to add MachineTime<SI> to a moment [#547]
 - Add some alternative numbering systems [#550]
+- Add active filter to DayPartitionBuilder [#552]
 
 ### Fixed
 - PUSH-FORWARD-strategy is not suitable for intervals [#545]
