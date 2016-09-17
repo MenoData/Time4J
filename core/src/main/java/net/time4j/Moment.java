@@ -502,6 +502,30 @@ public final class Moment
     }
 
     /**
+     * <p>Obtains the current time using the system clock. </p>
+     *
+     * <p>Equivalent alternative for: {@code SystemClock.currentMoment()}. </p>
+     *
+     * @return  current moment using the system clock
+     * @see     SystemClock#currentMoment()
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt die aktuelle Systemzeit. </p>
+     *
+     * <p>Alternative f&uuml;r: {@code SystemClock.currentMoment()}. </p>
+     *
+     * @return  current moment using the system clock
+     * @see     SystemClock#currentMoment()
+     * @since   3.23/4.19
+     */
+    public static Moment nowInSystemTime() {
+
+        return SystemClock.INSTANCE.currentTime();
+
+    }
+
+    /**
      * <p>Common conversion method. </p>
      *
      * @param   ut      UNIX-timestamp

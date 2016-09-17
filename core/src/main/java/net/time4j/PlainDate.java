@@ -898,6 +898,32 @@ public final class PlainDate
     }
 
     /**
+     * <p>Obtains the current date in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().today()}. </p>
+     *
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#today()
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().today()}. </p>
+     *
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#today()
+     * @since   3.23/4.19
+     */
+    public static PlainDate nowInSystemTime() {
+
+        return ZonalClock.ofSystem().today();
+
+    }
+
+    /**
      * <p>Common conversion method for proleptic gregorian dates. </p>
      *
      * @param   date    ISO-date

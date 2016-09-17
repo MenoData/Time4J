@@ -24,6 +24,7 @@ package net.time4j.calendar;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
@@ -472,6 +473,34 @@ public final class EthiopianCalendar
         }
 
         return new EthiopianCalendar(mihret(era, yearOfEra), month, dayOfMonth);
+
+    }
+
+    /**
+     * <p>Obtains the current calendar date in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(EthiopianCalendar.axis())}.
+     * Attention: The Ethiopian calendar changes the date in the morning at 6 AM. </p>
+     *
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(EthiopianCalendar.axis())}.
+     * Achtung: Der &auml;thiopische Kalender wechselt das Datum am Morgen um 6 Uhr. </p>
+     *
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.23/4.19
+     */
+    public static EthiopianCalendar nowInSystemTime() {
+
+        return SystemClock.inLocalView().now(EthiopianCalendar.axis());
 
     }
 

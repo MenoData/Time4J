@@ -24,6 +24,7 @@ package net.time4j.calendar;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainTime;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
@@ -630,6 +631,80 @@ public final class HijriCalendar
     ) {
 
         return HijriCalendar.of(VARIANT_UMALQURA, hyear, hmonth, hdom);
+
+    }
+
+    /**
+     * <p>Obtains the current calendar date in system time. </p>
+     *
+     * <p>Convenient short-cut for:
+     * {@code SystemClock.inLocalView().now(HijriCalendar.family(), variant, startOfDay).toDate())}. </p>
+     *
+     * @param   variant     calendar variant
+     * @param   startOfDay  determines the exact time of day when the calendar date will change (usually in the evening)
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(CalendarFamily, String, StartOfDay)
+     * @see     StartOfDay#EVENING
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r:
+     * {@code SystemClock.inLocalView().now(HijriCalendar.family(), variant, startOfDay).toDate())}. </p>
+     *
+     * @param   variant     calendar variant
+     * @param   startOfDay  determines the exact time of day when the calendar date will change (usually in the evening)
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(CalendarFamily, String, StartOfDay)
+     * @see     StartOfDay#EVENING
+     * @since   3.23/4.19
+     */
+    public static HijriCalendar nowInSystemTime(
+        String variant,
+        StartOfDay startOfDay
+    ) {
+
+        return SystemClock.inLocalView().now(HijriCalendar.family(), variant, startOfDay).toDate();
+
+    }
+
+    /**
+     * <p>Obtains the current calendar date in system time. </p>
+     *
+     * <p>Convenient short-cut for:
+     * {@code SystemClock.inLocalView().now(HijriCalendar.family(), variantSource, startOfDay).toDate())}. </p>
+     *
+     * @param   variantSource   source of calendar variant
+     * @param   startOfDay  determines the exact time of day when the calendar date will change (usually in the evening)
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(CalendarFamily, VariantSource, StartOfDay)
+     * @see     StartOfDay#EVENING
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r:
+     * {@code SystemClock.inLocalView().now(HijriCalendar.family(), variantSource, startOfDay).toDate())}. </p>
+     *
+     * @param   variantSource   source of calendar variant
+     * @param   startOfDay  determines the exact time of day when the calendar date will change (usually in the evening)
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(CalendarFamily, VariantSource, StartOfDay)
+     * @see     StartOfDay#EVENING
+     * @since   3.23/4.19
+     */
+    public static HijriCalendar nowInSystemTime(
+        VariantSource variantSource,
+        StartOfDay startOfDay
+    ) {
+
+        return SystemClock.inLocalView().now(HijriCalendar.family(), variantSource, startOfDay).toDate();
 
     }
 

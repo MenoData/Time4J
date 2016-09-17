@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.ZonalClock;
 import net.time4j.base.TimeSource;
@@ -45,6 +46,23 @@ public class ClockTest {
                 StartOfDay.ofFixedDeviation(-21600 + 60)
             ).toString(),
             is("AH-1436-10-02[islamic-umalqura]T18:01"));
+    }
+
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            HijriCalendar.nowInSystemTime(
+                HijriCalendar.VARIANT_UMALQURA,
+                StartOfDay.MIDNIGHT
+            ).transform(PlainDate.class),
+            is(PlainDate.nowInSystemTime()));
+        System.out.println(CopticCalendar.nowInSystemTime());
+        System.out.println(EthiopianCalendar.nowInSystemTime());
+        System.out.println(HijriCalendar.nowInSystemTime(HijriCalendar.VARIANT_UMALQURA, StartOfDay.EVENING));
+        System.out.println(JulianCalendar.nowInSystemTime());
+        System.out.println(MinguoCalendar.nowInSystemTime());
+        System.out.println(PersianCalendar.nowInSystemTime());
+        System.out.println(ThaiSolarCalendar.nowInSystemTime());
     }
 
 }
