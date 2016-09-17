@@ -25,6 +25,7 @@ import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainTime;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
@@ -417,6 +418,32 @@ public final class JulianCalendar
     }
 
     /**
+     * <p>Obtains the current calendar date in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(JulianCalendar.axis())}. </p>
+     *
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(JulianCalendar.axis())}. </p>
+     *
+     * @return  current calendar date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.23/4.19
+     */
+    public static JulianCalendar nowInSystemTime() {
+
+        return SystemClock.inLocalView().now(JulianCalendar.axis());
+
+    }
+
+    /**
      * <p>Yields the Julian era. </p>
      *
      * @return  either {@code HistoricEra.AD} or {@code HistoricEra.BC}
@@ -713,7 +740,7 @@ public final class JulianCalendar
     ) {
 
         StringBuilder sb = new StringBuilder(32);
-        sb.append("julian-");
+        sb.append("JULIAN-");
         sb.append(era.name());
         sb.append('-');
         String y = String.valueOf(yearOfEra);

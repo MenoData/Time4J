@@ -86,4 +86,37 @@ public class SystemClockTest {
         System.out.println(SystemClock.inLocalView().now(PlainTime.axis()));
     }
 
+    @Test
+    public void today() {
+        assertThat(SystemClock.inLocalView().today(), is(PlainDate.nowInSystemTime()));
+    }
+
+    @Test
+    public void nowTimestamp() {
+        PlainTimestamp now = SystemClock.inLocalView().now();
+        PlainTimestamp expected = PlainTimestamp.nowInSystemTime();
+        assertThat(
+            now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(1, ClockUnit.MILLIS).isAfter(expected),
+            is(true));
+    }
+
+    @Test
+    public void nowTime() {
+        PlainTime now = SystemClock.inLocalView().now().toTime();
+        PlainTime expected = PlainTime.nowInSystemTime();
+        assertThat(
+            now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(1, ClockUnit.MILLIS).isAfter(expected),
+            is(true));
+    }
+
+    @Test
+    public void nowMoment() {
+        Moment now = SystemClock.currentMoment();
+        Moment expected = Moment.nowInSystemTime();
+        assertThat(
+            now.minus(1, TimeUnit.NANOSECONDS).isBefore(expected)
+                && now.plus(1, TimeUnit.MILLISECONDS).isAfter(expected),
+            is(true));
+    }
+
 }

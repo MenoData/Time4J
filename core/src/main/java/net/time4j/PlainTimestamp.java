@@ -531,6 +531,32 @@ public final class PlainTimestamp
     }
 
     /**
+     * <p>Obtains the current timestamp in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now()}. </p>
+     *
+     * @return  current timestamp (without zone) in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now()
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt den aktuellen Zeitstempel in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now()}. </p>
+     *
+     * @return  current timestamp (without zone) in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now()
+     * @since   3.23/4.19
+     */
+    public static PlainTimestamp nowInSystemTime() {
+
+        return ZonalClock.ofSystem().now();
+
+    }
+
+    /**
      * <p>Short cut for {@code TemporalType.LOCAL_DATE_TIME.translate(ldt)}. </p>
      *
      * @param   ldt    Threeten-equivalent of this instance
