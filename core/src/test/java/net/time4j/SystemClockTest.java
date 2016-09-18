@@ -96,7 +96,7 @@ public class SystemClockTest {
         PlainTimestamp now = SystemClock.inLocalView().now();
         PlainTimestamp expected = PlainTimestamp.nowInSystemTime();
         assertThat(
-            now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(1, ClockUnit.MILLIS).isAfter(expected),
+            now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(2, ClockUnit.MILLIS).isAfter(expected),
             is(true));
     }
 
@@ -105,7 +105,7 @@ public class SystemClockTest {
         PlainTime now = SystemClock.inLocalView().now().toTime();
         PlainTime expected = PlainTime.nowInSystemTime();
         assertThat(
-            now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(1, ClockUnit.MILLIS).isAfter(expected),
+            now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(2, ClockUnit.MILLIS).isAfter(expected),
             is(true));
     }
 
@@ -115,7 +115,7 @@ public class SystemClockTest {
         Moment expected = Moment.nowInSystemTime();
         assertThat(
             now.minus(1, TimeUnit.NANOSECONDS).isBefore(expected)
-                && now.plus(1, TimeUnit.MILLISECONDS).isAfter(expected),
+                && now.plus(2, TimeUnit.MILLISECONDS).isAfter(expected),
             is(true));
     }
 

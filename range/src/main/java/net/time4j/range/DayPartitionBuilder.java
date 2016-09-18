@@ -56,7 +56,7 @@ import java.util.function.Predicate;
  *          .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .build();
  *
- *      List<TimestampInterval> intervals = // determine all intervals for August and September in 2016
+ *      List&lt;TimestampInterval&gt; intervals = // determine all intervals for August and September in 2016
  *          DateInterval.between(PlainDate.of(2016, 8, 1), PlainDate.of(2016, 9, 30))
  *              .streamPartitioned(rule)
  *              .parallel()
@@ -88,7 +88,7 @@ import java.util.function.Predicate;
  *          .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .build();
  *
- *      List<TimestampInterval> intervals = // ermittelt alle Intervalle f&uuml;r August und September 2016
+ *      List&lt;TimestampInterval&gt; intervals = // ermittelt alle Intervalle f&uuml;r August und September 2016
  *          DateInterval.between(PlainDate.of(2016, 8, 1), PlainDate.of(2016, 9, 30))
  *              .streamPartitioned(rule)
  *              .parallel()
