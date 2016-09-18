@@ -104,7 +104,7 @@ public enum NumberSystem {
     ARABIC_INDIC() {
         @Override
         public String getDigits() {
-            return "٠١٢٣٤٥٦٧٨٩";
+            return "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669";
         }
         @Override
         public boolean isDecimal() {
@@ -129,7 +129,7 @@ public enum NumberSystem {
     ARABIC_INDIC_EXT() {
         @Override
         public String getDigits() {
-            return "۰۱۲۳۴۵۶۷۸۹";
+            return "\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9";
         }
         @Override
         public boolean isDecimal() {
@@ -154,7 +154,7 @@ public enum NumberSystem {
     BENGALI() {
         @Override
         public String getDigits() {
-            return "০১২৩৪৫৬৭৮৯";
+            return "\u09E6\u09E7\u09E8\u09E9\u09EA\u09EB\u09EC\u09ED\u09EE\u09EF";
         }
         @Override
         public boolean isDecimal() {
@@ -179,7 +179,7 @@ public enum NumberSystem {
     DEVANAGARI() {
         @Override
         public String getDigits() {
-            return "०१२३४५६७८९";
+            return "\u0966\u0967\u0968\u0969\u096A\u096B\u096C\u096D\u096E\u096F";
         }
         @Override
         public boolean isDecimal() {
@@ -336,7 +336,7 @@ public enum NumberSystem {
     GUJARATI() {
         @Override
         public String getDigits() {
-            return "૦૧૨૩૪૫૬૭૮૯";
+            return "\u0AE6\u0AE7\u0AE8\u0AE9\u0AEA\u0AEB\u0AEC\u0AED\u0AEE\u0AEF";
         }
         @Override
         public boolean isDecimal() {
@@ -361,7 +361,7 @@ public enum NumberSystem {
     KHMER() {
         @Override
         public String getDigits() {
-            return "០១២៣៤៥៦៧៨៩";
+            return "\u17E0\u17E1\u17E2\u17E3\u17E4\u17E5\u17E6\u17E7\u17E8\u17E9";
         }
         @Override
         public boolean isDecimal() {
@@ -386,7 +386,7 @@ public enum NumberSystem {
     MYANMAR() {
         @Override
         public String getDigits() {
-            return "၀၁၂၃၄၅၆၇၈၉";
+            return "\u1040\u1041\u1042\u1043\u1044\u1045\u1046\u1047\u1048\u1049";
         }
         @Override
         public boolean isDecimal() {
@@ -520,7 +520,7 @@ public enum NumberSystem {
     TELUGU() {
         @Override
         public String getDigits() {
-            return "౦౧౨౩౪౫౬౭౮౯";
+            return "\u0C66\u0C67\u0C68\u0C69\u0C6A\u0C6B\u0C6C\u0C6D\u0C6E\u0C6F";
         }
         @Override
         public boolean isDecimal() {
@@ -545,7 +545,7 @@ public enum NumberSystem {
     THAI() {
         @Override
         public String getDigits() {
-            return "๐๑๒๓๔๕๖๗๘๙";
+            return "\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59";
         }
         @Override
         public boolean isDecimal() {
