@@ -1,4 +1,6 @@
-## [v4.19] not yet released
+## [v4.20] not yet released
+
+## [v4.19] published on 2016-09-18
 ### Added
 - Add historic centuries [#507]
 - Add rounding support for MachineTime.dividedBy(long) [#546]
