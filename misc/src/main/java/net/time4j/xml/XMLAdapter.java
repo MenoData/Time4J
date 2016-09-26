@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (XMLAdapter.java) is part of project Time4J.
  *
@@ -350,6 +350,13 @@ public abstract class XMLAdapter<S, T>
 
         }
 
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
+
+        }
+
     }
 
     private static class XmlTimeRule
@@ -410,6 +417,13 @@ public abstract class XMLAdapter<S, T>
                 return factory.newXMLGregorianCalendarTime(
                     hour, minute, second, f, noTZ);
             }
+
+        }
+
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
 
         }
 
@@ -500,6 +514,13 @@ public abstract class XMLAdapter<S, T>
 
         }
 
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
+
+        }
+
     }
 
     private static class XmlDateTimeOffsetRule
@@ -558,6 +579,13 @@ public abstract class XMLAdapter<S, T>
 
         }
 
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
+
+        }
+
     }
 
     private static class XmlDurationRule
@@ -590,6 +618,13 @@ public abstract class XMLAdapter<S, T>
 
             DatatypeFactory factory = getXMLFactory();
             return factory.newDuration(duration.toStringXML());
+
+        }
+
+        @Override
+        public Class<javax.xml.datatype.Duration> getSourceType() {
+
+            return javax.xml.datatype.Duration.class;
 
         }
 

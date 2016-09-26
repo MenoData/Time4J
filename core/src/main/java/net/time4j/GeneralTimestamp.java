@@ -26,7 +26,6 @@ import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.StartOfDay;
 import net.time4j.tz.TZID;
@@ -55,7 +54,7 @@ import net.time4j.tz.ZonalOffset;
  * @author  Meno Hochschild
  * @since   3.8/4.5
  */
-public final class GeneralTimestamp<C extends ChronoEntity<C>>
+public final class GeneralTimestamp<C>
     implements ChronoDisplay {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -320,35 +319,35 @@ public final class GeneralTimestamp<C extends ChronoEntity<C>>
     @Override
     public boolean contains(ChronoElement<?> element) {
 
-        return (element.isDateElement() ? this.toDate().contains(element) : this.time.contains(element));
+        return (element.isDateElement() ? this.toDate0().contains(element) : this.time.contains(element));
 
     }
 
     @Override
     public <V> V get(ChronoElement<V> element) {
 
-        return (element.isDateElement() ? this.toDate().get(element) : this.time.get(element));
+        return (element.isDateElement() ? this.toDate0().get(element) : this.time.get(element));
 
     }
 
     @Override
     public int getInt(ChronoElement<Integer> element) {
 
-        return (element.isDateElement() ? this.toDate().getInt(element) : this.time.getInt(element));
+        return (element.isDateElement() ? this.toDate0().getInt(element) : this.time.getInt(element));
 
     }
 
     @Override
     public <V> V getMinimum(ChronoElement<V> element) {
 
-        return (element.isDateElement() ? this.toDate().getMinimum(element) : this.time.getMinimum(element));
+        return (element.isDateElement() ? this.toDate0().getMinimum(element) : this.time.getMinimum(element));
 
     }
 
     @Override
     public <V> V getMaximum(ChronoElement<V> element) {
 
-        return (element.isDateElement() ? this.toDate().getMaximum(element) : this.time.getMaximum(element));
+        return (element.isDateElement() ? this.toDate0().getMaximum(element) : this.time.getMaximum(element));
 
     }
 
@@ -363,6 +362,13 @@ public final class GeneralTimestamp<C extends ChronoEntity<C>>
     public TZID getTimezone() {
 
         throw new ChronoException("Timezone not available: " + this);
+
+    }
+
+    private ChronoDisplay toDate0() {
+
+        Object date = ((this.cv == null) ? this.ca : this.cv);
+        return (ChronoDisplay) date;
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalType.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.Converter;
 import net.time4j.scale.TimeScale;
 
 
@@ -50,7 +51,8 @@ import net.time4j.scale.TimeScale;
  * @author  Meno Hochschild
  * @since   2.0
  */
-public abstract class TemporalType<S, T> {
+public abstract class TemporalType<S, T>
+    implements Converter<S, T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -224,6 +226,13 @@ public abstract class TemporalType<S, T> {
 
         }
 
+        @Override
+        public Class<java.util.Date> getSourceType() {
+
+            return java.util.Date.class;
+
+        }
+
     }
 
     private static class MillisSinceUnixRule
@@ -251,6 +260,13 @@ public abstract class TemporalType<S, T> {
                 MathUtils.safeAdd(
                     MathUtils.safeMultiply(posixTime, 1000),
                     fraction / MIO));
+
+        }
+
+        @Override
+        public Class<Long> getSourceType() {
+
+            return Long.class;
 
         }
 

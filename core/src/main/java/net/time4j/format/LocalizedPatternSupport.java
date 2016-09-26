@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LocalizedPatternSupport.java) is part of project Time4J.
  *
@@ -27,6 +27,7 @@ package net.time4j.format;
  * the CLDR-specification. </p>
  *
  * @author  Meno Hochschild
+ * @see     net.time4j.engine.ChronoMerger#getFormatPattern
  * @since   3.10/4.7
  */
 /*[deutsch]
@@ -34,6 +35,7 @@ package net.time4j.format;
  * signalisiert. </p>
  *
  * @author  Meno Hochschild
+ * @see     net.time4j.engine.ChronoMerger#getFormatPattern
  * @since   3.10/4.7
  */
 public interface LocalizedPatternSupport {

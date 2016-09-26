@@ -341,7 +341,7 @@ final class CustomizedProcessor<V>
     }
 
     // wildcard capture
-    private static <T extends ChronoEntity<T>> Set<ElementPosition> print(
+    private static <T> Set<ElementPosition> print(
         ChronoFormatter<T> formatter,
         Object value,
         StringBuilder collector,
