@@ -322,6 +322,13 @@ public abstract class JDBCAdapter<S, T>
 
         }
 
+        @Override
+        public Class<java.sql.Date> getSourceType() {
+
+            return java.sql.Date.class;
+
+        }
+
     }
 
     private static class SqlTimeRule
@@ -364,6 +371,13 @@ public abstract class JDBCAdapter<S, T>
             return new java.sql.Time(millis);
 
        }
+
+        @Override
+        public Class<java.sql.Time> getSourceType() {
+
+            return java.sql.Time.class;
+
+        }
 
     }
 
@@ -423,6 +437,13 @@ public abstract class JDBCAdapter<S, T>
 
         }
 
+        @Override
+        public Class<java.sql.Timestamp> getSourceType() {
+
+            return java.sql.Timestamp.class;
+
+        }
+
     }
 
     private static class SqlMomentRule
@@ -447,6 +468,13 @@ public abstract class JDBCAdapter<S, T>
             java.sql.Timestamp sql = new java.sql.Timestamp(MathUtils.safeMultiply(moment.getPosixTime(), 1000));
             sql.setNanos(moment.getNanosecond());
             return sql;
+
+        }
+
+        @Override
+        public Class<java.sql.Timestamp> getSourceType() {
+
+            return java.sql.Timestamp.class;
 
         }
 

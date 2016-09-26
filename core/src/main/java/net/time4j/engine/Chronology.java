@@ -51,7 +51,7 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * @param   <T> generic type compatible to {@link ChronoEntity}
  * @author  Meno Hochschild
  */
-public class Chronology<T extends ChronoEntity<T>>
+public class Chronology<T>
     implements ChronoMerger<T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -70,6 +70,27 @@ public class Chronology<T extends ChronoEntity<T>>
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Used by {@code BridgeChronology} only. </p>
+     *
+     * @param   chronoType      chronological type
+     * @since   3.24/4.20
+     */
+    Chronology(Class<T> chronoType) {
+        super();
+
+        if (chronoType == null) {
+            throw new NullPointerException("Missing chronological type.");
+        }
+
+        this.chronoType = chronoType;
+        this.merger = null;
+        this.ruleMap = Collections.emptyMap();
+        this.extensions = Collections.emptyList();
+        this.intRules = Collections.emptyMap();
+
+    }
+
+    /**
      * <p>Standard-Konstruktor. </p>
      *
      * <p>Implementierungshinweis: Subklassen sollten grunds&auml;tzlich
@@ -77,8 +98,7 @@ public class Chronology<T extends ChronoEntity<T>>
      * Konstruktor bieten. </p>
      *
      * @param   chronoType      chronological type
-     * @param   chronoMerger    creates a new instance of T based on infos
-     *                          from another source
+     * @param   chronoMerger    creates a new instance of T based on infos from another source
      * @param   ruleMap         registered elements and rules
      * @param   extensions      optional extensions
      */
@@ -481,13 +501,15 @@ public class Chronology<T extends ChronoEntity<T>>
         boolean wantsVeto
     ) {
 
-        if (element instanceof BasicElement) {
+        if (element instanceof BasicElement && ChronoEntity.class.isAssignableFrom(this.getChronoType())) {
             BasicElement<?> e = BasicElement.class.cast(element);
 
             String veto = (wantsVeto ? e.getVeto(this) : null);
 
             if (veto == null) {
-                return e.derive(this);
+                Chronology<? extends ChronoEntity> c = cast(this);
+                Object rule = e.derive(c);
+                return cast(rule);
             } else {
                 throw new RuleNotFoundException(veto);
             }

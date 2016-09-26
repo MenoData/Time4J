@@ -132,7 +132,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @since   3.0
  * @doctags.concurrency {immutable}
  */
-public final class ChronoFormatter<T extends ChronoEntity<T>>
+public final class ChronoFormatter<T>
     implements ChronoPrinter<T>, ChronoParser<T>, TemporalFormatter<T> {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -890,19 +890,20 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
         }
 
         T result;
-        ParsedValues parsed;
 
         if (this.overrideHandler != null) {
+
+            // use calendar override
             List<ChronoExtension> extensions = this.overrideHandler.getExtensions();
             ChronoMerger<? extends GeneralTimestamp<?>> merger = this.overrideHandler;
             GeneralTimestamp<?> tsp =
                 parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath, trailingChars);
-            parsed = status.getRawValues0();
 
             if (status.isError()) {
                 return null;
             }
 
+            ParsedValues parsed = status.getRawValues0();
             TZID tzid = null;
             Moment moment = null;
 
@@ -927,53 +928,26 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 status.setError(text.length(), "Missing timezone or offset.");
                 return null;
             } else {
-                updateSelf(parsed, Moment.axis().element(), moment);
-            }
-        } else {
-            Chronology<?> preparser = this.chronology.preparser();
-
-            if (preparser != null) {
-                Object intermediate =
-                    parse(
-                        this,
-                        preparser,
-                        preparser.getExtensions(), text, status, attrs, leniency, true, quickPath, trailingChars);
-                parsed = status.getRawValues0();
-
-                if (status.isError()) {
-                    return null;
-                } else if (preparser instanceof TimeAxis) {
-                    ChronoElement<?> self = TimeAxis.class.cast(preparser).element();
-                    updateSelf(parsed, self, intermediate);
+                parsed.with(Moment.axis().element(), moment);
+                result = cast(moment);
+                if (leniency.isStrict()) {
+                    checkConsistency(parsed, result, text, status);
                 }
-            } else {
-                return parse(
-                    this,
-                    this.chronology,
-                    this.chronology.getExtensions(), text, status, attrs, leniency, false, quickPath, trailingChars);
+                return result;
             }
-        }
-
-        try {
-            result = this.chronology.createFrom(parsed, attrs, leniency.isLax(), false);
-        } catch (RuntimeException re) {
-            status.setError(
-                text.length(),
-                re.getMessage() + getDescription(parsed));
-            return null;
-        }
-
-        if (result == null) {
-            if (!status.isError()) {
-                status.setError(
-                    text.length(),
-                    getReason(parsed) + getDescription(parsed));
-            }
-            return null;
-        } else if (leniency.isStrict()) {
-            return checkConsistency(parsed, result, text, status);
         } else {
-            return result;
+
+            // standard parsing mode
+            return this.parse(
+                this.chronology,
+                this.chronology.preparser(),
+                0,
+                text,
+                status,
+                attrs,
+                leniency,
+                quickPath,
+                trailingChars);
         }
 
     }
@@ -2097,8 +2071,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /**
      * <p>Constructs a pattern-based formatter for general chronologies. </p>
      *
-     * <p>This method is only applicable on chronologies which support CLDR-compatible format patterns. </p>
-     *
      * @param   <T> generic chronological type
      * @param   pattern     format pattern
      * @param   type        the type of the pattern to be used
@@ -2112,8 +2084,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
     /*[deutsch]
      * <p>Konstruiert einen musterbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
      *
-     * <p>Diese Methode ist nur auf Chronologien anwendbar, die CLDR-kompatible Formatmuster unterst&uuml;tzen. </p>
-     *
      * @param   <T> generic chronological type
      * @param   pattern     format pattern
      * @param   type        the type of the pattern to be used
@@ -2124,7 +2094,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @see     ChronoFormatter.Builder#addPattern(String, PatternType)
      * @since   3.14/4.11
      */
-    public static <T extends ChronoEntity<T> & LocalizedPatternSupport> ChronoFormatter<T> ofPattern(
+    public static <T> ChronoFormatter<T> ofPattern(
         String pattern,
         PatternType type,
         Locale locale,
@@ -2366,7 +2336,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @return  new {@code Builder}-instance
      * @since   3.10/4.7
      */
-    public static <T extends ChronoEntity<T>> ChronoFormatter.Builder<T> setUp(
+    public static <T> ChronoFormatter.Builder<T> setUp(
         Chronology<T> chronology,
         Locale locale
     ) {
@@ -2583,7 +2553,70 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static <T extends ChronoDisplay> T parse(
+    private <C> C parse(
+        Chronology<C> outer,
+        Chronology<?> inner,
+        int depth,
+        CharSequence text,
+        ParseLog status,
+        AttributeQuery attrs,
+        Leniency leniency,
+        boolean quickPath,
+        boolean trailingChars
+    ) {
+
+        if (inner == null) {
+            return parse(
+                this, outer, outer.getExtensions(), text, status, attrs, leniency, depth > 0, quickPath, trailingChars);
+        }
+
+        Object intermediate =
+            this.parse(inner, inner.preparser(), depth + 1, text, status, attrs, leniency, quickPath, trailingChars);
+
+        if (status.isError() || (intermediate == null) || !(inner instanceof TimeAxis)) {
+            return null;
+        }
+
+        ChronoElement<?> self = TimeAxis.class.cast(inner).element();
+        ParsedValues parsed = status.getRawValues0();
+        updateSelf(parsed, self, intermediate);
+        C result;
+
+        try {
+            result = outer.createFrom(parsed, attrs, leniency.isLax(), false);
+        } catch (RuntimeException re) {
+            status.setError(
+                text.length(),
+                re.getMessage() + getDescription(parsed));
+            return null;
+        }
+
+        if (result == null) {
+            if (!status.isError()) {
+                status.setError(
+                    text.length(),
+                    getReason(parsed) + getDescription(parsed));
+            }
+            return null;
+        } else if (leniency.isStrict()) {
+            return checkConsistency(parsed, result, text, status);
+        } else {
+            return result;
+        }
+
+    }
+
+    private static <T> void updateSelf(
+        ParsedValues parsed,
+        ChronoElement<T> element,
+        Object result
+    ) {
+
+        parsed.with(element, element.getType().cast(result));
+
+    }
+
+    private static <T> T parse(
         ChronoFormatter<?> cf,
         ChronoMerger<T> merger,
         List<ChronoExtension> extensions,
@@ -2712,16 +2745,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static <T> void updateSelf(
-        ParsedValues parsed,
-        ChronoElement<T> element,
-        Object result
-    ) {
-
-        parsed.with(element, element.getType().cast(result));
-
-    }
-
     private static boolean isEqual(
         Object obj1,
         Object obj2
@@ -2731,7 +2754,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static <T extends ChronoDisplay> T checkConsistency(
+    private static <T> T checkConsistency(
         ParsedValues parsed,
         T result,
         CharSequence text,
@@ -2783,12 +2806,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                     return null;
                 }
             }
-        } else {
+        } else if (result instanceof ChronoDisplay) {
             ChronoEntity<?> date = null;
+            ChronoDisplay test = (ChronoDisplay) result;
 
             if (
                 (result instanceof PlainTimestamp)
-                    && (result.getInt(PlainTime.ISO_HOUR) == 0)
+                && (PlainTimestamp.class.cast(result).getHour() == 0)
                 && (
                     (parsed.getInt(PlainTime.ISO_HOUR) == 24)
                     || (parsed.contains(PlainTime.COMPONENT) && (parsed.get(PlainTime.COMPONENT).getHour() == 24))
@@ -2801,8 +2825,6 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
                 if ((e == PlainTime.SECOND_OF_MINUTE) && (parsed.getInt(PlainTime.SECOND_OF_MINUTE) == 60)) {
                     continue;
                 }
-
-                ChronoDisplay test = result;
 
                 if (date != null) {
                     if (e.isDateElement()) {
@@ -3053,8 +3075,13 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         if (!support) {
             if (override == null) {
-                Chronology<?> child = chronology.preparser();
-                support = ((child != null) && child.isSupported(element));
+                Chronology<?> child = chronology;
+                while ((child = child.preparser()) != null) {
+                    if (child.isSupported(element)) {
+                        support = true;
+                        break;
+                    }
+                }
             } else {
                 support = (
                     (element.isDateElement() && override.isSupported(element))
@@ -3107,7 +3134,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @author      Meno Hochschild
      * @doctags.concurrency {mutable}
      */
-    public static final class Builder<T extends ChronoEntity<T>> {
+    public static final class Builder<T> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -6288,7 +6315,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
      * @serial  exclude
      */
     @SuppressWarnings("serial") // Not serializable!
-    private static class TraditionalFormat<T extends ChronoEntity<T>>
+    private static class TraditionalFormat<T>
         extends Format {
 
         //~ Statische Felder/Initialisierungen ----------------------------
@@ -6457,7 +6484,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
     }
 
-    private static class OverrideHandler<C extends ChronoEntity<C>>
+    private static class OverrideHandler<C>
         implements ChronoMerger<GeneralTimestamp<C>> {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -6481,7 +6508,7 @@ public final class ChronoFormatter<T extends ChronoEntity<T>>
 
         //~ Methoden ------------------------------------------------------
 
-        static <C extends ChronoEntity<C>> OverrideHandler<C> of(Chronology<C> override) {
+        static <C> OverrideHandler<C> of(Chronology<C> override) {
 
             if (override == null) {
                 return null;

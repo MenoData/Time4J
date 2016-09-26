@@ -5,11 +5,13 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.TemporalType;
 import net.time4j.format.Leniency;
 import org.junit.Test;
 
 import java.io.IOException;
 import java.text.ParseException;
+import java.time.Instant;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.LocalTime;
@@ -116,6 +118,39 @@ public class ThreetenFormatTest {
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build();
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
         formatter.formatThreeten(zdt.toInstant());
+    }
+
+    @Test
+    public void formatAndParseInstant1() throws ParseException {
+        ChronoFormatter<Instant> formatter =
+            ChronoFormatter.setUp(Moment.axis(TemporalType.INSTANT), Locale.ROOT)
+                .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build().withTimezone("Europe/Berlin");
+        ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
+        assertThat(
+            formatter.format(zdt.toInstant()),
+            is("2015-03-29T03:30+02:00")
+        );
+        assertThat(
+            formatter.parse("2015-03-29T03:30+02:00"),
+            is(zdt.toInstant())
+        );
+    }
+
+    @Test
+    public void formatAndParseInstant2() throws ParseException {
+        ChronoFormatter<Instant> formatter =
+            ChronoFormatter.ofPattern(
+                "uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR, Locale.ROOT, Moment.axis(TemporalType.INSTANT)
+            ).withTimezone("Europe/Berlin");
+        ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
+        assertThat(
+            formatter.format(zdt.toInstant()),
+            is("2015-03-29T03:30+02:00")
+        );
+        assertThat(
+            formatter.parse("2015-03-29T03:30+02:00"),
+            is(zdt.toInstant())
+        );
     }
 
     @Test(expected=IllegalArgumentException.class) // non-iso in strict mode

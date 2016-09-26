@@ -25,6 +25,7 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Calendrical;
@@ -35,6 +36,7 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -1632,6 +1634,32 @@ public final class Moment
     public static TimeAxis<TimeUnit, Moment> axis() {
 
         return ENGINE;
+
+    }
+
+    /**
+     * <p>Provides a static access to the associated time axis using the foreign type S. </p>
+     *
+     * @param   <S> foreign temporal type
+     * @param   converter       type converter
+     * @return  chronological system for foreign type
+     * @see     TemporalType#INSTANT
+     * @see     TemporalType#JAVA_UTIL_DATE
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Liefert die zugeh&ouml;rige Zeitachse angepasst f&uuml;r den Fremdtyp S. </p>
+     *
+     * @param   <S> foreign temporal type
+     * @param   converter       type converter
+     * @return  chronological system for foreign type
+     * @see     TemporalType#INSTANT
+     * @see     TemporalType#JAVA_UTIL_DATE
+     * @since   3.24/4.20
+     */
+    public static <S> Chronology<S> axis(Converter<S, Moment> converter) {
+
+        return new BridgeChronology<>(converter, ENGINE);
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (XMLAdapter.java) is part of project Time4J.
  *
@@ -41,6 +41,8 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.tz.ZonalOffset;
+
+import static java.math.RoundingMode.UNNECESSARY;
 
 
 /**
@@ -292,7 +294,7 @@ public abstract class XMLAdapter<S, T>
         } else {
             BigInteger y = BigInteger.valueOf(year);
             BigDecimal f =
-                BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
+                BigDecimal.valueOf(nano).setScale(9, UNNECESSARY).divide(MRD_D, UNNECESSARY);
             return factory.newXMLGregorianCalendar(
                 y, month, dom, hour, minute, second, f, tz);
         }
@@ -347,6 +349,13 @@ public abstract class XMLAdapter<S, T>
 
             return factory.newXMLGregorianCalendarDate(
                 year, month, dom, DatatypeConstants.FIELD_UNDEFINED);
+
+        }
+
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
 
         }
 
@@ -406,10 +415,17 @@ public abstract class XMLAdapter<S, T>
                     hour, minute, second, millis, noTZ);
             } else {
                 BigDecimal f =
-                    BigDecimal.valueOf(nano).setScale(9).divide(MRD_D);
+                    BigDecimal.valueOf(nano).setScale(9, UNNECESSARY).divide(MRD_D, UNNECESSARY);
                 return factory.newXMLGregorianCalendarTime(
                     hour, minute, second, f, noTZ);
             }
+
+        }
+
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
 
         }
 
@@ -500,6 +516,13 @@ public abstract class XMLAdapter<S, T>
 
         }
 
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
+
+        }
+
     }
 
     private static class XmlDateTimeOffsetRule
@@ -558,6 +581,13 @@ public abstract class XMLAdapter<S, T>
 
         }
 
+        @Override
+        public Class<XMLGregorianCalendar> getSourceType() {
+
+            return XMLGregorianCalendar.class;
+
+        }
+
     }
 
     private static class XmlDurationRule
@@ -590,6 +620,13 @@ public abstract class XMLAdapter<S, T>
 
             DatatypeFactory factory = getXMLFactory();
             return factory.newDuration(duration.toStringXML());
+
+        }
+
+        @Override
+        public Class<javax.xml.datatype.Duration> getSourceType() {
+
+            return javax.xml.datatype.Duration.class;
 
         }
 

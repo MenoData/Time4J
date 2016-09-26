@@ -1203,9 +1203,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         @Override
         @SuppressWarnings("unchecked")
-        protected <X extends ChronoEntity<X>> ElementRule<X, T> derive(
-            Chronology<X> chronology
-        ) {
+        protected <X extends ChronoEntity<X>> ElementRule<X, T> derive(Chronology<X> chronology) {
 
             if (chronology.getChronoType().equals(this.type)) {
                 return (ElementRule<X, T>) this;

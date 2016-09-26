@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.Converter;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -66,7 +67,8 @@ import java.time.temporal.TemporalUnit;
  * @author  Meno Hochschild
  * @since   2.0
  */
-public abstract class TemporalType<S, T> {
+public abstract class TemporalType<S, T>
+    implements Converter<S, T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -497,6 +499,13 @@ public abstract class TemporalType<S, T> {
 
         }
 
+        @Override
+        public Class<java.util.Date> getSourceType() {
+
+            return java.util.Date.class;
+
+        }
+
     }
 
     private static class MillisSinceUnixRule
@@ -527,6 +536,13 @@ public abstract class TemporalType<S, T> {
 
         }
 
+        @Override
+        public Class<Long> getSourceType() {
+
+            return Long.class;
+
+        }
+
     }
 
     private static class LocalDateRule
@@ -545,6 +561,13 @@ public abstract class TemporalType<S, T> {
         public LocalDate from(PlainDate date) {
 
             return LocalDate.of(date.getYear(), date.getMonth(), date.getDayOfMonth());
+
+        }
+
+        @Override
+        public Class<LocalDate> getSourceType() {
+
+            return LocalDate.class;
 
         }
 
@@ -570,6 +593,13 @@ public abstract class TemporalType<S, T> {
             }
 
             return LocalTime.of(time.getHour(), time.getMinute(), time.getSecond(), time.getNanosecond());
+
+        }
+
+        @Override
+        public Class<LocalTime> getSourceType() {
+
+            return LocalTime.class;
 
         }
 
@@ -605,6 +635,13 @@ public abstract class TemporalType<S, T> {
 
         }
 
+        @Override
+        public Class<LocalDateTime> getSourceType() {
+
+            return LocalDateTime.class;
+
+        }
+
     }
 
     private static class InstantRule
@@ -623,6 +660,13 @@ public abstract class TemporalType<S, T> {
         public Instant from(Moment moment) {
 
             return Instant.ofEpochSecond(moment.getPosixTime(), moment.getNanosecond());
+
+        }
+
+        @Override
+        public Class<Instant> getSourceType() {
+
+            return Instant.class;
 
         }
 
@@ -655,6 +699,13 @@ public abstract class TemporalType<S, T> {
             }
 
             return ZonedDateTime.ofInstant(instant, zone);
+
+        }
+
+        @Override
+        public Class<ZonedDateTime> getSourceType() {
+
+            return ZonedDateTime.class;
 
         }
 
@@ -715,6 +766,13 @@ public abstract class TemporalType<S, T> {
             }
 
             return threetenDuration;
+
+        }
+
+        @Override
+        public Class<java.time.Duration> getSourceType() {
+
+            return java.time.Duration.class;
 
         }
 
@@ -787,6 +845,13 @@ public abstract class TemporalType<S, T> {
 
         }
 
+        @Override
+        public Class<Period> getSourceType() {
+
+            return Period.class;
+
+        }
+
     }
 
     private static class ClockRule
@@ -805,6 +870,13 @@ public abstract class TemporalType<S, T> {
         public Clock from(TimeSource<?> time4j) {
 
             return new DelegateClock(ZoneId.systemDefault(), time4j);
+
+        }
+
+        @Override
+        public Class<Clock> getSourceType() {
+
+            return Clock.class;
 
         }
 
