@@ -1,4 +1,9 @@
 ## [v4.20] not yet released
+### Added
+- Add convenient methods to PrettyTime #559
+
+### Fixed
+- Document pattern order in case of or-logic applied #558
 
 ## [v4.19] published on 2016-09-18
 ### Added
