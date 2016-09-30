@@ -12,6 +12,7 @@ import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.UnitRule;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.TextWidth;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
@@ -576,7 +577,7 @@ public class PrettyTimeTest {
     public void print3MonthsArabicU0660() {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ"))
-                .withZeroDigit('\u0660')
+                .withZeroDigit(NumberSystem.ARABIC_INDIC)
                 .print(3, MONTHS, TextWidth.SHORT),
             is('\u0663' + " أشهر")); // ٣ أشهر
     }
@@ -959,6 +960,11 @@ public class PrettyTimeTest {
         assertThat(
             formattedDuration,
             is("2 m., 5 days"));
+    }
+
+    @Test
+    public void printToday() {
+        assertThat(PrettyTime.of(Locale.GERMAN).printToday(), is("heute"));
     }
 
     private static class FortnightPlusOneDay
