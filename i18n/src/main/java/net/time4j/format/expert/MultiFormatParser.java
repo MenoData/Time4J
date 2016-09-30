@@ -39,6 +39,17 @@ import java.util.List;
  *
  * <p>Note: This class is immutable and can be used by multiple threads in parallel. </p>
  *
+ * <p><strong>General notes about usage:</strong> </p>
+ *
+ * <p>a) If two patterns or formatters are combined then the order must be from the most complete
+ * pattern/formatter to the least complete one. Example: Use &quot;MM/dd/yyyy HH:mm|MM/dd/yyyy&quot;
+ * and not &quot;MM/dd/yyyy|MM/dd/yyyy HH:mm&quot;. This is especially important if the formatter in
+ * question use default values because the single components will be processed before evaluating any
+ * default values (which is a late step in parsing). </p>
+ *
+ * <p>b) If two patterns/formatters have the same degree of completeness then that component should
+ * be noted first which is more likely to be expected in input. </p>
+ *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.14/4.11
@@ -52,6 +63,19 @@ import java.util.List;
  *
  * <p>Hinweis: Diese Klasse ist <i>immutable</i> (unver&auml;nderlich) und kann von mehreren
  * Threads parallel verwendet werden. </p>
+ *
+ * <p><strong>Allgemeine Bestimmungen zum Gebrauch:</strong> </p>
+ *
+ * <p>a) Wenn zwei Formatmuster oder Formatierer miteinander kombiniert werden, dann mu&szlig; die
+ * Reihenfolge so gew&auml;hlt werden, da&szlig; das Formatmuster bzw. der Formatierer vorangeht, das/der
+ * einen h&ouml;heren Grad an Vollst&auml;ndigkeit besitzt. Beispiel: Verwende &quot;MM/dd/yyyy HH:mm|MM/dd/yyyy&quot;
+ * und nicht &quot;MM/dd/yyyy|MM/dd/yyyy HH:mm&quot;. Das ist besonders wichtig, wenn der
+ * fragliche {@code ChronoFormatter} Standardwerte verwendet, weil die einzelnen Formatelemente
+ * vor der Auswertung irgendwelcher Standardwerte zuerst ausgewertet werden. </p>
+ *
+ * <p>b) Falls zwei Formatmuster oder Formatierer den gleichen Grad an Vollst&auml;ndigkeit haben, dann sollte
+ * das Formatmuster bzw. der Formatierer vorangehen, das in den zu erwartenden Eingabewerten wahrscheinlicher
+ * zutrifft. </p>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild

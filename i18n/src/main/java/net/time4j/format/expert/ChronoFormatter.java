@@ -5659,6 +5659,17 @@ public final class ChronoFormatter<T>
          *
          * <p>Note: Or-blocks can also be used outside of an optional section. </p>
          *
+         * <p><strong>General notes about usage:</strong> </p>
+         *
+         * <p>a) If two patterns are combined then the order must be from the most complete
+         * pattern to the least complete one. Example: Use &quot;MM/dd/yyyy HH:mm|MM/dd/yyyy&quot;
+         * and not &quot;MM/dd/yyyy|MM/dd/yyyy HH:mm&quot;. This is especially important if the formatter
+         * in question use default values because the single components will be processed before evaluating
+         * any default values (which is a late step in parsing). </p>
+         *
+         * <p>b) If two patterns have the same degree of completeness then that component should
+         * be noted first which is more likely to be expected in input. </p>
+         *
          * @return  this instance for method chaining
          * @throws  IllegalStateException if called twice
          *          or called after the end of an optional section
@@ -5680,6 +5691,18 @@ public final class ChronoFormatter<T>
          * </pre>
          *
          * <p>Hinweis: Oder-Bl&ouml;cke k&ouml;nnen auch au&szlig;erhalb optionaler Sektionen verwendet werden. </p>
+         *
+         * <p><strong>Allgemeine Bestimmungen zum Gebrauch:</strong> </p>
+         *
+         * <p>a) Wenn zwei Formatmuster miteinander kombiniert werden, dann mu&szlig; die Reihenfolge so
+         * gew&auml;hlt werden, da&szlig; das Formatmuster vorangeht, das einen h&ouml;heren Grad an
+         * Vollst&auml;ndigkeit besitzt. Beispiel: Verwende &quot;MM/dd/yyyy HH:mm|MM/dd/yyyy&quot;
+         * und nicht &quot;MM/dd/yyyy|MM/dd/yyyy HH:mm&quot;. Das ist besonders wichtig, wenn der
+         * fragliche {@code ChronoFormatter} Standardwerte verwendet, weil die einzelnen Formatelemente
+         * vor der Auswertung irgendwelcher Standardwerte zuerst ausgewertet werden. </p>
+         *
+         * <p>b) Falls zwei Formatmuster den gleichen Grad an Vollst&auml;ndigkeit haben, dann sollte
+         * das Formatmuster vorangehen, das in den zu erwartenden Eingabewerten wahrscheinlicher zutrifft. </p>
          *
          * @return  this instance for method chaining
          * @throws  IllegalStateException if called twice
