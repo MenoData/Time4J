@@ -27,6 +27,7 @@ import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.NumberSymbolProvider;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
@@ -292,6 +293,34 @@ public final class PrettyTime {
     }
 
     /**
+     * <p>Defines the localized zero digit based on given decimal number system. </p>
+     *
+     * @param   numberSystem    decimal number system
+     * @return  changed copy of this instance
+     * @throws  IllegalArgumentException if the number system is not decimal
+     * @see     #withZeroDigit(char)
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Definiert die lokalisierte Nullziffer, indem das angegebene Dezimalzahlsystem ausgewertet wird. </p>
+     *
+     * @param   numberSystem    decimal number system
+     * @return  changed copy of this instance
+     * @throws  IllegalArgumentException if the number system is not decimal
+     * @see     #withZeroDigit(char)
+     * @since   3.24/4.20
+     */
+    public PrettyTime withZeroDigit(NumberSystem numberSystem) {
+
+        if (numberSystem.isDecimal()) {
+            return this.withZeroDigit(numberSystem.getDigits().charAt(0));
+        } else {
+            throw new IllegalArgumentException("Number system is not decimal: " + numberSystem);
+        }
+
+    }
+
+    /**
      * <p>Defines the localized zero digit. </p>
      *
      * <p>In most languages the zero digit is just ASCII-&quot;0&quot;,
@@ -532,6 +561,24 @@ public final class PrettyTime {
             this.emptyUnit,
             this.weekToDays,
             true);
+
+    }
+
+    /**
+     * <p>Determines the localized word for &quot;today&quot;. </p>
+     *
+     * @return  String
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das lokalisierte Wort f&uuml;r &quot;heute&quot;. </p>
+     *
+     * @return  String
+     * @since   3.24/4.20
+     */
+    public String printToday() {
+
+        return UnitPatterns.of(this.getLocale()).getTodayWord();
 
     }
 
