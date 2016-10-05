@@ -26,6 +26,7 @@ import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.Quarter;
+import net.time4j.SystemClock;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -173,6 +174,32 @@ public final class CalendarYear
     public static CalendarYear of(int year) {
 
         return new CalendarYear(year);
+
+    }
+
+    /**
+     * <p>Obtains the current calendar year in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(CalendarYear.chronology())}. </p>
+     *
+     * @return  current calendar year in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderjahr in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(CalendarYear.chronology())}. </p>
+     *
+     * @return  current calendar year in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.24/4.20
+     */
+    public static CalendarYear nowInSystemTime() {
+
+        return SystemClock.inLocalView().now(CalendarYear.chronology());
 
     }
 

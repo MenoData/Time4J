@@ -194,4 +194,11 @@ public class CalendarQuarterTest {
             is("uuuu-'Q'Q"));
     }
 
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            CalendarQuarter.nowInSystemTime(),
+            is(SystemClock.inLocalView().now(CalendarQuarter.chronology())));
+    }
+
 }

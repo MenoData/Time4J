@@ -219,4 +219,11 @@ public class CalendarMonthTest {
             is("uuuu-MM"));
     }
 
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            CalendarMonth.nowInSystemTime(),
+            is(SystemClock.inLocalView().now(CalendarMonth.chronology())));
+    }
+
 }

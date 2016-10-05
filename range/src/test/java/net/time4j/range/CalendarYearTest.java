@@ -196,4 +196,11 @@ public class CalendarYearTest {
             is("uuuu"));
     }
 
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            CalendarYear.nowInSystemTime(),
+            is(SystemClock.inLocalView().now(CalendarYear.chronology())));
+    }
+
 }

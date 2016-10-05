@@ -187,4 +187,11 @@ public class CalendarWeekTest {
             is(CalendarWeek.of(2015, 53)));
     }
 
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            CalendarWeek.nowInSystemTime(),
+            is(SystemClock.inLocalView().now(CalendarWeek.chronology())));
+    }
+
 }
