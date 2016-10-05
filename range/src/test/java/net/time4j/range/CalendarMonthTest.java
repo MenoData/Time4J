@@ -227,4 +227,11 @@ public class CalendarMonthTest {
         assertThat(CalendarMonth.of(2016, 2).toTemporalAccessor(), is(YearMonth.of(2016, 2)));
     }
 
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            CalendarMonth.nowInSystemTime(),
+            is(SystemClock.inLocalView().now(CalendarMonth.chronology())));
+    }
+
 }

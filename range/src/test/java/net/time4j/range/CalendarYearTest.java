@@ -203,4 +203,11 @@ public class CalendarYearTest {
         assertThat(CalendarYear.of(2016).toTemporalAccessor(), is(Year.of(2016)));
     }
 
+    @Test
+    public void nowInSystemTime() {
+        assertThat(
+            CalendarYear.nowInSystemTime(),
+            is(SystemClock.inLocalView().now(CalendarYear.chronology())));
+    }
+
 }
