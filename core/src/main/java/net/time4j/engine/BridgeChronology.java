@@ -23,7 +23,6 @@ package net.time4j.engine;
 
 import net.time4j.base.TimeSource;
 
-import java.time.temporal.TemporalAccessor;
 import java.util.List;
 import java.util.Locale;
 
@@ -111,17 +110,6 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
     }
 
     @Override
-    public S createFrom(
-        TemporalAccessor threeten,
-        AttributeQuery attributes
-    ) {
-
-        T temporal = this.delegate.createFrom(threeten, attributes);
-        return ((temporal == null) ? null : this.converter.from(temporal));
-
-    }
-
-    @Override
     @Deprecated
     public S createFrom(
         ChronoEntity<?> entity,
@@ -193,7 +181,7 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
     public CalendarSystem<S> getCalendarSystem() {
 
         CalendarSystem<T> calsys = this.delegate.getCalendarSystem();
-        return new CalendarSystemProxy<>(this.converter, calsys);
+        return new CalendarSystemProxy<S, T>(this.converter, calsys);
 
     }
 
@@ -201,7 +189,7 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
     public CalendarSystem<S> getCalendarSystem(String variant) {
 
         CalendarSystem<T> calsys = this.delegate.getCalendarSystem(variant);
-        return new CalendarSystemProxy<>(this.converter, calsys);
+        return new CalendarSystemProxy<S, T>(this.converter, calsys);
 
     }
 
