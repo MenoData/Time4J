@@ -209,7 +209,7 @@ public enum HijriAlgorithm
 	}
 
 	// yields the calculation engine
-	MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem() {
+	EraYearMonthDaySystem<HijriCalendar> getCalendarSystem() {
 
 		return this.calsys;
 
@@ -218,7 +218,7 @@ public enum HijriAlgorithm
 	//~ Innere Klassen ----------------------------------------------------
 
 	private static class Transformer
-		implements MonthBasedCalendarSystem<HijriCalendar> {
+		implements EraYearMonthDaySystem<HijriCalendar> {
 
 		//~ Instanzvariablen ----------------------------------------------
 

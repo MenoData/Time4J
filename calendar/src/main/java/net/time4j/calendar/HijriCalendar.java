@@ -356,11 +356,11 @@ public final class HijriCalendar
      */
     public static final String VARIANT_DIYANET = "islamic-diyanet";
 
-    private static final Map<String, MonthBasedCalendarSystem<HijriCalendar>> CALSYS;
+    private static final Map<String, EraYearMonthDaySystem<HijriCalendar>> CALSYS;
     private static final CalendarFamily<HijriCalendar> ENGINE;
 
     static {
-        Map<String, MonthBasedCalendarSystem<HijriCalendar>> calsys = new VariantMap();
+        Map<String, EraYearMonthDaySystem<HijriCalendar>> calsys = new VariantMap();
         calsys.put(VARIANT_UMALQURA, AstronomicalHijriData.UMALQURA);
         for (HijriAlgorithm algo : HijriAlgorithm.values()) {
             calsys.put(algo.getVariant(), algo.getCalendarSystem());
@@ -491,7 +491,7 @@ public final class HijriCalendar
         int hdom
     ) {
 
-        MonthBasedCalendarSystem<HijriCalendar> calsys = getCalendarSystem(variant);
+        EraYearMonthDaySystem<HijriCalendar> calsys = getCalendarSystem(variant);
 
         if (!calsys.isValid(HijriEra.ANNO_HEGIRAE, hyear, hmonth, hdom)) {
             throw new IllegalArgumentException(
@@ -1165,15 +1165,15 @@ public final class HijriCalendar
      *
      * @return  associated calendar system
      */
-    MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem() {
+    EraYearMonthDaySystem<HijriCalendar> getCalendarSystem() {
 
         return getCalendarSystem(this.variant);
 
     }
 
-    private static MonthBasedCalendarSystem<HijriCalendar> getCalendarSystem(String variant) {
+    private static EraYearMonthDaySystem<HijriCalendar> getCalendarSystem(String variant) {
 
-        MonthBasedCalendarSystem<HijriCalendar> calsys = CALSYS.get(variant);
+        EraYearMonthDaySystem<HijriCalendar> calsys = CALSYS.get(variant);
 
         if (calsys == null) {
             throw new ChronoException("Unsupported calendar variant: " + variant);
@@ -1367,14 +1367,14 @@ public final class HijriCalendar
     }
 
     private static class VariantMap
-        extends ConcurrentHashMap<String, MonthBasedCalendarSystem<HijriCalendar>> {
+        extends ConcurrentHashMap<String, EraYearMonthDaySystem<HijriCalendar>> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public MonthBasedCalendarSystem<HijriCalendar> get(Object key) {
+        public EraYearMonthDaySystem<HijriCalendar> get(Object key) {
 
-            MonthBasedCalendarSystem<HijriCalendar> calsys = super.get(key);
+            EraYearMonthDaySystem<HijriCalendar> calsys = super.get(key);
 
             if (calsys == null) {
                 String variant = key.toString();
@@ -1389,7 +1389,7 @@ public final class HijriCalendar
                     }
                 }
 
-                MonthBasedCalendarSystem<HijriCalendar> old = this.putIfAbsent(variant, calsys);
+                EraYearMonthDaySystem<HijriCalendar> old = this.putIfAbsent(variant, calsys);
 
                 if (old != null) {
                     calsys = old;
@@ -1430,7 +1430,7 @@ public final class HijriCalendar
                     return context.hdom;
                 case DAY_OF_YEAR_INDEX:
                     int doy = 0;
-                    MonthBasedCalendarSystem<HijriCalendar> calsys = context.getCalendarSystem();
+                    EraYearMonthDaySystem<HijriCalendar> calsys = context.getCalendarSystem();
                     for (int m = 1; m < context.hmonth; m++) {
                         doy += calsys.getLengthOfMonth(HijriEra.ANNO_HEGIRAE, context.hyear, m);
                     }
@@ -1446,7 +1446,7 @@ public final class HijriCalendar
 
             switch (this.index) {
                 case YEAR_INDEX:
-                    MonthBasedCalendarSystem<HijriCalendar> calsys = context.getCalendarSystem();
+                    EraYearMonthDaySystem<HijriCalendar> calsys = context.getCalendarSystem();
                     return calsys.transform(calsys.getMinimumSinceUTC()).hyear;
                 case DAY_OF_MONTH_INDEX:
                 case DAY_OF_YEAR_INDEX:
@@ -1460,7 +1460,7 @@ public final class HijriCalendar
         @Override
         public Integer getMaximum(HijriCalendar context) {
 
-            MonthBasedCalendarSystem<HijriCalendar> calsys = context.getCalendarSystem();
+            EraYearMonthDaySystem<HijriCalendar> calsys = context.getCalendarSystem();
 
             switch (this.index) {
                 case YEAR_INDEX:
@@ -1820,7 +1820,7 @@ public final class HijriCalendar
                 return null;
             }
 
-            MonthBasedCalendarSystem<HijriCalendar> calsys = CALSYS.get(variant);
+            EraYearMonthDaySystem<HijriCalendar> calsys = CALSYS.get(variant);
 
             if (calsys == null) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Unknown Hijri calendar variant: " + variant);

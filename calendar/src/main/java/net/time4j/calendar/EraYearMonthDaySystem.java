@@ -1,8 +1,8 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (MonthBasedCalendarSystem.java) is part of project Time4J.
+ * This file (EraYearMonthDaySystem.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -39,7 +39,7 @@ import net.time4j.engine.CalendarSystem;
  * @author  Meno Hochschild
  * @since   3.5/4.3
  */
-interface MonthBasedCalendarSystem<D>
+interface EraYearMonthDaySystem<D>
     extends CalendarSystem<D> {
 
     //~ Methoden ----------------------------------------------------------

@@ -77,7 +77,7 @@ final class LookupProcessor<V extends Enum<V>>
 
         this.protectedLength = 0;
         this.caseInsensitive = true;
-        this.locale = Locale.getDefault();
+        this.locale = Locale.getDefault(Locale.Category.FORMAT);
 
     }
 
@@ -152,7 +152,10 @@ final class LookupProcessor<V extends Enum<V>>
             quickPath
                 ? this.caseInsensitive
                 : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
-        Locale loc = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.getDefault()));
+        Locale loc = (
+            quickPath
+                ? this.locale
+                : attributes.get(Attributes.LANGUAGE, Locale.getDefault(Locale.Category.FORMAT)));
         int maxCount = len - start;
 
         for (V value : this.element.getType().getEnumConstants()) {
@@ -269,7 +272,7 @@ final class LookupProcessor<V extends Enum<V>>
             this.resources,
             attributes.get(Attributes.PROTECTED_CHARACTERS, Integer.valueOf(0)).intValue(),
             attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
-            attributes.get(Attributes.LANGUAGE, Locale.getDefault())
+            attributes.get(Attributes.LANGUAGE, Locale.getDefault(Locale.Category.FORMAT))
         );
 
     }

@@ -233,7 +233,7 @@ public final class ThaiSolarCalendar
         new StdWeekdayElement<>(ThaiSolarCalendar.class);
 
     private static final Map<Object, ChronoElement<?>> CHILDREN;
-    private static final MonthBasedCalendarSystem<ThaiSolarCalendar> CALSYS;
+    private static final EraYearMonthDaySystem<ThaiSolarCalendar> CALSYS;
     private static final TimeAxis<CalendarUnit, ThaiSolarCalendar> ENGINE;
 
     static {
@@ -798,7 +798,7 @@ public final class ThaiSolarCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<ThaiSolarCalendar> {
+        implements EraYearMonthDaySystem<ThaiSolarCalendar> {
 
         //~ Methoden ------------------------------------------------------
 

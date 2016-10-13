@@ -341,7 +341,7 @@ public final class Weekmodel
      */
     public static Weekmodel ofSystem() {
 
-        return Weekmodel.of(Locale.getDefault());
+        return Weekmodel.of(Locale.getDefault(Locale.Category.FORMAT));
 
     }
 
@@ -986,7 +986,7 @@ public final class Weekmodel
         @Override
         public int numerical(Weekday dayOfWeek) {
 
-            return Integer.valueOf(dayOfWeek.getValue(Weekmodel.this));
+            return dayOfWeek.getValue(Weekmodel.this);
 
         }
 
@@ -1193,7 +1193,16 @@ public final class Weekmodel
             Weekday value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            }
+
+            try {
+                this.withValue(context, value, false);
+                return true;
+            } catch (ArithmeticException | IllegalArgumentException ex) {
+                return false;
+            }
 
         }
 
