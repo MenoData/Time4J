@@ -248,7 +248,7 @@ public final class CopticCalendar
     public static final StdCalendarElement<Weekday, CopticCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<CopticCalendar>(CopticCalendar.class);
 
-    private static final MonthBasedCalendarSystem<CopticCalendar> CALSYS;
+    private static final EraYearMonthDaySystem<CopticCalendar> CALSYS;
     private static final TimeAxis<CopticCalendar.Unit, CopticCalendar> ENGINE;
 
     static {
@@ -835,7 +835,7 @@ public final class CopticCalendar
     }
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<CopticCalendar> {
+        implements EraYearMonthDaySystem<CopticCalendar> {
 
         //~ Methoden ------------------------------------------------------
 

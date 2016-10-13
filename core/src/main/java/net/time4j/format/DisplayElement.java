@@ -110,10 +110,15 @@ public abstract class DisplayElement<V extends Comparable<V>>
             case 'M':
                 key = "L_month";
                 break;
+            case 'w':
+            case 'W':
+                key = "L_week";
+                break;
             case 'd':
                 key = "L_day";
                 break;
             case 'E':
+            case 'e':
                 key = "L_weekday";
                 break;
             case 'H':

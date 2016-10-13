@@ -39,7 +39,7 @@ import net.time4j.engine.CalendarSystem;
  * @author  Meno Hochschild
  * @since   3.5/4.3
  */
-interface MonthBasedCalendarSystem<D>
+interface EraYearMonthDaySystem<D>
     extends CalendarSystem<D> {
 
     //~ Methoden ----------------------------------------------------------

@@ -448,6 +448,17 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     @Override
+    public CalendarSystem<T> getCalendarSystem(String variant) {
+
+        if (variant.isEmpty()) {
+            return this.getCalendarSystem();
+        }
+
+        return super.getCalendarSystem(variant);
+
+    }
+
+    @Override
     @Deprecated
     public T createFrom(
         ChronoEntity<?> entity,

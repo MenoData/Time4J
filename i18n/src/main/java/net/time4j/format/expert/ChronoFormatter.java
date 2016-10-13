@@ -2154,7 +2154,7 @@ public final class ChronoFormatter<T>
      * @see     DisplayMode
      * @since   3.10/4.7
      */
-    public static <T extends ChronoEntity<T> & LocalizedPatternSupport> ChronoFormatter<T> ofStyle(
+    public static <T extends LocalizedPatternSupport> ChronoFormatter<T> ofStyle(
         DisplayStyle style,
         Locale locale,
         Chronology<T> chronology

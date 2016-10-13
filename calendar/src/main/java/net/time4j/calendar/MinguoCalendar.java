@@ -206,7 +206,7 @@ public final class MinguoCalendar
         new StdWeekdayElement<MinguoCalendar>(MinguoCalendar.class);
 
     private static final Map<Object, ChronoElement<?>> CHILDREN;
-    private static final MonthBasedCalendarSystem<MinguoCalendar> CALSYS;
+    private static final EraYearMonthDaySystem<MinguoCalendar> CALSYS;
     private static final TimeAxis<CalendarUnit, MinguoCalendar> ENGINE;
 
     static {
@@ -723,7 +723,7 @@ public final class MinguoCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<MinguoCalendar> {
+        implements EraYearMonthDaySystem<MinguoCalendar> {
 
         //~ Methoden ------------------------------------------------------
 

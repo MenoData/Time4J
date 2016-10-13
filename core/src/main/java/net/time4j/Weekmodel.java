@@ -989,7 +989,7 @@ public final class Weekmodel
         @Override
         public int numerical(Weekday dayOfWeek) {
 
-            return Integer.valueOf(dayOfWeek.getValue(Weekmodel.this));
+            return dayOfWeek.getValue(Weekmodel.this);
 
         }
 
@@ -1196,7 +1196,16 @@ public final class Weekmodel
             Weekday value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            }
+
+            try {
+                this.withValue(context, value, false);
+                return true;
+            } catch (RuntimeException ex) {
+                return false;
+            }
 
         }
 

@@ -207,6 +207,12 @@ public abstract class StdDateElement<V extends Comparable<V>, T extends ChronoEn
 
     }
 
+    protected Class<T> getChronoType() {
+
+        return this.chrono;
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class DayOperator<T extends ChronoEntity<T>>

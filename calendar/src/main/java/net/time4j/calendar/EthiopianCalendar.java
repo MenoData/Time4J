@@ -311,7 +311,7 @@ public final class EthiopianCalendar
      */
     public static final TextElement<Tabot> TABOT = Tabot.Element.TABOT;
 
-    private static final MonthBasedCalendarSystem<EthiopianCalendar> CALSYS;
+    private static final EraYearMonthDaySystem<EthiopianCalendar> CALSYS;
     private static final TimeAxis<EthiopianCalendar.Unit, EthiopianCalendar> ENGINE;
 
     static {
@@ -912,7 +912,7 @@ public final class EthiopianCalendar
     }
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<EthiopianCalendar> {
+        implements EraYearMonthDaySystem<EthiopianCalendar> {
 
         //~ Methoden ------------------------------------------------------
 

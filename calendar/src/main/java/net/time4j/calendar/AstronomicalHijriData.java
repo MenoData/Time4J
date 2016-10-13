@@ -47,7 +47,7 @@ import java.util.Properties;
  * @since   3.5/4.3
  */
 final class AstronomicalHijriData
-    implements MonthBasedCalendarSystem<HijriCalendar> {
+    implements EraYearMonthDaySystem<HijriCalendar> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

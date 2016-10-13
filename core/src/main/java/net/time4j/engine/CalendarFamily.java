@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarFamily.java) is part of project Time4J.
  *
@@ -83,6 +83,10 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
 
     @Override
     public CalendarSystem<T> getCalendarSystem(String variant) {
+
+        if (variant.isEmpty()) {
+            return this.getCalendarSystem();
+        }
 
         CalendarSystem<T> result = this.calendars.get(variant);
 

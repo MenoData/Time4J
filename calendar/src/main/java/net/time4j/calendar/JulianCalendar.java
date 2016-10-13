@@ -252,7 +252,7 @@ public final class JulianCalendar
     public static final ChronoElement<Weekday> DAY_OF_WEEK =
         new StdWeekdayElement<JulianCalendar>(JulianCalendar.class);
 
-    private static final MonthBasedCalendarSystem<JulianCalendar> CALSYS;
+    private static final EraYearMonthDaySystem<JulianCalendar> CALSYS;
     private static final TimeAxis<JulianCalendar.Unit, JulianCalendar> ENGINE;
 
     static {
@@ -886,7 +886,7 @@ public final class JulianCalendar
     }
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<JulianCalendar> {
+        implements EraYearMonthDaySystem<JulianCalendar> {
 
         //~ Methoden ------------------------------------------------------
 

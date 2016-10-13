@@ -246,7 +246,7 @@ public final class PersianCalendar
     public static final StdCalendarElement<Weekday, PersianCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<PersianCalendar>(PersianCalendar.class);
 
-    private static final MonthBasedCalendarSystem<PersianCalendar> CALSYS;
+    private static final EraYearMonthDaySystem<PersianCalendar> CALSYS;
     private static final TimeAxis<PersianCalendar.Unit, PersianCalendar> ENGINE;
 
     static {
@@ -831,7 +831,7 @@ public final class PersianCalendar
     }
 
     private static class Transformer
-        implements MonthBasedCalendarSystem<PersianCalendar> {
+        implements EraYearMonthDaySystem<PersianCalendar> {
 
         //~ Methoden ------------------------------------------------------
 
