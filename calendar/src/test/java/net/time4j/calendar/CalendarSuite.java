@@ -15,10 +15,10 @@ import org.junit.runners.Suite.SuiteClasses;
         DiyanetDataTest.class,
         DiyanetRangeTest.class,
         EraNameTest.class,
-        EvangelistTest.class,
         EthiopianCalendarTest.class,
         EthiopianOperatorTest.class,
         EthiopianTimeTest.class,
+        EvangelistTest.class,
         HijriAlgoTest.class,
         HijriOperatorTest.class,
         HijriPatternTest.class,
@@ -36,7 +36,8 @@ import org.junit.runners.Suite.SuiteClasses;
         TabotTest.class,
         ThaiSolarCalendarTest.class,
         ThaiSolarOperatorTest.class,
-        UmalquraDataTest.class
+        UmalquraDataTest.class,
+        WeekCalculationTest.class
     }
 )
 public class CalendarSuite {
