@@ -276,7 +276,14 @@ public final class ThaiSolarCalendar
             .appendElement(
                 DAY_OF_WEEK,
                 FieldRule.of(DAY_OF_WEEK),
-                CalendarUnit.DAYS);
+                CalendarUnit.DAYS)
+            .appendExtension(
+                new CommonElements.Weekengine(
+                    "buddhist",
+                    ThaiSolarCalendar.class,
+                    DAY_OF_MONTH,
+                    DAY_OF_YEAR,
+                    getDefaultWeekmodel()));
             registerUnits(builder);
         ENGINE = builder.build();
     }
@@ -715,6 +722,28 @@ public final class ThaiSolarCalendar
     }
 
     /**
+     * <p>Obtains the standard week model of this calendar. </p>
+     *
+     * <p>The thai calendar usually starts on Sunday. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
+     *
+     * <p>Der Thai-Kalender startet normalerweise am Sonntag. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    public static Weekmodel getDefaultWeekmodel() {
+
+        return Weekmodel.of(Weekday.SUNDAY, 1);
+
+    }
+
+    /**
      * <p>Returns the associated time axis. </p>
      *
      * @return  chronology
@@ -1038,8 +1067,7 @@ public final class ThaiSolarCalendar
                 PlainDate date = start.iso.plus(toNumber(value) - 1, CalendarUnit.DAYS);
                 return new ThaiSolarCalendar(date);
             } else if (this.element.equals(DAY_OF_WEEK)) {
-                PlainDate date =
-                    context.iso.with(Weekmodel.of(Weekday.SUNDAY, 1).localDayOfWeek(), Weekday.class.cast(value));
+                PlainDate date = context.iso.with(getDefaultWeekmodel().localDayOfWeek(), Weekday.class.cast(value));
                 return new ThaiSolarCalendar(date);
             }
 

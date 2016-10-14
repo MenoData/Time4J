@@ -25,18 +25,25 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
+import net.time4j.format.Attributes;
 
 import java.io.ObjectStreamException;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.Locale;
+import java.util.Set;
 
 
 /**
@@ -272,6 +279,88 @@ public class CommonElements {
     }
 
     //~ Innere Klassen ----------------------------------------------------
+
+    /**
+     * <p>Wochenelement-Erweiterung. </p>
+     *
+     * @author  Meno Hochschild
+     */
+    static class Weekengine
+        implements ChronoExtension {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final String calendarType;
+        private final Class<? extends ChronoEntity> chronoType;
+        private final ChronoElement<Integer> dayOfMonthElement;
+        private final ChronoElement<Integer> dayOfYearElement;
+        private final Weekmodel defaultWeekmodel;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Weekengine(
+            String calendarType,
+            Class<? extends ChronoEntity> chronoType,
+            ChronoElement<Integer> dayOfMonthElement,
+            ChronoElement<Integer> dayOfYearElement,
+            Weekmodel defaultWeekmodel
+        ) {
+            super();
+
+            this.calendarType = calendarType;
+            this.chronoType = chronoType;
+            this.dayOfMonthElement = dayOfMonthElement;
+            this.dayOfYearElement = dayOfYearElement;
+            this.defaultWeekmodel = defaultWeekmodel;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean accept(Class<?> chronoType) {
+
+            return this.chronoType.equals(chronoType);
+
+        }
+
+        @Override
+        public Set<ChronoElement<?>> getElements(
+            Locale locale,
+            AttributeQuery attributes
+        ) {
+
+            if (
+                attributes.contains(Attributes.CALENDAR_TYPE)
+                && attributes.get(Attributes.CALENDAR_TYPE).equals(this.calendarType)
+            ) {
+                Weekmodel model = (locale.getCountry().isEmpty() ? this.defaultWeekmodel : Weekmodel.of(locale));
+                Set<ChronoElement<?>> set = new HashSet<>();
+                set.add(
+                    new DayOfWeekElement<>(this.chronoType, model));
+                set.add(new CalendarWeekElement<>(
+                    "WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement));
+                set.add(new CalendarWeekElement<>(
+                    "WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement));
+                return Collections.unmodifiableSet(set);
+            }
+
+            return Collections.emptySet();
+
+        }
+
+        @Override
+        public <T extends ChronoEntity<T>> T resolve(
+            T entity,
+            Locale locale,
+            AttributeQuery attributes
+        ) {
+
+            return entity; // no-op
+
+        }
+
+    }
 
     private static class CalendarWeekElement<T extends ChronoEntity<T>>
         extends StdIntegerDateElement<T> {
