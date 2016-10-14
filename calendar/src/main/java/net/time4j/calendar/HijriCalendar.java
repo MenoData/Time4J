@@ -388,8 +388,14 @@ public final class HijriCalendar
                 new IntegerRule(DAY_OF_YEAR_INDEX))
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule()
-            );
+                new WeekdayRule())
+            .appendExtension(
+                new CommonElements.Weekengine(
+                    "islamic",
+                    HijriCalendar.class,
+                    DAY_OF_MONTH,
+                    DAY_OF_YEAR,
+                    getDefaultWeekmodel()));
         ENGINE = builder.build();
     }
 
@@ -1093,6 +1099,30 @@ public final class HijriCalendar
     }
 
     /**
+     * <p>Obtains the standard week model of this calendar. </p>
+     *
+     * <p>The Hijri calendar usually starts on Sunday, but with the weekend on Friday and Saturday
+     * (like in Saudi-Arabia). </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
+     *
+     * <p>Der islamische Kalender startet per Vorgabe am Sonntag, mit dem Wochenende am Freitag
+     * und Samstag (wie in Saudi-Arabien). </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    public static Weekmodel getDefaultWeekmodel() {
+
+        return Weekmodel.of(Weekday.SUNDAY, 1, Weekday.FRIDAY, Weekday.SATURDAY);
+
+    }
+
+    /**
      * <p>Returns the associated calendar family. </p>
      *
      * @return  chronology as calendar family
@@ -1724,7 +1754,7 @@ public final class HijriCalendar
                 throw new IllegalArgumentException("Missing weekday.");
             }
 
-            Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
+            Weekmodel model = getDefaultWeekmodel();
             int oldValue = context.getDayOfWeek().getValue(model);
             int newValue = value.getValue(model);
             return context.plus(CalendarDays.of(newValue - oldValue));

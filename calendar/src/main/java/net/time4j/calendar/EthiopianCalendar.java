@@ -375,7 +375,14 @@ public final class EthiopianCalendar
                 new EthiopianUnitRule(Unit.DAYS),
                 Unit.DAYS.getLength(),
                 Collections.singleton(Unit.WEEKS))
-            .appendExtension(new EthiopianExtension()); // enable ethiopian hour for timestamps
+            .appendExtension(new EthiopianExtension()) // enable ethiopian hour for timestamps
+            .appendExtension(
+                new CommonElements.Weekengine(
+                    "ethiopic",
+                    EthiopianCalendar.class,
+                    DAY_OF_MONTH,
+                    DAY_OF_YEAR,
+                    getDefaultWeekmodel()));
         ENGINE = builder.build();
     }
 
@@ -763,6 +770,28 @@ public final class EthiopianCalendar
         }
         sb.append(this.edom);
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Obtains the standard week model of this calendar. </p>
+     *
+     * <p>The Ethiopian calendar usually starts on Sunday. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
+     *
+     * <p>Der &auml;thiopische Kalender startet normalerweise am Sonntag. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    public static Weekmodel getDefaultWeekmodel() {
+
+        return Weekmodel.of(Weekday.SUNDAY, 1);
 
     }
 
@@ -1512,7 +1541,7 @@ public final class EthiopianCalendar
                 throw new IllegalArgumentException("Missing weekday.");
             }
 
-            Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
+            Weekmodel model = getDefaultWeekmodel();
             int oldValue = context.getDayOfWeek().getValue(model);
             int newValue = value.getValue(model);
             return context.plus(CalendarDays.of(newValue - oldValue));
