@@ -312,7 +312,14 @@ public final class JulianCalendar
                 Unit.DAYS,
                 new JulianUnitRule(Unit.DAYS),
                 Unit.DAYS.getLength(),
-                Collections.singleton(Unit.WEEKS));
+                Collections.singleton(Unit.WEEKS))
+            .appendExtension(
+                new CommonElements.Weekengine(
+                    "julian",
+                    JulianCalendar.class,
+                    DAY_OF_MONTH,
+                    DAY_OF_YEAR,
+                    getDefaultWeekmodel()));
         ENGINE = builder.build();
     }
 
@@ -690,6 +697,28 @@ public final class JulianCalendar
     public String toString() {
 
         return toString(this.getEra(), this.getYear(), this.month, this.dom);
+
+    }
+
+    /**
+     * <p>Obtains the standard week model of this calendar. </p>
+     *
+     * <p>The Julian calendar usually starts on Sunday. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
+     *
+     * <p>Der julianische Kalender startet normalerweise am Sonntag. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    public static Weekmodel getDefaultWeekmodel() {
+
+        return Weekmodel.of(Weekday.SUNDAY, 1);
 
     }
 
@@ -1451,7 +1480,7 @@ public final class JulianCalendar
                 throw new IllegalArgumentException("Missing weekday.");
             }
 
-            Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
+            Weekmodel model = getDefaultWeekmodel();
             int oldValue = context.getDayOfWeek().getValue(model);
             int newValue = value.getValue(model);
             return context.plus(CalendarDays.of(newValue - oldValue));
