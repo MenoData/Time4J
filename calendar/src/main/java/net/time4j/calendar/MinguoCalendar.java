@@ -249,7 +249,14 @@ public final class MinguoCalendar
             .appendElement(
                 DAY_OF_WEEK,
                 FieldRule.of(DAY_OF_WEEK),
-                CalendarUnit.DAYS);
+                CalendarUnit.DAYS)
+            .appendExtension(
+                new CommonElements.Weekengine(
+                    "roc",
+                    MinguoCalendar.class,
+                    DAY_OF_MONTH,
+                    DAY_OF_YEAR,
+                    getDefaultWeekmodel()));
             registerUnits(builder);
         ENGINE = builder.build();
     }
@@ -628,6 +635,28 @@ public final class MinguoCalendar
     }
 
     /**
+     * <p>Obtains the standard week model of this calendar. </p>
+     *
+     * <p>The Minguo calendar usually starts on Sunday. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
+     *
+     * <p>Der Minguo-Kalender startet normalerweise am Sonntag. </p>
+     *
+     * @return  Weekmodel
+     * @since   3.24/4.20
+     */
+    public static Weekmodel getDefaultWeekmodel() {
+
+        return Weekmodel.of(Weekday.SUNDAY, 1);
+
+    }
+
+    /**
      * <p>Returns the associated time axis. </p>
      *
      * @return chronology
@@ -871,7 +900,7 @@ public final class MinguoCalendar
             } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = Month.JANUARY;
             } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekmodel.of(Locale.TAIWAN).localDayOfWeek().getDefaultMinimum();
+                result = Weekday.SUNDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -900,7 +929,7 @@ public final class MinguoCalendar
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.iso.getMaximum(PlainDate.DAY_OF_YEAR);
             } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekmodel.of(Locale.TAIWAN).localDayOfWeek().getDefaultMaximum();
+                result = Weekday.SATURDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -954,8 +983,7 @@ public final class MinguoCalendar
                 PlainDate date = context.iso.with(PlainDate.DAY_OF_YEAR, toNumber(value));
                 return new MinguoCalendar(date);
             } else if (this.element.equals(DAY_OF_WEEK)) {
-                PlainDate date =
-                    context.iso.with(Weekmodel.of(Locale.TAIWAN).localDayOfWeek(), Weekday.class.cast(value));
+                PlainDate date = context.iso.with(getDefaultWeekmodel().localDayOfWeek(), Weekday.class.cast(value));
                 return new MinguoCalendar(date);
             }
 

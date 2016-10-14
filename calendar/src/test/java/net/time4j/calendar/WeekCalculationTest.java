@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
@@ -128,6 +129,46 @@ public class WeekCalculationTest {
     }
 
     @Test
+    public void getWeekOfYearThai() {
+        ThaiSolarCalendar thai = PlainDate.of(1940, 4, 11).transform(ThaiSolarCalendar.class); // Thursday
+        Weekmodel model = ThaiSolarCalendar.getDefaultWeekmodel();
+        ChronoElement<Integer> element = CommonElements.weekOfYear(ThaiSolarCalendar.axis(), model);
+        assertThat(
+            thai.get(element),
+            is(2));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 10).get(element),
+            is(2));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 9).get(element),
+            is(2));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 8).get(element),
+            is(2));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 7).get(element), // Sunday
+            is(2));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 6).get(element),
+            is(1));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 5).get(element),
+            is(1));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 4).get(element),
+            is(1));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 3).get(element),
+            is(1));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 2).get(element),
+            is(1));
+        assertThat(
+            thai.with(ThaiSolarCalendar.DAY_OF_MONTH, 1).get(element),
+            is(1));
+    }
+
+    @Test
     @SuppressWarnings("unchecked")
     public void getLocalDayOfWeekIR() {
         HijriCalendar hijri = HijriCalendar.of(HijriAlgorithm.WEST_ISLAMIC_ASTRO, 1438, 1, 11); // Wednesday
@@ -182,6 +223,33 @@ public class WeekCalculationTest {
         assertThat(
             hijri.getDayOfWeek(),
             is(expected.getDayOfWeek()));
+    }
+
+    @Test
+    public void getMaximumWeekOfYearThai() {
+        ThaiSolarCalendar thai = PlainDate.of(1940, 4, 11).transform(ThaiSolarCalendar.class); // Thursday
+        Weekmodel model = ThaiSolarCalendar.getDefaultWeekmodel();
+        StdCalendarElement<Integer, ThaiSolarCalendar> element =
+            CommonElements.weekOfYear(ThaiSolarCalendar.axis(), model);
+        assertThat(
+            thai.getMaximum(element),
+            is(39));
+        assertThat(
+            thai.with(element.maximized()),
+            is(PlainDate.of(1940, 12, 26).transform(ThaiSolarCalendar.class)));
+        ThaiSolarCalendar thai2 = PlainDate.of(1940, 12, 31).transform(ThaiSolarCalendar.class); // Tuesday
+        assertThat(
+            thai2.get(element),
+            is(1));
+        assertThat(
+            thai2.with(ThaiSolarCalendar.DAY_OF_MONTH, 30).get(element),
+            is(1));
+        assertThat(
+            thai2.with(ThaiSolarCalendar.DAY_OF_MONTH, 29).get(element),
+            is(1));
+        assertThat(
+            thai2.with(ThaiSolarCalendar.DAY_OF_MONTH, 28).get(element),
+            is(39));
     }
 
     @Test
