@@ -8,6 +8,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -281,6 +286,30 @@ public class WeekCalculationTest {
                 Weekmodel.ISO
             ).getDisplayName(Locale.GERMAN),
             is("Wochentag"));
+    }
+
+    @Test
+    public void serialization() throws IOException, ClassNotFoundException {
+        roundtrip(CommonElements.localDayOfWeek(HijriCalendar.family(), Weekmodel.ISO));
+        roundtrip(CommonElements.localDayOfWeek(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
+        roundtrip(CommonElements.weekOfMonth(HijriCalendar.family(), Weekmodel.ISO));
+        roundtrip(CommonElements.weekOfMonth(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
+        roundtrip(CommonElements.weekOfYear(HijriCalendar.family(), Weekmodel.ISO));
+        roundtrip(CommonElements.weekOfYear(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
+    }
+
+    private static void roundtrip(Object obj)
+        throws IOException, ClassNotFoundException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        assertThat(ois.readObject(), is(obj));
+        ois.close();
     }
 
 }
