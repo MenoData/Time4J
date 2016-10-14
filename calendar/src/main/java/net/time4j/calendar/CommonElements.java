@@ -279,7 +279,7 @@ public class CommonElements {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        //private static final long serialVersionUID = -5936254509996557266L; // TODO: serialver.exe
+        private static final long serialVersionUID = -7471192143785466686L;
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -594,7 +594,7 @@ public class CommonElements {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        // private static final long serialVersionUID = 1945670789283677398L;// TODO: serialver.exe
+        private static final long serialVersionUID = 5613494586572932860L;
 
         //~ Instanzvariablen ----------------------------------------------
 
