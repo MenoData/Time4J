@@ -37,7 +37,6 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
-import net.time4j.format.Attributes;
 
 import java.io.ObjectStreamException;
 import java.util.Collections;
@@ -290,7 +289,6 @@ public class CommonElements {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final String calendarType;
         private final Class<? extends ChronoEntity> chronoType;
         private final ChronoElement<Integer> dayOfMonthElement;
         private final ChronoElement<Integer> dayOfYearElement;
@@ -299,7 +297,6 @@ public class CommonElements {
         //~ Konstruktoren -------------------------------------------------
 
         Weekengine(
-            String calendarType,
             Class<? extends ChronoEntity> chronoType,
             ChronoElement<Integer> dayOfMonthElement,
             ChronoElement<Integer> dayOfYearElement,
@@ -307,7 +304,6 @@ public class CommonElements {
         ) {
             super();
 
-            this.calendarType = calendarType;
             this.chronoType = chronoType;
             this.dayOfMonthElement = dayOfMonthElement;
             this.dayOfYearElement = dayOfYearElement;
@@ -330,22 +326,15 @@ public class CommonElements {
             AttributeQuery attributes
         ) {
 
-            if (
-                attributes.contains(Attributes.CALENDAR_TYPE)
-                && attributes.get(Attributes.CALENDAR_TYPE).equals(this.calendarType)
-            ) {
-                Weekmodel model = (locale.getCountry().isEmpty() ? this.defaultWeekmodel : Weekmodel.of(locale));
-                Set<ChronoElement<?>> set = new HashSet<>();
-                set.add(
-                    new DayOfWeekElement<>(this.chronoType, model));
-                set.add(new CalendarWeekElement<>(
-                    "WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement));
-                set.add(new CalendarWeekElement<>(
-                    "WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement));
-                return Collections.unmodifiableSet(set);
-            }
-
-            return Collections.emptySet();
+            Weekmodel model = (locale.getCountry().isEmpty() ? this.defaultWeekmodel : Weekmodel.of(locale));
+            Set<ChronoElement<?>> set = new HashSet<>();
+            set.add(
+                new DayOfWeekElement<>(this.chronoType, model));
+            set.add(new CalendarWeekElement<>(
+                "WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement));
+            set.add(new CalendarWeekElement<>(
+                "WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement));
+            return Collections.unmodifiableSet(set);
 
         }
 

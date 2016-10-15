@@ -306,7 +306,6 @@ public final class PersianCalendar
                 Collections.singleton(Unit.WEEKS))
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "persian",
                     PersianCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,
