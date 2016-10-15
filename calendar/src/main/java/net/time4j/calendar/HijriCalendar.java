@@ -391,7 +391,6 @@ public final class HijriCalendar
                 new WeekdayRule())
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "islamic",
                     HijriCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,

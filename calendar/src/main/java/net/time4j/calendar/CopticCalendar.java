@@ -308,7 +308,6 @@ public final class CopticCalendar
                 Collections.singleton(Unit.WEEKS))
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "coptic",
                     CopticCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,

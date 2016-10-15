@@ -252,7 +252,6 @@ public final class MinguoCalendar
                 CalendarUnit.DAYS)
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "roc",
                     MinguoCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,

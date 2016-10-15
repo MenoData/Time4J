@@ -24,6 +24,7 @@ package net.time4j.format.expert;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoExtension;
@@ -45,6 +46,7 @@ import net.time4j.i18n.UltimateFormatEngine;
 
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -918,6 +920,16 @@ public enum PatternType
      *      a special grammar. </td>
      *  </tr>
      *  <tr>
+     *      <td>WEEK_OF_YEAR</td>
+     *      <td>w</td>
+     *      <td>One or two symbols for the country-dependent week of year. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEK_OF_MONTH</td>
+     *      <td>W</td>
+     *      <td>One symbol for the country-dependent week of month. </td>
+     *  </tr>
+     *  <tr>
      *      <td>DAY_OF_MONTH</td>
      *      <td>d</td>
      *      <td>One or two symbols for the day of month. </td>
@@ -932,6 +944,19 @@ public enum PatternType
      *      <td>E</td>
      *      <td>One to three symbols for the abbreviation, four for the full
      *      name, five for a letter symbol or six for the short form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>e</td>
+     *      <td>Like E, but if there are only one or two symbols then the
+     *      formatter will choose the localized numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>c</td>
+     *      <td>Like e, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. However, 2 symbols are not allowed. </td>
      *  </tr>
      *  <tr>
      *      <td>RELATED_GREGORIAN_YEAR</td>
@@ -999,6 +1024,18 @@ public enum PatternType
      *      Deklination. </td>
      *  </tr>
      *  <tr>
+     *      <td>WEEK_OF_YEAR</td>
+     *      <td>w</td>
+     *      <td>Ein oder zwei Symbole f&uuml;r die l&auml;nderabh&auml;ngige
+     *      Woche des Jahres. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEK_OF_MONTH</td>
+     *      <td>W</td>
+     *      <td>Ein Symbol f&uuml;r die l&auml;nderabh&auml;ngige
+     *      Woche des Monats. </td>
+     *  </tr>
+     *  <tr>
      *      <td>DAY_OF_MONTH</td>
      *      <td>d</td>
      *      <td>Ein oder zwei Symbole f&uuml;r den Tag des Monats. </td>
@@ -1014,6 +1051,20 @@ public enum PatternType
      *      <td>Ein bis drei Symbole f&uuml;r die Abk&uuml;rzung, vier
      *      f&uuml;r den vollen Namen, f&uuml;nf f&uuml;r ein Buchstabensymbol
      *      oder sechs f&uuml;r die Kurzform. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>e</td>
+     *      <td>Wie E, aber wenn ein oder zwei Symbole angegeben sind, dann
+     *      wird die lokalisierte numerische Form gew&auml;hlt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>c</td>
+     *      <td>Wie e, aber in der {@link OutputContext#STANDALONE
+     *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
+     *      erfordert die alleinstehende Variante eine besondere
+     *      Deklination. Zu beachten: 2 Symbole sind nicht erlaubt. </td>
      *  </tr>
      *  <tr>
      *      <td>RELATED_GREGORIAN_YEAR</td>
@@ -1103,6 +1154,10 @@ public enum PatternType
             case 'd':
             case 'y':
             case 'r':
+            case 'w':
+            case 'W':
+            case 'e':
+            case 'c':
                 return true;
             default:
                 return false;
@@ -1674,7 +1729,7 @@ public enum PatternType
         Locale locale
     ) {
 
-        Set<ChronoElement<?>> elements = builder.getChronology().getRegisteredElements();
+        Set<ChronoElement<?>> elements = getElements(builder, symbol, locale);
         String chronoType = builder.getChronology().getChronoType().getName();
         ChronoElement<?> element = find(elements, symbol, chronoType);
         TextElement<?> textElement;
@@ -1744,6 +1799,17 @@ public enum PatternType
                     builder.endSection();
                 }
                 break;
+            case 'w':
+                addNumber(intElement, builder, count, false);
+                break;
+            case 'W':
+                if (count == 1) {
+                    builder.addFixedInteger(intElement, 1);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters: " + count);
+                }
+                break;
             case 'd':
                 addNumber(intElement, builder, count, false);
                 break;
@@ -1775,6 +1841,32 @@ public enum PatternType
                 builder.addText(textElement);
                 builder.endSection();
                 break;
+            case 'e':
+                if (count <= 2) {
+                    ChronoElement<Weekday> wde = cast(element);
+                    builder.addFixedNumerical(wde, count);
+                } else {
+                    general(builder, 'E', count, locale);
+                }
+                break;
+            case 'c':
+                if (count == 2) {
+                    throw new IllegalArgumentException(
+                        "Invalid pattern count of 2 for symbol 'c'.");
+                }
+                builder.startSection(
+                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                try {
+                    if (count == 1) {
+                        ChronoElement<Weekday> wde = cast(element);
+                        builder.addFixedNumerical(wde, 1);
+                    } else {
+                        general(builder, 'E', count, locale);
+                    }
+                } finally {
+                    builder.endSection();
+                }
+                break;
             default:
                 throw new IllegalArgumentException(
                     "Unsupported pattern symbol: " + symbol);
@@ -1784,13 +1876,40 @@ public enum PatternType
 
     }
 
+    private static Set<ChronoElement<?>> getElements(
+        ChronoFormatter.Builder<?> builder,
+        char symbol,
+        Locale locale
+    ) {
+
+        if ((symbol == 'w') || (symbol == 'W') || (symbol == 'e') || (symbol == 'c')) {
+            for (ChronoExtension extension : builder.getChronology().getExtensions()) {
+                for (ChronoElement<?> element : extension.getElements(locale, Attributes.empty())) {
+                    if (
+                        ((symbol == 'e' || symbol == 'c') && element.name().equals("LOCAL_DAY_OF_WEEK"))
+                        || ((symbol == 'w') && element.name().equals("WEEK_OF_YEAR"))
+                        || ((symbol == 'W') && element.name().equals("WEEK_OF_MONTH"))
+                    ) {
+                        Set<ChronoElement<?>> result = new HashSet<ChronoElement<?>>();
+                        result.add(element);
+                        return result;
+                    }
+                }
+            }
+            return Collections.emptySet();
+        } else {
+            return builder.getChronology().getRegisteredElements();
+        }
+
+    }
+
     private static ChronoElement<?> find(
         Set<ChronoElement<?>> elements,
         char symbol,
         String chronoType
     ) {
 
-        char c = ((symbol == 'L') ? 'M' : symbol);
+        char c = ((symbol == 'L') ? 'M' : ((symbol == 'c') ? 'e' : symbol));
 
         for (ChronoElement<?> element : elements) {
             if (element.getSymbol() == c) {
@@ -1799,7 +1918,7 @@ public enum PatternType
         }
 
         throw new IllegalArgumentException(
-            "Cannot find any registered element for symbol " + symbol + " in \"" + chronoType + "\".");
+            "Cannot find any chronological element for symbol " + symbol + " in \"" + chronoType + "\".");
 
     }
 

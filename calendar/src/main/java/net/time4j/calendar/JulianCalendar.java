@@ -315,7 +315,6 @@ public final class JulianCalendar
                 Collections.singleton(Unit.WEEKS))
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "julian",
                     JulianCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,

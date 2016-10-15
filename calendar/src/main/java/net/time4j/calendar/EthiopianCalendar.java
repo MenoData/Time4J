@@ -378,7 +378,6 @@ public final class EthiopianCalendar
             .appendExtension(new EthiopianExtension()) // enable ethiopian hour for timestamps
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "ethiopic",
                     EthiopianCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,

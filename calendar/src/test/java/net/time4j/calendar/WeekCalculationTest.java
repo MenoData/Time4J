@@ -4,7 +4,10 @@ import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.engine.ChronoElement;
+import net.time4j.format.Leniency;
 import net.time4j.format.NumericalElement;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -14,10 +17,12 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(JUnit4.class)
@@ -354,6 +359,34 @@ public class WeekCalculationTest {
                 Weekmodel.ISO
             ).getDisplayName(Locale.GERMAN),
             is("Wochentag"));
+    }
+
+    @Test
+    public void printWeekElementsThai() {
+        ThaiSolarCalendar thai = PlainDate.of(1940, 12, 28).transform(ThaiSolarCalendar.class); // Saturday
+        ChronoFormatter<ThaiSolarCalendar> cf =
+            ChronoFormatter.ofPattern("y w W ee c", PatternType.NON_ISO_DATE, Locale.ENGLISH, ThaiSolarCalendar.axis());
+        assertThat(cf.format(thai), is("2483 39 4 07 7"));
+        ChronoFormatter<ThaiSolarCalendar> cf2 =
+            ChronoFormatter.ofPattern("y ww W ee c", PatternType.CLDR, Locale.ENGLISH, ThaiSolarCalendar.axis());
+        assertThat(cf2.format(thai), is("2483 39 4 07 7"));
+    }
+
+    @Test
+    public void parseWeekElementsThai() throws ParseException {
+        ThaiSolarCalendar thai = PlainDate.of(1940, 12, 28).transform(ThaiSolarCalendar.class); // Saturday
+        ChronoFormatter<ThaiSolarCalendar> cf =
+            ChronoFormatter.ofPattern(
+                "G-yyyy-MM-dd w W ee c", PatternType.NON_ISO_DATE, Locale.ENGLISH, ThaiSolarCalendar.axis());
+        assertThat(
+            cf.with(Leniency.STRICT).parse("BE-2483-12-28 39 4 07 7"),
+            is(thai));
+        try {
+            cf.with(Leniency.STRICT).parse("BE-2483-12-28 39 4 07 6");
+            fail("Should fail due to parse exception because of ambivalent local-day-of-week.");
+        } catch (ParseException pe) {
+            // expected
+        }
     }
 
     @Test

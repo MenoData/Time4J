@@ -278,7 +278,6 @@ public final class ThaiSolarCalendar
                 CalendarUnit.DAYS)
             .appendExtension(
                 new CommonElements.Weekengine(
-                    "buddhist",
                     ThaiSolarCalendar.class,
                     DAY_OF_MONTH,
                     DAY_OF_YEAR,
