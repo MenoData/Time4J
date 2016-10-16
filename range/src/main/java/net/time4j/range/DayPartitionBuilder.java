@@ -47,13 +47,9 @@ import java.util.function.Predicate;
  *     DayPartitionRule rule =
  *      new DayPartitionBuilder()
  *          .addExclusion(PlainDate.of(2016, 8, 27))
- *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(MONDAY, FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(16, 0)))
- *          .addWeekdayRule(TUESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
- *          .addWeekdayRule(WEDNESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
- *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
- *          .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .build();
  *
  *      List&lt;TimestampInterval&gt; intervals = // determine all intervals for August and September in 2016
@@ -79,13 +75,9 @@ import java.util.function.Predicate;
  *     DayPartitionRule rule =
  *      new DayPartitionBuilder()
  *          .addExclusion(PlainDate.of(2016, 8, 27))
- *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+ *          .addWeekdayRule(MONDAY, FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(16, 0)))
- *          .addWeekdayRule(TUESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
- *          .addWeekdayRule(WEDNESDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
- *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
- *          .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
  *          .build();
  *
  *      List&lt;TimestampInterval&gt; intervals = // ermittelt alle Intervalle f&uuml;r August und September 2016
@@ -170,6 +162,34 @@ public class DayPartitionBuilder {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Adds a rule to partition any calendar date. </p>
+     *
+     * @param   partition   a clock interval
+     * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if there is no canonical form of given interval (for example for [00:00/24:00])
+     * @see     IsoInterval#toCanonical()
+     * @since   4.20
+     */
+    /*[deutsch]
+     * <p>F&uuml;gt eine Regel hinzu, die irgendeinen Kalendertag passend zerlegt. </p>
+     *
+     * @param   partition   a clock interval
+     * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if there is no canonical form of given interval (for example for [00:00/24:00])
+     * @see     IsoInterval#toCanonical()
+     * @since   4.20
+     */
+    public DayPartitionBuilder addDailyRule(ClockInterval partition) {
+
+        for (Weekday dayOfWeek : Weekday.values()) {
+            this.addWeekdayRule(dayOfWeek, partition);
+        }
+
+        return this;
+
+    }
+
+    /**
      * <p>Adds a rule to partition a date dependending on its day of week. </p>
      *
      * <p>This method can be called multiple times for the same day of week in order to define
@@ -220,6 +240,55 @@ public class DayPartitionBuilder {
         } catch (IllegalStateException ise) {
             throw new IllegalArgumentException(ise);
         }
+
+    }
+
+    /**
+     * <p>Adds a rule to partition a date dependending on when its day of week falls into given range. </p>
+     *
+     * <p>This method can be called multiple times using the same arguments in order to define
+     * more than one disjunct partition. </p>
+     *
+     * @param   from        starting day of week
+     * @param   to          ending day of week
+     * @param   partition   a clock interval
+     * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if there is no canonical form of given interval (for example for [00:00/24:00])
+     * @see     IsoInterval#toCanonical()
+     * @since   4.20
+     */
+    /*[deutsch]
+     * <p>F&uuml;gt eine Regel hinzu, die einen Kalendertag in Abh&auml;ngigkeit davon zerlegt, ob
+     * dessen Wochentag in den angegebenen Wochentagsbereich f&auml;llt. </p>
+     *
+     * <p>Diese Methode kann mehrmals mit den gleichen Parametern aufgerufen werden, um mehr als einen
+     * Tagesabschnitt zu definieren. </p>
+     *
+     * @param   from        starting day of week
+     * @param   to          ending day of week (inclusive)
+     * @param   partition   a clock interval
+     * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if there is no canonical form of given interval (for example for [00:00/24:00])
+     * @see     IsoInterval#toCanonical()
+     * @since   4.20
+     */
+    public DayPartitionBuilder addWeekdayRule(
+        Weekday from,
+        Weekday to,
+        ClockInterval partition
+    ) {
+
+        if (to.equals(from)) {
+            return this.addWeekdayRule(from, partition);
+        }
+
+        Weekday current = from;
+
+        do {
+            this.addWeekdayRule(current, partition);
+        } while (!(current = current.next()).equals(to));
+
+        return this.addWeekdayRule(to, partition);
 
     }
 

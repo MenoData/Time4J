@@ -23,6 +23,7 @@ package net.time4j.range;
 
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 
 import java.util.Collections;
 import java.util.List;
@@ -113,6 +114,35 @@ public interface DayPartitionRule {
      */
     default boolean isExcluded(PlainDate date) {
         return this.getPartition(date).isEmpty();
+    }
+
+    /**
+     * <p>Does this rule match given timestamp such that any rule interval contains it? </p>
+     *
+     * <p>Example: If this rule describes shop opening times then this method yields the answer to the
+     * question if the shop is open at given timestamp. </p>
+     *
+     * @param   timestamp   the timestamp to be checked
+     * @return  {@code true} if given timestamp fits to this rule else {@code false}
+     * @since   4.20
+     */
+    /*[deutsch]
+     * <p>Pr&uuml;ft, ob irgendein Zeitintervall dieser Regel den angegebenen Zeitstempel enth&auml;lt. </p>
+     *
+     * <p>Beispiel: Wenn diese Regel Laden&ouml;ffnungszeiten beschreibt, dann liefert diese Methode die
+     * Antwort auf die Frage, ob der Laden zur angegebenen Zeit offen ist. </p>
+     *
+     * @param   timestamp   the timestamp to be checked
+     * @return  {@code true} if given timestamp fits to this rule else {@code false}
+     * @since   4.20
+     */
+    default boolean matches(PlainTimestamp timestamp) {
+        for (ChronoInterval<PlainTime> interval : this.getPartition(timestamp.toDate())) {
+            if (interval.contains(timestamp.toTime())) {
+                return true;
+            }
+        }
+        return false;
     }
 
 }
