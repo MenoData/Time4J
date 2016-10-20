@@ -288,6 +288,7 @@ public interface ChronoMerger<T> {
      * @return  new time context or {@code null} if given data are insufficient
      * @throws  IllegalArgumentException in any case of inconsistent data
      * @since   4.0
+     * @deprecated Use new {@link BridgeChronology bridge chronology}
      */
     /*[deutsch]
      * <p>Konstruiert eine neue Entit&auml;t basierend auf den angegebenen
@@ -302,7 +303,9 @@ public interface ChronoMerger<T> {
      * @return  new time context or {@code null} if given data are insufficient
      * @throws  IllegalArgumentException in any case of inconsistent data
      * @since   4.0
+     * @deprecated Use new {@link BridgeChronology bridge chronology}
      */
+    @Deprecated
     default T createFrom(
         TemporalAccessor threeten,
         AttributeQuery attributes

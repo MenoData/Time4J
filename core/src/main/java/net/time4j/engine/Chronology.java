@@ -237,6 +237,7 @@ public class Chronology<T>
     }
 
     @Override
+    @Deprecated
     public T createFrom(
         TemporalAccessor threeten,
         AttributeQuery attributes

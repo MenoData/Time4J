@@ -581,6 +581,7 @@ public final class ChronoFormatter<T>
      * @return  formatted text
      * @throws  IllegalArgumentException if given argument cannot be formatted
      * @since   4.0
+     * @deprecated Use alternative approach based on static factory methods and bridge chronology
      */
     /*[deutsch]
      * <p>Formatiert das angegebene Threeten-Objekt. </p>
@@ -589,7 +590,9 @@ public final class ChronoFormatter<T>
      * @return  formatted text
      * @throws  IllegalArgumentException if given argument cannot be formatted
      * @since   4.0
+     * @deprecated Use alternative approach based on static factory methods and bridge chronology
      */
+    @Deprecated
     public String formatThreeten(TemporalAccessor formattable) {
 
         T entity = this.toEntity(formattable);
@@ -636,6 +639,7 @@ public final class ChronoFormatter<T>
      * @throws  IllegalArgumentException if given object is not formattable
      * @throws  IOException if writing to buffer fails
      * @since   4.0
+     * @deprecated Use alternative approach based on static factory methods and bridge chronology
      */
     /*[deutsch]
      * <p>Formatiert das angegebene Threeten-Objekt als Text und schreibt ihn in
@@ -649,7 +653,9 @@ public final class ChronoFormatter<T>
      * @throws  IllegalArgumentException if given object is not formattable
      * @throws  IOException if writing to buffer fails
      * @since   4.0
+     * @deprecated Use alternative approach based on static factory methods and bridge chronology
      */
+    @Deprecated
     public Set<ElementPosition> printThreeten(
         TemporalAccessor formattable,
         Appendable buffer
