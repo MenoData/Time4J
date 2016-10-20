@@ -1,5 +1,6 @@
 ## [v4.20] not yet released
 ### Added
+- Open ChronoFormatter for external types [#556]
 - Add some convenient methods around day partition rules [#563]
 - Week calculations for non-ISO calendars [#562]
 - Add convenient methods to PrettyTime [#559]
@@ -7,6 +8,9 @@
 
 ### Fixed
 - Document pattern order in case of or-logic applied [#558]
+
+### Deprecated
+- Specialized threeten-methods outdated due to a more general approach [#556]
 
 ## [v4.19] published on 2016-09-18
 ### Added
