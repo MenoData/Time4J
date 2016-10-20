@@ -1,5 +1,6 @@
 ## [v3.24] not yet released
 ### Added
+- Open ChronoFormatter for external types [#556]
 - Week calculations for non-ISO calendars [#562]
 - Add convenient methods to PrettyTime [#559]
 - New method nowInSystemTime() also for CalendarXYZ-types [#557]
