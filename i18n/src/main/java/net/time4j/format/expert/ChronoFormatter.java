@@ -6087,7 +6087,8 @@ public final class ChronoFormatter<T>
         Builder<T> addYear(
             ChronoElement<Integer> element,
             int count,
-            boolean protectedMode
+            boolean protectedMode,
+            boolean threeten
         ) {
 
             FormatStep last = (this.steps.isEmpty() ? null : this.steps.get(this.steps.size() - 1));
@@ -6098,7 +6099,8 @@ public final class ChronoFormatter<T>
                 || !last.isNumerical()
                 || (count != 4)
             ) {
-                SignPolicy signPolicy = ((count < 4) ? SignPolicy.SHOW_WHEN_NEGATIVE : SignPolicy.SHOW_WHEN_BIG_NUMBER);
+                SignPolicy signPolicy = (
+                    (count < 4 || !threeten) ? SignPolicy.SHOW_WHEN_NEGATIVE : SignPolicy.SHOW_WHEN_BIG_NUMBER);
                 return this.addNumber(element, false, count, 9, signPolicy, protectedMode);
             }
 

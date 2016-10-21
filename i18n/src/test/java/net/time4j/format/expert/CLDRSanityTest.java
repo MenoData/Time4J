@@ -1,11 +1,15 @@
 package net.time4j.format.expert;
 
+import net.time4j.PlainDate;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.util.Locale;
+
+import static org.hamcrest.CoreMatchers.is;
+import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
@@ -54,6 +58,26 @@ public class CLDRSanityTest {
     @Test(expected=IllegalArgumentException.class)
     public void momentPattern_yyyy_MM_DD() {
         ChronoFormatter.ofMomentPattern("yyyy-MM-DD HH:mmXXX", PatternType.CLDR, Locale.ENGLISH, ZonalOffset.UTC);
+    }
+
+    @Test
+    public void testSignStyleOfBigYears() {
+        assertThat(
+            ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR, Locale.ROOT)
+                .format(PlainDate.of(10000, 1, 1)),
+            is("10000-01-01"));
+        assertThat(
+            ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.CLDR_24, Locale.ROOT)
+                .format(PlainDate.of(10000, 1, 1)),
+            is("10000-01-01"));
+        assertThat(
+            ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.SIMPLE_DATE_FORMAT, Locale.ROOT)
+                .format(PlainDate.of(10000, 1, 1)),
+            is("10000-01-01"));
+        assertThat(
+            ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.THREETEN, Locale.ROOT)
+                .format(PlainDate.of(10000, 1, 1)),
+            is("+10000-01-01"));
     }
 
 }

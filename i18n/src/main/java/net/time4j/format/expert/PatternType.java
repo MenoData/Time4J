@@ -1464,23 +1464,23 @@ public enum PatternType
                 if (count == 2) {
                     builder.addTwoDigitYear(PlainDate.YEAR);
                 } else {
-                    builder.addYear(PlainDate.YEAR, count, false);
+                    builder.addYear(PlainDate.YEAR, count, false, false);
                 }
                 break;
             case 'Y':
                 if (count == 2) {
                     builder.addTwoDigitYear(PlainDate.YEAR_OF_WEEKDATE);
                 } else {
-                    builder.addYear(PlainDate.YEAR_OF_WEEKDATE, count, false);
+                    builder.addYear(PlainDate.YEAR_OF_WEEKDATE, count, false, false);
                 }
                 break;
             case 'u':
-                builder.addYear(PlainDate.YEAR, count, true);
+                builder.addYear(PlainDate.YEAR, count, true, false);
                 break;
             case 'r':
                 builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
                 builder.startSection(Attributes.ZERO_DIGIT, '0');
-                builder.addYear(PlainDate.YEAR, count, true);
+                builder.addYear(PlainDate.YEAR, count, true, false);
                 builder.endSection();
                 builder.endSection();
                 break;
@@ -1819,7 +1819,7 @@ public enum PatternType
                     builder.addTwoDigitYear(PlainDate.YEAR);
                     builder.endSection();
                 } else {
-                    builder.addYear(PlainDate.YEAR, count, false);
+                    builder.addYear(PlainDate.YEAR, count, false, true);
                 }
                 break;
             case 'Y':
@@ -1828,7 +1828,7 @@ public enum PatternType
                     builder.addTwoDigitYear(PlainDate.YEAR_OF_WEEKDATE);
                     builder.endSection();
                 } else {
-                    builder.addYear(PlainDate.YEAR_OF_WEEKDATE, count, false);
+                    builder.addYear(PlainDate.YEAR_OF_WEEKDATE, count, false, true);
                 }
                 break;
             case 'u':
@@ -1837,7 +1837,7 @@ public enum PatternType
                     builder.addProlepticIsoYearWithTwoDigits();
                     builder.endSection();
                 } else {
-                    builder.addYear(PlainDate.YEAR, count, true);
+                    builder.addYear(PlainDate.YEAR, count, true, true);
                 }
                 break;
             case 'W':
@@ -2155,7 +2155,7 @@ public enum PatternType
                 if (count == 2) {
                     builder.addTwoDigitYear(intElement);
                 } else {
-                    builder.addYear(intElement, count, false);
+                    builder.addYear(intElement, count, false, false);
                 }
                 if (hasSpecialAttribute) {
                     builder.endSection();
@@ -2164,7 +2164,7 @@ public enum PatternType
             case 'r':
                 builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
                 builder.startSection(Attributes.ZERO_DIGIT, '0');
-                builder.addYear(intElement, count, true);
+                builder.addYear(intElement, count, true, false);
                 builder.endSection();
                 builder.endSection();
                 break;
