@@ -2099,7 +2099,9 @@ public final class ChronoFormatter<T>
      *     (D is the day of year but not the day of month)</li>
      * </ul>
      *
-     * <p>Note that this check will only be done here but not on builder level (since v4.20). </p>
+     * <p>Note that this check will only be done here but not on builder level (since v4.20). The
+     * check does not claim to find all insane combinations of symbols but intends to prevent at least
+     * the most wide-spread pattern errors. </p>
      *
      * @param   <T> generic chronological type
      * @param   pattern     format pattern
@@ -2127,7 +2129,8 @@ public final class ChronoFormatter<T>
      * </ul>
      *
      * <p>Hinweis: Diese Pr&uuml;fung wird hier, aber nicht im {@code ChronoFormatter.Builder}
-     * durchgef&uuml;hrt (seit v4.20). </p>
+     * durchgef&uuml;hrt (seit v4.20). Sie hat auch nicht den Anspruch, alle ungesunden Kombinationen
+     * zu finden, sondern soll lediglich einige besonders h&auml;ufige Fehlerquellen abdecken. </p>
      *
      * @param   <T> generic chronological type
      * @param   pattern     format pattern
