@@ -8,6 +8,9 @@
 ### Fixed
 - Document pattern order in case of or-logic applied [#558]
 
+### Changed
+- Add simple sanity checks for cldr-format patterns [#565]
+
 ## [v3.23] published on 2016-09-18
 ### Added
 - Add historic centuries [#507]
