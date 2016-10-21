@@ -1,0 +1,59 @@
+package net.time4j.format.expert;
+
+import net.time4j.tz.ZonalOffset;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
+
+import java.util.Locale;
+
+
+@RunWith(JUnit4.class)
+public class CLDRSanityTest {
+
+    @Test(expected=IllegalArgumentException.class)
+    public void timePattern_hh_mm() {
+        ChronoFormatter.ofTimePattern("hh:mm", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void timestampPattern_hh_mm() {
+        ChronoFormatter.ofTimestampPattern("yyyy-MM-dd hh:mm", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void momentPattern_hh_mm() {
+        ChronoFormatter.ofMomentPattern("yyyy-MM-dd hh:mmXXX", PatternType.CLDR, Locale.ENGLISH, ZonalOffset.UTC);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void datePattern_YYYY_MM_DD() {
+        ChronoFormatter.ofDatePattern("YYYY-MM-DD", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void timestampPattern_YYYY_MM_DD() {
+        ChronoFormatter.ofTimestampPattern("YYYY-MM-DD HH:mm", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void momentPattern_YYYY_MM_DD() {
+        ChronoFormatter.ofMomentPattern("YYYY-MM-DD HH:mmXXX", PatternType.CLDR, Locale.ENGLISH, ZonalOffset.UTC);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void datePattern_yyyy_MM_DD() {
+        ChronoFormatter.ofDatePattern("yyyy-MM-DD", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void timestampPattern_yyyy_MM_DD() {
+        ChronoFormatter.ofTimestampPattern("yyyy-MM-DD HH:mm", PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void momentPattern_yyyy_MM_DD() {
+        ChronoFormatter.ofMomentPattern("yyyy-MM-DD HH:mmXXX", PatternType.CLDR, Locale.ENGLISH, ZonalOffset.UTC);
+    }
+
+}
