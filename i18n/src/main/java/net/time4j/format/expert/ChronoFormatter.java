@@ -1822,6 +1822,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     /*[deutsch]
@@ -1832,6 +1833,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     public static ChronoFormatter<PlainDate> ofDatePattern(
@@ -1841,7 +1843,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<PlainDate> builder = new Builder<PlainDate>(PlainDate.axis(), locale);
-        builder.addPattern(pattern, type);
+        addPattern(builder, pattern, type);
 
         try {
             return builder.build();
@@ -1859,6 +1861,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     /*[deutsch]
@@ -1869,6 +1872,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     public static ChronoFormatter<PlainTime> ofTimePattern(
@@ -1878,7 +1882,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<PlainTime> builder = new Builder<PlainTime>(PlainTime.axis(), locale);
-        builder.addPattern(pattern, type);
+        addPattern(builder, pattern, type);
 
         try {
             return builder.build();
@@ -1896,6 +1900,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     /*[deutsch]
@@ -1906,6 +1911,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     public static ChronoFormatter<PlainTimestamp> ofTimestampPattern(
@@ -1915,7 +1921,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<PlainTimestamp> builder = new Builder<PlainTimestamp>(PlainTimestamp.axis(), locale);
-        builder.addPattern(pattern, type);
+        addPattern(builder, pattern, type);
 
         try {
             return builder.build();
@@ -1934,6 +1940,7 @@ public final class ChronoFormatter<T>
      * @param   tzid        timezone id
      * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     /*[deutsch]
@@ -1945,6 +1952,7 @@ public final class ChronoFormatter<T>
      * @param   tzid        timezone id
      * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
     public static ChronoFormatter<Moment> ofMomentPattern(
@@ -1955,7 +1963,8 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<Moment> builder = new Builder<Moment>(Moment.axis(), locale);
-        builder.addPattern(pattern, type);
+        addPattern(builder, pattern, type);
+
         try {
             return builder.build().withTimezone(tzid);
         } catch (IllegalStateException ise) {
@@ -1966,6 +1975,20 @@ public final class ChronoFormatter<T>
 
     /**
      * <p>Constructs a pattern-based formatter for general chronologies. </p>
+     *
+     * <p>If given pattern type is equal to CLDR or derived from CLDR then an additional
+     * sanity check will be performed such that following combinations of symbols are excluded: </p>
+     *
+     * <ul>
+     *     <li>&quot;h&quot; or &quot;K&quot; without &quot;a&quot; or &quot;b&quot; or &quot;B&quot;
+     *     (12-hour-clock requires am/pm-marker or dayperiod)</li>
+     *     <li>&quot;Y&quot; with &quot;M&quot; or &quot;L&quot; but without &quot;w&quot;
+     *     (Y as week-based-year requires a week-date-format)</li>
+     *     <li>&quot;D&quot; with &quot;M&quot; or &quot;L&quot; but without &quot;d&quot;
+     *     (D is the day of year but not the day of month)</li>
+     * </ul>
+     *
+     * <p>Note that this check will only be done here but not on builder level (since v3.24). </p>
      *
      * @param   <T> generic chronological type
      * @param   pattern     format pattern
@@ -1979,6 +2002,21 @@ public final class ChronoFormatter<T>
      */
     /*[deutsch]
      * <p>Konstruiert einen musterbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
+     *
+     * <p>Falls der Mustertyp gleich CLDR oder von CLDR abgeleitet ist, wird eine zus&auml;tzliche
+     * Musterpr&uuml;fung ausgef&uuml;hrt, die folgende Symbolkombinationen ausschlie&szlig;t: </p>
+     *
+     * <ul>
+     *     <li>&quot;h&quot; oder &quot;K&quot; ohne &quot;a&quot; oder &quot;b&quot; oder &quot;B&quot;
+     *     (12-Stunden-Uhr erfordert eine am/pm-Kennung oder einen Tagesabschnitt)</li>
+     *     <li>&quot;Y&quot; mit &quot;M&quot; oder &quot;L&quot; aber ohne &quot;w&quot;
+     *     (Y als wochenbasiertes Jahr erfordert ein wochenbasiertes Format)</li>
+     *     <li>&quot;D&quot; mit &quot;M&quot; oder &quot;L&quot; aber ohne &quot;d&quot;
+     *     (D ist der Tag des Jahres, nicht des Monats)</li>
+     * </ul>
+     *
+     * <p>Hinweis: Diese Pr&uuml;fung wird hier, aber nicht im {@code ChronoFormatter.Builder}
+     * durchgef&uuml;hrt (seit v3.24). </p>
      *
      * @param   <T> generic chronological type
      * @param   pattern     format pattern
@@ -1998,7 +2036,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<T> builder = new Builder<T>(chronology, locale);
-        builder.addPattern(pattern, type);
+        addPattern(builder, pattern, type);
 
         try {
             return builder.build();
@@ -2651,6 +2689,44 @@ public final class ChronoFormatter<T>
     ) {
 
         return ((obj1 == null) ? (obj2 == null) : obj1.equals(obj2));
+
+    }
+
+    private static <T> void addPattern(
+        Builder<T> builder,
+        String pattern,
+        PatternType type
+    ) {
+
+        switch (type) {
+            case CLDR:
+            case CLDR_24:
+            case SIMPLE_DATE_FORMAT:
+            case NON_ISO_DATE:
+                if (pattern.contains("h") || pattern.contains("K")) {
+                    if (!pattern.contains("a") && !pattern.contains("b") && !pattern.contains("B")) {
+                        throw new IllegalArgumentException(
+                            "12-hour-clock requires am/pm-marker or dayperiod: " + pattern);
+                    }
+                }
+                if (pattern.contains("Y")) {
+                    if ((pattern.contains("M") || pattern.contains("L")) && !pattern.contains("w")) {
+                        throw new IllegalArgumentException(
+                            "Y as week-based-year requires a week-date-format: " + pattern);
+                    }
+                }
+                if (pattern.contains("D")) {
+                    if ((pattern.contains("M") || pattern.contains("L")) && !pattern.contains("d")) {
+                        throw new IllegalArgumentException(
+                            "D is the day of year but not the day of month: " + pattern);
+                    }
+                }
+                break;
+            default:
+                // no sanity check
+        }
+
+        builder.addPattern(pattern, type);
 
     }
 
