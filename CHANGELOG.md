@@ -9,6 +9,9 @@
 ### Fixed
 - Document pattern order in case of or-logic applied [#558]
 
+### Changed
+- Add simple sanity checks for cldr-format patterns [#565]
+
 ### Deprecated
 - Specialized threeten-methods outdated due to a more general approach [#556]
 
