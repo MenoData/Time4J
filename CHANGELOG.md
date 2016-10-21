@@ -6,6 +6,7 @@
 - New method nowInSystemTime() also for CalendarXYZ-types [#557]
 
 ### Fixed
+- Years in far future should not require a positive sign [#569]
 - Document pattern order in case of or-logic applied [#558]
 
 ### Changed
