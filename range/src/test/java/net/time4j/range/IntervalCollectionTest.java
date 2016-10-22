@@ -2,6 +2,7 @@ package net.time4j.range;
 
 import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
@@ -35,7 +36,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27),
                 PlainDate.of(2014, 6, 1));
         List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         intervals = // sorted!
@@ -72,7 +73,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27),
                 PlainDate.of(2014, 6, 1));
         List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         assertThat(
@@ -89,7 +90,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27),
                 PlainDate.of(2014, 6, 1));
         List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         assertThat(
@@ -108,7 +109,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27),
                 PlainDate.of(2014, 6, 1));
         List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         assertThat(
@@ -131,7 +132,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27),
                 PlainDate.of(2014, 6, 1));
         List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         intervals.add(i3);
@@ -155,7 +156,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27).atStartOfDay(),
                 PlainDate.of(2014, 6, 1).atStartOfDay());
         List<ChronoInterval<PlainTimestamp>> intervals =
-            new ArrayList<ChronoInterval<PlainTimestamp>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         intervals.add(i3);
@@ -179,7 +180,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27).atStartOfDay(),
                 PlainDate.of(2014, 6, 1).atStartOfDay());
         List<ChronoInterval<PlainTimestamp>> intervals =
-            new ArrayList<ChronoInterval<PlainTimestamp>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         intervals.add(i3);
@@ -197,7 +198,7 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 2, 27),
                 PlainDate.of(2014, 6, 1));
         List<ChronoInterval<PlainDate>> intervals =
-            new ArrayList<ChronoInterval<PlainDate>>();
+            new ArrayList<>();
         intervals.add(i1);
         intervals.add(i2);
         assertThat(
@@ -1007,6 +1008,193 @@ public class IntervalCollectionTest {
                 .plus(MomentInterval.between(d4, d5))
                 .plus(MomentInterval.between(d6, d7));
         assertThat(result, is(expected));
+    }
+
+    @Test
+    public void splittedDateIntervals() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 1),
+                PlainDate.of(2014, 4, 5));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i4 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3).plus(i4);
+        List<ChronoInterval<PlainDate>> splits =
+            windows.withSplits().getIntervals();
+        ChronoInterval<PlainDate> first =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 3, 31));
+        ChronoInterval<PlainDate> second = i2;
+        ChronoInterval<PlainDate> third =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 6),
+                PlainDate.of(2014, 4, 9));
+        ChronoInterval<PlainDate> fourth =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 10),
+                PlainDate.of(2014, 5, 31));
+        ChronoInterval<PlainDate> fifth = DateInterval.atomic(PlainDate.of(2014, 6, 1));
+        ChronoInterval<PlainDate> sixth = i4;
+
+        assertThat(splits.size(), is(6));
+        assertThat(splits.get(0), is(first));
+        assertThat(splits.get(1), is(second));
+        assertThat(splits.get(2), is(third));
+        assertThat(splits.get(3), is(fourth));
+        assertThat(splits.get(4), is(fifth));
+        assertThat(splits.get(5), is(sixth));
+    }
+
+    @Test
+    public void splittedTimeIntervals() {
+        ClockInterval i1 =
+            ClockInterval.between(
+                PlainTime.of(9, 28),
+                PlainTime.of(20, 31));
+        ClockInterval i2 =
+            ClockInterval.between(
+                PlainTime.of(10, 1),
+                PlainTime.of(11, 5));
+        ClockInterval i3 =
+            ClockInterval.between(
+                PlainTime.of(12),
+                PlainTime.of(20, 31, 1));
+        ClockInterval i4 =
+            ClockInterval.between(
+                PlainTime.of(22, 15),
+                PlainTime.of(24));
+        IntervalCollection<PlainTime> windows = IntervalCollection.onClockAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3).plus(i4);
+        List<ChronoInterval<PlainTime>> splits =
+            windows.withSplits().getIntervals();
+        ChronoInterval<PlainTime> first =
+            ClockInterval.between(
+                PlainTime.of(9, 28),
+                PlainTime.of(10, 1));
+        ChronoInterval<PlainTime> second = i2;
+        ChronoInterval<PlainTime> third =
+            ClockInterval.between(
+                PlainTime.of(11, 5),
+                PlainTime.of(12));
+        ChronoInterval<PlainTime> fourth =
+            ClockInterval.between(
+                PlainTime.of(12),
+                PlainTime.of(20, 31));
+        ChronoInterval<PlainTime> fifth =
+            ClockInterval.between(
+                PlainTime.of(20, 31),
+                PlainTime.of(20, 31, 1));
+        ChronoInterval<PlainTime> sixth = i4;
+
+        assertThat(splits.size(), is(6));
+        assertThat(splits.get(0), is(first));
+        assertThat(splits.get(1), is(second));
+        assertThat(splits.get(2), is(third));
+        assertThat(splits.get(3), is(fourth));
+        assertThat(splits.get(4), is(fifth));
+        assertThat(splits.get(5), is(sixth));
+    }
+
+    @Test
+    public void splittedDatesInfinite() {
+        DateInterval i1 =
+            DateInterval.since(PlainDate.of(2016, 8, 1));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2016, 2, 1),
+                PlainDate.of(2016, 2, 29));
+        DateInterval i3 =
+            DateInterval.since(PlainDate.of(2016, 4, 1));
+        DateInterval i4 =
+            DateInterval.until(PlainDate.of(2016, 2, 1));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3).plus(i4);
+
+        List<ChronoInterval<PlainDate>> splits =
+            windows.withSplits().getIntervals();
+        ChronoInterval<PlainDate> expected0 =
+            DateInterval.until(PlainDate.of(2016, 1, 31));
+        ChronoInterval<PlainDate> expected1 =
+            DateInterval.atomic(PlainDate.of(2016, 2, 1));
+        ChronoInterval<PlainDate> expected2 =
+            DateInterval.between(
+                PlainDate.of(2016, 2, 2),
+                PlainDate.of(2016, 2, 29));
+        ChronoInterval<PlainDate> expected3 =
+            DateInterval.between(
+                PlainDate.of(2016, 4, 1),
+                PlainDate.of(2016, 7, 31));
+        ChronoInterval<PlainDate> expected4 = i1;
+
+        assertThat(splits.size(), is(5));
+        assertThat(splits.get(0), is(expected0));
+        assertThat(splits.get(1), is(expected1));
+        assertThat(splits.get(2), is(expected2));
+        assertThat(splits.get(3), is(expected3));
+        assertThat(splits.get(4), is(expected4));
+    }
+
+    @Test
+    public void splittedTime24() {
+        ClockInterval i1 =
+            ClockInterval.since(PlainTime.of(13, 0));
+        ChronoInterval<PlainTime> i2 =
+            ClockInterval.between(
+                PlainTime.of(11, 15),
+                PlainTime.of(12));
+        ClockInterval i3 =
+            ClockInterval.since(PlainTime.of(19, 10));
+        IntervalCollection<PlainTime> windows = IntervalCollection.onClockAxis();
+        windows = windows.plus(i1).plus(i2).plus(i3);
+
+        List<ChronoInterval<PlainTime>> splits =
+            windows.withSplits().getIntervals();
+        ChronoInterval<PlainTime> expected1 = i2;
+        ChronoInterval<PlainTime> expected2 =
+            ClockInterval.between(
+                PlainTime.of(13),
+                PlainTime.of(19, 10));
+        ChronoInterval<PlainTime> expected3 =
+            ClockInterval.between(
+                PlainTime.of(19, 10),
+                PlainTime.of(24));
+
+        assertThat(splits.size(), is(3));
+        assertThat(splits.get(0), is(expected1));
+        assertThat(splits.get(1), is(expected2));
+        assertThat(splits.get(2), is(expected3));
+    }
+
+    @Test
+    public void splitsIfSingleInterval() {
+        DateInterval interval =
+            DateInterval.since(PlainDate.of(2014, 2, 28));
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis().plus(interval);
+
+        List<ChronoInterval<PlainDate>> splits =
+            windows.withSplits().getIntervals();
+        ChronoInterval<PlainDate> expected = interval;
+
+        assertThat(splits.size(), is(1));
+        assertThat(splits.get(0), is(expected));
+    }
+
+    @Test
+    public void splitsIfNoInterval() {
+        IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
+        assertThat(windows.withSplits().isEmpty(), is(true));
     }
 
 }

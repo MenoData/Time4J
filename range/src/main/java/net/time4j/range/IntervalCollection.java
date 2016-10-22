@@ -206,7 +206,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Gibt eine Antwort ob diese Instanz keine Intervalle enth&auml;lt. </p>
+     * <p>Gibt eine Antwort, ob diese Instanz keine Intervalle enth&auml;lt. </p>
      *
      * @return  {@code true} if there are no intervals else {@code false}
      * @since   2.0
@@ -214,6 +214,34 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     public boolean isEmpty() {
 
         return this.intervals.isEmpty();
+
+    }
+
+    /**
+     * <p>Queries if any interval of this collection contains given temporal. </p>
+     *
+     * @param   temporal    time point to be queried
+     * @return  {@code true} if given time point belongs to any interval of this collection else {@code false}
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Fragt ab, ob irgendein Intervall dieser Menge den angegebenen Zeitpunkt enth&auml;lt. </p>
+     *
+     * @param   temporal    time point to be queried
+     * @return  {@code true} if given time point belongs to any interval of this collection else {@code false}
+     * @since   3.24/4.20
+     */
+    public boolean contains(T temporal) {
+
+        for (ChronoInterval<T> interval : this.intervals) {
+            if (interval.contains(temporal)) {
+                return true;
+            } else if (interval.isAfter(temporal)) {
+                break;
+            }
+        }
+
+        return false;
 
     }
 
@@ -466,6 +494,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *
      * @param   other       another interval collection whose intervals are to be added to this instance
      * @return  new interval collection containing the intervals of this instance and the argument
+     * @throws  IllegalArgumentException if given collection contains a finite
+     *          interval with open start which cannot be adjusted to one with closed start
      * @since   3.7/4.5
      */
     /*[deutsch]
@@ -473,6 +503,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *
      * @param   other       another interval collection whose intervals are to be added to this instance
      * @return  new interval collection containing the intervals of this instance and the argument
+     * @throws  IllegalArgumentException if given collection contains a finite
+     *          interval with open start which cannot be adjusted to one with closed start
      * @since   3.7/4.5
      */
     public IntervalCollection<T> plus(IntervalCollection<T> other) {
@@ -621,6 +653,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *
      * @param   other       another interval collection whose intervals are to be subtracted from this instance
      * @return  new interval collection containing all timepoints of this instance excluding those of argument
+     * @throws  IllegalArgumentException if given collection contains a finite
+     *          interval with open start which cannot be adjusted to one with closed start
      * @since   3.7/4.5
      */
     /*[deutsch]
@@ -628,6 +662,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *
      * @param   other       another interval collection whose intervals are to be subtracted from this instance
      * @return  new interval collection containing all timepoints of this instance excluding those of argument
+     * @throws  IllegalArgumentException if given collection contains a finite
+     *          interval with open start which cannot be adjusted to one with closed start
      * @since   3.7/4.5
      */
     public IntervalCollection<T> minus(IntervalCollection<T> other) {
@@ -857,22 +893,24 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     }
 
     /**
-     * <p>Combines all intervals to disjunct blocks which never overlap. </p>
+     * <p>Combines all intervals to disjunct blocks which neither overlap nor meet each other. </p>
      *
-     * <p>Any overlapping intervals will be merged to one block. </p>
+     * <p>Any overlapping or abutting intervals will be merged to one block. If the interval boundaries
+     * are still to be kept then consider {@link #withSplits()} instead. </p>
      *
-     * @return  new interval collection containing disjunct blocks
+     * @return  new interval collection containing disjunct merged blocks
      *          while this instance remains unaffected
      * @since   2.0
      */
     /*[deutsch]
      * <p>Kombiniert alle Intervalle zu disjunkten Bl&ouml;cken, die sich
-     * nicht &uuml;berlappen. </p>
+     * weder &uuml;berlappen noch ber&uuml;hren. </p>
      *
-     * <p>Alle Intervalle, die sich &uuml;berlappen, werden zu jeweils
-     * einem Block verschmolzen. </p>
+     * <p>Alle Intervalle, die sich &uuml;berlappen oder sich ber&uuml;hren, werden zu jeweils
+     * einem Block verschmolzen. Wenn die Intervallgrenzen noch erhalten bleiben sollen, dann
+     * ist {@link #withSplits()} wahrscheinlich die sinnvollere Methode. </p>
      *
-     * @return  new interval collection containing disjunct blocks
+     * @return  new interval collection containing disjunct merged blocks
      *          while this instance remains unaffected
      * @since   2.0
      */
@@ -929,6 +967,99 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         blocks.add(this.newInterval(s, e));
         return this.create(blocks);
+
+    }
+
+    /**
+     * <p>Combines all intervals to disjunct blocks which never overlap but still might meet each other. </p>
+     *
+     * <p>Similar to {@link #withBlocks()} but all boundaries will be temporally conserved. </p>
+     *
+     * @return  new interval collection containing disjunct splitted sections
+     *          while this instance remains unaffected
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Kombiniert alle Intervalle zu disjunkten Bl&ouml;cken, die sich
+     * nicht &uuml;berlappen, aber noch sich ber&uuml;hren k&ouml;nnen. </p>
+     *
+     * <p>&Auml;hnlich wie {@link #withBlocks()}, aber alle Intervallgrenzen werden zeitlich beibehalten. </p>
+     *
+     * @return  new interval collection containing disjunct splitted sections
+     *          while this instance remains unaffected
+     * @since   3.24/4.20
+     */
+    public IntervalCollection<T> withSplits() {
+
+        if (this.intervals.size() < 2) {
+            return this;
+        }
+
+        List<Boundary<T>> dividers = new ArrayList<>(); // always finite
+        Boundary<T> infinitePast = null;
+        Boundary<T> infiniteFuture = null;
+
+        for (ChronoInterval<T> interval : this.intervals) {
+            Boundary<T> start = interval.getStart();
+            Boundary<T> end = interval.getEnd();
+
+            if (start.isInfinite()) {
+                infinitePast = Boundary.infinitePast();
+            } else {
+                int index = searchFiniteBoundary(dividers, start);
+                if (index < 0) {
+                    dividers.add(-index - 1, start);
+                }
+            }
+
+            if (end.isInfinite()) {
+                infiniteFuture = Boundary.infiniteFuture();
+            } else {
+                if (end.isClosed()) {
+                    T time = this.getTimeLine().stepForward(end.getTemporal());
+                    if (time == null) {
+                        infiniteFuture = Boundary.infiniteFuture();
+                        continue;
+                    }
+                    end = Boundary.ofClosed(time);
+                } else {
+                    end = Boundary.ofClosed(end.getTemporal());
+                }
+                int index = searchFiniteBoundary(dividers, end);
+                if (index < 0) {
+                    dividers.add(-index - 1, end);
+                }
+            }
+        }
+
+        List<ChronoInterval<T>> splitted = new ArrayList<>();
+        Boundary<T> start = infinitePast;
+
+        for (Boundary<T> divider : dividers) {
+            T time = divider.getTemporal();
+            boolean nextInterval = this.contains(time);
+            if (start != null) {
+                if (this.isCalendrical()) {
+                    time = this.getTimeLine().stepBackwards(time);
+                    if (time != null) {
+                        splitted.add(this.newInterval(start, Boundary.ofClosed(time)));
+                    }
+                } else {
+                    splitted.add(this.newInterval(start, Boundary.ofOpen(time)));
+                }
+            }
+            if (nextInterval) {
+                start = divider;
+            } else {
+                start = null;
+            }
+        }
+
+        if ((start != null) && (infiniteFuture != null)) {
+            splitted.add(this.newInterval(start, infiniteFuture));
+        }
+
+        return this.create(splitted);
 
     }
 
@@ -1381,6 +1512,34 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             ChronoInterval<T> interval = this.newInterval(s, e);
             return Collections.singletonList(interval);
         }
+
+    }
+
+    private static <T extends Temporal<? super T>> int searchFiniteBoundary(
+        List<Boundary<T>> list,
+        Boundary<T> key
+    ) {
+
+        int low = 0;
+        int high = list.size()-1;
+
+        while (low <= high) {
+            int mid = (low + high) >>> 1;
+            Boundary<T> midVal = list.get(mid);
+            T t1 = midVal.getTemporal();
+            T t2 = key.getTemporal();
+            int cmp = t1.isBefore(t2) ? - 1 : (t1.isAfter(t2) ? 1 : 0);
+
+            if (cmp < 0) {
+                low = mid + 1;
+            } else if (cmp > 0) {
+                high = mid - 1;
+            } else {
+                return mid; // key found
+            }
+        }
+
+        return -(low + 1);  // key not found
 
     }
 
