@@ -623,7 +623,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Changes this interval to an interval such that calendrical intervals become closed intervals
      * and other intervals become half-open. </p>
      *
-     * <p>The temporal space will not be changed. </p>
+     * <p>The temporal space will not be changed. Infinite boundaries also remain unchanged. </p>
      *
      * @return  new interval with canonical boundaries
      * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
@@ -633,7 +633,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Wandelt dieses Intervall so um, da&szlig; kalendarische Intervalle geschlossen und andere
      * Intervalle halb-offen werden. </p>
      *
-     * <p>Der temporale Zeitraum wird nicht ge&auml;ndert. </p>
+     * <p>Der temporale Zeitraum wird nicht ge&auml;ndert. Unendliche Intervallgrenzen bleiben
+     * ebenfalls unver&auml;ndert. </p>
      *
      * @return  new interval with canonical boundaries
      * @throws  IllegalStateException if there is no canonical form (for example for [00:00/24:00])
