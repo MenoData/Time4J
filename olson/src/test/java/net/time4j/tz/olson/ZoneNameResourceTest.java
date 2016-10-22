@@ -5,7 +5,6 @@ import net.time4j.engine.ValidationElement;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.OffsetSign;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 
@@ -45,7 +44,7 @@ public class ZoneNameResourceTest {
     public void getOffsetPatternNorway() {
         assertThat(
             ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 1).getStdFormatPattern(new Locale("no", "NO")),
-            is("GMT\u00B1hh.mm"));
+            is("GMT\u00B1hh:mm")); // was using a dot before cldr-v30
     }
 
 }
