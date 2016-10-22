@@ -4,11 +4,11 @@ import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
-import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
 import net.time4j.base.TimeSource;
+import net.time4j.base.UnixTime;
 import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
@@ -38,9 +38,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printRelativePT() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 4, 14, 40, 10).atUTC();
             }
         };
@@ -86,9 +86,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printRelativeOrDate() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
             }
         };
@@ -141,9 +141,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printRelativeOrDateTime() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 40).atUTC();
             }
         };
@@ -227,7 +227,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withMinusSign(minus)
                 .print(-3, MONTHS, TextWidth.SHORT),
-            is(minus + "3 أشهر"));
+            is(minus + "3 شهر"));
     }
 
     @Test
@@ -338,9 +338,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printNowGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -356,9 +356,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printRelativeInStdTimezone() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -374,9 +374,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printLastLeapsecondGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2012, 7, 1, 0, 0, 5).atUTC();
             }
         };
@@ -392,9 +392,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printNextLeapsecondEnglish() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2012, 6, 30, 23, 59, 54).atUTC();
             }
         };
@@ -410,9 +410,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printYesterdayGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 4, 14, 40).atUTC();
             }
         };
@@ -428,9 +428,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman1() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
             }
         };
@@ -447,9 +447,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman2() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
             }
         };
@@ -466,9 +466,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman3() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC();
             }
         };
@@ -485,9 +485,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printTodayGerman4() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 3, 15, 30).atUTC();
             }
         };
@@ -504,9 +504,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printTomorrowGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -522,9 +522,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print3DaysLaterGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -540,9 +540,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print4MonthsEarlierGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -558,9 +558,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print4HoursEarlierGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 3, 30, 5, 0)
                     .in(Timezone.of("Europe/Berlin"));
             }
@@ -578,9 +578,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print4HoursEarlierGermanShort() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 3, 30, 5, 0)
                     .in(Timezone.of("Europe/Berlin"));
             }
@@ -633,7 +633,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 2, MONTHS, TextWidth.SHORT),
-            is("شهران"));
+            is("2 شهر"));
     }
 
     @Test
@@ -641,7 +641,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 3, MONTHS, TextWidth.SHORT),
-            is("3 أشهر"));
+            is("3 شهر"));
     }
 
     @Test
@@ -650,7 +650,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withZeroDigit(NumberSystem.ARABIC_INDIC)
                 .print(3, MONTHS, TextWidth.SHORT),
-            is('\u0663' + " أشهر")); // ٣ أشهر
+            is('\u0663' + " شهر"));
     }
 
     @Test
@@ -787,10 +787,15 @@ public class PrettyTimeTest {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
             .inverse();
-        assertThat(
-            PrettyTime.of(new Locale("ar", "DZ"))
-                .print(duration, TextWidth.WIDE),
-            is("\u200E-15 سنة، \u200E-3 أشهر، \u200E-أسبوع، و\u200E-يومان"));
+        String actual = PrettyTime.of(new Locale("ar", "DZ")).print(duration, TextWidth.WIDE);
+        String expected = "\u200E-15 سنة، \u200E-3 أشهر، \u200E-أسبوع، و\u200E-يومان";
+//        assertThat(actual.length(), is(expected.length()));
+//        for (int i = 0; i < actual.length(); i++) {
+//            int codepoint1 = actual.charAt(i);
+//            int codepoint2 = expected.charAt(i);
+//            System.out.println(codepoint1 + " / " + codepoint2);
+//        }
+        assertThat(actual, is(expected));
     }
 
     @Test
@@ -936,9 +941,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print3WeeksLaterGerman() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -954,9 +959,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print3WeeksLaterGermanAndWeeksToDays() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -973,9 +978,9 @@ public class PrettyTimeTest {
 
     @Test
     public void print3WeeksLaterNorsk() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
             }
         };
@@ -1013,9 +1018,9 @@ public class PrettyTimeTest {
 
     @Test
     public void printSpecialUnitsEnglish() {
-        TimeSource<?> clock = new TimeSource<Moment>() {
+        TimeSource<?> clock = new TimeSource<UnixTime>() {
             @Override
-            public Moment currentTime() {
+            public UnixTime currentTime() {
                 return PlainTimestamp.of(2014, 10, 1, 14, 30).atUTC();
             }
         };
