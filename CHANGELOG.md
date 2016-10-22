@@ -13,6 +13,7 @@
 
 ### Changed
 - Add simple sanity checks for cldr-format patterns [#565]
+- Update resources to CLDR v30.0.2 [#570]
 
 ### Deprecated
 - Specialized threeten-methods outdated due to a more general approach [#556]
