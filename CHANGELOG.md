@@ -5,6 +5,7 @@
 - Week calculations for non-ISO calendars [#562]
 - Add convenient methods to PrettyTime [#559]
 - New method nowInSystemTime() also for CalendarXYZ-types [#557]
+- Splitting of interval-collections [#571]
 
 ### Fixed
 - Years in far future should not require a positive sign [#569]
