@@ -226,7 +226,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withMinusSign(minus)
                 .print(-3, MONTHS, TextWidth.SHORT),
-            is(minus + "3 أشهر"));
+            is(minus + "3 شهر"));
     }
 
     @Test
@@ -562,7 +562,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 2, MONTHS, TextWidth.SHORT),
-            is("شهران"));
+            is("2 شهر"));
     }
 
     @Test
@@ -570,7 +570,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 3, MONTHS, TextWidth.SHORT),
-            is("3 أشهر"));
+            is("3 شهر"));
     }
 
     @Test
@@ -579,7 +579,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withZeroDigit(NumberSystem.ARABIC_INDIC)
                 .print(3, MONTHS, TextWidth.SHORT),
-            is('\u0663' + " أشهر")); // ٣ أشهر
+            is('\u0663' + " شهر"));
     }
 
     @Test
