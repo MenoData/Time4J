@@ -453,7 +453,7 @@ public class DayPeriodTest {
             f.with(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE).parse("5:45 entathakusa"),
             is(PlainTime.of(5, 45)));
         assertThat(
-            f.parse("5:45 ekuseni"),
+            f.parse("5:45 entathakusa"),
             is(PlainTime.of(5, 45)));
         assertThat(
             f.parse("9:45 ekuseni"),
