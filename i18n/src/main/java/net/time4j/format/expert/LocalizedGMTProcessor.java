@@ -53,7 +53,7 @@ final class LocalizedGMTProcessor
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final char UNICODE_LRM = '\u200E';
+    // private static final char UNICODE_LRM = '\u200E';
     private static final ZonalOffset PROTOTYPE = ZonalOffset.ofTotalSeconds(3600 * 18);
     private static final ConcurrentMap<Locale, String> UTC_LITERALS = new ConcurrentHashMap<Locale, String>();
     private static final ConcurrentMap<Locale, Info> STD_PATTERN_INFOS = new ConcurrentHashMap<Locale, Info>();
@@ -152,10 +152,11 @@ final class LocalizedGMTProcessor
         String plus = (quickPath ? this.plusSign : attributes.get(AttributeSet.PLUS_SIGN, "+"));
         String minus = (quickPath ? this.minusSign : attributes.get(AttributeSet.MINUS_SIGN, "-"));
 
-        if ("ar".equals(loc.getLanguage()) && (zeroChar == '0')) {
-            plus = UNICODE_LRM + "+";
-            minus = UNICODE_LRM + "\u002D";
-        }
+// hack for cldr-version before v30
+//        if ("ar".equals(loc.getLanguage()) && (zeroChar == '0')) {
+//            plus = UNICODE_LRM + "+";
+//            minus = UNICODE_LRM + "\u002D";
+//        }
 
         boolean np = (
             quickPath
@@ -304,10 +305,11 @@ final class LocalizedGMTProcessor
         String plus = (quickPath ? this.plusSign : attributes.get(AttributeSet.PLUS_SIGN, "+"));
         String minus = (quickPath ? this.minusSign : attributes.get(AttributeSet.MINUS_SIGN, "-"));
 
-        if ("ar".equals(loc.getLanguage()) && (zeroChar == '0')) {
-            plus = UNICODE_LRM + "+";
-            minus = UNICODE_LRM + "\u002D";
-        }
+// hack for cldr-version before v30
+//        if ("ar".equals(loc.getLanguage()) && (zeroChar == '0')) {
+//            plus = UNICODE_LRM + "+";
+//            minus = UNICODE_LRM + "\u002D";
+//        }
 
         Info info = getPatternInfo(loc);
         int n = info.pattern.length();
