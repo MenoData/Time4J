@@ -20,11 +20,11 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class LocalizedGMTOffsetTest {
 
- 	@Parameterized.Parameters
+    @Parameterized.Parameters
         (name= "{index}: "
             + "(pattern={0},locale={1},timezone={2},value={3},text={4},noGMTPrefix={5})")
- 	public static Iterable<Object[]> data() {
- 		return Arrays.asList(
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(
             new Object[][] {
                 {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
                     "sq",
@@ -42,7 +42,7 @@ public class LocalizedGMTOffsetTest {
                     "fa",
                     "Asia/Tehran", // +04:30
                     "2012-06-30T23:59:60Z",
-                    "۲۰۱۲-۰۷-۰۱ ۰۴:۲۹:۶۰ \u200E+\u200E۰۴:۳۰ گرینویچ",
+                    "۲۰۱۲-۰۷-۰۱ ۰۴:۲۹:۶۰ \u200E+۰۴:۳۰ گرینویچ",
                     false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
                     "no",
@@ -66,19 +66,19 @@ public class LocalizedGMTOffsetTest {
                     "ar",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣جرينتش\u200F+٠٥:٣٠", // with RLM-marker
+                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣جرينتش\u061C+٠٥:٣٠", // with ALM-marker
                     false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "ar-DZ",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-07-01T05:29:60.123جرينتش\u200E+05:30", // with LRM-marker
+                    "2012-07-01T05:29:60.123جرينتش\u061C+05:30", // with ALM-marker
                     false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "ar-DZ",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-07-01T05:29:60.123\u200E+05:30", // with LRM-marker
+                    "2012-07-01T05:29:60.123\u061C+05:30", // with ALM-marker
                     true},
                 {"uuuu-MM-dd'T'HH:mm:ssOOOO",
                     "en-ARABEXT", // language en makes sure not to use bidi chars for sign representation
@@ -86,7 +86,7 @@ public class LocalizedGMTOffsetTest {
                     "2015-11-02T18:44:34Z",
                     "۲۰۱۵-۱۱-۰۲T۱۸:۴۴:۳۴+۰۰:۰۰",
                     true},
-           }
+            }
         );
     }
 
