@@ -12,6 +12,7 @@
 
 ### Changed
 - Add simple sanity checks for cldr-format patterns [#565]
+- Update resources to CLDR v30.0.2 [#570]
 
 ## [v3.23] published on 2016-09-18
 ### Added
