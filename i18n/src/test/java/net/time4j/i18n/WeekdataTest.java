@@ -14,7 +14,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class WeekendTest {
+public class WeekdataTest {
 
     @Test
     public void isWeekendISO() {
@@ -50,18 +50,18 @@ public class WeekendTest {
 
     @Test
     public void isWeekendYemen() {
-        Locale yemen = new Locale("ar", "Ye"); // Thursday + Friday
-        assertThat(
-            PlainDate.of(2014, 4, 2).isWeekend(yemen),
-            is(false));
+        Locale yemen = new Locale("ar", "Ye"); // Friday + Saturday in CLDR v30
         assertThat(
             PlainDate.of(2014, 4, 3).isWeekend(yemen),
-            is(true));
+            is(false));
         assertThat(
             PlainDate.of(2014, 4, 4).isWeekend(yemen),
             is(true));
         assertThat(
             PlainDate.of(2014, 4, 5).isWeekend(yemen),
+            is(true));
+        assertThat(
+            PlainDate.of(2014, 4, 6).isWeekend(yemen),
             is(false));
     }
 
@@ -88,26 +88,26 @@ public class WeekendTest {
     }
 
     @Test
-    public void modelYemen() {
-        Locale yemen = new Locale("ar", "YE");
+    public void modelAfghanistan() {
+        Locale afghanistan = new Locale("fa", "AF");
         assertThat(
-            Weekmodel.of(yemen),
+            Weekmodel.of(afghanistan),
             is(Weekmodel.of(
                 Weekday.SATURDAY, 1, Weekday.THURSDAY, Weekday.FRIDAY)));
         assertThat(
-            Weekmodel.of(yemen).getFirstDayOfWeek(),
+            Weekmodel.of(afghanistan).getFirstDayOfWeek(),
             is(Weekday.SATURDAY));
         assertThat(
-            Weekmodel.of(yemen).getMinimalDaysInFirstWeek(),
+            Weekmodel.of(afghanistan).getMinimalDaysInFirstWeek(),
             is(1));
         assertThat(
-            Weekmodel.of(yemen).getStartOfWeekend(),
+            Weekmodel.of(afghanistan).getStartOfWeekend(),
             is(Weekday.THURSDAY));
         assertThat(
-            Weekmodel.of(yemen).getEndOfWeekend(),
+            Weekmodel.of(afghanistan).getEndOfWeekend(),
             is(Weekday.FRIDAY));
         assertThat(
-            Weekmodel.of(yemen).getFirstWorkday(),
+            Weekmodel.of(afghanistan).getFirstWorkday(),
             is(Weekday.SATURDAY));
     }
 
@@ -137,14 +137,14 @@ public class WeekendTest {
 
     @Test
     public void weekend() {
-        Locale yemen = new Locale("ar", "YE");
+        Locale afghanistan = new Locale("fa", "AF");
         PlainDate date = PlainDate.of(2013, 3, 30); // Samstag
         assertThat(date.matches(Weekmodel.ISO.weekend()), is(true));
-        assertThat(date.matches(Weekmodel.of(yemen).weekend()), is(false));
+        assertThat(date.matches(Weekmodel.of(afghanistan).weekend()), is(false));
 
         date = PlainDate.of(2013, 3, 28); // Donnerstag
         assertThat(date.matches(Weekmodel.ISO.weekend()), is(false));
-        assertThat(date.matches(Weekmodel.of(yemen).weekend()), is(true));
+        assertThat(date.matches(Weekmodel.of(afghanistan).weekend()), is(true));
     }
 
 }
