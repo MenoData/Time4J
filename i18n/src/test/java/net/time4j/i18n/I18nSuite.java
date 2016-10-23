@@ -23,7 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
         PluralRulesTest.class,
         PrettyTimeTest.class,
         RootLocaleTest.class,
-        WeekendTest.class
+        WeekdataTest.class
     }
 )
 public class I18nSuite {

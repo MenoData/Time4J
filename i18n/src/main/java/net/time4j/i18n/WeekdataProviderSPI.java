@@ -34,8 +34,10 @@ import java.net.URI;
 import java.util.Collections;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
+import java.util.Set;
 
 
 /**
@@ -47,62 +49,11 @@ import java.util.Map;
 public class WeekdataProviderSPI
     implements WeekdataProvider {
 
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    static final Map<String, Weekday> START_OF_WEEKEND;
-    static final Map<String, Weekday> END_OF_WEEKEND;
-
-    // Daten aus CLDR 23
-    static {
-        Map<String, Weekday> tmp = new HashMap<String, Weekday>(28);
-        tmp.put("AF", Weekday.THURSDAY);
-        tmp.put("DZ", Weekday.THURSDAY);
-        tmp.put("IR", Weekday.THURSDAY);
-        tmp.put("OM", Weekday.THURSDAY);
-        tmp.put("SA", Weekday.THURSDAY);
-        tmp.put("YE", Weekday.THURSDAY);
-        tmp.put("AE", Weekday.FRIDAY);
-        tmp.put("BH", Weekday.FRIDAY);
-        tmp.put("EG", Weekday.FRIDAY);
-        tmp.put("IL", Weekday.FRIDAY);
-        tmp.put("IQ", Weekday.FRIDAY);
-        tmp.put("JO", Weekday.FRIDAY);
-        tmp.put("KW", Weekday.FRIDAY);
-        tmp.put("LY", Weekday.FRIDAY);
-        tmp.put("MA", Weekday.FRIDAY);
-        tmp.put("QA", Weekday.FRIDAY);
-        tmp.put("SD", Weekday.FRIDAY);
-        tmp.put("SY", Weekday.FRIDAY);
-        tmp.put("TN", Weekday.FRIDAY);
-        tmp.put("IN", Weekday.SUNDAY);
-        START_OF_WEEKEND = Collections.unmodifiableMap(tmp);
-
-        tmp = new HashMap<String, Weekday>(25);
-        tmp.put("AF", Weekday.FRIDAY);
-        tmp.put("DZ", Weekday.FRIDAY);
-        tmp.put("IR", Weekday.FRIDAY);
-        tmp.put("OM", Weekday.FRIDAY);
-        tmp.put("SA", Weekday.FRIDAY);
-        tmp.put("YE", Weekday.FRIDAY);
-        tmp.put("AE", Weekday.SATURDAY);
-        tmp.put("BH", Weekday.SATURDAY);
-        tmp.put("EG", Weekday.SATURDAY);
-        tmp.put("IL", Weekday.SATURDAY);
-        tmp.put("IQ", Weekday.SATURDAY);
-        tmp.put("JO", Weekday.SATURDAY);
-        tmp.put("KW", Weekday.SATURDAY);
-        tmp.put("LY", Weekday.SATURDAY);
-        tmp.put("MA", Weekday.SATURDAY);
-        tmp.put("QA", Weekday.SATURDAY);
-        tmp.put("SD", Weekday.SATURDAY);
-        tmp.put("SY", Weekday.SATURDAY);
-        tmp.put("TN", Weekday.SATURDAY);
-        END_OF_WEEKEND = Collections.unmodifiableMap(tmp);
-    }
-
     //~ Instanzvariablen --------------------------------------------------
 
     private final String source;
+    private final Set<String> countriesWithMinDays4;
+    private final Map<String, Weekday> firstDayOfWeek;
     private final Map<String, Weekday> startOfWeekend;
     private final Map<String, Weekday> endOfWeekend;
 
@@ -111,7 +62,7 @@ public class WeekdataProviderSPI
     public WeekdataProviderSPI() {
         super();
 
-        String name = "data/weekend.data";
+        String name = "data/week.data";
         URI uri = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
@@ -125,10 +76,10 @@ public class WeekdataProviderSPI
 
         if (is != null) {
             this.source = "@" + uri;
-            Map<String, Weekday> tmpStart =
-                new HashMap<String, Weekday>(START_OF_WEEKEND.size());
-            Map<String, Weekday> tmpEnd =
-                new HashMap<String, Weekday>(END_OF_WEEKEND.size());
+            Set<String> tmpMinDays4 = new HashSet<String>();
+            Map<String, Weekday> tmpFirst = new HashMap<String, Weekday>();
+            Map<String, Weekday> tmpStart = new HashMap<String, Weekday>();
+            Map<String, Weekday> tmpEnd = new HashMap<String, Weekday>();
 
             try {
                 BufferedReader br =
@@ -145,6 +96,19 @@ public class WeekdataProviderSPI
                     int equal = line.indexOf('=');
                     String prefix = line.substring(0, equal).trim();
                     String[] list = line.substring(equal + 1).split(" ");
+
+                    if (prefix.equals("minDays-4")) {
+                        for (String country : list) {
+                            String key = country.trim().toUpperCase(Locale.US);
+
+                            if (!key.isEmpty()) {
+                                tmpMinDays4.add(key);
+                            }
+                        }
+
+                        continue;
+                    }
+
                     String wd;
                     Weekday weekday;
                     Map<String, Weekday> map;
@@ -157,6 +121,10 @@ public class WeekdataProviderSPI
                         wd = prefix.substring(4);
                         weekday = Weekday.SUNDAY;
                         map = tmpEnd;
+                    } else if (prefix.startsWith("first-")) {
+                        wd = prefix.substring(6);
+                        weekday = Weekday.MONDAY;
+                        map = tmpFirst;
                     } else {
                         throw new IllegalStateException(
                             "Unexpected format: " + this.source);
@@ -188,6 +156,8 @@ public class WeekdataProviderSPI
 
                 }
 
+                this.countriesWithMinDays4 = Collections.unmodifiableSet(tmpMinDays4);
+                this.firstDayOfWeek = Collections.unmodifiableMap(tmpFirst);
                 this.startOfWeekend = Collections.unmodifiableMap(tmpStart);
                 this.endOfWeekend = Collections.unmodifiableMap(tmpEnd);
 
@@ -206,8 +176,10 @@ public class WeekdataProviderSPI
 
         } else {
             this.source = "@STATIC";
-            this.startOfWeekend = START_OF_WEEKEND;
-            this.endOfWeekend = END_OF_WEEKEND;
+            this.countriesWithMinDays4 = Collections.emptySet();
+            this.firstDayOfWeek = Collections.emptyMap();
+            this.startOfWeekend = Collections.emptyMap();
+            this.endOfWeekend = Collections.emptyMap();
 
             System.err.println("Warning: File \"" + name + "\" not found.");
         }
@@ -219,19 +191,43 @@ public class WeekdataProviderSPI
     @Override
     public int getFirstDayOfWeek(Locale country) {
 
-        // TODO: CLDR-Daten anzapfen?
-        GregorianCalendar gc = new GregorianCalendar(country);
-        int fd = gc.getFirstDayOfWeek();
-        return ((fd == 1) ? 7 : (fd - 1));
+        if (this.firstDayOfWeek.isEmpty()) {
+            // fallback
+            GregorianCalendar gc = new GregorianCalendar(country);
+            int fd = gc.getFirstDayOfWeek();
+            return ((fd == 1) ? 7 : (fd - 1));
+        }
+
+        String key = country.getCountry();
+        Weekday first = Weekday.MONDAY;
+
+        if (this.firstDayOfWeek.containsKey(key)) {
+            first = this.firstDayOfWeek.get(key);
+        }
+
+        return first.getValue();
 
     }
 
     @Override
     public int getMinimalDaysInFirstWeek(Locale country) {
 
-        // TODO: CLDR-Daten anzapfen?
-        GregorianCalendar gc = new GregorianCalendar(country);
-        return gc.getMinimalDaysInFirstWeek();
+        if (this.countriesWithMinDays4.isEmpty()) {
+            // fallback
+            GregorianCalendar gc = new GregorianCalendar(country);
+            return gc.getMinimalDaysInFirstWeek();
+        }
+
+        String key = country.getCountry();
+        int minDays = 1;
+
+        if (key.isEmpty() && country.getLanguage().isEmpty()) {
+            minDays = 4; // ISO-8601
+        } else if (this.countriesWithMinDays4.contains(key)) {
+            minDays = 4;
+        }
+
+        return minDays;
 
     }
 
