@@ -29,7 +29,6 @@ package net.time4j.engine;
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
  * @since   3.24/4.20
- * @doctags.spec All implementations must be ideally stateless or at least be immutable
  */
 /*[deutsch]
  * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus dem JDK oder anderen Bibliotheken. </p>
@@ -38,7 +37,6 @@ package net.time4j.engine;
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
  * @since   3.24/4.20
- * @doctags.spec All implementations must be ideally stateless or at least be immutable
  */
 public interface Converter<S, T> {
 
