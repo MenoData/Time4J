@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -1196,6 +1197,51 @@ public class IntervalCollectionTest {
     public void splitsIfNoInterval() {
         IntervalCollection<PlainDate> windows = IntervalCollection.onDateAxis();
         assertThat(windows.withSplits().isEmpty(), is(true));
+    }
+
+    @Test
+    public void isDisjunct() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 5, 31),
+                PlainDate.of(2014, 6, 1));
+        DateInterval i3 =
+            DateInterval.between(
+                PlainDate.of(2014, 6, 15),
+                PlainDate.of(2014, 6, 30));
+        assertThat(
+            IntervalCollection.onDateAxis().plus(i1).plus(i3).isDisjunct(),
+            is(true));
+        assertThat(
+            IntervalCollection.onDateAxis().plus(i1).plus(i2).plus(i3).isDisjunct(),
+            is(false));
+
+        ClockInterval c1 =
+            ClockInterval.between(
+                PlainTime.of(9, 28),
+                PlainTime.of(10, 31));
+        ClockInterval c2 =
+            ClockInterval.between(
+                PlainTime.of(10, 31),
+                PlainTime.of(12));
+        ClockInterval c3 =
+            ClockInterval.between(
+                PlainTime.of(12),
+                PlainTime.of(20, 35));
+        ClockInterval c4 =
+            ClockInterval.between(
+                PlainTime.of(12).minus(1, ClockUnit.NANOS),
+                PlainTime.of(20, 35));
+        assertThat(
+            IntervalCollection.onClockAxis().plus(c1).plus(c2).plus(c3).isDisjunct(),
+            is(true));
+        assertThat(
+            IntervalCollection.onClockAxis().plus(c1).plus(c2).plus(c4).isDisjunct(),
+            is(false));
     }
 
 }

@@ -177,18 +177,17 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /**
      * <p>Returns all appended intervals. </p>
      *
-     * <p>Note that all contained finite intervals have closed start. </p>
+     * <p>Note that all contained finite intervals have each a closed start. </p>
      *
-     * @return  unmodifiable sorted list of intervals
+     * @return  unmodifiable list of intervals sorted by start and then by length
      * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert alle hinzugef&uuml;gten Intervalle. </p>
      *
-     * <p>Alle enthaltenen endlichen Intervalle haben einen geschlossenen
-     * Start. </p>
+     * <p>Hinweis: Alle enthaltenen endlichen Intervalle haben einen geschlossenen Start. </p>
      *
-     * @return  unmodifiable sorted list of intervals
+     * @return  unmodifiable list of intervals sorted by start and then by length
      * @since   2.0
      */
     public List<ChronoInterval<T>> getIntervals() {
@@ -212,6 +211,38 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     public boolean isEmpty() {
 
         return this.intervals.isEmpty();
+
+    }
+
+    /**
+     * <p>Queries if there is no intersection of intervals. </p>
+     *
+     * @return  {@code true} if there is no intersection else {@code false}
+     * @since   3.24/4.20
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob keine &Uuml;berschneidung von Intervallen existiert. </p>
+     *
+     * @return  {@code true} if there is no intersection else {@code false}
+     * @since   3.24/4.20
+     */
+    public boolean isDisjunct() {
+
+        for (int i = 0, n = this.intervals.size() - 1; i < n; i++) {
+            ChronoInterval<T> current = this.intervals.get(i);
+            ChronoInterval<T> next = this.intervals.get(i + 1);
+            if (current.getEnd().isInfinite() || next.getStart().isInfinite()) {
+                return false;
+            } else if (current.getEnd().isOpen()) {
+                if (current.getEnd().getTemporal().isAfter(next.getStart().getTemporal())) {
+                    return false;
+                }
+            } else if (!current.getEnd().getTemporal().isBefore(next.getStart().getTemporal())) {
+                return false;
+            }
+        }
+
+        return true;
 
     }
 
@@ -989,7 +1020,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      */
     public IntervalCollection<T> withSplits() {
 
-        if (this.intervals.size() < 2) {
+        if (this.isDisjunct()) {
             return this;
         }
 
