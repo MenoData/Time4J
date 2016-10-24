@@ -5,6 +5,7 @@
 - Add convenient methods to PrettyTime [#559]
 - New method nowInSystemTime() also for CalendarXYZ-types [#557]
 - Splitting of interval-collections [#571]
+- New method `isDisjunct()` in class IntervalCollection [#572]
 
 ### Fixed
 - Years in far future should not require a positive sign [#569]
