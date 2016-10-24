@@ -1293,7 +1293,42 @@ public enum PatternType
      *
      * @since   3.5/4.3
      */
-    NON_ISO_DATE;
+    NON_ISO_DATE,
+
+    /**
+     * <p>Resolves a pattern such that the chronology used in current context determines the meaning
+     * of any pattern symbols. </p>
+     *
+     * <p>In contrast to other pattern types like {@code CLDR}, the meaning of pattern symbols is not
+     * defined by any external standard. The elements associated with symbols are looked up among the registered
+     * elements of a chronology including those which can be found via any chronological extension. If the
+     * found element is a {@link TextElement text element} then it will be treated as such, and the count of
+     * symbols is determines the text width (1 = NARROW, 2 = SHORT, 3 = ABBREVIATED, 4 = WIDE). Otherwise
+     * this pattern type tries to resolve the element in question as {@code ChronoElement<Integer>}, and
+     * the count of symbols will determine the min width of displayed/parsed digits and apply some padding
+     * if necessary. The maximum width is always 9, and no sign is used. </p>
+     *
+     * @see    ChronoElement#getSymbol()
+     * @since   4.20
+     */
+    /*[deutsch]
+     * <p>L&ouml;st ein Muster so auf, da&szlig; die im aktuellen Kontext benutzte Chronologie die
+     * Bedeutung von Mustersymbolen festlegt. </p>
+     *
+     * <p>Im Kontrast zu anderen Mustertypen wie {@code CLDR} ist die Bedeutung von Mustersymbolen nicht
+     * durch irgendeinen externen Standard festgelegt. Die mit den Symbolen verkn&uuml;pften Elemente
+     * werden unter den registrierten Elementen einer Chronologie gesucht, notfalls auch in den chronologischen
+     * Erweiterungen. Falls das gefundene Element ein {@link TextElement} ist, wird es als solches behandelt,
+     * und die Anzahl der Symbole bestimmt dann die Textbreite (1 = NARROW, 2 = SHORT, 3 = ABBREVIATED, 4 = WIDE).
+     * Sonst versucht dieser Mustertyp das fragliche Element als {@code ChronoElement<Integer>} aufzul&ouml;sen,
+     * und die Anzahl der Symbole wird die Mindestbreite der angezeigten/interpretierten Ziffern festlegen,
+     * unter Umst&auml;nden auch mit Auff&uuml;llen von F&uuml;llzeichen. Im numerischen Fall ist die maximale
+     * Breite 9, und ein Vorzeichen wird nie verwendet. </p>
+     *
+     * @see    ChronoElement#getSymbol()
+     * @since   4.20
+     */
+    DYNAMIC;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -1347,6 +1382,8 @@ public enum PatternType
                     throw new IllegalArgumentException("Choose CLDR or CLDR_24 for ISO-8601-chronology.");
                 }
                 return general(builder, symbol, count, locale);
+            case DYNAMIC:
+                return dynamic(builder, symbol, count, locale);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -2251,6 +2288,68 @@ public enum PatternType
             default:
                 throw new IllegalArgumentException(
                     "Unsupported pattern symbol: " + symbol);
+        }
+
+        return Collections.emptyMap();
+
+    }
+
+    private Map<ChronoElement<?>, ChronoElement<?>> dynamic(
+        ChronoFormatter.Builder<?> builder,
+        char symbol,
+        int count,
+        Locale locale
+    ) {
+
+        ChronoElement<?> found = null;
+
+        for (ChronoElement<?> element : builder.getChronology().getRegisteredElements()) {
+            if (element.getSymbol() == symbol) {
+                found = element;
+                break;
+            }
+        }
+
+        if (found == null) {
+            for (ChronoExtension extension : builder.getChronology().getExtensions()) {
+                for (ChronoElement<?> element : extension.getElements(locale, Attributes.empty())) {
+                    if (element.getSymbol() == symbol) {
+                        found = element;
+                        break;
+                    }
+                }
+                if (found != null) {
+                    break;
+                }
+            }
+        }
+
+        if (found == null) {
+            throw new IllegalArgumentException("Resolving failed for symbol: " + symbol);
+        } else if (found instanceof TextElement) {
+            switch (count) {
+                case 1:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.NARROW);
+                    break;
+                case 2:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.SHORT);
+                    break;
+                case 3:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED);
+                    break;
+                case 4:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal count of symbols: " + symbol);
+            }
+            builder.addText(TextElement.class.cast(found));
+            builder.endSection();
+        } else if (found.getType() == Integer.class) {
+            ChronoElement<Integer> intElement = cast(found);
+            builder.addInteger(intElement, count, 9);
+        } else {
+            throw new IllegalArgumentException("Can only handle integer or text elements: " + found);
         }
 
         return Collections.emptyMap();
