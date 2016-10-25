@@ -844,6 +844,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * <p>Searches for all gaps with time points which are not covered by any
      * interval of this instance. </p>
      *
+     * <p><img src="doc-files/withGaps.jpg" alt="withGaps"></p>
+     *
      * @return  new interval collection containing the inner gaps between
      *          the own intervals while this instance remains unaffected
      * @since   2.0
@@ -851,6 +853,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
     /*[deutsch]
      * <p>Sucht die L&uuml;cken mit allen Zeitpunkten, die nicht zu irgendeinem
      * Intervall dieser Instanz geh&ouml;ren. </p>
+     *
+     * <p><img src="doc-files/withGaps.jpg" alt="withGaps"></p>
      *
      * @return  new interval collection containing the inner gaps between
      *          the own intervals while this instance remains unaffected
@@ -929,6 +933,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * <p>Any overlapping or abutting intervals will be merged to one block. If the interval boundaries
      * are still to be kept then consider {@link #withSplits()} instead. </p>
      *
+     * <p><img src="doc-files/withBlocks.jpg" alt="withBlocks"></p>
+     *
      * @return  new interval collection containing disjunct merged blocks
      *          while this instance remains unaffected
      * @since   2.0
@@ -940,6 +946,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * <p>Alle Intervalle, die sich &uuml;berlappen oder sich ber&uuml;hren, werden zu jeweils
      * einem Block verschmolzen. Wenn die Intervallgrenzen noch erhalten bleiben sollen, dann
      * ist {@link #withSplits()} wahrscheinlich die sinnvollere Methode. </p>
+     *
+     * <p><img src="doc-files/withBlocks.jpg" alt="withBlocks"></p>
      *
      * @return  new interval collection containing disjunct merged blocks
      *          while this instance remains unaffected
@@ -1006,6 +1014,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *
      * <p>Similar to {@link #withBlocks()} but all boundaries will be temporally conserved. </p>
      *
+     * <p><img src="doc-files/withSplits.jpg" alt="withSplits"></p>
+     *
      * @return  new interval collection containing disjunct splitted sections
      *          while this instance remains unaffected
      * @since   3.24/4.20
@@ -1015,6 +1025,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * nicht &uuml;berlappen, aber noch sich ber&uuml;hren k&ouml;nnen. </p>
      *
      * <p>&Auml;hnlich wie {@link #withBlocks()}, aber alle Intervallgrenzen werden zeitlich beibehalten. </p>
+     *
+     * <p><img src="doc-files/withSplits.jpg" alt="withSplits"></p>
      *
      * @return  new interval collection containing disjunct splitted sections
      *          while this instance remains unaffected
@@ -1100,6 +1112,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      * <p>Note: This instance remains unaffected as specified for immutable
      * classes. </p>
      *
+     * <p><img src="doc-files/withIntersection.jpg" alt="withIntersection"></p>
+     *
      * @return  new interval collection containing the intersection interval,
      *          maybe empty (if there is no intersection)
      * @since   2.0
@@ -1109,6 +1123,8 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      *
      * <p>Hinweis: Diese Instanz bleibt unver&auml;ndert, weil die Klasse
      * <i>immutable</i> (unver&auml;nderlich) ist. </p>
+     *
+     * <p><img src="doc-files/withIntersection.jpg" alt="withIntersection"></p>
      *
      * @return  new interval collection containing the intersection interval,
      *          maybe empty (if there is no intersection)
