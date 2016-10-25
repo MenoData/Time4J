@@ -293,6 +293,42 @@ public class DayPartitionBuilder {
     }
 
     /**
+     * <p>Adds a rule to partition a date dependending on when its day of week falls into given range. </p>
+     *
+     * <p>This method can be called multiple times using the same arguments in order to define
+     * more than one disjunct partition. </p>
+     *
+     * @param   spanOfWeekdays  span of weekdays with start and end
+     * @param   partition       a clock interval
+     * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if there is no canonical form of given interval (for example for [00:00/24:00])
+     * @see     IsoInterval#toCanonical()
+     * @since   4.20
+     */
+    /*[deutsch]
+     * <p>F&uuml;gt eine Regel hinzu, die einen Kalendertag in Abh&auml;ngigkeit davon zerlegt, ob
+     * dessen Wochentag in den angegebenen Wochentagsbereich f&auml;llt. </p>
+     *
+     * <p>Diese Methode kann mehrmals mit den gleichen Parametern aufgerufen werden, um mehr als einen
+     * Tagesabschnitt zu definieren. </p>
+     *
+     * @param   spanOfWeekdays  span of weekdays with start and end
+     * @param   partition       a clock interval
+     * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if there is no canonical form of given interval (for example for [00:00/24:00])
+     * @see     IsoInterval#toCanonical()
+     * @since   4.20
+     */
+    public DayPartitionBuilder addWeekdayRule(
+        SpanOfWeekdays spanOfWeekdays,
+        ClockInterval partition
+    ) {
+
+        return this.addWeekdayRule(spanOfWeekdays.getStart(), spanOfWeekdays.getEnd(), partition);
+
+    }
+
+    /**
      * <p>Adds a rule to partition a special calendar date. </p>
      *
      * <p>This method can be called multiple times for the same special day in order to define

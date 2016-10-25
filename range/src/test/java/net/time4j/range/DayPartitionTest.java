@@ -88,7 +88,9 @@ public class DayPartitionTest {
         DayPartitionRule rule =
             new DayPartitionBuilder((date) -> !date.equals(PlainDate.of(2016, 9, 2)))
                 .addExclusion(Collections.singleton(PlainDate.of(2016, 8, 27)))
-                .addWeekdayRule(MONDAY, FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(
+                    SpanOfWeekdays.betweenMondayAndFriday(),
+                    ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
                 .addWeekdayRule(MONDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(16, 0)))
                 .addWeekdayRule(TUESDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
                 .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
