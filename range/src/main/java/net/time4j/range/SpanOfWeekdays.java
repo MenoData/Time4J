@@ -124,6 +124,7 @@ public final class SpanOfWeekdays
     }
 
     private static final SpanOfWeekdays MONDAY_TO_FRIDAY = new SpanOfWeekdays(Weekday.MONDAY, Weekday.FRIDAY);
+    private static final long serialVersionUID = 3484703887286756207L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -421,6 +422,8 @@ public final class SpanOfWeekdays
         implements TextElement<Weekday>, ElementRule<SpanOfWeekdays, Weekday> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final long serialVersionUID = 8221317125139231996L;
 
         //~ Instanzvariablen ----------------------------------------------
 

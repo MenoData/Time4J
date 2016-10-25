@@ -270,6 +270,15 @@ public class SerializationTest {
         roundtrip(CalendarMonth.of(2016, Month.FEBRUARY));
     }
 
+    @Test
+    public void roundTripOfSpanOfWeekdays()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(SpanOfWeekdays.betweenMondayAndFriday());
+        roundtrip(SpanOfWeekdays.START);
+        roundtrip(SpanOfWeekdays.END);
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 
