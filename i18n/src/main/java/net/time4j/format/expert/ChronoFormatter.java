@@ -1030,7 +1030,7 @@ public final class ChronoFormatter<T>
         // Phase 2: Anreicherung mit Default-Werten
         for (ChronoElement<?> e : this.defaults.keySet()) {
             if (!parsed.contains(e)) {
-                parsed.put(e, this.getDefaultValue(e));
+                parsed.put(e, this.getDefaultValue(e, parsed));
             }
         }
 
@@ -1588,6 +1588,62 @@ public final class ChronoFormatter<T>
 
         Map<ChronoElement<?>, Object> defaultMap = new HashMap<>();
         defaultMap.put(element, supplier);
+        return new ChronoFormatter<>(this, defaultMap);
+
+    }
+
+    /**
+     * <p>Determines a source reference in parsed data for a default replacement value of given element. </p>
+     *
+     * <p>Default replacement values will be considered by Time4J if either
+     * the formatter does not contain the element in question at all or if
+     * there are no consumable characters for given element. Latter
+     * situation might sometimes require the use of sectional attribute
+     * {@code PROTECTED_CHARACTERS} in order to simulate an end-of-text
+     * situation. </p>
+     *
+     * @param   <V> generic element value type
+     * @param   element     chronological element to be updated
+     * @param   source      element reference in parsed data whose value serves as replacement value
+     *                      or {@code null} if the default value shall be deregistered
+     * @return  changed copy with new replacement value
+     * @throws  IllegalArgumentException if the first argument is not supported by the underlying chronology
+     *                                   or if both arguments are equal
+     * @see     Attributes#PROTECTED_CHARACTERS
+     * @since   4.20
+     */
+    /*[deutsch]
+     * <p>Legt eine Elementquelle in interpretierten Rohdaten f&uuml;r einen Standard-Ersatzwert
+     * des angegebenen Elements fest, wenn die Interpretation sonst nicht funktioniert. </p>
+     *
+     * <p>Standard-Ersatzwerte werden von Time4J herangezogen, wenn entweder
+     * der Formatierer das fragliche Element nicht enth&auml;lt oder wenn es
+     * keine konsumierbaren Zeichen f&uuml;r das angegebene Element gibt.
+     * Die letzte Situation erfordert manchmal die Verwendung des sektionalen
+     * Attributs {@code PROTECTED_CHARACTERS}, um eine Situation zu simulieren,
+     * in der der Formatierer quasi am Ende eines Texts angekommen ist. </p>
+     *
+     * @param   <V> generic element value type
+     * @param   element     chronological element to be updated
+     * @param   source      element reference in parsed data whose value serves as replacement value
+     *                      or {@code null} if the default value shall be deregistered
+     * @return  changed copy with new replacement value
+     * @throws  IllegalArgumentException if the first argument is not supported by the underlying chronology
+     *                                   or if both arguments are equal
+     * @see     Attributes#PROTECTED_CHARACTERS
+     * @since   4.20
+     */
+    public <V> ChronoFormatter<T> withDefaultSource(
+        ChronoElement<V> element,
+        ChronoElement<V> source
+    ) {
+
+        if (element.equals(source)) { // NPE-check
+            throw new IllegalArgumentException("Source equal to defaulting element.");
+        }
+
+        Map<ChronoElement<?>, Object> defaultMap = new HashMap<>();
+        defaultMap.put(element, source);
         return new ChronoFormatter<>(this, defaultMap);
 
     }
@@ -2714,7 +2770,7 @@ public final class ChronoFormatter<T>
         if (!cf.defaults.isEmpty()) {
             for (ChronoElement<?> e : cf.defaults.keySet()) {
                 if (!parsed.contains(e)) {
-                    parsed.put(e, cf.getDefaultValue(e));
+                    parsed.put(e, cf.getDefaultValue(e, parsed));
                 }
             }
         }
@@ -3019,7 +3075,7 @@ public final class ChronoFormatter<T>
             if (status.isWarning()) {
                 ChronoElement<?> element = step.getProcessor().getElement();
                 if ((element != null) && this.defaults.containsKey(element)) {
-                    parsedResult.put(element, this.getDefaultValue(element));
+                    parsedResult.put(element, this.getDefaultValue(element, parsedResult));
                     parsedResult.with(ValidationElement.ERROR_MESSAGE, null);
                     status.clearError();
                     status.clearWarning();
@@ -3140,12 +3196,17 @@ public final class ChronoFormatter<T>
 
     }
 
-    private Object getDefaultValue(ChronoElement<?> element) {
+    private Object getDefaultValue(
+        ChronoElement<?> element,
+        ParsedValues parsedData
+    ) {
 
         Object obj = this.defaults.get(element);
 
         if (obj instanceof Supplier) {
             obj = Supplier.class.cast(obj).get();
+        } else if (obj instanceof ChronoElement) {
+            obj = parsedData.get(ChronoElement.class.cast(obj));
         }
 
         return obj;

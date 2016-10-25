@@ -31,6 +31,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RelationTest.class,
         SerializationTest.class,
         SingleUnitTest.class,
+        SpanOfWeekdaysTest.class,
         TimestampIntervalFormatTest.class,
         YearsTest.class
     }

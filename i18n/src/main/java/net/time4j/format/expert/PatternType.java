@@ -2343,7 +2343,8 @@ public enum PatternType
                 default:
                     throw new IllegalArgumentException("Illegal count of symbols: " + symbol);
             }
-            builder.addText(TextElement.class.cast(found));
+            TextElement<?> textElement = cast(found);
+            builder.addText(textElement);
             builder.endSection();
         } else if (found.getType() == Integer.class) {
             ChronoElement<Integer> intElement = cast(found);
