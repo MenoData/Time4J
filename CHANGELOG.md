@@ -9,6 +9,7 @@
 - New method `isDisjunct()` in class IntervalCollection [#572]
 - New PatternType.DYNAMIC [#567]
 - Support span of weekdays [#568]
+- Bridge chronologies for AnnualDate, CalendarYear and CalendarMonth [#566]
 
 ### Fixed
 - Years in far future should not require a positive sign [#569]
