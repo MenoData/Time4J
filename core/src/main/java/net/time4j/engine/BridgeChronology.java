@@ -130,7 +130,14 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
         boolean preparsing
     ) {
 
-        T temporal = this.delegate.createFrom(entity, attributes, lenient, preparsing);
+        T temporal;
+
+        if (this.delegate.getChronoType().isInstance(entity)) {
+            temporal = this.delegate.getChronoType().cast(entity);
+        } else {
+            temporal = this.delegate.createFrom(entity, attributes, lenient, preparsing);
+        }
+
         return ((temporal == null) ? null : this.converter.from(temporal));
 
     }
@@ -159,7 +166,7 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
         Locale locale
     ) {
 
-        return this.delegate.getFormatPattern(style, locale);
+        throw new UnsupportedOperationException("Localized format patterns are not available for foreign types.");
 
     }
 

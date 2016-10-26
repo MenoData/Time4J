@@ -32,6 +32,7 @@ import net.time4j.base.TimeSource;
 import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Calendrical;
@@ -97,14 +98,32 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * chronological text and the chronological value of type T. </p>
  *
  * <p>An instance can either be created via a {@code Builder} obtainable
- * by {@link #setUp(Class, Locale)} or by some predefined format constants
- * in {@link Iso8601Format} which can be adjusted by some
- * {@code with()}-methods. Another way to create an instance are the
- * methods {@code formatter(...)} and {@code localFormatter(...)} in
- * the classes {@code PlainDate}, {@code PlainTime}, {@code PlainTimestamp}
- * and {@code Moment}. </p>
+ * by {@link #setUp(Class, Locale)} or by some static factory methods.
+ * The class {@link Iso8601Format} provides additional formatters
+ * adapted for the ISO-8601-standard. </p>
  *
- * <p>Note: This class is immutable and can be used by multiple threads in parallel. </p>
+ * <p><strong>Interoperability note:</strong> </p>
+ *
+ * <p>The static methods {@link #setUp(Chronology, Locale)} and
+ * {@link #ofPattern(String, PatternType, Locale, Chronology)} also
+ * allow the usage of foreign types by specifying a suitable bridge
+ * chronology. Even the old type {@code java.util.Date} can be
+ * used in conjunction with this formatter. Example: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;java.util.Date&gt; f =
+ *          ChronoFormatter.ofPattern(
+ *              &quot;MM/dd/yyyy&quot;,
+ *              PatternType.CLDR,
+ *              Locale.US,
+ *              Moment.axis(TemporalType.JAVA_UTIL_DATE))
+ *          .withDefault(PlainTime.COMPONENT, PlainTime.midnightAtStartOfDay())
+ *          .withStdTimezone();
+ *     System.out.println(f.format(new java.util.Date()));
+ *     java.util.Date d = f.parse(&quot;10/26/2016&quot;);
+ * </pre>
+ *
+ * <p>About thread-safety: This class is immutable and can be used by multiple threads in parallel. </p>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
@@ -115,14 +134,32 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * chronologischen Text und einem chronologischen Wert des Typs T. </p>
  *
  * <p>Eine Instanz kann entweder &uuml;ber einen {@code Builder} via
- * {@link #setUp(Class, Locale)} erzeugt werden, oder die Hauptpaket-Klasse
- * {@link Iso8601Format} liefert einige vordefinierte Formate,
- * die dann mit den {@code with()}-Methoden geeignet angepasst werden
- * k&ouml;nnen. Ein anderer Weg sind die Methoden {@code formatter(...)}
- * und {@code localFormatter(...)} der Klassen {@code PlainDate},
- * {@code PlainTime}, {@code PlainTimestamp} und {@code Moment}. </p>
+ * {@link #setUp(Class, Locale)} oder &uuml;ber statische Fabrikmethoden
+ * erzeugt werden. Die Klasse {@link Iso8601Format} liefert dazu
+ * speziell f&uuml;r die ISO-8601-Norm vordefinierte Formate. </p>
  *
- * <p>Hinweis: Diese Klasse ist <code>immutable</code> und kann von mehreren
+ * <p><strong>Interoperabilit&auml;tsnotiz:</strong> </p>
+ *
+ * <p>Die statischen Methoden {@link #setUp(Chronology, Locale)} und
+ * {@link #ofPattern(String, PatternType, Locale, Chronology)} erlauben
+ * auch die Verwendung von externen Typen, indem eine geeignete Chronologie
+ * angegegeben wird. Sogar der alte Typ {@code java.util.Date} kann in
+ * Verbindung mit diesem Formatierer verwendet werden. Beispiel: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;java.util.Date&gt; f =
+ *          ChronoFormatter.ofPattern(
+ *              &quot;MM/dd/yyyy&quot;,
+ *              PatternType.CLDR,
+ *              Locale.US,
+ *              Moment.axis(TemporalType.JAVA_UTIL_DATE))
+ *          .withDefault(PlainTime.COMPONENT, PlainTime.midnightAtStartOfDay())
+ *          .withStdTimezone();
+ *     System.out.println(f.format(new java.util.Date()));
+ *     java.util.Date d = f.parse(&quot;10/26/2016&quot;);
+ * </pre>
+ *
+ * <p>Hinweis zur Thread-Sicherheit: Diese Klasse ist <code>immutable</code> und kann von mehreren
  * Threads parallel verwendet werden. </p>
  *
  * @param   <T> generic type of chronological entity
@@ -2511,17 +2548,23 @@ public final class ChronoFormatter<T>
         Object intermediate =
             this.parse(inner, inner.preparser(), depth + 1, text, status, attrs, leniency, quickPath);
 
-        if (status.isError() || (intermediate == null) || !(inner instanceof TimeAxis)) {
+        if (status.isError() || (intermediate == null)) {
             return null;
         }
 
-        ChronoElement<?> self = TimeAxis.class.cast(inner).element();
         ParsedValues parsed = status.getRawValues0();
-        updateSelf(parsed, self, intermediate);
         C result;
 
         try {
-            result = outer.createFrom(parsed, attrs, leniency.isLax(), false);
+            if (inner instanceof TimeAxis) {
+                ChronoElement<?> self = TimeAxis.class.cast(inner).element();
+                updateSelf(parsed, self, intermediate);
+                result = outer.createFrom(parsed, attrs, leniency.isLax(), false);
+            } else if (outer instanceof BridgeChronology) {
+                result = outer.createFrom(ChronoEntity.class.cast(intermediate), Attributes.empty(), false, false);
+            } else {
+                throw new IllegalStateException("Unsupported chronology or preparser: " + outer);
+            }
         } catch (RuntimeException re) {
             status.setError(
                 text.length(),
