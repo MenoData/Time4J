@@ -7,6 +7,7 @@ import net.time4j.ZonalClock;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -122,6 +123,11 @@ public class AnnualDateTest {
         assertThat(
             germanStyle.format(AnnualDate.of(9, 11)),
             is("11.9."));
+        ChronoFormatter<MonthDay> patternBased = // style-based is not possible here
+            ChronoFormatter.ofPattern("d. MMMM", PatternType.CLDR, Locale.GERMAN, AnnualDate.threeten());
+        assertThat(
+            patternBased.format(MonthDay.of(10, 1)),
+            is("1. Oktober"));
     }
 
     @Test

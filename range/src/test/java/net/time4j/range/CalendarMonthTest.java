@@ -212,6 +212,18 @@ public class CalendarMonthTest {
     }
 
     @Test
+    public void parse3() throws ParseException {
+        assertThat(
+            ChronoFormatter.ofPattern(
+                "yyyyMM'00'",
+                PatternType.CLDR,
+                Locale.ROOT,
+                CalendarMonth.threeten()
+            ).parse("20150100"),
+            is(YearMonth.of(2015, 1)));
+    }
+
+    @Test
     public void pattern() {
         assertThat(
             CalendarMonth.chronology().getFormatPattern(DisplayMode.LONG, Locale.JAPANESE),

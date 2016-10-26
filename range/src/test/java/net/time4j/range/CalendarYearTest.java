@@ -183,10 +183,18 @@ public class CalendarYearTest {
     }
 
     @Test
-    public void parse() throws ParseException {
+    public void parse1() throws ParseException {
         CalendarYear expected = CalendarYear.of(2016);
         assertThat(
             ChronoFormatter.ofPattern("yyyy", PatternType.CLDR, Locale.ROOT, CalendarYear.chronology()).parse("2016"),
+            is(expected));
+    }
+
+    @Test
+    public void parse2() throws ParseException {
+        Year expected = Year.of(2016);
+        assertThat(
+            ChronoFormatter.ofPattern("yyyy", PatternType.CLDR, Locale.ROOT, CalendarYear.threeten()).parse("2016"),
             is(expected));
     }
 

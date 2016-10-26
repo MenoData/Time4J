@@ -27,11 +27,13 @@ import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
@@ -185,6 +187,27 @@ public final class AnnualDate
 
     private static final ChronoFormatter<AnnualDate> PARSER =
         ChronoFormatter.setUp(ENGINE, Locale.ROOT).addPattern("--MM-dd", PatternType.CLDR).build();
+
+    private static final Chronology<MonthDay> THREETEN;
+
+    static {
+        Converter<MonthDay, AnnualDate> converter =
+            new Converter<MonthDay, AnnualDate>() {
+                @Override
+                public AnnualDate translate(MonthDay source) {
+                    return new AnnualDate(source.getMonthValue(), source.getDayOfMonth());
+                }
+                @Override
+                public MonthDay from(AnnualDate time4j) {
+                    return MonthDay.of(time4j.month, time4j.dayOfMonth);
+                }
+                @Override
+                public Class<MonthDay> getSourceType() {
+                    return MonthDay.class;
+                }
+            };
+        THREETEN = new BridgeChronology<>(converter, ENGINE);
+    }
 
     private static final long serialVersionUID = 7510648008819092983L;
 
@@ -583,6 +606,24 @@ public final class AnnualDate
     public static Chronology<AnnualDate> chronology() {
 
         return ENGINE;
+
+    }
+
+    /**
+     * <p>Obtains a bridge chronology for the type {@code java.time.MonthDay}. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.MonthDay}
+     * @see     #chronology()
+     */
+    /*[deutsch]
+     * <p>Liefert eine an den Typ {@code java.time.MonthDay} angepasste Chronologie. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.MonthDay}
+     * @see     #chronology()
+     */
+    public static Chronology<MonthDay> threeten() {
+
+        return THREETEN;
 
     }
 

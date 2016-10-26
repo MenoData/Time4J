@@ -31,10 +31,12 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
@@ -150,6 +152,27 @@ public final class CalendarYear
             .setUp(CalendarYear.class, new Merger())
             .appendElement(YEAR, new YearRule())
             .build();
+
+    private static final Chronology<Year> THREETEN;
+
+    static {
+        Converter<Year, CalendarYear> converter =
+            new Converter<Year, CalendarYear>() {
+                @Override
+                public CalendarYear translate(Year source) {
+                    return CalendarYear.of(source.getValue());
+                }
+                @Override
+                public Year from(CalendarYear time4j) {
+                    return Year.of(time4j.year);
+                }
+                @Override
+                public Class<Year> getSourceType() {
+                    return Year.class;
+                }
+            };
+        THREETEN = new BridgeChronology<>(converter, ENGINE);
+    }
 
     private static final long serialVersionUID = 2151327270599436439L;
 
@@ -534,6 +557,24 @@ public final class CalendarYear
     public static Chronology<CalendarYear> chronology() {
 
         return ENGINE;
+
+    }
+
+    /**
+     * <p>Obtains a bridge chronology for the type {@code java.time.Year}. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.Year}
+     * @see     #chronology()
+     */
+    /*[deutsch]
+     * <p>Liefert eine an den Typ {@code java.time.Year} angepasste Chronologie. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.Year}
+     * @see     #chronology()
+     */
+    public static Chronology<Year> threeten() {
+
+        return THREETEN;
 
     }
 

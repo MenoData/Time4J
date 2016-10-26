@@ -30,10 +30,12 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
@@ -186,6 +188,27 @@ public final class CalendarMonth
     private static final ChronoFormatter<CalendarMonth> PARSER =
         ChronoFormatter.setUp(CalendarMonth.chronology(), Locale.ROOT)
             .addPattern("uuuu-MM|uuuuMM", PatternType.CLDR).build();
+
+    private static final Chronology<YearMonth> THREETEN;
+
+    static {
+        Converter<YearMonth, CalendarMonth> converter =
+            new Converter<YearMonth, CalendarMonth>() {
+                @Override
+                public CalendarMonth translate(YearMonth source) {
+                    return CalendarMonth.of(source.getYear(), source.getMonthValue());
+                }
+                @Override
+                public YearMonth from(CalendarMonth time4j) {
+                    return YearMonth.of(time4j.year, time4j.month.getValue());
+                }
+                @Override
+                public Class<YearMonth> getSourceType() {
+                    return YearMonth.class;
+                }
+            };
+        THREETEN = new BridgeChronology<>(converter, ENGINE);
+    }
 
     private static final long serialVersionUID = -5097347953941448741L;
 
@@ -664,6 +687,24 @@ public final class CalendarMonth
     public static Chronology<CalendarMonth> chronology() {
 
         return ENGINE;
+
+    }
+
+    /**
+     * <p>Obtains a bridge chronology for the type {@code java.time.YearMonth}. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.YearMonth}
+     * @see     #chronology()
+     */
+    /*[deutsch]
+     * <p>Liefert eine an den Typ {@code java.time.YearMonth} angepasste Chronologie. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.YearMonth}
+     * @see     #chronology()
+     */
+    public static Chronology<YearMonth> threeten() {
+
+        return THREETEN;
 
     }
 
