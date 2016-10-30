@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (VariantSource.java) is part of project Time4J.
  *
@@ -34,6 +34,7 @@ package net.time4j.engine;
  * @author  Meno Hochschild
  * @since   3.6/4.4
  */
+@FunctionalInterface
 public interface VariantSource {
 
     //~ Methoden ----------------------------------------------------------

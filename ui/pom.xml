@@ -1,0 +1,49 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    
+    <modelVersion>4.0.0</modelVersion>
+    
+    <parent>
+        <groupId>net.time4j</groupId>
+        <artifactId>time4j-parent</artifactId>
+        <version>4.20</version>
+        <relativePath>../pom.xml</relativePath>
+    </parent>
+    
+    <groupId>net.time4j</groupId>
+    <artifactId>time4j-ui</artifactId>
+    <packaging>jar</packaging>
+    <name>Time4J-UI</name>
+
+    <dependencies>
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-core</artifactId>
+            <version>[4.20,)</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-i18n</artifactId>
+            <version>[4.20,)</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-range</artifactId>
+            <version>[4.20,)</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>net.time4j</groupId>
+            <artifactId>time4j-calendar</artifactId>
+            <version>[4.20,)</version>
+            <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+        </dependency>
+    </dependencies>
+
+</project>

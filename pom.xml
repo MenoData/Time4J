@@ -17,6 +17,7 @@
         <module>range</module>
         <module>misc</module>
         <module>olson</module>
+        <module>ui</module>
     </modules>
     
     <licenses>
