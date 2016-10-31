@@ -1,5 +1,6 @@
 ## [v4.20] not yet released
 ### Added
+- JavaFX-CalendarPicker [#561]
 - Open ChronoFormatter for external types [#556]
 - Add some convenient methods around day partition rules [#563]
 - Week calculations for non-ISO calendars [#562]
