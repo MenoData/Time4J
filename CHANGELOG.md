@@ -1,4 +1,6 @@
-## [v4.20] not yet released
+## [v4.21] not yet released
+
+## [v4.20] published on 2016-11-01
 ### Added
 - JavaFX-CalendarPicker [#561]
 - Open ChronoFormatter for external types [#556]
