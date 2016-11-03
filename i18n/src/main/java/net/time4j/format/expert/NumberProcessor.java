@@ -60,6 +60,7 @@ class NumberProcessor<V>
     private final char zeroDigit;
     private final NumberSystem numberSystem;
     private final int protectedLength;
+    private final int scaleOfNumsys;
 
     // high-speed optimization
     private final boolean fixedInt;
@@ -152,6 +153,7 @@ class NumberProcessor<V>
         this.numberSystem = numberSystem;
         this.lenientMode = lenientMode;
         this.protectedLength = protectedLength;
+        this.scaleOfNumsys = scale;
 
     }
 
@@ -396,12 +398,16 @@ class NumberProcessor<V>
 
         NumberSystem numsys;
         char zeroChar;
+        int effectiveMin = 1;
+        int effectiveMax;
 
         if (quickPath) {
             numsys = this.numberSystem;
+            effectiveMax = this.scaleOfNumsys;
             zeroChar = this.zeroDigit;
         } else {
             numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+            effectiveMax = this.getScale(numsys);
             zeroChar = (
                 attributes.contains(Attributes.ZERO_DIGIT)
                     ? attributes.get(Attributes.ZERO_DIGIT).charValue()
@@ -409,9 +415,6 @@ class NumberProcessor<V>
         }
 
         Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
-
-        int effectiveMin = 1;
-        int effectiveMax = this.getScale(numsys);
 
         if (this.fixedWidth || !leniency.isLax()) {
             effectiveMin = this.minDigits;
