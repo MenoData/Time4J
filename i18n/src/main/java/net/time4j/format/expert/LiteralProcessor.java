@@ -50,6 +50,7 @@ final class LiteralProcessor
 
     // quick path optimization
     private final boolean caseInsensitive;
+    private final boolean interpunctuationMode;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -77,6 +78,7 @@ final class LiteralProcessor
         }
 
         this.caseInsensitive = true;
+        this.interpunctuationMode = ((literal.length() == 1) && isInterpunctuation(this.single));
 
     }
 
@@ -108,6 +110,7 @@ final class LiteralProcessor
         }
 
         this.caseInsensitive = true;
+        this.interpunctuationMode = false;
 
     }
 
@@ -130,6 +133,7 @@ final class LiteralProcessor
         this.multi = null;
 
         this.caseInsensitive = true;
+        this.interpunctuationMode = false;
 
     }
 
@@ -138,7 +142,8 @@ final class LiteralProcessor
         char alt,
         String multi,
         AttributeKey<Character> attribute,
-        boolean caseInsensitive
+        boolean caseInsensitive,
+        boolean interpunctuationMode
     ) {
         super();
 
@@ -147,6 +152,8 @@ final class LiteralProcessor
         this.multi = multi;
         this.attribute = attribute;
         this.caseInsensitive = caseInsensitive;
+
+        this.interpunctuationMode = interpunctuationMode;
 
     }
 
@@ -181,7 +188,15 @@ final class LiteralProcessor
         boolean quickPath
     ) {
 
-        if (this.multi == null) {
+        if (this.interpunctuationMode) {
+            int offset = status.getPosition();
+            int parsedLen = subSequenceEquals(text, offset, this.single); // filters out any bidi-chars
+            if (parsedLen == -1) {
+                this.logError(text, status);
+            } else {
+                status.setPosition(offset + parsedLen);
+            }
+        } else if (this.multi == null) {
             this.parseChar(text, status, attributes, quickPath);
         } else {
             this.parseMulti(text, status, attributes, quickPath);
@@ -218,8 +233,8 @@ final class LiteralProcessor
             ) { // Spezialfall: ISO-8601
                 alternative = (
                     (literal == ',')
-                    ? '.'
-                    : ((literal == '.') ? ',' : literal)
+                        ? '.'
+                        : ((literal == '.') ? ',' : literal)
                 );
             }
 
@@ -228,8 +243,8 @@ final class LiteralProcessor
             if (error) {
                 boolean caseInsensitive = (
                     quickPath
-                        ? this.caseInsensitive
-                        : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+                    ? this.caseInsensitive
+                    : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
                 if (caseInsensitive && (charEqualsIgnoreCase(c, literal) || charEqualsIgnoreCase(c, alternative))) {
                     error = false;
                 }
@@ -261,24 +276,16 @@ final class LiteralProcessor
     ) {
 
         int offset = status.getPosition();
-        int len = this.multi.length();
 
         boolean caseInsensitive = (
             quickPath
-                ? this.caseInsensitive
-                : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+            ? this.caseInsensitive
+            : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
 
         int parsedLen = subSequenceEquals(text, offset, this.multi, caseInsensitive);
 
         if (parsedLen == -1) {
-            StringBuilder msg = new StringBuilder("Cannot parse: \"");
-            msg.append(text);
-            msg.append("\" (expected: [");
-            msg.append(this.multi);
-            msg.append("], found: [");
-            msg.append(text.subSequence(offset, Math.min(offset + len, text.length())));
-            msg.append("])");
-            status.setError(offset, msg.toString());
+            this.logError(text, status);
         } else {
             status.setPosition(offset + parsedLen);
         }
@@ -383,7 +390,8 @@ final class LiteralProcessor
             this.alt,
             this.multi,
             this.attribute,
-            attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue()
+            attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
+            this.interpunctuationMode
         );
 
     }
@@ -452,6 +460,38 @@ final class LiteralProcessor
 
     }
 
+    private static int subSequenceEquals(
+        CharSequence test,
+        int offset,
+        char expected
+    ) {
+
+        int j = 0;
+        int max = test.length();
+        char c = '\u0000';
+
+        while ((j + offset < max) && isBidi(c = test.charAt(j + offset))) {
+            j++;
+        }
+
+        if (j + offset >= max) {
+            return -1;
+        } else {
+            j++;
+        }
+
+        if (c != expected) {
+            return -1;
+        }
+
+        while ((j + offset < max) && isBidi(test.charAt(j + offset))) {
+            j++;
+        }
+
+        return j;
+
+    }
+
     private static boolean charEqualsIgnoreCase(
         char c1,
         char c2
@@ -468,6 +508,29 @@ final class LiteralProcessor
     private static boolean isBidi(char c) {
 
         return ((c == '\u200E') || (c == '\u200F') || (c == '\u061C')); // LRM, RLM, ALM
+
+    }
+
+    private static boolean isInterpunctuation(char c) {
+
+        return (!Character.isLetter(c) && !Character.isDigit(c) && !isBidi(c));
+
+    }
+
+    private void logError(
+        CharSequence text,
+        ParseLog status
+    ) {
+
+        int offset = status.getPosition();
+        StringBuilder msg = new StringBuilder("Cannot parse: \"");
+        msg.append(text);
+        msg.append("\" (expected: [");
+        msg.append(this.multi);
+        msg.append("], found: [");
+        msg.append(text.subSequence(offset, Math.min(offset + this.multi.length(), text.length())));
+        msg.append("])");
+        status.setError(offset, msg.toString());
 
     }
 

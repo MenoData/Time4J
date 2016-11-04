@@ -186,6 +186,7 @@ public final class ChronoFormatter<T>
     private final Leniency leniency;
     private final boolean indexable;
     private final boolean trailing;
+    private final boolean noPreparser;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -264,6 +265,7 @@ public final class ChronoFormatter<T>
         }
 
         this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
+        this.noPreparser = this.hasNoPreparser();
         this.steps = this.freeze(steps);
 
     }
@@ -368,6 +370,7 @@ public final class ChronoFormatter<T>
 
         this.indexable = ix;
         this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
+        this.noPreparser = this.hasNoPreparser();
         this.steps = this.freeze(copy);
 
     }
@@ -414,6 +417,7 @@ public final class ChronoFormatter<T>
 
         this.defaults = Collections.unmodifiableMap(map);
         this.indexable = ix;
+        this.noPreparser = this.hasNoPreparser();
         this.steps = this.freeze(formatter.steps);
 
     }
@@ -769,7 +773,7 @@ public final class ChronoFormatter<T>
     public T parse(CharSequence text) throws ParseException {
 
         ParseLog status = new ParseLog();
-        T result = this.parse(text, status, this.globalAttributes);
+        T result = this.parse(text, status);
 
         if (result == null) {
             throw new ParseException(
@@ -804,7 +808,7 @@ public final class ChronoFormatter<T>
         ParsePosition position
     ) {
 
-        return this.parse(text, new ParseLog(position), this.globalAttributes);
+        return this.parse(text, new ParseLog(position));
 
     }
 
@@ -816,7 +820,7 @@ public final class ChronoFormatter<T>
     ) {
 
         ParseLog plog = new ParseLog(position);
-        T result = this.parse(text, plog, this.globalAttributes);
+        T result = this.parse(text, plog);
         rawValues.accept(plog.getRawValues());
         return result;
 
@@ -849,9 +853,24 @@ public final class ChronoFormatter<T>
         ParseLog status
     ) {
 
+        if (this.noPreparser) {
+            return parse(
+                this,
+                this.chronology,
+                this.chronology.getExtensions(),
+                text,
+                status,
+                this.globalAttributes,
+                this.leniency,
+                false,
+                true
+            );
+        }
+
         return this.parse(text, status, this.globalAttributes);
 
     }
+
 
     /**
      * <p>Interpretes given text as chronological entity starting
@@ -901,8 +920,6 @@ public final class ChronoFormatter<T>
             quickPath = false;
         }
 
-        T result;
-
         if (this.overrideHandler != null) {
 
             // use calendar override
@@ -940,7 +957,7 @@ public final class ChronoFormatter<T>
                 return null;
             } else {
                 parsed.with(Moment.axis().element(), moment);
-                result = cast(moment);
+                T result = cast(moment);
                 if (leniency.isStrict()) {
                     checkConsistency(parsed, result, text, status);
                 }
@@ -3115,6 +3132,12 @@ public final class ChronoFormatter<T>
         }
 
         return Collections.unmodifiableList(frozen);
+
+    }
+
+    private boolean hasNoPreparser() {
+
+        return ((this.chronology.preparser() == null) && (this.overrideHandler == null));
 
     }
 
