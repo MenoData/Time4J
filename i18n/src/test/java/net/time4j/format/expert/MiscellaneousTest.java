@@ -810,6 +810,39 @@ public class MiscellaneousTest {
             is(expected));
     }
 
+    @Test(expected=ParseException.class)
+    public void testInterpunctuationLiteralWithBidisISO() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern(
+                "uuuu-MM-dd",
+                PatternType.CLDR,
+                Locale.ROOT);
+        PlainDate expected = PlainDate.of(2015, 12, 20);
+        assertThat(
+            formatter.parse("2015-12-20"), // stripped version without bidis
+            is(expected));
+        assertThat(
+            formatter.parse("2015\u200E\u200F-\u061C12-20"), // extra bidis
+            is(expected));
+    }
+
+    @Test
+    public void testInterpunctuationLiteralWithBidisArabic() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern(
+                "uuuu-MM-dd",
+                PatternType.CLDR,
+                new Locale("ar")
+            ).with(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+        PlainDate expected = PlainDate.of(2015, 12, 20);
+        assertThat(
+            formatter.parse("2015-12-20"), // stripped version without bidis
+            is(expected));
+        assertThat(
+            formatter.parse("2015\u200E\u200F-\u061C12-20"), // extra bidis
+            is(expected));
+    }
+
     @Test
     public void parseZDTWithException() throws ParseException {
         Timezone tz = Timezone.of("Asia/Tokyo");
