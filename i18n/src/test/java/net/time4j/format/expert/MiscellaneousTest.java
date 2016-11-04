@@ -792,7 +792,7 @@ public class MiscellaneousTest {
     public void testLiteralWithBidis() throws ParseException {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern(
-                "uuuu-MM" + "\u200E\u200F" + "-dd" + "\u061C",
+                "uuuu" + "\u200E\u200F" + "-MM-dd" + "\u061C",
                 PatternType.CLDR,
                 Locale.ENGLISH);
         PlainDate expected = PlainDate.of(2015, 12, 20);
