@@ -26,6 +26,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 
 import java.io.IOException;
 import java.util.Locale;
@@ -188,13 +189,12 @@ final class LiteralProcessor
         boolean quickPath
     ) {
 
-        if (this.interpunctuationMode) {
+        if (this.interpunctuationMode) { // not relevant for RTL-languages (see quickPath()-method)
             int offset = status.getPosition();
-            int parsedLen = subSequenceEquals(text, offset, this.single); // filters out any bidi-chars
-            if (parsedLen == -1) {
-                this.logError(text, status);
+            if ((offset < text.length()) && (text.charAt(offset) == this.single)) {
+                status.setPosition(offset + 1);
             } else {
-                status.setPosition(offset + parsedLen);
+                this.logError(text, status);
             }
         } else if (this.multi == null) {
             this.parseChar(text, status, attributes, quickPath);
@@ -233,8 +233,8 @@ final class LiteralProcessor
             ) { // Spezialfall: ISO-8601
                 alternative = (
                     (literal == ',')
-                        ? '.'
-                        : ((literal == '.') ? ',' : literal)
+                    ? '.'
+                    : ((literal == '.') ? ',' : literal)
                 );
             }
 
@@ -308,7 +308,7 @@ final class LiteralProcessor
                     && (this.alt == that.alt)
                 );
             } else {
-                return this.multi.equals(that.multi);
+                return this.multi.equals(that.multi) && (this.interpunctuationMode == that.interpunctuationMode);
             }
         } else {
             return false;
@@ -391,7 +391,7 @@ final class LiteralProcessor
             this.multi,
             this.attribute,
             attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
-            this.interpunctuationMode
+            this.interpunctuationMode && !CalendarText.isRTL(formatter.getLocale())
         );
 
     }
@@ -450,38 +450,6 @@ final class LiteralProcessor
             } else if (c != exp) {
                 return -1;
             }
-        }
-
-        while ((j + offset < max) && isBidi(test.charAt(j + offset))) {
-            j++;
-        }
-
-        return j;
-
-    }
-
-    private static int subSequenceEquals(
-        CharSequence test,
-        int offset,
-        char expected
-    ) {
-
-        int j = 0;
-        int max = test.length();
-        char c = '\u0000';
-
-        while ((j + offset < max) && isBidi(c = test.charAt(j + offset))) {
-            j++;
-        }
-
-        if (j + offset >= max) {
-            return -1;
-        } else {
-            j++;
-        }
-
-        if (c != expected) {
-            return -1;
         }
 
         while ((j + offset < max) && isBidi(test.charAt(j + offset))) {

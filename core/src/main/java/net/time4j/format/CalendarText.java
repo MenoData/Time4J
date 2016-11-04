@@ -1157,6 +1157,26 @@ public final class CalendarText {
     }
 
     /**
+     * <p>Determines if given language is written in right-to-left direction. </p>
+     *
+     * @param   locale  language to be checked
+     * @return  {@code true} if right-to-left else {@code false}
+     * @since   3.25/4.21
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob die angegebene Sprache von rechts nach links geschrieben wird. </p>
+     *
+     * @param   locale  language to be checked
+     * @return  {@code true} if right-to-left else {@code false}
+     * @since   3.25/4.21
+     */
+    public static boolean isRTL(Locale locale) {
+
+        return RTL.contains(locale.getLanguage());
+
+    }
+
+    /**
      * <p>Extrahiert den Kalendertyp aus der angegebenen Chronologie. </p>
      *
      * <p>Kann kein Kalendertyp ermittelt werden, wird {@code ISO_CALENDAR_TYPE}
@@ -1787,8 +1807,8 @@ public final class CalendarText {
             if (this.delegate == null) {
                 if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
                     return "{0}/{1}"; // ISO-8601-style
-                } else if (isTextRTL(locale)) {
-                    return "{0} - {1}"; // based on analysis of CLDR-data
+//                } else if (isRTL(locale)) {
+//                    return "{0} - {1}"; // based on analysis of CLDR-data
                 } else {
                     return "{0} - {1}"; // default
                 }
@@ -1822,13 +1842,6 @@ public final class CalendarText {
             }
 
             throw new IllegalStateException("Cannot retrieve format pattern: " + df);
-
-        }
-
-        // helper method for text orientation
-        private static boolean isTextRTL(Locale locale) {
-
-            return RTL.contains(locale.getLanguage());
 
         }
 
