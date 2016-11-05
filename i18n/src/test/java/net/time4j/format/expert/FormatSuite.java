@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DuplicateElementTest.class,
         FractionTest.class,
         Iso8601FormatTest.class,
+        LiteralWithBidisTest.class,
         LiteralWithDigitsTest.class,
         MiscellaneousTest.class,
         MomentPatternTest.class,

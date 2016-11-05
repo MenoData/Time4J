@@ -26,6 +26,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
@@ -288,6 +289,7 @@ final class LocalizedGMTProcessor
         }
 
         Locale loc = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+        boolean rtl = CalendarText.isRTL(loc);
 
         boolean np = (
             quickPath
@@ -345,10 +347,10 @@ final class LocalizedGMTProcessor
             }
 
             OffsetSign sign;
-            int parsedLen = LiteralProcessor.subSequenceEquals(text, pos, plus, ignoreCase);
+            int parsedLen = LiteralProcessor.subSequenceEquals(text, pos, plus, ignoreCase, rtl);
 
             if (parsedLen == -1) {
-                parsedLen = LiteralProcessor.subSequenceEquals(text, pos, minus, ignoreCase);
+                parsedLen = LiteralProcessor.subSequenceEquals(text, pos, minus, ignoreCase, rtl);
 
                 if (parsedLen == -1) {
                     int zl = (np ? 0 : parseUTC(text, len, old, loc, ignoreCase)); // no sign => try UTC
@@ -402,7 +404,7 @@ final class LocalizedGMTProcessor
             }
 
             Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
-            int seplen = LiteralProcessor.subSequenceEquals(text, pos, info.separator, ignoreCase);
+            int seplen = LiteralProcessor.subSequenceEquals(text, pos, info.separator, ignoreCase, rtl);
 
             if (seplen != -1) {
                 pos += seplen;
@@ -430,7 +432,7 @@ final class LocalizedGMTProcessor
             int seconds = 0;
 
             if (pos < len) {
-                seplen = LiteralProcessor.subSequenceEquals(text, pos, info.separator, ignoreCase);
+                seplen = LiteralProcessor.subSequenceEquals(text, pos, info.separator, ignoreCase, rtl);
 
                 if (seplen != -1) {
                     pos += seplen;
