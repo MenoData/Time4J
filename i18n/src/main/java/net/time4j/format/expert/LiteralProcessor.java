@@ -52,6 +52,7 @@ final class LiteralProcessor
     // quick path optimization
     private final boolean caseInsensitive;
     private final boolean interpunctuationMode;
+    private final boolean rtl;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -80,6 +81,7 @@ final class LiteralProcessor
 
         this.caseInsensitive = true;
         this.interpunctuationMode = ((literal.length() == 1) && isInterpunctuation(this.single));
+        this.rtl = false;
 
     }
 
@@ -112,6 +114,7 @@ final class LiteralProcessor
 
         this.caseInsensitive = true;
         this.interpunctuationMode = false;
+        this.rtl = false;
 
     }
 
@@ -135,6 +138,7 @@ final class LiteralProcessor
 
         this.caseInsensitive = true;
         this.interpunctuationMode = false;
+        this.rtl = false;
 
     }
 
@@ -144,7 +148,8 @@ final class LiteralProcessor
         String multi,
         AttributeKey<Character> attribute,
         boolean caseInsensitive,
-        boolean interpunctuationMode
+        boolean interpunctuationMode,
+        boolean rtl
     ) {
         super();
 
@@ -153,8 +158,8 @@ final class LiteralProcessor
         this.multi = multi;
         this.attribute = attribute;
         this.caseInsensitive = caseInsensitive;
-
         this.interpunctuationMode = interpunctuationMode;
+        this.rtl = rtl;
 
     }
 
@@ -189,7 +194,7 @@ final class LiteralProcessor
         boolean quickPath
     ) {
 
-        if (this.interpunctuationMode) { // not relevant for RTL-languages (see quickPath()-method)
+        if (quickPath && this.interpunctuationMode) { // not relevant for RTL-languages (see quickPath()-method)
             int offset = status.getPosition();
             if ((offset < text.length()) && (text.charAt(offset) == this.single)) {
                 status.setPosition(offset + 1);
@@ -281,8 +286,11 @@ final class LiteralProcessor
             quickPath
             ? this.caseInsensitive
             : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
-
-        int parsedLen = subSequenceEquals(text, offset, this.multi, caseInsensitive);
+        boolean rtl = (
+            quickPath
+            ? this.rtl
+            : CalendarText.isRTL(attributes.get(Attributes.LANGUAGE, Locale.ROOT)));
+        int parsedLen = subSequenceEquals(text, offset, this.multi, caseInsensitive, rtl);
 
         if (parsedLen == -1) {
             this.logError(text, status);
@@ -385,13 +393,16 @@ final class LiteralProcessor
         int reserved
     ) {
 
+        boolean rtl = CalendarText.isRTL(attributes.get(Attributes.LANGUAGE, Locale.ROOT));
+
         return new LiteralProcessor(
             this.single,
             this.alt,
             this.multi,
             this.attribute,
             attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
-            this.interpunctuationMode && !CalendarText.isRTL(formatter.getLocale())
+            this.interpunctuationMode && !rtl,
+            rtl
         );
 
     }
@@ -418,7 +429,8 @@ final class LiteralProcessor
         CharSequence test,
         int offset,
         CharSequence expected,
-        boolean caseInsensitive
+        boolean caseInsensitive,
+        boolean rtl
     ) {
 
         int j = 0;
@@ -430,11 +442,15 @@ final class LiteralProcessor
             char exp = expected.charAt(i);
 
             if (isBidi(exp)) {
-                continue;
+                continue; // always ignore bidis in pattern when parsing
             }
 
-            while ((j + offset < max) && isBidi(c = test.charAt(j + offset))) {
-                j++;
+            if (rtl) {
+                while ((j + offset < max) && isBidi(c = test.charAt(j + offset))) {
+                    j++;
+                }
+            } else if (j + offset < max) {
+                c = test.charAt(j + offset);
             }
 
             if (j + offset >= max) {
@@ -452,8 +468,10 @@ final class LiteralProcessor
             }
         }
 
-        while ((j + offset < max) && isBidi(test.charAt(j + offset))) {
-            j++;
+        if (rtl) {
+            while ((j + offset < max) && isBidi(test.charAt(j + offset))) {
+                j++;
+            }
         }
 
         return j;
