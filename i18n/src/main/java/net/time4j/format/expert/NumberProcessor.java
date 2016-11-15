@@ -21,6 +21,7 @@
 
 package net.time4j.format.expert;
 
+import net.time4j.PlainDate;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
@@ -573,6 +574,10 @@ class NumberProcessor<V>
             return;
         } else if (type == Long.class) {
             value = Long.valueOf(total);
+        } else if (this.element == PlainDate.MONTH_OF_YEAR) {
+            parsedResult.put(PlainDate.MONTH_AS_NUMBER, (int) total);
+            status.setPosition(pos);
+            return;
         } else if (Enum.class.isAssignableFrom(type)) {
             if (this.element instanceof NumericalElement) { // Normalfall
                 NumericalElement<V> ne = (NumericalElement<V>) this.element;

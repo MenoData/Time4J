@@ -8,6 +8,7 @@ import java.text.ParseException;
 import java.util.Locale;
 
 import net.time4j.format.Attributes;
+import net.time4j.format.Leniency;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -133,6 +134,34 @@ public class DefaultValueTest {
                 .withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 15);
         PlainTime time = fmt.parse("10:21");
         assertThat(time, is(PlainTime.of(15, 10, 21)));
+    }
+
+    @Test
+    public void doubleElementForMonth1() throws ParseException {
+        ChronoFormatter<PlainDate> ff =
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
+                .addFixedInteger(PlainDate.YEAR, 4)
+                .startOptionalSection()
+                .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
+                .addPattern("[dd]]", PatternType.CLDR)
+                .build()
+                .withDefault(PlainDate.MONTH_AS_NUMBER, 1)
+                .withDefault(PlainDate.DAY_OF_MONTH, 1).with(Leniency.STRICT);
+        assertThat(ff.parse("20160504"), is(PlainDate.of(2016, 5, 4)));
+    }
+
+    @Test
+    public void doubleElementForMonth2() throws ParseException {
+        ChronoFormatter<PlainDate> ff =
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
+                .addFixedInteger(PlainDate.YEAR, 4)
+                .startOptionalSection()
+                .addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2)
+                .addPattern("[dd]]", PatternType.CLDR)
+                .build()
+                .withDefault(PlainDate.MONTH_OF_YEAR, Month.JANUARY)
+                .withDefault(PlainDate.DAY_OF_MONTH, 1).with(Leniency.STRICT);
+        assertThat(ff.parse("20160504"), is(PlainDate.of(2016, 5, 4)));
     }
 
 }

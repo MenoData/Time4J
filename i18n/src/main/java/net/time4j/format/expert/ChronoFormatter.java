@@ -25,6 +25,7 @@ import net.time4j.CalendarUnit;
 import net.time4j.DayPeriod;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
+import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -2667,6 +2668,9 @@ public final class ChronoFormatter<T>
         if (!cf.defaults.isEmpty()) {
             for (ChronoElement<?> e : cf.defaults.keySet()) {
                 if (!parsed.contains(e)) {
+                    if ((e == PlainDate.MONTH_OF_YEAR) && parsed.contains(PlainDate.MONTH_AS_NUMBER)) {
+                        continue;
+                    }
                     parsed.put(e, cf.defaults.get(e));
                 }
             }
