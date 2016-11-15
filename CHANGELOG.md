@@ -1,5 +1,6 @@
 ## [v4.21] not yet released
 ### Fixed
+- Ambivalence parsing check sometimes faulty [#577]
 - Unicode-BIDI-chars should not be parsed in context of ISO [#574]
 
 ## [v4.20] published on 2016-11-01
