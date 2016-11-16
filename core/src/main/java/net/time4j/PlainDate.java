@@ -517,13 +517,14 @@ public final class PlainDate
      *
      * @see     #MONTH_OF_YEAR
      */
+    @FormattableElement(format = "M")
     public static final ProportionalElement<Integer, PlainDate> MONTH_AS_NUMBER =
         IntegerDateElement.create(
             "MONTH_AS_NUMBER",
             IntegerDateElement.MONTH,
             1,
             12,
-            '\u0000');
+            'M');
 
     /**
      * <p>Element with the day of month in the value range

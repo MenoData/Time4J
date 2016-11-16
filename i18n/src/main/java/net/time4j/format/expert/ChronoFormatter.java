@@ -2849,12 +2849,25 @@ public final class ChronoFormatter<T>
 
         // Phase 2: Anreicherung mit Default-Werten
         if (!cf.defaults.isEmpty()) {
-            for (ChronoElement<?> e : cf.defaults.keySet()) {
-                if (!parsed.contains(e)) {
-                    if ((e == PlainDate.MONTH_OF_YEAR) && parsed.contains(PlainDate.MONTH_AS_NUMBER)) {
-                        continue;
+            Set<ChronoElement<?>> parsedElements = null;
+            for (ChronoElement<?> de : cf.defaults.keySet()) {
+                if (!parsed.contains(de)) {
+                    char s = de.getSymbol();
+                    boolean inject = true;
+                    if (s != '\u0000') {
+                        if (parsedElements == null) {
+                            parsedElements = parsed.getRegisteredElements(); // lazy
+                        }
+                        for (ChronoElement<?> pe : parsedElements) {
+                            if (pe.getSymbol() == s) {
+                                inject = false;
+                                break;
+                            }
+                        }
                     }
-                    parsed.put(e, cf.getDefaultValue(e, parsed));
+                    if (inject) {
+                        parsed.put(de, cf.getDefaultValue(de, parsed));
+                    }
                 }
             }
         }
