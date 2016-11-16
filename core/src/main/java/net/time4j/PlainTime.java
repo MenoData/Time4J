@@ -552,13 +552,14 @@ public final class PlainTime
      *
      * @see     #getHour()
      */
+    @FormattableElement(format = "H")
     public static final ProportionalElement<Integer, PlainTime> ISO_HOUR =
         IntegerTimeElement.createTimeElement(
             "ISO_HOUR",
             IntegerTimeElement.ISO_HOUR,
             0,
             23,
-            '\u0000');
+            'H');
 
     /**
      * <p>Element with the minute of hour in the value range {@code 0-59}. </p>

@@ -164,4 +164,12 @@ public class DefaultValueTest {
         assertThat(ff.parse("20160504"), is(PlainDate.of(2016, 5, 4)));
     }
 
+    @Test
+    public void doubleElementForHour24() throws ParseException {
+        ChronoFormatter<PlainTime> ff =
+            ChronoFormatter.ofTimePattern("HH:mm:ss", PatternType.CLDR, Locale.ROOT)
+                .withDefault(PlainTime.ISO_HOUR, 0).with(Leniency.STRICT);
+        assertThat(ff.parse("21:15:04"), is(PlainTime.of(21, 15, 4)));
+    }
+
 }
