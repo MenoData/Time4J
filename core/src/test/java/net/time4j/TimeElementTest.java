@@ -411,7 +411,7 @@ public class TimeElementTest {
 
     @Test
     public void isoHourGetSymbol() {
-        assertThat(ISO_HOUR.getSymbol(), is('\u0000'));
+        assertThat(ISO_HOUR.getSymbol(), is('H'));
     }
 
     @Test

@@ -166,10 +166,10 @@ public class AdjacentDigitParsingTest {
         } catch (ParseException pe) {
             assertThat(
                 pe.getMessage(),
-                is("[MONTH_OF_YEAR] No enum found for value: 74"));
+                is("Cannot parse: \"20000229174521123456\" (expected: [.], found: [6])"));
             assertThat(
                 pe.getErrorOffset(),
-                is(9));
+                is(19));
             throw pe;
         }
     }
@@ -194,10 +194,10 @@ public class AdjacentDigitParsingTest {
         } catch (ParseException pe) {
             assertThat(
                 pe.getMessage(),
-                is("[MONTH_OF_YEAR] No enum found for value: 22"));
+                is("Cannot parse: \"20000229174521123456\" (expected: [.], found: [2])"));
             assertThat(
                 pe.getErrorOffset(),
-                is(5));
+                is(15));
             throw pe;
         }
     }
