@@ -25,7 +25,6 @@ import net.time4j.CalendarUnit;
 import net.time4j.DayPeriod;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
-import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;

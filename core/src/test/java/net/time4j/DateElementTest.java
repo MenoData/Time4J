@@ -334,7 +334,7 @@ public class DateElementTest {
 
     @Test
     public void monthAsNumberGetSymbol() {
-        assertThat(MONTH_AS_NUMBER.getSymbol(), is('\u0000'));
+        assertThat(MONTH_AS_NUMBER.getSymbol(), is('M'));
     }
 
     @Test

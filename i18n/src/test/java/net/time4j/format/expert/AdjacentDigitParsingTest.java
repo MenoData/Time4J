@@ -154,7 +154,7 @@ public class AdjacentDigitParsingTest {
                 .startSection(Attributes.LENIENCY, Leniency.LAX)
                 .addInteger(PlainDate.YEAR, 4, 4) // no fixed-width!
                 .endSection()
-                .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
+                .addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
                 .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
@@ -166,10 +166,10 @@ public class AdjacentDigitParsingTest {
         } catch (ParseException pe) {
             assertThat(
                 pe.getMessage(),
-                is("[MONTH_OF_YEAR] No enum found for value: 74"));
+                is("Cannot parse: \"20000229174521123456\" (expected: [.], found: [6])"));
             assertThat(
                 pe.getErrorOffset(),
-                is(9));
+                is(19));
             throw pe;
         }
     }
@@ -182,7 +182,7 @@ public class AdjacentDigitParsingTest {
                 .startSection(Attributes.LENIENCY, Leniency.SMART)
                 .addInteger(PlainDate.YEAR, 4, 5) // no fixed-width!
                 .endSection()
-                .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
+                .addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
                 .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
@@ -194,10 +194,10 @@ public class AdjacentDigitParsingTest {
         } catch (ParseException pe) {
             assertThat(
                 pe.getMessage(),
-                is("[MONTH_OF_YEAR] No enum found for value: 22"));
+                is("Cannot parse: \"20000229174521123456\" (expected: [.], found: [2])"));
             assertThat(
                 pe.getErrorOffset(),
-                is(5));
+                is(15));
             throw pe;
         }
     }

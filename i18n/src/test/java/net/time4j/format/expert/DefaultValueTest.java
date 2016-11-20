@@ -6,7 +6,6 @@ import net.time4j.PlainTime;
 
 import java.text.ParseException;
 import java.util.Locale;
-import java.util.function.Supplier;
 
 import net.time4j.PlainTimestamp;
 import net.time4j.SystemClock;
