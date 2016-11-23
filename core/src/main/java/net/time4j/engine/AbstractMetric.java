@@ -21,7 +21,6 @@
 
 package net.time4j.engine;
 
-
 import net.time4j.base.MathUtils;
 
 import java.util.ArrayList;
@@ -351,6 +350,8 @@ public abstract class AbstractMetric
         List<TimeSpan.Item<U>> resultList
     ) {
 
+        Comparator<? super U> comparator = engine.unitComparator();
+
         for (int i = sortedUnits.size() - 1; i >= 0; i--) {
             if (i > 0) {
                 U currentUnit = sortedUnits.get(i);
@@ -370,17 +371,16 @@ public abstract class AbstractMetric
                             if (a == 0) {
                                 removeItem(resultList, currentUnit);
                             } else {
-                                putItem(resultList, engine, a, currentUnit);
+                                putItem(resultList, comparator, a, currentUnit);
                             }
                             TimeSpan.Item<U> nextItem =
                                 getItem(resultList, nextUnit);
                             if (nextItem == null) {
-                                putItem(
-                                    resultList, engine, overflow, nextUnit);
+                                putItem(resultList, comparator, overflow, nextUnit);
                             } else {
                                 putItem(
                                     resultList,
-                                    engine,
+                                    comparator,
                                     MathUtils.safeAdd(
                                         nextItem.getAmount(),
                                         overflow),

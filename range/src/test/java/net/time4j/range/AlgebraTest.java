@@ -1162,9 +1162,6 @@ public class AlgebraTest {
         DateInterval a = DateInterval.between(startA, endA);
         DateInterval b = DateInterval.since(startB);
 
-        assertThat(a.abuts(b), is(true));
-        assertThat(b.abuts(a), is(true));
-
         b = b.move(1, CalendarUnit.DAYS);
         assertThat(a.abuts(b), is(false));
         assertThat(b.abuts(a), is(false));
@@ -1172,6 +1169,15 @@ public class AlgebraTest {
         b = b.move(-2, CalendarUnit.DAYS);
         assertThat(a.abuts(b), is(false));
         assertThat(b.abuts(a), is(false));
+
+        b = b.move(1, CalendarUnit.DAYS);
+        assertThat(a.abuts(b), is(true));
+        assertThat(b.abuts(a), is(true));
+
+        b = b.collapse();
+        assertThat(a.abuts(b), is(false));
+        assertThat(b.abuts(a), is(false));
+
     }
 
 }

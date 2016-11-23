@@ -46,7 +46,7 @@ import java.io.Serializable;
  * @author  Meno Hochschild
  * @since   2.0
  */
-public final class Boundary<T extends Temporal<? super T>>
+public final class Boundary<T>
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -116,7 +116,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @since   2.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Temporal<? super T>> Boundary<T> infinitePast() {
+    public static <T> Boundary<T> infinitePast() {
 
         return (Boundary<T>) INFINITE_PAST;
 
@@ -138,7 +138,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @since   2.0
      */
     @SuppressWarnings("unchecked")
-    public static <T extends Temporal<? super T>> Boundary<T> infiniteFuture() {
+    public static <T> Boundary<T> infiniteFuture() {
 
         return (Boundary<T>) INFINITE_FUTURE;
 
@@ -168,8 +168,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @see     #infiniteFuture()
      * @see     #isOpen()
      */
-    public static
-    <T extends Temporal<? super T>> Boundary<T> ofOpen(T temporal) {
+    public static <T> Boundary<T> ofOpen(T temporal) {
 
         return new Boundary<T>(IntervalEdge.OPEN, temporal);
 
@@ -199,8 +198,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @see     #infiniteFuture()
      * @see     #isClosed()
      */
-    public static
-    <T extends Temporal<? super T>> Boundary<T> ofClosed(T temporal) {
+    public static <T> Boundary<T> ofClosed(T temporal) {
 
         return new Boundary<T>(IntervalEdge.CLOSED, temporal);
 
@@ -220,7 +218,7 @@ public final class Boundary<T extends Temporal<? super T>>
      * @see     #isOpen()
      * @see     #isClosed()
      */
-    static <T extends Temporal<? super T>> Boundary<T> of(
+    static <T> Boundary<T> of(
         IntervalEdge edge,
         T temporal
     ) {
@@ -257,7 +255,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if open else {@code false}
      * @since   2.0
-     * @see     #ofOpen(Temporal)
+     * @see     #ofOpen(Object) ofOpen(T)
      */
     /*[deutsch]
      * <p>Gibt an, ob diese Intervalgrenze offen ist. </p>
@@ -267,7 +265,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if open else {@code false}
      * @since   2.0
-     * @see     #ofOpen(Temporal)
+     * @see     #ofOpen(Object) ofOpen(T)
      */
     public boolean isOpen() {
 
@@ -283,7 +281,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if closed else {@code false}
      * @since   2.0
-     * @see     #ofClosed(Temporal)
+     * @see     #ofClosed(Object) ofClosed(T)
      */
     /*[deutsch]
      * <p>Gibt an, ob diese Intervalgrenze geschlossen ist. </p>
@@ -293,7 +291,7 @@ public final class Boundary<T extends Temporal<? super T>>
      *
      * @return  {@code true} if closed else {@code false}
      * @since   2.0
-     * @see     #ofClosed(Temporal)
+     * @see     #ofClosed(Object) ofClosed(T)
      */
     public boolean isClosed() {
 

@@ -51,7 +51,7 @@ import java.util.Set;
  */
 public final class TimeAxis<U, T extends TimePoint<U, T>>
     extends Chronology<T>
-    implements Comparator<U>, TimeLine<T> {
+    implements TimeLine<T> {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -295,19 +295,60 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     /**
-     * <p>Compares time units by ascending precision
-     * (that is descending length). </p>
+     * <p>Compares time units by ascending precision (that is descending length). </p>
+     *
+     * <p>Note: Before release v3.25/4.21, the time axis implemented {@code Comparator<U>}, not {@code Comparator<T>}.
+     * This new method serves as the replacement for the old comparator method. </p>
+     *
+     * @return  Comparator
+     * @see     #compare(TimePoint, TimePoint)
+     * @since   3.25/4.21
      */
     /*[deutsch]
-     * <p>Vergleicht Zeiteinheiten nach aufsteigender Genauigkeit. </p>
+     * <p>Vergleicht Zeiteinheiten nach wachsender Genauigkeit (also abnehmender L&auml;nge). </p>
+     *
+     * <p>Hinweis: Vor dem Release v3.25/4.21 hat diese Klasse das Interface {@code Comparator<U>} und
+     * nicht {@code Comparator<T>} implementiert. Diese neue Methode dient als Ersatz f&uuml;r die
+     * alte Vergleichsmethode. </p>
+     *
+     * @return  Comparator
+     * @see     #compare(TimePoint, TimePoint)
+     * @since   3.25/4.21
+     */
+    public Comparator<? super U> unitComparator() {
+
+        return new Comparator<U>() {
+            @Override
+            public int compare(U unit1, U unit2) {
+                return Double.compare(TimeAxis.this.getLength(unit2), TimeAxis.this.getLength(unit1));
+            }
+        };
+
+    }
+
+    /**
+     * <p>Compares points in time by their temporal position on the timeline. </p>
+     *
+     * @param   first       the first point in comparison
+     * @param   second      the second point in comparison
+     * @return  positive, zero or negative number if {@code first} is later, simultaneous or earlier than {@code second}
+     * @since   3.25/4.21
+     */
+    /*[deutsch]
+     * <p>Vergleicht Zeitpunkte nach ihrer temporalen Position auf dem Zeitstrahl. </p>
+     *
+     * @param   first       the first point in comparison
+     * @param   second      the second point in comparison
+     * @return  positive, zero or negative number if {@code first} is later, simultaneous or earlier than {@code second}
+     * @since   3.25/4.21
      */
     @Override
     public int compare(
-        U unit1,
-        U unit2
+        T first,
+        T second
     ) {
 
-        return Double.compare(this.getLength(unit2), this.getLength(unit1));
+        return first.compareTo(second);
 
     }
 
@@ -1279,6 +1320,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
             }
 
             return timepoint.minus(1, this.step);
+
+        }
+
+        @Override
+        public int compare(T t1, T t2) {
+
+            return t1.compareTo(t2);
 
         }
 

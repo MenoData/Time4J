@@ -21,10 +21,10 @@
 
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.Temporal;
 
 import java.io.Serializable;
 
@@ -43,7 +43,7 @@ import java.io.Serializable;
  */
 public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
     extends ChronoEntity<T>
-    implements Temporal<T>, Comparable<T>, ChronoInterval<PlainDate>, Iterable<PlainDate>, Serializable {
+    implements Comparable<T>, ChronoInterval<PlainDate>, Iterable<PlainDate>, Serializable {
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -90,20 +90,136 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
     }
 
     @Override
-    public boolean isAfter(T other) {
+    public boolean contains(ChronoInterval<PlainDate> other) {
 
-        return (this.compareTo(other) > 0);
+        if (!other.isFinite()) {
+            return false;
+        }
+
+        PlainDate startA = this.getStart().getTemporal();
+        PlainDate startB = other.getStart().getTemporal();
+
+        if (other.getStart().isOpen()) {
+            if (startB.equals(PlainDate.axis().getMaximum())) {
+                return false;
+            }
+            startB = startB.plus(1, CalendarUnit.DAYS);
+        }
+
+        if (startA.isAfter(startB)) {
+            return false;
+        }
+
+        PlainDate endA = this.getEnd().getTemporal();
+        PlainDate endB = other.getEnd().getTemporal();
+
+        if (other.getEnd().isOpen()) {
+            if (startB.isSimultaneous(endB)) {
+                return !startB.isAfter(endA);
+            } else if (endB.equals(PlainDate.axis().getMinimum())) {
+                return false;
+            }
+            endB = endB.minus(1, CalendarUnit.DAYS);
+        }
+
+        return !endA.isBefore(endB);
 
     }
 
     @Override
-    public boolean isBefore(T other) {
+    public boolean isBefore(ChronoInterval<PlainDate> other) {
 
-        return (this.compareTo(other) < 0);
+        if (other.getStart().isInfinite()) {
+            return false;
+        }
+
+        PlainDate endA = this.getEnd().getTemporal();
+        PlainDate startB = other.getStart().getTemporal();
+
+        if (other.getStart().isOpen()) {
+            if (startB.equals(PlainDate.axis().getMaximum())) {
+                return true;
+            }
+            startB = startB.plus(1, CalendarUnit.DAYS);
+        }
+
+        return endA.isBefore(startB);
 
     }
 
     @Override
+    public boolean isAfter(ChronoInterval<PlainDate> other) {
+
+        return other.isBefore(this);
+
+    }
+
+    @Override
+    public boolean abuts(ChronoInterval<PlainDate> other) {
+
+        if (other.isEmpty()) {
+            return false;
+        }
+
+        PlainDate startA = this.getStart().getTemporal();
+        PlainDate startB = other.getStart().getTemporal();
+
+        if ((startB != null) && other.getStart().isOpen()) {
+            startB = startB.plus(1, CalendarUnit.DAYS);
+        }
+
+        PlainDate endA = this.getEnd().getTemporal();
+        PlainDate endB = other.getEnd().getTemporal();
+
+        try {
+            endA = endA.plus(1, CalendarUnit.DAYS);
+        } catch (ArithmeticException ex) {
+            return ((endB != null) && startA.isSimultaneous(endB));
+        }
+
+        try {
+            if (endB == null) {
+                return ((startB != null) && endA.isSimultaneous(startB));
+            } else if (other.getEnd().isClosed()) {
+                endB = endB.plus(1, CalendarUnit.DAYS);
+            }
+        } catch (ArithmeticException ex) {
+            return ((startB != null) && endA.isSimultaneous(startB));
+        }
+
+        if (startB == null) {
+            return startA.isSimultaneous(endB);
+        } else if (endB == null) {
+            return endA.isSimultaneous(startB);
+        }
+
+        return (endA.isSimultaneous(startB) ^ startA.isSimultaneous(endB));
+
+    }
+
+    @Override
+    public boolean intersects(ChronoInterval<PlainDate> other) {
+
+        if (this.isEmpty() || other.isEmpty()) {
+            return false;
+        }
+        return !(this.isBefore(other) || this.isAfter(other));
+
+    }
+
+    /**
+     * <p>Queries if this object and given object have the same position
+     * on the time axis. </p>
+     *
+     * @param   other    object this instance is compared to
+     * @return  {@code true} if this instance is temporally equal to {@code other} else {@code false}
+     */
+    /*[deutsch]
+     * <p>Sind dieses Objekt und das angegebene Argument zeitlich gleich? </p>
+     *
+     * @param   other    object this instance is compared to
+     * @return  {@code true} if this instance is temporally equal to {@code other} else {@code false}
+     */
     public boolean isSimultaneous(T other) {
 
         return (this.compareTo(other) == 0);
