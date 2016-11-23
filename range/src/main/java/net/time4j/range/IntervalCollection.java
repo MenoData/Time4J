@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalCollection.java) is part of project Time4J.
  *
@@ -25,7 +25,6 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 
 import java.io.Serializable;
@@ -71,7 +70,7 @@ import java.util.NoSuchElementException;
  * @see     TimestampInterval#comparator()
  * @see     MomentInterval#comparator()
  */
-public abstract class IntervalCollection<T extends Temporal<? super T>>
+public abstract class IntervalCollection<T>
     implements Serializable {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -236,10 +235,10 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             if (current.getEnd().isInfinite() || next.getStart().isInfinite()) {
                 return false;
             } else if (current.getEnd().isOpen()) {
-                if (current.getEnd().getTemporal().isAfter(next.getStart().getTemporal())) {
+                if (this.isAfter(current.getEnd().getTemporal(), next.getStart().getTemporal())) {
                     return false;
                 }
-            } else if (!current.getEnd().getTemporal().isBefore(next.getStart().getTemporal())) {
+            } else if (!this.isBefore(current.getEnd().getTemporal(), next.getStart().getTemporal())) {
                 return false;
             }
         }
@@ -357,7 +356,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                     candidate = this.getTimeLine().stepBackwards(candidate);
                 }
 
-                if (candidate.isAfter(max)) {
+                if (this.isAfter(candidate, max)) {
                     max = candidate;
                 }
             }
@@ -391,7 +390,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                     }
                 }
 
-                if (candidate.isAfter(max)) {
+                if (this.isAfter(candidate, max)) {
                     max = candidate;
                 }
             }
@@ -814,7 +813,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                         e = this.getTimeLine().stepBackwards(e);
                         be = Boundary.ofClosed(e);
                     }
-                    if (!s.isAfter(be.getTemporal())) {
+                    if (!this.isAfter(s, be.getTemporal())) {
                         gaps.add(this.newInterval(bs, be));
                     }
                 } else {
@@ -829,7 +828,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                             be = Boundary.ofOpen(e);
                         }
                     }
-                    if (s.isBefore(be.getTemporal())) {
+                    if (this.isBefore(s, be.getTemporal())) {
                         gaps.add(this.newInterval(bs, be));
                     }
                 }
@@ -890,10 +889,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                 }
             }
 
-            if (
-                (previous == null)
-                || gapStart.isAfter(previous)
-            ) {
+            if ((previous == null) || this.isAfter(gapStart, previous)) {
                 previous = gapStart;
             } else {
                 gapStart = previous;
@@ -901,10 +897,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
             T gapEnd = this.intervals.get(i + 1).getStart().getTemporal();
 
-            if (
-                (gapEnd == null)
-                || !gapEnd.isAfter(gapStart)
-            ) {
+            if ((gapEnd == null) || !this.isAfter(gapEnd, gapStart)) {
                 continue;
             }
 
@@ -1049,7 +1042,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             if (start.isInfinite()) {
                 infinitePast = Boundary.infinitePast();
             } else {
-                int index = searchFiniteBoundary(dividers, start);
+                int index = this.searchFiniteBoundary(dividers, start);
                 if (index < 0) {
                     dividers.add(-index - 1, start);
                 }
@@ -1068,7 +1061,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                 } else {
                     end = Boundary.ofClosed(end.getTemporal());
                 }
-                int index = searchFiniteBoundary(dividers, end);
+                int index = this.searchFiniteBoundary(dividers, end);
                 if (index < 0) {
                     dividers.add(-index - 1, end);
                 }
@@ -1243,13 +1236,13 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
         if ((min1 == null) || (min2 == null)) {
             min = null;
         } else {
-            min = (min1.isAfter(min2) ? min2 : min1);
+            min = (this.isAfter(min1, min2) ? min2 : min1);
         }
 
         if ((max1 == null) || (max2 == null)) {
             max = null;
         } else {
-            max = (max1.isBefore(max2) ? max2 : max1);
+            max = (this.isBefore(max1, max2) ? max2 : max1);
         }
 
         Boundary<T> start = this.createStartBoundary(min);
@@ -1363,6 +1356,18 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
      */
     abstract TimeLine<T> getTimeLine();
 
+    boolean isAfter(T t1, T t2) {
+
+        return (this.getTimeLine().compare(t1, t2) > 0);
+
+    }
+
+    boolean isBefore(T t1, T t2) {
+
+        return (this.getTimeLine().compare(t1, t2) < 0);
+
+    }
+
     /**
      * <p>Erzeugt ein Intervall zwischen den angegebenen Grenzen. </p>
      *
@@ -1390,10 +1395,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
         Boundary<T> start = interval.getStart();
 
-        if (
-            !start.isInfinite()
-            && start.isOpen()
-        ) {
+        if (start.isOpen() && !start.isInfinite()) {
             T s = this.getTimeLine().stepForward(start.getTemporal());
 
             if (s == null) {
@@ -1486,7 +1488,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
         T min
     ) {
 
-        if (start.isBefore(min)) {
+        if (this.isBefore(start, min)) {
             Boundary<T> be;
 
             if (this.isCalendrical()) {
@@ -1529,10 +1531,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
                 }
             }
 
-            if (
-                (earliestEnd == null)
-                || candidate.isBefore(earliestEnd)
-            ) {
+            if ((earliestEnd == null) || this.isBefore(candidate, earliestEnd)) {
                 earliestEnd = candidate;
             }
         }
@@ -1544,11 +1543,11 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             s = this.createStartBoundary(latestStart);
             e = Boundary.infiniteFuture();
         } else if (this.isCalendrical()) {
-            if (!earliestEnd.isBefore(latestStart)) {
+            if (!this.isBefore(earliestEnd, latestStart)) {
                 s = this.createStartBoundary(latestStart);
                 e = Boundary.ofClosed(earliestEnd);
             }
-        } else if (earliestEnd.isAfter(latestStart)) {
+        } else if (this.isAfter(earliestEnd, latestStart)) {
             s = this.createStartBoundary(latestStart);
             e = Boundary.ofOpen(earliestEnd);
         }
@@ -1562,7 +1561,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
 
     }
 
-    private static <T extends Temporal<? super T>> int searchFiniteBoundary(
+    private int searchFiniteBoundary(
         List<Boundary<T>> list,
         Boundary<T> key
     ) {
@@ -1575,7 +1574,7 @@ public abstract class IntervalCollection<T extends Temporal<? super T>>
             Boundary<T> midVal = list.get(mid);
             T t1 = midVal.getTemporal();
             T t2 = key.getTemporal();
-            int cmp = t1.isBefore(t2) ? - 1 : (t1.isAfter(t2) ? 1 : 0);
+            int cmp = this.getTimeLine().compare(t1, t2);
 
             if (cmp < 0) {
                 low = mid + 1;

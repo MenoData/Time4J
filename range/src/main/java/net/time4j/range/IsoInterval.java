@@ -91,7 +91,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     ) {
         super();
 
-
         if (Boundary.isAfter(start, end)) { // NPE-check
             throw new IllegalArgumentException(
                 "Start after end: " + start + "/" + end);
@@ -319,13 +318,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     }
 
     @Override
-    public boolean isFinite() {
-
-        return !(this.start.isInfinite() || this.end.isInfinite());
-
-    }
-
-    @Override
     public boolean isEmpty() {
 
         if (!this.isFinite()) {
@@ -371,40 +363,34 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     /**
      * <p>Is this interval before the other one? </p>
      *
-     * <p>Equivalent to the expression
-     * {@code (precedes(other) || meets(other))}. </p>
+     * <p>Equivalent to the expression {@code (precedes(other) || meets(other))}. </p>
      *
-     * @param   other   another interval whose relation to this interval
-     *                  is to be investigated
-     * @return  {@code true} if this interval is before the other one
-     *          else {@code false}
+     * @param   other   another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval is before the other one else {@code false}
      * @since   2.0
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall vor dem anderen? </p>
      *
-     * <p>&Auml;quivalent zum Ausdruck
-     * {@code (precedes(other) || meets(other))}. </p>
+     * <p>&Auml;quivalent zum Ausdruck {@code (precedes(other) || meets(other))}. </p>
      *
-     * @param   other   another interval whose relation to this interval
-     *                  is to be investigated
-     * @return  {@code true} if this interval is before the other one
-     *          else {@code false}
+     * @param   other   another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval is before the other one else {@code false}
      * @since   2.0
      */
-    public boolean isBefore(I other) {
+    @Override
+    public boolean isBefore(ChronoInterval<T> other) {
 
-        if (
-            other.getStart().isInfinite()
-            || this.end.isInfinite()
-        ) {
+        if (other.getStart().isInfinite() || this.end.isInfinite()) {
             return false;
         }
 
         T endA = this.end.getTemporal();
-        T startB = other.getClosedFiniteStart();
+        T startB = getClosedFiniteStart(other.getStart(), this.getTimeLine());
 
-        if (this.end.isOpen()) {
+        if (startB == null) { // exotic case: start in infinite future
+            return true;
+        } else if (this.end.isOpen()) {
             return !endA.isAfter(startB);
         } else {
             return endA.isBefore(startB);
@@ -428,30 +414,25 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     /**
      * <p>Is this interval after the other one? </p>
      *
-     * <p>Equivalent to the expression
-     * {@code (precededBy(other) || metBy(other))}. </p>
+     * <p>Equivalent to the expression {@code (precededBy(other) || metBy(other))}. </p>
      *
-     * @param   other   another interval whose relation to this interval
-     *                  is to be investigated
-     * @return  {@code true} if this interval is after the other one
-     *          else {@code false}
+     * @param   other   another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval is after the other one else {@code false}
      * @since   2.0
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall nach dem anderen? </p>
      *
-     * <p>&Auml;quivalent zum Ausdruck
-     * {@code (precededBy(other) || metBy(other))}. </p>
+     * <p>&Auml;quivalent zum Ausdruck {@code (precededBy(other) || metBy(other))}. </p>
      *
-     * @param   other   another interval whose relation to this interval
-     *                  is to be investigated
-     * @return  {@code true} if this interval is after the other one
-     *          else {@code false}
+     * @param   other   another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval is after the other one else {@code false}
      * @since   2.0
      */
-    public boolean isAfter(I other) {
+    @Override
+    public boolean isAfter(ChronoInterval<T> other) {
 
-        return other.isBefore(this.getContext());
+        return other.isBefore(this);
 
     }
 
@@ -493,13 +474,10 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     /**
      * <p>Does this interval contain the other one? </p>
      *
-     * <p>In contrast to {@link #encloses} the interval boundaries may also
-     * be equal. </p>
+     * <p>In contrast to {@link #encloses} the interval boundaries may also be equal. </p>
      *
-     * @param   other   another interval whose relation to this interval
-     *                  is to be investigated
-     * @return  {@code true} if this interval contains the other one
-     *          else {@code false}
+     * @param   other   another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval contains the other one else {@code false}
      * @since   2.0
      */
     /*[deutsch]
@@ -508,22 +486,21 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Im Unterschied zu {@link #encloses} d&uuml;rfen die Grenzen der
      * Intervalle auch gleich sein. </p>
      *
-     * @param   other   another interval whose relation to this interval
-     *                  is to be investigated
-     * @return  {@code true} if this interval contains the other one
-     *          else {@code false}
+     * @param   other   another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval contains the other one else {@code false}
      * @since   2.0
      */
-    public boolean contains(I other) {
+    @Override
+    public boolean contains(ChronoInterval<T> other) {
 
         if (!other.isFinite()) {
             return false;
         }
 
         T startA = this.getClosedFiniteStart();
-        T startB = other.getClosedFiniteStart();
+        T startB = getClosedFiniteStart(other.getStart(), this.getTimeLine());
 
-        if ((startA != null) && startA.isAfter(startB)) {
+        if ((startB == null) || ((startA != null) && startA.isAfter(startB))) {
             return false;
         }
 
@@ -1353,7 +1330,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          of the other one else {@code false}
      * @since   2.0
      * @see     #overlappedBy(IsoInterval)
-     * @see     #intersects(IsoInterval)
+     * @see     #intersects(ChronoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Uuml;berlappt dieses Intervall so das andere,
@@ -1371,7 +1348,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          of the other one else {@code false}
      * @since   2.0
      * @see     #overlappedBy(IsoInterval)
-     * @see     #intersects(IsoInterval)
+     * @see     #intersects(ChronoInterval)
      */
     public boolean overlaps(I other) {
 
@@ -1441,7 +1418,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          of this interval else {@code false}
      * @since   2.0
      * @see     #overlaps(IsoInterval)
-     * @see     #intersects(IsoInterval)
+     * @see     #intersects(ChronoInterval)
      */
     /*[deutsch]
      * <p>ALLEN-Relation: &Auml;quivalent to {@code other.overlaps(this)}. </p>
@@ -1457,7 +1434,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      *          of this interval else {@code false}
      * @since   2.0
      * @see     #overlaps(IsoInterval)
-     * @see     #intersects(IsoInterval)
+     * @see     #intersects(ChronoInterval)
      */
     public boolean overlappedBy(I other) {
 
@@ -1874,10 +1851,10 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.19/4.15
-     * @see     #findIntersection(IsoInterval)
+     * @see     #findIntersection(ChronoInterval)
      * @see     #overlaps(IsoInterval)
-     * @see     #isBefore(IsoInterval)
-     * @see     #isAfter(IsoInterval)
+     * @see     #isBefore(ChronoInterval)
+     * @see     #isAfter(ChronoInterval)
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall sich mit dem angegebenen Intervall so &uuml;berschneidet, da&szlig;
@@ -1886,18 +1863,44 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.19/4.15
-     * @see     #findIntersection(IsoInterval)
+     * @see     #findIntersection(ChronoInterval)
      * @see     #overlaps(IsoInterval)
-     * @see     #isBefore(IsoInterval)
-     * @see     #isAfter(IsoInterval)
+     * @see     #isBefore(ChronoInterval)
+     * @see     #isAfter(ChronoInterval)
      */
-    public boolean intersects(I other) {
+    public boolean intersects(ChronoInterval<T> other) {
 
         if (this.isEmpty() || other.isEmpty()) {
             return false;
         }
 
-        return !(this.isBefore(other) || this.isAfter(other));
+        boolean startALessEqEndB = (this.getStart().isInfinite() || other.getEnd().isInfinite());
+
+        if (!startALessEqEndB) {
+            T startA = this.getClosedFiniteStart();
+            if (other.getEnd().isOpen()) {
+                startALessEqEndB = startA.isBefore(other.getEnd().getTemporal());
+            } else {
+                startALessEqEndB = !startA.isAfter(other.getEnd().getTemporal());
+            }
+        }
+
+        if (!startALessEqEndB) {
+            return false;
+        }
+
+        boolean startBLessEqEndA = (other.getStart().isInfinite() || this.getEnd().isInfinite());
+
+        if (!startBLessEqEndA) {
+            T startB = getClosedFiniteStart(other.getStart(), this.getTimeLine());
+            if (this.getEnd().isOpen()) {
+                startBLessEqEndA = startB.isBefore(this.getEnd().getTemporal());
+            } else {
+                startBLessEqEndA = !startB.isAfter(this.getEnd().getTemporal());
+            }
+        }
+
+        return startBLessEqEndA;
 
     }
 
@@ -1907,8 +1910,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  a wrapper around the found intersection or an empty wrapper
      * @see     Optional#isPresent()
-     * @see     #intersects(IsoInterval)
-     * @since   4.18
+     * @see     #intersects(ChronoInterval)
+     * @since   4.21
      */
     /*[deutsch]
      * <p>Ermittelt die Schnittmenge dieses Intervalls mit dem angegebenen anderen Intervall, falls vorhanden. </p>
@@ -1916,10 +1919,10 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   other   another interval which might have an intersection with this interval
      * @return  a wrapper around the found intersection or an empty wrapper
      * @see     Optional#isPresent()
-     * @see     #intersects(IsoInterval)
-     * @since   4.18
+     * @see     #intersects(ChronoInterval)
+     * @since   4.21
      */
-    public Optional<I> findIntersection(I other) {
+    public Optional<I> findIntersection(ChronoInterval<T> other) {
 
         if (this.isEmpty() || other.isEmpty()) {
             return Optional.empty();
@@ -1934,7 +1937,10 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             s = this.start;
         } else {
             T t1 = this.getClosedFiniteStart();
-            T t2 = other.getClosedFiniteStart();
+            T t2 = other.getStart().getTemporal();
+            if (other.getStart().isOpen()) {
+                t2 = this.getTimeLine().stepForward(t2);
+            }
             if ((t1 == null) || (t2 == null)) {
                 return Optional.empty();
             }
@@ -1947,14 +1953,20 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             e = this.end;
         } else if (this.getFactory().isCalendrical()) {
             T t1 = this.getClosedFiniteEnd();
-            T t2 = other.getClosedFiniteEnd();
+            T t2 = other.getEnd().getTemporal();
+            if (other.getEnd().isOpen()) {
+                t2 = this.getTimeLine().stepBackwards(t2);
+            }
             if ((t1 == null) || (t2 == null)) {
                 return Optional.empty();
             }
             e = (t1.isBefore(t2) ? Boundary.ofClosed(t1) : Boundary.ofClosed(t2));
         } else {
             T t1 = this.getOpenFiniteEnd();
-            T t2 = other.getOpenFiniteEnd();
+            T t2 = other.getEnd().getTemporal();
+            if (other.getEnd().isClosed()) {
+                t2 = this.getTimeLine().stepForward(t2);
+            }
             if (t1 == null) {
                 e = ((t2 == null) ? Boundary.infiniteFuture() : Boundary.ofOpen(t2));
             } else if (t2 == null) {
@@ -1976,7 +1988,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     /**
      * <p>Queries if this interval abuts the other one such that there is neither any overlap nor any gap between. </p>
      *
-     * <p>Equivalent to the expression {@code this.meets(other) || this.metBy(other)}. </p>
+     * <p>Equivalent to the expression {@code this.meets(other) || this.metBy(other)}. Empty intervals never abut. </p>
      *
      * @param   other   another interval which might abut this interval
      * @return  {@code true} if there is no intersection and no gap between else {@code false}
@@ -1988,7 +2000,8 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * <p>Ermittelt, ob dieses Intervall das angegebene Intervall so ber&uuml;hrt, da&szlig;
      * weder eine &Uuml;berlappung noch eine L&uuml;cke dazwischen existieren. </p>
      *
-     * <p>&Auml;quivalent zum Ausdruck {@code this.meets(other) || this.metBy(other)}. </p>
+     * <p>&Auml;quivalent zum Ausdruck {@code this.meets(other) || this.metBy(other)}. Leere Intervalle
+     * ber&uuml;hren sich nie. </p>
      *
      * @param   other   another interval which might abut this interval
      * @return  {@code true} if there is no intersection and no gap between else {@code false}
@@ -1996,9 +2009,24 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @see     #meets(IsoInterval)
      * @see     #metBy(IsoInterval)
      */
-    public boolean abuts(I other) {
+    public boolean abuts(ChronoInterval<T> other) {
 
-        return (this.meets(other) || this.metBy(other));
+        if (this.isEmpty() || other.isEmpty()) {
+            return false;
+        }
+
+        T startA = this.getClosedFiniteStart();
+        T startB = getClosedFiniteStart(other.getStart(), this.getTimeLine());
+        T endA = this.getOpenFiniteEnd();
+        T endB = getOpenFiniteEnd(other.getEnd(), this.getTimeLine());
+
+        if ((endA == null) || (startB == null)) {
+            return ((startA != null) && (endB != null) && startA.isSimultaneous(endB));
+        } else if ((startA == null) || (endB == null)) {
+            return endA.isSimultaneous(startB);
+        }
+
+        return (endA.isSimultaneous(startB) ^ startA.isSimultaneous(endB));
 
     }
 
@@ -2146,6 +2174,36 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
 
         if ((temporal != null) && this.end.isClosed()) {
             return this.getTimeLine().stepForward(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
+
+    private static <T extends Temporal<? super T>> T getClosedFiniteStart(
+        Boundary<T> start,
+        TimeLine<T> timeLine
+    ) {
+
+        T temporal = start.getTemporal();
+
+        if ((temporal != null) && start.isOpen()) {
+            return timeLine.stepForward(temporal);
+        } else {
+            return temporal;
+        }
+
+    }
+
+    private static <T extends Temporal<? super T>> T getOpenFiniteEnd(
+        Boundary<T> end,
+        TimeLine<T> timeLine
+    ) {
+
+        T temporal = end.getTemporal();
+
+        if ((temporal != null) && end.isClosed()) {
+            return timeLine.stepForward(temporal);
         } else {
             return temporal;
         }

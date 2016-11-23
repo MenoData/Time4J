@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimePoint.java) is part of project Time4J.
  *
@@ -61,7 +61,8 @@ import java.io.Serializable;
  * in strict temporal order and consistent with {@code equals()}. In case
  * of doubt the documentation of the subclass is leading. Alternatively,
  * subclasses are free to implement the interface {@code Temporal} to
- * enable a temporal order. </p>
+ * enable a temporal order. A pure temporal state of any implementation
+ * is strongly recommended. </p>
  *
  * <p><strong>Addition (or subtraction) of a time span to a time point</strong></p>
  *
@@ -97,7 +98,7 @@ import java.io.Serializable;
  *  noted that the time units must correspond to the internal state of
  *  a time point because otherwise the calculation of a time span between
  *  two time points cannot be complete. For example it would be a mistake
- *  to allow milliseconds for a time point which even has nanoseconds. </li>
+ *  to allow milliseconds only for a time point which even has nanoseconds. </li>
  *  <li>The natural order should be consistent with {@code equals()}. </li>
  * </ul>
  *
@@ -148,7 +149,8 @@ import java.io.Serializable;
  * {@code equals()} sein. Im Zweifelsfall ist die Dokumentation der
  * konkreten Subklasse ma&szlig;geblich. Alternativ k&ouml;nnen Subklassen
  * auch das Interface {@code Temporal} implementieren, um eine rein
- * zeitliche Ordnung zu erm&ouml;glichen. </p>
+ * zeitliche Ordnung zu erm&ouml;glichen. Es ist auch sehr angeraten,
+ * nur einen rein zeitlichen Zustand in der Implementierung zu w&auml;hlen. </p>
  *
  * <p><strong>Addition (oder Subtraktion) einer Zeitspanne zu einem Zeitpunkt</strong></p>
  *

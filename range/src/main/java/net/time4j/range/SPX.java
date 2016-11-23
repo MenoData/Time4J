@@ -27,7 +27,6 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Quarter;
-import net.time4j.engine.Temporal;
 import net.time4j.scale.TimeScale;
 
 import java.io.Externalizable;
@@ -493,7 +492,6 @@ final class SPX
     }
 
     // serialization of a single boundary object
-    @SuppressWarnings("unchecked")
     private static Object readBoundary(
         ObjectInput in,
         byte header
@@ -526,7 +524,7 @@ final class SPX
         }
 
         Object t = in.readObject();
-        return Boundary.of(edge, Temporal.class.cast(t));
+        return Boundary.of(edge, t);
 
     }
 
@@ -546,7 +544,6 @@ final class SPX
 
     }
 
-    @SuppressWarnings("unchecked")
     private static Object readBoundary(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
@@ -564,11 +561,11 @@ final class SPX
             : IntervalEdge.CLOSED);
 
         Object t = in.readObject();
-        return Boundary.of(edge, Temporal.class.cast(t));
+        return Boundary.of(edge, t);
 
     }
 
-    private static <T extends Temporal<? super T>> Boundary<T> getBoundary(
+    private static <T> Boundary<T> getBoundary(
         Object obj,
         Class<T> type,
         boolean ending

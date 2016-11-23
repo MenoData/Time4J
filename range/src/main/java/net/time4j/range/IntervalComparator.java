@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalComparator.java) is part of project Time4J.
  *
@@ -21,7 +21,6 @@
 
 package net.time4j.range;
 
-import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 
 import java.util.Comparator;
@@ -33,7 +32,7 @@ import java.util.Comparator;
  *
  * @author  Meno Hochschild
  */
-final class IntervalComparator<T extends Temporal<? super T>>
+final class IntervalComparator<T>
     implements Comparator<ChronoInterval<T>> {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -96,13 +95,13 @@ final class IntervalComparator<T extends Temporal<? super T>>
             return -1;
         }
 
-        if (start1.isBefore(start2)) {
-            return -1;
-        } else if (start1.isAfter(start2)) {
-            return 1;
-        } else {
-            return this.compareEnd(o1, o2);
+        int delta = this.axis.compare(start1, start2);
+
+        if (delta == 0) {
+            delta = this.compareEnd(o1, o2);
         }
+
+        return delta;
 
     }
 
@@ -166,13 +165,7 @@ final class IntervalComparator<T extends Temporal<? super T>>
         }
 
         // default case
-        if (end1.isBefore(end2)) {
-            return -1;
-        } else if (end1.isAfter(end2)) {
-            return 1;
-        } else {
-            return 0;
-        }
+        return this.axis.compare(end1, end2);
 
     }
 

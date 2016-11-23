@@ -27,7 +27,6 @@ import net.time4j.engine.TimeLine;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -92,6 +91,20 @@ final class TimestampWindows
     TimeLine<PlainTimestamp> getTimeLine() {
 
         return PlainTimestamp.axis();
+
+    }
+
+    @Override
+    boolean isAfter(PlainTimestamp t1, PlainTimestamp t2) {
+
+        return t1.isAfter(t2);
+
+    }
+
+    @Override
+    boolean isBefore(PlainTimestamp t1, PlainTimestamp t2) {
+
+        return t1.isBefore(t2);
 
     }
 

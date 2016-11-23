@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import java.util.Comparator;
+
 
 /**
  * <p>Represents a time axis where a point in time can be moved forward or
@@ -44,7 +46,8 @@ package net.time4j.engine;
  * @author  Meno Hochschild
  * @since   2.0
  */
-public interface TimeLine<T> {
+public interface TimeLine<T>
+    extends Comparator<T> {
 
     //~ Methoden ----------------------------------------------------------
 

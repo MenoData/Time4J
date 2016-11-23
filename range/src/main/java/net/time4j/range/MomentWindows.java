@@ -27,7 +27,6 @@ import net.time4j.engine.TimeLine;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.ObjectStreamException;
 import java.util.Comparator;
 import java.util.List;
 
@@ -90,6 +89,20 @@ final class MomentWindows
     TimeLine<Moment> getTimeLine() {
 
         return Moment.axis();
+
+    }
+
+    @Override
+    boolean isAfter(Moment t1, Moment t2) {
+
+        return t1.isAfter(t2);
+
+    }
+
+    @Override
+    boolean isBefore(Moment t1, Moment t2) {
+
+        return t1.isBefore(t2);
 
     }
 

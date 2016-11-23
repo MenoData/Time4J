@@ -246,4 +246,37 @@ public class CalendarMonthTest {
             is(SystemClock.inLocalView().now(CalendarMonth.chronology())));
     }
 
+    @Test
+    public void abuts() {
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(CalendarMonth.of(2016, 9)),
+            is(false));
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(CalendarMonth.of(2016, 10)),
+            is(true));
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(CalendarMonth.of(2016, 11)),
+            is(false));
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(CalendarMonth.of(2016, 12)),
+            is(true));
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(CalendarMonth.of(2017, 1)),
+            is(false));
+
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(DateInterval.since(PlainDate.of(2016, 11, 30))),
+            is(false));
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(DateInterval.since(PlainDate.of(2016, 12, 1))),
+            is(true));
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(DateInterval.since(PlainDate.of(2016, 12, 2))),
+            is(false));
+
+        assertThat(
+            CalendarMonth.of(2016, 11).abuts(DateInterval.since(PlainDate.of(2016, 12, 1)).collapse()),
+            is(false));
+    }
+
 }
