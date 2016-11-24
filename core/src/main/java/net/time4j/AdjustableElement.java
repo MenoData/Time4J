@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AdjustableElement.java) is part of project Time4J.
  *
@@ -142,11 +142,34 @@ public interface AdjustableElement<V, T>
     /**
      * <p>Rounds down an entity by setting all child elements to minimum. </p>
      *
+     * <p>If there is no child element then this operator will not do anything (no-op). Example: </p>
+     *
+     * <pre>
+     *     PlainDate date = PlainDate.of(2016, 11, 24);
+     *     // DAY_OF_WEEK has no time element as child in context of plain calendar dates
+     *     System.out.println(date.with(DAY_OF_WEEK.atFloor())); // 2016-11-24
+     *
+     *     PlainTimestamp tsp = date.atTime(20, 45);
+     *     // DAY_OF_WEEK has now child elements which can be set to zero
+     *     System.out.println(tsp.with(DAY_OF_WEEK.atFloor())); // 2016-11-24T00
+     * </pre>
+     *
      * @return  operator directly applicable on local types without timezone
      */
     /*[deutsch]
-     * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses
-     * Elements auf ihr Minimum gesetzt werden. </p>
+     * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses Elements auf ihr Minimum gesetzt werden. </p>
+     *
+     * <p>Wenn es kein Kindselement gibt, wird dieser Operator nichts tun (no-op). Beispiel: </p>
+     *
+     * <pre>
+     *     PlainDate date = PlainDate.of(2016, 11, 24);
+     *     // DAY_OF_WEEK hat kein Uhrzeitelement im Kontext eines reinen Kalenderdatums
+     *     System.out.println(date.with(DAY_OF_WEEK.atFloor())); // 2016-11-24
+     *
+     *     PlainTimestamp tsp = date.atTime(20, 45);
+     *     // DAY_OF_WEEK hat jetzt Kindselemente, die genullt werden k&ouml;nnen
+     *     System.out.println(tsp.with(DAY_OF_WEEK.atFloor())); // 2016-11-24T00
+     * </pre>
      *
      * @return  operator directly applicable also on {@code PlainTimestamp}
      */
@@ -155,11 +178,34 @@ public interface AdjustableElement<V, T>
     /**
      * <p>Rounds up an entity by setting all child elements to maximum. </p>
      *
+     * <p>If there is no child element then this operator will not do anything (no-op). Example: </p>
+     *
+     * <pre>
+     *     PlainDate date = PlainDate.of(2016, 11, 24);
+     *     // DAY_OF_WEEK has no time element as child in context of plain calendar dates
+     *     System.out.println(date.with(DAY_OF_WEEK.atCeiling())); // 2016-11-24
+     *
+     *     PlainTimestamp tsp = date.atTime(20, 45);
+     *     // DAY_OF_WEEK has now child elements which can be all maximized
+     *     System.out.println(tsp.with(DAY_OF_WEEK.atCeiling())); // 2016-11-24T23:59:59,999999999
+     * </pre>
+     *
      * @return  operator directly applicable on local types without timezone
      */
     /*[deutsch]
-     * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses
-     * Elements auf ihr Maximum gesetzt werden. </p>
+     * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses Elements auf ihr Maximum gesetzt werden. </p>
+     *
+     * <p>Wenn es kein Kindselement gibt, wird dieser Operator nichts tun (no-op). Beispiel: </p>
+     *
+     * <pre>
+     *     PlainDate date = PlainDate.of(2016, 11, 24);
+     *     // DAY_OF_WEEK hat kein Uhrzeitelement im Kontext eines reinen Kalenderdatums
+     *     System.out.println(date.with(DAY_OF_WEEK.atCeiling())); // 2016-11-24
+     *
+     *     PlainTimestamp tsp = date.atTime(20, 45);
+     *     // DAY_OF_WEEK hat jetzt Kindselemente, die alle maximiert werden k&ouml;nnen
+     *     System.out.println(tsp.with(DAY_OF_WEEK.atCeiling())); // 2016-11-24T23:59:59,999999999
+     * </pre>
      *
      * @return  operator directly applicable also on {@code PlainTimestamp}
      */
