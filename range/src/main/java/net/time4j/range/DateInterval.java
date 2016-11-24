@@ -1223,7 +1223,7 @@ public final class DateInterval
     /**
      * <p>Interpretes given text as interval using a localized interval pattern. </p>
      *
-     * <p>If given printer does not contain a reference to a locale then the interval pattern
+     * <p>If given parser does not contain a reference to a locale then the interval pattern
      * &quot;{0}/{1}&quot; will be used. </p>
      *
      * @param   text        text to be parsed

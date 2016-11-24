@@ -490,9 +490,9 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
      * @throws  ParseException if parsing fails
      * @since   4.18
      */
-    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parsePattern(
+    static <T, I extends ChronoInterval<T>> I parsePattern(
         CharSequence text,
-        IntervalFactory<T, I> factory,
+        IntervalCreator<T, I> factory,
         ChronoParser<T> parser,
         String pattern
     ) throws ParseException {
@@ -517,9 +517,9 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
     }
 
-    private static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parseComponent(
+    private static <T, I extends ChronoInterval<T>> I parseComponent(
         CharSequence text,
-        IntervalFactory<T, I> factory,
+        IntervalCreator<T, I> factory,
         ChronoParser<T> parser,
         String pattern,
         ParseLog plog

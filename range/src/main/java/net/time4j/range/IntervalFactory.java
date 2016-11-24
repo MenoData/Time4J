@@ -37,34 +37,10 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @see     2.0
  */
-interface IntervalFactory<T extends Temporal<? super T>, I extends IsoInterval<T, I>> {
+interface IntervalFactory<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
+    extends IntervalCreator<T, I> {
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Creates an interval between given boundaries. </p>
-     *
-     * @param   start   lower boundary
-     * @param   end     upper boundary
-     * @return  new interval
-     * @throws  IllegalArgumentException if start is after end
-     * @since   2.0
-     * @see     net.time4j.engine.CalendarDate
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein Intervall zwischen den angegebenen Intervallgrenzen. </p>
-     *
-     * @param   start   lower boundary
-     * @param   end     upper boundary
-     * @return  new interval
-     * @throws  IllegalArgumentException if start is after end
-     * @since   2.0
-     * @see     net.time4j.engine.CalendarDate
-     */
-    I between(
-        Boundary<T> start,
-        Boundary<T> end
-    );
 
     /**
      * <p>Addiert die angegebene Dauer zu einem Zeitpunkt. </p>
@@ -108,14 +84,6 @@ interface IntervalFactory<T extends Temporal<? super T>, I extends IsoInterval<T
      *          of the end boundary
      */
     Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData);
-
-    /**
-     * <p>Liegt ein kalendarischer Typ vor? </p>
-     *
-     * @return  {@code true} if the underlying chronological type is
-     *          assignable to {@code Calendrical} else {@code false}
-     */
-    boolean isCalendrical();
 
     /**
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
