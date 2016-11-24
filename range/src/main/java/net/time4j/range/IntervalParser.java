@@ -450,9 +450,9 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
      * @return  parsed interval or {@code null} if parsing fails
      * @since   3.9/4.6
      */
-    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> I parseCustom(
+    static <T, I extends ChronoInterval<T>> I parseCustom(
         CharSequence text,
-        IntervalFactory<T, I> factory,
+        IntervalCreator<T, I> factory,
         ChronoParser<T> parser,
         String pattern,
         ParseLog plog
