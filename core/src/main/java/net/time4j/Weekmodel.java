@@ -767,13 +767,13 @@ public final class Weekmodel
      * <p>Example: </p>
      *
      * <pre>
-     *  PlainDate date = new PlainDate(2013, 3, 30); // Saturday
+     *  PlainDate date = new PlainDate(2013, 3, 31); // Sunday
      *  System.out.println(date.matches(Weekmodel.ISO.weekend()));
      *  // Output: true
      *
      *  Locale yemen = new Locale("ar", "YE");
      *  System.out.println(date.matches(Weekmodel.of(yemen).weekend()));
-     *  // Output: false (in Yemen the weekend matches Thursday and Friday)
+     *  // Output: false (in Yemen the weekend matches Friday and Saturday)
      * </pre>
      *
      * @return  test for weekend
@@ -784,13 +784,13 @@ public final class Weekmodel
      * <p>Beispiel: </p>
      *
      * <pre>
-     *  PlainDate date = new PlainDate(2013, 3, 30); // Samstag
+     *  PlainDate date = new PlainDate(2013, 3, 31); // Sonntag
      *  System.out.println(date.matches(Weekmodel.ISO.weekend()));
      *  // Ausgabe: true
      *
      *  Locale yemen = new Locale("ar", "YE");
      *  System.out.println(date.matches(Weekmodel.of(yemen).weekend()));
-     *  // Ausgabe: false (im Jemen ist das Wochenende Donnerstag und Freitag)
+     *  // Ausgabe: false (im Jemen ist das Wochenende Freitag und Samstag)
      * </pre>
      *
      * @return  test for weekend
