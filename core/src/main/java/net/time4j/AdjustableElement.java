@@ -142,7 +142,9 @@ public interface AdjustableElement<V, T>
     /**
      * <p>Rounds down an entity by setting all child elements to minimum. </p>
      *
-     * <p>If there is no child element then this operator will not do anything (no-op). Example: </p>
+     * <p>Many elements are organized by parent-child-relations. The most important dependency chain is:
+     * YEAR -&gt; MONTH -&gt; DAY_OF_MONTH -&gt; HOUR_OF_DAY -&gt; MINUTE -&gt; SECOND -&gt; NANO_OF_SECOND.
+     * If there is no child element then this operator will not do anything (no-op). Example: </p>
      *
      * <pre>
      *     PlainDate date = PlainDate.of(2016, 11, 24);
@@ -159,7 +161,9 @@ public interface AdjustableElement<V, T>
     /*[deutsch]
      * <p>Rundet eine Entit&auml;t ab, indem alle Kindselemente dieses Elements auf ihr Minimum gesetzt werden. </p>
      *
-     * <p>Wenn es kein Kindselement gibt, wird dieser Operator nichts tun (no-op). Beispiel: </p>
+     * <p>Viele Elemente sind in Eltern-Kind-Relationen organisiert. Die wichtigste Abh&auml;ngigkeitskette ist:
+     * YEAR -&gt; MONTH -&gt; DAY_OF_MONTH -&gt; HOUR_OF_DAY -&gt; MINUTE -&gt; SECOND -&gt; NANO_OF_SECOND.
+     * Wenn es kein Kindselement gibt, wird dieser Operator nichts tun (no-op). Beispiel: </p>
      *
      * <pre>
      *     PlainDate date = PlainDate.of(2016, 11, 24);
@@ -178,7 +182,9 @@ public interface AdjustableElement<V, T>
     /**
      * <p>Rounds up an entity by setting all child elements to maximum. </p>
      *
-     * <p>If there is no child element then this operator will not do anything (no-op). Example: </p>
+     * <p>Many elements are organized by parent-child-relations. The most important dependency chain is:
+     * YEAR -&gt; MONTH -&gt; DAY_OF_MONTH -&gt; HOUR_OF_DAY -&gt; MINUTE -&gt; SECOND -&gt; NANO_OF_SECOND.
+     * If there is no child element then this operator will not do anything (no-op). Example: </p>
      *
      * <pre>
      *     PlainDate date = PlainDate.of(2016, 11, 24);
@@ -195,7 +201,9 @@ public interface AdjustableElement<V, T>
     /*[deutsch]
      * <p>Rundet eine Entit&auml;t auf, indem alle Kindselemente dieses Elements auf ihr Maximum gesetzt werden. </p>
      *
-     * <p>Wenn es kein Kindselement gibt, wird dieser Operator nichts tun (no-op). Beispiel: </p>
+     * <p>Viele Elemente sind in Eltern-Kind-Relationen organisiert. Die wichtigste Abh&auml;ngigkeitskette ist:
+     * YEAR -&gt; MONTH -&gt; DAY_OF_MONTH -&gt; HOUR_OF_DAY -&gt; MINUTE -&gt; SECOND -&gt; NANO_OF_SECOND.
+     * Wenn es kein Kindselement gibt, wird dieser Operator nichts tun (no-op). Beispiel: </p>
      *
      * <pre>
      *     PlainDate date = PlainDate.of(2016, 11, 24);
