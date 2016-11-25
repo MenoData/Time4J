@@ -87,11 +87,6 @@ public final class TimestampInterval
 
     private static final long serialVersionUID = -3965530927182499606L;
 
-    private static final ChronoFormatter<PlainTimestamp> EXTENDED_ISO =
-        Iso8601Format.EXTENDED_DATE_TIME.with(Attributes.TRAILING_CHARACTERS, true);
-    private static final ChronoFormatter<PlainTimestamp> BASIC_ISO =
-        Iso8601Format.BASIC_DATE_TIME.with(Attributes.TRAILING_CHARACTERS, true);
-
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
         new IntervalComparator<>(false, PlainTimestamp.axis());
 
@@ -1080,6 +1075,11 @@ public final class TimestampInterval
 
         if ((interval == null) || plog.isError()) {
             throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (
+            (plog.getPosition() < text.length())
+            && !parser.getAttributes().get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()
+        ) {
+            throw new ParseException("Trailing characters found: " + text, plog.getPosition());
         } else {
             return interval;
         }
@@ -1398,7 +1398,8 @@ public final class TimestampInterval
         }
 
         // prepare component parsers
-        ChronoFormatter<PlainTimestamp> startFormat = (extended ? EXTENDED_ISO : BASIC_ISO);
+        ChronoFormatter<PlainTimestamp> startFormat = (
+            extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME);
         ChronoFormatter<PlainTimestamp> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
@@ -1526,13 +1527,6 @@ public final class TimestampInterval
 
         }
 
-        @Override
-        protected boolean wantsTrailingCheck() {
-
-            return true;
-
-        }
-
         private ChronoFormatter<PlainTimestamp> createEndFormat(
             ChronoDisplay defaultSupplier,
             ChronoEntity<?> rawData
@@ -1606,9 +1600,7 @@ public final class TimestampInterval
                 setDefault(builder, key, defaultSupplier);
             }
 
-            Attributes attributes =
-                new Attributes.Builder().set(Attributes.TRAILING_CHARACTERS, true).build();
-            return builder.build(attributes);
+            return builder.build();
 
         }
 

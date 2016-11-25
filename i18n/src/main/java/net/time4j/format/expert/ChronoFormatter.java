@@ -62,7 +62,6 @@ import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
-import net.time4j.format.internal.AttributeProxy;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
@@ -851,6 +850,15 @@ public final class ChronoFormatter<T>
             );
         }
 
+        int index = status.getPosition();
+
+        if (!this.trailing && (index < text.length())) {
+            throw new ParseException(
+                "Unparsed trailing characters: " + sub(index, text),
+                index
+            );
+        }
+
         return result;
 
     }
@@ -871,8 +879,7 @@ public final class ChronoFormatter<T>
                 this.globalAttributes,
                 this.leniency,
                 false,
-                true,
-                this.trailing
+                true
             );
         }
 
@@ -961,14 +968,9 @@ public final class ChronoFormatter<T>
         AttributeQuery attrs = attributes;
         Leniency leniency = this.leniency;
         boolean quickPath = true;
-        boolean trailingChars = this.trailing;
 
-        if (attributes instanceof AttributeProxy) {
-            trailingChars = attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
-            quickPath = (AttributeProxy.class.cast(attributes).getDelegate() == this.globalAttributes);
-        } else if (attributes != this.globalAttributes) {
+        if (attributes != this.globalAttributes) {
             attrs = new MergedAttributes(attributes, this.globalAttributes);
-            trailingChars = attrs.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
             leniency = attrs.get(Attributes.LENIENCY, Leniency.SMART);
             quickPath = false;
         }
@@ -979,7 +981,7 @@ public final class ChronoFormatter<T>
             List<ChronoExtension> extensions = this.overrideHandler.getExtensions();
             ChronoMerger<? extends GeneralTimestamp<?>> merger = this.overrideHandler;
             GeneralTimestamp<?> tsp =
-                parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath, trailingChars);
+                parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath);
 
             if (status.isError()) {
                 return null;
@@ -1028,8 +1030,7 @@ public final class ChronoFormatter<T>
                 status,
                 attrs,
                 leniency,
-                quickPath,
-                trailingChars);
+                quickPath);
         }
 
     }
@@ -2739,17 +2740,16 @@ public final class ChronoFormatter<T>
         ParseLog status,
         AttributeQuery attrs,
         Leniency leniency,
-        boolean quickPath,
-        boolean trailingChars
+        boolean quickPath
     ) {
 
         if (inner == null) {
             return parse(
-                this, outer, outer.getExtensions(), text, status, attrs, leniency, depth > 0, quickPath, trailingChars);
+                this, outer, outer.getExtensions(), text, status, attrs, leniency, depth > 0, quickPath);
         }
 
         Object intermediate =
-            this.parse(inner, inner.preparser(), depth + 1, text, status, attrs, leniency, quickPath, trailingChars);
+            this.parse(inner, inner.preparser(), depth + 1, text, status, attrs, leniency, quickPath);
 
         if (status.isError() || (intermediate == null)) {
             return null;
@@ -2809,8 +2809,7 @@ public final class ChronoFormatter<T>
         AttributeQuery attributes,
         Leniency leniency,
         boolean preparsing,
-        boolean quickPath,
-        boolean trailing
+        boolean quickPath
     ) {
 
         int len = text.length();
@@ -2834,15 +2833,6 @@ public final class ChronoFormatter<T>
         }
 
         if ((parsed == null) || status.isError()) {
-            return null;
-        }
-
-        int index = status.getPosition();
-
-        if ((index < len) && !trailing) {
-            status.setError(
-                index,
-                "Unparsed trailing characters: " + sub(index, text));
             return null;
         }
 
@@ -5050,9 +5040,7 @@ public final class ChronoFormatter<T>
         ) {
 
             this.checkElement(element);
-            this.startSection(Attributes.TRAILING_CHARACTERS, true);
             this.addProcessor(new CustomizedProcessor<>(element, printer, parser));
-            this.endSection();
             return this;
 
         }

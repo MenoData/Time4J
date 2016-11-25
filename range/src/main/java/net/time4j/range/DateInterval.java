@@ -1380,6 +1380,11 @@ public final class DateInterval
 
         if ((interval == null) || plog.isError()) {
             throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (
+            (plog.getPosition() < text.length())
+            && !parser.getAttributes().get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()
+        ) {
+            throw new ParseException("Trailing characters found: " + text, plog.getPosition());
         } else {
             return interval;
         }
@@ -1668,7 +1673,6 @@ public final class DateInterval
         }
 
         // prepare component parsers
-        startFormat = startFormat.with(Attributes.TRAILING_CHARACTERS, true);
         ChronoFormatter<PlainDate> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
@@ -1851,13 +1855,6 @@ public final class DateInterval
 
         }
 
-        @Override
-        protected boolean wantsTrailingCheck() {
-
-            return true;
-
-        }
-
         private ChronoFormatter<PlainDate> createEndFormat(
             ChronoDisplay defaultSupplier,
             ChronoEntity<?> rawData
@@ -1911,9 +1908,7 @@ public final class DateInterval
                 setDefault(builder, key, defaultSupplier);
             }
 
-            Attributes attributes =
-                new Attributes.Builder().set(Attributes.TRAILING_CHARACTERS, true).build();
-            return builder.build(attributes);
+            return builder.build();
 
         }
 
