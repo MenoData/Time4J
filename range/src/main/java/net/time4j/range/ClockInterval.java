@@ -24,8 +24,6 @@ package net.time4j.range;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.PlainTime;
-import net.time4j.format.Attributes;
-import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
@@ -64,11 +62,6 @@ public final class ClockInterval
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final long serialVersionUID = -6020908050362634577L;
-
-    private static final ChronoFormatter<PlainTime> BASIC_ISO =
-        Iso8601Format.BASIC_WALL_TIME.with(Attributes.TRAILING_CHARACTERS, true);
-    private static final ChronoFormatter<PlainTime> EXTENDED_ISO =
-        Iso8601Format.EXTENDED_WALL_TIME.with(Attributes.TRAILING_CHARACTERS, true);
 
     private static final Comparator<ChronoInterval<PlainTime>> COMPARATOR =
         new IntervalComparator<PlainTime>(false, PlainTime.axis());
@@ -499,7 +492,8 @@ public final class ClockInterval
             throw new IndexOutOfBoundsException("Empty text.");
         }
 
-        ChronoParser<PlainTime> parser = ((text.indexOf(':') == -1) ? BASIC_ISO : EXTENDED_ISO);
+        ChronoParser<PlainTime> parser = (
+            (text.indexOf(':') == -1) ? Iso8601Format.BASIC_WALL_TIME : Iso8601Format.EXTENDED_WALL_TIME);
         ParseLog plog = new ParseLog();
 
         ClockInterval result =

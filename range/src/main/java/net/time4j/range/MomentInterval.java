@@ -79,11 +79,6 @@ public final class MomentInterval
 
     private static final long serialVersionUID = -5403584519478162113L;
 
-    private static final ChronoFormatter<Moment> EXTENDED_ISO =
-        Iso8601Format.EXTENDED_DATE_TIME_OFFSET.with(Attributes.TRAILING_CHARACTERS, true);
-    private static final ChronoFormatter<Moment> BASIC_ISO =
-        Iso8601Format.BASIC_DATE_TIME_OFFSET.with(Attributes.TRAILING_CHARACTERS, true);
-
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
         new IntervalComparator<Moment>(false, Moment.axis());
 
@@ -907,7 +902,8 @@ public final class MomentInterval
         }
 
         // prepare component parsers
-        ChronoFormatter<Moment> startFormat = (extended ? EXTENDED_ISO : BASIC_ISO);
+        ChronoFormatter<Moment> startFormat = (
+            extended ? Iso8601Format.EXTENDED_DATE_TIME_OFFSET : Iso8601Format.BASIC_DATE_TIME_OFFSET);
         ChronoFormatter<Moment> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
@@ -1054,13 +1050,6 @@ public final class MomentInterval
 
         }
 
-        @Override
-        protected boolean isISO() {
-
-            return true;
-
-        }
-
         private ChronoFormatter<Moment> createEndFormat(
             ChronoDisplay defaultSupplier,
             ChronoEntity<?> rawData
@@ -1139,7 +1128,6 @@ public final class MomentInterval
 
             Attributes attributes =
                 new Attributes.Builder()
-                    .set(Attributes.TRAILING_CHARACTERS, true)
                     .setTimezone(rawData.getTimezone())
                     .build();
 

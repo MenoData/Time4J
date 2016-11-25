@@ -782,6 +782,15 @@ public final class ChronoFormatter<T>
             );
         }
 
+        int index = status.getPosition();
+
+        if (!this.trailing && (index < text.length())) {
+            throw new ParseException(
+                "Unparsed trailing characters: " + sub(index, text),
+                index
+            );
+        }
+
         return result;
 
     }
@@ -2647,19 +2656,6 @@ public final class ChronoFormatter<T>
         }
 
         if ((parsed == null) || status.isError()) {
-            return null;
-        }
-
-        int index = status.getPosition();
-        boolean trailing = (
-            quickPath
-                ? cf.trailing
-                : attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue());
-
-        if ((index < len) && !trailing) {
-            status.setError(
-                index,
-                "Unparsed trailing characters: " + sub(index, text));
             return null;
         }
 
@@ -4848,9 +4844,7 @@ public final class ChronoFormatter<T>
         ) {
 
             this.checkElement(element);
-            this.startSection(Attributes.TRAILING_CHARACTERS, true);
             this.addProcessor(new CustomizedProcessor<V>(element, printer, parser));
-            this.endSection();
             return this;
 
         }

@@ -438,7 +438,11 @@ public final class Attributes
      *  // Output: T17:45
      * </pre>
      *
-     * <p>Default value: {@code false} </p>
+     * <p>Starting with version v3.25/4.21, this attribute will only matter if users don&#39;t explicitly
+     * specify a {@code ParseLog} or a {@code ParsePosition}. Otherwise - with explicit parse log or
+     * position - the parser will always tolerate trailing characters. </p>
+     *
+     * <p>Default value: {@code false} in strict or smart mode </p>
      */
     /*[deutsch]
      * <p>Steuert, ob beim Parsen verbleibende Zeichen der Texteingabe
@@ -460,7 +464,11 @@ public final class Attributes
      *  // Output: T17:45
      * </pre>
      *
-     * <p>Standardwert: {@code false} </p>
+     * <p>Beginnend mit der Version v3.25/4.21 spielt dieses Formatattribut nur eine Rolle, wenn Anwender
+     * kein {@code ParseLog} oder eine {@code ParsePosition} angeben. Sonst - mit extra Angaben zur Position -
+     * wird der Interpretierer immer verbleibende Zeichen tolerieren. </p>
+     *
+     * <p>Standardwert: {@code false} wenn kein laxer Modus vorliegt </p>
      */
     public static final AttributeKey<Boolean> TRAILING_CHARACTERS =
         PredefinedKey.valueOf("TRAILING_CHARACTERS", Boolean.class);

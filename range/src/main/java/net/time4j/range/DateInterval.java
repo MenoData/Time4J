@@ -840,7 +840,6 @@ public final class DateInterval
         }
 
         // prepare component parsers
-        startFormat = startFormat.with(Attributes.TRAILING_CHARACTERS, true);
         ChronoFormatter<PlainDate> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
@@ -959,13 +958,6 @@ public final class DateInterval
 
         }
 
-        @Override
-        protected boolean isISO() {
-
-            return true;
-
-        }
-
         private ChronoFormatter<PlainDate> createEndFormat(
             ChronoDisplay defaultSupplier,
             ChronoEntity<?> rawData
@@ -1019,9 +1011,7 @@ public final class DateInterval
                 setDefault(builder, key, defaultSupplier);
             }
 
-            Attributes attributes =
-                new Attributes.Builder().set(Attributes.TRAILING_CHARACTERS, true).build();
-            return builder.build(attributes);
+            return builder.build();
 
         }
 

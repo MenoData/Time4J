@@ -41,20 +41,10 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collections;
-import java.util.IdentityHashMap;
 import java.util.Locale;
-import java.util.Map;
 
-import static net.time4j.PlainDate.DAY_OF_MONTH;
-import static net.time4j.PlainDate.DAY_OF_WEEK;
-import static net.time4j.PlainDate.DAY_OF_YEAR;
-import static net.time4j.PlainDate.MONTH_AS_NUMBER;
-import static net.time4j.PlainDate.YEAR;
-import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
-import static net.time4j.PlainTime.ISO_HOUR;
-import static net.time4j.PlainTime.MINUTE_OF_HOUR;
-import static net.time4j.PlainTime.NANO_OF_SECOND;
-import static net.time4j.PlainTime.SECOND_OF_MINUTE;
+import static net.time4j.PlainDate.*;
+import static net.time4j.PlainTime.*;
 
 
 /**
@@ -346,8 +336,6 @@ public class Iso8601Format {
      */
     public static final ChronoFormatter<Moment> EXTENDED_DATE_TIME_OFFSET;
 
-    private static final Map<Object, ChronoFormatter<PlainDate>> DATE_PARSERS;
-
     static {
         BASIC_CALENDAR_DATE = calendarFormat(false);
         EXTENDED_CALENDAR_DATE = calendarFormat(true);
@@ -355,15 +343,6 @@ public class Iso8601Format {
         EXTENDED_ORDINAL_DATE = ordinalFormat(true);
         BASIC_WEEK_DATE = weekdateFormat(false);
         EXTENDED_WEEK_DATE = weekdateFormat(true);
-
-        Map<Object, ChronoFormatter<PlainDate>> map = new IdentityHashMap<Object, ChronoFormatter<PlainDate>>(6);
-        fill(map, BASIC_CALENDAR_DATE);
-        fill(map, EXTENDED_CALENDAR_DATE);
-        fill(map, BASIC_ORDINAL_DATE);
-        fill(map, EXTENDED_ORDINAL_DATE);
-        fill(map, BASIC_WEEK_DATE);
-        fill(map, EXTENDED_WEEK_DATE);
-        DATE_PARSERS = map;
 
         BASIC_DATE = generalDateFormat(false);
         EXTENDED_DATE = generalDateFormat(true);
@@ -412,6 +391,8 @@ public class Iso8601Format {
 
         if ((date == null) || plog.isError()) {
             throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (plog.getPosition() < iso.length()) {
+            throw new ParseException("Trailing characters found: " + iso, plog.getPosition());
         } else {
             return date;
         }
@@ -668,9 +649,9 @@ LOOP:
                             break;
                         case 'W':
                             if (extended) {
-                                return DATE_PARSERS.get(EXTENDED_WEEK_DATE).parse(text, status);
+                                return EXTENDED_WEEK_DATE.parse(text, status);
                             } else {
-                                return DATE_PARSERS.get(BASIC_WEEK_DATE).parse(text, status);
+                                return BASIC_WEEK_DATE.parse(text, status);
                             }
                         case 'T':
                         case '/':
@@ -683,9 +664,9 @@ LOOP:
 
                 if (extended) {
                     if (hyphens == 1) {
-                        return DATE_PARSERS.get(EXTENDED_ORDINAL_DATE).parse(text, status);
+                        return EXTENDED_ORDINAL_DATE.parse(text, status);
                     } else {
-                        return DATE_PARSERS.get(EXTENDED_CALENDAR_DATE).parse(text, status);
+                        return EXTENDED_CALENDAR_DATE.parse(text, status);
                     }
                 } else {
                     len -= 4; // year length is usually 4 digits
@@ -694,9 +675,9 @@ LOOP:
                         len -= 2; // concerns years with at least 5 digits or more
                     }
                     if (len == 3) {
-                        return DATE_PARSERS.get(BASIC_ORDINAL_DATE).parse(text, status);
+                        return BASIC_ORDINAL_DATE.parse(text, status);
                     } else {
-                        return DATE_PARSERS.get(BASIC_CALENDAR_DATE).parse(text, status);
+                        return BASIC_CALENDAR_DATE.parse(text, status);
                     }
                 }
             }
@@ -737,15 +718,6 @@ LOOP:
         for (int i = 0; i < 5; i++) {
             builder.endSection();
         }
-
-    }
-
-    private static void fill(
-        Map<Object, ChronoFormatter<PlainDate>> map,
-        ChronoFormatter<PlainDate> parser
-    ) {
-
-        map.put(parser, parser.with(Attributes.TRAILING_CHARACTERS, true));
 
     }
 

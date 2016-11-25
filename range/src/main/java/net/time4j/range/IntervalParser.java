@@ -21,7 +21,6 @@
 
 package net.time4j.range;
 
-import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Temporal;
 import net.time4j.format.Attributes;
@@ -151,19 +150,28 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 	I parse(String text) throws ParseException {
 
         ParseLog plog = new ParseLog();
-        I ret =
-            this.parse(
-                text,
-                plog,
-                IsoInterval.extractDefaultAttributes(this.startFormat));
+        AttributeQuery attrs = IsoInterval.extractDefaultAttributes(this.startFormat);
+        I ret = this.parse(text, plog, attrs);
+        int pos = plog.getPosition();
+        int len = text.length();
 
-        if (
-            (ret == null)
-            || plog.isError()
-        ) {
+        if ((ret == null) || plog.isError()) {
             throw new ParseException(
                 plog.getErrorMessage(),
                 plog.getErrorIndex());
+        } else if (
+            (pos < len)
+            && !attrs.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()
+        ) {
+            String suffix;
+
+            if (len - pos <= 10) {
+                suffix = text.subSequence(pos, len).toString();
+            } else {
+                suffix = text.subSequence(pos, pos + 10).toString() + "...";
+            }
+
+            throw new ParseException("Unparsed trailing characters: " + suffix, pos);
         }
 
         return ret;
@@ -186,7 +194,6 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             throw new IndexOutOfBoundsException("[" + pos + "]: " + text.toString());
         }
 
-        AttributeQuery attrs = wrap(attributes);
         IntervalEdge left = CLOSED;
         IntervalEdge right = this.factory.isCalendrical() ? CLOSED : OPEN;
         T t1 = null;
@@ -266,7 +273,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             pos++;
         } else {
             lowerLog = new ParseLog(pos);
-            t1 = this.startFormat.parse(text, lowerLog, attrs);
+            t1 = this.startFormat.parse(text, lowerLog, attributes);
             if (t1 == null || lowerLog.isError()) {
                 status.setError(pos, lowerLog.getErrorMessage());
                 return null;
@@ -324,9 +331,9 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         } else {
             upperLog = new ParseLog(pos);
             if (this.endFormat == null) {
-                t2 = this.parseReducedEnd(text, t1, lowerLog, upperLog, attrs);
+                t2 = this.parseReducedEnd(text, t1, lowerLog, upperLog, attributes);
             } else {
-                t2 = this.endFormat.parse(text, upperLog, attrs);
+                t2 = this.endFormat.parse(text, upperLog, attributes);
             }
             if (t2 == null || upperLog.isError()) {
                 status.setError(pos, upperLog.getErrorMessage());
@@ -362,22 +369,6 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         }
 
         if (status.isError()) {
-            return null;
-        }
-
-        if (
-            (pos < len)
-            && (this.isISO() || !attributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue())
-        ) {
-            String suffix;
-
-            if (len - pos <= 10) {
-                suffix = text.subSequence(pos, len).toString();
-            } else {
-                suffix = text.subSequence(pos, pos + 10).toString() + "...";
-            }
-
-            status.setError(pos, "Unparsed trailing characters: " + suffix);
             return null;
         }
 
@@ -466,8 +457,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         int n = pattern.length();
         boolean startWasSet = false;
         boolean endWasSet = false;
-        AttributeQuery query = IsoInterval.extractDefaultAttributes(parser);
-        AttributeQuery attrs = wrap(query);
+        AttributeQuery attrs = IsoInterval.extractDefaultAttributes(parser);
 
         while (i < n) {
             char c = pattern.charAt(i);
@@ -533,7 +523,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             pos++;
         }
 
-        if ((pos < len) && !query.get(Attributes.TRAILING_CHARACTERS, false)) {
+        if ((pos < len) && !attrs.get(Attributes.TRAILING_CHARACTERS, false)) {
             plog.setError(pos, "Trailing characters found: " + text);
             return null;
         }
@@ -574,29 +564,6 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
 
     }
 
-    protected boolean isISO() {
-
-        return false;
-
-    }
-
-    private static AttributeQuery wrap(AttributeQuery attributes) {
-
-        AttributeQuery attrs = attributes;
-        boolean allowTrailingChars =
-            attributes.get(
-                Attributes.TRAILING_CHARACTERS,
-                Boolean.FALSE
-            ).booleanValue();
-
-        if (!allowTrailingChars) {
-            attrs = new Wrapper(attributes);
-        }
-
-        return attrs;
-
-    }
-
     private void checkSeparatorChar(
         CharSequence text,
         ParseLog status,
@@ -625,52 +592,6 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
                 pos,
                 "Missing separation char between start and end boundaries: "
                 + ((this.separator == null) ? "/ or -" : this.separator.toString()));
-        }
-
-    }
-
-    //~ Innere Klassen ----------------------------------------------------
-
-    static class Wrapper
-        implements AttributeQuery {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final AttributeQuery attributes;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        Wrapper(AttributeQuery attributes) {
-            super();
-
-            this.attributes = attributes;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public boolean contains(AttributeKey<?> key) {
-            if (key == Attributes.TRAILING_CHARACTERS) {
-                return true;
-            }
-            return this.attributes.contains(key);
-        }
-
-        @Override
-        public <A> A get(AttributeKey<A> key) {
-            if (key == Attributes.TRAILING_CHARACTERS) {
-                return key.type().cast(Boolean.TRUE);
-            }
-            return this.attributes.get(key);
-        }
-
-        @Override
-        public <A> A get(AttributeKey<A> key, A defaultValue) {
-            if (key == Attributes.TRAILING_CHARACTERS) {
-                return key.type().cast(Boolean.TRUE);
-            }
-            return this.attributes.get(key, defaultValue);
         }
 
     }

@@ -78,11 +78,6 @@ public final class TimestampInterval
 
     private static final long serialVersionUID = -3965530927182499606L;
 
-    private static final ChronoFormatter<PlainTimestamp> EXTENDED_ISO =
-        Iso8601Format.EXTENDED_DATE_TIME.with(Attributes.TRAILING_CHARACTERS, true);
-    private static final ChronoFormatter<PlainTimestamp> BASIC_ISO =
-        Iso8601Format.BASIC_DATE_TIME.with(Attributes.TRAILING_CHARACTERS, true);
-
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
         new IntervalComparator<PlainTimestamp>(false, PlainTimestamp.axis());
 
@@ -866,7 +861,8 @@ public final class TimestampInterval
         }
 
         // prepare component parsers
-        ChronoFormatter<PlainTimestamp> startFormat = (extended ? EXTENDED_ISO : BASIC_ISO);
+        ChronoFormatter<PlainTimestamp> startFormat = (
+            extended ? Iso8601Format.EXTENDED_DATE_TIME : Iso8601Format.BASIC_DATE_TIME);
         ChronoFormatter<PlainTimestamp> endFormat = (sameFormat ? startFormat : null); // null means reduced iso format
 
         // create interval
@@ -991,13 +987,6 @@ public final class TimestampInterval
 
         }
 
-        @Override
-        protected boolean isISO() {
-
-            return true;
-
-        }
-
         private ChronoFormatter<PlainTimestamp> createEndFormat(
             ChronoDisplay defaultSupplier,
             ChronoEntity<?> rawData
@@ -1071,9 +1060,7 @@ public final class TimestampInterval
                 setDefault(builder, key, defaultSupplier);
             }
 
-            Attributes attributes =
-                new Attributes.Builder().set(Attributes.TRAILING_CHARACTERS, true).build();
-            return builder.build(attributes);
+            return builder.build();
 
         }
 
