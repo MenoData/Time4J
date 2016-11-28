@@ -1,4 +1,7 @@
 ## [v4.21] not yet released
+### Changed
+- Simplify parsing of trailing characters [#576]
+
 ### Fixed
 - Clarify documentation of AdjustableElement.atFloor() and .atCeiling() [#580]
 - Ambivalence parsing check sometimes faulty [#577]
