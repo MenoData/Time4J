@@ -126,8 +126,13 @@ final class TwoDigitYearProcessor
         int year = formattable.getInt(this.element);
 
         if (year < 0) {
-            throw new IllegalArgumentException(
-                "Negative year cannot be printed as two-digit-year: " + year);
+            if (year == Integer.MIN_VALUE) {
+                throw new IllegalArgumentException(
+                    "Format context has no year: " + formattable);
+            } else {
+                throw new IllegalArgumentException(
+                    "Negative year cannot be printed as two-digit-year: " + year);
+            }
         }
 
         int yy = MathUtils.floorModulo(year, 100);

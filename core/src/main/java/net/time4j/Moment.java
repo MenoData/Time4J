@@ -2791,7 +2791,7 @@ public final class Moment
                 return context.inZonalView(tzid);
             }
 
-            return context;
+            throw new IllegalArgumentException("Cannot print moment without timezone.");
 
         }
 

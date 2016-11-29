@@ -190,8 +190,13 @@ class NumberProcessor<V>
         if (quickPath && this.fixedInt) {
             int v = formattable.getInt((ChronoElement<Integer>) this.element);
             if (v < 0) {
-                throw new IllegalArgumentException(
-                    "Negative value not allowed according to sign policy.");
+                if (v == Integer.MIN_VALUE) {
+                    throw new IllegalArgumentException(
+                        "Format context \"" + formattable + "\" without element: " + this.element);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Negative value not allowed according to sign policy.");
+                }
             }
             String digits = Integer.toString(v);
             int count = digits.length();
@@ -221,6 +226,10 @@ class NumberProcessor<V>
 
             if (type == Integer.class) {
                 int v = formattable.getInt((ChronoElement<Integer>) this.element);
+                if (v == Integer.MIN_VALUE) {
+                    throw new IllegalArgumentException(
+                        "Format context \"" + formattable + "\" without element: " + this.element);
+                }
                 negative = (v < 0);
                 digits = toNumeral(numsys, v);
             } else if (type == Long.class) {

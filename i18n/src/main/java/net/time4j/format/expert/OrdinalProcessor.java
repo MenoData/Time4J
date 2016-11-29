@@ -151,8 +151,13 @@ final class OrdinalProcessor
         int value = formattable.getInt(this.element);
 
         if (value < 0) {
-            throw new IllegalArgumentException(
-                "Cannot format negative ordinal numbers: " + formattable);
+            if (value == Integer.MIN_VALUE) {
+                throw new IllegalArgumentException(
+                    "Format context \"" + formattable + "\" without element: " + this.element);
+            } else {
+                throw new IllegalArgumentException(
+                    "Cannot format negative ordinal numbers: " + formattable);
+            }
         }
 
         String digits = Integer.toString(value);
