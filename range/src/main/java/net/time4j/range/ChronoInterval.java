@@ -49,8 +49,8 @@ public interface ChronoInterval<T> {
     /**
      * <p>Yields the lower bound of this interval. </p>
      *
-     * @return start interval boundary
-     * @since 2.0
+     * @return  start interval boundary
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die untere Grenze dieses Intervalls. </p>
@@ -63,8 +63,8 @@ public interface ChronoInterval<T> {
     /**
      * <p>Yields the upper bound of this interval. </p>
      *
-     * @return end interval boundary
-     * @since 2.0
+     * @return  end interval boundary
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Liefert die obere Grenze dieses Intervalls. </p>
@@ -77,8 +77,8 @@ public interface ChronoInterval<T> {
     /**
      * <p>Determines if this interval has finite boundaries. </p>
      *
-     * @return {@code true} if start and end are finite else {@code false}
-     * @since 2.0
+     * @return  {@code true} if start and end are finite else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall endliche Grenzen hat. </p>
@@ -93,8 +93,8 @@ public interface ChronoInterval<T> {
     /**
      * <p>Determines if this interval is empty. </p>
      *
-     * @return {@code true} if this interval does not contain any time point else {@code false}
-     * @since 2.0
+     * @return  {@code true} if this interval does not contain any time point else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall leer ist. </p>
@@ -107,9 +107,9 @@ public interface ChronoInterval<T> {
     /**
      * <p>Queries if given time point belongs to this interval. </p>
      *
-     * @param temporal time point to be queried
-     * @return {@code true} if given time point belongs to this interval else {@code false}
-     * @since 2.0
+     * @param   temporal    time point to be queried
+     * @return  {@code true} if given time point belongs to this interval else {@code false}
+     * @since   2.0
      */
     /*[deutsch]
      * <p>Ermittelt, ob der angegebene Zeitpunkt zu diesem Intervall
@@ -124,15 +124,23 @@ public interface ChronoInterval<T> {
     /**
      * <p>Does this interval contain the other one? </p>
      *
-     * @param other another interval whose relation to this interval is to be investigated
-     * @return {@code true} if this interval contains the other one else {@code false}
-     * @since 3.25/4.21
+     * <p>An interval cannot contain infinite intervals but can contain an empty interval if it contains
+     * the start anchor of the empty interval. </p>
+     *
+     * @param   other       another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval contains the other one else {@code false}
+     * @see     #intersects(ChronoInterval)
+     * @since   3.25/4.21
      */
     /*[deutsch]
      * <p>Enth&auml;lt dieses Intervall das andere Intervall? </p>
      *
-     * @param   other   another interval whose relation to this interval is to be investigated
+     * <p>Ein Intervall kann nie unendliche Intervalle enthalten, aber sehr wohl ein leeres Intervall,
+     * wenn es dessen Startanker enth&auml;lt. </p>
+     *
+     * @param   other       another interval whose relation to this interval is to be investigated
      * @return  {@code true} if this interval contains the other one else {@code false}
+     * @see     #intersects(ChronoInterval)
      * @since   3.25/4.21
      */
     boolean contains(ChronoInterval<T> other);
@@ -140,8 +148,8 @@ public interface ChronoInterval<T> {
     /**
      * <p>Is this interval after the given time point? </p>
      *
-     * @param temporal reference time point
-     * @return {@code true} if this interval is after given time point else {@code false}
+     * @param   temporal    reference time point
+     * @return  {@code true} if this interval is after given time point else {@code false}
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall nach dem angegebenen Zeitpunkt? </p>
@@ -154,14 +162,14 @@ public interface ChronoInterval<T> {
     /**
      * <p>Is this interval after the other one? </p>
      *
-     * @param other another interval whose relation to this interval is to be investigated
-     * @return {@code true} if this interval is after the other one else {@code false}
-     * @since 3.25/4.21
+     * @param   other       another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval is after the other one else {@code false}
+     * @since   3.25/4.21
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall nach dem anderen? </p>
      *
-     * @param   other   another interval whose relation to this interval is to be investigated
+     * @param   other       another interval whose relation to this interval is to be investigated
      * @return  {@code true} if this interval is after the other one else {@code false}
      * @since   3.25/4.21
      */
@@ -172,8 +180,8 @@ public interface ChronoInterval<T> {
     /**
      * <p>Is this interval before the given time point? </p>
      *
-     * @param temporal reference time point
-     * @return {@code true} if this interval is before given time point else {@code false}
+     * @param   temporal    reference time point
+     * @return  {@code true} if this interval is before given time point else {@code false}
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall vor dem angegebenen Zeitpunkt? </p>
@@ -186,14 +194,14 @@ public interface ChronoInterval<T> {
     /**
      * <p>Is this interval before the other one? </p>
      *
-     * @param other another interval whose relation to this interval is to be investigated
-     * @return {@code true} if this interval is before the other one else {@code false}
-     * @since 3.25/4.21
+     * @param   other       another interval whose relation to this interval is to be investigated
+     * @return  {@code true} if this interval is before the other one else {@code false}
+     * @since   3.25/4.21
      */
     /*[deutsch]
      * <p>Liegt dieses Intervall vor dem anderen? </p>
      *
-     * @param   other   another interval whose relation to this interval is to be investigated
+     * @param   other       another interval whose relation to this interval is to be investigated
      * @return  {@code true} if this interval is before the other one else {@code false}
      * @since   3.25/4.21
      */
@@ -204,9 +212,9 @@ public interface ChronoInterval<T> {
      * <p>
      * <p>Note: Empty intervals never abut. </p>
      *
-     * @param other another interval which might abut this interval
-     * @return {@code true} if there is no intersection and no gap between else {@code false}
-     * @since 3.25/4.21
+     * @param   other       another interval which might abut this interval
+     * @return  {@code true} if there is no intersection and no gap between else {@code false}
+     * @since   3.25/4.21
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall das angegebene Intervall so ber&uuml;hrt, da&szlig;
@@ -214,7 +222,7 @@ public interface ChronoInterval<T> {
      *
      * <p>Hinweis: Leere Intervalle ber&uuml;hren sich nie. </p>
      *
-     * @param   other   another interval which might abut this interval
+     * @param   other       another interval which might abut this interval
      * @return  {@code true} if there is no intersection and no gap between else {@code false}
      * @since   3.25/4.21
      */
@@ -223,17 +231,22 @@ public interface ChronoInterval<T> {
     /**
      * <p>Queries if this interval intersects the other one such that there is at least one common time point. </p>
      *
-     * @param other another interval which might have an intersection with this interval
-     * @return {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
-     * @see #isBefore(ChronoInterval)
-     * @see #isAfter(ChronoInterval)
-     * @since 3.25/4.21
+     * <p>In contrast to {@link #contains(ChronoInterval)}, an interval can never intersect an empty interval. </p>
+     *
+     * @param   other       another interval which might have an intersection with this interval
+     * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
+     * @see     #isBefore(ChronoInterval)
+     * @see     #isAfter(ChronoInterval)
+     * @since   3.25/4.21
      */
     /*[deutsch]
      * <p>Ermittelt, ob dieses Intervall sich mit dem angegebenen Intervall so &uuml;berschneidet, da&szlig;
      * mindestens ein gemeinsamer Zeitpunkt existiert. </p>
      *
-     * @param   other   another interval which might have an intersection with this interval
+     * <p>Im Unterschied zu {@link #contains(ChronoInterval)} kann sich ein Intervall niemals mit einem leeren
+     * Intervall &uuml;berschneiden. </p>
+     *
+     * @param   other       another interval which might have an intersection with this interval
      * @return  {@code true} if there is an non-empty intersection of this interval and the other one else {@code false}
      * @since   3.25/4.21
      * @see     #isBefore(ChronoInterval)
