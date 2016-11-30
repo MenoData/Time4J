@@ -1,4 +1,7 @@
 ## [v4.21] not yet released
+### Added
+- Enable open start of intervals [#584]
+
 ### Changed
 - Simplify parsing of trailing characters [#576]
 
