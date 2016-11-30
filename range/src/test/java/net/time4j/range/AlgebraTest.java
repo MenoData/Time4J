@@ -32,6 +32,10 @@ public class AlgebraTest {
 
         assertThat(a.precedes(b), is(false));
         assertThat(b.precededBy(a), is(false));
+
+        // special check
+        assertThat(b.withOpenStart().precededBy(a), is(true));
+        assertThat(b.move(-1, CalendarUnit.DAYS).withOpenStart().precededBy(a), is(false));
     }
 
     @Test
@@ -86,14 +90,24 @@ public class AlgebraTest {
 
         DateInterval a =
             DateInterval.between(startA, endA);
-        DateInterval b =
+        DateInterval b1 =
             DateInterval.parse(
                 "(2014-01-01/2014-05-31]",
                 Iso8601Format.EXTENDED_CALENDAR_DATE,
                 BracketPolicy.SHOW_ALWAYS);
 
-        assertThat(a.meets(b), is(true));
-        assertThat(b.metBy(a), is(true));
+        assertThat(a.meets(b1), is(true));
+        assertThat(b1.metBy(a), is(true));
+
+        DateInterval b2 =
+            DateInterval.between(
+                PlainDate.of(2014, 1, 1),
+                PlainDate.of(2014, 5, 31)
+            ).withOpenStart();
+        assertThat(b1, is(b2));
+
+        assertThat(a.meets(b2), is(true));
+        assertThat(b2.metBy(a), is(true));
     }
 
     @Test
@@ -103,18 +117,28 @@ public class AlgebraTest {
 
         DateInterval a =
             DateInterval.between(startA, endA);
-        DateInterval b =
+        DateInterval b1 =
             DateInterval.parse(
                 "(2014-01-01/2014-05-31]",
                 Iso8601Format.EXTENDED_CALENDAR_DATE,
                 BracketPolicy.SHOW_ALWAYS);
+        DateInterval b2 =
+            DateInterval.between(
+                PlainDate.of(2014, 1, 1),
+                PlainDate.of(2014, 5, 31)
+            ).withOpenStart();
+        assertThat(b1, is(b2));
 
-        assertThat(a.precedes(b), is(false));
-        assertThat(b.precededBy(a), is(false));
+        assertThat(a.precedes(b1), is(false));
+        assertThat(b1.precededBy(a), is(false));
+        assertThat(a.precedes(b2), is(false));
+        assertThat(b2.precededBy(a), is(false));
 
         a = a.move(-1, CalendarUnit.DAYS);
-        assertThat(a.precedes(b), is(true));
-        assertThat(b.precededBy(a), is(true));
+        assertThat(a.precedes(b1), is(true));
+        assertThat(b1.precededBy(a), is(true));
+        assertThat(a.precedes(b2), is(true));
+        assertThat(b2.precededBy(a), is(true));
     }
 
     @Test

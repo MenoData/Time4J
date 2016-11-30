@@ -326,6 +326,25 @@ public class BasicDateRangeTest {
     }
 
     @Test
+    public void withOpenStart() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.withOpenStart().getStart().isOpen(),
+            is(true));
+        assertThat(
+            interval.withOpenStart().getStart().getTemporal(),
+            is(start));
+
+        DateInterval infinite = DateInterval.until(end);
+        assertThat(
+            infinite.withOpenStart(),
+            is(infinite));
+    }
+
+    @Test
     public void withOpenEnd() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
@@ -334,11 +353,25 @@ public class BasicDateRangeTest {
         assertThat(
             interval.withOpenEnd().getEnd().isOpen(),
             is(true));
+        assertThat(
+            interval.withOpenEnd().getEnd().getTemporal(),
+            is(end));
 
         DateInterval infinite = DateInterval.since(start);
         assertThat(
             infinite.withOpenEnd(),
             is(infinite));
+    }
+
+    @Test
+    public void withClosedStart() {
+        PlainDate start = PlainDate.of(2014, 2, 27);
+        PlainDate end = PlainDate.of(2014, 5, 14);
+
+        DateInterval interval = DateInterval.between(start, end);
+        assertThat(
+            interval.withClosedStart(),
+            is(interval));
     }
 
     @Test
