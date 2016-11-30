@@ -7,8 +7,10 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -1241,6 +1243,39 @@ public class IntervalCollectionTest {
         assertThat(
             IntervalCollection.onClockAxis().plus(c1).plus(c2).plus(c4).isDisjunct(),
             is(false));
+    }
+
+    @Test
+    public void collectionOfTraditionalIntervals() {
+        SimpleInterval<Date> i1 =
+            SimpleInterval.between(new Date(0L), new Date(5L));
+        SimpleInterval<Date> i2 =
+            SimpleInterval.between(new Date(0L), new Date(7L));
+        SimpleInterval<Date> i3 =
+            SimpleInterval.between(new Date(1L), new Date(1L));
+        IntervalCollection<Date> icoll = IntervalCollection.onTraditionalTimeLine().plus(i3).plus(i2).plus(i1);
+        assertThat(icoll.getIntervals(), is(Arrays.asList(i1, i2, i3)));
+        assertThat(icoll.getSize(), is(3));
+        assertThat(icoll.withIntersection().isEmpty(), is(true));
+        assertThat(icoll.getRange(), is(SimpleInterval.between(new Date(0L), new Date(7L))));
+        assertThat(icoll.withBlocks().getIntervals(), is(Arrays.asList(i2)));
+        assertThat(icoll.withGaps().getIntervals().isEmpty(), is(true));
+    }
+
+    @Test
+    public void collectionOfInstantIntervals() {
+        Instant now = Instant.now();
+        SimpleInterval<Instant> i1 =
+            SimpleInterval.between(Instant.EPOCH, Instant.now());
+        SimpleInterval<Instant> i2 =
+            SimpleInterval.since(now.plusSeconds(1));
+        IntervalCollection<Instant> icoll = IntervalCollection.onInstantTimeLine().plus(i2).plus(i1);
+        assertThat(icoll.getIntervals(), is(Arrays.asList(i1, i2)));
+        assertThat(icoll.getSize(), is(2));
+        assertThat(icoll.withIntersection().isEmpty(), is(true));
+        assertThat(icoll.getRange(), is(SimpleInterval.since(Instant.EPOCH)));
+        assertThat(icoll.withBlocks().getIntervals(), is(Arrays.asList(i1, i2)));
+        assertThat(icoll.withGaps().getIntervals(), is(Arrays.asList(SimpleInterval.between(now, now.plusSeconds(1)))));
     }
 
 }

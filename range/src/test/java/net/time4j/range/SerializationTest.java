@@ -11,6 +11,8 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.time.Instant;
+import java.util.Date;
 
 import net.time4j.Quarter;
 import org.junit.Test;
@@ -190,6 +192,21 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfGenericIntervalCollection()
+        throws IOException, ClassNotFoundException {
+
+        Instant now = Instant.now();
+        SimpleInterval<Instant> i1 =
+            SimpleInterval.between(Instant.EPOCH, Instant.now());
+        SimpleInterval<Instant> i2 =
+            SimpleInterval.since(now.plusSeconds(1));
+        IntervalCollection<Instant> windows = IntervalCollection.onInstantTimeLine().plus(i2).plus(i1);
+
+        Object ser = roundtrip(windows);
+        assertThat(windows, is(ser));
+    }
+
+    @Test
     public void roundTripOfEmptyIntervalCollections()
         throws IOException, ClassNotFoundException {
 
@@ -204,6 +221,12 @@ public class SerializationTest {
 
         IntervalCollection<Moment> w4 = IntervalCollection.onMomentAxis();
         assertThat(w4, is(roundtrip(w4)));
+
+        IntervalCollection<Date> w5 = IntervalCollection.onTraditionalTimeLine();
+        assertThat(w5, is(roundtrip(w5)));
+
+        IntervalCollection<Instant> w6 = IntervalCollection.onInstantTimeLine();
+        assertThat(w6, is(roundtrip(w6)));
     }
 
     @Test
@@ -277,6 +300,15 @@ public class SerializationTest {
         roundtrip(SpanOfWeekdays.betweenMondayAndFriday());
         roundtrip(SpanOfWeekdays.START);
         roundtrip(SpanOfWeekdays.END);
+    }
+
+    @Test
+    public void roundtripOfSimpleInterval()
+        throws IOException, ClassNotFoundException {
+
+        Object interval = SimpleInterval.between(new Date(0L), new Date());
+        Object ser = roundtrip(interval);
+        assertThat(interval, is(ser));
     }
 
     private static Object roundtrip(Object obj)

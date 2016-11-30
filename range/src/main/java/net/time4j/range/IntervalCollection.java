@@ -28,9 +28,11 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.TimeLine;
 
 import java.io.Serializable;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -40,7 +42,8 @@ import java.util.NoSuchElementException;
  *
  * <p>Any instance can first be achieved by calling one of the static
  * {@code onXYZAxis()}-methods and then be filled with any count of
- * typed intervals via {@code plus(...)}-methods. </p>
+ * typed intervals via {@code plus(...)}-methods. All intervals are
+ * stored with closed start if they have finite start. </p>
  *
  * @param   <T> generic type characterizing the associated time axis
  * @author  Meno Hochschild
@@ -58,7 +61,8 @@ import java.util.NoSuchElementException;
  * <p>Zuerst kann eine Instanz mit Hilfe von statischen Fabrikmethoden
  * wie {@code onXYZAxis()} erhalten und dann mit einer beliebigen Zahl
  * von typisierten Intervallen gef&uuml;llt werden - via {@code plus(...)}
- * -Methoden. </p>
+ * -Methoden. Alle Intervalle werden so gespeichert, da&szlig; sie den
+ * Start inklusive haben, wenn dieser endlich ist. </p>
  *
  * @param   <T> generic type characterizing the associated time axis
  * @author  Meno Hochschild
@@ -172,6 +176,71 @@ public abstract class IntervalCollection<T>
     public static IntervalCollection<Moment> onMomentAxis() {
 
         return MomentWindows.EMPTY;
+
+    }
+
+    /**
+     * <p>Yields an empty instance for intervals with the component type {@code java.util.Date}. </p>
+     *
+     * @return  empty {@code IntervalCollection} for old {@code java.util.Date}-intervals
+     * @since   3.25/4.21
+     */
+    /*[deutsch]
+     * <p>Liefert eine leere Instanz f&uuml;r Intervalle mit dem Komponententyp {@code java.util.Date}. </p>
+     *
+     * @return  empty {@code IntervalCollection} for old {@code java.util.Date}-intervals
+     * @since   3.25/4.21
+     */
+    public static IntervalCollection<Date> onTraditionalTimeLine() {
+
+        return onTimeLine(SimpleInterval.onTraditionalTimeLine().getTimeLine());
+
+    }
+
+    /**
+     * <p>Yields an empty instance for intervals with the component type {@code java.time.Instant}. </p>
+     *
+     * @return  empty {@code IntervalCollection} for {@code java.time.Instant}-intervals
+     * @since   4.21
+     */
+    /*[deutsch]
+     * <p>Liefert eine leere Instanz f&uuml;r Intervalle mit dem Komponententyp {@code java.time.Instant}. </p>
+     *
+     * @return  empty {@code IntervalCollection} for {@code java.time.Instant}-intervals
+     * @since   4.21
+     */
+    public static IntervalCollection<Instant> onInstantTimeLine() {
+
+        return onTimeLine(SimpleInterval.onInstantTimeLine().getTimeLine());
+
+    }
+
+    /**
+     * <p>Yields an empty instance for intervals on given timeline. </p>
+     *
+     * @return  empty generic {@code IntervalCollection}
+     * @since   3.25/4.21
+     */
+    /*[deutsch]
+     * <p>Liefert eine leere Instanz f&uuml;r Intervalle auf dem angegebenen Zeitstrahl. </p>
+     *
+     * @return  empty generic {@code IntervalCollection}
+     * @since   3.25/4.21
+     */
+    @SuppressWarnings("unchecked")
+    public static <T> IntervalCollection<T> onTimeLine(TimeLine<T> timeLine) {
+
+        if (timeLine.equals(PlainDate.axis())) {
+            return (IntervalCollection<T>) onDateAxis();
+        } else if (timeLine.equals(PlainTime.axis())) {
+            return (IntervalCollection<T>) onClockAxis();
+        } else if (timeLine.equals(PlainTimestamp.axis())) {
+            return (IntervalCollection<T>) onTimestampAxis();
+        } else if (timeLine.equals(Moment.axis())) {
+            return (IntervalCollection<T>) onMomentAxis();
+        }
+
+        return new GenericWindows<>(timeLine, Collections.emptyList());
 
     }
 
