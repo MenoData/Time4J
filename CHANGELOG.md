@@ -1,5 +1,7 @@
 ## [v4.21] not yet released
 ### Added
+- Interval search tree [#575]
+- Generic interval type for arbitrary foreign types [#578]
 - Enable open start of intervals [#584]
 
 ### Changed
