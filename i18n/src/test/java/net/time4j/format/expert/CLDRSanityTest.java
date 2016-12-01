@@ -1,5 +1,6 @@
 package net.time4j.format.expert;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -74,6 +75,14 @@ public class CLDRSanityTest {
             ChronoFormatter.ofDatePattern("yyyy-MM-dd", PatternType.SIMPLE_DATE_FORMAT, Locale.ROOT)
                 .format(PlainDate.of(10000, 1, 1)),
             is("10000-01-01"));
+    }
+
+    @Test
+    public void momentPatternOK() {
+        ChronoFormatter<Moment> cf =
+            ChronoFormatter.ofMomentPattern(
+                "EEEE, d MMMM y 'à' HH.mm:ss 'h' zzzz", PatternType.CLDR, Locale.US, ZonalOffset.UTC);
+        assertThat(cf.format(Moment.UNIX_EPOCH), is("Thursday, 1 January 1970 à 00.00:00 h GMT"));
     }
 
 }

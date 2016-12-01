@@ -2773,25 +2773,50 @@ public final class ChronoFormatter<T>
         PatternType type
     ) {
 
+        int n = pattern.length();
+        StringBuilder sb = new StringBuilder(n);
+
+        for (int i = 0; i < n; i++) {
+            char c = pattern.charAt(i);
+
+            if (c == '\'') {
+                i++;
+                while (i < n) {
+                    if (pattern.charAt(i) == '\'') {
+                        if ((i + 1 < n) && (pattern.charAt(i + 1) == '\'')) {
+                            i++;
+                        } else {
+                            break;
+                        }
+                    }
+                    i++;
+                }
+            } else {
+                sb.append(c);
+            }
+        }
+
+        String p = sb.toString(); // literals are now stripped off
+
         switch (type) {
             case CLDR:
             case CLDR_24:
             case SIMPLE_DATE_FORMAT:
             case NON_ISO_DATE:
-                if (pattern.contains("h") || pattern.contains("K")) {
-                    if (!pattern.contains("a") && !pattern.contains("b") && !pattern.contains("B")) {
+                if (p.contains("h") || p.contains("K")) {
+                    if (!p.contains("a") && !p.contains("b") && !p.contains("B")) {
                         throw new IllegalArgumentException(
                             "12-hour-clock requires am/pm-marker or dayperiod: " + pattern);
                     }
                 }
-                if (pattern.contains("Y")) {
-                    if ((pattern.contains("M") || pattern.contains("L")) && !pattern.contains("w")) {
+                if (p.contains("Y")) {
+                    if ((p.contains("M") || p.contains("L")) && !p.contains("w")) {
                         throw new IllegalArgumentException(
                             "Y as week-based-year requires a week-date-format: " + pattern);
                     }
                 }
-                if (pattern.contains("D")) {
-                    if ((pattern.contains("M") || pattern.contains("L")) && !pattern.contains("d")) {
+                if (p.contains("D")) {
+                    if ((p.contains("M") || p.contains("L")) && !p.contains("d")) {
                         throw new IllegalArgumentException(
                             "D is the day of year but not the day of month: " + pattern);
                     }
