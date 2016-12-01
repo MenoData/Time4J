@@ -1,4 +1,8 @@
 ## [v3.25] not yet released
+### Added
+- Interval search tree [#575]
+- Generic interval type for arbitrary foreign types [#578]
+
 ### Changed
 - Simplify parsing of trailing characters [#576]
 
