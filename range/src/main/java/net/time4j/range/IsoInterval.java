@@ -772,6 +772,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   printer     format object for printing start and end
      * @return  localized formatted string
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @see     #toCanonical()
      * @see     #print(ChronoPrinter, String)
      * @see     FormatPatternProvider#getIntervalPattern(Locale)
@@ -788,6 +789,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   printer     format object for printing start and end
      * @return  localized formatted string
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @see     #toCanonical()
      * @see     #print(ChronoPrinter, String)
      * @see     FormatPatternProvider#getIntervalPattern(Locale)
@@ -815,6 +817,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   printer             format object for printing start and end components
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @return  formatted string in given pattern format
      * @see     #toCanonical()
      * @since   3.9/4.6
@@ -836,6 +839,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
      * @return  formatted string in given pattern format
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @see     #toCanonical()
      * @since   3.9/4.6
      */
@@ -904,6 +908,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @since   2.0
      */
     /*[deutsch]
@@ -929,6 +934,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   policy      strategy for printing interval boundaries
      * @return  formatted string in format {start}/{end}
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @since   2.0
      */
     public String print(
@@ -959,6 +965,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   policy      strategy for printing interval boundaries
      * @param   buffer      writing buffer
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @throws  IOException if writing to the buffer fails
      * @since   3.9/4.6
      */
@@ -976,6 +983,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @param   policy      strategy for printing interval boundaries
      * @param   buffer      writing buffer
      * @throws  IllegalStateException if the canonicalization of this interval fails
+     * @throws  IllegalArgumentException if an interval boundary is not formattable
      * @throws  IOException if writing to the buffer fails
      * @since   3.9/4.6
      */
