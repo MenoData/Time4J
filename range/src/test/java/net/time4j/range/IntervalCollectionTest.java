@@ -9,6 +9,7 @@ import net.time4j.PlainTimestamp;
 import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 
@@ -1242,6 +1243,30 @@ public class IntervalCollectionTest {
         assertThat(
             IntervalCollection.onClockAxis().plus(c1).plus(c2).plus(c4).isDisjunct(),
             is(false));
+    }
+
+    @Test
+    public void collectionOfTraditionalIntervals() {
+        SimpleInterval<Date> i1 =
+            SimpleInterval.between(new Date(0L), new Date(5L));
+        SimpleInterval<Date> i2 =
+            SimpleInterval.between(new Date(0L), new Date(7L));
+        SimpleInterval<Date> i3 =
+            SimpleInterval.between(new Date(1L), new Date(1L));
+        IntervalCollection<Date> icoll = IntervalCollection.onTraditionalTimeLine().plus(i3).plus(i2).plus(i1);
+        List<ChronoInterval<Date>> expected1 = new ArrayList<ChronoInterval<Date>>();
+        expected1.add(i1);
+        expected1.add(i2);
+        expected1.add(i3);
+        assertThat(icoll.getIntervals(), is(expected1));
+        assertThat(icoll.getSize(), is(3));
+        assertThat(icoll.withIntersection().isEmpty(), is(true));
+        ChronoInterval<Date> expected2 = SimpleInterval.between(new Date(0L), new Date(7L));
+        assertThat(icoll.getRange(), is(expected2));
+        List<ChronoInterval<Date>> expected3 = new ArrayList<ChronoInterval<Date>>();
+        expected3.add(i2);
+        assertThat(icoll.withBlocks().getIntervals(), is(expected3));
+        assertThat(icoll.withGaps().getIntervals().isEmpty(), is(true));
     }
 
 }

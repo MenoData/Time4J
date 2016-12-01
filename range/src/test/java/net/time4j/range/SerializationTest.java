@@ -11,6 +11,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Date;
 
 import net.time4j.Quarter;
 import org.junit.Test;
@@ -204,6 +205,9 @@ public class SerializationTest {
 
         IntervalCollection<Moment> w4 = IntervalCollection.onMomentAxis();
         assertThat(w4, is(roundtrip(w4)));
+
+        IntervalCollection<Date> w5 = IntervalCollection.onTraditionalTimeLine();
+        assertThat(w5, is(roundtrip(w5)));
     }
 
     @Test
@@ -268,6 +272,15 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         roundtrip(CalendarMonth.of(2016, Month.FEBRUARY));
+    }
+
+    @Test
+    public void roundtripOfSimpleInterval()
+        throws IOException, ClassNotFoundException {
+
+        Object interval = SimpleInterval.between(new Date(0L), new Date());
+        Object ser = roundtrip(interval);
+        assertThat(interval, is(ser));
     }
 
     private static Object roundtrip(Object obj)

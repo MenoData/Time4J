@@ -27,6 +27,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Quarter;
+import net.time4j.engine.TimeLine;
 import net.time4j.scale.TimeScale;
 
 import java.io.Externalizable;
@@ -87,6 +88,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code MomentWindows}. */
     static final int MOMENT_WINDOW_ID = 43;
+
+    /** Serialisierungstyp von {@code GenerictWindows}. */
+    static final int GENERIC_WINDOW_ID = 44;
 
     /** Serialisierungstyp von {@code Boundary}. */
     static final int BOUNDARY_TYPE = 57;
@@ -216,6 +220,16 @@ final class SPX
                         writeBoundary(part.getEnd(), out);
                     }
                     break;
+                case GENERIC_WINDOW_ID:
+                    IntervalCollection<?> gwindow =
+                        IntervalCollection.class.cast(this.obj);
+                    out.writeObject(gwindow.getTimeLine());
+                    out.writeInt(gwindow.getSize());
+                    for (ChronoInterval<?> part : gwindow.getIntervals()) {
+                        out.writeObject(part.getStart().getTemporal());
+                        out.writeObject(part.getEnd().getTemporal());
+                    }
+                    break;
                 case MACHINE_TIME_TYPE:
                     this.writeMachineTime(out);
                     break;
@@ -283,6 +297,9 @@ final class SPX
                 break;
             case MOMENT_WINDOW_ID:
                 this.obj = readMomentWindows(in);
+                break;
+            case GENERIC_WINDOW_ID:
+                this.obj = readGenericWindows(in);
                 break;
             case BOUNDARY_TYPE:
                 this.obj = readBoundary(in, header);
@@ -492,6 +509,27 @@ final class SPX
 
         Collections.sort(intervals, MomentInterval.comparator());
         return MomentWindows.EMPTY.plus(intervals);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static IntervalCollection<?> readGenericWindows(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        TimeLine<?> timeLine = TimeLine.class.cast(in.readObject());
+        int size = in.readInt();
+
+        List<ChronoInterval<?>> intervals = new ArrayList<ChronoInterval<?>>(size);
+
+        for (int i = 0; i < size; i++) {
+            Object s = in.readObject();
+            Object e = in.readObject();
+
+            intervals.add(new SimpleInterval(s, e, timeLine));
+        }
+
+        Collections.sort(intervals, new IntervalComparator(false, timeLine));
+        return new GenericWindows(timeLine, intervals);
 
     }
 
