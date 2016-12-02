@@ -231,7 +231,7 @@ class NumberProcessor<V>
                         "Format context \"" + formattable + "\" without element: " + this.element);
                 }
                 negative = (v < 0);
-                digits = toNumeral(numsys, v);
+                digits = numsys.toNumeral(Math.abs(v));
             } else if (type == Long.class) {
                 V value = formattable.get(this.element);
                 long v = Long.class.cast(value).longValue();
@@ -260,7 +260,10 @@ class NumberProcessor<V>
                             "Enum broken: " + value + " / " + type.getName());
                     }
                 }
-                digits = toNumeral(numsys, v);
+                if (v == Integer.MIN_VALUE) {
+                    throw new IllegalArgumentException("Cannot print: " + this.element);
+                }
+                digits = numsys.toNumeral(Math.abs(v));
             } else {
                 throw new IllegalArgumentException("Not formattable: " + this.element);
             }
@@ -760,25 +763,6 @@ class NumberProcessor<V>
         } else {
             return Integer.MAX_VALUE;
         }
-
-    }
-
-    private static String toNumeral(
-        NumberSystem numsys,
-        int v
-    ) {
-
-        if (v == Integer.MIN_VALUE) {
-            if (numsys == NumberSystem.ARABIC) {
-                return "2147483648";
-            } else if (numsys.isDecimal()) {
-                return numsys.toNumeral(21474) + numsys.toNumeral(83648);
-            } else {
-                throw new IllegalArgumentException("Cannot convert: 2147483648");
-            }
-        }
-
-        return numsys.toNumeral(Math.abs(v));
 
     }
 
