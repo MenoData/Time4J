@@ -495,18 +495,26 @@ public final class SimpleInterval<T>
     /**
      * <p>Obtains the intersection of this interval and other one if present. </p>
      *
-     * @param   other   another interval which might have an intersection with this interval
-     * @return  a wrapper around the found intersection or an empty wrapper
-     * @see     Optional#isPresent()
-     * @see     #intersects(ChronoInterval)
-     */
-    /*[deutsch]
-     * <p>Ermittelt die Schnittmenge dieses Intervalls mit dem angegebenen anderen Intervall, falls vorhanden. </p>
+     * <p>Note that the return type of the method is for the older version line v3.25 or later
+     * just {@code SimpleInterval&lt;T&gt;}, possibly returning {@code null}. </p>
      *
      * @param   other   another interval which might have an intersection with this interval
      * @return  a wrapper around the found intersection or an empty wrapper
      * @see     Optional#isPresent()
      * @see     #intersects(ChronoInterval)
+     * @since   4.21
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Schnittmenge dieses Intervalls mit dem angegebenen anderen Intervall, falls vorhanden. </p>
+     *
+     * <p>Zu beachten: In der &auml;lteren Versionslinie v3.25 oder sp&auml;ter ist der return-type einfach nur
+     * {@code SimpleInterval&lt;T&gt;}, wobei {@code null} ein m&ouml;glicher R&uuml;ckgabewert ist. </p>
+     *
+     * @param   other   another interval which might have an intersection with this interval
+     * @return  a wrapper around the found intersection or an empty wrapper
+     * @see     Optional#isPresent()
+     * @see     #intersects(ChronoInterval)
+     * @since   4.21
      */
     public Optional<SimpleInterval<T>> findIntersection(ChronoInterval<T> other) {
 

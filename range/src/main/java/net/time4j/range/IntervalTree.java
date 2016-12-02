@@ -435,7 +435,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
     /**
      * <p>Accepts given interval tree visitor. </p>
      *
-     * <p>All nodes will be visited in descending order, first sorted by start then by end. </p>
+     * <p>All nodes will be visited in ascending order, first sorted by start then by end. </p>
      *
      * <p>Example: </p>
      *
