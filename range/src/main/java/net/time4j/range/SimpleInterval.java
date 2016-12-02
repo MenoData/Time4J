@@ -446,12 +446,18 @@ public final class SimpleInterval<T>
     /**
      * <p>Obtains the intersection of this interval and other one if present. </p>
      *
+     * <p>Note that starting with v4.21 the return type has changed to
+     * {@code Optional&lt;SimpleInterval&lt;T&gt;&gt;}. </p>
+     *
      * @param   other   another interval which might have an intersection with this interval
      * @return  found intersection or {@code null}
      * @see     #intersects(ChronoInterval)
      */
     /*[deutsch]
      * <p>Ermittelt die Schnittmenge dieses Intervalls mit dem angegebenen anderen Intervall, falls vorhanden. </p>
+     *
+     * <p>Zu beachten: Beginnend mit v4.21 &auml;ndert sich der return-type zu
+     * {@code Optional&lt;SimpleInterval&lt;T&gt;&gt;}. </p>
      *
      * @param   other   another interval which might have an intersection with this interval
      * @return  found intersection or {@code null}
