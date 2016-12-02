@@ -1,4 +1,6 @@
-## [v4.21] not yet released
+## [v4.22] not yet released
+
+## [v4.21] published on 2016-12-03
 ### Added
 - Interval search tree [#575]
 - Generic interval type for arbitrary foreign types [#578]
