@@ -360,7 +360,7 @@ public abstract class JDBCAdapter<S, T>
         @Override
         public java.sql.Time from(PlainTime time) {
 
-            long millis = time.get(PlainTime.MILLI_OF_DAY);
+            long millis = time.getInt(PlainTime.MILLI_OF_DAY);
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
@@ -421,7 +421,7 @@ public abstract class JDBCAdapter<S, T>
                     tsp.getCalendarDate().get(EpochDays.UNIX),
                     86400 * 1000
                 );
-            long timeMillis = tsp.get(PlainTime.MILLI_OF_DAY);
+            long timeMillis = tsp.getInt(PlainTime.MILLI_OF_DAY);
 
             if (!WITH_SQL_UTC_CONVERSION) {
                 ZonalOffset offset =
@@ -432,7 +432,7 @@ public abstract class JDBCAdapter<S, T>
             java.sql.Timestamp ret =
                 new java.sql.Timestamp(
                     MathUtils.safeAdd(dateMillis, timeMillis));
-            ret.setNanos(tsp.get(PlainTime.NANO_OF_SECOND));
+            ret.setNanos(tsp.getInt(PlainTime.NANO_OF_SECOND));
             return ret;
 
         }
