@@ -439,7 +439,7 @@ final class FractionProcessor
      */
     ChronoEntity<?> update(
         ChronoEntity<?> entity,
-        ParsedValues parsed
+        ChronoEntity<?> parsed
     ) {
 
         if (!parsed.contains(FractionalElement.FRACTION)) {

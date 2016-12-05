@@ -448,35 +448,6 @@ class ParsedValues
 
     }
 
-    // gets the count of stored values
-    int size() {
-
-        if (this.keys == null) {
-            int total = ((this.len == Integer.MIN_VALUE) ? 0 : 1);
-            if (this.mask != Integer.MIN_VALUE){
-                total++;
-            }
-            if (this.threshold != Integer.MIN_VALUE) {
-                total++;
-            }
-            if (this.count != Integer.MIN_VALUE) {
-                total++;
-            }
-            for (int i = 0; i < 3; i++) {
-                if (this.ints[i] != Integer.MIN_VALUE) {
-                    total++;
-                }
-            }
-            if (this.map != null) {
-                total += this.map.size();
-            }
-            return total;
-        }
-
-        return this.count;
-
-    }
-
     // used by ChronoFormatter in order to determine the indexable-flag
     static boolean isIndexed(ChronoElement<?> element) {
 
