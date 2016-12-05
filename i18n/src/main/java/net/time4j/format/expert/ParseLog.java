@@ -54,7 +54,7 @@ public class ParseLog {
 
     private ParsePosition pp;
     private String errorMessage;
-    private ParsedValues rawValues;
+    private ChronoEntity<?> rawValues;
     private Boolean daylightSaving;
     private boolean warning;
 
@@ -375,7 +375,7 @@ public class ParseLog {
      *
      * @return  parsed values, initially {@code null}
      */
-    ParsedValues getRawValues0() {
+    ChronoEntity<?> getRawValues0() {
 
         return this.rawValues;
 
@@ -398,6 +398,7 @@ public class ParseLog {
      */
     void setRawValues(ParsedValues rawValues) {
 
+        rawValues.setNoAmbivalentCheck();
         this.rawValues = rawValues;
 
     }

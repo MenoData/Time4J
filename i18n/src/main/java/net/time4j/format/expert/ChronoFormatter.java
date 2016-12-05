@@ -987,7 +987,7 @@ public final class ChronoFormatter<T>
                 return null;
             }
 
-            ParsedValues parsed = status.getRawValues0();
+            ChronoEntity<?> parsed = status.getRawValues0();
             TZID tzid = null;
             Moment moment = null;
 
@@ -1090,7 +1090,6 @@ public final class ChronoFormatter<T>
 
         try {
             parsed = this.parseElements(text, status, this.globalAttributes, true, this.countOfElements);
-            parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
             if (!status.isError()) {
@@ -1105,7 +1104,7 @@ public final class ChronoFormatter<T>
         // Phase 2: Anreicherung mit Default-Werten
         for (ChronoElement<?> e : this.defaults.keySet()) {
             if (!parsed.contains(e)) {
-                parsed.put(e, this.getDefaultValue(e, parsed));
+                setValue(parsed, e, this.getDefaultValue(e, parsed));
             }
         }
 
@@ -2755,7 +2754,7 @@ public final class ChronoFormatter<T>
             return null;
         }
 
-        ParsedValues parsed = status.getRawValues0();
+        ChronoEntity<?> parsed = status.getRawValues0();
         C result;
 
         try {
@@ -2791,7 +2790,7 @@ public final class ChronoFormatter<T>
     }
 
     private static <T> void updateSelf(
-        ParsedValues parsed,
+        ChronoEntity<?> parsed,
         ChronoElement<T> element,
         Object result
     ) {
@@ -2824,7 +2823,6 @@ public final class ChronoFormatter<T>
 
         try {
             parsed = cf.parseElements(text, status, attributes, quickPath, cf.countOfElements);
-            parsed.setNoAmbivalentCheck();
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
             if (!status.isError()) {
@@ -2855,7 +2853,7 @@ public final class ChronoFormatter<T>
                         }
                     }
                     if (inject) {
-                        parsed.put(de, cf.getDefaultValue(de, parsed));
+                        setValue(parsed, de, cf.getDefaultValue(de, parsed));
                     }
                 }
             }
@@ -2911,6 +2909,16 @@ public final class ChronoFormatter<T>
 
     }
 
+    private static <V> void setValue(
+        ChronoEntity<?> parsed,
+        ChronoElement<V> element,
+        Object value
+    ) {
+
+        parsed.with(element, element.getType().cast(value));
+
+    }
+
     @SuppressWarnings("unchecked")
     private static <T> T cast(Object obj) {
 
@@ -2918,7 +2926,7 @@ public final class ChronoFormatter<T>
 
     }
 
-    private static String getReason(ParsedValues parsed) {
+    private static String getReason(ChronoEntity<?> parsed) {
 
         String reason;
 
@@ -3009,7 +3017,7 @@ public final class ChronoFormatter<T>
     }
 
     private static <T> T checkConsistency(
-        ParsedValues parsed,
+        ChronoEntity<?> parsed,
         T result,
         CharSequence text,
         ParseLog status
@@ -3284,13 +3292,14 @@ public final class ChronoFormatter<T>
 
     }
 
-    private static String getDescription(ParsedValues parsed) {
+    private static String getDescription(ChronoEntity<?> parsed) {
 
-        StringBuilder sb = new StringBuilder(parsed.size() * 16);
+        Set<ChronoElement<?>> elements = parsed.getRegisteredElements();
+        StringBuilder sb = new StringBuilder(elements.size() * 16);
         sb.append(" [parsed={");
         boolean first = true;
 
-        for (ChronoElement<?> element : parsed.getRegisteredElements()) {
+        for (ChronoElement<?> element : elements) {
             if (first) {
                 first = false;
             } else {
@@ -3309,7 +3318,7 @@ public final class ChronoFormatter<T>
 
     private Object getDefaultValue(
         ChronoElement<?> element,
-        ParsedValues parsedData
+        ChronoEntity<?> parsedData
     ) {
 
         Object obj = this.defaults.get(element);
