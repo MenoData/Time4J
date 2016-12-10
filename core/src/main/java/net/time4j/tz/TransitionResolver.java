@@ -303,7 +303,7 @@ final class TransitionResolver
             "Invalid local timestamp due to timezone transition: "
             + "local-date=" + date
             + ", local-time=" + time
-            + " [" + tz.getID() + "]"
+            + " [" + tz.getID().canonical() + "]"
         );
 
     }
