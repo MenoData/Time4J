@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         AdjacentDigitParsingTest.class,
         CLDRSanityTest.class,
+        ChronoHierarchyTest.class,
         DayPeriodTest.class,
         DefaultValueTest.class,
         DuplicateElementTest.class,

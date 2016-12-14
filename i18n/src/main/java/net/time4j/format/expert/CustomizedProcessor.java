@@ -170,7 +170,7 @@ final class CustomizedProcessor<V>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        ParsedValues parsedResult,
+        ParsedEntity<?> parsedResult,
         boolean quickPath
     ) {
 

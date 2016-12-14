@@ -130,7 +130,7 @@ final class LookupProcessor<V extends Enum<V>>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        ParsedValues parsedResult,
+        ParsedEntity<?> parsedResult,
         boolean quickPath
     ) {
 
