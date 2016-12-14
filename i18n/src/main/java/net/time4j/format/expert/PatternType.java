@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.Chronology;
@@ -1483,7 +1484,7 @@ public enum PatternType
                     width = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (G): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 ChronoHistory history = ChronoHistory.of(locale);
@@ -1546,8 +1547,13 @@ public enum PatternType
                 }
                 break;
             case 'w':
-                addNumber(
-                    Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
+                if (count <= 2) {
+                    addNumber(
+                        Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters (w): " + count);
+                }
                 break;
             case 'W':
                 if (count == 1) {
@@ -1555,7 +1561,7 @@ public enum PatternType
                         Weekmodel.of(locale).weekOfMonth(), 1);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (W): " + count);
                 }
                 break;
             case 'd':
@@ -1568,7 +1574,7 @@ public enum PatternType
                     builder.addFixedInteger(PlainDate.DAY_OF_YEAR, count);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (D): " + count);
                 }
                 break;
             case 'F':
@@ -1576,7 +1582,7 @@ public enum PatternType
                     builder.addFixedInteger(PlainDate.WEEKDAY_IN_MONTH, count);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (F): " + count);
                 }
                 break;
             case 'g':
@@ -1690,7 +1696,7 @@ public enum PatternType
                         builder.addLongTimezoneName();
                     } else {
                         throw new IllegalArgumentException(
-                            "Too many pattern letters: " + count);
+                            "Too many pattern letters (z): " + count);
                     }
                 } catch (IllegalStateException ise) {
                     throw new IllegalArgumentException(ise.getMessage());
@@ -1711,7 +1717,7 @@ public enum PatternType
                         Collections.singletonList("Z"));
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (Z): " + count);
                 }
                 break;
             case 'O':
@@ -2302,8 +2308,13 @@ public enum PatternType
     ) {
 
         ChronoElement<?> found = null;
+        Chronology<?> chronology = builder.getChronology();
 
-        for (ChronoElement<?> element : builder.getChronology().getRegisteredElements()) {
+        if (chronology instanceof BridgeChronology) {
+            chronology = chronology.preparser();
+        }
+
+        for (ChronoElement<?> element : chronology.getRegisteredElements()) {
             if (element.getSymbol() == symbol) {
                 found = element;
                 break;
@@ -2311,7 +2322,7 @@ public enum PatternType
         }
 
         if (found == null) {
-            for (ChronoExtension extension : builder.getChronology().getExtensions()) {
+            for (ChronoExtension extension : chronology.getExtensions()) {
                 for (ChronoElement<?> element : extension.getElements(locale, Attributes.empty())) {
                     if (element.getSymbol() == symbol) {
                         found = element;
