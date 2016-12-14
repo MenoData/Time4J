@@ -1,4 +1,7 @@
 ## [v4.22] not yet released
+### Fixed
+- BridgeChronology: Some format patterns are not runnable [#588]
+- BridgeChronology: Some formatters cannot be built [#587]
 
 ## [v4.21] published on 2016-12-03
 ### Added
