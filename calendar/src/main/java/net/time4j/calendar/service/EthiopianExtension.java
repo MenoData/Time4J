@@ -64,8 +64,8 @@ public class EthiopianExtension
     }
 
     @Override
-    public <T extends ChronoEntity<T>> T resolve(
-        T entity,
+    public ChronoEntity<?> resolve(
+        ChronoEntity<?> entity,
         Locale locale,
         AttributeQuery attributes
     ) {

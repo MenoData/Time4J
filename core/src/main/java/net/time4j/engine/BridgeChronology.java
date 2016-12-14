@@ -23,8 +23,10 @@ package net.time4j.engine;
 
 import net.time4j.base.TimeSource;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Set;
 
 
 /**
@@ -160,6 +162,22 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
 
     }
 
+    /**
+     * <p>Not supported for foreign types. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  nothing
+     * @throws  UnsupportedOperationException always
+     */
+    /*[deutsch]
+     * <p>F&uuml;r Fremdtypen nicht unterst&uuml;tzt. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  nothing
+     * @throws  UnsupportedOperationException always
+     */
     @Override
     public String getFormatPattern(
         DisplayStyle style,
@@ -197,6 +215,43 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
 
         CalendarSystem<T> calsys = this.delegate.getCalendarSystem(variant);
         return new CalendarSystemProxy<S, T>(this.converter, calsys);
+
+    }
+
+    /**
+     * <p>This chronology does not itself support any elements. </p>
+     *
+     * <p>Only its delegate chronology might support given element. </p>
+     *
+     * @param   element     element to be asked (optional)
+     * @return  {@code false}
+     */
+    /*[deutsch]
+     * <p>Diese Chronologie unterst&uuml;tzt selber kein chronologisches Element. </p>
+     *
+     * <p>Eventuell wird das angegebene Element von der zugrundeliegenden Delegationschronologie unterst&uuml;tzt. </p>
+     *
+     * @param   element     element to be asked (optional)
+     * @return  {@code false}
+     */
+    @Override
+    public boolean isSupported(ChronoElement<?> element) {
+
+        return false;
+
+    }
+
+    @Override
+    public Set<ChronoElement<?>> getRegisteredElements() {
+
+        return Collections.emptySet();
+
+    }
+
+    @Override
+    public List<ChronoExtension> getExtensions() {
+
+        return Collections.emptyList();
 
     }
 
