@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoExtension.java) is part of project Time4J.
  *
@@ -95,7 +95,6 @@ public interface ChronoExtension {
      * {@code entity.with(element, null)}. Note: The argument has
      * exceptionally no chronology. </p>
      *
-     * @param   <T> generic type of applicable chronological entity
      * @param   entity  any kind of map from chronological elements to
      *                  their values (note that the main use case of parsed
      *                  data has no chronology and allows the virtual value
@@ -118,7 +117,6 @@ public interface ChronoExtension {
      * aus der Wertquelle zu l&ouml;schen. Zu beachten: Das Argument hat als
      * Ausnahmefall keine Chronologie. </p>
      *
-     * @param   <T> generic type of applicable chronological entity
      * @param   entity  any kind of map from chronological elements to
      *                  their values (note that the main use case of parsed
      *                  data has no chronology and allows the virtual value
@@ -131,8 +129,8 @@ public interface ChronoExtension {
      * @since   3.0
      * @see     ChronoEntity#with(ChronoElement, Object) ChronoEntity.with(ChronoElement, V)
      */
-    <T extends ChronoEntity<T>> T resolve(
-        T entity,
+    ChronoEntity<?> resolve(
+        ChronoEntity<?> entity,
         Locale locale,
         AttributeQuery attributes
     );
