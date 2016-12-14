@@ -187,6 +187,7 @@ public final class ChronoFormatter<T>
     private final boolean indexable;
     private final boolean trailing;
     private final boolean noPreparser;
+    private final Chronology<?> deepestParser;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -197,7 +198,8 @@ public final class ChronoFormatter<T>
         Locale locale,
         List<FormatStep> steps,
         Map<ChronoElement<?>, Object> defaults,
-        Attributes globals
+        Attributes globals,
+        Chronology<?> deepestParser
     ) {
         super();
 
@@ -209,6 +211,7 @@ public final class ChronoFormatter<T>
 
         this.chronology = chronology;
         this.overrideHandler = OverrideHandler.of(override);
+        this.deepestParser = deepestParser;
         this.globalAttributes =
             AttributeSet.createDefaults((override == null) ? chronology : override, globals, locale);
         this.leniency = this.globalAttributes.get(Attributes.LENIENCY, Leniency.SMART);
@@ -257,11 +260,7 @@ public final class ChronoFormatter<T>
         } else if (PlainTimestamp.class.isAssignableFrom(chronoType)) {
             this.needsExtensions = (dp || nh || (chronology.getExtensions().size() > 3));
         } else {
-            int count = chronology.getExtensions().size();
-            if (override != null) {
-                count += override.getExtensions().size();
-            }
-            this.needsExtensions = (count > 0);
+            this.needsExtensions = true;
         }
 
         this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
@@ -302,6 +301,7 @@ public final class ChronoFormatter<T>
 
         this.chronology = old.chronology;
         this.overrideHandler = old.overrideHandler;
+        this.deepestParser = old.deepestParser;
         this.globalAttributes = globalAttributes;
         this.leniency = this.globalAttributes.get(Attributes.LENIENCY, Leniency.SMART);
         this.defaults = Collections.unmodifiableMap(new NonAmbivalentMap(old.defaults));
@@ -319,14 +319,22 @@ public final class ChronoFormatter<T>
         for (int i = 0; i < len; i++) {
             FormatStep step = copy.get(i);
             ChronoElement<?> element = step.getProcessor().getElement();
+            Chronology<?> c = this.chronology;
+
+            if (c instanceof BridgeChronology) {
+                c = c.preparser();
+            }
+            if (c == Moment.axis()) {
+                c = c.preparser();
+            }
 
             // update extension elements
             if (
                 (element != null) // no literal steps etc.
-                && !this.chronology.isRegistered(element)
+                && !c.isRegistered(element)
             ) {
                 // example: week-of-year dependent on LOCALE
-                for (ChronoExtension ext : this.chronology.getExtensions()) {
+                for (ChronoExtension ext : c.getExtensions()) {
                     if (ext.getElements(old.getLocale(), old.globalAttributes).contains(element)) {
                         Set<ChronoElement<?>> elements =
                             ext.getElements(globalAttributes.getLocale(), globalAttributes);
@@ -393,6 +401,7 @@ public final class ChronoFormatter<T>
 
         this.chronology = formatter.chronology;
         this.overrideHandler = formatter.overrideHandler;
+        this.deepestParser = formatter.deepestParser;
         this.globalAttributes = formatter.globalAttributes;
         this.leniency = formatter.leniency;
         this.fracproc = formatter.fracproc;
@@ -975,9 +984,9 @@ public final class ChronoFormatter<T>
         } else {
 
             // standard parsing mode
-            return this.parse(
+            return parse(
+                this,
                 this.chronology,
-                this.chronology.preparser(),
                 0,
                 text,
                 status,
@@ -1039,7 +1048,7 @@ public final class ChronoFormatter<T>
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
         ParseLog status = new ParseLog(offset);
-        ParsedValues parsed = null;
+        ChronoEntity<?> parsed = null;
 
         try {
             parsed = this.parseElements(text, status, this.globalAttributes, true, this.countOfElements);
@@ -2554,9 +2563,9 @@ public final class ChronoFormatter<T>
 
     }
 
-    private <C> C parse(
+    private static <C> C parse(
+        ChronoFormatter<?> cf,
         Chronology<C> outer,
-        Chronology<?> inner,
         int depth,
         CharSequence text,
         ParseLog status,
@@ -2565,15 +2574,27 @@ public final class ChronoFormatter<T>
         boolean quickPath
     ) {
 
-        if (inner == null) {
-            return parse(
-                this, outer, outer.getExtensions(), text, status, attrs, leniency, depth > 0, quickPath);
+        Chronology<?> inner = outer.preparser();
+
+        if ((inner == null) || (outer == cf.deepestParser)) {
+            return parse(cf, outer, outer.getExtensions(), text, status, attrs, leniency, depth > 0, quickPath);
         }
 
-        Object intermediate =
-            this.parse(inner, inner.preparser(), depth + 1, text, status, attrs, leniency, quickPath);
+        Object intermediate;
 
-        if (status.isError() || (intermediate == null)) {
+        if (inner == cf.deepestParser) { // potentially limits recursion depth
+            intermediate = parse(cf, inner, inner.getExtensions(), text, status, attrs, leniency, true, quickPath);
+        } else {
+            intermediate = parse(cf, inner, depth + 1, text, status, attrs, leniency, quickPath);
+        }
+
+        if (status.isError()) {
+            return null;
+        } else if (intermediate == null) {
+            ChronoEntity<?> parsed = status.getRawValues();
+            status.setError(
+                text.length(),
+                getReason(parsed) + getDescription(parsed));
             return null;
         }
 
@@ -2642,10 +2663,14 @@ public final class ChronoFormatter<T>
         }
 
         // Phase 1: elementweise Interpretation und Sammeln der Elementwerte
-        ParsedValues parsed = null;
+        ChronoEntity<?> parsed = null;
 
         try {
-            parsed = cf.parseElements(text, status, attributes, quickPath, cf.countOfElements);
+            if ((cf.countOfElements == 1) && !cf.hasOptionals) { // TODO: only apply for specialized edge cases
+                parsed = cf.parseElement(text, status, attributes, quickPath);
+            } else {
+                parsed = cf.parseElements(text, status, attributes, quickPath, cf.countOfElements);
+            }
             status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
             if (!status.isError()) {
@@ -2958,7 +2983,7 @@ public final class ChronoFormatter<T>
 
     }
 
-    private ParsedValues parseElements(
+    private ChronoEntity<?> parseElements(
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
@@ -3056,6 +3081,7 @@ public final class ChronoFormatter<T>
                     if (data != null) {
                         values = data.peek();
                     }
+                    values.setNoAmbivalentCheck();
                     return values;
                 } else {
                     // Ende des optionalen Abschnitts suchen
@@ -3095,7 +3121,75 @@ public final class ChronoFormatter<T>
             values = data.peek();
         }
 
+        values.setNoAmbivalentCheck();
         return values;
+
+    }
+
+    private ParsedValue parseElement(
+        CharSequence text,
+        ParseLog status,
+        AttributeQuery attributes,
+        boolean quickPath
+    ) {
+
+        ParsedValue parsedValue = new ParsedValue();
+        int index = 0;
+        int len = this.steps.size();
+        int position = status.getPosition();
+
+        while (index < len) {
+            FormatStep step = this.steps.get(index);
+
+            // Delegation der Element-Verarbeitung
+            status.clearWarning();
+            step.parse(text, status, attributes, parsedValue, quickPath);
+
+            // Im Warnzustand default-value verwenden?
+            if (status.isWarning()) {
+                ChronoElement<?> element = step.getProcessor().getElement();
+                if ((element != null) && this.defaults.containsKey(element)) {
+                    parsedValue.put(element, this.defaults.get(element));
+                    parsedValue.with(ValidationElement.ERROR_MESSAGE, null);
+                    status.clearError();
+                    status.clearWarning();
+                }
+            }
+
+            // Fehler-Auflösung
+            if (status.isError()) {
+                // nächsten oder-Block suchen
+                int section = step.getSection();
+                int last = index;
+
+                if (!step.isNewOrBlockStarted()) {
+                    for (int j = index + 1; j < len; j++) {
+                        FormatStep test = this.steps.get(j);
+                        if (test.isNewOrBlockStarted() && (test.getSection() == section)) {
+                            last = j;
+                            break;
+                        }
+                    }
+                }
+
+                if ((last > index) || step.isNewOrBlockStarted()) {
+                    // wenn gefunden, zum nächsten oder-Block springen
+                    status.clearError();
+                    status.setPosition(position);
+                    parsedValue.reset(); // alte Werte verwerfen
+                    index = last;
+                } else {
+                    return parsedValue;
+                }
+            } else if (step.isNewOrBlockStarted()) {
+                index = step.skipTrailingOrBlocks();
+            }
+
+            // Schleifenzähler inkrementieren
+            index++;
+        }
+
+        return parsedValue;
 
     }
 
@@ -3138,7 +3232,7 @@ public final class ChronoFormatter<T>
 
     }
 
-    private static void checkElement(
+    private static Chronology<?> checkElement(
         Chronology<?> chronology,
         Chronology<?> override,
         ChronoElement<?> element
@@ -3146,26 +3240,50 @@ public final class ChronoFormatter<T>
 
         boolean support = chronology.isSupported(element);
 
-        if (!support) {
-            if (override == null) {
-                Chronology<?> child = chronology;
-                while ((child = child.preparser()) != null) {
-                    if (child.isSupported(element)) {
-                        support = true;
-                        break;
-                    }
-                }
-            } else {
-                support = (
-                    (element.isDateElement() && override.isSupported(element))
-                    || (element.isTimeElement() && PlainTime.axis().isSupported(element))
-                );
-            }
+        if (support) {
+            return chronology;
+        }
 
-            if (!support) {
-                throw new IllegalArgumentException("Unsupported element: " + element.name());
+        if (override == null) {
+            Chronology<?> child = chronology;
+            while ((child = child.preparser()) != null) {
+                if (child.isSupported(element)) {
+                    return child;
+                }
+            }
+        } else if (element.isDateElement() && override.isSupported(element)) {
+            return override;
+        } else if (element.isTimeElement() && PlainTime.axis().isSupported(element)) {
+            return PlainTime.axis();
+        }
+
+        throw new IllegalArgumentException("Unsupported element: " + element.name());
+
+    }
+
+    private static int getDepth(
+        Chronology<?> test,
+        Chronology<?> chronology,
+        Chronology<?> override
+    ) {
+
+        if (override != null) {
+            return -1;
+        } else if (test.equals(chronology)) {
+            return 0;
+        }
+
+        Chronology<?> child = chronology;
+        int depth = 0;
+
+        while ((child = child.preparser()) != null) {
+            depth++;
+            if (test.equals(child)) {
+                return depth;
             }
         }
+
+        return Integer.MAX_VALUE;
 
     }
 
@@ -3228,6 +3346,8 @@ public final class ChronoFormatter<T>
         private int leftPadWidth;
         private DayPeriod dayPeriod;
         private Map<ChronoElement<?>, Object> defaultMap;
+        private Chronology<?> deepestParser;
+        private int depthOfParser;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -3262,6 +3382,9 @@ public final class ChronoFormatter<T>
             this.leftPadWidth = 0;
             this.dayPeriod = null;
             this.defaultMap = new HashMap<ChronoElement<?>, Object>();
+
+            this.deepestParser = chronology;
+            this.depthOfParser = 0;
 
         }
 
@@ -4534,13 +4657,15 @@ public final class ChronoFormatter<T>
                     Map<ChronoElement<?>, ChronoElement<?>> map =
                         patternType.registerSymbol(this, loc, c, i - start);
 
-                    if (replacement.isEmpty()) {
-                        replacement = map;
-                    } else {
-                        Map<ChronoElement<?>, ChronoElement<?>> tmp =
-                            new HashMap<ChronoElement<?>, ChronoElement<?>>(replacement);
-                        tmp.putAll(map);
-                        replacement = tmp;
+                    if (!map.isEmpty()) {
+                        if (replacement.isEmpty()) {
+                            replacement = map;
+                        } else {
+                            Map<ChronoElement<?>, ChronoElement<?>> tmp =
+                                new HashMap<ChronoElement<?>, ChronoElement<?>>(replacement);
+                            tmp.putAll(map);
+                            replacement = tmp;
+                        }
                     }
 
                     i--; // Schleifenzähler nicht doppelt inkrementieren
@@ -4604,11 +4729,9 @@ public final class ChronoFormatter<T>
                     FormatStep step = this.steps.get(i);
                     ChronoElement<?> element = step.getProcessor().getElement();
 
-                    if (this.chronology.isRegistered(element)) {
-                        if (replacement.containsKey(element)) {
-                            ChronoElement<?> newElement = replacement.get(element);
-                            this.steps.set(i, step.updateElement(newElement));
-                        }
+                    if (replacement.containsKey(element)) {
+                        ChronoElement<?> newElement = replacement.get(element);
+                        this.steps.set(i, step.updateElement(newElement));
                     }
                 }
             }
@@ -4992,9 +5115,7 @@ public final class ChronoFormatter<T>
          */
         public Builder<T> addTimezoneID() {
 
-            Class<?> chronoType = this.chronology.getChronoType();
-
-            if (UnixTime.class.isAssignableFrom(chronoType)) {
+            if (hasUnixChronology(this.chronology)) {
                 this.addProcessor(TimezoneIDProcessor.INSTANCE);
                 return this;
             } else {
@@ -6036,7 +6157,8 @@ public final class ChronoFormatter<T>
                     this.locale,
                     this.steps,
                     this.defaultMap,
-                    attributes
+                    attributes,
+                    this.deepestParser
                 );
 
             if (this.dayPeriod != null) {
@@ -6219,9 +6341,14 @@ public final class ChronoFormatter<T>
                 return false;
             }
 
-            if ((this.override == null) && (!this.chronology.isSupported(element))) {
-                Chronology<?> child = this.chronology.preparser();
-                return ((child != null) && child.isSupported(element));
+            if ((this.override == null) && !this.chronology.isSupported(element)) {
+                Chronology<?> child = this.chronology;
+                while ((child = child.preparser()) != null) {
+                    if (child.isSupported(element)) {
+                        return true;
+                    }
+                }
+                return false;
             }
 
             return true;
@@ -6249,11 +6376,25 @@ public final class ChronoFormatter<T>
 
         private void checkMomentChrono() {
 
-            if (!UnixTime.class.isAssignableFrom(this.chronology.getChronoType())) {
+            if (!hasUnixChronology(this.chronology)) {
                 throw new IllegalStateException(
                     "Timezone names in specific non-location format can only be reliably combined "
                     + "with instant-like types, for example \"Moment\".");
             }
+
+        }
+
+        private static boolean hasUnixChronology(Chronology<?> chronology) {
+
+            Chronology<?> c = chronology;
+
+            do {
+                if (UnixTime.class.isAssignableFrom(c.getChronoType())) {
+                    return true;
+                }
+            } while ((c = c.preparser()) != null);
+
+            return false;
 
         }
 
@@ -6274,7 +6415,13 @@ public final class ChronoFormatter<T>
 
         private void checkElement(ChronoElement<?> element) {
 
-            ChronoFormatter.checkElement(this.chronology, this.override, element);
+            Chronology<?> test = ChronoFormatter.checkElement(this.chronology, this.override, element);
+            int depth = ChronoFormatter.getDepth(test, this.chronology, this.override);
+
+            if (depth >= this.depthOfParser) {
+                this.deepestParser = test;
+                this.depthOfParser = depth;
+            }
 
         }
 
@@ -6668,7 +6815,7 @@ public final class ChronoFormatter<T>
     }
 
     private static class ZonalDisplay
-        implements ChronoDisplay {
+        implements ChronoDisplay, UnixTime {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -6736,6 +6883,35 @@ public final class ChronoFormatter<T>
         public TZID getTimezone() {
 
             return this.tzid;
+
+        }
+
+        @Override
+        public long getPosixTime() {
+
+            return this.getUnixTime().getPosixTime(); // can be used by TimezoneNameProcessor when printing
+
+        }
+
+        @Override
+        public int getNanosecond() {
+
+            return this.getUnixTime().getNanosecond();
+
+        }
+
+        private UnixTime getUnixTime() {
+
+            StartOfDay startOfDay;
+
+            try {
+                Class type = this.tsp.toDate().getClass();
+                startOfDay = Chronology.lookup(type).getDefaultStartOfDay();
+            } catch (RuntimeException re) {
+                startOfDay = StartOfDay.MIDNIGHT; // fallback
+            }
+
+            return this.tsp.in(Timezone.of(this.tzid), startOfDay);
 
         }
 

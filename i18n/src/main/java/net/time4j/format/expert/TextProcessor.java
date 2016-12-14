@@ -153,7 +153,7 @@ final class TextProcessor<V>
         CharSequence text,
         ParseLog status,
         AttributeQuery attributes,
-        ParsedValues parsedResult,
+        ParsedEntity<?> parsedResult,
         boolean quickPath
     ) {
 

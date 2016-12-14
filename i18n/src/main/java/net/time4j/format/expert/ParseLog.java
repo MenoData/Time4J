@@ -394,9 +394,8 @@ public class ParseLog {
      *
      * @param   rawValues       parsed values
      */
-    void setRawValues(ParsedValues rawValues) {
+    void setRawValues(ChronoEntity<?> rawValues) {
 
-        rawValues.setNoAmbivalentCheck();
         this.rawValues = rawValues;
 
     }

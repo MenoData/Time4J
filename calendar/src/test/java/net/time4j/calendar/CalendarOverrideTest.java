@@ -96,7 +96,7 @@ public class CalendarOverrideTest {
         Moment m = PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset);
         assertThat(
             f.format(m),
-            is("Amete Mihret, 2008-03-09 03:45 pm +03:00"));
+            is("Amete Mihret, 2008-03-09 09:45 pm +03:00"));
     }
 
     @Test
@@ -108,7 +108,7 @@ public class CalendarOverrideTest {
                 .build()
                 .withTimezone(offset);
         assertThat(
-            f.parse("Amete Mihret, 2008-03-09 03:45 PM +03:00"),
+            f.parse("Amete Mihret, 2008-03-09 09:45 PM +03:00"),
             is(PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset))
         );
     }
@@ -142,12 +142,12 @@ public class CalendarOverrideTest {
 
     @Test
     public void printMinguo() {
-        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+        ZonalOffset offset = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30);
         ChronoFormatter<Moment> f =
             ChronoFormatter.setUpWithOverride(Locale.ENGLISH, MinguoCalendar.axis())
-                .addPattern("G-y-MM-dd HH:mmXXX", PatternType.CLDR)
+                .addPattern("G-y-MM-dd HH:mm z", PatternType.CLDR)
                 .build()
-                .withTimezone(offset);
+                .withTimezone("Asia/Kolkata");
         Moment m = PlainTimestamp.of(2015, 2, 19, 21, 45).at(offset);
         GeneralTimestamp<MinguoCalendar> tsp =
             m.toGeneralTimestamp(MinguoCalendar.axis(), offset, StartOfDay.MIDNIGHT);
@@ -162,7 +162,7 @@ public class CalendarOverrideTest {
 
         assertThat(
             f.format(m),
-            is("Minguo-104-02-19 21:45+03:00"));
+            is("Minguo-104-02-19 21:45 IST"));
     }
 
 }

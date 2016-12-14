@@ -24,13 +24,9 @@ package net.time4j.format.expert;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.Chronology;
-import net.time4j.tz.TZID;
 
 import java.util.AbstractSet;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -48,7 +44,7 @@ import java.util.Set;
  * @since   3.0
  */
 class ParsedValues
-    extends ChronoEntity<ParsedValues> {
+    extends ParsedEntity<ParsedValues> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -236,56 +232,6 @@ class ParsedValues
 
     }
 
-    @Override
-    public <V> boolean isValid(
-        ChronoElement<V> element,
-        V value // optional
-    ) {
-
-        if (element == null) {
-            throw new NullPointerException("Missing chronological element.");
-        }
-
-        return true;
-
-    }
-
-    @Override
-    public <V> ParsedValues with(
-        ChronoElement<V> element,
-        V value // optional
-    ) {
-
-        this.put(element, value);
-        return this;
-
-    }
-
-    @Override
-    public ParsedValues with(
-        ChronoElement<Integer> element,
-        int value
-    ) {
-
-        this.put(element, value);
-        return this;
-
-    }
-
-    @Override
-    public <V> V getMinimum(ChronoElement<V> element) {
-
-        return element.getDefaultMinimum();
-
-    }
-
-    @Override
-    public <V> V getMaximum(ChronoElement<V> element) {
-
-        return element.getDefaultMaximum();
-
-    }
-
     /**
      * <p>Vergleichsmethode. </p>
      */
@@ -294,8 +240,8 @@ class ParsedValues
 
         if (this == obj) {
             return true;
-        } else if (obj instanceof ParsedValues) {
-            ParsedValues that = (ParsedValues) obj;
+        } else if (obj instanceof ParsedEntity) {
+            ParsedEntity<?> that = (ParsedEntity<?>) obj;
             Set<ChronoElement<?>> e1 = this.getRegisteredElements();
             Set<ChronoElement<?>> e2 = that.getRegisteredElements();
             if (e1.size() != e2.size()) {
@@ -319,11 +265,7 @@ class ParsedValues
     @Override
     public int hashCode() {
 
-        if (this.keys == null) {
-            return Arrays.hashCode(this.ints) + 3 * this.len + 7 * this.mask + 11 * this.threshold + 31 * this.count;
-        }
-
-        return Arrays.hashCode(this.keys);
+        return this.getRegisteredElements().hashCode();
 
     }
 
@@ -387,43 +329,6 @@ class ParsedValues
         }
 
         return new KeySet();
-
-    }
-
-    @Override
-    protected Chronology<ParsedValues> getChronology() {
-
-        throw new UnsupportedOperationException(
-            "Parsed values do not have any chronology.");
-
-    }
-
-    @Override
-    public boolean hasTimezone() {
-
-        return (
-            this.contains(TimezoneElement.TIMEZONE_ID)
-            || this.contains(TimezoneElement.TIMEZONE_OFFSET)
-        );
-
-    }
-
-    @Override
-    public TZID getTimezone() {
-
-        Object tz = null;
-
-        if (this.contains(TimezoneElement.TIMEZONE_ID)) {
-            tz = this.get(TimezoneElement.TIMEZONE_ID);
-        } else if (this.contains(TimezoneElement.TIMEZONE_OFFSET)) {
-            tz = this.get(TimezoneElement.TIMEZONE_OFFSET);
-        }
-
-        if (tz instanceof TZID) {
-            return TZID.class.cast(tz);
-        } else {
-            return super.getTimezone(); // throws exception
-        }
 
     }
 
