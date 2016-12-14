@@ -1236,7 +1236,7 @@ public enum PatternType
                     width = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (G): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 ChronoHistory history = ChronoHistory.of(locale);
@@ -1300,8 +1300,13 @@ public enum PatternType
                 }
                 break;
             case 'w':
-                addNumber(
-                    Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
+                if (count <= 2) {
+                    addNumber(
+                        Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters (w): " + count);
+                }
                 break;
             case 'W':
                 if (count == 1) {
@@ -1309,7 +1314,7 @@ public enum PatternType
                         Weekmodel.of(locale).weekOfMonth(), 1);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (W): " + count);
                 }
                 break;
             case 'd':
@@ -1322,7 +1327,7 @@ public enum PatternType
                     builder.addFixedInteger(PlainDate.DAY_OF_YEAR, count);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (D): " + count);
                 }
                 break;
             case 'F':
@@ -1330,7 +1335,7 @@ public enum PatternType
                     builder.addFixedInteger(PlainDate.WEEKDAY_IN_MONTH, count);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (F): " + count);
                 }
                 break;
             case 'g':
@@ -1445,7 +1450,7 @@ public enum PatternType
                         builder.addLongTimezoneName();
                     } else {
                         throw new IllegalArgumentException(
-                            "Too many pattern letters: " + count);
+                            "Too many pattern letters (z): " + count);
                     }
                 } catch (IllegalStateException ise) {
                     throw new IllegalArgumentException(ise.getMessage());
@@ -1466,7 +1471,7 @@ public enum PatternType
                         Collections.singletonList("Z"));
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (Z): " + count);
                 }
                 break;
             case 'O':
