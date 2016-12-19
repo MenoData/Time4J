@@ -1,4 +1,7 @@
 ## [v3.26] not yet released
+### Added
+- Make styled formatters sensible for change of locale [#586]
+
 ### Fixed
 - BridgeChronology: Some format patterns are not runnable [#588]
 - BridgeChronology: Some formatters cannot be built [#587]
