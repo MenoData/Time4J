@@ -2144,8 +2144,9 @@ public final class ChronoFormatter<T>
         Locale locale
     ) {
 
-        String pattern = CalendarText.patternForDate(style, locale);
-        return ofDatePattern(pattern, PatternType.CLDR, locale);
+        Builder<PlainDate> builder = new Builder<PlainDate>(PlainDate.axis(), locale);
+        builder.addProcessor(new StyleProcessor<PlainDate>(style, style));
+        return builder.build();
 
     }
 
@@ -2172,8 +2173,9 @@ public final class ChronoFormatter<T>
         Locale locale
     ) {
 
-        String pattern = CalendarText.patternForTime(style, locale);
-        return ofTimePattern(pattern, PatternType.CLDR, locale);
+        Builder<PlainTime> builder = new Builder<PlainTime>(PlainTime.axis(), locale);
+        builder.addProcessor(new StyleProcessor<PlainTime>(style, style));
+        return builder.build();
 
     }
 
@@ -2203,8 +2205,9 @@ public final class ChronoFormatter<T>
         Locale locale
     ) {
 
-        String pattern = CalendarText.patternForTimestamp(dateStyle, timeStyle, locale);
-        return ofTimestampPattern(pattern, PatternType.CLDR, locale);
+        Builder<PlainTimestamp> builder = new Builder<PlainTimestamp>(PlainTimestamp.axis(), locale);
+        builder.addProcessor(new StyleProcessor<PlainTimestamp>(dateStyle, timeStyle));
+        return builder.build();
 
     }
 
@@ -2237,8 +2240,9 @@ public final class ChronoFormatter<T>
         TZID tzid
     ) {
 
-        String pattern = CalendarText.patternForMoment(dateStyle, timeStyle, locale);
-        return ofMomentPattern(pattern, PatternType.CLDR, locale, tzid);
+        Builder<Moment> builder = new Builder<Moment>(Moment.axis(), locale);
+        builder.addProcessor(new StyleProcessor<Moment>(dateStyle, timeStyle));
+        return builder.build().withTimezone(tzid);
 
     }
 
@@ -2273,9 +2277,8 @@ public final class ChronoFormatter<T>
     ) {
 
         if (LocalizedPatternSupport.class.isAssignableFrom(chronology.getChronoType())) {
-            String pattern = chronology.getFormatPattern(style, locale);
             Builder<T> builder = new Builder<T>(chronology, locale);
-            builder.addPattern(pattern, PatternType.CLDR);
+            builder.addProcessor(new StyleProcessor<T>(style, style));
             return builder.build();
         } else if (chronology.equals(Moment.axis())) {
             throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
@@ -2666,12 +2669,26 @@ public final class ChronoFormatter<T>
         ChronoEntity<?> parsed = null;
 
         try {
-            if ((cf.countOfElements == 1) && !cf.hasOptionals) { // TODO: only apply for specialized edge cases
-                parsed = cf.parseElement(text, status, attributes, quickPath);
+            if ((cf.steps.size() == 1) && !cf.hasOptionals) { // TODO: only apply for specialized edge cases?
+                ParsedValue parsedValue = new ParsedValue();
+                cf.steps.get(0).parse(text, status, attributes, parsedValue, quickPath);
+                if (status.isError()) {
+                    return null;
+                }
+                try {
+                    T result = parsedValue.getResult();
+                    if (result != null) {
+                        return result;
+                    }
+                } catch (ClassCastException cce) {
+                    // ok, now let's handle it like having multiple steps
+                }
+                parsed = parsedValue;
+                status.setRawValues(parsed);
             } else {
                 parsed = cf.parseElements(text, status, attributes, quickPath, cf.countOfElements);
+                status.setRawValues(parsed);
             }
-            status.setRawValues(parsed);
         } catch (AmbivalentValueException ex) {
             if (!status.isError()) {
                 status.setError(status.getPosition(), ex.getMessage());
@@ -3123,73 +3140,6 @@ public final class ChronoFormatter<T>
 
         values.setNoAmbivalentCheck();
         return values;
-
-    }
-
-    private ParsedValue parseElement(
-        CharSequence text,
-        ParseLog status,
-        AttributeQuery attributes,
-        boolean quickPath
-    ) {
-
-        ParsedValue parsedValue = new ParsedValue();
-        int index = 0;
-        int len = this.steps.size();
-        int position = status.getPosition();
-
-        while (index < len) {
-            FormatStep step = this.steps.get(index);
-
-            // Delegation der Element-Verarbeitung
-            status.clearWarning();
-            step.parse(text, status, attributes, parsedValue, quickPath);
-
-            // Im Warnzustand default-value verwenden?
-            if (status.isWarning()) {
-                ChronoElement<?> element = step.getProcessor().getElement();
-                if ((element != null) && this.defaults.containsKey(element)) {
-                    parsedValue.put(element, this.defaults.get(element));
-                    parsedValue.with(ValidationElement.ERROR_MESSAGE, null);
-                    status.clearError();
-                    status.clearWarning();
-                }
-            }
-
-            // Fehler-Auflösung
-            if (status.isError()) {
-                // nächsten oder-Block suchen
-                int section = step.getSection();
-                int last = index;
-
-                if (!step.isNewOrBlockStarted()) {
-                    for (int j = index + 1; j < len; j++) {
-                        FormatStep test = this.steps.get(j);
-                        if (test.isNewOrBlockStarted() && (test.getSection() == section)) {
-                            last = j;
-                            break;
-                        }
-                    }
-                }
-
-                if ((last > index) || step.isNewOrBlockStarted()) {
-                    // wenn gefunden, zum nächsten oder-Block springen
-                    status.clearError();
-                    status.setPosition(position);
-                    parsedValue.reset(); // alte Werte verwerfen
-                    index = last;
-                } else {
-                    return parsedValue;
-                }
-            } else if (step.isNewOrBlockStarted()) {
-                index = step.skipTrailingOrBlocks();
-            }
-
-            // Schleifenzähler inkrementieren
-            index++;
-        }
-
-        return parsedValue;
 
     }
 

@@ -232,70 +232,6 @@ class ParsedValues
 
     }
 
-    /**
-     * <p>Vergleichsmethode. </p>
-     */
-    @Override
-    public boolean equals(Object obj) {
-
-        if (this == obj) {
-            return true;
-        } else if (obj instanceof ParsedEntity) {
-            ParsedEntity<?> that = (ParsedEntity<?>) obj;
-            Set<ChronoElement<?>> e1 = this.getRegisteredElements();
-            Set<ChronoElement<?>> e2 = that.getRegisteredElements();
-            if (e1.size() != e2.size()) {
-                return false;
-            }
-            for (ChronoElement<?> element : e1) {
-                if (!e2.contains(element) || !this.get(element).equals(that.get(element))) {
-                    return false;
-                }
-            }
-            return true;
-        } else {
-            return false;
-        }
-
-    }
-
-    /**
-     * <p>Berechnet den Hash-Code. </p>
-     */
-    @Override
-    public int hashCode() {
-
-        return this.getRegisteredElements().hashCode();
-
-    }
-
-    /**
-     * <p>Gibt den internen Zustand in String-Form aus. </p>
-     */
-    @Override
-    public String toString() {
-
-        boolean first = true;
-        StringBuilder sb = new StringBuilder(128);
-        sb.append('{');
-
-        for (ChronoElement<?> element : this.getRegisteredElements()) {
-            if (first) {
-                first = false;
-            } else {
-                sb.append(", ");
-            }
-
-            sb.append(element.name());
-            sb.append('=');
-            sb.append(this.get(element));
-        }
-
-        sb.append('}');
-        return sb.toString();
-
-    }
-
     @Override
     public Set<ChronoElement<?>> getRegisteredElements() {
 
@@ -588,6 +524,20 @@ class ParsedValues
         if (this.count++ >= this.threshold) {
             this.rehash(arraySize(this.count));
         }
+
+    }
+
+    @Override
+    void setResult(Object entity) {
+
+        // no-op
+
+    }
+
+    @Override
+    <E> E getResult() {
+
+        return null;
 
     }
 

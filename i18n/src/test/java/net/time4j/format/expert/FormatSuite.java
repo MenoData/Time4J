@@ -26,6 +26,7 @@ import org.junit.runners.Suite.SuiteClasses;
         OrdinalTest.class,
         ParsingTextOverflowTest.class,
         SkipUnknownTest.class,
+        StyleProcessorTest.class,
         WhitespaceTest.class
     }
 )
