@@ -142,7 +142,13 @@ abstract class ParsedEntity<T extends ParsedEntity<T>>
                     return false;
                 }
             }
-            return true;
+            Object o1 = this.getResult();
+            Object o2 = that.getResult();
+            if (o1 == null) {
+                return (o2 == null);
+            } else {
+                return o1.equals(o2);
+            }
         } else {
             return false;
         }
@@ -155,7 +161,12 @@ abstract class ParsedEntity<T extends ParsedEntity<T>>
     @Override
     public final int hashCode() {
 
-        return this.getRegisteredElements().hashCode();
+        int hash = this.getRegisteredElements().hashCode();
+        Object result = this.getResult();
+        if (result != null) {
+            hash += 31 * result.hashCode();
+        }
+        return hash;
 
     }
 
@@ -182,6 +193,11 @@ abstract class ParsedEntity<T extends ParsedEntity<T>>
         }
 
         sb.append('}');
+        Object result = this.getResult();
+        if (result != null) {
+            sb.append(">>>result=");
+            sb.append(result);
+        }
         return sb.toString();
 
     }
@@ -199,5 +215,11 @@ abstract class ParsedEntity<T extends ParsedEntity<T>>
 
     // called by format processors
     abstract void put(ChronoElement<?> element, Object v);
+
+    // concerns processors which do the result evaluation themselves
+    abstract void setResult(Object entity);
+
+    // concerns processors which do the result evaluation themselves
+    abstract <E> E getResult();
 
 }

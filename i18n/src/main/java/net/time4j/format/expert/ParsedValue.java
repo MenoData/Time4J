@@ -26,14 +26,12 @@ import net.time4j.engine.ChronoException;
 
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.Map;
 import java.util.Set;
 
 
 /**
- * <p>Definiert eine aktualisierbare Wertquelle mit normalerweise nur einem chronologischen Element,
- * dem ein beliebiger Wert ohne weitere Validierung zugeordnet sind. </p>
+ * <p>Definiert eine aktualisierbare Wertquelle mit nur einem Ergebniswert. </p>
  *
  * @author  Meno Hochschild
  * @since   3.26/4.22
@@ -43,8 +41,7 @@ class ParsedValue
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private ChronoElement<?> key;
-    private Object value;
+    private Object result;
 
     // other element-value-pairs which don't exist by default but can be used in extensions or mergers
     private Map<ChronoElement<?>, Object> map = null;
@@ -57,8 +54,7 @@ class ParsedValue
     ParsedValue() {
         super();
 
-        this.key = null;
-        this.value = null;
+        this.result = null;
 
     }
 
@@ -67,25 +63,19 @@ class ParsedValue
     @Override
     public boolean contains(ChronoElement<?> element) {
 
-        if (element == null) {
-            return false;
+        if ((element != null) && (this.map != null)) {
+            return this.map.containsKey(element);
         }
 
-        boolean found = element.equals(this.key);
-
-        if (!found && (this.map != null)) {
-            found = this.map.containsKey(element);
-        }
-
-        return found;
+        return false;
 
     }
 
     @Override
     public <V> V get(ChronoElement<V> element) {
 
-        if (element.equals(this.key)) {
-            return element.getType().cast(this.value);
+        if (element == null) {
+            throw new NullPointerException();
         }
 
         Map<ChronoElement<?>, Object> m = this.map;
@@ -101,8 +91,8 @@ class ParsedValue
     @Override
     public int getInt(ChronoElement<Integer> element) {
 
-        if (element.equals(this.key)) {
-            return element.getType().cast(this.value).intValue();
+        if (element == null) {
+            throw new NullPointerException();
         }
 
         Map<ChronoElement<?>, Object> m = this.map;
@@ -118,24 +108,19 @@ class ParsedValue
     @Override
     public Set<ChronoElement<?>> getRegisteredElements() {
 
-        Set<ChronoElement<?>> set = new HashSet<>();
-        if (this.key != null) {
-            set.add(this.key);
+        if (this.map == null) {
+            return Collections.emptySet();
         }
-        if (this.map != null) {
-            set.addAll(this.map.keySet());
-        }
-        return Collections.unmodifiableSet(set);
+
+        return Collections.unmodifiableSet(this.map.keySet());
 
     }
 
     // called by format processors
     void put(ChronoElement<?> element, int v) {
 
-        if ((this.key == null) || element.equals(this.key)) {
-            this.key = element;
-            this.value = Integer.valueOf(v);
-            return;
+        if (element == null) {
+            throw new NullPointerException();
         }
 
         Map<ChronoElement<?>, Object> m = this.map;
@@ -143,27 +128,24 @@ class ParsedValue
             m = new HashMap<>();
             this.map = m;
         }
-        Object newValue = Integer.valueOf(v);
-        m.put(element, newValue);
+        m.put(element, Integer.valueOf(v));
 
     }
 
     // called by format processors
     void put(ChronoElement<?> element, Object v) {
 
+        if (element == null) {
+            throw new NullPointerException();
+        }
+
         if (v == null) { // removal
-            if (element.equals(this.key)) {
-                this.key = null;
-                this.value = null;
-            } else if (this.map != null) {
+            if (this.map != null) {
                 this.map.remove(element);
                 if (this.map.isEmpty()) {
                     this.map = null;
                 }
             }
-        } else if ((this.key == null) || element.equals(this.key)) {
-            this.key = element;
-            this.value = element.getType().cast(v);
         } else {
             Map<ChronoElement<?>, Object> m = this.map;
             if (m == null) {
@@ -175,12 +157,18 @@ class ParsedValue
 
     }
 
-    // called in context of erraneous or-block
-    void reset() {
+    @Override
+    void setResult(Object entity) {
 
-        this.key = null;
-        this.value = null;
-        this.map = null;
+        this.result = entity;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    @Override
+    <E> E getResult() {
+
+        return (E) this.result;
 
     }
 

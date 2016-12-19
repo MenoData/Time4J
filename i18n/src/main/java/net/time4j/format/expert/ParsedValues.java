@@ -527,6 +527,20 @@ class ParsedValues
 
     }
 
+    @Override
+    void setResult(Object entity) {
+
+        // no-op
+
+    }
+
+    @Override
+    <E> E getResult() {
+
+        return null;
+
+    }
+
     // called in context of erraneous or-block
     void reset() {
 
