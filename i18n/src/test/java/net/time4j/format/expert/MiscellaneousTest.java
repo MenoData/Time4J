@@ -285,7 +285,7 @@ public class MiscellaneousTest {
         cf.parse(text, plog);
         ChronoEntity<?> e1 = plog.getRawValues();
         ChronoEntity<?> e2 = cf.parseRaw(text);
-        assertThat(e1.equals(e2), is(true));
+        assertThat(e1.equals(e2.with(Moment.axis().element(), null)), is(true));
     }
 
     @Test

@@ -67,6 +67,7 @@ final class CustomizedProcessor<V>
     // quick path optimization
     private boolean optPrinter;
     private boolean optParser;
+    private boolean singleStepMode;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -82,7 +83,7 @@ final class CustomizedProcessor<V>
         ChronoPrinter<V> printer,
         ChronoParser<V> parser
     ) {
-        this(element, printer, parser, false, false);
+        this(element, printer, parser, false, false, false);
 
     }
 
@@ -91,7 +92,8 @@ final class CustomizedProcessor<V>
         ChronoPrinter<V> printer,
         ChronoParser<V> parser,
         boolean optPrinter,
-        boolean optParser
+        boolean optParser,
+        boolean singleStepMode
     ) {
         super();
 
@@ -111,6 +113,7 @@ final class CustomizedProcessor<V>
 
         this.optPrinter = optPrinter;
         this.optParser = optParser;
+        this.singleStepMode = singleStepMode;
 
     }
 
@@ -194,6 +197,8 @@ final class CustomizedProcessor<V>
 
             if (value == null) {
                 status.setError(offset, status.getErrorMessage());
+            } else if (this.singleStepMode && (parsedResult instanceof ParsedValue)) {
+                parsedResult.setResult(value);
             } else {
                 ChronoEntity<?> raw = status.getRawValues();
                 for (ChronoElement<?> e : raw.getRegisteredElements()) {
@@ -292,6 +297,10 @@ final class CustomizedProcessor<V>
         int reserved
     ) {
 
+        boolean singleStepMode =
+            formatter.isSingleStepOptimizationPossible()
+            && this.element.getType().equals(formatter.getChronology().getChronoType());
+
         if (attributes instanceof AttributeSet) { // should always happen, see implementation of FormatStep
             ChronoPrinter<V> effectivePrinter = this.printer;
             ChronoParser<V> effectiveParser = this.parser;
@@ -313,12 +322,19 @@ final class CustomizedProcessor<V>
             }
 
             return new CustomizedProcessor<V>(
-                this.element, effectivePrinter, effectiveParser, effectiveOptPrinter, effectiveOptParser);
+                this.element, effectivePrinter, effectiveParser,
+                effectiveOptPrinter, effectiveOptParser, singleStepMode);
         } else if (this.optPrinter || this.optParser) {
             return new CustomizedProcessor<V>(this.element, this.printer, this.parser);
         } else {
             return this;
         }
+
+    }
+
+    boolean isSingleStepMode() {
+
+        return this.singleStepMode;
 
     }
 
