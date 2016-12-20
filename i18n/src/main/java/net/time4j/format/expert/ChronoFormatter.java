@@ -190,6 +190,8 @@ public final class ChronoFormatter<T>
     private final boolean trailing;
     private final boolean noPreparser;
     private final Chronology<?> deepestParser;
+    private final int stepCount;
+    private final boolean singleStepMode;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -267,7 +269,9 @@ public final class ChronoFormatter<T>
 
         this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
         this.noPreparser = this.hasNoPreparser();
+        this.stepCount = steps.size();
         this.steps = this.freeze(steps);
+        this.singleStepMode = this.getSingleStepMode();
 
     }
 
@@ -381,7 +385,9 @@ public final class ChronoFormatter<T>
         this.indexable = ix;
         this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
         this.noPreparser = this.hasNoPreparser();
+        this.stepCount = copy.size();
         this.steps = this.freeze(copy);
+        this.singleStepMode = this.getSingleStepMode();
 
     }
 
@@ -429,7 +435,9 @@ public final class ChronoFormatter<T>
         this.defaults = Collections.unmodifiableMap(map);
         this.indexable = ix;
         this.noPreparser = this.hasNoPreparser();
+        this.stepCount = formatter.stepCount;
         this.steps = this.freeze(formatter.steps);
+        this.singleStepMode = this.getSingleStepMode();
 
     }
 
@@ -2693,6 +2701,30 @@ public final class ChronoFormatter<T>
 
     }
 
+    // used by CustomizedProcessor
+    boolean isSingleStepOptimizationPossible() {
+
+        return ((this.stepCount == 1) && !this.hasOptionals);
+
+    }
+
+    private boolean getSingleStepMode() {
+
+        boolean optSingleStep = this.isSingleStepOptimizationPossible();
+
+        if (optSingleStep) {
+            FormatProcessor<?> processor = this.steps.get(0).getProcessor();
+            if (processor instanceof CustomizedProcessor) {
+                optSingleStep = CustomizedProcessor.class.cast(processor).isSingleStepMode();
+            } else if (!(processor instanceof StyleProcessor)) {
+                optSingleStep = false;
+            }
+        }
+
+        return optSingleStep;
+
+    }
+
     private String format0(ChronoDisplay display) {
 
         StringBuilder buffer = new StringBuilder(this.steps.size() * 8);
@@ -2846,7 +2878,7 @@ public final class ChronoFormatter<T>
         ChronoEntity<?> parsed = null;
 
         try {
-            if ((cf.steps.size() == 1) && !cf.hasOptionals) { // TODO: only apply for specialized edge cases?
+            if (cf.singleStepMode && !preparsing) {
                 ParsedValue parsedValue = new ParsedValue();
                 cf.steps.get(0).parse(text, status, attributes, parsedValue, quickPath);
                 if (status.isError()) {
@@ -3434,7 +3466,7 @@ public final class ChronoFormatter<T>
 
     private List<FormatStep> freeze(List<FormatStep> steps) {
 
-        List<FormatStep> frozen = new ArrayList<>();
+        List<FormatStep> frozen = new ArrayList<>(steps.size());
 
         for (FormatStep step : steps) {
             frozen.add(step.quickPath(this));
