@@ -2701,6 +2701,13 @@ public final class ChronoFormatter<T>
 
     }
 
+    // used by MultiFormatParser
+    boolean isToleratingTrailingChars() {
+
+        return this.trailing;
+
+    }
+
     // used by CustomizedProcessor
     boolean isSingleStepOptimizationPossible() {
 
