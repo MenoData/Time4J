@@ -178,16 +178,23 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
         throws ParseException {
 
         ParseLog status = new ParseLog();
-        T result = this.parse(text, status);
 
-        if (result == null) {
-            throw new ParseException(
-                status.getErrorMessage(),
-                status.getErrorIndex()
-            );
+        for (int i = 0; i < this.parsers.length; i++) {
+            status.reset(); // initialization
+            status.setPosition(0);
+
+            // use the default global attributes of every single parser
+            T parsed = this.parsers[i].parse(text, status);
+
+            if ((parsed != null) && !status.isError()) {
+                if (this.parsers[i].isToleratingTrailingChars() || (status.getPosition() == text.length())) {
+                    return parsed;
+                }
+            }
+
         }
 
-        return result;
+        throw new ParseException("Not matched by any format: " + text, text.length());
 
     }
 
@@ -216,7 +223,6 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *         int index = 0;
      *
      *         for (String text : data) {
-     *             plog.reset(); // initialization
      *             PlainDate date = MULTI_FORMAT_PARSER.parse(text, plog);
      *             if ((date == null) || plog.isError()) {
      *                 // users are encouraged to use any good logging framework here
@@ -230,6 +236,9 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *         return Collections.unmodifiableCollection(parsedDates);
      *     }
      * </pre>
+     *
+     * <p>Note: This method tolerates trailing characters. If this behaviour is not useful
+     * then please consider the alternative method {@link #parse(CharSequence)}. </p>
      *
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)
@@ -262,10 +271,9 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *         int index = 0;
      *
      *         for (String text : data) {
-     *             plog.reset(); // initialization
      *             PlainDate date = MULTI_FORMAT_PARSER.parse(text, plog);
      *             if ((date == null) || plog.isError()) {
-     *                 // users are encouraged to use any good logging framework here
+     *                 // Anwender werden ermuntert, ein gutes Logging-Framework ihrer Wahl hier zu verwenden
      *                 System.out.println(&quot;Wrong entry found: &quot; + text + &quot; at position &quot; + index);
      *             } else {
      *                 parsedDates.add(date);
@@ -276,6 +284,9 @@ public final class MultiFormatParser<T extends ChronoEntity<T>>
      *         return Collections.unmodifiableCollection(parsedDates);
      *     }
      * </pre>
+     *
+     * <p>Hinweis: Die Methode toleriert nicht interpretierte Zeichen am Textende. Wenn dieses Verhalten
+     * nicht erw&uuml;nscht ist, dann bitte die alternative Methode {@link #parse(CharSequence)} benutzen. </p>
      *
      * @param   text        text to be parsed
      * @param   status      parser information (always as new instance)

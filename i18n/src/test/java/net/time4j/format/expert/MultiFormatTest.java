@@ -27,6 +27,12 @@ public class MultiFormatTest {
     }
 
     @Test(expected=ParseException.class)
+    public void parseTrailingChars() throws ParseException {
+        MultiFormatParser<PlainDate> mfp = createMultipleFormat();
+        mfp.parse("31.12.2015xyz");
+    }
+
+    @Test(expected=ParseException.class)
     public void parseUnexpectedLiterals() throws ParseException {
         MultiFormatParser<PlainDate> mfp = createMultipleFormat();
         mfp.parse("31-12-2015");
