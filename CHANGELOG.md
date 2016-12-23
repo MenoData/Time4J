@@ -1,5 +1,6 @@
 ## [v4.22] not yet released
 ### Added
+- Enable or-logic when parsing durations [#592]
 - Make styled formatters sensible for change of locale [#586]
 
 ### Fixed
