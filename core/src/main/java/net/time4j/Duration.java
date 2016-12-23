@@ -4007,6 +4007,8 @@ public final class Duration<U extends IsoUnit>
                 throw new NullPointerException("Missing unit type.");
             } else if (items.isEmpty()) {
             	throw new IllegalArgumentException("Missing format pattern.");
+            } else if ((items.get(0) == OrItem.INSTANCE) || (items.get(items.size() - 1) == OrItem.INSTANCE)) {
+                throw new IllegalArgumentException("Pattern must not start or end with an or-operator.");
             }
 
             int n = items.size();
@@ -4014,8 +4016,12 @@ public final class Duration<U extends IsoUnit>
 
             for (int i = n - 2; i >= 0; i--) {
                 FormatItem item = items.get(i);
-                items.set(i, item.update(reserved));
-                reserved += item.getMinWidth();
+                if (item == OrItem.INSTANCE) {
+                    reserved = 0;
+                } else {
+                    items.set(i, item.update(reserved));
+                    reserved += item.getMinWidth();
+                }
             }
 
             this.type = type;
@@ -4109,6 +4115,7 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>[]</td><td>optional section</td></tr>
          *  <tr><td>{}</td><td>section with plural forms, since v2.0</td></tr>
          *  <tr><td>#</td><td>placeholder for an optional digit, since v3.0</td></tr>
+         *  <tr><td>|</td><td>joins two parsing sections by or-logic, since v3.26/4.22</td></tr>
          * </table>
          *
          * <p>All letters in range a-z and A-Z are always reserved chars
@@ -4175,6 +4182,16 @@ public final class Duration<U extends IsoUnit>
          *  System.out.println(s); // output: 123
          * </pre>
          *
+         * <p><strong>Enhancement since version v3.26/4.22: or-logic</strong></p>
+         *
+         * <p>The character &quot;|&quot; starts a new section which will not be used for printing
+         * but parsing in case of preceding errors. For example, following pattern enables parsing
+         * a duration in days for two different languages: </p>
+         *
+         * <pre>
+         *  &quot;{D: :en:ONE=day:OTHER=days}|{D: :de:ONE=Tag:OTHER=Tage}&quot;
+         * </pre>
+         *
          * @param   <U>     generic unit type
          * @param   type    reified unit type
          * @param   pattern format pattern
@@ -4209,7 +4226,8 @@ public final class Duration<U extends IsoUnit>
          *  <tr><td>'</td><td>Apostroph, zum Markieren von Literalen</td></tr>
          *  <tr><td>[]</td><td>optionaler Abschnitt</td></tr>
          *  <tr><td>{}</td><td>Abschnitt mit Pluralformen, seit v2.0</td></tr>
-         *  <tr><td>#</td><td>zuk&uuml;nftiges reserviertes Zeichen</td></tr>
+         *  <tr><td>#</td><td>numerischer Platzhalter, seit v3.0</td></tr>
+         *  <tr><td>|</td><td>verbindet zwei Abschnitte per oder-Logik, seit v3.26/4.22</td></tr>
          * </table>
          *
          * <p>Alle Buchstaben im Bereich a-z und A-Z sind grunds&auml;tzlich
@@ -4277,6 +4295,17 @@ public final class Duration<U extends IsoUnit>
          *      Duration.Formatter.ofPattern(CalendarUnit.class, &quot;##D&quot;);
          *  String s = formatter2.format(Duration.of(123, DAYS));
          *  System.out.println(s); // output: 123
+         * </pre>
+         *
+         * <p><strong>Erweiterung seit Version v3.26/4.22: oder-Logik</strong></p>
+         *
+         * <p>Das Zeichen &quot;|&quot; beginnt einen neuen Abschnitt, der nicht zur Textausgabe,
+         * aber beim Interpretieren (Parsen) verwendet wird, falls im vorangehenden Abschnitt
+         * Fehler auftraten. Zum Beispiel erm&ouml;glicht folgendes Muster das Interpretieren
+         * einer Dauer in Tagen f&uuml;r zwei verschiedene Sprachen: </p>
+         *
+         * <pre>
+         *  &quot;{D: :en:ONE=day:OTHER=days}|{D: :de:ONE=Tag:OTHER=Tage}&quot;
          * </pre>
          *
          * @param   <U>     generic unit type
@@ -4353,6 +4382,8 @@ public final class Duration<U extends IsoUnit>
                         i++;
                     }
                     addPluralItem(pattern.substring(start, i), stack);
+                } else if (c == '|') {
+                    lastOn(stack).add(OrItem.INSTANCE);
                 } else {
                     addLiteral(c, stack);
                 }
@@ -4465,6 +4496,9 @@ public final class Duration<U extends IsoUnit>
         ) throws IOException {
 
 			for (FormatItem item : this.items) {
+                if (item == OrItem.INSTANCE) {
+                    break;
+                }
 				item.print(duration, buffer);
 			}
 
@@ -4522,11 +4556,29 @@ public final class Duration<U extends IsoUnit>
             int pos = offset;
 			Map<Object, Long> unitsToValues = new HashMap<Object, Long>();
 
-			for (FormatItem item : this.items) {
+			for (int i = 0, n = this.items.size(); i < n; i++) {
+                FormatItem item = this.items.get(i);
+
+                if (item == OrItem.INSTANCE) {
+                    break;
+                }
+
 				int reply = item.parse(unitsToValues, text, pos);
 
 				if (reply < 0) {
-					throw new ParseException("Cannot parse: " + text, ~reply);
+                    int found = -1;
+                    for (int j = i + 1; j < n; j++) {
+                        if (this.items.get(j) == OrItem.INSTANCE) {
+                            found = j;
+                            break;
+                        }
+                    }
+                    if (found == -1) {
+                        throw new ParseException("Cannot parse: " + text, ~reply);
+                    } else {
+                        unitsToValues.clear();
+                        i = found;
+                    }
 				} else {
 					pos = reply;
 				}
@@ -5253,6 +5305,59 @@ public final class Duration<U extends IsoUnit>
 
     }
 
+    private static class OrItem
+        extends FormatItem {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final OrItem INSTANCE = new OrItem();
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private OrItem() {
+            super(0);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        void print(
+            Duration<?> duration,
+            Appendable buffer
+        ) throws IOException {
+
+            // no-op
+
+        }
+
+        @Override
+        int parse(
+            Map<Object, Long> unitsToValues,
+            CharSequence text,
+            int start
+        ) {
+
+            return start;
+
+        }
+
+        @Override
+        int getMinWidth() {
+
+            return 0;
+
+        }
+
+        @Override
+        FormatItem update(int reserved) {
+
+            return this;
+
+        }
+
+    }
+
     private static class LiteralItem
 		extends FormatItem {
 
@@ -5466,6 +5571,9 @@ public final class Duration<U extends IsoUnit>
 			if (items.isEmpty()) {
 				throw new IllegalArgumentException(
                     "Optional section is empty.");
+            } else if ((items.get(0) == OrItem.INSTANCE) || (items.get(items.size() - 1) == OrItem.INSTANCE)) {
+                throw new IllegalArgumentException(
+                    "Optional section must not start or end with an or-operator.");
 			}
 
 			this.items = Collections.unmodifiableList(items);
@@ -5482,6 +5590,9 @@ public final class Duration<U extends IsoUnit>
 
             if (!this.isZero(duration)) {
                 for (FormatItem item : this.items) {
+                    if (item == OrItem.INSTANCE) {
+                        break;
+                    }
                     item.print(duration, buffer);
                 }
             }
@@ -5495,21 +5606,39 @@ public final class Duration<U extends IsoUnit>
             int start
         ) {
 
-			int pos = start;
-			Map<Object, Long> store = new HashMap<Object, Long>(unitsToValues);
+            int pos = start;
+            Map<Object, Long> store = new HashMap<Object, Long>();
 
-			for (FormatItem item : this.items) {
-				int reply = item.parse(store, text, pos);
+            for (int i = 0, n = this.items.size(); i < n; i++) {
+                FormatItem item = this.items.get(i);
 
-				if (reply < 0) {
-					return start;
-				} else {
-					pos = reply;
-				}
-			}
+                if (item == OrItem.INSTANCE) {
+                    break;
+                }
 
-			unitsToValues.putAll(store);
-			return pos;
+                int reply = item.parse(store, text, pos);
+
+                if (reply < 0) {
+                    int found = -1;
+                    for (int j = i + 1; j < n; j++) {
+                        if (this.items.get(j) == OrItem.INSTANCE) {
+                            found = j;
+                            break;
+                        }
+                    }
+                    if (found == -1) {
+                        return start;
+                    } else {
+                        store.clear();
+                        i = found;
+                    }
+                } else {
+                    pos = reply;
+                }
+            }
+
+            unitsToValues.putAll(store);
+            return pos;
 
 		}
 
