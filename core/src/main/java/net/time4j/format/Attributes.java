@@ -434,7 +434,7 @@ public final class Attributes
      *      .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
      *      .build()
      *      .with(Attributes.TRAILING_CHARACTERS, true);
-     *  System.out.println(formatter.parse("5 PM 45xyz"));
+     *  System.out.println(formatter.parse(&quot;5 PM 45xyz&quot;));
      *  // Output: T17:45
      * </pre>
      *
@@ -460,7 +460,7 @@ public final class Attributes
      *      .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
      *      .build()
      *      .with(Attributes.TRAILING_CHARACTERS, true);
-     *  System.out.println(formatter.parse("5 PM 45xyz"));
+     *  System.out.println(formatter.parse(&quot;5 PM 45xyz&quot;));
      *  // Output: T17:45
      * </pre>
      *
@@ -537,6 +537,23 @@ public final class Attributes
      */
     public static final AttributeKey<StartOfDay> START_OF_DAY =
         PredefinedKey.valueOf("START_OF_DAY", StartOfDay.class);
+
+    /**
+     * <p>This attribute controls if style-driven date patterns should always have four-digit-years or not. </p>
+     *
+     * <p>Default value: {@code false} </p>
+     *
+     * @since   3.26/4.22
+     */
+    /*[deutsch]
+     * <p>Steuert, ob stil-basierte Datumsformatmuster immer vierstellige Jahreszahlen haben oder nicht. </p>
+     *
+     * <p>Standardwert: {@code false} </p>
+     *
+     * @since   3.26/4.22
+     */
+    public static final AttributeKey<Boolean> FOUR_DIGIT_YEAR =
+        PredefinedKey.valueOf("FOUR_DIGIT_YEAR", Boolean.class);
 
     private static final Attributes EMPTY = new Attributes.Builder().build();
 

@@ -139,6 +139,7 @@ final class StyleProcessor<T>
                 this.dateStyle,
                 this.timeStyle,
                 attributes.get(Attributes.LANGUAGE, this.formatter.getLocale()),
+                attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
                 tz);
         }
 
@@ -232,6 +233,7 @@ final class StyleProcessor<T>
                 this.dateStyle,
                 this.timeStyle,
                 locale,
+                attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
                 (tzid == null) ? null : Timezone.of(tzid).with(strategy));
 
         return new StyleProcessor<T>(cf, this.dateStyle, this.timeStyle);
@@ -244,6 +246,7 @@ final class StyleProcessor<T>
         DisplayStyle dateStyle,
         DisplayStyle timeStyle,
         Locale locale,
+        boolean fourDigitYear,
         Timezone tz // optional
     ) {
 
@@ -262,6 +265,10 @@ final class StyleProcessor<T>
             pattern = chronology.getFormatPattern(dateStyle, locale);
         } else {
             throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
+        }
+
+        if (fourDigitYear && pattern.contains("yy") && !pattern.contains("yyy")) {
+            pattern = pattern.replace("yy", "yyyy");
         }
 
         ChronoFormatter<?> cf = ChronoFormatter.ofPattern(pattern, PatternType.CLDR, locale, chronology);
