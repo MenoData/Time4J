@@ -254,6 +254,17 @@ public final class SystemClock
      *
      * <p>Uses the standard clock {@code SystemClock.INSTANCE} and the platform timezone data. </p>
      *
+     * <p><strong>Background</strong>: Some mobile devices might have outdated or wrong timezone data but still display
+     * the correct local time because they compensate the wrong zone information by adjusting the clock.
+     * This method can help in such a situation, for example: </p>
+     *
+     * <pre>
+     *     // we assume/know that the local device time is correct...
+     *     PlainTimestamp localTimestamp = SystemClock.inPlatformView().now();
+     *     // ...and then we combine correct local device time with the valid timezone data of Time4J
+     *     Moment nowCorrect = localTimestamp.inStdTimezone();
+     * </pre>
+     *
      * @return  local clock in system timezone using the platform timezone data
      * @since   3.3/4.2
      * @see     net.time4j.tz.Timezone#ofSystem()
@@ -264,6 +275,18 @@ public final class SystemClock
      * <p>Erzeugt eine lokale Uhr in der Plattform-Zeitzone. </p>
      *
      * <p>Verwendet die Standarduhr {@code SystemClock.INSTANCE} und die Zeitzonendaten der Plattform. </p>
+     *
+     * <p><strong>Hintergrund</strong>: Einige Mobilfunkger&auml;te haben m&ouml;glicherweise veraltete oder falsche
+     * Zeitzonendaten, zeigen aber trotzdem die richtige Lokalzeit an, weil sie die falschen Zeitzonendaten
+     * mit einer Verstellung der Uhr kompensieren. Diese Methode kann in solchen F&auml;llen helfen, zum
+     * Beispiel: </p>
+     *
+     * <pre>
+     *     // wir nehmen an oder wissen, da&szlig; die lokale Zeit des Ger&auml;ts richtig ist...
+     *     PlainTimestamp localTimestamp = SystemClock.inPlatformView().now();
+     *     // ...und dann kombinieren wir die lokale Zeit mit den g&uuml;ltigen Zeitzonendaten von Time4J
+     *     Moment nowCorrect = localTimestamp.inStdTimezone();
+     * </pre>
      *
      * @return  local clock in system timezone using the platform timezone data
      * @since   3.3/4.2
