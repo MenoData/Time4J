@@ -1,6 +1,7 @@
 package net.time4j.format.expert;
 
 import net.time4j.PlainDate;
+import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -25,6 +26,20 @@ public class StyleProcessorTest {
         assertThat(
             chinese.with(Locale.ENGLISH).format(date),
             is(english.format(date))
+        );
+    }
+
+    @Test
+    public void fourDigitYear() {
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.ofDateStyle(DisplayMode.SHORT, Locale.ENGLISH);
+        assertThat(
+            f.format(PlainDate.of(2016, 12, 23)),
+            is("12/23/16")
+        );
+        assertThat(
+            f.with(Attributes.FOUR_DIGIT_YEAR, true).format(PlainDate.of(2016, 12, 23)),
+            is("12/23/2016")
         );
     }
 
