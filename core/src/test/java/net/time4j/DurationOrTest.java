@@ -15,7 +15,7 @@ public class DurationOrTest {
 
     @Test
     public void parseEnglishText() throws ParseException {
-        Duration<?> duration = Duration.of(3, CalendarUnit.DAYS);
+        Duration<IsoUnit> duration = Duration.of(3, CalendarUnit.DAYS);
         Duration.Formatter<?> f = Duration.formatter("{D: :en:ONE=day:OTHER=days}|{D: :de:ONE=Tag:OTHER=Tage}");
 
         assertThat(
@@ -28,7 +28,7 @@ public class DurationOrTest {
 
     @Test
     public void parseGermanText() throws ParseException {
-        Duration<?> duration = Duration.of(3, CalendarUnit.DAYS);
+        Duration<IsoUnit> duration = Duration.of(3, CalendarUnit.DAYS);
         Duration.Formatter<?> f = Duration.formatter("{D: :en:ONE=day:OTHER=days}|{D: :de:ONE=Tag:OTHER=Tage}");
 
         assertThat(
@@ -53,6 +53,11 @@ public class DurationOrTest {
         assertThat(
             f.parse("3 Tage"),
             is(Duration.of(3, CalendarUnit.DAYS)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void parseEmptyPattern() {
+        Duration.formatter("");
     }
 
     @Test(expected=IllegalArgumentException.class)

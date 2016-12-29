@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeSpan.java) is part of project Time4J.
  *
@@ -269,7 +269,7 @@ public interface TimeSpan<U> {
      * @param   <U> type of time unit
      * @doctags.concurrency {immutable}
      */
-    public static final class Item<U>
+    class Item<U>
         implements Serializable {
 
         //~ Statische Felder/Initialisierungen ----------------------------
@@ -339,7 +339,7 @@ public interface TimeSpan<U> {
             U unit
         ) {
 
-            return new Item<U>(amount, unit);
+            return new Item<>(amount, unit);
 
         }
 
