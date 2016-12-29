@@ -31,9 +31,7 @@ import net.time4j.engine.Normalizer;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
-import net.time4j.format.NumberType;
-import net.time4j.format.PluralCategory;
-import net.time4j.format.PluralRules;
+import net.time4j.format.TimeSpanFormatter;
 import net.time4j.tz.Timezone;
 
 import java.io.IOException;
@@ -44,26 +42,12 @@ import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 
-import static net.time4j.CalendarUnit.CENTURIES;
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.CalendarUnit.DECADES;
-import static net.time4j.CalendarUnit.MILLENNIA;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.QUARTERS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MICROS;
-import static net.time4j.ClockUnit.MILLIS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
-import static net.time4j.ClockUnit.SECONDS;
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 
 
 /**
@@ -156,7 +140,6 @@ public final class Duration<U extends IsoUnit>
         : ',' // Empfehlung des ISO-Standards
     );
 
-    private static final Object SIGN_KEY = new Object();
     private static final long MRD = 1000000000L;
     private static final long MIO = 1000000L;
 
@@ -2302,6 +2285,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   pattern format pattern
      * @return  new formatter instance
+     * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
      * @since   3.0
      */
     /*[deutsch]
@@ -2309,6 +2293,7 @@ public final class Duration<U extends IsoUnit>
      *
      * @param   pattern format pattern
      * @return  new formatter instance
+     * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
      * @since   3.0
      */
     public static Duration.Formatter<IsoUnit> formatter(String pattern) {
@@ -2324,6 +2309,7 @@ public final class Duration<U extends IsoUnit>
      * @param   type    reified unit type
      * @param   pattern format pattern
      * @return  new formatter instance
+     * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
      * @since   3.0
      */
     /*[deutsch]
@@ -2333,6 +2319,7 @@ public final class Duration<U extends IsoUnit>
      * @param   type    reified unit type
      * @param   pattern format pattern
      * @return  new formatter instance
+     * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
      * @since   3.0
      */
     public static <U extends IsoUnit> Duration.Formatter<U> formatter(
@@ -3980,7 +3967,8 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
      */
-    public static final class Formatter<U extends IsoUnit> {
+    public static final class Formatter<U extends IsoUnit>
+        extends TimeSpanFormatter<U, Duration<U>> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -3988,45 +3976,13 @@ public final class Duration<U extends IsoUnit>
             "'P'[-#################Y'Y'][-#################M'M'][-#################W'W'][-#################D'D']"
             + "['T'[-#################h'H'][-#################m'M'][-#################s'S'[.fffffffff]]]";
 
-        //~ Instanzvariablen ----------------------------------------------
-
-    	private final Class<U> type;
-    	private final List<FormatItem> items;
-        private final String pattern;
-
         //~ Konstruktoren -------------------------------------------------
 
         private Formatter(
             Class<U> type,
-            List<FormatItem> items,
             String pattern
         ) {
-            super();
-
-            if (type == null) {
-                throw new NullPointerException("Missing unit type.");
-            } else if (items.isEmpty()) {
-            	throw new IllegalArgumentException("Missing format pattern.");
-            } else if ((items.get(0) == OrItem.INSTANCE) || (items.get(items.size() - 1) == OrItem.INSTANCE)) {
-                throw new IllegalArgumentException("Pattern must not start or end with an or-operator.");
-            }
-
-            int n = items.size();
-            int reserved = items.get(n - 1).getMinWidth();
-
-            for (int i = n - 2; i >= 0; i--) {
-                FormatItem item = items.get(i);
-                if (item == OrItem.INSTANCE) {
-                    reserved = 0;
-                } else {
-                    items.set(i, item.update(reserved));
-                    reserved += item.getMinWidth();
-                }
-            }
-
-            this.type = type;
-            this.items = Collections.unmodifiableList(items);
-            this.pattern = pattern;
+            super(type, pattern);
 
         }
 
@@ -4052,7 +4008,7 @@ public final class Duration<U extends IsoUnit>
          * <p>Die Vorzeichenbehandlung von Joda-Time erlaubt und erzwingt im Kontrast
          * zu XML-Schema negative Vorzeichen nicht vor dem P-Symbol, sondern wiederholt
          * f&uuml;r jedes einzelne Dauerelement. Warnung: Gemischte Vorzeichen werden
-         * von Tim4J dennoch nicht unterst&uuml;tzt. </p>
+         * von Time4J dennoch nicht unterst&uuml;tzt. </p>
          *
          * @return  new formatter instance for parsing Joda-Style period expressions
          * @since   3.0
@@ -4069,6 +4025,7 @@ public final class Duration<U extends IsoUnit>
          *
          * @param   pattern format pattern
          * @return  new formatter instance
+         * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
          * @since   1.2
          * @see     #ofPattern(Class, String)
          */
@@ -4077,6 +4034,7 @@ public final class Duration<U extends IsoUnit>
          *
          * @param   pattern format pattern
          * @return  new formatter instance
+         * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
          * @since   1.2
          * @see     #ofPattern(Class, String)
          */
@@ -4154,7 +4112,7 @@ public final class Duration<U extends IsoUnit>
          * must be present. The underscore is an acceptable alternative
          * for the minus-sign. Finally there must be a sequence of
          * name-value-pairs in the form CATEGORY=LITERAL. Every category
-         * label must be the name of a {@link PluralCategory plural category}.
+         * label must be the name of a {@link net.time4j.format.PluralCategory plural category}.
          * The category OTHER must exist. Example: </p>
          *
          * <pre>
@@ -4196,6 +4154,7 @@ public final class Duration<U extends IsoUnit>
          * @param   type    reified unit type
          * @param   pattern format pattern
          * @return  new formatter instance
+         * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
          * @since   1.2
          */
         /*[deutsch]
@@ -4312,6 +4271,7 @@ public final class Duration<U extends IsoUnit>
          * @param   type    reified unit type
          * @param   pattern format pattern
          * @return  new formatter instance
+         * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
          * @since   1.2
          */
         public static <U extends IsoUnit> Formatter<U> ofPattern(
@@ -4319,320 +4279,20 @@ public final class Duration<U extends IsoUnit>
             String pattern
         ) {
 
-            int n = pattern.length();
-            List<List<FormatItem>> stack = new ArrayList<List<FormatItem>>();
-            stack.add(new ArrayList<FormatItem>());
-            int digits = 0;
-
-            for (int i = 0; i < n; i++) {
-                char c = pattern.charAt(i);
-
-                if (c == '#') {
-                    digits++;
-                } else if (isSymbol(c)) {
-                    int start = i++;
-                    while ((i < n) && pattern.charAt(i) == c) {
-                        i++;
-                    }
-                    addSymbol(c, i - start, digits, stack);
-                    digits = 0;
-                    i--;
-                } else if (digits > 0) {
-                    throw new IllegalArgumentException("Char # must be followed by unit symbol.");
-                } else if (c == '\'') { // Literalsektion
-                    int start = i++;
-                    while (i < n) {
-                        if (pattern.charAt(i) == '\'') {
-                            if (
-                                (i + 1 < n)
-                                && (pattern.charAt(i + 1) == '\'')
-                            ) {
-                                i++;
-                            } else {
-                                break;
-                            }
-                        }
-                        i++;
-                    }
-                    if (i >= n) {
-                        throw new IllegalArgumentException(
-                            "String literal in pattern not closed: " + pattern);
-                    }
-                    if (start + 1 == i) {
-                        addLiteral('\'', stack);
-                    } else {
-                        String s = pattern.substring(start + 1, i);
-                        addLiteral(s.replace("''", "'"), stack);
-                    }
-                } else if (c == '[') {
-                    startOptionalSection(stack);
-                } else if (c == ']') {
-                    endOptionalSection(stack);
-                } else if (c == '.') {
-                    lastOn(stack).add(new SeparatorItem('.', ','));
-                } else if (c == ',') {
-                    lastOn(stack).add(new SeparatorItem(',', '.'));
-                } else if (c == '-') {
-                    lastOn(stack).add(new SignItem(false));
-                } else if (c == '+') {
-                    lastOn(stack).add(new SignItem(true));
-                } else if (c == '{') {
-                    int start = ++i;
-                    while ((i < n) && pattern.charAt(i) != '}') {
-                        i++;
-                    }
-                    addPluralItem(pattern.substring(start, i), stack);
-                } else if (c == '|') {
-                    lastOn(stack).add(OrItem.INSTANCE);
-                } else {
-                    addLiteral(c, stack);
-                }
-            }
-
-            if (stack.size() > 1) {
-                throw new IllegalArgumentException(
-                    "Open square bracket without closing one.");
-            } else if (stack.isEmpty()) {
-                throw new IllegalArgumentException("Empty or invalid pattern.");
-            }
-
-        	return new Formatter<U>(type, stack.get(0), pattern);
+            return new Formatter<U>(type, pattern);
 
         }
 
-        /**
-         * <p>Yields the underlying format pattern. </p>
-         *
-         * @return  String
-         * @since   1.2
-         */
-        /*[deutsch]
-         * <p>Liefert das zugrundeliegende Formatmuster. </p>
-         *
-         * @return  String
-         * @since   1.2
-         */
-        public String getPattern() {
+        @Override
+        protected Duration<U> convert(Map<U, Long> map, boolean negative) {
 
-            return this.pattern;
+            return Duration.create(map, negative);
 
         }
 
-        /**
-         * <p>Yields the associated reified unit type. </p>
-         *
-         * @return  Class
-         * @since   1.2
-         */
-        /*[deutsch]
-         * <p>Liefert den zugeh&ouml;rigen Zeiteinheitstyp. </p>
-         *
-         * @return  Class
-         * @since   1.2
-         */
-        public Class<U> getType() {
-
-            return this.type;
-
-        }
-
-        /**
-         * <p>Creates a textual output of given duration. </p>
-         *
-         * @param   duration	duration object
-         * @return  textual represenation of duration
-         * @throws	IllegalArgumentException if some aspects of duration
-         *          prevents printing (for example too many nanoseconds)
-         * @since   1.2
-         */
-        /*[deutsch]
-         * <p>Erzeugt eine textuelle Ausgabe der angegebenen Dauer. </p>
-         *
-         * @param   duration	duration object
-         * @return  textual represenation of duration
-         * @throws	IllegalArgumentException if some aspects of duration
-         *          prevents printing (for example too many nanoseconds)
-         * @since   1.2
-         */
-        public String format(Duration<?> duration) {
-
-        	StringBuilder buffer = new StringBuilder();
-
-            try {
-                this.print(duration, buffer);
-            } catch (IOException ex) {
-                throw new AssertionError(ex); // should never happen
-			}
-
-        	return buffer.toString();
-
-        }
-
-        /**
-         * <p>Creates a textual output of given duration and writes to
-         * the buffer. </p>
-         *
-         * @param   duration	duration object
-         * @param   buffer      I/O-buffer where the result is written to
-         * @throws	IllegalArgumentException if some aspects of duration
-         *          prevents printing (for example too many nanoseconds)
-         * @throws  IOException if writing into buffer fails
-         * @since   1.2
-         */
-        /*[deutsch]
-         * <p>Erzeugt eine textuelle Ausgabe der angegebenen Dauer und
-         * schreibt sie in den Puffer. </p>
-         *
-         * @param   duration	duration object
-         * @param   buffer      I/O-buffer where the result is written to
-         * @throws	IllegalArgumentException if some aspects of duration
-         *          prevents printing (for example too many nanoseconds)
-         * @throws  IOException if writing into buffer fails
-         * @since   1.2
-         */
-        public void print(
-            Duration<?> duration,
-            Appendable buffer
-        ) throws IOException {
-
-			for (FormatItem item : this.items) {
-                if (item == OrItem.INSTANCE) {
-                    break;
-                }
-				item.print(duration, buffer);
-			}
-
-        }
-
-        /**
-         * <p>Equivalent to {@code parse(text, 0)}. </p>
-         *
-         * @param   text	custom textual representation to be parsed
-         * @return  parsed duration
-         * @throws	ParseException (for example in case of mixed signs)
-         * @since   1.2
-         * @see     #parse(CharSequence, int)
-         */
-        /*[deutsch]
-         * <p>&Auml;quivalent zu {@code parse(text, 0)}. </p>
-         *
-         * @param   text	custom textual representation to be parsed
-         * @return  parsed duration
-         * @throws	ParseException (for example in case of mixed signs)
-         * @since   1.2
-         * @see     #parse(CharSequence, int)
-         */
-        public Duration<U> parse(CharSequence text) throws ParseException {
-
-            return this.parse(text, 0);
-
-        }
-
-        /**
-         * <p>Analyzes given text according to format pattern and parses the
-         * text to a duration. </p>
-         *
-         * @param   text	custom textual representation to be parsed
-         * @param   offset  start position for the parser
-         * @return  parsed duration
-         * @throws	ParseException (for example in case of mixed signs)
-         * @since   1.2
-         */
-        /*[deutsch]
-         * <p>Interpretiert den angegebenen Text entsprechend dem
-         * voreingestellten Formatmuster als Dauer. </p>
-         *
-         * @param   text	custom textual representation to be parsed
-         * @param   offset  start position for the parser
-         * @return  parsed duration
-         * @throws	ParseException (for example in case of mixed signs)
-         * @since   1.2
-         */
-        public Duration<U> parse(
-            CharSequence text,
-            int offset
-        ) throws ParseException {
-
-            int pos = offset;
-			Map<Object, Long> unitsToValues = new HashMap<Object, Long>();
-
-			for (int i = 0, n = this.items.size(); i < n; i++) {
-                FormatItem item = this.items.get(i);
-
-                if (item == OrItem.INSTANCE) {
-                    break;
-                }
-
-				int reply = item.parse(unitsToValues, text, pos);
-
-				if (reply < 0) {
-                    int found = -1;
-                    for (int j = i + 1; j < n; j++) {
-                        if (this.items.get(j) == OrItem.INSTANCE) {
-                            found = j;
-                            break;
-                        }
-                    }
-                    if (found == -1) {
-                        throw new ParseException("Cannot parse: " + text, ~reply);
-                    } else {
-                        unitsToValues.clear();
-                        i = found;
-                    }
-				} else {
-					pos = reply;
-				}
-			}
-
-			Long sign = unitsToValues.remove(SIGN_KEY);
-			boolean negative = ((sign != null) && (sign.longValue() < 0));
-			Map<U, Long> map = new HashMap<U, Long>();
-
-			for (Object key : unitsToValues.keySet()) {
-				if (this.type.isInstance(key)) {
-					map.put(this.type.cast(key), unitsToValues.get(key));
-				} else {
-					throw new ParseException(
-                        "Duration type mismatched: " + unitsToValues, pos);
-				}
-			}
-
-			return Duration.create(map, negative);
-
-        }
-
-        private static boolean isSymbol(char c) {
-
-            return (
-                ((c >= 'A') && (c <= 'Z'))
-                || ((c >= 'a') && (c <= 'z'))
-            );
-
-        }
-
-        private static void addSymbol(
-        	char symbol,
-        	int count,
-            int digits,
-        	List<List<FormatItem>> stack
-        ) {
-
-            IsoUnit unit = getUnit(symbol);
-        	List<FormatItem> items = stack.get(stack.size() - 1);
-
-            if (symbol == 'f') {
-                if (digits > 0) {
-                    throw new IllegalArgumentException("Combination of # and f-symbol not allowed.");
-                } else {
-                    items.add(new FractionItem(0, count));
-                }
-            } else {
-                items.add(new NumberItem(0, count, count + digits, unit));
-            }
-
-        }
-
-        private static IsoUnit getUnit(char symbol) {
+        @SuppressWarnings("unchecked")
+        @Override
+        protected U getUnit(char symbol) {
 
             IsoUnit unit;
 
@@ -4678,1007 +4338,15 @@ public final class Duration<U extends IsoUnit>
                         "Unsupported pattern symbol: " + symbol);
             }
 
-            return unit;
-
-        }
-
-        private static void addLiteral(
-        	char literal,
-        	List<List<FormatItem>> stack
-        ) {
-
-        	addLiteral(String.valueOf(literal), stack);
-
-        }
-
-        private static void addLiteral(
-        	String literal,
-        	List<List<FormatItem>> stack
-        ) {
-
-        	lastOn(stack).add(new LiteralItem(literal));
-
-        }
-
-        private static void addPluralItem(
-            String pluralInfo,
-            List<List<FormatItem>> stack
-        ) {
-
-            String[] parts = pluralInfo.split(":");
-
-            if (
-                (parts.length > 9)
-                || (parts.length < 4)
-            ) {
-                throw new IllegalArgumentException(
-                    "Plural information has wrong format: " + pluralInfo);
+            try {
+                return (U) unit;
+            } catch (ClassCastException cce) {
+                throw new IllegalArgumentException(cce.getMessage(), cce);
             }
-
-            IsoUnit unit;
-
-            if (parts[0].length() == 1) {
-                unit = getUnit(parts[0].charAt(0));
-            } else {
-                throw new IllegalArgumentException(
-                    "Plural information has wrong symbol: " + pluralInfo);
-            }
-
-            String[] localInfo = parts[2].split("-|_");
-            String lang = localInfo[0];
-            Locale loc;
-
-            if (localInfo.length > 1) {
-                String country = localInfo[1];
-                if (localInfo.length > 2) {
-                    String variant = localInfo[2];
-                    if (localInfo.length > 3) {
-                        throw new IllegalArgumentException(
-                            "Plural information has wrong locale: "
-                            + pluralInfo);
-                    } else {
-                        loc = new Locale(lang, country, variant);
-                    }
-                } else {
-                    loc = new Locale(lang, country);
-                }
-            } else {
-                loc = new Locale(lang);
-            }
-
-            Map<PluralCategory, String> pluralForms =
-                new EnumMap<PluralCategory, String>(PluralCategory.class);
-            PluralRules rules = PluralRules.of(loc, NumberType.CARDINALS);
-
-            for (int i = 3; i < parts.length; i++) {
-                String[] formInfo = parts[i].split("=");
-                if (formInfo.length == 2) {
-                    pluralForms.put(
-                        PluralCategory.valueOf(formInfo[0]),
-                        formInfo[1]);
-                } else {
-                    throw new IllegalArgumentException(
-                        "Plural information has wrong format: " + pluralInfo);
-                }
-            }
-
-            if (pluralForms.isEmpty()) {
-                throw new IllegalArgumentException(
-                    "Missing plural forms: " + pluralInfo);
-            } else if (!pluralForms.containsKey(PluralCategory.OTHER)) {
-                throw new IllegalArgumentException(
-                    "Missing plural category OTHER: " + pluralInfo);
-            }
-
-        	lastOn(stack).add(new PluralItem(unit, parts[1], rules, pluralForms));
-
-        }
-
-        private static void startOptionalSection(List<List<FormatItem>> stack) {
-
-            stack.add(new ArrayList<FormatItem>());
-
-        }
-
-        private static void endOptionalSection(List<List<FormatItem>> stack) {
-
-        	int last = stack.size() - 1;
-
-            if (last < 1) {
-                throw new IllegalArgumentException(
-                    "Closing square bracket without open one.");
-            }
-
-        	List<FormatItem> items = stack.remove(last);
-        	stack.get(last - 1).add(new OptionalSectionItem(items));
-
-        }
-
-        private static List<FormatItem> lastOn(List<List<FormatItem>> stack) {
-
-            return stack.get(stack.size() - 1);
 
         }
 
     }
-
-    private abstract static class FormatItem {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final int reserved;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        FormatItem(int reserved){
-            super();
-
-            this.reserved = reserved;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        boolean isZero(Duration<?> duration) {
-            return true;
-        }
-
-    	abstract void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException;
-
-    	abstract int parse(
-    		Map<Object, Long> unitsToValues,
-    		CharSequence text,
-    		int pos
-    	);
-
-        int getReserved() {
-            return this.reserved;
-        }
-
-        abstract int getMinWidth();
-
-        abstract FormatItem update(int reserved);
-
-    }
-
-    private static class NumberItem
-    	extends FormatItem {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-    	private final int minWidth;
-        private final int maxWidth;
-    	private final IsoUnit unit;
-
-        //~ Konstruktoren -------------------------------------------------
-
-    	private NumberItem(
-            int reserved,
-    		int minWidth,
-            int maxWidth,
-    		IsoUnit unit
-    	) {
-    		super(reserved);
-
-    		if (minWidth < 1 || minWidth > 18) {
-                throw new IllegalArgumentException("Min width out of bounds: " + minWidth);
-            } else if (maxWidth < minWidth) {
-                throw new IllegalArgumentException("Max width smaller than min width.");
-            } else if (maxWidth > 18) {
-                throw new IllegalArgumentException("Max width out of bounds: " + maxWidth);
-    		} else if (unit == null) {
-    			throw new NullPointerException("Missing unit.");
-    		}
-
-    		this.minWidth = minWidth;
-            this.maxWidth = maxWidth;
-    		this.unit = unit;
-
-    	}
-
-        //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-			String num = String.valueOf(duration.getPartialAmount(this.unit));
-
-            if (num.length() > this.maxWidth) {
-                throw new IllegalArgumentException("Too many digits for: " + this.unit + " [" + duration + "]");
-            }
-
-			for (int i = this.minWidth - num.length(); i > 0; i--) {
-				buffer.append('0');
-			}
-
-			buffer.append(num);
-
-		}
-
-		@Override
-		int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-			long total = 0;
-			int pos = start;
-
-			for (int i = start, n = text.length() - this.getReserved(); i < n; i++) {
-				char c = text.charAt(i);
-				if ((c >= '0') && (c <= '9')) {
-					if (i - start >= this.maxWidth) {
-						break;
-					}
-					int digit = (c - '0');
-					total = total * 10 + digit;
-					pos++;
-				} else {
-					break;
-				}
-			}
-
-			if (pos == start) {
-				return ~start; // digits expected
-			}
-
-			Long value = Long.valueOf(total);
-			Object old = unitsToValues.put(this.unit, value);
-
-			if ((old == null) || old.equals(value)) {
-				return pos;
-			} else {
-				return ~start; // ambivalent parsing
-			}
-
-		}
-
-        @Override
-        int getMinWidth() {
-
-            return this.minWidth;
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return new NumberItem(reserved, this.minWidth, this.maxWidth, this.unit);
-
-        }
-
-        @Override
-        boolean isZero(Duration<?> duration) {
-
-            return (this.getAmount(duration) == 0);
-
-        }
-
-        long getAmount(Duration<?> duration) {
-
-            return duration.getPartialAmount(this.unit);
-
-        }
-
-        IsoUnit getUnit() {
-
-            return this.unit;
-
-        }
-
-    }
-
-    private static class FractionItem
-		extends FormatItem {
-
-	    //~ Instanzvariablen ----------------------------------------------
-
-    	private final int width;
-
-	    //~ Konstruktoren -------------------------------------------------
-
-		private FractionItem(
-            int reserved,
-            int width
-        ) {
-			super(reserved);
-
-    		if (width < 1 || width > 9) {
-    			throw new IllegalArgumentException(
-                    "Fraction width out of bounds: " + width);
-    		}
-
-			this.width = width;
-
-		}
-
-	    //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-			String num = String.valueOf(duration.getPartialAmount(NANOS));
-			int len = num.length();
-
-			if (len > 9) {
-				throw new IllegalArgumentException(
-					"Too many nanoseconds, consider normalization: "
-                    + duration);
-			}
-
-			StringBuilder sb = new StringBuilder();
-
-			for (int i = 0; i < 9 - len; i++) {
-				sb.append('0');
-			}
-
-			sb.append(num);
-			buffer.append(sb.toString().substring(0, this.width));
-
-		}
-
-		@Override
-		int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-			StringBuilder fraction = new StringBuilder();
-			int pos = start;
-
-			for (
-                int i = start, n = Math.min(text.length() - this.getReserved(), start + this.width);
-                i < n;
-                i++
-            ) {
-				char c = text.charAt(i);
-				if ((c >= '0') && (c <= '9')) {
-					fraction.append(c);
-					pos++;
-				} else {
-					break;
-				}
-			}
-
-			if (pos == start) {
-				return ~start; // digits expected
-			}
-
-			for (int i = 0, n = pos - start; i < 9 - n; i++) {
-				fraction.append('0');
-			}
-
-			Long value = Long.valueOf(Long.parseLong(fraction.toString()));
-			Object old = unitsToValues.put(NANOS, value);
-
-			if ((old == null) || old.equals(value)) {
-				return pos;
-			} else {
-				return ~start; // ambivalent parsing
-			}
-
-		}
-
-        @Override
-        int getMinWidth() {
-
-            return this.width;
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return new FractionItem(reserved, width);
-
-        }
-
-        @Override
-        boolean isZero(Duration<?> duration) {
-
-            return (duration.getPartialAmount(NANOS) == 0);
-
-        }
-
-	}
-
-    private static class PluralItem
-        extends FormatItem {
-
-	    //~ Instanzvariablen ----------------------------------------------
-
-        private final NumberItem numItem;
-        private final FormatItem sepItem;
-    	private final PluralRules rules;
-    	private final Map<PluralCategory, String> pluralForms;
-        private final int minWidth;
-
-	    //~ Konstruktoren -------------------------------------------------
-
-		private PluralItem(
-            IsoUnit unit,
-            String separator,
-			PluralRules rules,
-			Map<PluralCategory, String> pluralForms
-	    ) {
-			super(0);
-
-            this.numItem = new NumberItem(0, 1, 18, unit);
-            this.sepItem = new LiteralItem(separator, true);
-			this.rules = rules;
-			this.pluralForms = pluralForms;
-
-            int width = Integer.MAX_VALUE;
-
-            for (String s : pluralForms.values()) {
-                if (s.length() < width) {
-                    width = s.length();
-                }
-            }
-
-            this.minWidth = width;
-
-		}
-
-        private PluralItem(
-            int reserved,
-            NumberItem numItem,
-            FormatItem sepItem,
-            PluralRules rules,
-            Map<PluralCategory, String> pluralForms,
-            int minWidth
-        ) {
-            super(reserved);
-
-            this.numItem = numItem;
-            this.sepItem = sepItem;
-            this.rules = rules;
-            this.pluralForms = pluralForms;
-            this.minWidth = minWidth;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-            this.numItem.print(duration, buffer);
-            this.sepItem.print(duration, buffer);
-            PluralCategory category =
-                this.rules.getCategory(this.numItem.getAmount(duration));
-            buffer.append(this.pluralForms.get(category));
-
-        }
-
-        @Override
-        int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int pos
-        ) {
-
-            int start = pos;
-            pos = this.numItem.parse(unitsToValues, text, pos);
-
-            if (pos < 0) {
-                return pos;
-            }
-
-            pos = this.sepItem.parse(unitsToValues, text, pos);
-
-            if (pos < 0) {
-                return pos;
-            }
-
-            long value = unitsToValues.get(this.numItem.getUnit()).longValue();
-            String s = this.pluralForms.get(this.rules.getCategory(value));
-            int n = s.length();
-
-            if (pos + n > text.length() - this.getReserved()) {
-                return ~start;
-            }
-
-            for (int i = 0; i < n; i++) {
-                if (s.charAt(i) != text.charAt(pos + i)) {
-                    return ~start;
-                }
-            }
-
-            return pos + n;
-
-        }
-
-        @Override
-        int getMinWidth() {
-
-            return this.minWidth;
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return new PluralItem(reserved, this.numItem, this.sepItem, this.rules, this.pluralForms, this.minWidth);
-
-        }
-
-        @Override
-        boolean isZero(Duration<?> duration) {
-
-            return this.numItem.isZero(duration);
-
-        }
-
-    }
-
-    private static class SeparatorItem
-		extends FormatItem {
-
-	    //~ Instanzvariablen ----------------------------------------------
-
-    	private final char separator;
-    	private final char alt;
-
-	    //~ Konstruktoren -------------------------------------------------
-
-        private SeparatorItem(
-            char separator,
-            char alt
-        ) {
-            this(0, separator, alt);
-
-        }
-
-		private SeparatorItem(
-            int reserved,
-			char separator,
-			char alt
-	    ) {
-			super(reserved);
-
-			this.separator = separator;
-			this.alt = alt;
-
-		}
-
-	    //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-			buffer.append(this.separator);
-
-		}
-
-		@Override
-		int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-			if (start >= text.length() - this.getReserved()) {
-                return ~start; // end of text
-            }
-
-            char c = text.charAt(start);
-
-            if ((c != this.separator) && (c != this.alt)) {
-				return ~start; // decimal separator expected
-			}
-
-			return start + 1;
-
-		}
-
-        @Override
-        int getMinWidth() {
-
-            return 1;
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return new SeparatorItem(reserved, this.separator, this.alt);
-
-        }
-
-    }
-
-    private static class OrItem
-        extends FormatItem {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final OrItem INSTANCE = new OrItem();
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private OrItem() {
-            super(0);
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        void print(
-            Duration<?> duration,
-            Appendable buffer
-        ) throws IOException {
-
-            // no-op
-
-        }
-
-        @Override
-        int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-            return start;
-
-        }
-
-        @Override
-        int getMinWidth() {
-
-            return 0;
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return this;
-
-        }
-
-    }
-
-    private static class LiteralItem
-		extends FormatItem {
-
-	    //~ Instanzvariablen ----------------------------------------------
-
-		private final String literal;
-
-	    //~ Konstruktoren -------------------------------------------------
-
-		private LiteralItem(String literal) {
-			this(literal, false);
-
-        }
-
-		private LiteralItem(
-            String literal,
-            boolean withEmpty
-        ) {
-			super(0);
-
-			if (!withEmpty && literal.isEmpty()) {
-				throw new IllegalArgumentException("Literal is empty.");
-			}
-
-			this.literal = literal;
-
-		}
-
-        private LiteralItem(
-            int reserved,
-            String literal
-        ) {
-            super(reserved);
-
-            this.literal = literal;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-			buffer.append(this.literal);
-
-		}
-
-		@Override
-		int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-            int end = start + this.literal.length();
-
-            if (end > text.length() - this.getReserved()) {
-                return ~start; // end of line
-            }
-
-            for (int i = start; i < end; i++) {
-                if (text.charAt(i) != this.literal.charAt(i - start)) {
-                    return ~start; // literal expected
-                }
-            }
-
-			return end;
-
-		}
-
-        @Override
-        int getMinWidth() {
-
-            return this.literal.length();
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return new LiteralItem(reserved, this.literal);
-
-        }
-
-    }
-
-    private static class SignItem
-		extends FormatItem {
-
-	    //~ Instanzvariablen ----------------------------------------------
-
-		private final boolean always;
-
-	    //~ Konstruktoren -------------------------------------------------
-
-		private SignItem(boolean always) {
-			super(0);
-
-            this.always = always;
-
-		}
-
-        private SignItem(
-            int reserved,
-            boolean always
-        ) {
-            super(reserved);
-
-            this.always = always;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-            if (this.always) {
-                buffer.append(duration.isNegative() ? '-' : '+');
-            } else if (duration.isNegative()) {
-                buffer.append('-');
-            }
-
-		}
-
-		@Override
-		int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-			if (start >= text.length() - this.getReserved()) {
-                if (this.always) {
-					return ~start; // sign expected
-				} else {
-					Long old = unitsToValues.put(SIGN_KEY, Long.valueOf(1));
-					if ((old != null) && (old.longValue() != 1)) {
-						return ~start; // mixed signs
-					}
-					return start;
-				}
-			}
-
-			char c = text.charAt(start);
-			Long sign = Long.valueOf(1);
-			int ret = start;
-
-            if (this.always) {
-                if (c == '+') {
-                    ret = start + 1;
-                } else if (c == '-') {
-                    sign = Long.valueOf(-1);
-                    ret = start + 1;
-                } else {
-                    return ~start; // sign expected
-                }
-            } else {
-                if (c == '+') {
-                    return ~start; // positive sign not allowed
-                } else if (c == '-') {
-                    sign = Long.valueOf(-1);
-                    ret = start + 1;
-                }
-            }
-
-			Long old = unitsToValues.put(SIGN_KEY, sign);
-
-			if ((old != null) && (old.longValue() != sign.longValue())) {
-				return ~start; // mixed signs
-			}
-
-			return ret;
-
-		}
-
-        @Override
-        int getMinWidth() {
-
-            return (this.always ? 1 : 0);
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            return new SignItem(reserved, this.always);
-
-        }
-
-    }
-
-    private static class OptionalSectionItem
-		extends FormatItem {
-
-	    //~ Instanzvariablen ----------------------------------------------
-
-    	private final List<FormatItem> items;
-
-	    //~ Konstruktoren -------------------------------------------------
-
-    	private OptionalSectionItem(List<FormatItem> items) {
-			super(0);
-
-			if (items.isEmpty()) {
-				throw new IllegalArgumentException(
-                    "Optional section is empty.");
-            } else if ((items.get(0) == OrItem.INSTANCE) || (items.get(items.size() - 1) == OrItem.INSTANCE)) {
-                throw new IllegalArgumentException(
-                    "Optional section must not start or end with an or-operator.");
-			}
-
-			this.items = Collections.unmodifiableList(items);
-
-		}
-
-        //~ Methoden ------------------------------------------------------
-
-		@Override
-		void print(
-    		Duration<?> duration,
-    		Appendable buffer
-    	) throws IOException {
-
-            if (!this.isZero(duration)) {
-                for (FormatItem item : this.items) {
-                    if (item == OrItem.INSTANCE) {
-                        break;
-                    }
-                    item.print(duration, buffer);
-                }
-            }
-
-		}
-
-		@Override
-		int parse(
-            Map<Object, Long> unitsToValues,
-            CharSequence text,
-            int start
-        ) {
-
-            int pos = start;
-            Map<Object, Long> store = new HashMap<Object, Long>();
-
-            for (int i = 0, n = this.items.size(); i < n; i++) {
-                FormatItem item = this.items.get(i);
-
-                if (item == OrItem.INSTANCE) {
-                    break;
-                }
-
-                int reply = item.parse(store, text, pos);
-
-                if (reply < 0) {
-                    int found = -1;
-                    for (int j = i + 1; j < n; j++) {
-                        if (this.items.get(j) == OrItem.INSTANCE) {
-                            found = j;
-                            break;
-                        }
-                    }
-                    if (found == -1) {
-                        return start;
-                    } else {
-                        store.clear();
-                        i = found;
-                    }
-                } else {
-                    pos = reply;
-                }
-            }
-
-            unitsToValues.putAll(store);
-            return pos;
-
-		}
-
-        @Override
-        int getMinWidth() {
-
-            return 0;
-
-        }
-
-        @Override
-        FormatItem update(int reserved) {
-
-            List<FormatItem> tmp = new ArrayList<FormatItem>(this.items);
-            int n = tmp.size();
-
-            for (int i = n - 1; i >= 0; i--) {
-                FormatItem item = tmp.get(i);
-                tmp.set(i, item.update(reserved));
-                reserved += item.getMinWidth();
-            }
-
-            return new OptionalSectionItem(tmp);
-
-        }
-
-        @Override
-        boolean isZero(Duration<?> duration) {
-
-			for (FormatItem item : this.items) {
-                if (!item.isZero(duration)) {
-                    return false;
-                }
-            }
-
-            return true;
-
-        }
-
-	}
 
     private static class Metric<U extends IsoUnit>
         extends AbstractMetric<U, Duration<U>> {

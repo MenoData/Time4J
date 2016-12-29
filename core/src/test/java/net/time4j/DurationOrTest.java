@@ -58,6 +58,11 @@ public class DurationOrTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
+    public void parseEmptyPattern() {
+        Duration.formatter("");
+    }
+
+    @Test(expected=IllegalArgumentException.class)
     public void parsePatternWithStartingOr() {
         Duration.formatter("|{D: :en:ONE=day:OTHER=days}|+hh:mm|{D: :de:ONE=Tag:OTHER=Tage}");
     }
