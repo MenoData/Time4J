@@ -6,6 +6,7 @@ import net.time4j.scale.TimeScale;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -483,6 +484,66 @@ public class MachineTimeTest {
         assertThat(mt.getFraction(), is(1));
         assertThat(m1.plus(mt.getSeconds(), TimeUnit.SECONDS).plus(mt.getFraction(), TimeUnit.NANOSECONDS), is(m2));
         assertThat(m1.plus(mt), is(m2));
+    }
+
+    @Test
+    public void format1() {
+        MachineTime.Formatter f =
+            MachineTime.Formatter.ofPattern("+hh:mm:ss");
+        String s1 = f.format(MachineTime.of(99005, TimeUnit.SECONDS));
+        assertThat(s1, is("+27:30:05"));
+        String s2 = f.format(MachineTime.of(-99005, TimeUnit.SECONDS));
+        assertThat(s2, is("-27:30:05"));
+    }
+
+    @Test
+    public void format2() {
+        MachineTime.Formatter f =
+            MachineTime.Formatter.ofPattern("+D:hh:mm:ss");
+        String s1 = f.format(MachineTime.of(99005, TimeUnit.SECONDS));
+        assertThat(s1, is("+1:03:30:05"));
+        String s2 = f.format(MachineTime.of(-99005, TimeUnit.SECONDS));
+        assertThat(s2, is("-1:03:30:05"));
+    }
+
+    @Test
+    public void format3() {
+        MachineTime.Formatter f =
+            MachineTime.Formatter.ofPattern("+D:#mm:ss");
+        String s1 = f.format(MachineTime.of(99005, TimeUnit.SECONDS));
+        assertThat(s1, is("+1:210:05"));
+        String s2 = f.format(MachineTime.of(-99005, TimeUnit.SECONDS));
+        assertThat(s2, is("-1:210:05"));
+    }
+
+    @Test
+    public void format4() {
+        MachineTime.Formatter f =
+            MachineTime.Formatter.ofPattern("+mm:ss.ffff");
+        String s1 = f.format(MachineTime.ofPosixUnits(65, 123456789));
+        assertThat(s1, is("+01:05.1234"));
+        String s2 = f.format(MachineTime.ofPosixUnits(-65, -123456789));
+        assertThat(s2, is("-01:05.1234"));
+    }
+
+    @Test
+    public void format5() {
+        MachineTime.Formatter f =
+            MachineTime.Formatter.ofPattern("+##s,ffffff");
+        String s1 = f.format(MachineTime.ofPosixUnits(0, 123456789));
+        assertThat(s1, is("+0,123456"));
+        String s2 = f.format(MachineTime.ofPosixUnits(0, -123456789));
+        assertThat(s2, is("-0,123456"));
+    }
+
+    @Test
+    public void parse() throws ParseException {
+        MachineTime.Formatter f =
+            MachineTime.Formatter.ofPattern("+hh:mm:ss");
+        MachineTime<TimeUnit> mt1 = f.parse("+27:30:05");
+        MachineTime<TimeUnit> mt2 = f.parse("-27:30:05");
+        assertThat(mt1, is(MachineTime.of(99005, TimeUnit.SECONDS)));
+        assertThat(mt2, is(MachineTime.of(-99005, TimeUnit.SECONDS)));
     }
 
 }

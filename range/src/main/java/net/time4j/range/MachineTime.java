@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MachineTime.java) is part of project Time4J.
  *
@@ -27,6 +27,8 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.RealTime;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
+import net.time4j.engine.TimeSpan;
+import net.time4j.format.TimeSpanFormatter;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
 
@@ -38,7 +40,11 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.EnumSet;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 import static net.time4j.scale.TimeScale.POSIX;
@@ -159,7 +165,7 @@ public final class MachineTime<U>
             fraction -= MRD;
         }
 
-        this.seconds =  secs;
+        this.seconds = secs;
         this.nanos = fraction;
         this.scale = scale;
 
@@ -1107,6 +1113,506 @@ public final class MachineTime<U>
     }
 
     //~ Innere Klassen ----------------------------------------------------
+
+    /**
+     * <p>Non-localized and user-defined format for machine-time-durations based on a
+     * pattern containing some standard symbols and literals. </p>
+     *
+     * <p>Example (printing a wall-time-like duration): </p>
+     *
+     * <pre>
+     *  MachineTime.Formatter f =
+     *      MachineTime.Formatter.ofPattern("+hh:mm:ss");
+     *  String s = f.print(MachineTime.of(27 * 3600 + 30 * 60 + 5, TimeUnit.SECONDS));
+     *  System.out.println(s); // output: +27:30:05
+     * </pre>
+     *
+     * @see     #ofPattern(String)
+     * @since   3.26/4.22
+     * @doctags.concurrency {immutable}
+     */
+    /*[deutsch]
+     * <p>Nicht-lokalisiertes benutzerdefiniertes Dauerformat, das auf
+     * Symbolmustern beruht. </p>
+     *
+     * <p>Beispiel (Ausgabe einer uhrzeit&auml;hnlichen Dauer): </p>
+     *
+     * <pre>
+     *  MachineTime.Formatter f =
+     *      MachineTime.Formatter.ofPattern("+hh:mm:ss");
+     *  String s = f.print(MachineTime.of(27 * 3600 + 30 * 60 + 5, TimeUnit.SECONDS));
+     *  System.out.println(s); // Ausgabe: +27:30:05
+     * </pre>
+     *
+     * @see     #ofPattern(String)
+     * @since   3.26/4.22
+     * @doctags.concurrency {immutable}
+     */
+    public static final class Formatter
+        extends TimeSpanFormatter<TimeUnit, MachineTime<TimeUnit>> {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Formatter(String pattern) {
+            super(TimeUnit.class, pattern);
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Constructs a new instance of duration formatter. </p>
+         *
+         * <p>Uses a pattern with symbols as followed: <br>&nbsp;</p>
+         *
+         * <table border="1">
+         *  <caption>Legend</caption>
+         *  <tr><th>Symbol</th><th>Description</th></tr>
+         *  <tr><td>+</td><td>sign of duration, printing + or -</td></tr>
+         *  <tr><td>-</td><td>sign of duration, printing only -</td></tr>
+         *  <tr><td>D</td><td>{@link TimeUnit#DAYS}</td></tr>
+         *  <tr><td>h</td><td>{@link TimeUnit#HOURS}</td></tr>
+         *  <tr><td>m</td><td>{@link TimeUnit#MINUTES}</td></tr>
+         *  <tr><td>s</td><td>{@link TimeUnit#SECONDS}</td></tr>
+         *  <tr><td>,</td><td>decimal separator, comma is preferred</td></tr>
+         *  <tr><td>.</td><td>decimal separator, dot is preferred</td></tr>
+         *  <tr><td>f</td>
+         *    <td>{@link TimeUnit#NANOSECONDS} as fraction, (1-9) chars</td></tr>
+         *  <tr><td>'</td><td>apostroph, for escaping literal chars</td></tr>
+         *  <tr><td>[]</td><td>optional section</td></tr>
+         *  <tr><td>{}</td><td>section with plural forms</td></tr>
+         *  <tr><td>#</td><td>placeholder for an optional digit</td></tr>
+         *  <tr><td>|</td><td>joins two parsing sections by or-logic</td></tr>
+         * </table>
+         *
+         * <p>All letters in range a-z and A-Z are always reserved chars
+         * and must be escaped by apostrophes for interpretation as literals.
+         * If such a letter is repeated then the count of symbols controls
+         * the minimum width for formatted output. Such a minimum width also
+         * reserves this area for parsing of any preceding item. If necessary a
+         * number (of units) will be padded from left with the zero digit. The
+         * unit symbol (with exception of &quot;f&quot;) can be preceded by
+         * any count of char &quot;#&quot; (&gt;= 0). The sum of min width and
+         * count of #-chars define the maximum width for formatted output and
+         * parsing. </p>
+         *
+         * <p>Optional sections let the parser be error-tolerant and continue
+         * with the next section in case of errors. During printing,
+         * an optional section will only be printed if there is any non-zero
+         * part. </p>
+         *
+         * <p><strong>Plural forms</strong></p>
+         *
+         * <p>Every expression inside curly brackets represents a combination
+         * of amount, separator and pluralized unit name and has following
+         * syntax: </p>
+         *
+         * <p>{[symbol]:[separator]:[locale]:[CATEGORY=LITERAL][:...]}</p>
+         *
+         * <p>The symbol is one of following chars:
+         * D, h, m, s, f (legend see table above)</p>
+         *
+         * <p>Afterwards the definition of separator chars follows. The
+         * empty separator (represented by zero space between colons) is
+         * permitted, too. The next section denotes the locale necessary
+         * for determination of suitable plural rules. The form
+         * [language]-[country]-[variant] can be used, for example
+         * &quot;en-US&quot; or &quot;en_US&quot;. At least the language
+         * must be present. The underscore is an acceptable alternative
+         * for the minus-sign. Finally there must be a sequence of
+         * name-value-pairs in the form CATEGORY=LITERAL. Every category
+         * label must be the name of a {@link net.time4j.format.PluralCategory plural category}.
+         * The category OTHER must exist. Example: </p>
+         *
+         * <pre>
+         *  MachineTime.Formatter formatter =
+         *      MachineTime.Formatter.ofPattern(&quot;{D: :en:ONE=day:OTHER=days}&quot;);
+         *  String s = formatter.format(MachineTime.of(3, TimeUnit.DAYS));
+         *  System.out.println(s); // output: 3 days
+         * </pre>
+         *
+         * <p><strong>Numerical placeholders</strong></p>
+         *
+         * <p>The maximum numerical width is the sum of min width and the count of preceding #-chars. Example: </p>
+         *
+         * <pre>
+         *  MachineTime.Formatter formatter1 =
+         *      MachineTime.Formatter.ofPattern(&quot;D&quot;);
+         *  formatter1.format(MachineTime.of(123, TimeUnit.DAYS)); throws IllegalArgumentException
+         *
+         *  MachineTime.Formatter formatter2 =
+         *      MachineTime.Formatter.ofPattern(&quot;##D&quot;);
+         *  String s = formatter2.format(MachineTime.of(123, TimeUnit.DAYS));
+         *  System.out.println(s); // output: 123
+         * </pre>
+         *
+         * <p><strong>Or-logic</strong></p>
+         *
+         * <p>The character &quot;|&quot; starts a new section which will not be used for printing
+         * but parsing in case of preceding errors. For example, following pattern enables parsing
+         * a duration in days for two different languages: </p>
+         *
+         * <pre>
+         *  &quot;{D: :en:ONE=day:OTHER=days}|{D: :de:ONE=Tag:OTHER=Tage}&quot;
+         * </pre>
+         *
+         * @param   pattern format pattern
+         * @return  new formatter instance
+         * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
+         */
+        /*[deutsch]
+         * <p>Konstruiert eine neue Formatinstanz. </p>
+         *
+         * <p>Benutzt ein Formatmuster mit Symbolen wie folgt: <br>&nbsp;</p>
+         *
+         * <table border="1">
+         *  <caption>Legende</caption>
+         *  <tr><th>Symbol</th><th>Beschreibung</th></tr>
+         *  <tr><td>+</td><td>Vorzeichen der Dauer, gibt + oder - aus</td></tr>
+         *  <tr><td>-</td><td>Vorzeichen der Dauer, gibt nur - aus</td></tr>
+         *  <tr><td>D</td><td>{@link TimeUnit#DAYS}</td></tr>
+         *  <tr><td>h</td><td>{@link TimeUnit#HOURS}</td></tr>
+         *  <tr><td>m</td><td>{@link TimeUnit#MINUTES}</td></tr>
+         *  <tr><td>s</td><td>{@link TimeUnit#SECONDS}</td></tr>
+         *  <tr><td>,</td><td>Dezimaltrennzeichen, vorzugsweise Komma</td></tr>
+         *  <tr><td>.</td><td>Dezimaltrennzeichen, vorzugsweise Punkt</td></tr>
+         *  <tr><td>f</td>
+         *    <td>{@link TimeUnit#NANOSECONDS} als Bruchteil, (1-9) Zeichen</td></tr>
+         *  <tr><td>'</td><td>Apostroph, zum Markieren von Literalen</td></tr>
+         *  <tr><td>[]</td><td>optionaler Abschnitt</td></tr>
+         *  <tr><td>{}</td><td>Abschnitt mit Pluralformen</td></tr>
+         *  <tr><td>#</td><td>numerischer Platzhalter</td></tr>
+         *  <tr><td>|</td><td>verbindet zwei Abschnitte per oder-Logik</td></tr>
+         * </table>
+         *
+         * <p>Alle Buchstaben im Bereich a-z und A-Z sind grunds&auml;tzlich
+         * reservierte Zeichen und m&uuml;ssen als Literale in Apostrophe
+         * gefasst werden. Wird ein Buchstabensymbol mehrfach wiederholt,
+         * dann regelt die Anzahl der Symbole die Mindestbreite in der formatierten
+         * Ausgabe. Solch eine Mindestbreite reserviert auch das zugeh&ouml;rige Element,
+         * wenn vorangehende Dauerelemente interpretiert werden. Bei Bedarf wird eine
+         * Zahl (von Einheiten) von links mit der Nullziffer aufgef&uuml;llt. Ein
+         * Einheitensymbol kann eine beliebige Zahl von numerischen Platzhaltern
+         * &quot;#&quot; vorangestellt haben (&gt;= 0). Die Summe aus minimaler Breite
+         * und der Anzahl der #-Zeichen definiert die maximale Breite, die ein
+         * Dauerelement numerisch haben darf. </p>
+         *
+         * <p>Optionale Abschnitte regeln, da&szlig; der Interpretationsvorgang
+         * bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
+         * Abschnitt fortsetzt und den fehlerhaften Abschnitt ignoriert. Es
+         * gilt auch, da&szlig; optionale Abschnitte nur dann etwas ausgeben,
+         * wenn es darin irgendeine von {code 0} verschiedene Dauerkomponente gibt. </p>
+         *
+         * <p><strong>Pluralformen</strong></p>
+         *
+         * <p>Jeder in geschweifte Klammern gefasste Ausdruck symbolisiert
+         * eine Kombination aus Betrag, Trennzeichen und pluralisierten
+         * Einheitsnamen und hat folgende Syntax: </p>
+         *
+         * <p>{[symbol]:[separator]:[locale]:[CATEGORY=LITERAL][:...]}</p>
+         *
+         * <p>Das Symbol ist eines von folgenden Zeichen: D, h, m, s, f (Bedeutung siehe Tabelle)</p>
+         *
+         * <p>Danach folgen Trennzeichen, abgetrennt durch einen Doppelpunkt.
+         * Eine leere Zeichenkette ist auch zul&auml;ssig. Danach folgt eine
+         * Lokalisierungsangabe zum Bestimmen der Pluralregeln in der Form
+         * [language]-[country]-[variant], zum Beispiel &quot;de-DE&quot; oder
+         * &quot;en_US&quot;. Mindestens mu&szlig; die Sprache vorhanden sein.
+         * Der Unterstrich wird neben dem Minuszeichen ebenfalls interpretiert.
+         * Schlie&szlig;lich folgt eine Sequenz von Name-Wert-Paaren in
+         * der Form CATEGORY=LITERAL. Jede Kategoriebezeichnung ist der Name
+         * einer {@link PluralCategory Pluralkategorie}. Die Kategorie OTHER
+         * mu&szlig; enthalten sein. Beispiel: </p>
+         *
+         * <pre>
+         *  MachineTime.Formatter formatter =
+         *      MachineTime.Formatter.ofPattern(&quot;{D: :de:ONE=Tag:OTHER=Tage}&quot;);
+         *  String s = formatter.format(MachineTime.of(3, TimeUnit.DAYS));
+         *  System.out.println(s); // output: 3 Tage
+         * </pre>
+         *
+         * <p><strong>Numerische Platzhalter</strong></p>
+         *
+         * <p>Die maximale numerische Breite ist immer die Summe aus minimaler Breite
+         * und der Anzahl der vorangehenden #-Zeichen. Beispiel: </p>
+         *
+         * <pre>
+         *  MachineTime.Formatter formatter1 =
+         *      MachineTime.Formatter.ofPattern(&quot;D&quot;);
+         *  formatter1.format(MachineTime.of(123, TimeUnit.DAYS)); throws IllegalArgumentException
+         *
+         *  MachineTime.Formatter formatter2 =
+         *      MachineTime.Formatter.ofPattern(&quot;##D&quot;);
+         *  String s = formatter2.format(MachineTime.of(123, TimeUnit.DAYS));
+         *  System.out.println(s); // output: 123
+         * </pre>
+         *
+         * <p><strong>oder-Logik</strong></p>
+         *
+         * <p>Das Zeichen &quot;|&quot; beginnt einen neuen Abschnitt, der nicht zur Textausgabe,
+         * aber beim Interpretieren (Parsen) verwendet wird, falls im vorangehenden Abschnitt
+         * Fehler auftraten. Zum Beispiel erm&ouml;glicht folgendes Muster das Interpretieren
+         * einer Dauer in Tagen f&uuml;r zwei verschiedene Sprachen: </p>
+         *
+         * <pre>
+         *  &quot;{D: :en:ONE=day:OTHER=days}|{D: :de:ONE=Tag:OTHER=Tage}&quot;
+         * </pre>
+         *
+         * @param   pattern format pattern
+         * @return  new formatter instance
+         * @throws  IllegalArgumentException in any case of pattern inconsistencies or failures
+         */
+        public static Formatter ofPattern(String pattern) {
+
+            return new Formatter(pattern);
+
+        }
+
+        /**
+         * <p>Creates a textual output of given duration and writes to the buffer. </p>
+         *
+         * <p>Note: This method performs an automatical normalization such that the underlying
+         * format pattern will be respected in every possible way. </p>
+         *
+         * @param   duration	duration object
+         * @param   buffer      I/O-buffer where the result is written to
+         * @throws	IllegalArgumentException if some aspects of duration
+         *          prevents printing (for example too many nanoseconds)
+         * @throws  IOException if writing into buffer fails
+         */
+        /*[deutsch]
+         * <p>Erzeugt eine textuelle Ausgabe der angegebenen Dauer und schreibt sie in den Puffer. </p>
+         *
+         * <p>Hinweis: Diese Methode leistet auch eine automatische Normalisierung derart, da&szlig;
+         * das zugrundeliegende Formatmuster in jeder erdenklichen Weise ber&uuml;cksichtigt wird. </p>
+         *
+         * @param   duration	duration object
+         * @param   buffer      I/O-buffer where the result is written to
+         * @throws	IllegalArgumentException if some aspects of duration
+         *          prevents printing (for example too many nanoseconds)
+         * @throws  IOException if writing into buffer fails
+         */
+        @Override
+        public void print(
+            TimeSpan<? super TimeUnit> duration,
+            Appendable buffer
+        ) throws IOException {
+
+            String p = this.getPattern();
+            int n = p.length();
+            StringBuilder sb = new StringBuilder(n);
+
+            for (int i = 0; i < n; i++) {
+                char c = p.charAt(i);
+
+                if (c == '\'') {
+                    i++;
+                    while (i < n) {
+                        if (p.charAt(i) == '\'') {
+                            if ((i + 1 < n) && (p.charAt(i + 1) == '\'')) {
+                                i++;
+                            } else {
+                                break;
+                            }
+                        }
+                        i++;
+                    }
+                } else {
+                    sb.append(c);
+                }
+            }
+
+            String pattern = sb.toString(); // literals are now stripped off
+            Set<TimeUnit> patternUnits = EnumSet.noneOf(TimeUnit.class);
+
+            if (pattern.contains("D")) {
+                patternUnits.add(TimeUnit.DAYS);
+            }
+            if (pattern.contains("h")) {
+                patternUnits.add(TimeUnit.HOURS);
+            }
+            if (pattern.contains("m")) {
+                patternUnits.add(TimeUnit.MINUTES);
+            }
+            if (pattern.contains("s")) {
+                patternUnits.add(TimeUnit.SECONDS);
+            }
+            if (pattern.contains("f")) {
+                patternUnits.add(TimeUnit.NANOSECONDS);
+            }
+
+            super.print(new Normalized(duration, patternUnits), buffer);
+
+        }
+
+        @Override
+        protected MachineTime<TimeUnit> convert(Map<TimeUnit, Long> map, boolean negative) {
+
+            long seconds = 0L;
+            int nanos = 0;
+
+            if (map.containsKey(TimeUnit.NANOSECONDS)) {
+                nanos = MathUtils.safeCast(map.get(TimeUnit.NANOSECONDS).longValue());
+            }
+
+            for (Map.Entry<TimeUnit, Long> entry : map.entrySet()) {
+                int factor;
+                switch (entry.getKey()) {
+                    case DAYS:
+                        factor = 86400;
+                        break;
+                    case HOURS:
+                        factor = 3600;
+                        break;
+                    case MINUTES:
+                        factor = 60;
+                        break;
+                    case SECONDS:
+                        factor = 1;
+                        break;
+                    default:
+                        continue;
+                }
+                seconds += MathUtils.safeMultiply(entry.getValue().longValue(), factor);
+            }
+
+            if (negative) {
+                seconds = MathUtils.safeNegate(seconds);
+                nanos = -nanos;
+            }
+
+            return MachineTime.ofPosixUnits(seconds, nanos);
+
+        }
+
+        @Override
+        protected TimeUnit getUnit(char symbol) {
+
+            switch (symbol) {
+                case 'D':
+                    return TimeUnit.DAYS;
+                case 'h':
+                    return TimeUnit.HOURS;
+                case 'm':
+                    return TimeUnit.MINUTES;
+                case 's':
+                    return TimeUnit.SECONDS;
+                case 'f':
+                    return TimeUnit.NANOSECONDS;
+                default:
+                    throw new IllegalArgumentException(
+                        "Unsupported pattern symbol: " + symbol);
+            }
+
+        }
+
+    }
+
+    private static class Normalized
+        implements TimeSpan<TimeUnit> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final TimeSpan<? super TimeUnit> duration;
+        private final Set<TimeUnit> patternUnits;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Normalized(
+            TimeSpan<? super TimeUnit> duration,
+            Set<TimeUnit> patternUnits
+        ) {
+            super();
+
+            if (duration == null) {
+                throw new NullPointerException();
+            }
+
+            this.duration = duration;
+            this.patternUnits = patternUnits;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public List<Item<TimeUnit>> getTotalLength() {
+            throw new AssertionError("Never called.");
+        }
+
+        @Override
+        public boolean contains(TimeUnit unit) {
+            return true;
+        }
+
+        @Override
+        public long getPartialAmount(TimeUnit unit) {
+
+            if (unit == TimeUnit.NANOSECONDS) {
+                return this.duration.getPartialAmount(TimeUnit.NANOSECONDS);
+            }
+
+            long days = 0L;
+            long hours = 0L;
+            long minutes = 0L;
+            long seconds = this.duration.getPartialAmount(TimeUnit.SECONDS);
+
+            if (this.patternUnits.contains(TimeUnit.DAYS)) {
+                days = seconds / 86400;
+                seconds -= (days * 86400);
+            }
+
+            if (this.patternUnits.contains(TimeUnit.HOURS)) {
+                hours = seconds / 3600;
+                seconds -= (hours * 3600);
+            }
+
+            if (this.patternUnits.contains(TimeUnit.MINUTES)) {
+                minutes = seconds / 60;
+                seconds -= (minutes * 60);
+            }
+
+            switch (unit) {
+                case DAYS:
+                    return days;
+                case HOURS:
+                    return hours;
+                case MINUTES:
+                    return minutes;
+                case SECONDS:
+                    return seconds;
+                default:
+                    throw new AssertionError("Never called.");
+            }
+
+        }
+
+        @Override
+        public boolean isNegative() {
+            return this.duration.isNegative();
+        }
+
+        @Override
+        public boolean isPositive() {
+            return this.duration.isPositive();
+        }
+
+        @Override
+        public boolean isEmpty() {
+            return this.duration.isEmpty();
+        }
+
+        @Override
+        public <T extends TimePoint<? super TimeUnit, T>> T addTo(T time) {
+            throw new AssertionError("Never called.");
+        }
+
+        @Override
+        public <T extends TimePoint<? super TimeUnit, T>> T subtractFrom(T time) {
+            throw new AssertionError("Never called.");
+        }
+
+    }
 
     private static class Metric<U>
         implements TimeMetric<TimeUnit, MachineTime<U>> {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeSpanFormatter.java) is part of project Time4J.
  *
@@ -644,7 +644,7 @@ public abstract class TimeSpanFormatter<U, S extends TimeSpan<U>> {
             Appendable buffer
         ) throws IOException {
 
-            String num = String.valueOf(duration.getPartialAmount(this.unit));
+            String num = String.valueOf(this.getAmount(duration));
 
             if (num.length() > this.maxWidth) {
                 throw new IllegalArgumentException("Too many digits for: " + this.unit + " [" + duration + "]");
