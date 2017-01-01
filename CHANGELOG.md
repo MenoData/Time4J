@@ -1,5 +1,6 @@
 ## [v3.26] not yet released
 ### Added
+- Add formatting/parsing to class MachineTime [#593]
 - Enable or-logic when parsing durations [#592]
 - Ensure 4 digit-years in date style patterns [#591]
 - Document how to handle wrong platform tz-data on Android [#589]
