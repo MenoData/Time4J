@@ -62,7 +62,7 @@ public class CalendarWeekTest {
     public void currentValue() {
         ZonalClock clock = SystemClock.inLocalView();
         CalendarWeek cw = clock.now(CalendarWeek.chronology());
-        assertThat(cw.getYear(), is(clock.today().getYear()));
+        assertThat(cw.getYear(), is(clock.today().get(PlainDate.YEAR_OF_WEEKDATE)));
         assertThat(cw.getWeek(), is(clock.today().get(CalendarWeek.WEEK_OF_YEAR)));
     }
 
