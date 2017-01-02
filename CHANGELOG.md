@@ -7,6 +7,7 @@
 - Make styled formatters sensible for change of locale [#586]
 
 ### Fixed
+- RFC-1123-formatter must support northamerican zones [#594]
 - MultiFormatParser tolerates trailing characters [#590]
 - BridgeChronology: Some format patterns are not runnable [#588]
 - BridgeChronology: Some formatters cannot be built [#587]
