@@ -228,6 +228,10 @@ public class WeekCalculationTest {
         assertThat(
             hijri.getDayOfWeek(),
             is(expected.getDayOfWeek()));
+        HijriCalendar hijri2 = HijriCalendar.of(HijriAlgorithm.WEST_ISLAMIC_ASTRO, 1436, 12, 29); // Monday
+        assertThat(
+            hijri2.with(CommonElements.weekOfYear(HijriCalendar.family(), model).maximized()),
+            is(HijriCalendar.of(HijriAlgorithm.WEST_ISLAMIC_ASTRO, 1437, 12, 24)));
     }
 
     @Test
