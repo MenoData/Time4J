@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CommonElements.java) is part of project Time4J.
  *
@@ -563,7 +563,13 @@ public class CommonElements {
             int wCurrent = getFirstCalendarWeekAsDay(context, 0);
 
             if (wCurrent <= scaledDay) {
-                int wNext = getFirstCalendarWeekAsDay(context, 1) + getLengthOfYM(context, 0);
+                int wNext =
+                    getFirstCalendarWeekAsDay(context, 1) + getLengthOfYM(context, 0);
+                if (wNext <= scaledDay) { // reference date points to next week cycle
+                    wCurrent = getFirstCalendarWeekAsDay(context, 1);
+                    D corrected = context.with(EpochDays.UTC, context.get(EpochDays.UTC).longValue() + 7);
+                    wNext = getFirstCalendarWeekAsDay(corrected, 1) + getLengthOfYM(context, 1);
+                }
                 return (wNext - wCurrent) / 7;
             } else {
                 int wPrevious = getFirstCalendarWeekAsDay(context, -1);

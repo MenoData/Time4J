@@ -75,6 +75,12 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(1999, 12, 25).get(model.weekOfYear()),
             is(51)); // Samstag
+        assertThat(
+            PlainDate.of(2014, 12, 29).get(model.weekOfYear()),
+            is(1)); // Montag
+        assertThat(
+            PlainDate.of(2016, 1, 1).get(model.weekOfYear()),
+            is(53)); // Freitag
     }
 
     @Test
@@ -134,6 +140,9 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2000, 12, 2).with(model.weekOfYear().maximized()),
             is(PlainDate.of(2000, 12, 30)));
+        assertThat(
+            PlainDate.of(2014, 12, 29).with(model.weekOfYear().maximized()),
+            is(PlainDate.of(2015, 12, 28)));
     }
 
     @Test
@@ -143,6 +152,12 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2000, 12, 2).with(model.weekOfYear().minimized()),
             is(PlainDate.of(2000, 1, 8)));
+        assertThat(
+            PlainDate.of(2016, 1, 1).with(model.weekOfYear().minimized()),
+            is(PlainDate.of(2015, 1, 2)));
+        assertThat(
+            PlainDate.of(2015, 12, 30).with(model.weekOfYear().minimized()),
+            is(PlainDate.of(2014, 12, 31)));
     }
 
     @Test
@@ -200,6 +215,9 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2004, 12, 30).getMaximum(model.weekOfYear()),
             is(53));
+        assertThat(
+            PlainDate.of(2014, 12, 29).getMaximum(model.weekOfYear()),
+            is(53));
     }
 
     @Test
@@ -248,7 +266,7 @@ public class WeekmodelTest {
 
         assertThat(
             PlainDate.of(2000, 12, 31).with(model.weekOfYear().maximized()),
-            is(PlainDate.of(2001, 12, 30)));
+            is(PlainDate.of(2001, 12, 23)));
         assertThat(
             PlainDate.of(2000, 12, 2).with(model.weekOfYear().maximized()),
             is(PlainDate.of(2000, 12, 30)));

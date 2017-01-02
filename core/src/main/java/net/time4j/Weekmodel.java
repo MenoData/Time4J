@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekmodel.java) is part of project Time4J.
  *
@@ -1576,8 +1576,11 @@ public final class Weekmodel
 
             if (wCurrent <= scaledDay) {
                 int wNext =
-                    getFirstCalendarWeekAsDay(date, 1)
-                    + getLengthOfYM(date, 0);
+                    getFirstCalendarWeekAsDay(date, 1) + getLengthOfYM(date, 0);
+                if (wNext <= scaledDay) { // reference date points to next week cycle
+                    wCurrent = getFirstCalendarWeekAsDay(date, 1);
+                    wNext = getFirstCalendarWeekAsDay(date, 2) + getLengthOfYM(date, 1);
+                }
                 return (wNext - wCurrent) / 7;
             } else {
                 int wPrevious = getFirstCalendarWeekAsDay(date, -1);
@@ -1624,6 +1627,9 @@ public final class Weekmodel
                     year--;
                 } else if (month == 13) {
                     month = 1;
+                    year++;
+                } else if (month == 14) {
+                    month = 2;
                     year++;
                 }
 
