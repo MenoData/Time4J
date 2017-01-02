@@ -338,10 +338,22 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void momentFormatterRFC1123() {
+    public void momentFormatterRFC1123() throws ParseException {
         assertThat(
             Moment.formatterRFC1123().format(Moment.UNIX_EPOCH),
             is("Thu, 1 Jan 1970 00:00:00 GMT"));
+        assertThat(
+            Moment.formatterRFC1123().parse("Thu, 1 Jan 1970 00:00:00 GMT"),
+            is(Moment.UNIX_EPOCH));
+        assertThat(
+            Moment.formatterRFC1123().parse("Thu, 1 Jan 1970 00:00:00 UT"),
+            is(Moment.UNIX_EPOCH));
+        assertThat(
+            Moment.formatterRFC1123().parse("Thu, 1 Jan 1970 00:00:00 Z"),
+            is(Moment.UNIX_EPOCH));
+        assertThat(
+            Moment.formatterRFC1123().parse("Wed, 31 Dec 1969 19:00:00 EST"),
+            is(Moment.UNIX_EPOCH));
     }
 
     @Test
