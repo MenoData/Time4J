@@ -7,6 +7,7 @@
 - Make styled formatters sensible for change of locale [#586]
 
 ### Fixed
+- Max-calculation for week-of-year sometimes broken [#595]
 - RFC-1123-formatter must support northamerican zones [#594]
 - MultiFormatParser tolerates trailing characters [#590]
 - BridgeChronology: Some format patterns are not runnable [#588]
