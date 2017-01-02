@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFormatter.java) is part of project Time4J.
  *
@@ -65,9 +65,11 @@ import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.math.BigDecimal;
@@ -79,6 +81,7 @@ import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
@@ -168,6 +171,32 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  */
 public final class ChronoFormatter<T>
     implements ChronoPrinter<T>, ChronoParser<T>, TemporalFormatter<T> {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Special formatter for printing or parsing moments according
+     * to the <a href="https://tools.ietf.org/html/rfc1123">RFC-1123-specification</a>. </p>
+     *
+     * <p>Note: Military timezones with the exception of Z (=UTC) are NOT supported
+     * because the specification had originally given the offset signs in reverse way
+     * from UTC (an error in RFC-822). However, north american timezone names are
+     * supported (EST/EDT/CST/CDT/MST/MDT/PST/PDT). </p>
+     *
+     * @since   3.26/4.22
+     */
+    /*[deutsch]
+     * <p>Spezialformat f&uuml;r die Ausgabe oder Interpretation von {@code Moment}-Objekten
+     * ensprechend der <a href="https://tools.ietf.org/html/rfc1123">RFC-1123-Spezifikation</a>. </p>
+     *
+     * <p>Hinweis: Milit&auml;rische Zeitzonen werden mit Ausnahme von Z (=UTC) NICHT unterst&uuml;tzt,
+     * weil die Spezifikation urspr&uuml;nglich die Zonen-Offsets mit falschem Vorzeichen relativ zu UTC
+     * gez&auml;hlt hat (ein Fehler in RFC-822). Aber: Nordamerikanische Zeitzonennamen werden
+     * unterst&uuml;tzt (EST/EDT/CST/CDT/MST/MDT/PST/PDT). </p>
+     *
+     * @since   3.26/4.22
+     */
+    public static final ChronoFormatter<Moment> RFC_1123 = rfc1123();
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -2564,6 +2593,93 @@ public final class ChronoFormatter<T>
         }
 
         return buffer.toString();
+
+    }
+
+    private static ChronoFormatter<Moment> rfc1123() {
+
+        ChronoFormatter.Builder<Moment> builder = ChronoFormatter.setUp(Moment.class, Locale.ENGLISH);
+        rfc1123DateTime(builder);
+        builder.addTimezoneOffset(
+            DisplayMode.MEDIUM,
+            false,
+            Arrays.asList("GMT", "UT", "Z"));
+
+        builder.or();
+
+        rfc1123DateTime(builder);
+        final Map<String, ZonalOffset> northAmericanZones = new HashMap<String, ZonalOffset>();
+        northAmericanZones.put("EST", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 5));
+        northAmericanZones.put("EDT", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4));
+        northAmericanZones.put("CST", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 6));
+        northAmericanZones.put("CDT", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 5));
+        northAmericanZones.put("MST", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 7));
+        northAmericanZones.put("MDT", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 6));
+        northAmericanZones.put("PST", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 8));
+        northAmericanZones.put("PDT", ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 7));
+        builder.addProcessor(
+            new CustomizedProcessor<TZID>(
+                TimezoneElement.TIMEZONE_OFFSET,
+                new ChronoPrinter<TZID>() {
+                    @Override
+                    public <R> R print(
+                        TZID formattable,
+                        Appendable buffer,
+                        AttributeQuery attributes,
+                        ChronoFunction<ChronoDisplay, R> query
+                    ) throws IOException {
+                        return null;
+                    }
+                },
+                new ChronoParser<TZID>() {
+                    @Override
+                    public TZID parse(CharSequence text, ParseLog status, AttributeQuery attributes) {
+                        int offset = status.getPosition();
+                        if (offset + 3 <= text.length()) {
+                            String key = text.subSequence(offset, offset + 3).toString();
+                            TZID tzid = northAmericanZones.get(key);
+                            if (tzid != null) {
+                                status.setPosition(offset + 3);
+                                return tzid;
+                            } else {
+                                status.setError(offset, "No time zone information found.");
+                            }
+                        }
+                        return null;
+                    }
+                }
+            )
+        );
+
+        return builder.build().withTimezone(ZonalOffset.UTC);
+
+    }
+
+    private static void rfc1123DateTime(ChronoFormatter.Builder<Moment> builder) {
+
+        builder
+            .startOptionalSection()
+            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
+            .addText(PlainDate.DAY_OF_WEEK)
+            .endSection()
+            .addLiteral(", ")
+            .endSection()
+            .addInteger(PlainDate.DAY_OF_MONTH, 1, 2)
+            .addLiteral(' ')
+            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
+            .addText(PlainDate.MONTH_OF_YEAR)
+            .endSection()
+            .addLiteral(' ')
+            .addFixedInteger(PlainDate.YEAR, 4)
+            .addLiteral(' ')
+            .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
+            .addLiteral(':')
+            .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
+            .startOptionalSection()
+            .addLiteral(':')
+            .addFixedInteger(PlainTime.SECOND_OF_MINUTE, 2)
+            .endSection()
+            .addLiteral(' ');
 
     }
 

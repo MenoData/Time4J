@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UltimateFormatEngine.java) is part of project Time4J.
  *
@@ -21,21 +21,13 @@
 
 package net.time4j.i18n;
 
-import net.time4j.Moment;
-import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.TemporalFormatter;
-import net.time4j.format.TextWidth;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.scale.UniversalTime;
-import net.time4j.tz.ZonalOffset;
 
-import java.util.Arrays;
 import java.util.Locale;
 
 
@@ -81,37 +73,7 @@ public final class UltimateFormatEngine
     @Override
     public TemporalFormatter<? extends UniversalTime> createRFC1123() {
 
-        return ChronoFormatter.setUp(Moment.class, Locale.ENGLISH)
-            .startSection(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE)
-            .startOptionalSection()
-            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
-            .addText(PlainDate.DAY_OF_WEEK)
-            .endSection()
-            .addLiteral(", ")
-            .endSection()
-            .addInteger(PlainDate.DAY_OF_MONTH, 1, 2)
-            .addLiteral(' ')
-            .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
-            .addText(PlainDate.MONTH_OF_YEAR)
-            .endSection()
-            .addLiteral(' ')
-            .addFixedInteger(PlainDate.YEAR, 4)
-            .addLiteral(' ')
-            .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
-            .addLiteral(':')
-            .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
-            .startOptionalSection()
-            .addLiteral(':')
-            .addFixedInteger(PlainTime.SECOND_OF_MINUTE, 2)
-            .endSection()
-            .addLiteral(' ')
-            .addTimezoneOffset(
-                DisplayMode.MEDIUM,
-                false,
-                Arrays.asList("GMT", "UT", "Z"))
-            .endSection()
-            .build()
-            .withTimezone(ZonalOffset.UTC);
+        return ChronoFormatter.RFC_1123;
 
     }
 
