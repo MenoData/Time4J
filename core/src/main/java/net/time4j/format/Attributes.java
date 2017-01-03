@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Attributes.java) is part of project Time4J.
  *
@@ -376,20 +376,66 @@ public final class Attributes
         PredefinedKey.valueOf("DECIMAL_SEPARATOR", Character.class);
 
     /**
-     * <p>Determines the pad char to be used if a formatted representation is
+     * <p>Determines the pad char to be used for non-decimal elements if a formatted representation is
      * shorter than specified. </p>
      *
-     * <p>Default value is the space. Numerical elements are not affected
-     * by this attribute because they always use the zero digit as pad char. </p>
+     * <p>This attribute is mainly interesting for text elements. </p>
+     *
+     * <p>Default value is the space. Numerical elements using decimal numbering systems are not affected
+     * by this attribute because they always use the zero digit as pad char. However, other numbering
+     * systems like Roman numbers can be combined with this attribute if a padding instruction is also
+     * defined in the formatter. Example for numerical but non-decimal elements: </p>
+     *
+     * <pre>
+     *     ChronoFormatter&lt;PlainDate&gt; f =
+     *       ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
+     *         .addFixedInteger(PlainDate.YEAR, 4)
+     *         .addLiteral(&#39;-&#39;)
+     *         .padNext(2)
+     *         .addInteger(PlainDate.MONTH_AS_NUMBER, 1, 2)
+     *         .addLiteral(&#39;-&#39;)
+     *         .padNext(2)
+     *         .addInteger(PlainDate.DAY_OF_MONTH, 1, 2)
+     *         .build()
+     *         .with(Attributes.NUMBER_SYSTEM, NumberSystem.DOZENAL) // non-decimal!
+     *         .with(Attributes.PAD_CHAR, '0');
+     *
+     *     assertThat(
+     *       f.format(PlainDate.of(2017, 10, 11)),
+     *       is(&quot;1201-0\u218A-0\u218B&quot;));
+     * </pre>
      */
     /*[deutsch]
-     * <p>Legt das F&uuml;llzeichen in Textelementen fest, das verwendet wird,
+     * <p>Legt das F&uuml;llzeichen in nicht-dezimalen Elementen fest, das verwendet wird,
      * wenn eine formatierte Darstellung k&uuml;rzer als mindestens angegeben
      * ist. </p>
      *
-     * <p>Standardwert ist das Leerzeichen. Numerische Elemente sind hiervon
-     * nicht ber&uuml;hrt, da sie immer die Nullziffer als F&uuml;llzeichen
-     * verwenden. </p>
+     * <p>Dieses Attribut ist vor allem f&uuml;r Textelemente interessant. </p>
+     *
+     * <p>Standardwert ist das Leerzeichen. Numerische Elemente, die das Dezimalsystem verwenden, sind hiervon
+     * nicht ber&uuml;hrt, da sie immer die Nullziffer als F&uuml;llzeichen verwenden. Allerdings k&ouml;nnen
+     * andere Zahlsysteme wie die r&ouml;mischen Zahlen mit diesem Attribut kombiniert werden, soweit der
+     * Formatierer noch eine F&uuml;llzeichenanweisung enth&auml;lt. Beispiel f&uuml;r numerische aber
+     * nicht-dezimale Elemente: </p>
+     *
+     * <pre>
+     *     ChronoFormatter&lt;PlainDate&gt; f =
+     *       ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
+     *         .addFixedInteger(PlainDate.YEAR, 4)
+     *         .addLiteral(&#39;-&#39;)
+     *         .padNext(2)
+     *         .addInteger(PlainDate.MONTH_AS_NUMBER, 1, 2)
+     *         .addLiteral(&#39;-&#39;)
+     *         .padNext(2)
+     *         .addInteger(PlainDate.DAY_OF_MONTH, 1, 2)
+     *         .build()
+     *         .with(Attributes.NUMBER_SYSTEM, NumberSystem.DOZENAL) // nicht dezimal!
+     *         .with(Attributes.PAD_CHAR, '0');
+     *
+     *     assertThat(
+     *       f.format(PlainDate.of(2017, 10, 11)),
+     *       is(&quot;1201-0\u218A-0\u218B&quot;));
+     * </pre>
      */
     public static final AttributeKey<Character> PAD_CHAR =
         PredefinedKey.valueOf("PAD_CHAR", Character.class);

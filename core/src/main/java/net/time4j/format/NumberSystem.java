@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSystem.java) is part of project Time4J.
  *
@@ -21,10 +21,10 @@
 
 package net.time4j.format;
 
-
 import net.time4j.base.MathUtils;
 
 import java.util.Locale;
+
 
 /**
  * <p>Defines the number system. </p>
@@ -184,6 +184,52 @@ public enum NumberSystem {
         @Override
         public boolean isDecimal() {
             return true;
+        }
+    },
+
+    /**
+     * Dozenal numbers describe a 12-based positional numbering system.
+     *
+     * <p>See also <a href="https://en.wikipedia.org/wiki/Duodecimal">Wikipedia</a>.
+     * Note: Must not be negative. </p>
+     *
+     * @since   3.26/4.22
+     */
+    /*[deutsch]
+     * Zw&ouml;lfersystem, das ein Stellenwertsystem zur Zahlendarstellung mit der Basis 12 darstellt.
+     *
+     * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Duodezimalsystem">Wikipedia</a>.
+     * Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.26/4.22
+     */
+    DOZENAL() {
+        @Override
+        public String toNumeral(int number) {
+            if (number < 0) {
+                throw new IllegalArgumentException("Cannot convert: " + number);
+            }
+            return Integer.toString(number, 12).replace('a', '\u218A').replace('b', '\u218B');
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            int result = Integer.parseInt(numeral.replace('\u218A', 'a').replace('\u218B', 'b'), 12);
+            if (result < 0) {
+                throw new NumberFormatException("Cannot convert negative number: " + numeral);
+            }
+            return result;
+        }
+        @Override
+        public boolean contains(char digit) {
+            return ((digit >= '0') && (digit <= '9')) || (digit == '\u218A') || (digit == '\u218B');
+        }
+        @Override
+        public String getDigits() {
+            return "0123456789\u218A\u218B";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
         }
     },
 

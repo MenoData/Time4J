@@ -13,6 +13,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ChronoHierarchyTest.class,
         DayPeriodTest.class,
         DefaultValueTest.class,
+        DozenalNumberTest.class,
         DuplicateElementTest.class,
         FractionTest.class,
         Iso8601FormatTest.class,
