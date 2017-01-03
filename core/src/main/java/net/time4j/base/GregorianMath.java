@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GregorianMath.java) is part of project Time4J.
  *
@@ -77,6 +77,10 @@ public final class GregorianMath {
      * @return  {@code true} if it is a leap year else {@code false}
      */
     public static boolean isLeapYear(int year) {
+
+        if ((year > 1900) && (year < 2100)) {
+            return ((year & 3) == 0);
+        }
 
         return ((year & 3) == 0) && ((year % 100) != 0) || ((year % 400) == 0);
 
