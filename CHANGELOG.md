@@ -1,4 +1,6 @@
-## [v3.26] not yet released
+## [v3.27] not yet released
+
+## [v3.26] published on 2017-01-03
 ### Added
 - Add formatting/parsing to class MachineTime [#593]
 - Enable or-logic when parsing durations [#592]
