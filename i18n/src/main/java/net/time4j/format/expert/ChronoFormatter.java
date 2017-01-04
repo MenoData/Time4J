@@ -692,7 +692,8 @@ public final class ChronoFormatter<T>
         Appendable buffer
     ) throws IOException {
 
-        this.print(formattable, buffer, this.globalAttributes);
+        ChronoDisplay display = this.display(formattable, this.globalAttributes);
+        this.print(display, buffer, this.globalAttributes, false);
 
     }
 
@@ -878,7 +879,7 @@ public final class ChronoFormatter<T>
         if (withPositions) {
             return Collections.unmodifiableSet(positions);
         } else {
-            return Collections.emptySet();
+            return null;
         }
 
     }
