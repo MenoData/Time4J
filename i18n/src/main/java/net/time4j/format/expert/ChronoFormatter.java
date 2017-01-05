@@ -3593,8 +3593,8 @@ public final class ChronoFormatter<T>
          * strict or smart mode (lax) then the parser will always assume
          * {@code minDigits == 0} and {@code maxDigits = 9}. </li></ol>
          *
-         * <p>Note: The argument {@code maxDigits} will only be taken into account
-         * if the arabic number system is used. </p>
+         * <p>Note: The arguments {@code minDigits} and {@code maxDigits} will only be taken into account
+         * if a decimal number system is used. </p>
          *
          * <p>Example: </p>
          * <pre>
@@ -3652,8 +3652,8 @@ public final class ChronoFormatter<T>
          * {@code minDigits == 0} und die Obergrenze von {@code maxDigits = 9}
          * angenommen. </li></ol>
          *
-         * <p>Hinweis: Das Argument {@code maxDigits} wird nur dann ber&uuml;cksichtigt,
-         * wenn das arabische Zahlensystem verwendet wird. </p>
+         * <p>Hinweis: Die Argumente {@code minDigits} und {@code maxDigits} werden nur dann ber&uuml;cksichtigt,
+         * wenn ein dezimales Zahlensystem verwendet wird. </p>
          *
          * <p>Beispiel: </p>
          * <pre>

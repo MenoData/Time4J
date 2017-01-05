@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberProcessor.java) is part of project Time4J.
  *
@@ -198,19 +198,32 @@ class NumberProcessor<V>
                         "Negative value not allowed according to sign policy.");
                 }
             }
-            String digits = Integer.toString(v);
-            int count = digits.length();
+            int count = length(v);
             if (count > this.maxDigits) {
                 throw new IllegalArgumentException(
                     "Element " + this.element.name()
-                        + " cannot be printed as the formatted value " + digits
+                        + " cannot be printed as the formatted value " + v
                         + " exceeds the maximum width of " + this.maxDigits + ".");
             }
             for (int i = 0, n = this.minDigits - count; i < n; i++) {
                 buffer.append('0');
                 printed++;
             }
-            buffer.append(digits);
+            if (count == 2) {
+                appendTwoDigits(v, buffer, '0');
+            } else if (count == 1) {
+                buffer.append((char) (v + 48));
+            } else if (v >= 2000 && v < 2100) {
+                buffer.append('2');
+                buffer.append('0');
+                appendTwoDigits(v - 2000, buffer, '0');
+            } else if (v >= 1900 && v < 2000) {
+                buffer.append('1');
+                buffer.append('9');
+                appendTwoDigits(v - 1900, buffer, '0');
+            } else {
+                buffer.append(Integer.toString(v));
+            }
             printed += count;
         } else if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
             HistorizedElement te = HistorizedElement.class.cast(this.element);
@@ -222,7 +235,10 @@ class NumberProcessor<V>
             char defaultZeroChar = numsys.getDigits().charAt(0);
             Class<V> type = this.element.getType();
             boolean negative = false;
-            String digits;
+            boolean decimal = numsys.isDecimal();
+            String digits = null;
+            int x;
+            int count;
 
             if (type == Integer.class) {
                 int v = formattable.getInt((ChronoElement<Integer>) this.element);
@@ -231,7 +247,8 @@ class NumberProcessor<V>
                         "Format context \"" + formattable + "\" without element: " + this.element);
                 }
                 negative = (v < 0);
-                digits = numsys.toNumeral(Math.abs(v));
+                x = Math.abs(v);
+                count = length(x);
             } else if (type == Long.class) {
                 V value = formattable.get(this.element);
                 long v = Long.class.cast(value).longValue();
@@ -241,6 +258,8 @@ class NumberProcessor<V>
                         ? "9223372036854775808"
                         : Long.toString(Math.abs(v))
                 );
+                x = Integer.MIN_VALUE; // satisfies compiler
+                count = digits.length();
                 defaultZeroChar = '0';
             } else if (Enum.class.isAssignableFrom(type)) {
                 V value = formattable.get(this.element);
@@ -263,21 +282,28 @@ class NumberProcessor<V>
                 if (v == Integer.MIN_VALUE) {
                     throw new IllegalArgumentException("Cannot print: " + this.element);
                 }
-                digits = numsys.toNumeral(Math.abs(v));
+                x = Math.abs(v);
+                count = length(x);
             } else {
                 throw new IllegalArgumentException("Not formattable: " + this.element);
             }
 
-            if (numsys.isDecimal()) {
-                if (zeroChar != defaultZeroChar) {
+            if (decimal) {
+                if (zeroChar != defaultZeroChar) { // rare case
                     int diff = zeroChar - defaultZeroChar;
+                    if (digits == null) {
+                        digits = numsys.toNumeral(x);
+                    }
                     char[] characters = digits.toCharArray();
                     for (int i = 0; i < characters.length; i++) {
                         characters[i] = (char) (characters[i] + diff);
                     }
                     digits = new String(characters);
                 }
-                if (digits.length() > this.maxDigits) {
+                if (count > this.maxDigits) {
+                    if (digits == null) {
+                        digits = numsys.toNumeral(x);
+                    }
                     throw new IllegalArgumentException(
                         "Element " + this.element.name()
                             + " cannot be printed as the formatted value " + digits
@@ -300,7 +326,7 @@ class NumberProcessor<V>
                         printed++;
                         break;
                     case SHOW_WHEN_BIG_NUMBER:
-                        if (digits.length() > this.minDigits) {
+                        if (count > this.minDigits) {
                             buffer.append('+');
                             printed++;
                         }
@@ -310,15 +336,38 @@ class NumberProcessor<V>
                 }
             }
 
-            if (numsys.isDecimal()) {
-                for (int i = 0, n = this.minDigits - digits.length(); i < n; i++) {
+            if (decimal) {
+                for (int i = 0, n = this.minDigits - count; i < n; i++) {
                     buffer.append(zeroChar);
                     printed++;
                 }
             }
 
-            buffer.append(digits);
-            printed += digits.length();
+            if (digits == null) {
+                if (decimal) {
+                    if (count == 2) {
+                        appendTwoDigits(x, buffer, zeroChar);
+                    } else if (count == 1) {
+                        buffer.append((char) (x + zeroChar));
+                    } else if (x >= 2000 && x < 2100) {
+                        buffer.append((char) (2 + zeroChar));
+                        buffer.append(zeroChar);
+                        appendTwoDigits(x - 2000, buffer, zeroChar);
+                    } else if (x >= 1900 && x < 2000) {
+                        buffer.append((char) (1 + zeroChar));
+                        buffer.append((char) (9 + zeroChar));
+                        appendTwoDigits(x - 1900, buffer, zeroChar);
+                    } else {
+                        buffer.append(numsys.toNumeral(x));
+                    }
+                } else {
+                    numsys.toNumeral(x, buffer);
+                }
+            } else {
+                buffer.append(digits);
+            }
+
+            printed += count;
         }
 
         if (
@@ -763,6 +812,32 @@ class NumberProcessor<V>
         } else {
             return Integer.MAX_VALUE;
         }
+
+    }
+
+    private static final int[] THRESHOLDS =
+        { 9, 99, 999, 9999, 99999, 999999, 9999999, 99999999, 999999999, Integer.MAX_VALUE };
+
+    private static int length(int v) {
+
+        assert (v >= 0);
+
+        for (int i = 0; ; i++) {
+            if (v <= THRESHOLDS[i]) return i + 1;
+        }
+
+    }
+
+    private static void appendTwoDigits(
+        int dd, // must consist of two digits only
+        Appendable buffer,
+        char zeroDigit
+    ) throws IOException {
+
+        int q = ((dd * 103) >>> 10);        // q = dd / 10;
+        int r = dd - ((q << 3) + (q << 1)); // r = dd - (q * 10);
+        buffer.append((char) (q + zeroDigit));
+        buffer.append((char) (r + zeroDigit));
 
     }
 
