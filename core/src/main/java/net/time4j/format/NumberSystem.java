@@ -21,6 +21,7 @@
 
 package net.time4j.format;
 
+import java.io.IOException;
 import java.util.Locale;
 
 
@@ -637,6 +638,35 @@ public enum NumberSystem {
         } else {
             throw new IllegalArgumentException("Cannot convert: " + number);
         }
+
+    }
+
+    /**
+     * <p>Converts given integer to a text numeral which will then
+     * be written into buffer. </p>
+     *
+     * @param   number      number to be displayed as text
+     * @param   buffer      the buffer where any formatted number goes to
+     * @throws  IllegalArgumentException if the conversion is not supported for given number
+     * @throws  IOException if writing to the buffer fails
+     * @since   3.27/4.22
+     */
+    /*[deutsch]
+     * <p>Konvertiert die angegebene Zahl zu einem Textnumeral, das
+     * dann in den Puffer geschrieben wird. </p>
+     *
+     * @param   number      number to be displayed as text
+     * @param   buffer      the buffer where any formatted number goes to
+     * @throws  IllegalArgumentException if the conversion is not supported for given number
+     * @throws  IOException if writing to the buffer fails
+     * @since   3.27/4.22
+     */
+    public void toNumeral(
+        int number,
+        Appendable buffer
+    ) throws IOException {
+
+        buffer.append(this.toNumeral(number));
 
     }
 

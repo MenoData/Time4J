@@ -52,6 +52,15 @@ import static org.junit.Assert.fail;
 public class MiscellaneousTest {
 
     @Test
+    public void divisionByTen() {
+        for (int i = 0; i < 100; i++) {
+            int expected = i / 10;
+            int calculated = ((i * 103) >>> 10);
+            assertThat(calculated, is(expected));
+        }
+    }
+
+    @Test
     public void printArabicIndicMicroOfDay() {
         ChronoFormatter<PlainTime> f =
             ChronoFormatter.setUp(PlainTime.axis(), new Locale("en"))
