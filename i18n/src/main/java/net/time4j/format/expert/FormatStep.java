@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatStep.java) is part of project Time4J.
  *
@@ -160,9 +160,17 @@ final class FormatStep {
             return;
         }
 
-        StringBuilder collector = new StringBuilder();
+        StringBuilder collector;
+        int start = -1;
         int offset = -1;
         Set<ElementPosition> posBuf = null;
+
+        if (buffer instanceof StringBuilder) {
+            collector = (StringBuilder) buffer;
+            start = collector.length();
+        } else {
+            collector = new StringBuilder();
+        }
 
         if (
             (buffer instanceof CharSequence)
@@ -174,6 +182,7 @@ final class FormatStep {
 
         boolean strict = this.isStrict(aq);
         char padChar = this.getPadChar(aq);
+        int len = collector.length();
 
         this.processor.print(
             formattable,
@@ -183,7 +192,7 @@ final class FormatStep {
             quickPath
         );
 
-        int len = collector.length();
+        len = collector.length() - len;
         int printed = len;
 
         if (this.padLeft > 0) {
@@ -192,11 +201,17 @@ final class FormatStep {
             }
 
             while (printed < this.padLeft) {
-                buffer.append(padChar);
+                if (start == -1) {
+                    buffer.append(padChar);
+                } else {
+                    collector.insert(start, padChar);
+                }
                 printed++;
             }
 
-            buffer.append(collector);
+            if (start == -1) {
+                buffer.append(collector);
+            }
 
             if (offset != -1) {
                 for (ElementPosition ep : posBuf) {
@@ -223,7 +238,9 @@ final class FormatStep {
                 throw new IllegalArgumentException(this.padExceeded());
             }
 
-            buffer.append(collector);
+            if (start == -1) {
+                buffer.append(collector);
+            }
 
             while (printed < this.padRight) {
                 buffer.append(padChar);

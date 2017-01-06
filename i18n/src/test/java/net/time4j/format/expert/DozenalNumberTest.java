@@ -8,6 +8,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.Locale;
 
@@ -64,6 +65,17 @@ public class DozenalNumberTest {
         assertThat(
             f2.format(LocalDate.of(2017, 10, 11)),
             is("1201-0\u218A-0\u218B"));
+    }
+
+    @Test
+    public void toNumeralWithBuffer() throws IOException {
+        for (int num = 0; num < 20736; num++) {
+            StringBuilder sb = new StringBuilder();
+            String expected = NumberSystem.DOZENAL.toNumeral(num);
+            int count = NumberSystem.DOZENAL.toNumeral(num, sb);
+            assertThat(count, is(expected.length()));
+            assertThat(sb.toString(), is(expected));
+        }
     }
 
 }

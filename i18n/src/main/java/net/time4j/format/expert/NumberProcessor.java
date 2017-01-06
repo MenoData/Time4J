@@ -363,10 +363,11 @@ class NumberProcessor<V>
                         buffer.append(numsys.toNumeral(x));
                     }
                 } else {
-                    numsys.toNumeral(x, buffer);
+                    count = numsys.toNumeral(x, buffer);
                 }
             } else {
                 buffer.append(digits);
+                count = digits.length();
             }
 
             printed += count;
