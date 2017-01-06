@@ -136,14 +136,16 @@ class NumberProcessor<V>
                 "Sign policy must be SHOW_NEVER in fixed-width-mode.");
         }
 
-        int scale = this.getScale(NumberSystem.ARABIC);
+        int scale = this.getScale(numberSystem);
 
-        if (minDigits > scale) {
-            throw new IllegalArgumentException(
-                "Min digits out of range: " + minDigits);
-        } else if (maxDigits > scale) {
-            throw new IllegalArgumentException(
-                "Max digits out of range: " + maxDigits);
+        if (numberSystem.isDecimal()) {
+            if (minDigits > scale) {
+                throw new IllegalArgumentException(
+                    "Min digits out of range: " + minDigits);
+            } else if (maxDigits > scale) {
+                throw new IllegalArgumentException(
+                    "Max digits out of range: " + maxDigits);
+            }
         }
 
         this.yearOfEra = (this.element.name().equals("YEAR_OF_ERA"));
@@ -326,7 +328,7 @@ class NumberProcessor<V>
                         printed++;
                         break;
                     case SHOW_WHEN_BIG_NUMBER:
-                        if (count > this.minDigits) {
+                        if (decimal && (count > this.minDigits)) {
                             buffer.append('+');
                             printed++;
                         }
@@ -462,23 +464,26 @@ class NumberProcessor<V>
         char zeroChar;
         int effectiveMin = 1;
         int effectiveMax;
+        boolean decimal;
 
         if (quickPath) {
             numsys = this.numberSystem;
+            decimal = numsys.isDecimal();
             effectiveMax = this.scaleOfNumsys;
             zeroChar = this.zeroDigit;
         } else {
             numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+            decimal = numsys.isDecimal();
             effectiveMax = this.getScale(numsys);
             zeroChar = (
                 attributes.contains(Attributes.ZERO_DIGIT)
                     ? attributes.get(Attributes.ZERO_DIGIT).charValue()
-                    : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
+                    : (decimal ? numsys.getDigits().charAt(0) : '0'));
         }
 
         Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
-        if (this.fixedWidth || !leniency.isLax()) {
+        if (decimal && (this.fixedWidth || !leniency.isLax())) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
         }
@@ -532,7 +537,7 @@ class NumberProcessor<V>
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
-            if (numsys.isDecimal()) {
+            if (decimal) {
                 for (int i = pos; i < len; i++) {
                     int digit = text.charAt(i) - zeroChar;
 
@@ -559,7 +564,7 @@ class NumberProcessor<V>
         int maxPos = Math.min(len, pos + effectiveMax);
         long total = 0;
 
-        if (numsys.isDecimal()) {
+        if (decimal) {
             while (pos < maxPos) {
                 int digit = text.charAt(pos) - zeroChar;
 
@@ -613,7 +618,7 @@ class NumberProcessor<V>
         } else if (
             (this.signPolicy == SignPolicy.SHOW_WHEN_BIG_NUMBER)
             && leniency.isStrict()
-            && numsys.isDecimal()
+            && decimal
         ) {
             if ((sign == '+') && (pos <= minPos)) {
                 status.setError(
@@ -810,7 +815,7 @@ class NumberProcessor<V>
         if (numsys.isDecimal()) {
             return ((this.element.getType() == Long.class) ? 18 : 9);
         } else {
-            return Integer.MAX_VALUE;
+            return 100; // sufficiently large
         }
 
     }
