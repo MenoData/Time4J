@@ -1,4 +1,7 @@
 ## [v3.27] not yet released
+### Added
+- Reduce buffer allocation when printing numbers [#598]
+
 ### Fixed
 - ChronoFormatter.formatToBuffer() should be optimized [#597]
 
