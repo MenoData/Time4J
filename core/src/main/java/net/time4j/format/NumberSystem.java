@@ -213,6 +213,29 @@ public enum NumberSystem {
             return Integer.toString(number, 12).replace('a', '\u218A').replace('b', '\u218B');
         }
         @Override
+        public int toNumeral(int number, Appendable buffer) throws IOException {
+            if (number >= 0) {
+                int count = 0;
+                for (int i = 1; i <= 4; i++) {
+                    if (number < D_FACTORS[i]) {
+                        count = i;
+                        break;
+                    }
+                }
+                if (count > 0) {
+                    int j = count - 1;
+                    do {
+                        int q = number / D_FACTORS[j];
+                        buffer.append((q == 11) ? '\u218B' : (q == 10 ? '\u218A' : (char) (q + '0')));
+                        number -=  q * D_FACTORS[j];
+                        j--;
+                    } while (j >= 0);
+                    return count;
+                }
+            }
+            return super.toNumeral(number, buffer);
+        }
+        @Override
         public int toInteger(String numeral, Leniency leniency) {
             int result = Integer.parseInt(numeral.replace('\u218A', 'a').replace('\u218B', 'b'), 12);
             if (result < 0) {
@@ -608,6 +631,8 @@ public enum NumberSystem {
     private static final int[] NUMBERS = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     private static final String[] LETTERS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
+    private static final int[] D_FACTORS = {1, 12, 144, 1728, 20736};
+
     //~ Methoden ----------------------------------------------------------
 
     /**
@@ -649,6 +674,7 @@ public enum NumberSystem {
      *
      * @param   number      number to be displayed as text
      * @param   buffer      the buffer where any formatted number goes to
+     * @return  count of characters written to the buffer
      * @throws  IllegalArgumentException if the conversion is not supported for given number
      * @throws  IOException if writing to the buffer fails
      * @since   3.27/4.22
@@ -659,16 +685,19 @@ public enum NumberSystem {
      *
      * @param   number      number to be displayed as text
      * @param   buffer      the buffer where any formatted number goes to
+     * @return  count of characters written to the buffer
      * @throws  IllegalArgumentException if the conversion is not supported for given number
      * @throws  IOException if writing to the buffer fails
      * @since   3.27/4.22
      */
-    public void toNumeral(
+    public int toNumeral(
         int number,
         Appendable buffer
     ) throws IOException {
 
-        buffer.append(this.toNumeral(number));
+        String digits = this.toNumeral(number);
+        buffer.append(digits);
+        return digits.length();
 
     }
 

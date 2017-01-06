@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatProcessor.java) is part of project Time4J.
  *
@@ -52,7 +52,7 @@ interface FormatProcessor<V> {
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  IOException if writing into buffer fails
      */
-    void print(
+    void print( // TODO: return count of printed characters???
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
