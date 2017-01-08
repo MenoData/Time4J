@@ -1,6 +1,6 @@
 ## [v4.23] not yet released
 ### Added
-- Support for Breton (br), Faroese (fo), Western Frisian (fy), Scottish Gaelic (gd), Luxembourgish (lb)
+- Support for Breton (br), Faroese (fo), Western Frisian (fy), Scottish Gaelic (gd), Luxembourgish (lb) [#599]
 - Support for generic timezone names [#491]
 - Reduce buffer allocation when printing numbers [#598]
 
