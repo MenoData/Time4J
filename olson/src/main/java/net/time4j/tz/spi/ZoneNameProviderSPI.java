@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZoneNameProviderSPI.java) is part of project Time4J.
  *
@@ -217,6 +217,7 @@ public class ZoneNameProviderSPI
                 names.put(NameStyle.SHORT_STANDARD_TIME, arr[2]);
                 names.put(NameStyle.LONG_DAYLIGHT_TIME, arr[3]);
                 names.put(NameStyle.SHORT_DAYLIGHT_TIME, arr[4]);
+                // TODO: Wenn Daten verfügbar sind, dann hier einfügen (und NameStyle erweitern)
                 map.put(arr[0], names);
             }
 

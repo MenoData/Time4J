@@ -65,6 +65,7 @@ import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -5236,7 +5237,8 @@ public final class ChronoFormatter<T>
          *
          * <p>Dependent on the current locale, the preferred timezone IDs
          * in a country will be determined first. The parsing of
-         * timezone names is case-sensitive. </p>
+         * timezone names is case-sensitive. Both winter- and summer-time-names
+         * will be processed. </p>
          *
          * <p>Note that Time4J will try to find a unique mapping from names to
          * IDs for US in smart parsing mode. However, this is only an imperfect
@@ -5248,13 +5250,16 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#SHORT_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#SHORT_DAYLIGHT_TIME
          */
         /*[deutsch]
          * <p>F&uuml;gt die Abk&uuml;rzung eines Zeitzonennamens hinzu. </p>
          *
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
          * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
-         * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         * Kleinschreibung der Zeitzonennamen wird beachtet. Sowohl Winter- als
+         * auch Sommerzeitnamen werden verarbeitet. </p>
          *
          * <p>Hinweis: Time4J versucht das Beste, um eine eindeutige Abbildung
          * von Namen auf IDs f&uuml;r die USA im smart-Modus zu finden. Aber
@@ -5266,6 +5271,8 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#SHORT_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#SHORT_DAYLIGHT_TIME
          */
         public Builder<T> addShortTimezoneName() {
 
@@ -5280,7 +5287,8 @@ public final class ChronoFormatter<T>
          *
          * <p>Dependent on the current locale, the preferred timezone IDs
          * in a country will be determined first. The parsing of
-         * timezone names is case-sensitive. </p>
+         * timezone names is case-sensitive. Both winter- and summer-time-names
+         * will be processed. </p>
          *
          * <p>Note that Time4J will try to find a unique mapping from names to
          * IDs for US in smart parsing mode. However, this is only an imperfect
@@ -5292,13 +5300,16 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#LONG_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#LONG_DAYLIGHT_TIME
          */
         /*[deutsch]
          * <p>F&uuml;gt einen langen Zeitzonennamen hinzu. </p>
          *
          * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
          * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
-         * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         * Kleinschreibung der Zeitzonennamen wird beachtet. Sowohl Winter- als
+         * auch Sommerzeitnamen werden verarbeitet. </p>
          *
          * <p>Hinweis: Time4J versucht das Beste, um eine eindeutige Abbildung
          * von Namen auf IDs f&uuml;r die USA im smart-Modus zu finden. Aber
@@ -5311,6 +5322,8 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#LONG_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#LONG_DAYLIGHT_TIME
          */
         public Builder<T> addLongTimezoneName() {
 
@@ -5323,27 +5336,30 @@ public final class ChronoFormatter<T>
         /**
          * <p>Adds a short localized timezone name (an abbreviation in specific non-location format). </p>
          *
-         * <p>Parsing of timezone names is case-sensitive. </p>
+         * <p>Parsing of timezone names is case-sensitive. Both winter- and summer-time-names
+         * will be processed. </p>
          *
-         * @param   preferredZones  preferred timezone ids for resolving
-         *                          duplicates
+         * @param   preferredZones  preferred timezone ids for resolving duplicates
          * @return  this instance for method chaining
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#SHORT_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#SHORT_DAYLIGHT_TIME
          */
         /*[deutsch]
          * <p>F&uuml;gt die Abk&uuml;rzung eines Zeitzonennamens hinzu. </p>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird
-         * beachtet. </p>
+         * beachtet. Sowohl Winter- als auch Sommerzeitnamen werden verarbeitet. </p>
          *
-         * @param   preferredZones  preferred timezone ids for resolving
-         *                          duplicates
+         * @param   preferredZones  preferred timezone ids for resolving duplicates
          * @return  this instance for method chaining
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addLongTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#SHORT_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#SHORT_DAYLIGHT_TIME
          */
         public Builder<T> addShortTimezoneName(Set<TZID> preferredZones) {
 
@@ -5356,32 +5372,102 @@ public final class ChronoFormatter<T>
         /**
          * <p>Adds a long localized timezone name (in specific non-location format). </p>
          *
-         * <p>Parsing of timezone names is case-sensitive. </p>
+         * <p>Parsing of timezone names is case-sensitive. Both winter- and summer-time-names
+         * will be processed. </p>
          *
-         * @param   preferredZones  preferred timezone ids for resolving
-         *                          duplicates
+         * @param   preferredZones  preferred timezone ids for resolving duplicates
          * @return  this instance for method chaining
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#LONG_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#LONG_DAYLIGHT_TIME
          */
         /*[deutsch]
          * <p>F&uuml;gt einen langen Zeitzonennamen hinzu. </p>
          *
          * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird
-         * beachtet. </p>
+         * beachtet. Sowohl Winter- als auch Sommerzeitnamen werden verarbeitet. </p>
          *
-         * @param   preferredZones  preferred timezone ids for resolving
-         *                          duplicates
+         * @param   preferredZones  preferred timezone ids for resolving duplicates
          * @return  this instance for method chaining
          * @throws  IllegalStateException if the underlying chronology does not correspond
          *          to the type {@link net.time4j.base.UnixTime}
          * @see     #addShortTimezoneName(Set)
+         * @see     net.time4j.tz.NameStyle#LONG_STANDARD_TIME
+         * @see     net.time4j.tz.NameStyle#LONG_DAYLIGHT_TIME
          */
         public Builder<T> addLongTimezoneName(Set<TZID> preferredZones) {
 
             this.checkMomentChrono();
             this.addProcessor(new TimezoneNameProcessor(false, preferredZones));
+            return this;
+
+        }
+
+        /**
+         * <p>Adds a localized timezone name in given style. </p>
+         *
+         * <p>Dependent on the current locale, the preferred timezone IDs
+         * in a country will be determined first. The parsing of
+         * timezone names is case-sensitive. </p>
+         *
+         * @param   style       naming style
+         * @return  this instance for method chaining
+         * @see     #addLongTimezoneName()
+         * @see     #addShortTimezoneName()
+         * @since   3.27/4.23
+         */
+        /*[deutsch]
+         * <p>F&uuml;gt einen Zeitzonennamen im angegebenen Stil hinzu. </p>
+         *
+         * <p>Mit Hilfe der aktuellen L&auml;ndereinstellung werden zuerst
+         * die bevorzugten Zeitzonen-IDs bestimmt. Die Gro&szlig;- und
+         * Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         *
+         * @param   style       naming style
+         * @return  this instance for method chaining
+         * @see     #addLongTimezoneName()
+         * @see     #addShortTimezoneName()
+         * @since   3.27/4.23
+         */
+        public Builder<T> addTimezoneName(NameStyle style) {
+
+            this.addProcessor(new TimezoneGenericProcessor(style));
+            return this;
+
+        }
+
+        /**
+         * <p>Adds a localized timezone name in given style. </p>
+         *
+         * <p>The parsing of timezone names is case-sensitive. </p>
+         *
+         * @param   style           naming style
+         * @param   preferredZones  preferred timezone ids for resolving duplicates
+         * @return  this instance for method chaining
+         * @see     #addLongTimezoneName()
+         * @see     #addShortTimezoneName()
+         * @since   3.27/4.23
+         */
+        /*[deutsch]
+         * <p>F&uuml;gt einen Zeitzonennamen im angegebenen Stil hinzu. </p>
+         *
+         * <p>Die Gro&szlig;- und Kleinschreibung der Zeitzonennamen wird beachtet. </p>
+         *
+         * @param   style           naming style
+         * @param   preferredZones  preferred timezone ids for resolving duplicates
+         * @return  this instance for method chaining
+         * @see     #addLongTimezoneName()
+         * @see     #addShortTimezoneName()
+         * @since   3.27/4.23
+         */
+        public Builder<T> addTimezoneName(
+            NameStyle style,
+            Set<TZID> preferredZones
+        ) {
+
+            this.addProcessor(new TimezoneGenericProcessor(style, preferredZones));
             return this;
 
         }

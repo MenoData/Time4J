@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -1208,7 +1208,7 @@ public enum PatternType
             if (ethioHour == null) {
                 throw new IllegalArgumentException("Ethiopian time not available.");
             }
-            addNumber(ethioHour, builder, count, false);
+            addNumber(ethioHour, symbol, builder, count, false);
             return Collections.emptyMap();
         } else {
             return this.cldrISO(builder, locale, symbol, count, false);
@@ -1301,8 +1301,7 @@ public enum PatternType
                 break;
             case 'w':
                 if (count <= 2) {
-                    addNumber(
-                        Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
+                    addNumber(Weekmodel.of(locale).weekOfYear(), symbol, builder, count, sdf);
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters (w): " + count);
@@ -1310,15 +1309,14 @@ public enum PatternType
                 break;
             case 'W':
                 if (count == 1) {
-                    builder.addFixedInteger(
-                        Weekmodel.of(locale).weekOfMonth(), 1);
+                    builder.addFixedInteger(Weekmodel.of(locale).weekOfMonth(), 1);
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters (W): " + count);
                 }
                 break;
             case 'd':
-                addNumber(PlainDate.DAY_OF_MONTH, builder, count, sdf);
+                addNumber(PlainDate.DAY_OF_MONTH, symbol, builder, count, sdf);
                 break;
             case 'D':
                 if (count < 3) {
@@ -1356,7 +1354,7 @@ public enum PatternType
                     width = TextWidth.SHORT;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (E): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(PlainDate.DAY_OF_WEEK);
@@ -1418,22 +1416,22 @@ public enum PatternType
                 builder.endSection();
                 break;
             case 'h':
-                addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, builder, count, sdf);
+                addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, symbol, builder, count, sdf);
                 break;
             case 'H':
-                addNumber(PlainTime.DIGITAL_HOUR_OF_DAY, builder, count, sdf);
+                addNumber(PlainTime.DIGITAL_HOUR_OF_DAY, symbol, builder, count, sdf);
                 break;
             case 'K':
-                addNumber(PlainTime.DIGITAL_HOUR_OF_AMPM, builder, count, sdf);
+                addNumber(PlainTime.DIGITAL_HOUR_OF_AMPM, symbol, builder, count, sdf);
                 break;
             case 'k':
-                addNumber(PlainTime.CLOCK_HOUR_OF_DAY, builder, count, sdf);
+                addNumber(PlainTime.CLOCK_HOUR_OF_DAY, symbol, builder, count, sdf);
                 break;
             case 'm':
-                addNumber(PlainTime.MINUTE_OF_HOUR, builder, count, sdf);
+                addNumber(PlainTime.MINUTE_OF_HOUR, symbol, builder, count, sdf);
                 break;
             case 's':
-                addNumber(PlainTime.SECOND_OF_MINUTE, builder, count, sdf);
+                addNumber(PlainTime.SECOND_OF_MINUTE, symbol, builder, count, sdf);
                 break;
             case 'S':
                 builder.addFraction(
@@ -1497,10 +1495,10 @@ public enum PatternType
                 }
                 break;
             case 'X':
-                addOffset(builder, count, true);
+                addOffset(builder, symbol, count, true);
                 break;
             case 'x':
-                addOffset(builder, count, false);
+                addOffset(builder, symbol, count, false);
                 break;
             default:
                 throw new IllegalArgumentException(
@@ -1546,7 +1544,7 @@ public enum PatternType
                 builder.addFixedInteger(PlainTime.MILLI_OF_SECOND, count);
                 break;
             case 'Z':
-                addOffset(builder, 2, false);
+                addOffset(builder, symbol, 2, false);
                 break;
             case 'b':
             case 'B':
@@ -1566,7 +1564,7 @@ public enum PatternType
             case 'X':
                 if (count >= 4) {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (X): " + count);
                 }
                 return cldrISO(builder, locale, 'X', count, true);
             default:
@@ -1585,7 +1583,7 @@ public enum PatternType
     ) {
 
         if (symbol == 'H') {
-            addNumber(PlainTime.ISO_HOUR, builder, count, false);
+            addNumber(PlainTime.ISO_HOUR, symbol, builder, count, false);
             return Collections.emptyMap();
         }
 
@@ -1595,6 +1593,7 @@ public enum PatternType
 
     private static void addOffset(
         ChronoFormatter.Builder<?> builder,
+        char symbol,
         int count,
         boolean zulu
     ) {
@@ -1632,13 +1631,14 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters (" + symbol + "): " + count);
         }
 
     }
 
     private static void addNumber(
         ChronoElement<Integer> element,
+        char symbol,
         ChronoFormatter.Builder<?> builder,
         int count,
         boolean sdf
@@ -1650,7 +1650,7 @@ public enum PatternType
             builder.addFixedInteger(element, count);
         } else {
             throw new IllegalArgumentException(
-                "Too many pattern letters: " + count);
+                "Too many pattern letters (" + symbol + "): " + count);
         }
 
     }
@@ -1687,7 +1687,7 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters for month: " + count);
         }
 
     }
@@ -1722,7 +1722,7 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters for quarter-of-year: " + count);
         }
 
     }
@@ -1764,7 +1764,7 @@ public enum PatternType
                     eraWidth = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (G): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
                 builder.addText(textElement);
@@ -1805,18 +1805,18 @@ public enum PatternType
                 }
                 break;
             case 'w':
-                addNumber(intElement, builder, count, false);
+                addNumber(intElement, symbol, builder, count, false);
                 break;
             case 'W':
                 if (count == 1) {
                     builder.addFixedInteger(intElement, 1);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (W): " + count);
                 }
                 break;
             case 'd':
-                addNumber(intElement, builder, count, false);
+                addNumber(intElement, symbol, builder, count, false);
                 break;
             case 'D':
                 if (count < 3) {
@@ -1825,7 +1825,7 @@ public enum PatternType
                     builder.addFixedInteger(intElement, count);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (D): " + count);
                 }
                 break;
             case 'E':
@@ -1840,7 +1840,7 @@ public enum PatternType
                     width = TextWidth.SHORT;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (E): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(textElement);
@@ -1963,7 +1963,7 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters for month: " + count);
         }
 
     }
