@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2014-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2014-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NameStyle.java) is part of project Time4J.
  *
@@ -82,7 +82,31 @@ public enum NameStyle {
      *
      * <p>Beispiel: Mitteleurop&auml;ische Sommerzeit </p>
      */
-    LONG_DAYLIGHT_TIME;
+    LONG_DAYLIGHT_TIME,
+
+    /**
+     * <p>Abbreviation without making a difference between winter or summer time. </p>
+     *
+     * @since   4.23
+     */
+    /*[deutsch]
+     * <p>Abk&uuml;rzung, die nicht zwischen Winter- oder Sommerzeit unterscheidet. </p>
+     *
+     * @since   4.23
+     */
+    SHORT_GENERIC_TIME,
+
+    /**
+     * <p>Long name without making a difference between winter or summer time. </p>
+     *
+     * @since   4.23
+     */
+    /*[deutsch]
+     * <p>Langer Name, der nicht zwischen Winter- oder Sommerzeit unterscheidet. </p>
+     *
+     * @since   4.23
+     */
+    LONG_GENERIC_TIME;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -98,10 +122,7 @@ public enum NameStyle {
      */
     public boolean isAbbreviation() {
 
-        return (
-            (this == SHORT_STANDARD_TIME)
-            || (this == SHORT_DAYLIGHT_TIME)
-        );
+        return ((this == SHORT_STANDARD_TIME) || (this == SHORT_DAYLIGHT_TIME) || (this == SHORT_GENERIC_TIME));
 
     }
 
@@ -109,18 +130,19 @@ public enum NameStyle {
      * <p>Does this style denote a daylight saving time? </p>
      *
      * @return  boolean
+     * @see     #SHORT_DAYLIGHT_TIME
+     * @see     #LONG_DAYLIGHT_TIME
      */
     /*[deutsch]
      * <p>Liegt eine Sommerzeitform vor? </p>
      *
      * @return  boolean
+     * @see     #SHORT_DAYLIGHT_TIME
+     * @see     #LONG_DAYLIGHT_TIME
      */
     public boolean isDaylightSaving() {
 
-        return (
-            (this == SHORT_DAYLIGHT_TIME)
-            || (this == LONG_DAYLIGHT_TIME)
-        );
+        return ((this == SHORT_DAYLIGHT_TIME) || (this == LONG_DAYLIGHT_TIME));
 
     }
 

@@ -1,9 +1,11 @@
 package net.time4j.tz.olson;
 
+import net.time4j.PlainTime;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -45,6 +47,50 @@ public class ZoneNameResourceTest {
         assertThat(
             ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 1).getStdFormatPattern(new Locale("no", "NO")),
             is("GMT\u00B1hh:mm")); // was using a dot before cldr-v30
+    }
+
+    @Test
+    public void printTimeWithStdZoneName() {
+        PlainTime time = PlainTime.of(17, 45);
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
+                .addPattern("HH:mm ", PatternType.CLDR)
+                .addTimezoneName(NameStyle.SHORT_STANDARD_TIME)
+                .build()
+                .withTimezone(AMERICA.LOS_ANGELES);
+        assertThat(f.format(time), is("17:45 PST"));
+    }
+
+    @Test
+    public void printTimeWithDaylightZoneName() {
+        PlainTime time = PlainTime.of(17, 45);
+        ChronoFormatter<PlainTime> f =
+            ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
+                .addPattern("HH:mm ", PatternType.CLDR)
+                .addTimezoneName(NameStyle.SHORT_DAYLIGHT_TIME)
+                .build()
+                .withTimezone(AMERICA.LOS_ANGELES);
+        assertThat(f.format(time), is("17:45 PDT"));
+    }
+
+    @Test
+    public void printTimeWithGenericZoneName() {
+        PlainTime time = PlainTime.of(17, 45);
+        ChronoFormatter<PlainTime> f1 =
+            ChronoFormatter.setUp(PlainTime.axis(), Locale.ENGLISH)
+                .addPattern("HH:mm ", PatternType.CLDR)
+                .addTimezoneName(NameStyle.SHORT_GENERIC_TIME)
+                .build()
+                .withTimezone(AMERICA.LOS_ANGELES);
+        assertThat(f1.format(time), is("17:45 PT"));
+        ChronoFormatter<PlainTime> f2 =
+            ChronoFormatter.ofTimePattern("HH:mm z", PatternType.THREETEN, Locale.ENGLISH)
+                .withTimezone(AMERICA.LOS_ANGELES);
+        assertThat(f2.format(time), is("17:45 PT"));
+        ChronoFormatter<PlainTime> f3 =
+            ChronoFormatter.ofTimePattern("HH:mm v", PatternType.CLDR, Locale.ENGLISH)
+                .withTimezone(AMERICA.LOS_ANGELES);
+        assertThat(f3.format(time), is("17:45 PT"));
     }
 
 }

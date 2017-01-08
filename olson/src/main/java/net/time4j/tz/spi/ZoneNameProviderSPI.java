@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZoneNameProviderSPI.java) is part of project Time4J.
  *
@@ -36,6 +36,10 @@ import net.time4j.tz.olson.INDIAN;
 import net.time4j.tz.olson.PACIFIC;
 
 import java.text.DateFormatSymbols;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.zone.ZoneRulesException;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -216,7 +220,26 @@ public class ZoneNameProviderSPI
                 names.put(NameStyle.SHORT_STANDARD_TIME, arr[2]);
                 names.put(NameStyle.LONG_DAYLIGHT_TIME, arr[3]);
                 names.put(NameStyle.SHORT_DAYLIGHT_TIME, arr[4]);
-                map.put(arr[0], names);
+                if (arr.length >= 7) {
+                    names.put(NameStyle.LONG_GENERIC_TIME, arr[5]); // data introduced in Java-8
+                    names.put(NameStyle.SHORT_GENERIC_TIME, arr[6]);  // data introduced in Java-8
+                } else { // before 8u60
+                    try {
+                        ZoneId zoneId = ZoneId.of(arr[0]);
+                        DateTimeFormatter threetenLong =
+                            DateTimeFormatter.ofPattern("zzzz", locale).withZone(zoneId);
+                        DateTimeFormatter threetenShort =
+                            DateTimeFormatter.ofPattern("z", locale).withZone(zoneId);
+                        String s1 = threetenLong.format(LocalDate.MAX);
+                        String s2 = threetenShort.format(LocalDate.MAX);
+                        names.put(NameStyle.LONG_GENERIC_TIME, s1);
+                        names.put(NameStyle.SHORT_GENERIC_TIME, s2);
+                    } catch (ZoneRulesException ex) {
+                        names.put(NameStyle.LONG_GENERIC_TIME, "");
+                        names.put(NameStyle.SHORT_GENERIC_TIME, "");
+                    }
+                }
+                map.put(arr[0], names); // tz-id
             }
 
             Map<String, Map<NameStyle, String>> old = NAMES.putIfAbsent(locale, map);

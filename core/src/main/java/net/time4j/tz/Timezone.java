@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Timezone.java) is part of project Time4J.
  *
@@ -1870,6 +1870,7 @@ public abstract class Timezone
                 return "";
             }
 
+            // Note: There is no official API for querying the generic zone names
             java.util.TimeZone tz = PlatformTimezone.findZone(tzid);
 
             if (tz.getID().equals(tzid)) {

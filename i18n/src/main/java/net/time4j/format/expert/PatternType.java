@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -44,6 +44,7 @@ import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistorizedElement;
 import net.time4j.i18n.UltimateFormatEngine;
+import net.time4j.tz.NameStyle;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -299,6 +300,13 @@ public enum PatternType
      *      attribute {@link Attributes#NO_GMT_PREFIX}. See also
      *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()}
      *      or its short counter part. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>GENERIC_TIMEZONE_NAME</td>
+     *      <td>v</td>
+     *      <td>One symbol for the abbreviation or 4 symbols for the long
+     *      variant. The generic non-location format will be used,
+     *      for example &quot;Pacific Time&quot; (PT). </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_ID</td>
@@ -571,6 +579,13 @@ public enum PatternType
      *      {@link Attributes#NO_GMT_PREFIX} unterdr&uuml;ckt werden. Siehe auch
      *      {@link ChronoFormatter.Builder#addLongLocalizedOffset()} oder
      *      sein kurzes Gegenst&uuml;ck. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>GENERIC_TIMEZONE_NAME</td>
+     *      <td>v</td>
+     *      <td>1 Symbol f&uuml;r die Kurzform, 4 Symbole f&uuml;r den
+     *      langen Zeitzonennamen. Es wird das <i>generic non-location format</i> verwendet,
+     *      zum Beispiel &quot;Pacific Time&quot; (PT). </td>
      *  </tr>
      *  <tr>
      *      <td>TIMEZONE_ID</td>
@@ -922,6 +937,12 @@ public enum PatternType
      *      <td>p</td>
      *      <td>No CLDR-equivalent. </td>
      *  </tr>
+     *  <tr>
+     *      <td>TIMEZONE_NAME</td>
+     *      <td>z</td>
+     *      <td>Similar to CLDR but if applied on &quot;local&quot; types
+     *      then it behaves like symbol &quot;v&quot; (generic location format). </td>
+     *  </tr>
      * </table>
      * </div>
      *
@@ -1029,6 +1050,12 @@ public enum PatternType
      *      <td>Kein CLDR-&Auml;quivalent. </td>
      *  </tr>
      * </table>
+     *  <tr>
+     *      <td>TIMEZONE_NAME</td>
+     *      <td>z</td>
+     *      <td>&Auml;hnlich wie in CLDR. Aber wenn das Symbol auf &quot;lokale&quot; Typen angewandt wird,
+     *      dann ver&auml;lt es sich wie das CLDR-Symbol &quot;v&quot; (<i>generic location format</i>. </td>
+     *  </tr>
      * </div>
      *
      * @since   4.0
@@ -1456,7 +1483,7 @@ public enum PatternType
             if (ethioHour == null) {
                 throw new IllegalArgumentException("Ethiopian time not available.");
             }
-            addNumber(ethioHour, builder, count, false);
+            addNumber(ethioHour, symbol, builder, count, false);
             return Collections.emptyMap();
         } else {
             return this.cldrISO(builder, locale, symbol, count, false);
@@ -1549,7 +1576,7 @@ public enum PatternType
             case 'w':
                 if (count <= 2) {
                     addNumber(
-                        Weekmodel.of(locale).weekOfYear(), builder, count, sdf);
+                        Weekmodel.of(locale).weekOfYear(), symbol, builder, count, sdf);
                 } else {
                     throw new IllegalArgumentException(
                         "Too many pattern letters (w): " + count);
@@ -1565,7 +1592,7 @@ public enum PatternType
                 }
                 break;
             case 'd':
-                addNumber(PlainDate.DAY_OF_MONTH, builder, count, sdf);
+                addNumber(PlainDate.DAY_OF_MONTH, symbol, builder, count, sdf);
                 break;
             case 'D':
                 if (count < 3) {
@@ -1603,7 +1630,7 @@ public enum PatternType
                     width = TextWidth.SHORT;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (E): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(PlainDate.DAY_OF_WEEK);
@@ -1664,22 +1691,22 @@ public enum PatternType
                 builder.endSection();
                 break;
             case 'h':
-                addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, builder, count, sdf);
+                addNumber(PlainTime.CLOCK_HOUR_OF_AMPM, symbol, builder, count, sdf);
                 break;
             case 'H':
-                addNumber(PlainTime.DIGITAL_HOUR_OF_DAY, builder, count, sdf);
+                addNumber(PlainTime.DIGITAL_HOUR_OF_DAY, symbol, builder, count, sdf);
                 break;
             case 'K':
-                addNumber(PlainTime.DIGITAL_HOUR_OF_AMPM, builder, count, sdf);
+                addNumber(PlainTime.DIGITAL_HOUR_OF_AMPM, symbol, builder, count, sdf);
                 break;
             case 'k':
-                addNumber(PlainTime.CLOCK_HOUR_OF_DAY, builder, count, sdf);
+                addNumber(PlainTime.CLOCK_HOUR_OF_DAY, symbol, builder, count, sdf);
                 break;
             case 'm':
-                addNumber(PlainTime.MINUTE_OF_HOUR, builder, count, sdf);
+                addNumber(PlainTime.MINUTE_OF_HOUR, symbol, builder, count, sdf);
                 break;
             case 's':
-                addNumber(PlainTime.SECOND_OF_MINUTE, builder, count, sdf);
+                addNumber(PlainTime.SECOND_OF_MINUTE, symbol, builder, count, sdf);
                 break;
             case 'S':
                 builder.addFraction(
@@ -1727,7 +1754,17 @@ public enum PatternType
                     builder.addLongLocalizedOffset();
                 } else {
                     throw new IllegalArgumentException(
-                        "Count of pattern letters is not 1 or 4: " + count);
+                        "Count of pattern letters O is not 1 or 4: " + count);
+                }
+                break;
+            case 'v':
+                if (count == 1) {
+                    builder.addTimezoneName(NameStyle.SHORT_GENERIC_TIME);
+                } else if (count == 4) {
+                    builder.addTimezoneName(NameStyle.LONG_GENERIC_TIME);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Count of pattern letters v is not 1 or 4: " + count);
                 }
                 break;
             case 'V':
@@ -1739,14 +1776,14 @@ public enum PatternType
                     }
                 } else {
                     throw new IllegalArgumentException(
-                        "Count of pattern letters is not 2: " + count);
+                        "Count of pattern letters V is not 2: " + count);
                 }
                 break;
             case 'X':
-                addOffset(builder, count, true);
+                addOffset(builder, symbol, count, true);
                 break;
             case 'x':
-                addOffset(builder, count, false);
+                addOffset(builder, symbol, count, false);
                 break;
             default:
                 throw new IllegalArgumentException(
@@ -1792,7 +1829,7 @@ public enum PatternType
                 builder.addFixedInteger(PlainTime.MILLI_OF_SECOND, count);
                 break;
             case 'Z':
-                addOffset(builder, 2, false);
+                addOffset(builder, symbol, 2, false);
                 break;
             case 'b':
             case 'B':
@@ -1803,6 +1840,7 @@ public enum PatternType
             case 'e':
             case 'c':
             case 'O':
+            case 'v':
             case 'V':
             case 'x':
                 throw new IllegalArgumentException(
@@ -1812,7 +1850,7 @@ public enum PatternType
             case 'X':
                 if (count >= 4) {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (X): " + count);
                 }
                 return cldrISO(builder, locale, 'X', count, true);
             default:
@@ -1841,7 +1879,7 @@ public enum PatternType
                     eraWidth = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (G): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
                 ChronoHistory history = ChronoHistory.PROLEPTIC_GREGORIAN;
@@ -1889,7 +1927,7 @@ public enum PatternType
                         Weekmodel.of(locale).boundedWeekOfMonth(), 1);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (W): " + count);
                 }
                 break;
             case 'E':
@@ -1902,7 +1940,7 @@ public enum PatternType
                     width = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (E): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(PlainDate.DAY_OF_WEEK);
@@ -1959,8 +1997,17 @@ public enum PatternType
                 builder.addLongNumber(PlainTime.NANO_OF_DAY, count, 18, SignPolicy.SHOW_NEVER);
                 break;
             case 'z':
-                // TODO: if we are going to support "v" in CLDR then we should use that for zoneless types
-                return cldrISO(builder, locale, 'z', count, false);
+                if (ChronoFormatter.hasUnixChronology(builder.getChronology())) {
+                    return cldrISO(builder, locale, 'z', count, false);
+                } else if (count <= 3) {
+                    builder.addTimezoneName(NameStyle.SHORT_GENERIC_TIME);
+                } else if (count == 4) {
+                    builder.addTimezoneName(NameStyle.LONG_GENERIC_TIME);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters (z): " + count);
+                }
+                break;
             case 'Z':
                 if (count < 4) {
                     builder.addTimezoneOffset(
@@ -1976,7 +2023,7 @@ public enum PatternType
                         Collections.singletonList("Z"));
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (Z): " + count);
                 }
                 break;
             case 'O':
@@ -2004,7 +2051,7 @@ public enum PatternType
     ) {
 
         if (symbol == 'H') {
-            addNumber(PlainTime.ISO_HOUR, builder, count, false);
+            addNumber(PlainTime.ISO_HOUR, symbol, builder, count, false);
             return Collections.emptyMap();
         }
 
@@ -2014,6 +2061,7 @@ public enum PatternType
 
     private static void addOffset(
         ChronoFormatter.Builder<?> builder,
+        char symbol,
         int count,
         boolean zulu
     ) {
@@ -2051,13 +2099,14 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters (" + symbol + "): " + count);
         }
 
     }
 
     private static void addNumber(
         ChronoElement<Integer> element,
+        char symbol,
         ChronoFormatter.Builder<?> builder,
         int count,
         boolean sdf
@@ -2069,7 +2118,7 @@ public enum PatternType
             builder.addFixedInteger(element, count);
         } else {
             throw new IllegalArgumentException(
-                "Too many pattern letters: " + count);
+                "Too many pattern letters (" + symbol + "): " + count);
         }
 
     }
@@ -2106,7 +2155,7 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters for month: " + count);
         }
 
     }
@@ -2141,7 +2190,7 @@ public enum PatternType
                 break;
             default:
                 throw new IllegalArgumentException(
-                    "Too many pattern letters: " + count);
+                    "Too many pattern letters for quarter-of-year: " + count);
         }
 
     }
@@ -2183,7 +2232,7 @@ public enum PatternType
                     eraWidth = TextWidth.NARROW;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (G): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, eraWidth);
                 builder.addText(textElement);
@@ -2224,18 +2273,18 @@ public enum PatternType
                 }
                 break;
             case 'w':
-                addNumber(intElement, builder, count, false);
+                addNumber(intElement, symbol, builder, count, false);
                 break;
             case 'W':
                 if (count == 1) {
                     builder.addFixedInteger(intElement, 1);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (W): " + count);
                 }
                 break;
             case 'd':
-                addNumber(intElement, builder, count, false);
+                addNumber(intElement, symbol, builder, count, false);
                 break;
             case 'D':
                 if (count < 3) {
@@ -2244,7 +2293,7 @@ public enum PatternType
                     builder.addFixedInteger(intElement, count);
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (D): " + count);
                 }
                 break;
             case 'E':
@@ -2259,7 +2308,7 @@ public enum PatternType
                     width = TextWidth.SHORT;
                 } else {
                     throw new IllegalArgumentException(
-                        "Too many pattern letters: " + count);
+                        "Too many pattern letters (E): " + count);
                 }
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(textElement);
@@ -2447,7 +2496,7 @@ public enum PatternType
                 builder.endSection();
                 break;
             default:
-                throw new IllegalArgumentException("Too many pattern letters: " + count);
+                throw new IllegalArgumentException("Too many pattern letters for month: " + count);
         }
 
     }
