@@ -1,5 +1,6 @@
 ## [v4.23] not yet released
 ### Added
+- Support for generic timezone names [#491]
 - Reduce buffer allocation when printing numbers [#598]
 
 ### Fixed
