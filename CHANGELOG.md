@@ -1,4 +1,6 @@
-## [v4.23] not yet released
+## [v4.24] not yet released
+
+## [v4.23] published on 2017-01-08
 ### Added
 - Support for Breton (br), Faroese (fo), Western Frisian (fy), Scottish Gaelic (gd), Luxembourgish (lb) [#599]
 - Support for generic timezone names [#491]
