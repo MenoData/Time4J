@@ -1,4 +1,6 @@
 ## [v4.24] not yet released
+### Changed
+- Adjust leap second expiry date [#601]
 
 ## [v4.23] published on 2017-01-08
 ### Added
