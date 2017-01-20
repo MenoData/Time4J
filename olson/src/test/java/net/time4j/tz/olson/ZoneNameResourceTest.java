@@ -1,15 +1,20 @@
 package net.time4j.tz.olson;
 
+import net.time4j.Moment;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 
+import java.text.ParseException;
+import java.util.Collections;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -71,6 +76,91 @@ public class ZoneNameResourceTest {
                 .build()
                 .withTimezone(AMERICA.LOS_ANGELES);
         assertThat(f.format(time), is("17:45 PDT"));
+    }
+
+    @Test
+    public void parseISTWithBuiltInAndExtraPreference() throws ParseException {
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss ", PatternType.CLDR)
+                .addShortTimezoneName(Collections.<TZID>singleton(ASIA.KOLKATA))
+                .addPattern(" yyyy", PatternType.CLDR)
+                .build();
+        String input = "Dec 31 07:30:00 IST 2016";
+        assertThat(
+            f.parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 2, 0).atUTC()));
+        assertThat(
+            f.withTimezone(ZonalOffset.UTC).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 2, 0).atUTC()));
+        assertThat(
+            f.withTimezone(ASIA.JERUSALEM).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 5, 30).atUTC()));
+        assertThat(
+            f.withTimezone(ASIA.KOLKATA).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 2, 0).atUTC()));
+        assertThat(
+            f.withTimezone(EUROPE.DUBLIN).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 7, 30).atUTC()));
+    }
+
+    @Test
+    public void parseISTWithExtraPreference() throws ParseException {
+        String input = "Dec 31 07:30:00 IST 2016";
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss z yyyy", PatternType.CLDR)
+                .build();
+        assertThat(
+            f.withTimezone(ASIA.JERUSALEM).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 5, 30).atUTC()));
+        assertThat(
+            f.withTimezone(ASIA.KOLKATA).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 2, 0).atUTC()));
+        assertThat(
+            f.withTimezone(EUROPE.DUBLIN).parse(input),
+            is(PlainTimestamp.of(2016, 12, 31, 7, 30).atUTC()));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseISTWithOffsetPreference() throws ParseException {
+        String input = "Dec 31 07:30:00 IST 2016";
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss z yyyy", PatternType.CLDR)
+                .build();
+        f.withTimezone(ZonalOffset.UTC).parse(input);
+    }
+
+    @Test
+    public void parseIDTWithExtraPreference() throws ParseException {
+        String input = "Jun 30 07:30:00 IDT 2016";
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss z yyyy", PatternType.CLDR)
+                .build();
+        assertThat(
+            f.withTimezone(ASIA.JERUSALEM).parse(input),
+            is(PlainTimestamp.of(2016, 6, 30, 4, 30).atUTC()));
+        assertThat(
+            f.withTimezone(ASIA.KOLKATA).parse(input),
+            is(PlainTimestamp.of(2016, 6, 30, 2, 0).atUTC()));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseIDTWithEirePreference() throws ParseException {
+        String input = "Jun 30 07:30:00 IDT 2016";
+//        System.out.println(Timezone.of(EUROPE.DUBLIN).getDisplayName(NameStyle.SHORT_STANDARD_TIME, Locale.ENGLISH));
+//        System.out.println(Timezone.of(EUROPE.DUBLIN).getDisplayName(NameStyle.SHORT_DAYLIGHT_TIME, Locale.ENGLISH));
+//        System.out.println(Timezone.of(EUROPE.DUBLIN).getDisplayName(NameStyle.SHORT_GENERIC_TIME, Locale.ENGLISH));
+//        System.out.println(Timezone.of(EUROPE.DUBLIN).getDisplayName(NameStyle.LONG_STANDARD_TIME, Locale.ENGLISH));
+//        System.out.println(Timezone.of(EUROPE.DUBLIN).getDisplayName(NameStyle.LONG_DAYLIGHT_TIME, Locale.ENGLISH));
+//        System.out.println(Timezone.of(EUROPE.DUBLIN).getDisplayName(NameStyle.LONG_GENERIC_TIME, Locale.ENGLISH));
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss z yyyy", PatternType.CLDR)
+                .build();
+        f.withTimezone(EUROPE.DUBLIN).parse(input);
     }
 
 }
