@@ -1,4 +1,7 @@
 ## [v3.28] not yet released
+### Added
+- Make parsing of ambivalent zone informations easier [#603]
+
 ### Changed
 - Adjust leap second expiry date [#601]
 
