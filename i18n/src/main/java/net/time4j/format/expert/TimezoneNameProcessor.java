@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneNameProcessor.java) is part of project Time4J.
  *
@@ -293,11 +293,36 @@ final class TimezoneNameProcessor
         List<TZID> dstZonesOriginal = dstZones;
 
         if ((sum > 1) && !leniency.isLax()) {
-            if (stdZones.size() > 0) {
-                stdZones = this.resolveUsingPreferred(stdZones, lang, leniency);
+            TZID pref = attributes.get(Attributes.TIMEZONE_ID, ZonalOffset.UTC);
+            boolean resolved = false;
+            if (!(pref instanceof ZonalOffset)) {
+                for (TZID tzid : stdZones) {
+                    if (tzid.canonical().equals(pref.canonical())) {
+                        stdZones = Collections.singletonList(tzid);
+                        dstZones = Collections.emptyList();
+                        resolved = true;
+                        break;
+                    }
+                }
+                if (!resolved) {
+                    for (TZID tzid : dstZones) {
+                        if (tzid.canonical().equals(pref.canonical())) {
+                            stdZones = Collections.emptyList();
+                            dstZones = new ArrayList<TZID>();
+                            dstZones.add(tzid);
+                            resolved = true;
+                            break;
+                        }
+                    }
+                }
             }
-            if (dstZones.size() > 0) {
-                dstZones = this.resolveUsingPreferred(dstZones, lang, leniency);
+            if (!resolved) {
+                if (stdZones.size() > 0) {
+                    stdZones = this.resolveUsingPreferred(stdZones, lang, leniency);
+                }
+                if (dstZones.size() > 0) {
+                    dstZones = this.resolveUsingPreferred(dstZones, lang, leniency);
+                }
             }
         }
 

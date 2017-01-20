@@ -285,8 +285,21 @@ final class TimezoneGenericProcessor
         List<TZID> genericZonesOriginal = genericZones;
 
         if ((sum > 1) && !leniency.isLax()) {
-            if (genericZones.size() > 0) {
+            TZID pref = attributes.get(Attributes.TIMEZONE_ID, ZonalOffset.UTC);
+            if (pref instanceof ZonalOffset) {
                 genericZones = this.resolveUsingPreferred(genericZones, lang, leniency);
+            } else {
+                boolean resolved = false;
+                for (TZID tzid : genericZones) {
+                    if (tzid.canonical().equals(pref.canonical())) {
+                        genericZones = Collections.singletonList(tzid);
+                        resolved = true;
+                        break;
+                    }
+                }
+                if (!resolved) {
+                    genericZones = this.resolveUsingPreferred(genericZones, lang, leniency);
+                }
             }
         }
 

@@ -1329,8 +1329,21 @@ public final class ChronoFormatter<T>
      * <p>The timezone is in most cases only relevant for the type
      * {@link net.time4j.Moment}. When formatting the timezone helps
      * to convert the UTC value into a zonal representation. When
-     * parsing the timezone serves as replacement value if the formatted
-     * text does not contain any timezone. </p>
+     * parsing the timezone serves either as replacement value if the formatted
+     * text does not contain any timezone. Or it helps to resolve possibly ambivalent
+     * zone informations. Example: </p>
+     *
+     * <pre>
+     *     // IST might also be Dublin/Ireland or Kolkata/India
+     *     String input = &quot;Dec 31 07:30:00 IST 2016&quot;;
+     *     ChronoFormatter&lt;Moment&gt; f =
+     *       ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+     *       .addPattern(&quot;MMM dd HH:mm:ss z yyyy&quot;, PatternType.CLDR)
+     *       .build();
+     *     assertThat(
+     *       f.withTimezone(ASIA.JERUSALEM).parse(input), // preference for Israel Time set
+     *       is(PlainTimestamp.of(2016, 12, 31, 5, 30).atUTC()));
+     * </pre>
      *
      * @param   tz      timezone
      * @return  changed copy with the new or changed timezone while this instance remains unaffected
@@ -1345,9 +1358,22 @@ public final class ChronoFormatter<T>
      *
      * <p>Die Zeitzone ist nur f&uuml;r den Typ {@link net.time4j.Moment}
      * von Bedeutung. Beim Formatieren wandelt sie die UTC-Darstellung in
-     * eine zonale Repr&auml;sentation um. Beim Parsen dient sie als
+     * eine zonale Repr&auml;sentation um. Beim Parsen dient sie entweder als
      * Ersatzwert, wenn im zu interpretierenden Text keine Zeitzone
-     * gefunden werden konnte. </p>
+     * gefunden werden konnte. Oder sie dient zur Aufl&ouml;sung von m&ouml;glicherweise
+     * mehrdeutigen Zoneninformationen. Beispiel: </p>
+     *
+     * <pre>
+     *     // IST kann auch Dublin/Ireland oder Kolkata/India sein
+     *     String input = &quot;Dec 31 07:30:00 IST 2016&quot;;
+     *     ChronoFormatter&lt;Moment&gt; f =
+     *       ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+     *       .addPattern(&quot;MMM dd HH:mm:ss z yyyy&quot;, PatternType.CLDR)
+     *       .build();
+     *     assertThat(
+     *       f.withTimezone(ASIA.JERUSALEM).parse(input), // hier Vorrang f&uuml;r Israel-Zeit gew&auml;hlt
+     *       is(PlainTimestamp.of(2016, 12, 31, 5, 30).atUTC()));
+     * </pre>
      *
      * @param   tz      timezone
      * @return  changed copy with the new or changed timezone while this instance remains unaffected
