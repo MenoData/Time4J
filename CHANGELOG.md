@@ -5,6 +5,9 @@
 ### Changed
 - Adjust leap second expiry date [#601]
 
+### Fixed
+- equals-contract for ChronoFormatter including zone elements broken [#604]
+
 ## [v3.27] published on 2017-01-08
 ### Added
 - Support for Breton (br), Faroese (fo), Western Frisian (fy), Scottish Gaelic (gd), Luxembourgish (lb) [#599]
