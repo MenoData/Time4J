@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Duration.java) is part of project Time4J.
  *
@@ -1614,6 +1614,68 @@ public final class Duration<U extends IsoUnit>
         }
 
         if (clockItems.isEmpty()) {
+            return Duration.ofZero();
+        }
+
+        return new Duration<ClockUnit>(clockItems, this.isNegative());
+
+    }
+
+    /**
+     * <p>Extracts a new duration with all contained clock units only. </p>
+     *
+     * <p>The calendrical part will be removed with the exception of the days
+     * which will be converted into hours (on the base 1 day = 24 hours). </p>
+     *
+     * @return  new duration with clock units only
+     * @since   3.28/4.24
+     * @see     #compose(Duration, Duration)
+     * @see     #toCalendarPeriod()
+     */
+    /*[deutsch]
+     * <p>Extrahiert eine neue Dauer, die nur alle Uhrzeiteinheiten
+     * dieser Dauer enth&auml;lt. </p>
+     *
+     * <p>Der kalendarische Teil wird bis auf die Tage entfernt. Die Tage selber werden in Stunden
+     * (auf der Basis 1 Tag = 24 Stunden) umgerechnet. </p>
+     *
+     * @return  new duration with clock units only
+     * @since   3.28/4.24
+     * @see     #compose(Duration, Duration)
+     * @see     #toCalendarPeriod()
+     */
+    public Duration<ClockUnit> toClockPeriodWithDaysAs24Hours() {
+
+        if (this.isEmpty()) {
+            return Duration.ofZero();
+        }
+
+        List<Item<ClockUnit>> clockItems = new ArrayList<Item<ClockUnit>>();
+        long extraHours = 0L;
+
+        for (Item<U> item : this.items) {
+            if (item.getUnit() instanceof ClockUnit) {
+                clockItems.add(Item.of(item.getAmount(), ClockUnit.class.cast(item.getUnit())));
+            } else if (item.getUnit().equals(CalendarUnit.DAYS)) {
+                extraHours = MathUtils.safeMultiply(item.getAmount(), 24);
+            }
+        }
+
+        if (extraHours != 0L) {
+            boolean hasHours = false;
+            for (int i = 0, n = clockItems.size(); i < n; i++) {
+                Item<ClockUnit> item = clockItems.get(i);
+                if (item.getUnit() == ClockUnit.HOURS) {
+                    hasHours = true;
+                    item = Item.of(MathUtils.safeAdd(item.getAmount(), extraHours), ClockUnit.HOURS);
+                    clockItems.set(i, item);
+                    break;
+                }
+            }
+            if (!hasHours) {
+                clockItems.add(Item.of(extraHours, ClockUnit.HOURS));
+            }
+        } else if (clockItems.isEmpty()) {
             return Duration.ofZero();
         }
 

@@ -1407,6 +1407,21 @@ public class DurationBasicsTest {
     }
 
     @Test
+    public void toClockPeriodWithDaysAs24Hours() throws ParseException {
+        String input1 = "+1d1h55m15s584ms";
+        String input2 = "+1d55m15s584ms";
+        assertThat(daysAndHoursToMillis(input1), is(93315584L));
+        assertThat(daysAndHoursToMillis(input2), is(93315584L - 3600 * 1000L));
+    }
+
+    private static long daysAndHoursToMillis(String input) throws ParseException {
+        String pattern = "+[#D'd'][#h'h'][#m'm'][#s's'][fff'ms']";
+        Duration<?> d =
+            Duration.formatter(pattern).parse(input).with(Duration.STD_PERIOD);
+        return d.toClockPeriodWithDaysAs24Hours().with(ClockUnit.MILLIS.only()).getPartialAmount(ClockUnit.MILLIS);
+    }
+
+    @Test
     public void jodaStyle() throws ParseException {
         Duration.Formatter<IsoUnit> f = Duration.Formatter.ofJodaStyle();
         assertThat(
