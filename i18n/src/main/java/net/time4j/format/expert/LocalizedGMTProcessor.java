@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LocalizedGMTProcessor.java) is part of project Time4J.
  *
@@ -508,6 +508,39 @@ final class LocalizedGMTProcessor
             attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue(),
             attributes.get(Attributes.LENIENCY, Leniency.SMART)
         );
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof LocalizedGMTProcessor) {
+            LocalizedGMTProcessor that = (LocalizedGMTProcessor) obj;
+            return (this.abbreviated == that.abbreviated);
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return (this.abbreviated ? 1 : 0);
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(this.getClass().getName());
+        sb.append("[abbreviated=");
+        sb.append(this.abbreviated);
+        sb.append(']');
+        return sb.toString();
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneOffsetProcessor.java) is part of project Time4J.
  *
@@ -520,6 +520,47 @@ final class TimezoneOffsetProcessor
             attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue(),
             attributes.get(Attributes.LENIENCY, Leniency.SMART)
         );
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof TimezoneOffsetProcessor) {
+            TimezoneOffsetProcessor that = (TimezoneOffsetProcessor) obj;
+            return (
+                (this.precision == that.precision)
+                && (this.extended == that.extended)
+                && this.zeroOffsets.equals(that.zeroOffsets)
+            );
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return (7 * this.precision.hashCode() + 31 * this.zeroOffsets.hashCode() + (extended ? 1 : 0));
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(this.getClass().getName());
+        sb.append("[precision=");
+        sb.append(this.precision);
+        sb.append(", extended=");
+        sb.append(this.extended);
+        sb.append(", zero-offsets=");
+        sb.append(this.zeroOffsets);
+        sb.append(']');
+        return sb.toString();
 
     }
 
