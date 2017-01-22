@@ -442,6 +442,46 @@ final class TimezoneNameProcessor
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof TimezoneNameProcessor) {
+            TimezoneNameProcessor that = (TimezoneNameProcessor) obj;
+            return (
+                (this.abbreviated == that.abbreviated)
+                && ((this.preferredZones == null)
+                    ? (that.preferredZones == null)
+                    : this.preferredZones.equals(that.preferredZones))
+            );
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return ((this.preferredZones == null) ? 0 : this.preferredZones.hashCode()) + (this.abbreviated ? 1 : 0);
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(this.getClass().getName());
+        sb.append("[abbreviated=");
+        sb.append(this.abbreviated);
+        sb.append(", preferredZones=");
+        sb.append(this.preferredZones);
+        sb.append(']');
+        return sb.toString();
+
+    }
+
     private Map<String, List<TZID>> getTimezoneNameMap(
         Locale locale,
         boolean daylightSaving

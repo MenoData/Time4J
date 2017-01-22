@@ -703,7 +703,7 @@ public class MiscellaneousTest {
             is(moment.inZonalView(ZonalOffset.ofHours(AHEAD_OF_UTC, 9))));
     }
 
-    @Test(expected = ParseException.class)
+    @Test(expected=ParseException.class)
     public void parseAmbivalentOffset() throws ParseException {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.ofMomentPattern(
@@ -715,7 +715,7 @@ public class MiscellaneousTest {
         formatter.parse("2012-07-01T08:59:60+01:00[Asia/Tokyo]");
     }
 
-    @Test(expected = ParseException.class)
+    @Test(expected=ParseException.class)
     public void parseOffsetWithoutSignInSmartMode() throws ParseException {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.ofMomentPattern(
@@ -808,6 +808,14 @@ public class MiscellaneousTest {
         } catch (ParseException pe) {
             assertThat(pe.getMessage(), is("Cannot parse: \"2012-07-01T09:00+0900\" (expected: [ ], found: [T])"));
         }
+    }
+
+    @Test
+    public void simplifiedMomentParser() throws ParseException {
+        String pattern = "yyyy-MM-dd HH:mm XXX";
+        ChronoParser<Moment> f = ChronoFormatter.ofMomentPattern(pattern, PatternType.CLDR, Locale.ROOT);
+        Object expected = ChronoFormatter.ofMomentPattern(pattern, PatternType.CLDR, Locale.ROOT, ZonalOffset.UTC);
+        assertThat(ChronoFormatter.class.cast(f).withTimezone(ZonalOffset.UTC).equals(expected), is(true));
     }
 
     @Test

@@ -2068,7 +2068,54 @@ public final class ChronoFormatter<T>
     }
 
     /**
+     * <p>Constructs a pattern-based parser for global timestamp objects. </p>
+     *
+     * <p>The input to be parsed must contain any timezone or offset information for successful parsing. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofMomentPattern(String, PatternType, Locale, TZID)
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Interpretierer f&uuml;r globale Zeitstempelobjekte. </p>
+     *
+     * <p>Weil kein Zeitzonenbezug angegeben ist, setzt das erfolgreiche Interpretieren das Vorhandensein
+     * einer Zeitzonen- oder Offset-Information im zu interpretierenden Text voraus. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   type        the type of the pattern to be used
+     * @param   locale      format locale
+     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @see     #ofMomentPattern(String, PatternType, Locale, TZID)
+     * @since   3.28/4.24
+     */
+    public static ChronoParser<Moment> ofMomentPattern(
+        String pattern,
+        PatternType type,
+        Locale locale
+    ) {
+
+        Builder<Moment> builder = new Builder<Moment>(Moment.axis(), locale);
+        addPattern(builder, pattern, type);
+
+        try {
+            return builder.build();
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
+
+    }
+
+    /**
      * <p>Constructs a pattern-based formatter for global timestamp objects. </p>
+     *
+     * <p>The given timezone parameter can help to compensate missing timezone or offset informations in input
+     * or to resolve possibly ambivalent timezone names in input. </p>
      *
      * @param   pattern     format pattern
      * @param   type        the type of the pattern to be used
@@ -2081,6 +2128,9 @@ public final class ChronoFormatter<T>
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempelobjekte. </p>
+     *
+     * <p>Der angegebene Zeitzonenparameter hilft, fehlende Zeitzonen- oder Offset-Informationen in der Eingabe
+     * zu ersetzen oder m&ouml;glicherweise mehrdeutige Zeitzonennamen aufzul&ouml;sen. </p>
      *
      * @param   pattern     format pattern
      * @param   type        the type of the pattern to be used

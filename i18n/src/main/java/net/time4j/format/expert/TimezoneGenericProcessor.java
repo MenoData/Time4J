@@ -389,6 +389,46 @@ final class TimezoneGenericProcessor
 
     }
 
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof TimezoneGenericProcessor) {
+            TimezoneGenericProcessor that = (TimezoneGenericProcessor) obj;
+            return (
+                (this.style == that.style)
+                && ((this.preferredZones == null)
+                    ? (that.preferredZones == null)
+                    : this.preferredZones.equals(that.preferredZones))
+            );
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return this.style.hashCode();
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder(64);
+        sb.append(this.getClass().getName());
+        sb.append("[style=");
+        sb.append(this.style);
+        sb.append(", preferredZones=");
+        sb.append(this.preferredZones);
+        sb.append(']');
+        return sb.toString();
+
+    }
+
     private Map<String, List<TZID>> getTimezoneNameMap(Locale locale) {
 
         List<TZID> zones;
