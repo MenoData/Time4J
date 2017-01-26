@@ -25,6 +25,7 @@ import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.StartOfDay;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -600,6 +601,51 @@ public final class Attributes
      */
     public static final AttributeKey<Boolean> FOUR_DIGIT_YEAR =
         PredefinedKey.valueOf("FOUR_DIGIT_YEAR", Boolean.class);
+
+    /**
+     * <p>Attribute for the time scale to be used in parsing
+     * or formatting universal timestamps. </p>
+     *
+     * <p>If this attribute is missing then Time4J will assume the default UTC scale. Example for TAI: </p>
+     *
+     * <pre>
+     *     assertThat(
+     *       ChronoFormatter.ofMomentPattern(
+     *         &quot;uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSX&quot;,
+     *         PatternType.CLDR,
+     *         Locale.ROOT,
+     *         ZonalOffset.UTC)
+     *       .with(Attributes.TIME_SCALE, TimeScale.TAI)
+     *       .parse(&quot;2012-07-01T00:00:34.123456789Z&quot;)
+     *       .toString(),
+     *       is(&quot;2012-06-30T23:59:60,123456789Z&quot;)); // 35 seconds delta between UTC and TAI
+     * </pre>
+     *
+     * @since       3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Gibt die Zeitskala an, die bei der Aufl&ouml;sung oder Formatierung von
+     * universellen Zeitstempeln zu verwenden ist. </p>
+     *
+     * <p>Fehlt das Attribut, wird die UTC-Skala als Standard angenommen. Beispiel f&uuml;r TAI: </p>
+     *
+     * <pre>
+     *     assertThat(
+     *       ChronoFormatter.ofMomentPattern(
+     *         &quot;uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSX&quot;,
+     *         PatternType.CLDR,
+     *         Locale.ROOT,
+     *         ZonalOffset.UTC)
+     *       .with(Attributes.TIME_SCALE, TimeScale.TAI)
+     *       .parse(&quot;2012-07-01T00:00:34.123456789Z&quot;)
+     *       .toString(),
+     *       is(&quot;2012-06-30T23:59:60,123456789Z&quot;)); // 35 Sekunden zwischen UTC und TAI
+     * </pre>
+     *
+     * @since       3.28/4.24
+     */
+    public static final AttributeKey<TimeScale> TIME_SCALE =
+        PredefinedKey.valueOf("TIME_SCALE", TimeScale.class);
 
     private static final Attributes EMPTY = new Attributes.Builder().build();
 
