@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeScale.java) is part of project Time4J.
  *
@@ -162,7 +162,7 @@ public enum TimeScale {
      * the SI-second was introduced in year 1967. Second, the nowadays
      * used TAI-scale had got its name on a conference in year 1971, third
      * to note, the TAI-ancestors were still directly synchronized with
-     * UT2 hence had still got a vague astronomical reference.. At the
+     * UT2 hence had still got a vague astronomical reference. At the
      * calendar date 1972-01-01 the difference between TAI and UTC was
      * defined as exactly 10 seconds (TAI = UTC + 10). This difference is
      * fixed for all timestamps in epoch seconds because both TAI and UTC
@@ -170,8 +170,8 @@ public enum TimeScale {
      * to an element-oriented notation (YYYY-MM-DD HH:MM:SS) then the
      * difference between TAI and UTC increases with every inserted
      * leap second because of the different labelling. A TAI day does not
-     * know leap seconds. In the year 2013 this difference between a TAI
-     * day and an UTC day has increased to 35 seconds. </p>
+     * know leap seconds. In the year 2017 this difference between a TAI
+     * day and an UTC day has increased to 37 seconds. </p>
      */
     /*[deutsch]
      * <p>Internationale Atomuhrzeit, die auf den SI-Sekunden einer Atomuhr
@@ -203,8 +203,8 @@ public enum TimeScale {
      * feldorientierten Notation (YYYY-MM-DD HH:MM:SS) aufgel&ouml;st,
      * dann &auml;ndert sich der Versatz seit 1972 laufend mit jeder
      * eingef&uuml;gten Schaltsekunde, weil ein TAI-Tag keine Schaltsekunden
-     * kennt. Im Jahr 2013 ist dieser Versatz zwischen TAI-Tag und UTC-Tag
-     * auf 35 Sekunden angewachsen. </p>
+     * kennt. Im Jahr 2017 ist dieser Versatz zwischen TAI-Tag und UTC-Tag
+     * auf 37 Sekunden angewachsen. </p>
      */
     TAI,
 

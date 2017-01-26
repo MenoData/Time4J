@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Moment.java) is part of project Time4J.
  *
@@ -672,19 +672,36 @@ public final class Moment
     /**
      * <p>Represents this timestamp as decimal value in given time scale. </p>
      *
+     * <p>The scale determines the epoch reference to be used and how to count elapsed seconds
+     * since a given epoch. Please note that some scales like TAI, GPS and UTC are atomic scales
+     * counting SI-seconds continuously. Such time scales do not suppress leap seconds in this view.
+     * However, the scales handle the representation of leap seconds in a very different way.
+     * TAI for example does not consider leap seconds as leap seconds but just normal seconds
+     * (in the model of 1 TAI-day = 86400 SI-seconds) while UTC lables leap seconds with the
+     * special value 60 causing discontinuities.</p>
+     *
      * @param   scale       time scale reference
      * @return  decimal value in given time scale as seconds inclusive fraction
-     * @throws  IllegalArgumentException if this instance is out of range
-     *          for given time scale
+     * @throws  IllegalArgumentException if this instance is out of range for given time scale
+     * @see     #toString(TimeScale)
      */
     /*[deutsch]
      * <p>Stellt diese Zeit als Dezimalwert in der angegebenen Zeitskala
      * dar. </p>
      *
+     * <p>Die Zeitskala bestimmt die Epochenreferenz und auch, wie seit dieser Epoche verstrichene
+     * Sekunden gez&auml;hlt werden. Zu beachten: Einige Zeitskalen wie TAI, GPS und UTC sind atomare
+     * Zeitskalen, die auf Atomuhren Bezug nehmen und kontinuierlich SI-Sekunden z&auml;hlen. Aber:
+     * Die jeweiligen Zeitskalen behandeln die Repr&auml;sentation von Schaltsekunden sehr verschieden.
+     * TAI zum Beispiel betrachtet eine verstrichene Schaltsekunde nicht als Schaltsekunde, sondern
+     * einfach als erste Sekunde des n&auml;chsten TAI-Tags, der entsprechend immer 86400 SI-Sekunden
+     * lang ist. Im Kontrast hierzu etikettiert UTC Schaltsekunden als solche, indem sie mit dem
+     * speziellen Wert &quot;60&quot; versehen werden, was eine Diskontinuit&auml;t darstellt. </p>
+     *
      * @param   scale       time scale reference
      * @return  decimal value in given time scale as seconds inclusive fraction
-     * @throws  IllegalArgumentException if this instance is out of range
-     *          for given time scale
+     * @throws  IllegalArgumentException if this instance is out of range for given time scale
+     * @see     #toString(TimeScale)
      */
     public BigDecimal transform(TimeScale scale) {
 
