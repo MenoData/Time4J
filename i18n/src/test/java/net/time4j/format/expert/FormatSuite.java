@@ -21,6 +21,7 @@ import org.junit.runners.Suite.SuiteClasses;
         LiteralWithDigitsTest.class,
         MiscellaneousTest.class,
         MomentPatternTest.class,
+        MomentScaleTest.class,
         MultiFormatTest.class,
         OffsetPatternTest.class,
         OrFormatTest.class,

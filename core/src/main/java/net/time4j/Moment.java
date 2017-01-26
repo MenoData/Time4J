@@ -1600,24 +1600,12 @@ public final class Moment
                 sb.append(this.toString());
                 break;
             case TAI:
-                Moment tai =
-                    new Moment(
-                        this.getNanosecond(),
-                        Math.addExact(
-                            this.getElapsedTime(TAI),
-                            POSIX_UTC_DELTA)
-                        );
+                Moment tai = this.transformForPrint(scale);
                 sb.append(PlainTimestamp.from(tai, ZonalOffset.UTC));
                 sb.append('Z');
                 break;
             case GPS:
-                Moment gps =
-                    new Moment(
-                        this.getNanosecond(),
-                        Math.addExact(
-                            this.getElapsedTime(GPS),
-                            POSIX_GPS_DELTA)
-                        );
+                Moment gps = this.transformForPrint(scale);
                 sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
                 sb.append('Z');
                 break;
@@ -1804,6 +1792,73 @@ public final class Moment
         if ((nanoFraction >= MRD) || (nanoFraction < 0)) {
             throw new IllegalArgumentException(
                 "Nanosecond out of range: " + nanoFraction);
+        }
+
+    }
+
+    private Moment transformForPrint(TimeScale scale) {
+
+        switch (scale) {
+            case POSIX:
+                if (this.isLeapSecond()) {
+                    return new Moment(
+                        this.getNanosecond(),
+                        this.posixTime
+                    );
+                } else {
+                    return this;
+                }
+            case UTC:
+                return this;
+            case TAI:
+                return new Moment(
+                    this.getNanosecond(),
+                    Math.addExact(
+                        this.getElapsedTime(TAI),
+                        POSIX_UTC_DELTA)
+                );
+            case GPS:
+                return new Moment(
+                    this.getNanosecond(),
+                    Math.addExact(
+                        this.getElapsedTime(GPS),
+                        POSIX_GPS_DELTA)
+                );
+            default:
+                throw new UnsupportedOperationException(scale.name());
+        }
+
+    }
+
+    private Moment transformForParse(TimeScale scale) {
+
+        if (scale == UTC) {
+            return this;
+        } else if (this.isLeapSecond()) {
+            throw new IllegalArgumentException("Leap seconds do not exist on continuous time scale: " + scale);
+        }
+
+        switch (scale) {
+            case POSIX:
+                return this;
+            case TAI:
+                return new Moment(
+                    Math.subtractExact(
+                        this.posixTime,
+                        POSIX_UTC_DELTA),
+                    this.getNanosecond(),
+                    scale
+                );
+            case GPS:
+                return new Moment(
+                    Math.subtractExact(
+                        this.posixTime,
+                        POSIX_GPS_DELTA),
+                    this.getNanosecond(),
+                    scale
+                );
+            default:
+                throw new UnsupportedOperationException(scale.name());
         }
 
     }
@@ -2695,6 +2750,7 @@ public final class Moment
         }
 
         @Override
+        @Deprecated
         public Moment createFrom(
             TemporalAccessor threeten,
             AttributeQuery attributes
@@ -2765,15 +2821,17 @@ public final class Moment
             boolean pp
         ) {
 
+            TimeScale scale = attrs.get(Attributes.TIME_SCALE, TimeScale.UTC);
+
             if (entity instanceof UnixTime) {
-                return Moment.from(UnixTime.class.cast(entity));
+                return Moment.from(UnixTime.class.cast(entity)).transformForParse(scale);
             } else if (entity.contains(LongElement.POSIX_TIME)) {
                 long posixTime = entity.get(LongElement.POSIX_TIME).longValue();
                 int fraction = 0;
                 if (entity.contains(IntElement.FRACTION)) {
                     fraction = entity.get(IntElement.FRACTION).intValue();
                 }
-                return Moment.of(posixTime, fraction, POSIX);
+                return Moment.of(posixTime, fraction, POSIX).transformForParse(scale);
             }
 
             Moment result = null;
@@ -2815,7 +2873,11 @@ public final class Moment
                 }
             }
 
-            if (leapsecond && (result != null)) {
+            if (result == null) {
+                return null;
+            }
+
+            if (leapsecond) {
                 ZonalOffset offset;
 
                 if (tzid instanceof ZonalOffset) {
@@ -2857,7 +2919,7 @@ public final class Moment
                 }
             }
 
-            return result;
+            return result.transformForParse(scale);
 
         }
 
@@ -2869,7 +2931,8 @@ public final class Moment
 
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
-                return context.inZonalView(tzid);
+                TimeScale scale = attributes.get(Attributes.TIME_SCALE, TimeScale.UTC);
+                return context.transformForPrint(scale).inZonalView(tzid);
             }
 
             throw new IllegalArgumentException("Cannot print moment without timezone.");
