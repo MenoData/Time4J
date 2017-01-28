@@ -121,6 +121,50 @@ import static net.time4j.scale.TimeScale.*;
  * {@code plus(long, unit)}, {@code minus(long, unit)} and
  * {@code until(Moment, unit)}. </p>
  *
+ * <h3>Time scales</h3>
+ *
+ * <p>Following table illustrates some options how different scales can be applied. Two views
+ * exist, either interpreting a moment as count of seconds elapsed since an epoch or printed
+ * in a scale-specific representation. </p>
+ *
+ * <div style="margin-top:5px;">
+ * <table border="1">
+ * <caption>Different scale values/representations for the same moment</caption>
+ * <tr>
+ *     <th>time scale</th>
+ *     <th>epoch<br /><code>Moment.of(0, scale)</code></th>
+ *     <th>value space<br /><code>getElapsedTime(scale)</code></th>
+ *     <th>lexical space<br /><code>toString(scale)</code></th>
+ * </tr>
+ * <tr>
+ *     <td>POSIX</td>
+ *     <td>1970-01-01T00:00:00.000Z</td>
+ *     <td>1483228799</td>
+ *     <td>2016-12-31T23:59:59.000Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UTC</td>
+ *     <td>1972-01-01T00:00:00.000Z</td>
+ *     <td>1420156826</td>
+ *     <td>2016-12-31T23:59:60.000Z</td>
+ * </tr>
+ * <tr>
+ *     <td>TAI</td>
+ *     <td>1971-12-31T23:59:50.000Z *)</td>
+ *     <td>1420156836</td>
+ *     <td>2017-01-01T00:00:36.000Z</td>
+ * </tr>
+ * <tr>
+ *     <td>GPS</td>
+ *     <td>1980-01-06T00:00:00.000Z</td>
+ *     <td>1167264017</td>
+ *     <td>2017-01-01T00:00:17.000Z</td>
+ * </tr>
+ * </table>
+ * <p style="font-size: 0.9em;">*) This value is only virtual
+ * since TAI is really supported first at UTC epoch (10 seconds later). </p>
+ * </div>
+ *
  * @author      Meno Hochschild
  */
 /*[deutsch]
@@ -159,6 +203,51 @@ import static net.time4j.scale.TimeScale.*;
  * die UTC-Schaltsekunden ignorieren. Beide Arten von Zeiteinheiten werden in
  * den Methoden {@code plus(long, unit)}, {@code minus(long, unit)} und
  * {@code until(Moment, unit)} verwendet. </p>
+ *
+ * <h3>Zeitskalen</h3>
+ *
+ * <p>Folgende Tabelle illustriert einige M&ouml;glichkeiten wie verschiedene Zeitskalen
+ * angewandt werden k&ouml;nnen. Zwei Ansichten gibt es, entweder wird ein Moment als
+ * seit einer Epoche verstrichene Anzahl von Sekunden interpretiert, oder der Moment
+ * wird in einer skalenspezifischen Darstellung ausgegeben. </p>
+ *
+ * <div style="margin-top:5px;">
+ * <table border="1">
+ * <caption>Verschiedene Werte/Darstellungen ein- und desselben Moments</caption>
+ * <tr>
+ *     <th>time scale</th>
+ *     <th>epoch<br /><code>Moment.of(0, scale)</code></th>
+ *     <th>value space<br /><code>getElapsedTime(scale)</code></th>
+ *     <th>lexical space<br /><code>toString(scale)</code></th>
+ * </tr>
+ * <tr>
+ *     <td>POSIX</td>
+ *     <td>1970-01-01T00:00:00.000Z</td>
+ *     <td>1483228799</td>
+ *     <td>2016-12-31T23:59:59.000Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UTC</td>
+ *     <td>1972-01-01T00:00:00.000Z</td>
+ *     <td>1420156826</td>
+ *     <td>2016-12-31T23:59:60.000Z</td>
+ * </tr>
+ * <tr>
+ *     <td>TAI</td>
+ *     <td>1971-12-31T23:59:50.000Z *)</td>
+ *     <td>1420156836</td>
+ *     <td>2017-01-01T00:00:36.000Z</td>
+ * </tr>
+ * <tr>
+ *     <td>GPS</td>
+ *     <td>1980-01-06T00:00:00.000Z</td>
+ *     <td>1167264017</td>
+ *     <td>2017-01-01T00:00:17.000Z</td>
+ * </tr>
+ * </table>
+ * <p style="font-size: 0.9em;">*) Dieser Wert ist nur virtuell, weil TAI erst ab
+ * der UTC-Epoche unterst&uuml;tzt wird (10 Sekunden sp&auml;ter). </p>
+ * </div>
  *
  * @author      Meno Hochschild
  */
@@ -1528,6 +1617,7 @@ public final class Moment
      * @throws  IllegalArgumentException if this instance is out of range
      *          for given time scale
      * @see     #getElapsedTime(TimeScale)
+     * @see     net.time4j.format.Attributes#TIME_SCALE
      */
     /*[deutsch]
      * <p>Erzeugt eine formatierte Sicht dieser Instanz unter
@@ -1558,6 +1648,7 @@ public final class Moment
      * @throws  IllegalArgumentException if this instance is out of range
      *          for given time scale
      * @see     #getElapsedTime(TimeScale)
+     * @see     net.time4j.format.Attributes#TIME_SCALE
      */
     public String toString(TimeScale scale) {
 
