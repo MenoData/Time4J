@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapSeconds.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.ResourceLoader;
+import net.time4j.base.UnixTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -352,6 +353,30 @@ public final class LeapSeconds
     public int getCount() {
 
         return this.getEventsInDescendingOrder().length;
+
+    }
+
+    /**
+     * <p>Yields the count of all registered leap seconds which happened before given timestamp. </p>
+     *
+     * @param   until   the upper search limit (exclusive)
+     * @return  count of registered leap seconds happening before
+     * @see     #getCount()
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Anzahl aller registrierten Schaltsekunden, die vor dem angegebenen Zeitstempel
+     * existieren. </p>
+     *
+     * @param   until   the upper search limit (exclusive)
+     * @return  count of registered leap seconds happening before
+     * @see     #getCount()
+     * @since   3.28/4.24
+     */
+    public int getCount(UnixTime until) {
+
+        long ut = until.getPosixTime();
+        return MathUtils.safeCast(this.enhance(ut) + UNIX_OFFSET - ut);
 
     }
 

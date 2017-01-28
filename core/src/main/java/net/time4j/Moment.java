@@ -123,13 +123,13 @@ import static net.time4j.scale.TimeScale.*;
  *
  * <h3>Time scales</h3>
  *
- * <p>Following table illustrates some options how different scales can be applied. Two views
- * exist, either interpreting a moment as count of seconds elapsed since an epoch or printed
- * in a scale-specific representation. </p>
+ * <p>Following table illustrates how a time scale affects values and representations
+ * before, during and after a leap second event. Two views exist, either interpreting
+ * a moment as count of seconds elapsed since an epoch or printed in a scale-specific representation. </p>
  *
  * <div style="margin-top:5px;">
  * <table border="1">
- * <caption>Different scale values/representations for the same moment</caption>
+ * <caption>What does happen around a leap second?</caption>
  * <tr>
  *     <th>time scale</th>
  *     <th>epoch<br /><code>Moment.of(0, scale)</code></th>
@@ -139,26 +139,26 @@ import static net.time4j.scale.TimeScale.*;
  * <tr>
  *     <td>POSIX</td>
  *     <td>1970-01-01T00:00:00.000Z</td>
- *     <td>1483228799</td>
- *     <td>2016-12-31T23:59:59.000Z</td>
+ *     <td>1483228799<br />1483228799<br />1483228800</td>
+ *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:59.000Z<br />2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>UTC</td>
  *     <td>1972-01-01T00:00:00.000Z</td>
- *     <td>1420156826</td>
- *     <td>2016-12-31T23:59:60.000Z</td>
+ *     <td>1420156825<br />1420156826<br />1420156827</td>
+ *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:60.000Z<br />2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>TAI</td>
  *     <td>1971-12-31T23:59:50.000Z *)</td>
- *     <td>1420156836</td>
- *     <td>2017-01-01T00:00:36.000Z</td>
+ *     <td>1420156835<br />1420156836<br />1420156837</td>
+ *     <td>2017-01-01T00:00:35.000Z<br />2017-01-01T00:00:36.000Z<br />2017-01-01T00:00:37.000Z</td>
  * </tr>
  * <tr>
  *     <td>GPS</td>
  *     <td>1980-01-06T00:00:00.000Z</td>
- *     <td>1167264017</td>
- *     <td>2017-01-01T00:00:17.000Z</td>
+ *     <td>1167264016<br />1167264017<br />1167264018</td>
+ *     <td>2017-01-01T00:00:16.000Z<br />2017-01-01T00:00:17.000Z<br />2017-01-01T00:00:18.000Z</td>
  * </tr>
  * </table>
  * <p style="font-size: 0.9em;">*) This value is only virtual
@@ -223,26 +223,26 @@ import static net.time4j.scale.TimeScale.*;
  * <tr>
  *     <td>POSIX</td>
  *     <td>1970-01-01T00:00:00.000Z</td>
- *     <td>1483228799</td>
- *     <td>2016-12-31T23:59:59.000Z</td>
+ *     <td>1483228799<br />1483228799<br />1483228800</td>
+ *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:59.000Z<br />2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>UTC</td>
  *     <td>1972-01-01T00:00:00.000Z</td>
- *     <td>1420156826</td>
- *     <td>2016-12-31T23:59:60.000Z</td>
+ *     <td>1420156825<br />1420156826<br />1420156827</td>
+ *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:60.000Z<br />2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>TAI</td>
  *     <td>1971-12-31T23:59:50.000Z *)</td>
- *     <td>1420156836</td>
- *     <td>2017-01-01T00:00:36.000Z</td>
+ *     <td>1420156835<br />1420156836<br />1420156837</td>
+ *     <td>2017-01-01T00:00:35.000Z<br />2017-01-01T00:00:36.000Z<br />2017-01-01T00:00:37.000Z</td>
  * </tr>
  * <tr>
  *     <td>GPS</td>
  *     <td>1980-01-06T00:00:00.000Z</td>
- *     <td>1167264017</td>
- *     <td>2017-01-01T00:00:17.000Z</td>
+ *     <td>1167264016<br />1167264017<br />1167264018</td>
+ *     <td>2017-01-01T00:00:16.000Z<br />2017-01-01T00:00:17.000Z<br />2017-01-01T00:00:18.000Z</td>
  * </tr>
  * </table>
  * <p style="font-size: 0.9em;">*) Dieser Wert ist nur virtuell, weil TAI erst ab

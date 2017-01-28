@@ -1,6 +1,8 @@
 package net.time4j.scale;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.base.GregorianDate;
 
 import org.junit.BeforeClass;
@@ -69,6 +71,15 @@ public class LeapSecondTest {
         assertThat(
             LeapSeconds.getInstance().getCount(),
             is(expected));
+        assertThat(
+            LeapSeconds.getInstance().getCount(Moment.UNIX_EPOCH),
+            is(0));
+        assertThat(
+            LeapSeconds.getInstance().getCount(PlainTimestamp.of(1974, 1, 1, 0, 0).atUTC()),
+            is(3));
+        assertThat(
+            LeapSeconds.getInstance().getCount(PlainTimestamp.of(2010, 1, 1, 0, 0).atUTC()),
+            is(24));
     }
 
     @Test
