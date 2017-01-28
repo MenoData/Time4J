@@ -1,12 +1,18 @@
 package net.time4j.scale;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.base.GregorianDate;
 
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -69,6 +75,15 @@ public class LeapSecondTest {
         assertThat(
             LeapSeconds.getInstance().getCount(),
             is(expected));
+        assertThat(
+            LeapSeconds.getInstance().getCount(Moment.UNIX_EPOCH),
+            is(0));
+        assertThat(
+            LeapSeconds.getInstance().getCount(PlainTimestamp.of(1974, 1, 1, 0, 0).atUTC()),
+            is(3));
+        assertThat(
+            LeapSeconds.getInstance().getCount(PlainTimestamp.of(2010, 1, 1, 0, 0).atUTC()),
+            is(24));
     }
 
     @Test
@@ -208,6 +223,17 @@ public class LeapSecondTest {
             }
         }
         assertThat(i, is(25));
+    }
+
+    @Test
+    public void stream() {
+        Collection<LeapSecondEvent> coll = new ArrayList<>();
+
+        for (LeapSecondEvent lse : LeapSeconds.getInstance()) {
+            coll.add(lse);
+        }
+
+        assertThat(LeapSeconds.getInstance().stream().collect(Collectors.toList()), is(coll));
     }
 
     @Test

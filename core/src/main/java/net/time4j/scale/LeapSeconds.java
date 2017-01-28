@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapSeconds.java) is part of project Time4J.
  *
@@ -23,7 +23,9 @@ package net.time4j.scale;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.base.MathUtils;
 import net.time4j.base.ResourceLoader;
+import net.time4j.base.UnixTime;
 
 import java.io.Serializable;
 import java.util.ArrayList;
@@ -36,6 +38,7 @@ import java.util.Map;
 import java.util.SortedSet;
 import java.util.TreeSet;
 import java.util.concurrent.CopyOnWriteArrayList;
+import java.util.stream.Stream;
 
 
 /**
@@ -355,6 +358,30 @@ public final class LeapSeconds
     }
 
     /**
+     * <p>Yields the count of all registered leap seconds which happened before given timestamp. </p>
+     *
+     * @param   until   the upper search limit (exclusive)
+     * @return  count of registered leap seconds happening before
+     * @see     #getCount()
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Anzahl aller registrierten Schaltsekunden, die vor dem angegebenen Zeitstempel
+     * existieren. </p>
+     *
+     * @param   until   the upper search limit (exclusive)
+     * @return  count of registered leap seconds happening before
+     * @see     #getCount()
+     * @since   3.28/4.24
+     */
+    public int getCount(UnixTime until) {
+
+        long ut = until.getPosixTime();
+        return MathUtils.safeCast(this.enhance(ut) + UNIX_OFFSET - ut);
+
+    }
+
+    /**
      * <p>Registers a new positive leap second by defining the
      * switch-over-day. </p>
      *
@@ -481,6 +508,25 @@ public final class LeapSeconds
 
         final LeapSecondEvent[] events = this.getEventsInDescendingOrder();
         return Collections.unmodifiableList(Arrays.asList(events)).iterator();
+
+    }
+
+    /**
+     * <p>Creates a stream over all leap second events in descending temporal order. </p>
+     *
+     * @return  {@code Stream} over all stored leap second events in descending order
+     * @since   4.24
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen <code>Stream</code> &uuml;ber alle Schaltsekundenereignisse in zeitlich
+     * absteigender Reihenfolge. </p>
+     *
+     * @return  {@code Stream} over all stored leap second events in descending order
+     * @since   4.24
+     */
+    public Stream<LeapSecondEvent> stream() {
+
+        return Arrays.stream(this.getEventsInDescendingOrder());
 
     }
 
