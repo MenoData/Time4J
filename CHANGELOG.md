@@ -1,5 +1,6 @@
 ## [v4.24] not yet released
 ### Added
+- New stream- and counting methods for class LeapSeconds [#608]
 - Support different time-scales in formatting and parsing moments [#607]
 - Duration conversion to clock units including days [#605]
 - Make parsing of ambivalent zone informations easier [#603]
