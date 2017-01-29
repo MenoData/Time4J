@@ -4,6 +4,7 @@ import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.ZonalClock;
+import net.time4j.base.GregorianDate;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -19,6 +20,33 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class CalendarWeekTest {
+
+    @Test
+    public void fromGregorianDate() {
+        assertThat(
+            CalendarWeek.from(PlainDate.of(2016, 2, 29)),
+            is(CalendarWeek.of(2016, 9)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void fromGregorianDateInvalid() {
+        CalendarWeek.from(
+            new GregorianDate() {
+                @Override
+                public int getYear() {
+                    return 2015;
+                }
+                @Override
+                public int getMonth() {
+                    return 2;
+                }
+                @Override
+                public int getDayOfMonth() {
+                    return 29;
+                }
+            }
+        );
+    }
 
     @Test
     public void getYear() {

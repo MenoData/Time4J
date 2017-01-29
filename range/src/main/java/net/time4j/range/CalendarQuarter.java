@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarQuarter.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.Quarter;
 import net.time4j.SystemClock;
+import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -346,6 +347,29 @@ public final class CalendarQuarter
     public int length() {
 
         return this.start.getTemporal().getMaximum(PlainDate.DAY_OF_QUARTER);
+
+    }
+
+    /**
+     * <p>Converts given gregorian date to a quarter year. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  CalendarQuarter
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Konvertiert das angegebene gregorianische Datum zu einem Kalenderquartal. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  CalendarQuarter
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    public static CalendarQuarter from(GregorianDate date) {
+
+        PlainDate iso = PlainDate.from(date); // includes validation
+        return CalendarQuarter.of(iso.getYear(), iso.get(PlainDate.QUARTER_OF_YEAR));
 
     }
 
