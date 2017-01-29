@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AnnualDate.java) is part of project Time4J.
  *
@@ -24,6 +24,7 @@ package net.time4j.xml;
 import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainDate;
+import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
@@ -282,6 +283,29 @@ public final class AnnualDate
 
         check(month, dayOfMonth);
         return new AnnualDate(month, dayOfMonth);
+
+    }
+
+    /**
+     * <p>Converts given gregorian date to an annual date. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  AnnualDate
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Konvertiert das angegebene gregorianische Datum zu einem Jahrestag. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  AnnualDate
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    public static AnnualDate from(GregorianDate date) {
+
+        PlainDate iso = PlainDate.from(date); // includes validation
+        return new AnnualDate(iso.getMonth(), iso.getDayOfMonth());
 
     }
 

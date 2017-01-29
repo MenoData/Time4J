@@ -4,6 +4,7 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
+import net.time4j.base.GregorianDate;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -27,6 +28,33 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class AnnualDateTest {
+
+    @Test
+    public void fromGregorianDate() {
+        assertThat(
+            AnnualDate.from(PlainDate.of(2016, 2, 29)),
+            is(AnnualDate.of(2, 29)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void fromGregorianDateInvalid() {
+        AnnualDate.from(
+            new GregorianDate() {
+                @Override
+                public int getYear() {
+                    return 2015;
+                }
+                @Override
+                public int getMonth() {
+                    return 2;
+                }
+                @Override
+                public int getDayOfMonth() {
+                    return 29;
+                }
+            }
+        );
+    }
 
     @Test
     public void toStringXML() {
