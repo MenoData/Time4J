@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarWeek.java) is part of project Time4J.
  *
@@ -28,6 +28,7 @@ import net.time4j.SystemClock;
 import net.time4j.Weekcycle;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -402,6 +403,29 @@ public final class CalendarWeek
     public int length() {
 
         return 7;
+
+    }
+
+    /**
+     * <p>Converts given gregorian date to a calendar week. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  CalendarWeek
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Konvertiert das angegebene gregorianische Datum zu einer Kalenderwoche. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  CalendarWeek
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    public static CalendarWeek from(GregorianDate date) {
+
+        PlainDate iso = PlainDate.from(date); // includes validation
+        return CalendarWeek.of(iso.getInt(PlainDate.YEAR_OF_WEEKDATE), iso.getInt(Weekmodel.ISO.weekOfYear()));
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarYear.java) is part of project Time4J.
  *
@@ -27,6 +27,7 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.Quarter;
 import net.time4j.SystemClock;
+import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -406,6 +407,29 @@ public final class CalendarYear
     public int length() {
 
         return (this.isLeap() ? 366 : 365);
+
+    }
+
+    /**
+     * <p>Converts given gregorian date to a calendar year. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  CalendarYear
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Konvertiert das angegebene gregorianische Datum zu einem Kalenderjahr. </p>
+     *
+     * @param   date    gregorian calendar date (for example {@code PlainDate}
+     * @return  CalendarYear
+     * @throws  IllegalArgumentException if given date is invalid
+     * @since   3.28/4.24
+     */
+    public static CalendarYear from(GregorianDate date) {
+
+        PlainDate iso = PlainDate.from(date); // includes validation
+        return CalendarYear.of(iso.getYear());
 
     }
 
