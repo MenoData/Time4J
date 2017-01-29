@@ -1,5 +1,7 @@
 ## [v3.28] not yet released
 ### Added
+- Static from(GregorianDate)-factories for partial calendar classes [#600]
+- New counting method for class LeapSeconds [#608]
 - Support different time-scales in formatting and parsing moments [#607]
 - Duration conversion to clock units including days [#605]
 - Make parsing of ambivalent zone informations easier [#603]
