@@ -1,5 +1,6 @@
 ## [v4.24] not yet released
 ### Added
+- Support unicode-nu-extension in formatting and parsing [#611]
 - Static from(GregorianDate)-factories for partial calendar classes [#600]
 - New stream- and counting methods for class LeapSeconds [#608]
 - Support different time-scales in formatting and parsing moments [#607]
