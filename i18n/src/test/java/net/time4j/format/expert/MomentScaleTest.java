@@ -217,10 +217,7 @@ public class MomentScaleTest {
             TAI_FORMATTER.parse("2012-07-01 00:00:33.123456789Z"),
             is(utc1));
         Moment utc2 =
-            PlainTimestamp.of(
-                PlainDate.of(2012, 6, 30),
-                PlainTime.of(23, 59, 59, 123456789)
-            ).inTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
+            PlainTimestamp.of(2012, 1, 1, 0, 0).atUTC().with(Moment.nextLeapSecond()).plus(123456789, SI.NANOSECONDS);
         assertThat(
             TAI_FORMATTER.parse("2012-07-01 00:00:34.123456789Z"),
             is(utc2));
