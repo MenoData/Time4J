@@ -3,6 +3,7 @@ package net.time4j.range;
 import net.time4j.CalendarUnit;
 import net.time4j.Duration;
 import net.time4j.PlainDate;
+import net.time4j.Weekday;
 import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -630,6 +631,23 @@ public class BasicDateRangeTest {
 
         List<PlainDate> dates =
             DateInterval.between(start, end).streamWeekBased(1, 2, 3).parallel().collect(Collectors.toList());
+        assertThat(dates, is(expected));
+    }
+
+    @Test
+    public void streamExcluding() {
+        List<PlainDate> dates =
+            DateInterval.between(
+                PlainDate.of(2017, 2, 1),
+                PlainDate.of(2017, 2, 8)
+            ).streamExcluding(Weekday.SATURDAY.or(Weekday.SUNDAY)).collect(Collectors.toList());
+        List<PlainDate> expected = new ArrayList<>();
+        expected.add(PlainDate.of(2017, 2, 1));
+        expected.add(PlainDate.of(2017, 2, 2));
+        expected.add(PlainDate.of(2017, 2, 3));
+        expected.add(PlainDate.of(2017, 2, 6));
+        expected.add(PlainDate.of(2017, 2, 7));
+        expected.add(PlainDate.of(2017, 2, 8));
         assertThat(dates, is(expected));
     }
 

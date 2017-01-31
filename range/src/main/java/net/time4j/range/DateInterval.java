@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateInterval.java) is part of project Time4J.
  *
@@ -61,6 +61,7 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Spliterator;
 import java.util.function.Consumer;
+import java.util.function.Predicate;
 import java.util.stream.LongStream;
 import java.util.stream.Stream;
 import java.util.stream.StreamSupport;
@@ -929,6 +930,59 @@ public final class DateInterval
 
         return LongStream.range(0, size).mapToObj(
             index -> start.plus(eMonths * index, CalendarUnit.MONTHS).plus(eDays * index, CalendarUnit.DAYS));
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date of the canonical form of this interval
+     * and applies given exclusion filter. </p>
+     *
+     * <p>Example of exclusion of Saturday and Sunday: </p>
+     *
+     * <pre>
+     *     DateInterval.between(
+     *       PlainDate.of(2017, 2, 1),
+     *       PlainDate.of(2017, 2, 8)
+     *     ).streamExcluding(Weekday.SATURDAY.or(Weekday.SUNDAY)).forEach(System.out::println);
+     * </pre>
+     *
+     * <p>All objects whose type is a subclass of {@code ChronoCondition} can be also used as parameter, for example
+     * localized weekends by the expression {@code Weekmodel.of(locale).weekend()}. </p>
+     *
+     * @param   exclusion   filter as predicate
+     * @return  daily filtered stream
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @see     #toCanonical()
+     * @see     net.time4j.engine.ChronoCondition
+     * @since   4.24
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der &uuml;ber jedes Kalenderdatum der kanonischen Form
+     * dieses Intervalls geht und den angegebenen Ausschlu&szlig;filter anwendet. </p>
+     *
+     * <p>Beispiel des Ausschlusses von Samstag und Sonntag: </p>
+     *
+     * <pre>
+     *     DateInterval.between(
+     *       PlainDate.of(2017, 2, 1),
+     *       PlainDate.of(2017, 2, 8)
+     *     ).streamExcluding(Weekday.SATURDAY.or(Weekday.SUNDAY)).forEach(System.out::println);
+     * </pre>
+     *
+     * <p>Alle Objekte, deren Typ eine Subklasse von {@code ChronoCondition} darstellt, k&ouml;nnen ebenfalls
+     * als Parameter verwendet werden, zum Beispiel lokalisierte Wochenenden mit dem Ausdruck
+     * {@code Weekmodel.of(locale).weekend()}. </p>
+     *
+     * @param   exclusion   filter as predicate
+     * @return  daily filtered stream
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @see     #toCanonical()
+     * @see     net.time4j.engine.ChronoCondition
+     * @since   4.24
+     */
+    public Stream<PlainDate> streamExcluding(Predicate<? super PlainDate> exclusion) {
+
+        return this.streamDaily().filter(exclusion.negate());
 
     }
 
