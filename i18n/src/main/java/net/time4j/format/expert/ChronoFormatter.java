@@ -1125,6 +1125,7 @@ public final class ChronoFormatter<T>
      *  <li>{@link Attributes#LANGUAGE}</li>
      *  <li>{@link Attributes#ZERO_DIGIT}</li>
      *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
+     *  <li>{@link Attributes#NUMBER_SYSTEM}</li>
      * </ul>
      *
      * <p>If necessary all inner format elements which are locale-dependent
@@ -1161,6 +1162,7 @@ public final class ChronoFormatter<T>
      *  <li>{@link Attributes#LANGUAGE}</li>
      *  <li>{@link Attributes#ZERO_DIGIT}</li>
      *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
+     *  <li>{@link Attributes#NUMBER_SYSTEM}</li>
      * </ul>
      *
      * <p>Angepasst werden bei Bedarf auch innere Formatelemente, die
