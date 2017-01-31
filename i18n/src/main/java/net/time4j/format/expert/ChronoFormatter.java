@@ -1172,7 +1172,12 @@ public final class ChronoFormatter<T>
      *  <li>{@link Attributes#LANGUAGE}</li>
      *  <li>{@link Attributes#ZERO_DIGIT}</li>
      *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
+     *  <li>{@link Attributes#NUMBER_SYSTEM}</li>
      * </ul>
+     *
+     * <p>Example for the support of unicode-nu-extension since v4.24: The parameter
+     * {@code Locale.forLanguageTag("th-TH-u-nu-" + NumberSystem.THAI.getCode())} will
+     * set the Thai numbering system. </p>
      *
      * <p>If necessary all inner format elements which are locale-dependent
      * will also be adjusted. Some country-specific extensions like
@@ -1194,6 +1199,7 @@ public final class ChronoFormatter<T>
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
      *          this instance remains unaffected
+     * @throws  IllegalArgumentException if an unicode extension is not recognized or supported
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie mit der alternativ angegebenen
@@ -1208,7 +1214,12 @@ public final class ChronoFormatter<T>
      *  <li>{@link Attributes#LANGUAGE}</li>
      *  <li>{@link Attributes#ZERO_DIGIT}</li>
      *  <li>{@link Attributes#DECIMAL_SEPARATOR}</li>
+     *  <li>{@link Attributes#NUMBER_SYSTEM}</li>
      * </ul>
+     *
+     * <p>Beispiel zur Unterst&uuml;tzung der Unicode-nu-Erweiterung seit v4.24: Der Parameter
+     * {@code Locale.forLanguageTag("th-TH-u-nu-" + NumberSystem.THAI.getCode())} wird
+     * das Thai-Zahlensystem setzen. </p>
      *
      * <p>Angepasst werden bei Bedarf auch innere Formatelemente, die
      * Bestandteil landesabh&auml;ngiger chronologischer Erweiterungen wie
@@ -1231,6 +1242,7 @@ public final class ChronoFormatter<T>
      * @param   locale      new language and country configuration
      * @return  changed copy with given language and localized symbols while
      *          this instance remains unaffected
+     * @throws  IllegalArgumentException if an unicode extension is not recognized or supported
      */
     @Override
     public ChronoFormatter<T> with(Locale locale) {

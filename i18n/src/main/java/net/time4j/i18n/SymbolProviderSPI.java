@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SymbolProviderSPI.java) is part of project Time4J.
  *
@@ -70,11 +70,9 @@ public final class SymbolProviderSPI
         INSTANCE = new SymbolProviderSPI();
 
         Map<String, NumberSystem> map = new HashMap<>();
-        map.put("latn", NumberSystem.ARABIC);
-        map.put("arab", NumberSystem.ARABIC_INDIC);
-        map.put("arabext", NumberSystem.ARABIC_INDIC_EXT);
-        map.put("deva", NumberSystem.DEVANAGARI);
-        map.put("mymr", NumberSystem.MYANMAR);
+        for (NumberSystem numsys : NumberSystem.values()) {
+            map.put(numsys.getCode(), numsys);
+        }
         CLDR_NAMES = Collections.unmodifiableMap(map);
     }
 
@@ -140,7 +138,7 @@ public final class SymbolProviderSPI
     @Override
     public NumberSystem getDefaultNumberSystem(Locale locale) {
 
-        String cldr = lookup(locale, "numsys", "latn");
+        String cldr = lookup(locale, "numsys", NumberSystem.ARABIC.getCode());
         return CLDR_NAMES.get(cldr);
 
     }

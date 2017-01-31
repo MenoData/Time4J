@@ -48,15 +48,17 @@ public enum NumberSystem {
     /**
      * Arabic numbers with the decimal digits 0-9 (default setting).
      *
-     * <p>This number system is used worldwide. Direct conversion of negative integers is not supported. </p>
+     * <p>This number system is used worldwide. Direct conversion of negative integers is not supported.
+     * {@link #getCode() Code}: &quot;latn&quot; as inconsistently defined in CLDR (has nothing to do with Latin). </p>
      */
     /*[deutsch]
      * Arabische Zahlen mit den Dezimalziffern 0-9 (Standardeinstellung).
      *
      * <p>Dieses Zahlsystem wird weltweit verwendet. Die direkte Konversion von negativen Ganzzahlen
-     * wird jedoch nicht unterst&uuml;tzt. </p>
+     * wird jedoch nicht unterst&uuml;tzt. {@link #getCode() Code}: &quot;latn&quot;, inkonsistent in CLDR definiert,
+     * weil es mit Latein nichts zu tun hat. </p>
      */
-    ARABIC() {
+    ARABIC("latn") {
         @Override
         public String toNumeral(int number) {
             if (number < 0) {
@@ -89,18 +91,19 @@ public enum NumberSystem {
     /**
      * Arabic-Indic numbers (used in many Arabic countries).
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;arab&quot; as defined shortened in CLDR. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Arabisch-indische Zahlen (in vielen arabischen L&auml;ndern verwendet).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;arab&quot;
+     * wie in CLDR verk&uuml;rzt definiert. </p>
      *
      * @since   3.23/4.19
      */
-    ARABIC_INDIC() {
+    ARABIC_INDIC("arab") {
         @Override
         public String getDigits() {
             return "\u0660\u0661\u0662\u0663\u0664\u0665\u0666\u0667\u0668\u0669";
@@ -114,18 +117,18 @@ public enum NumberSystem {
     /**
      * Extended Arabic-Indic numbers (used for example in Iran).
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;arabext&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Erweiterte arabisch-indische Zahlen (zum Beispiel im Iran).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;arabext&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    ARABIC_INDIC_EXT() {
+    ARABIC_INDIC_EXT("arabext") {
         @Override
         public String getDigits() {
             return "\u06F0\u06F1\u06F2\u06F3\u06F4\u06F5\u06F6\u06F7\u06F8\u06F9";
@@ -139,18 +142,18 @@ public enum NumberSystem {
     /**
      * The Bengali digits used in parts of India.
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;beng&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Die Bengalii-Ziffern (in Teilen von Indien verwendet).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;beng&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    BENGALI() {
+    BENGALI("beng") {
         @Override
         public String getDigits() {
             return "\u09E6\u09E7\u09E8\u09E9\u09EA\u09EB\u09EC\u09ED\u09EE\u09EF";
@@ -164,18 +167,18 @@ public enum NumberSystem {
     /**
      * The Devanagari digits used in parts of India.
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;deva&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Die Devanagari-Ziffern (in Teilen von Indien verwendet).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;deva&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    DEVANAGARI() {
+    DEVANAGARI("deva") {
         @Override
         public String getDigits() {
             return "\u0966\u0967\u0968\u0969\u096A\u096B\u096C\u096D\u096E\u096F";
@@ -190,7 +193,7 @@ public enum NumberSystem {
      * Dozenal numbers describe a 12-based positional numbering system.
      *
      * <p>See also <a href="https://en.wikipedia.org/wiki/Duodecimal">Wikipedia</a>.
-     * Note: Must not be negative. </p>
+     * Note: Must not be negative. {@link #getCode() Code}: &quot;dozenal&quot; (no CLDR-equivalent). </p>
      *
      * @since   3.26/4.22
      */
@@ -198,11 +201,11 @@ public enum NumberSystem {
      * Zw&ouml;lfersystem, das ein Stellenwertsystem zur Zahlendarstellung mit der Basis 12 darstellt.
      *
      * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Duodezimalsystem">Wikipedia</a>.
-     * Hinweis: Darf nicht negativ sein. </p>
+     * Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;dozenal&quot; (kein CLDR-&Auml;quivalent). </p>
      *
      * @since   3.26/4.22
      */
-    DOZENAL() {
+    DOZENAL("dozenal") {
         @Override
         public String toNumeral(int number) {
             if (number < 0) {
@@ -259,15 +262,15 @@ public enum NumberSystem {
      * Ethiopic numerals (always positive).
      *
      * <p>See also <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>.
-     * Attention: This enum is not a decimal system. </p>
+     * Attention: This enum is not a decimal system. {@link #getCode() Code}: &quot;ethiopic&quot;. </p>
      */
     /*[deutsch]
      * &Auml;thiopische Numerale (immer positiv).
      *
      * <p>Siehe auch <a href="http://www.geez.org/Numerals/">A Look at Ethiopic Numerals</a>.
-     * Achtung: Dieses Enum ist kein Dezimalsystem. </p>
+     * Achtung: Dieses Enum ist kein Dezimalsystem. {@link #getCode() Code}: &quot;ethiopic&quot;. </p>
      */
-    ETHIOPIC() {
+    ETHIOPIC("ethiopic") {
         @Override
         public String toNumeral(int number) {
             if (number < 1) {
@@ -390,18 +393,18 @@ public enum NumberSystem {
     /**
      * The Gujarati digits used in parts of India.
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;gujr&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Die Gujarati-Ziffern (in Teilen von Indien verwendet).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;gujr&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    GUJARATI() {
+    GUJARATI("gujr") {
         @Override
         public String getDigits() {
             return "\u0AE6\u0AE7\u0AE8\u0AE9\u0AEA\u0AEB\u0AEC\u0AED\u0AEE\u0AEF";
@@ -415,18 +418,18 @@ public enum NumberSystem {
     /**
      * Traditional number system used by Khmer people in Cambodia.
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;khmr&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Traditionelles Zahlsystem vom Khmer-Volk in Kambodscha verwendet.
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;khmr&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    KHMER() {
+    KHMER("khmr") {
         @Override
         public String getDigits() {
             return "\u17E0\u17E1\u17E2\u17E3\u17E4\u17E5\u17E6\u17E7\u17E8\u17E9";
@@ -440,18 +443,18 @@ public enum NumberSystem {
     /**
      * The number system used in Myanmar (Burma).
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;mymr&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Das traditionelle Zahlsystem von Myanmar (Burma).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;mymr&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    MYANMAR() {
+    MYANMAR("mymr") {
         @Override
         public String getDigits() {
             return "\u1040\u1041\u1042\u1043\u1044\u1045\u1046\u1047\u1048\u1049";
@@ -467,16 +470,18 @@ public enum NumberSystem {
      *
      * <p>If the leniency is strict then parsing of Roman numerals will only follow modern usage.
      * The parsing is always case-insensitive. See also
-     * <a href="https://en.wikipedia.org/wiki/Roman_numerals">Roman Numerals</a>. </p>
+     * <a href="https://en.wikipedia.org/wiki/Roman_numerals">Roman Numerals</a>.
+     * {@link #getCode() Code}: &quot;roman&quot; (deviation from CLDR). </p>
      */
     /*[deutsch]
      * R&ouml;mische Numerale im Wertbereich 1-3999.
      *
      * <p>Wenn die Nachsichtigkeit strikt ist, wird das Interpretieren von r&ouml;mischen Numeralen
      * nur dem modernen Gebrauch folgen. Die Gro&szlig;- und Kleinschreibung spielt keine Rolle. Siehe
-     * auch <a href="https://en.wikipedia.org/wiki/Roman_numerals">Roman Numerals</a>. </p>
+     * auch <a href="https://en.wikipedia.org/wiki/Roman_numerals">Roman Numerals</a>.
+     * {@link #getCode() Code}: &quot;roman&quot; (Abweichung von CLDR). </p>
      */
-    ROMAN() {
+    ROMAN("roman") {
         @Override
         public String toNumeral(int number) {
             if ((number < 1) || (number > 3999)) {
@@ -574,18 +579,18 @@ public enum NumberSystem {
     /**
      * The Telugu digits used in parts of India.
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;telu&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Die Telugu-Ziffern (in Teilen von Indien verwendet).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;telu&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    TELUGU() {
+    TELUGU("telu") {
         @Override
         public String getDigits() {
             return "\u0C66\u0C67\u0C68\u0C69\u0C6A\u0C6B\u0C6C\u0C6D\u0C6E\u0C6F";
@@ -599,18 +604,18 @@ public enum NumberSystem {
     /**
      * The Thai digits used in Thailand (Siam).
      *
-     * <p>Note: Must not be negative. </p>
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;thai&quot;. </p>
      *
      * @since   3.23/4.19
      */
     /*[deutsch]
      * Die Thai-Ziffern (in Thailand verwendet).
      *
-     * <p>Hinweis: Darf nicht negativ sein. </p>
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;thai&quot;. </p>
      *
      * @since   3.23/4.19
      */
-    THAI() {
+    THAI("thai") {
         @Override
         public String getDigits() {
             return "\u0E50\u0E51\u0E52\u0E53\u0E54\u0E55\u0E56\u0E57\u0E58\u0E59";
@@ -630,6 +635,16 @@ public enum NumberSystem {
     private static final String[] LETTERS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
     private static final int[] D_FACTORS = {1, 12, 144, 1728, 20736};
+
+    //~ Instanzvariablen --------------------------------------------------
+
+    private final String code;
+
+    //~ Konstruktoren -----------------------------------------------------
+
+    private NumberSystem(String code) {
+        this.code = code;
+    }
 
     //~ Methoden ----------------------------------------------------------
 
@@ -841,6 +856,32 @@ public enum NumberSystem {
     public boolean isDecimal() {
 
         throw new AbstractMethodError();
+
+    }
+
+    /**
+     * <p>Obtains an identifier which can be used together with the unicode extension &quot;nu&quot;
+     * in {@code Locale}-parameters. </p>
+     *
+     * <p>Example: {@code Locale.forLanguageTag("th-TH-u-nu-" + NumberSystem.THAI.getCode())}
+     * would set the Thai-number-system where the code &quot;thai&quot; is used. </p>
+     *
+     * @return  unicode extension identifier (in most cases defined like in CLDR)
+     * @since   4.24
+     */
+    /*[deutsch]
+     * <p>Liefert ein Kennzeichen, das zusammen mit der Unicode-Erweiterung &quot;nu&quot;
+     * in {@code Locale}-Parametern verwendet werden kann. </p>
+     *
+     * <p>Beispiel: {@code Locale.forLanguageTag("th-TH-u-nu-" + NumberSystem.THAI.getCode())} w&uuml;rde
+     * das Thai-Zahlensystem setzen, indem der Code &quot;thai&quot; verwendet wird. </p>
+     *
+     * @return  unicode extension identifier (in most cases defined like in CLDR)
+     * @since   4.24
+     */
+    public String getCode() {
+
+        return this.code;
 
     }
 

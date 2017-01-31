@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AttributeSet.java) is part of project Time4J.
  *
@@ -348,6 +348,7 @@ final class AttributeSet
      *
      * @param   locale      new language and country setting
      * @return  this instance for method chaining
+     * @throws  IllegalArgumentException if an unicode extension is not recognized
      */
     AttributeSet withLocale(Locale locale) {
 
@@ -359,10 +360,7 @@ final class AttributeSet
         String lang = LanguageMatch.getAlias(locale);
         String country = locale.getCountry();
 
-        if (
-            lang.isEmpty()
-            && country.isEmpty()
-        ) {
+        if (lang.isEmpty() && country.isEmpty()) {
             locale = Locale.ROOT;
             builder.set(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
             builder.set(Attributes.DECIMAL_SEPARATOR, ISO_DECIMAL_SEPARATOR);
@@ -398,7 +396,25 @@ final class AttributeSet
                 }
             }
 
-            builder.set(Attributes.NUMBER_SYSTEM, symbols.numsys);
+            String code = locale.getUnicodeLocaleType("nu");
+            NumberSystem numsys;
+
+            if (code == null) {
+                numsys = symbols.defnumsys;
+            } else {
+                numsys = null;
+                for (NumberSystem ns : NumberSystem.values()) {
+                    if (code.equals(ns.getCode())) {
+                        numsys = ns;
+                        break;
+                    }
+                }
+                if (numsys == null) {
+                    throw new IllegalArgumentException("Unsupported unicode-nu-extension: " + code);
+                }
+            }
+
+            builder.set(Attributes.NUMBER_SYSTEM, numsys);
             builder.set(Attributes.ZERO_DIGIT, symbols.zeroDigit); // allow deviation
             builder.set(Attributes.DECIMAL_SEPARATOR, symbols.decimalSeparator);
             plus = symbols.plus;
@@ -444,7 +460,7 @@ final class AttributeSet
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final NumberSystem numsys;
+        private final NumberSystem defnumsys;
         private final char zeroDigit;
         private final char decimalSeparator;
         private final String plus;
@@ -453,7 +469,7 @@ final class AttributeSet
         //~ Konstruktoren -------------------------------------------------
 
         NumericalSymbols(
-            NumberSystem numsys,
+            NumberSystem defnumsys,
             char zeroDigit,
             char decimalSeparator,
             String plus,
@@ -461,7 +477,7 @@ final class AttributeSet
         ) {
             super();
 
-            this.numsys = numsys;
+            this.defnumsys = defnumsys;
             this.zeroDigit = zeroDigit;
             this.decimalSeparator = decimalSeparator;
             this.plus = plus;

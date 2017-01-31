@@ -40,7 +40,7 @@ public class DozenalNumberTest {
     }
 
     @Test
-    public void printDate() {
+    public void printDate1() {
         ChronoFormatter<PlainDate> f =
             ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
                 .addFixedInteger(PlainDate.YEAR, 4)
@@ -56,15 +56,30 @@ public class DozenalNumberTest {
         assertThat(
             f.format(PlainDate.of(2017, 10, 11)),
             is("1201-0\u218A-0\u218B"));
+    }
 
-        ChronoFormatter<LocalDate> f2 =
+    @Test
+    public void printDate2() {
+        ChronoFormatter<LocalDate> f =
             ChronoFormatter.ofPattern(
-                "yyyy-ppM-ppd", PatternType.THREETEN, Locale.ROOT, PlainDate.axis(TemporalType.LOCAL_DATE))
-                .with(Attributes.NUMBER_SYSTEM, NumberSystem.DOZENAL)
-                .with(Attributes.PAD_CHAR, '0');
+                "yyyy-ppM-ppd",
+                PatternType.THREETEN,
+                Locale.forLanguageTag("fr-u-nu-dozenal"), // set the number system to DOZENAL
+                PlainDate.axis(TemporalType.LOCAL_DATE)
+            ).with(Attributes.PAD_CHAR, '0');
         assertThat(
-            f2.format(LocalDate.of(2017, 10, 11)),
+            f.format(LocalDate.of(2017, 10, 11)),
             is("1201-0\u218A-0\u218B"));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void printDateWithWrongUnicodeExtension() {
+        ChronoFormatter.ofPattern(
+            "yyyy-ppM-ppd",
+            PatternType.THREETEN,
+            Locale.forLanguageTag("fr-u-nu-dozl"), // wrong extension code
+            PlainDate.axis(TemporalType.LOCAL_DATE)
+        );
     }
 
     @Test
