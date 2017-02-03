@@ -201,7 +201,7 @@ public final class CalendarWeek
         if ((year < GregorianMath.MIN_YEAR) || (year > GregorianMath.MAX_YEAR)) {
             throw new IllegalArgumentException("Year out of bounds: " + year);
         } else if ((week < 1) || (week > wmax)) {
-            throw new NullPointerException("Week-of-year out of bounds: " + week);
+            throw new IllegalArgumentException("Week-of-year out of bounds: " + week);
         }
 
         this.year = year;
