@@ -22,6 +22,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ComparatorTest.class,
         DateIntervalFormatTest.class,
         DayPartitionTest.class,
+        HolidayTest.class,
         IntervalCollectionTest.class,
         IntervalTreeTest.class,
         IsoRecurrenceTest.class,

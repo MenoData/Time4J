@@ -34,6 +34,8 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
@@ -541,6 +543,34 @@ public final class DateInterval
 
         return this.toFullDays().in(
             Timezone.of(tzid).with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET)));
+
+    }
+
+    /**
+     * <p>Lets given query evaluate this interval. </p>
+     *
+     * @param   <R> generic type of result of query
+     * @param   function    interval query
+     * @return  result of query or {@code null} if undefined
+     * @throws  ChronoException if the given query is not executable
+     * @see     HolidayModel#firstBusinessDay()
+     * @see     HolidayModel#lastBusinessDay()
+     * @since   4.24
+     */
+    /*[deutsch]
+     * <p>L&auml;&szlig;t die angegebene Abfrage dieses Intervall auswerten. </p>
+     *
+     * @param   <R> generic type of result of query
+     * @param   function    interval query
+     * @return  result of query or {@code null} if undefined
+     * @throws  ChronoException if the given query is not executable
+     * @see     HolidayModel#firstBusinessDay()
+     * @see     HolidayModel#lastBusinessDay()
+     * @since   4.24
+     */
+    public final <R> R get(ChronoFunction<ChronoInterval<PlainDate>, R> function) {
+
+        return function.apply(this);
 
     }
 
