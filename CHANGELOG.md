@@ -10,6 +10,7 @@
 - Adjust leap second expiry date [#601]
 
 ### Fixed
+- Invalid CalendarWeek throws wrong exception [#612]
 - equals-contract for ChronoFormatter including zone elements broken [#604]
 
 ## [v3.27] published on 2017-01-08
