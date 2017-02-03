@@ -21,6 +21,11 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class CalendarWeekTest {
 
+    @Test(expected=IllegalArgumentException.class)
+    public void invalidWeek() {
+        CalendarWeek.of(2014, 53);
+    }
+
     @Test
     public void fromGregorianDate() {
         assertThat(
