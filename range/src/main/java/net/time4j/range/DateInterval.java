@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateInterval.java) is part of project Time4J.
  *
@@ -205,6 +205,29 @@ public final class DateInterval
 
         return between(date, date);
 
+    }
+
+    /**
+     * <p>Converts an arbitrary date interval to an interval of this type. </p>
+     *
+     * @param   interval    any kind of date interval
+     * @return  DateInterval
+     * @since   3.28/4.24
+     */
+    /*[deutsch]
+     * <p>Konvertiet ein beliebiges Datumsintervall zu einem Intervall dieses Typs. </p>
+     *
+     * @param   interval    any kind of date interval
+     * @return  DateInterval
+     * @since   3.28/4.24
+     */
+    public static DateInterval from(ChronoInterval<PlainDate> interval) {
+
+        if (interval instanceof DateInterval) {
+            return DateInterval.class.cast(interval);
+        } else {
+            return new DateInterval(interval.getStart(), interval.getEnd());
+        }
     }
 
     /**
