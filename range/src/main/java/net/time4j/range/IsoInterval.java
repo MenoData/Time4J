@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoInterval.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Temporal;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
@@ -128,6 +129,54 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         return this.end;
 
     }
+
+    /**
+     * <p>Lets given query evaluate this interval. </p>
+     *
+     * @param   <R> generic type of result of query
+     * @param   function    interval query
+     * @return  result of query or {@code null} if undefined
+     * @throws  net.time4j.engine.ChronoException if the given query is not executable
+     * @see     HolidayModel#firstBusinessDay()
+     * @see     HolidayModel#lastBusinessDay()
+     * @since   4.24
+     */
+    /*[deutsch]
+     * <p>L&auml;&szlig;t die angegebene Abfrage dieses Intervall auswerten. </p>
+     *
+     * @param   <R> generic type of result of query
+     * @param   function    interval query
+     * @return  result of query or {@code null} if undefined
+     * @throws  net.time4j.engine.ChronoException if the given query is not executable
+     * @see     HolidayModel#firstBusinessDay()
+     * @see     HolidayModel#lastBusinessDay()
+     * @since   4.24
+     */
+    public final <R> R get(ChronoFunction<ChronoInterval<T>, R> function) {
+
+        return function.apply(this);
+
+    }
+
+//    /**
+//     * <p>Checks if this interval matches given condition. </p>
+//     *
+//     * @param   condition    interval query as conditional expression
+//     * @return  {@code true} if given condition is matched else {@code false}
+//     * @since   4.24
+//     */
+//    /*[deutsch]
+//     * <p>Pr&uuml;ft, ob die angegebene Bedingung von diesem Intervall erf&uuml;llt wird. </p>
+//     *
+//     * @param   condition    interval query as conditional expression
+//     * @return  {@code true} if given condition is matched else {@code false}
+//     * @since   4.24
+//     */
+//    public final boolean matches(ChronoCondition<ChronoInterval<T>> condition) {
+//
+//        return condition.test(this);
+//
+//    }
 
     /**
      * <p>Yields a copy of this interval with given start time. </p>
