@@ -1,5 +1,6 @@
 ## [v4.24] not yet released
 ### Added
+- New HolidayModel-interface [#487]
 - New streaming method for DateInterval with exclusion [#610]
 - Support unicode-nu-extension in formatting and parsing [#611]
 - Static from(GregorianDate)-factories for partial calendar classes [#600]
