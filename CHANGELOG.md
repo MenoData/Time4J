@@ -1,5 +1,8 @@
-## [v4.24] not yet released
+## [v4.25] not yet released
+
+## [v4.24] published on 2017-02-06
 ### Added
+- Stream support for fixed calendar intervals [#613]
 - New HolidayModel-interface [#487]
 - New streaming method for DateInterval with exclusion [#610]
 - Support unicode-nu-extension in formatting and parsing [#611]
