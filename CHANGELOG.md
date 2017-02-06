@@ -1,4 +1,6 @@
-## [v3.28] not yet released
+## [v3.29] not yet released
+
+## [v3.28] published on 2017-02-06
 ### Added
 - Static from(GregorianDate)-factories for partial calendar classes [#600]
 - New counting method for class LeapSeconds [#608]
