@@ -78,6 +78,7 @@ import java.util.NoSuchElementException;
  * </pre>
  *
  * <p>Note: The current calendar week can be determined by an expression like:
+ * {@link #nowInSystemTime()} or in a more general way
  * {@code CalendarWeek current = SystemClock.inLocalView().now(CalendarWeek.chronology())}. </p>
  *
  * @author  Meno Hochschild
@@ -105,6 +106,7 @@ import java.util.NoSuchElementException;
  * </pre>
  *
  * <p>Hinweis: Die aktuelle Kalenderwoche kann mit einem Ausdruck wie folgt bestimmt werden:
+ * {@link #nowInSystemTime()} oder allgemeiner
  * {@code CalendarWeek current = SystemClock.inLocalView().now(CalendarWeek.chronology())}. </p>
  *
  * @author  Meno Hochschild
