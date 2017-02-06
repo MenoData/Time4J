@@ -71,6 +71,7 @@ import java.util.NoSuchElementException;
  * </ul>
  *
  * <p>Note: The current quarter of calendar year can be determined by an expression like:
+ * {@link #nowInSystemTime()} or in a more general way
  * {@code CalendarQuarter current = SystemClock.inLocalView().now(CalendarQuarter.chronology())}. </p>
  *
  * @author  Meno Hochschild
@@ -88,6 +89,7 @@ import java.util.NoSuchElementException;
  * </ul>
  *
  * <p>Hinweis: Das aktuelle Quartal kann mit einem Ausdruck wie folgt bestimmt werden:
+ * {@link #nowInSystemTime()} oder allgemeiner
  * {@code CalendarQuarter current = SystemClock.inLocalView().now(CalendarQuarter.chronology())}. </p>
  *
  * @author  Meno Hochschild

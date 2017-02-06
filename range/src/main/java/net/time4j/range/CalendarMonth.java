@@ -86,6 +86,7 @@ import java.util.NoSuchElementException;
  * </pre>
  *
  * <p>Note: The current month of calendar year can be determined by an expression like:
+ * {@link #nowInSystemTime()} or in a more general way
  * {@code CalendarMonth current = SystemClock.inLocalView().now(CalendarMonth.chronology())}. </p>
  *
  * @author  Meno Hochschild
@@ -115,6 +116,7 @@ import java.util.NoSuchElementException;
  * </pre>
  *
  * <p>Hinweis: Der aktuelle Monat kann mit einem Ausdruck wie folgt bestimmt werden:
+ * {@link #nowInSystemTime()} oder allgemeiner
  * {@code CalendarMonth current = SystemClock.inLocalView().now(CalendarMonth.chronology())}. </p>
  *
  * @author  Meno Hochschild

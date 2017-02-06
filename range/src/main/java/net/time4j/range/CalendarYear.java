@@ -68,6 +68,7 @@ import java.util.NoSuchElementException;
  * </ul>
  *
  * <p>Note: The current calendar year can be determined by an expression like:
+ * {@link #nowInSystemTime()} or in a more general way
  * {@code CalendarYear current = SystemClock.inLocalView().now(CalendarYear.chronology())}. </p>
  *
  * @author  Meno Hochschild
@@ -83,6 +84,7 @@ import java.util.NoSuchElementException;
  * </ul>
  *
  * <p>Hinweis: Das aktuelle Kalenderjahr kann mit einem Ausdruck wie folgt bestimmt werden:
+ * {@link #nowInSystemTime()} oder allgemeiner
  * {@code CalendarYear current = SystemClock.inLocalView().now(CalendarYear.chronology())}. </p>
  *
  * @author  Meno Hochschild
