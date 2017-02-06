@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FixedCalendarInterval.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.engine.ChronoEntity;
 
 import java.io.Serializable;
+import java.util.stream.Stream;
 
 
 /**
@@ -223,6 +224,24 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
     public DateInterval toFlexInterval() {
 
         return new DateInterval(this.getStart(), this.getEnd());
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every calendar date of this interval. </p>
+     *
+     * @return  daily stream
+     * @since   4.24
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der &uuml;ber jedes Kalenderdatum dieses Intervalls geht. </p>
+     *
+     * @return  daily stream
+     * @since   4.24
+     */
+    public Stream<PlainDate> streamDaily() {
+
+        return DateInterval.streamDaily(this.getStart().getTemporal(), this.getEnd().getTemporal());
 
     }
 

@@ -12,7 +12,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -41,10 +44,12 @@ public class CalendarWeekTest {
                 public int getYear() {
                     return 2015;
                 }
+
                 @Override
                 public int getMonth() {
                     return 2;
                 }
+
                 @Override
                 public int getDayOfMonth() {
                     return 29;
@@ -225,6 +230,19 @@ public class CalendarWeekTest {
         assertThat(
             CalendarWeek.nowInSystemTime(),
             is(SystemClock.inLocalView().now(CalendarWeek.chronology())));
+    }
+
+    @Test
+    public void streamDaily() {
+        List<PlainDate> expected = new ArrayList<>();
+        expected.add(PlainDate.of(2016, 1, 25));
+        expected.add(PlainDate.of(2016, 1, 26));
+        expected.add(PlainDate.of(2016, 1, 27));
+        expected.add(PlainDate.of(2016, 1, 28));
+        expected.add(PlainDate.of(2016, 1, 29));
+        expected.add(PlainDate.of(2016, 1, 30));
+        expected.add(PlainDate.of(2016, 1, 31));
+        assertThat(CalendarWeek.of(2016, 4).streamDaily().collect(Collectors.toList()), is(expected));
     }
 
 }
