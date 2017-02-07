@@ -132,33 +132,33 @@ import static net.time4j.scale.TimeScale.*;
  * <caption>What does happen around a leap second?</caption>
  * <tr>
  *     <th>time scale</th>
- *     <th>epoch<br /><code>Moment.of(0, scale)</code></th>
- *     <th>value space<br /><code>getElapsedTime(scale)</code></th>
- *     <th>lexical space<br /><code>toString(scale)</code></th>
+ *     <th>epoch<br><code>Moment.of(0, scale)</code></th>
+ *     <th>value space<br><code>getElapsedTime(scale)</code></th>
+ *     <th>lexical space<br><code>toString(scale)</code></th>
  * </tr>
  * <tr>
  *     <td>POSIX</td>
  *     <td>1970-01-01T00:00:00.000Z</td>
- *     <td>1483228799<br />1483228799<br />1483228800</td>
- *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:59.000Z<br />2017-01-01T00:00:00.000Z</td>
+ *     <td>1483228799<br>1483228799<br>1483228800</td>
+ *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:59.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>UTC</td>
  *     <td>1972-01-01T00:00:00.000Z</td>
- *     <td>1420156825<br />1420156826<br />1420156827</td>
- *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:60.000Z<br />2017-01-01T00:00:00.000Z</td>
+ *     <td>1420156825<br>1420156826<br>1420156827</td>
+ *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:60.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>TAI</td>
  *     <td>1971-12-31T23:59:50.000Z *)</td>
- *     <td>1420156835<br />1420156836<br />1420156837</td>
- *     <td>2017-01-01T00:00:35.000Z<br />2017-01-01T00:00:36.000Z<br />2017-01-01T00:00:37.000Z</td>
+ *     <td>1420156835<br>1420156836<br>1420156837</td>
+ *     <td>2017-01-01T00:00:35.000Z<br>2017-01-01T00:00:36.000Z<br>2017-01-01T00:00:37.000Z</td>
  * </tr>
  * <tr>
  *     <td>GPS</td>
  *     <td>1980-01-06T00:00:00.000Z</td>
- *     <td>1167264016<br />1167264017<br />1167264018</td>
- *     <td>2017-01-01T00:00:16.000Z<br />2017-01-01T00:00:17.000Z<br />2017-01-01T00:00:18.000Z</td>
+ *     <td>1167264016<br>1167264017<br>1167264018</td>
+ *     <td>2017-01-01T00:00:16.000Z<br>2017-01-01T00:00:17.000Z<br>2017-01-01T00:00:18.000Z</td>
  * </tr>
  * </table>
  * <p style="font-size: 0.9em;">*) This value is only virtual
@@ -216,33 +216,33 @@ import static net.time4j.scale.TimeScale.*;
  * <caption>Verschiedene Werte/Darstellungen ein- und desselben Moments</caption>
  * <tr>
  *     <th>time scale</th>
- *     <th>epoch<br /><code>Moment.of(0, scale)</code></th>
- *     <th>value space<br /><code>getElapsedTime(scale)</code></th>
- *     <th>lexical space<br /><code>toString(scale)</code></th>
+ *     <th>epoch<br><code>Moment.of(0, scale)</code></th>
+ *     <th>value space<br><code>getElapsedTime(scale)</code></th>
+ *     <th>lexical space<br><code>toString(scale)</code></th>
  * </tr>
  * <tr>
  *     <td>POSIX</td>
  *     <td>1970-01-01T00:00:00.000Z</td>
- *     <td>1483228799<br />1483228799<br />1483228800</td>
- *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:59.000Z<br />2017-01-01T00:00:00.000Z</td>
+ *     <td>1483228799<br>1483228799<br>1483228800</td>
+ *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:59.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>UTC</td>
  *     <td>1972-01-01T00:00:00.000Z</td>
- *     <td>1420156825<br />1420156826<br />1420156827</td>
- *     <td>2016-12-31T23:59:59.000Z<br />2016-12-31T23:59:60.000Z<br />2017-01-01T00:00:00.000Z</td>
+ *     <td>1420156825<br>1420156826<br>1420156827</td>
+ *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:60.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>TAI</td>
  *     <td>1971-12-31T23:59:50.000Z *)</td>
- *     <td>1420156835<br />1420156836<br />1420156837</td>
- *     <td>2017-01-01T00:00:35.000Z<br />2017-01-01T00:00:36.000Z<br />2017-01-01T00:00:37.000Z</td>
+ *     <td>1420156835<br>1420156836<br>1420156837</td>
+ *     <td>2017-01-01T00:00:35.000Z<br>2017-01-01T00:00:36.000Z<br>2017-01-01T00:00:37.000Z</td>
  * </tr>
  * <tr>
  *     <td>GPS</td>
  *     <td>1980-01-06T00:00:00.000Z</td>
- *     <td>1167264016<br />1167264017<br />1167264018</td>
- *     <td>2017-01-01T00:00:16.000Z<br />2017-01-01T00:00:17.000Z<br />2017-01-01T00:00:18.000Z</td>
+ *     <td>1167264016<br>1167264017<br>1167264018</td>
+ *     <td>2017-01-01T00:00:16.000Z<br>2017-01-01T00:00:17.000Z<br>2017-01-01T00:00:18.000Z</td>
  * </tr>
  * </table>
  * <p style="font-size: 0.9em;">*) Dieser Wert ist nur virtuell, weil TAI erst ab
