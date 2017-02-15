@@ -41,7 +41,6 @@ import java.math.RoundingMode;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
@@ -1196,10 +1195,14 @@ public final class MachineTime<U>
          * count of #-chars define the maximum width for formatted output and
          * parsing. </p>
          *
-         * <p>Optional sections let the parser be error-tolerant and continue
-         * with the next section in case of errors. During printing,
-         * an optional section will only be printed if there is any non-zero
-         * part. </p>
+         * <p><strong>Optional sections</strong></p>
+         *
+         * <p>Optional sections enclosed by square brackets let the parser be error-tolerant
+         * and continue with the next section in case of errors. During printing,
+         * an optional section will only be printed if there is any non-zero part. When parsing
+         * an optional section will be skipped if the input to be parsed does not match the
+         * expected pattern. For example: An input missing the hour part can be handled when
+         * an optional section is applied on the hour part. </p>
          *
          * <p><strong>Plural forms</strong></p>
          *
@@ -1297,11 +1300,15 @@ public final class MachineTime<U>
          * und der Anzahl der #-Zeichen definiert die maximale Breite, die ein
          * Dauerelement numerisch haben darf. </p>
          *
-         * <p>Optionale Abschnitte regeln, da&szlig; der Interpretationsvorgang
-         * bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
-         * Abschnitt fortsetzt und den fehlerhaften Abschnitt ignoriert. Es
-         * gilt auch, da&szlig; optionale Abschnitte nur dann etwas ausgeben,
-         * wenn es darin irgendeine von {code 0} verschiedene Dauerkomponente gibt. </p>
+         * <p><strong>Optionale Sektionen</strong></p>
+         *
+         * <p>Optionale Abschnitte, die durch eckige Klammern definiert sind, regeln, da&szlig; der
+         * Interpretationsvorgang bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
+         * Abschnitt fortsetzt und den fehlerhaften Abschnitt ignoriert. Zum Beispiel wird ein solcher
+         * Abschnitt ignoriert, wenn die Eingabe keinen Stundenteil hat, aber der Stundenteil im
+         * Abschnitt als optional gekennzeichnet ist. Es gilt auch, da&szlig; optionale
+         * Abschnitte nur dann etwas ausgeben, wenn es darin irgendeine von {code 0} verschiedene
+         * Dauerkomponente gibt. </p>
          *
          * <p><strong>Pluralformen</strong></p>
          *
