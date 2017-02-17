@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlatformTimezone.java) is part of project Time4J.
  *
@@ -71,6 +71,19 @@ final class PlatformTimezone
     //~ Konstruktoren -----------------------------------------------------
 
     /**
+     * <p>Wrapper around the default platform timezone. </p>
+     */
+    PlatformTimezone() {
+        super();
+
+        this.id = null;
+        this.tz = null;
+        this.strict = false;
+        this.fixedOffset = null;
+
+    }
+
+    /**
      * <p>Construtor for the system timezone (very internal use only). </p>
      *
      * @param   tzid    resolved id of system timezone
@@ -137,25 +150,44 @@ final class PlatformTimezone
     @Override
     public TZID getID() {
 
-        return this.id;
+        if (this.id == null) {
+            String zoneID = java.util.TimeZone.getDefault().getID();
+            return new NamedID(zoneID);
+        } else {
+            return this.id;
+        }
 
     }
 
     @Override
     public ZonalOffset getOffset(UnixTime ut) {
 
-        if (this.isFixed()) {
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else if (this.fixedOffset != null) {
             return this.fixedOffset;
+        } else {
+            inner = this.tz;
         }
 
-        return fromOffsetMillis(this.tz.getOffset(ut.getPosixTime() * 1000));
+        return fromOffsetMillis(inner.getOffset(ut.getPosixTime() * 1000));
 
     }
 
     @Override
     public ZonalOffset getStandardOffset(UnixTime ut) {
 
-        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
+        GregorianCalendar gcal = new GregorianCalendar(inner);
         gcal.setTimeInMillis(ut.getPosixTime() * 1000);
         return fromOffsetMillis(gcal.get(Calendar.ZONE_OFFSET));
 
@@ -164,7 +196,15 @@ final class PlatformTimezone
     @Override
     public ZonalOffset getDaylightSavingOffset(UnixTime ut){
 
-        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
+        GregorianCalendar gcal = new GregorianCalendar(inner);
         gcal.setTimeInMillis(ut.getPosixTime() * 1000);
         return fromOffsetMillis(gcal.get(Calendar.DST_OFFSET));
 
@@ -176,7 +216,7 @@ final class PlatformTimezone
         WallTime localTime
     ) {
 
-        if (this.isFixed()) {
+        if (this.fixedOffset != null) {
             return this.fixedOffset;
         }
 
@@ -221,8 +261,16 @@ final class PlatformTimezone
             ) * 1000 + (localTime.getNanosecond() / 1000000);
         }
 
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
         return fromOffsetMillis(
-            this.tz.getOffset(era, yearOfEra, month - 1, dom, dow, millis));
+            inner.getOffset(era, yearOfEra, month - 1, dom, dow, millis));
 
     }
 
@@ -232,7 +280,7 @@ final class PlatformTimezone
         WallTime localTime
     ) {
 
-        if (this.isFixed()) {
+        if (this.fixedOffset != null) {
             return false;
         }
 
@@ -244,7 +292,15 @@ final class PlatformTimezone
         int second = localTime.getSecond();
         int milli = localTime.getNanosecond() / 1000000;
 
-        GregorianCalendar gcal = new GregorianCalendar(this.tz);
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
+        GregorianCalendar gcal = new GregorianCalendar(inner);
         gcal.set(Calendar.MILLISECOND, milli);
         gcal.set(year, month - 1, day, hour, minute, second);
 
@@ -263,11 +319,19 @@ final class PlatformTimezone
     @Override
     public boolean isDaylightSaving(UnixTime ut) {
 
-        if (this.isFixed()) {
+        if (this.fixedOffset != null) {
             return false;
         }
 
-        return this.tz.inDaylightTime(new Date(ut.getPosixTime() * 1000));
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
+        return inner.inDaylightTime(new Date(ut.getPosixTime() * 1000));
 
     }
 
@@ -295,7 +359,9 @@ final class PlatformTimezone
 
         if (obj instanceof PlatformTimezone) {
             PlatformTimezone that = (PlatformTimezone) obj;
-            if (!this.tz.equals(that.tz)) {
+            if (this.id == null) {
+                return (that.id == null);
+            } else if (!this.tz.equals(that.tz) || (this.strict != that.strict)) {
                 return false;
             } else if (this.fixedOffset == null) {
                 return (that.fixedOffset == null);
@@ -310,18 +376,26 @@ final class PlatformTimezone
     @Override
     public int hashCode() {
 
-        return this.tz.hashCode();
+        return ((this.id == null) ? 0 : this.tz.hashCode());
 
     }
 
     @Override
     public String toString() {
 
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
         StringBuilder sb = new StringBuilder(256);
         sb.append('[');
         sb.append(this.getClass().getName());
         sb.append(':');
-        sb.append(this.tz);
+        sb.append(inner);
         sb.append(']');
         return sb.toString();
 
@@ -333,7 +407,15 @@ final class PlatformTimezone
         Locale locale
     ) {
 
-        return this.tz.getDisplayName(
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
+        return inner.getDisplayName(
             style.isDaylightSaving(),
             style.isAbbreviation()
                 ? java.util.TimeZone.SHORT
@@ -353,7 +435,7 @@ final class PlatformTimezone
     @Override
     public Timezone with(TransitionStrategy strategy) {
 
-        if (this.getStrategy() == strategy) {
+        if ((this.id == null) || (this.getStrategy() == strategy)) {
             return this;
         } else if (strategy == DEFAULT_CONFLICT_STRATEGY) {
             return new PlatformTimezone(this.id, this.tz, false);
@@ -392,7 +474,15 @@ final class PlatformTimezone
      */
     boolean isGMT() {
 
-        return this.tz.getID().equals("GMT");
+        java.util.TimeZone inner;
+
+        if (this.id == null) {
+            inner = java.util.TimeZone.getDefault();
+        } else {
+            inner = this.tz;
+        }
+
+        return inner.getID().equals("GMT");
 
     }
 
@@ -409,6 +499,10 @@ final class PlatformTimezone
      * @return      replacement object in serialization graph
      */
     private Object readResolve() {
+
+        if (this.id == null) {
+            return new PlatformTimezone();
+        }
 
         return new PlatformTimezone(this.id, this.tz, this.strict);
 

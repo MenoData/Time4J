@@ -28,6 +28,13 @@ public class PlatformTimezoneTest {
     private static final String PREFIX = "java.util.TimeZone~";
 
     @Test
+    public void ofPlatform() {
+        assertThat(
+            Timezone.ofPlatform().getID().canonical().equals(Timezone.ofSystem().getID().canonical()),
+            is(true));
+    }
+
+    @Test
     public void getOffsetOfUnixTimeSTD() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
         Moment utc = Moment.of(40 * 365 * 86400, TimeScale.POSIX);
