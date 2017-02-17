@@ -249,7 +249,7 @@ public final class SystemClock
     }
 
     /**
-     * <p>Creates a local clock in platform timezone. </p>
+     * <p>Creates a local clock in the platform timezone. </p>
      *
      * <p>Uses the standard clock {@code SystemClock.INSTANCE} and the platform timezone data. </p>
      *
