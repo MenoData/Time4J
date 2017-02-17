@@ -509,13 +509,16 @@ public abstract class Timezone
      * will determine the system timezone only for one time while being
      * loaded. </p>
      *
+     * <p>Once the identifier of the system timezone has been evaluated,
+     * it will be combined with the best available timezone data and rules. </p>
+     *
      * <p>Note: If the system timezone cannot be determined (for example
      * due to a wrong property value for &quot;user.timezone&quot;) then
      * this method will fall back to UTC timezone.. </p>
      *
      * @return  default timezone data of system
-     * @see     java.util.TimeZone#getDefault()
-     *          java.util.TimeZone.getDefault()
+     * @see     java.util.TimeZone#getDefault() java.util.TimeZone.getDefault()
+     * @see     #ofPlatform()
      */
     /*[deutsch]
      * <p>Liefert die Standard-Zeitzone des Systems. </p>
@@ -530,13 +533,16 @@ public abstract class Timezone
      * auch ge&auml;ndert werden, sonst wird sie einmalig beim Laden
      * dieser Klasse gesetzt. </p>
      *
+     * <p>Sobald die ID der Systemzeitzone ermittelt worden ist, wird Time4J
+     * sie mit den am besten geeigneten Zeitzonendaten und Regeln kombinieren. </p>
+     *
      * <p>Zu beachten: Kann die Standard-Zeitzone zum Beispiel wegen eines
      * falschen Property-Werts in &quot;user.timezone&quot; nicht interpretiert
      * werden, f&auml;llt diese Methode auf die UTC-Zeitzone zur&uuml;ck. </p>
      *
      * @return  default timezone data of system
-     * @see     java.util.TimeZone#getDefault()
-     *          java.util.TimeZone.getDefault()
+     * @see     java.util.TimeZone#getDefault() java.util.TimeZone.getDefault()
+     * @see     #ofPlatform()
      */
     public static Timezone ofSystem() {
 
@@ -547,6 +553,36 @@ public abstract class Timezone
             assert (SYSTEM_TZ_ORIGINAL != null);
             return SYSTEM_TZ_ORIGINAL;
         }
+
+    }
+
+    /**
+     * <p>Obtains the platform timezone with data and rules of the platform. </p>
+     *
+     * <p>Note that this method will never access the timezone repository of Time4J. In contrast,
+     * {@code Timezone.ofSystem()} only evaluates the identifier of the system timezone and combines
+     * it with the best available data and rules (possibly based on Time4J-data). </p>
+     *
+     * @return  system timezone using the platform timezone data and rules
+     * @since   3.29/4.25
+     * @see     #ofSystem()
+     * @see     java.util.TimeZone
+     */
+    /*[deutsch]
+     * <p>Liefert die Plattform-Zeitzone mitsamt den Daten und Regeln der Plattform. </p>
+     *
+     * <p>Zu beachten: Diese Methode wird niemals die Zeitzonendatenbank von Time4J nutzen. Im Gegensatz
+     * dazu wird {@code Timezone.ofSystem()} die ID der Systemzeitzone ermitteln und sie mit den besten
+     * verf&uuml;gbaren Daten und Regeln kombinieren (eventuell basierend auf Time4J-Daten). </p>
+     *
+     * @return  system timezone using the platform timezone data and rules
+     * @since   3.29/4.25
+     * @see     #ofSystem()
+     * @see     java.util.TimeZone
+     */
+    public static Timezone ofPlatform() {
+
+        return new PlatformTimezone();
 
     }
 
@@ -1678,66 +1714,6 @@ public abstract class Timezone
         ) {
             super(tz, queue);
             this.tzid = tz.getID().canonical();
-
-        }
-
-    }
-
-    private static class NamedID
-        implements TZID, Serializable {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        private static final long serialVersionUID = -4889632013137688471L;
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        /**
-         * @serial  timezone id
-         */
-        private final String tzid;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        NamedID(String tzid) {
-            super();
-
-            this.tzid = tzid;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public String canonical() {
-
-            return this.tzid;
-
-        }
-
-        @Override
-        public boolean equals(Object obj) {
-
-            if (obj instanceof NamedID) {
-                NamedID that = (NamedID) obj;
-                return this.tzid.equals(that.tzid);
-            } else {
-                return false;
-            }
-
-        }
-
-        @Override
-        public int hashCode() {
-
-            return this.tzid.hashCode();
-
-        }
-
-        @Override
-        public String toString() {
-
-            return this.getClass().getName() + "@" + this.tzid;
 
         }
 

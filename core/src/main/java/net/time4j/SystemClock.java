@@ -250,7 +250,7 @@ public final class SystemClock
     }
 
     /**
-     * <p>Creates a local clock in platform timezone. </p>
+     * <p>Creates a local clock in the platform timezone. </p>
      *
      * <p>Uses the standard clock {@code SystemClock.INSTANCE} and the platform timezone data. </p>
      *
@@ -267,7 +267,7 @@ public final class SystemClock
      *
      * @return  local clock in system timezone using the platform timezone data
      * @since   3.3/4.2
-     * @see     net.time4j.tz.Timezone#ofSystem()
+     * @see     net.time4j.tz.Timezone#ofPlatform()
      * @see     #INSTANCE
      * @see     java.util.TimeZone
      */
@@ -290,20 +290,13 @@ public final class SystemClock
      *
      * @return  local clock in system timezone using the platform timezone data
      * @since   3.3/4.2
-     * @see     net.time4j.tz.Timezone#ofSystem()
+     * @see     net.time4j.tz.Timezone#ofPlatform()
      * @see     #INSTANCE
      * @see     java.util.TimeZone
      */
     public static ZonalClock inPlatformView() {
 
-        Timezone sys = Timezone.ofSystem();
-
-        if (sys.getHistory() == null) {
-            return new ZonalClock(INSTANCE, sys);
-        }
-
-        String tzid = "java.util.TimeZone~" + sys.getID().canonical();
-        return new ZonalClock(INSTANCE, tzid);
+        return new ZonalClock(INSTANCE, Timezone.ofPlatform());
 
     }
 
