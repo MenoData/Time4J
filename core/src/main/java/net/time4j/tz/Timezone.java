@@ -553,7 +553,10 @@ public abstract class Timezone
      *
      * <p>Note that this method will never access the timezone repository of Time4J. In contrast,
      * {@code Timezone.ofSystem()} only evaluates the identifier of the system timezone and combines
-     * it with the best available data and rules (possibly based on Time4J-data). </p>
+     * it with the best available data and rules (possibly based on Time4J-data). Using the platform
+     * data can only be recommended in some situations on mobile platforms where device users try to
+     * compensate bad timezone data by adjusting the clock. Hence this method would help to achieve
+     * the correct local time as set on the mobile device. </p>
      *
      * @return  system timezone using the platform timezone data and rules
      * @since   3.29/4.25
@@ -565,7 +568,11 @@ public abstract class Timezone
      *
      * <p>Zu beachten: Diese Methode wird niemals die Zeitzonendatenbank von Time4J nutzen. Im Gegensatz
      * dazu wird {@code Timezone.ofSystem()} die ID der Systemzeitzone ermitteln und sie mit den besten
-     * verf&uuml;gbaren Daten und Regeln kombinieren (eventuell basierend auf Time4J-Daten). </p>
+     * verf&uuml;gbaren Daten und Regeln kombinieren (eventuell basierend auf Time4J-Daten). Die Verwendung
+     * der Plattform-Zeitzone kann nur in einigen Situationen auf Mobilger&auml;ten empfohlen werden, wo
+     * Anwender schlechte oder veraltete Zeitzonendaten mit Uhrverstellungen zu kompensieren versuchen.
+     * In einem solchen Fall kann diese Methode helfen, die richtige lokale Zeit zu erhalten, wie sie auf
+     * dem Mobilger&auml;t eingestellt worden ist. </p>
      *
      * @return  system timezone using the platform timezone data and rules
      * @since   3.29/4.25
