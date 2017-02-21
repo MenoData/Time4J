@@ -111,7 +111,7 @@ public class SystemClockTest {
 
     @Test
     public void nowMoment() {
-        Moment now = SystemClock.currentMoment();
+        Moment now = SystemClock.inLocalView().currentMoment();
         Moment expected = Moment.nowInSystemTime();
         assertThat(
             now.minus(1, TimeUnit.NANOSECONDS).isBefore(expected)
