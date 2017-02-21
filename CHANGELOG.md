@@ -2,6 +2,9 @@
 ### Added
 - More convenient access to platform timezone data [#616]
 
+### Fixed
+- Improve and fix parsing of decimal elements [#617]
+
 ## [v4.24] published on 2017-02-06
 ### Added
 - Stream support for fixed calendar intervals [#613]
