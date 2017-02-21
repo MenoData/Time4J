@@ -1,4 +1,6 @@
 ## [v4.25] not yet released
+### Added
+- More convenient access to platform timezone data [#616]
 
 ## [v4.24] published on 2017-02-06
 ### Added
