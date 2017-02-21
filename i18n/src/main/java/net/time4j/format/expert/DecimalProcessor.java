@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DecimalProcessor.java) is part of project Time4J.
  *
@@ -271,8 +271,8 @@ final class DecimalProcessor
 
         Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
-        if (leniency.isStrict() && (p != (this.precision - this.scale))) {
-            status.setError(pos, "Integer part does not match expected width.");
+        if (!leniency.isLax() && (p != (this.precision - this.scale))) {
+            status.setError(pos, "Integer part of decimal element does not match expected width.");
             return;
         }
 
@@ -313,7 +313,7 @@ final class DecimalProcessor
         } else if (leniency.isStrict() && (s != this.scale)) {
             status.setError(
                 pos,
-                "Fraction part does not match expected width.");
+                "Fraction part of decimal element does not match expected width.");
             return;
         }
 

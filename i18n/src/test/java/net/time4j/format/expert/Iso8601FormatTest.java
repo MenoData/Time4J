@@ -8,11 +8,11 @@ import net.time4j.Weekday;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.tz.ZonalOffset;
-
-import java.text.ParseException;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

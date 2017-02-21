@@ -3337,7 +3337,15 @@ public final class ChronoFormatter<T>
                     return values;
                 } else {
                     // Ende des optionalen Abschnitts suchen
-                    for (int j = len - 1; j > index; j--) {
+                    int level = step.getLevel();
+                    for (int j = index + 1; j < len; j++) {
+                        if (this.steps.get(j).getLevel() > level) {
+                            last = j;
+                        } else {
+                            break;
+                        }
+                    }
+                    for (int j = len - 1; j > last; j--) {
                         if (this.steps.get(j).getSection() == section) {
                             last = j;
                             break;
@@ -4235,6 +4243,34 @@ public final class ChronoFormatter<T>
         }
 
         /**
+         * <p>Equivalent to {@code addFixedDecimal(element, 11, 9)}. </p>
+         *
+         * <p>This method is mainly suitable for parsing. When printing the overloaded method with two
+         * extra integer arguments allow more control. </p>
+         *
+         * @param   element         chronological element
+         * @return  this instance for method chaining
+         * @see     #addFixedDecimal(ChronoElement, int, int)
+         * @since   3.29/4.25
+         */
+        /*[deutsch]
+         * <p>&Auml;quivalent zu {@code addFixedDecimal(element, 11, 9)}. </p>
+         *
+         * <p>Diese Methode ist vor allem zum Interpretieren (parse) gedacht. F&uuml;r die formatierte
+         * Ausgabe ist die &uuml;berladene Methode mit zwei extra int-Argumenten besser geeignet. </p>
+         *
+         * @param   element         chronological element
+         * @return  this instance for method chaining
+         * @see     #addFixedDecimal(ChronoElement, int, int)
+         * @since   3.29/4.25
+         */
+        public Builder<T> addFixedDecimal(ChronoElement<BigDecimal> element) {
+
+            return this.addFixedDecimal(element, 11, 9);
+
+        }
+
+        /**
          * <p>Defines a fixed unsigned decimal format for given chronological
          * element. </p>
          *
@@ -4249,9 +4285,11 @@ public final class ChronoFormatter<T>
          * with zero digit chars. Otherwise the sequence of decimal digits will
          * be truncated if necessary. </p></li>
          *
-         * <li>PARSE =&gt; Exactly {@code precision} chars will be
-         * interpreted as digits in strict mode. Otherwise as many digits are
-         * parsed as available and found. </li>
+         * <li>PARSE =&gt; Exactly {@code precision} chars will be interpreted
+         * as digits in strict mode. The strict mode also mandates {@code precision - scale}
+         * digits before the decimal separator. If the lax mode is applied then as many digits
+         * are parsed as available and found. The smart mode is strict before the decimal
+         * separator and lax after the decimal separator. </li>
          * </ol>
          *
          * <p>Example: </p>
@@ -4284,6 +4322,7 @@ public final class ChronoFormatter<T>
          *          part defined
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
+         * @see     Attributes#DECIMAL_SEPARATOR
          */
         /*[deutsch]
          * <p>Definiert ein festes Dezimalformat ohne Vorzeichen f&uuml;r das
@@ -4301,9 +4340,12 @@ public final class ChronoFormatter<T>
          * abgeschnitten. </p></li>
          *
          * <li>PARSE =&gt; Exakt {@code precision} Zeichen werden nebst dem
-         * Dezimaltrennzeichen als Ziffern im strikten Modus interpretiert.
-         * Andernfalls werden soviele Ziffern interpretiert, wie welche
-         * vorhanden sind. </li>
+         * Dezimaltrennzeichen als Ziffern im strikten Modus interpretiert,
+         * wobei vor dem Dezimaltrennzeichen {@code precision - scale} Ziffern
+         * vorhanden sein m&uuml;ssen. Im laxen Modus hingegen werden soviele
+         * Ziffern interpretiert, wie &uuml;berhaupt welche vorhanden sind. Der
+         * <i>smart</i>-Modus verh&auml;lt sich vor dem Dezimaltrennzeichen strikt
+         * und nach dem Dezimaltrennzeichen lax. </li>
          * </ol>
          *
          * <p>Beispiel: </p>
@@ -4336,6 +4378,7 @@ public final class ChronoFormatter<T>
          *          part defined
          * @see     Chronology#isSupported(ChronoElement)
          * @see     Attributes#LENIENCY
+         * @see     Attributes#DECIMAL_SEPARATOR
          */
         public Builder<T> addFixedDecimal(
             ChronoElement<BigDecimal> element,
@@ -6697,11 +6740,13 @@ public final class ChronoFormatter<T>
 
         private void ensureDecimalDigitsOnlyOnce() {
 
-            for (FormatStep step : this.steps) {
-                if (step.isDecimal()) {
+            for (int i = this.steps.size() - 1; i >= 0; i--) {
+                FormatStep step = this.steps.get(i);
+                if (step.isNewOrBlockStarted()) {
+                    return;
+                } else if (step.isDecimal()) {
                     throw new IllegalArgumentException(
-                        "Cannot define more than one element"
-                        + " with decimal digits.");
+                        "Cannot define more than one element with decimal digits.");
                 }
             }
 
