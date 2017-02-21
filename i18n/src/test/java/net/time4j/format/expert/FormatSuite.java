@@ -12,6 +12,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CLDRSanityTest.class,
         ChronoHierarchyTest.class,
         DayPeriodTest.class,
+        DecimalFormatTest.class,
         DefaultValueTest.class,
         DozenalNumberTest.class,
         DuplicateElementTest.class,

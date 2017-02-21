@@ -309,24 +309,6 @@ public class MiscellaneousTest {
         assertThat(e.contains(PlainDate.DAY_OF_MONTH), is(false));
     }
 
-    @Test
-    public void printVariableHourDecimalMinute()
-        throws ParseException {
-
-        ChronoFormatter<PlainTime> formatter =
-            ChronoFormatter
-                .setUp(PlainTime.class, Locale.ROOT)
-                .addInteger(PlainTime.ISO_HOUR, 1, 2)
-                .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
-                .build();
-        assertThat(
-            formatter.format(PlainTime.of(17, 8, 30)),
-            is("1708,5"));
-        assertThat(
-            formatter.format(PlainTime.of(7, 8, 30)),
-            is("708,5"));
-    }
-
     @Test(expected=NullPointerException.class)
     public void momentFormatterWithoutTimezone1() {
         Moment.formatter(DisplayMode.FULL, Locale.FRENCH, null);
@@ -362,32 +344,6 @@ public class MiscellaneousTest {
             is(Moment.UNIX_EPOCH));
         assertThat(
             Moment.formatterRFC1123().parse("Wed, 31 Dec 1969 19:00:00 EST"),
-            is(Moment.UNIX_EPOCH));
-    }
-
-    @Test
-    public void momentFormatterPrintingDecimalMinute() {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.US)
-                .addPattern("uuuu-MM-dd HH:", PatternType.CLDR)
-                .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
-                .build()
-                .withTimezone(ZonalOffset.UTC);
-        assertThat(
-            formatter.format(Moment.UNIX_EPOCH),
-            is("1970-01-01 00:00.0"));
-    }
-
-    @Test
-    public void momentFormatterParsingDecimalMinute() throws ParseException {
-        ChronoFormatter<Moment> formatter =
-            ChronoFormatter.setUp(Moment.class, Locale.US)
-                .addPattern("uuuu-MM-dd HH:", PatternType.CLDR)
-                .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
-                .build()
-                .withTimezone(ZonalOffset.UTC);
-        assertThat(
-            formatter.parse("1970-01-01 00:00.0"),
             is(Moment.UNIX_EPOCH));
     }
 
