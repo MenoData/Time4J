@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalClock.java) is part of project Time4J.
  *
@@ -402,6 +402,33 @@ public final class ZonalClock {
     ) {
 
         return this.now(family, variantSource.getVariant(), startOfDay);
+
+    }
+
+    /**
+     * <p>Equivalent to the expression {@code now().inStdTimezone()}. </p>
+     *
+     * <p>For performance reasons, it is usually better to directly call {@code SystemClock.currentMoment()}.
+     * However, this method is designed for mobile platforms where users have adjusted the clock to compensate
+     * outdated or wrong device timezone data, see also {@link SystemClock#inPlatformView()}. </p>
+     *
+     * @return  current moment
+     * @since   3.29/4.25
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zum Ausdruck {@code now().inStdTimezone()}. </p>
+     *
+     * <p>F&uuml;r ein optimales Antwortzeitverhalten ist es gew&ouml;hnlich besser, direkt
+     * {@code SystemClock.currentMoment()} aufzurufen. Aber diese Methode ist speziell f&uuml;r Mobilplattformen
+     * gedacht, auf denen Anwender die Uhr verstellt haben, um veraltete oder falsche Zeitzonendaten der
+     * Plattform auszugleichen, siehe auch {@link SystemClock#inPlatformView()}. </p>
+     *
+     * @return  current moment
+     * @since   3.29/4.25
+     */
+    public Moment currentMoment() {
+
+        return this.now().inStdTimezone();
 
     }
 
