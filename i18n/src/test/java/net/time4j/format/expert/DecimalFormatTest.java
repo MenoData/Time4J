@@ -3,6 +3,7 @@ package net.time4j.format.expert;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
 import net.time4j.format.DisplayMode;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -118,6 +119,20 @@ public class DecimalFormatTest {
         assertThat(
             mf.parse("2016123118.25-0500").toString(),
             is("2016-12-31T23:15:00Z"));
+    }
+
+    @Test
+    public void parseDecimalHour() throws ParseException {
+        String input = "2017-03-01 13.52Z";
+        ChronoFormatter<Moment> formatter =
+            ChronoFormatter.setUp(Moment.class, Locale.US)
+                .addPattern("uuuu-MM-dd ", PatternType.CLDR)
+                .addFixedDecimal(PlainTime.DECIMAL_HOUR, 4, 2)
+                .addTimezoneOffset()
+                .build();
+        assertThat(
+            formatter.parse(input), // 2017-03-01T13:31:12Z
+            is(PlainTimestamp.of(2017, 3, 1, 13, 31, 12).atUTC()));
     }
 
     @Test
