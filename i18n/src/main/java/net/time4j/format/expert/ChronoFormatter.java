@@ -5220,8 +5220,7 @@ public final class ChronoFormatter<T>
          * @param   <V> generic type of element values
          * @param   element         chronological element
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         * @throws  IllegalArgumentException if given element is not supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -5230,8 +5229,7 @@ public final class ChronoFormatter<T>
          * @param   <V> generic type of element values
          * @param   element         chronological element
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology
+         * @throws  IllegalArgumentException if given element is not supported by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          */
         public <V extends Enum<V>> Builder<T> addText(ChronoElement<V> element) {
@@ -5243,8 +5241,11 @@ public final class ChronoFormatter<T>
                 this.addProcessor(TextProcessor.create(te));
             } else {
                 // String-Ressource ist enum.toString()
-                Map<V, String> empty = Collections.emptyMap();
-                this.addProcessor(new LookupProcessor<>(element, empty));
+                Map<V, String> simpleMap = new HashMap<>();
+                for (V value : element.getType().getEnumConstants()) {
+                    simpleMap.put(value, value.toString());
+                }
+                this.addProcessor(new LookupProcessor<>(element, simpleMap));
             }
 
             return this;
@@ -5259,8 +5260,8 @@ public final class ChronoFormatter<T>
          * @param   element         chronological element
          * @param   lookup          text resources for lookup
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology or its preparser
+         * @throws  IllegalArgumentException if given element is not supported by chronology or its preparser
+         *          or if there are not enough text resources to match all values of an enum element type
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -5271,11 +5272,11 @@ public final class ChronoFormatter<T>
          * @param   element         chronological element
          * @param   lookup          text resources for lookup
          * @return  this instance for method chaining
-         * @throws  IllegalArgumentException if given element is not
-         *          supported by chronology or its preparser
+         * @throws  IllegalArgumentException if given element is not supported by chronology or its preparser
+         *          or if there are not enough text resources to match all values of an enum element type
          * @see     Chronology#isSupported(ChronoElement)
          */
-        public <V extends Enum<V>> Builder<T> addText(
+        public <V> Builder<T> addText(
             ChronoElement<V> element,
             Map<V, String> lookup
         ) {

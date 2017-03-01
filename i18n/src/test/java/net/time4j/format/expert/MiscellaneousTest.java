@@ -38,7 +38,9 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
@@ -599,23 +601,34 @@ public class MiscellaneousTest {
 
     @Test
     public void printIndividualFormat2() throws ParseException {
+        // using partially mad settings, not a real-world-test
+        Map<Weekday, String> lookup = new HashMap<>();
+        lookup.put(Weekday.MONDAY, "Montag");
+        lookup.put(Weekday.TUESDAY, "Dienstag");
+        lookup.put(Weekday.WEDNESDAY, "Mittwoch");
+        lookup.put(Weekday.THURSDAY, "Donnerstag");
+        lookup.put(Weekday.FRIDAY, "Freitag");
+        lookup.put(Weekday.SATURDAY, "Sonnabend");
+        lookup.put(Weekday.SUNDAY, "Sonntag");
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.US)
+                .addText(PlainDate.YEAR, Collections.singletonMap(2015, "current year"))
+                .addLiteral(", ")
                 .startSection(Attributes.PAD_CHAR, '#')
                 .addNumerical(PlainDate.MONTH_OF_YEAR, 1, 2)
                 .padPrevious(2)
                 .endSection()
                 .addLiteral(' ')
-                .addText(PlainDate.DAY_OF_WEEK, Collections.singletonMap(Weekday.THURSDAY, "Donnerstag"))
+                .addText(Weekmodel.ISO.localDayOfWeek(), lookup)
                 .addLiteral(" (attribute-value=")
                 .addLiteral(Attributes.ZERO_DIGIT)
                 .addLiteral(") ")
-                .addOrdinal(PlainDate.DAY_OF_MONTH, Collections.singletonMap(PluralCategory.OTHER, "st"))
+                .addOrdinal(PlainDate.DAY_OF_MONTH, Collections.singletonMap(PluralCategory.OTHER, "th")) // mad def
                 .build()
-                .with(Attributes.ZERO_DIGIT, '8'); // just done here for better test coverage
+                .with(Attributes.ZERO_DIGIT, '2'); // insane data, just done here for better test coverage
         assertThat(
-            formatter.format(PlainDate.of(2015, 1)),
-            is("9# Donnerstag (attribute-value=8) 9st") // "9" because of value of Attributes.ZERO_DIGIT
+            formatter.format(PlainDate.of(2015, 1, 3)),
+            is("current year, 3# Sonnabend (attribute-value=2) 5th") // "3" because of value of Attributes.ZERO_DIGIT
         );
     }
 
