@@ -1,4 +1,6 @@
 ## [v3.30] not yet released
+### Added
+- Enable text-lookup for non-enum elements in formatting [#618]
 
 ## [v3.29] published on 2017-02-22
 ### Added
