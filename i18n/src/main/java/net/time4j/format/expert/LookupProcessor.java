@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LookupProcessor.java) is part of project Time4J.
  *
@@ -29,6 +29,7 @@ import net.time4j.format.Attributes;
 import java.io.IOException;
 import java.util.Collections;
 import java.util.EnumMap;
+import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
@@ -42,7 +43,7 @@ import java.util.Set;
  * @author  Meno Hochschild
  * @since   3.0
  */
-final class LookupProcessor<V extends Enum<V>>
+final class LookupProcessor<V>
     implements FormatProcessor<V> {
 
     //~ Instanzvariablen ----------------------------------------------
@@ -62,6 +63,7 @@ final class LookupProcessor<V extends Enum<V>>
      *
      * @param   element     element to be formatted
      * @param   resources   text resources
+     * @throws  IllegalArgumentException if there not enough text resources to match all values of an enum element type
      */
     LookupProcessor(
         ChronoElement<V> element,
@@ -69,9 +71,19 @@ final class LookupProcessor<V extends Enum<V>>
     ) {
         super();
 
-        Map<V, String> tmp = new EnumMap<V, String>(element.getType());
-        tmp.putAll(resources);
+        Map<V, String> tmp;
+        Class<V> keyType = element.getType();
 
+        if (keyType.isEnum()) {
+            if (resources.size() < keyType.getEnumConstants().length) {
+                throw new IllegalArgumentException("Not enough text resources defined for enum: " + keyType.getName());
+            }
+            tmp = createMap(keyType);
+        } else {
+            tmp = new HashMap<V, String>(resources.size());
+        }
+
+        tmp.putAll(resources);
         this.element = element;
         this.resources = Collections.unmodifiableMap(tmp);
 
@@ -155,7 +167,7 @@ final class LookupProcessor<V extends Enum<V>>
         Locale loc = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.getDefault()));
         int maxCount = len - start;
 
-        for (V value : this.element.getType().getEnumConstants()) {
+        for (V value : this.resources.keySet()) {
             String test = this.getString(value);
 
             if (ignoreCase) {
@@ -184,10 +196,9 @@ final class LookupProcessor<V extends Enum<V>>
                     }
                 }
             }
-
         }
 
-        status.setError(start, "Enum value could not be parsed.");
+        status.setError(start, "Element value could not be parsed: " + this.element.name());
 
     }
 
@@ -293,6 +304,14 @@ final class LookupProcessor<V extends Enum<V>>
         }
 
         return test;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <V, K extends Enum<K>> Map<V, String> createMap(Class<V> keyType) {
+
+        Class<K> clazz = (Class<K>) keyType;
+        return (Map<V, String>) new EnumMap<K, String>(clazz);
 
     }
 
