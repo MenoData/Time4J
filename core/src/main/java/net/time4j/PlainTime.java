@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTime.java) is part of project Time4J.
  *
@@ -1664,22 +1664,7 @@ public final class PlainTime
                 append2Digits(this.second, sb);
 
                 if (this.nano != 0) {
-                    sb.append(ISO_DECIMAL_SEPARATOR);
-                    String num = Integer.toString(this.nano);
-                    int len;
-                    if ((this.nano % MIO) == 0) {
-                        len = 3;
-                    } else if ((this.nano % KILO) == 0) {
-                        len = 6;
-                    } else {
-                        len = 9;
-                    }
-                    for (int i = num.length(); i < 9; i++) {
-                        sb.append('0');
-                    }
-                    for (int i = 0, n = len + num.length() - 9; i < n; i++) {
-                        sb.append(num.charAt(i));
-                    }
+                    printNanos(sb, this.nano);
                 }
             }
         }
@@ -1739,6 +1724,34 @@ public final class PlainTime
     protected PlainTime getContext() {
 
         return this;
+
+    }
+
+    // also called by ZonalDateTime
+    static void printNanos(
+        StringBuilder sb,
+        int nano
+    ) {
+
+        sb.append(PlainTime.ISO_DECIMAL_SEPARATOR);
+        String num = Integer.toString(nano);
+        int len;
+
+        if ((nano % MIO) == 0) {
+            len = 3;
+        } else if ((nano % KILO) == 0) {
+            len = 6;
+        } else {
+            len = 9;
+        }
+
+        for (int i = num.length(); i < 9; i++) {
+            sb.append('0');
+        }
+
+        for (int i = 0, n = len + num.length() - 9; i < n; i++) {
+            sb.append(num.charAt(i));
+        }
 
     }
 

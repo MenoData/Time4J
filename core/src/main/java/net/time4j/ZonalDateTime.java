@@ -604,23 +604,40 @@ public final class ZonalDateTime
     public String toString() {
 
         StringBuilder sb = new StringBuilder(40);
-        sb.append(this.timestamp);
+        sb.append(this.timestamp.getCalendarDate());
+        sb.append('T');
+        int hour = this.timestamp.getHour();
+        if (hour < 10) {
+            sb.append('0');
+        }
+        sb.append(hour);
+        sb.append(':');
+        int minute = this.timestamp.getMinute();
+        if (minute < 10) {
+            sb.append('0');
+        }
+        sb.append(minute);
+        sb.append(':');
+        if (this.isLeapSecond()) {
+            sb.append("60");
+        } else {
+            int second = this.timestamp.getSecond();
+            if (second < 10) {
+                sb.append('0');
+            }
+            sb.append(second);
+        }
+        int n = this.timestamp.getNanosecond();
+        if (n != 0) {
+            PlainTime.printNanos(sb, n);
+        }
         sb.append(this.getOffset());
         TZID tzid = this.getTimezone();
         boolean offset = (tzid instanceof ZonalOffset);
-        boolean ls = this.isLeapSecond();
 
-        if (!offset || ls) {
+        if (!offset) {
             sb.append('[');
-            if (ls) {
-                sb.append("leap-second");
-            }
-            if (!offset && ls) {
-                sb.append(':');
-            }
-            if (!offset) {
-                sb.append(tzid.canonical());
-            }
+            sb.append(tzid.canonical());
             sb.append(']');
         }
 
