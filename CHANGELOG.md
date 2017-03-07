@@ -2,6 +2,9 @@
 ### Added
 - Enable text-lookup for non-enum elements in formatting [#618]
 
+### Fixed
+- ZonalDateTime.toString() should not contain UTC-literal [#623]
+
 ## [v4.25] published on 2017-02-22
 ### Added
 - More convenient access to platform timezone data [#616]
