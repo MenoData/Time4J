@@ -137,11 +137,11 @@ public class ZonalDateTimeTest {
         ZonalDateTime zdt1 = moment.inZonalView(tz.getID());
         assertThat(
             zdt1.toString(),
-            is("2012-07-01T09+09:00[Asia/Tokyo]"));
+            is("2012-07-01T09:00:00+09:00[Asia/Tokyo]"));
         ZonalDateTime zdt2 = moment.minus(1, SI.SECONDS).inZonalView(tz.getID());
         assertThat(
             zdt2.toString(),
-            is("2012-07-01T08:59:59+09:00[leap-second:Asia/Tokyo]"));
+            is("2012-07-01T08:59:60+09:00[Asia/Tokyo]"));
     }
 
 }
