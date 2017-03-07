@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalDateTime.java) is part of project Time4J.
  *
@@ -591,25 +591,36 @@ public final class ZonalDateTime
     /**
      * <p>Yields a canonical representation in ISO-like-style. </p>
      *
-     * @return  String
+     * @return  String suitable only for debugging purposes
+     * @see     #print(TemporalFormatter)
      */
     /*[deutsch]
      * <p>Liefert eine kanonische Darstellung &auml;hnlich zu ISO-8601. </p>
      *
-     * @return  String
+     * @return  String suitable only for debugging purposes
+     * @see     #print(TemporalFormatter)
      */
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder(40);
         sb.append(this.timestamp);
-        sb.append(this.getOffset().canonical());
+        sb.append(this.getOffset());
         TZID tzid = this.getTimezone();
         boolean offset = (tzid instanceof ZonalOffset);
+        boolean ls = this.isLeapSecond();
 
-        if (!offset) {
+        if (!offset || ls) {
             sb.append('[');
-            sb.append(tzid.canonical());
+            if (ls) {
+                sb.append("leap-second");
+            }
+            if (!offset && ls) {
+                sb.append(':');
+            }
+            if (!offset) {
+                sb.append(tzid.canonical());
+            }
             sb.append(']');
         }
 
