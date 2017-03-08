@@ -1,5 +1,6 @@
 ## [v4.26] not yet released
 ### Added
+- Make zone offset calculation for geo-longitude more precise [#622]
 - Enable text-lookup for non-enum elements in formatting [#618]
 
 ### Fixed
