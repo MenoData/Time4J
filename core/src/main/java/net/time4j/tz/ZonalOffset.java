@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalOffset.java) is part of project Time4J.
  *
@@ -289,7 +289,7 @@ public final class ZonalOffset
      * @return  zonal offset in decimal precision
      * @throws  IllegalArgumentException if range check fails (also if total
      *          absolute offset goes beyond 180 degrees)
-     * @see     #atLongitude(BigDecimal)
+     * @deprecated  Use {@link #atLongitude(OffsetSign, int, int, double)} instead
      */
     /*[deutsch]
      * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
@@ -307,13 +307,62 @@ public final class ZonalOffset
      * @return  zonal offset in decimal precision
      * @throws  IllegalArgumentException if range check fails (also if total
      *          absolute offset goes beyond 180 degrees)
-     * @see     #atLongitude(BigDecimal)
+     * @deprecated  Use {@link #atLongitude(OffsetSign, int, int, double)} instead
      */
+    @Deprecated
     public static ZonalOffset atLongitude(
         OffsetSign sign,
         int degrees,
         int arcMinutes,
         int arcSeconds
+    ) {
+
+        return atLongitude(sign, degrees, arcMinutes, (double) arcSeconds);
+
+    }
+
+    /**
+     * <p>Creates a new shift based on a geographical longitude. </p>
+     *
+     * <p>Note that fractional offsets are not used in context of timezones,
+     * but can only be applied to conversions between {@code PlainTimestamp}
+     * and {@code Moment}. </p>
+     *
+     * @param   sign        sign of shift relative to zero meridian
+     * @param   degrees     geographical length in degreed, defined in
+     *                      range {@code 0 <= degrees <= 180}
+     * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
+     * @param   arcSeconds  arc second part ({@code 0.0 <= arcSeconds < 60.0})
+     * @return  zonal offset in decimal precision
+     * @throws  IllegalArgumentException if range check fails (also if total
+     *          absolute offset goes beyond 180 degrees)
+     * @see     #atLongitude(BigDecimal)
+     * @since   4.26/3.30
+     */
+    /*[deutsch]
+     * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
+     * L&auml;ngenangabe. </p>
+     *
+     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
+     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
+     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. </p>
+     *
+     * @param   sign        sign of shift relative to zero meridian
+     * @param   degrees     geographical length in degreed, defined in
+     *                      range {@code 0 <= degrees <= 180}
+     * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
+     * @param   arcSeconds  arc second part ({@code 0.0 <= arcSeconds < 60.0})
+     * @return  zonal offset in decimal precision
+     * @throws  IllegalArgumentException if range check fails (also if total
+     *          absolute offset goes beyond 180 degrees)
+     * @see     #atLongitude(BigDecimal)
+     * @since   4.26/3.30
+     */
+    public static ZonalOffset atLongitude(
+        OffsetSign sign,
+        int degrees,
+        int arcMinutes,
+        double arcSeconds
     ) {
 
         if (sign == null) {
@@ -324,9 +373,9 @@ public final class ZonalOffset
         } else if ((arcMinutes < 0) || (arcMinutes > 59)) {
             throw new IllegalArgumentException(
                 "Arc minute out of range (0 <= arcMinutes <= 59).");
-        } else if ((arcSeconds < 0) || (arcSeconds > 59)) {
+        } else if ((Double.compare(arcSeconds, 0.0) < 0) || (Double.compare(arcSeconds, 60.0) >= 0)) {
             throw new IllegalArgumentException(
-                "Arc second out of range (0 <= arcSeconds <= 59).");
+                "Arc second out of range (0.0 <= arcSeconds < 60.0).");
         }
 
         BigDecimal longitude = BigDecimal.valueOf(degrees);

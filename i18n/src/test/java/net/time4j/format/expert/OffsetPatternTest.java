@@ -82,11 +82,11 @@ public class OffsetPatternTest {
                     "2012-06-30T23:59:60,123000000Z",
                     "2012-06-30T23:59:60.123GMT"},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSXXXXX",
-                    ZonalOffset.atLongitude(BEHIND_UTC, 14, 30, 0),
+                    ZonalOffset.atLongitude(BEHIND_UTC, 14, 30, 0.0),
                     "2012-06-30T12:00Z",
                     "2012-06-30T11:02:00.000000000-00:58"},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSSSSSSSXXXXX",
-                    ZonalOffset.atLongitude(BEHIND_UTC, 14, 30, 20),
+                    ZonalOffset.atLongitude(BEHIND_UTC, 14, 30, 20.0),
                     "2012-06-30T12:00:00Z",
                     "2012-06-30T11:01:58.000000000-00:58:02"} // rounded!!!
             }
