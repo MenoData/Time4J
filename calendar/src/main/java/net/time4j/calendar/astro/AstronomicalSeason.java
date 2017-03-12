@@ -21,39 +21,93 @@
 
 package net.time4j.calendar.astro;
 
-　
 import net.time4j.Moment;
 
 import net.time4j.scale.TimeScale;
 
+
+/**
+ * <p>The four astronomical seasons (Spring, Summer, Autumn and Winter). </p>
+ *
+ * @author 	Meno Hochschild
+ * @since 	3.30/4.26
+ */
+/*[deutsch]
+ * <p>Die vier astronomischen Jahreszeiten (Fr&uuml;hling, Sommer, Herbst und Winter). </p>
+ *
+ * @author 	Meno Hochschild
+ * @since 	3.30/4.26
+ */
 public enum AstronomicalSeason {
 
+	//~ Statische Felder/Initialisierungen --------------------------------
+
+	/**
+	 * <p>Begin of Spring on the northern hemisphere in March (or Autumn on the southern hemisphere). </p>
+	 */
+	/*[deutsch]
+	 * <p>Fr&uuml;hlingsanfang auf der n&oumlr;dlichen Halbkugel im M&auml;rz
+	 * (oder Herbstanfang auf der s&uuml;dlichen Halbkugel). </p>
+	 */
 	VERNAL_EQUINOX,
 
+	/**
+	 * <p>Begin of Summer on the northern hemisphere in June (or Winter on the southern hemisphere). </p>
+	 */
+	/*[deutsch]
+	 * <p>Sommeranfang auf der n&oumlr;dlichen Halbkugel im Juni
+	 * (oder Winteranfang auf der s&uuml;dlichen Halbkugel). </p>
+	 */
 	SUMMER_SOLSTICE,
 
+	/**
+	 * <p>Begin of Autumn on the northern hemisphere in September (or Spring on the southern hemisphere). </p>
+	 */
+	/*[deutsch]
+	 * <p>Herbstanfang auf der n&oumlr;dlichen Halbkugel im September
+	 * (oder Fr&uuml;hlingsanfang auf der s&uuml;dlichen Halbkugel). </p>
+	 */
 	AUTUMNAL_EQUINOX,
 
+	/**
+	 * <p>Begin of Winter on the northern hemisphere in December (or Summer on the southern hemisphere). </p>
+	 */
+	/*[deutsch]
+	 * <p>Winteranfang auf der n&oumlr;dlichen Halbkugel im Dezember
+	 * (oder Sommeranfang auf der s&uuml;dlichen Halbkugel). </p>
+	 */
 	WINTER_SOLSTICE;
 
-	public static void main(String... args) {
-		System.out.println(AUTUMNAL_EQUINOX.getTime(2017)); // 2017-09-23T20:01:28Z
-	}
+	//~ Methoden ----------------------------------------------------------
 
-	// TAI = UTC + 10 (ab 1972)
-	// TT - UT1 = deltaT (vor 1972)
-	// TT = TAI + 32.184
+	/**
+	 * <p>Determines the moment of this astronomical event in given year. </p>
+	 *
+	 * <p>The precision is for modern times (around 2000) better than a minute. The underlying astronomical
+	 * calculations are based on formula given by Jean Meeus in his book &quot;Astronomical algorithms&quot;. </p>
+	 *
+	 * @param 	year	gregorian/julian year
+	 * @return	time of this astronomical event (equinox or solstice) in given year
+	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 */
+	/*[deutsch]
+	 * <p>Berechnet die Zeit, wann dieses astronomische Ereignis im angegebenen Jahr auftritt. </p>
+	 *
+	 * <p>Die Genauigkeit ist f&uuml;r moderne Zeiten (um das Jahr 2000 herum) besser als eine Minute.
+	 * Die zugrundeliegenden astronomischen Berechnungen fu&szlig;en auf Formeln aus dem Buch
+	 * &quot;Astronomical algorithms&quot; von Jean Meeus. </p>
+	 *
+	 * @param 	year	gregorian/julian year
+	 * @return	time of this astronomical event (equinox or solstice) in given year
+	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 */
+	public Moment inYear(int year) {
 
-	// ab 1972 => TT = UTC + 42.184
-
-	public Moment getTime(int year) {
-
-		double tt = (this.jdEphemerisDays(year) - 2400000.5 - 41317) * 86400.0;
+		double tt = (this.jdEphemerisDays(year) - 2441317.5) * 86400.0;
 		double utc;
 
 		if (year < 1972) {
-			double deltaT = 0.0; // TODO: implement
-			utc = tt - deltaT;
+			utc = tt - TimeScale.deltaT(year, (this.ordinal() + 1) * 3);
 		} else {
 			utc = tt - 42.184;
 		}
@@ -61,7 +115,7 @@ public enum AstronomicalSeason {
 		long seconds = (long) Math.floor(utc);
 		int nanos = (int) (utc - seconds) * 1_000_000_000;
 
-		return Moment.of(seconds, nanos, TimeScale.UTC); // 2017-09-22T20:01:28Z
+		return Moment.of(seconds, nanos, TimeScale.UTC);
 
 	}
 
@@ -131,25 +185,22 @@ public enum AstronomicalSeason {
 	}
 
 	// Meeus - Astronomical Algorithms - p179, Table 27.C
-	private static final int[] A =
-		{
-			485, 203, 199, 182, 156, 136, 77, 74, 70, 58, 52, 50, 45, 44, 29, 18, 17, 16, 14, 12,
-			12, 12, 9, 8
-		};
+	private static final int[] A = {
+		485, 203, 199, 182, 156, 136, 77, 74, 70, 58, 52, 50, 45, 44, 29, 18, 17, 16, 14, 12,
+		12, 12, 9, 8
+	};
 
-	private static final double[] B =
-		{ // in degrees
-			324.96, 337.23, 342.08, 27.85, 73.14, 171.52, 222.54, 296.72, 243.58, 119.81, 297.17,
-			21.02, 247.54, 325.15, 60.93, 155.12, 288.79, 198.04, 199.76, 95.39, 287.11, 320.81,
-			227.73, 15.45
-		};
+	private static final double[] B = { // in degrees
+		324.96, 337.23, 342.08, 27.85, 73.14, 171.52, 222.54, 296.72, 243.58, 119.81, 297.17,
+		21.02, 247.54, 325.15, 60.93, 155.12, 288.79, 198.04, 199.76, 95.39, 287.11, 320.81,
+		227.73, 15.45
+	};
 
-	private static final double[] C =
-		{ // in degrees
-			1934.136, 32964.467, 20.186, 445267.112, 45036.886, 22518.443, 65928.934, 3034.906,
-			9037.513, 33718.147, 150.678, 2281.226, 29929.562, 31555.956, 4443.417, 67555.328,
-			4562.452, 62894.029, 31436.921, 14577.848, 31931.756, 34777.259, 1222.114, 16859.074
-		};
+	private static final double[] C = { // in degrees
+		1934.136, 32964.467, 20.186, 445267.112, 45036.886, 22518.443, 65928.934, 3034.906,
+		9037.513, 33718.147, 150.678, 2281.226, 29929.562, 31555.956, 4443.417, 67555.328,
+		4562.452, 62894.029, 31436.921, 14577.848, 31931.756, 34777.259, 1222.114, 16859.074
+	};
 
 	private static double periodic24(double t) {
 
