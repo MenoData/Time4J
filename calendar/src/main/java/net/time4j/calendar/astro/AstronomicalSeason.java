@@ -30,13 +30,13 @@ import net.time4j.scale.TimeScale;
  * <p>The four astronomical seasons (Spring, Summer, Autumn and Winter). </p>
  *
  * @author 	Meno Hochschild
- * @since 	3.30/4.26
+ * @since 	3.31/4.26
  */
 /*[deutsch]
  * <p>Die vier astronomischen Jahreszeiten (Fr&uuml;hling, Sommer, Herbst und Winter). </p>
  *
  * @author 	Meno Hochschild
- * @since 	3.30/4.26
+ * @since 	3.31/4.26
  */
 public enum AstronomicalSeason {
 

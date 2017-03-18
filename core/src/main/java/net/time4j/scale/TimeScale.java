@@ -277,7 +277,7 @@ public enum TimeScale {
      * @param   month   gregorian/julian month in range 1-12
      * @return  estimated difference deltaT = TT - UT1 in seconds
      * @throws  IllegalArgumentException if any parameter is out of range
-     * @since   3.30/4.26
+     * @since   3.31/4.26
      */
     /*[deutsch]
      * <p>Liefert eine Sch&auml;tzung der Differenz zwischen TT und UT1 in dezimalen Sekunden
@@ -290,7 +290,7 @@ public enum TimeScale {
      * @param   month   gregorian/julian month in range 1-12
      * @return  estimated difference deltaT = TT - UT1 in seconds
      * @throws  IllegalArgumentException if any parameter is out of range
-     * @since   3.30/4.26
+     * @since   3.31/4.26
      */
     public static double deltaT(
         int year,
