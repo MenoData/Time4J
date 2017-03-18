@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericTextProviderSPI.java) is part of project Time4J.
  *
@@ -106,7 +106,7 @@ public final class GenericTextProviderSPI
     @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "buddhist", "coptic", "ethiopic", "generic", "islamic", "persian", "roc" };
+        return new String[] { "buddhist", "coptic", "ethiopic", "generic", "islamic", "japanese", "persian", "roc" };
 
     }
 
@@ -126,7 +126,7 @@ public final class GenericTextProviderSPI
         boolean leapForm
     ) {
 
-        if (calendarType.equals("roc") || calendarType.equals("buddhist")) {
+        if (calendarType.equals("roc") || calendarType.equals("buddhist") || calendarType.equals("japanese")) {
             TextProvider p = new IsoTextProviderSPI();
             return p.months(calendarType, locale, tw, oc, leapForm);
         }
@@ -196,6 +196,14 @@ public final class GenericTextProviderSPI
         Locale locale,
         TextWidth tw
     ) {
+
+        if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
+            if (tw == TextWidth.NARROW) {
+                return new String[] { "M", "T", "S", "H" };
+            } else {
+                return new String[] { "Meiji", "Taishō", "Shōwa", "Heisei" };
+            }
+        }
 
         ResourceBundle rb = getBundle(calendarType, locale);
 
