@@ -2,6 +2,7 @@
 ### Added
 - Make zone offset calculation for geo-longitude more precise [#622]
 - Enable text-lookup for non-enum elements in formatting [#618]
+- Support for Ewe language [#625]
 
 ### Fixed
 - ZonalDateTime.toString() should not contain UTC-literal [#623]
