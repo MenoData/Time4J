@@ -21,6 +21,7 @@
 
 package net.time4j.calendar.service;
 
+import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
@@ -126,9 +127,11 @@ public final class GenericTextProviderSPI
         boolean leapForm
     ) {
 
-        if (calendarType.equals("roc") || calendarType.equals("buddhist") || calendarType.equals("japanese")) {
+        if (calendarType.equals("roc") || calendarType.equals("buddhist")) {
             TextProvider p = new IsoTextProviderSPI();
             return p.months(calendarType, locale, tw, oc, leapForm);
+        } else if (calendarType.equals("japanese")) {
+            return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
         }
 
         ResourceBundle rb = getBundle(calendarType, locale);
