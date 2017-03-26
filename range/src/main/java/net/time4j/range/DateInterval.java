@@ -74,6 +74,16 @@ public final class DateInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /**
+     * Constant for a date interval from infinite past to infinitefuture.
+     */
+    /*[deutsch]
+     * Konstante f&uuml;r ein Datumsintervall, das von der unbegrenzten Vergangenheit
+     * bis in die unbegrenzte Zukunft reicht.
+     */
+    public static final DateInterval ALWAYS =
+        DateIntervalFactory.INSTANCE.between(Boundary.<PlainDate>infinitePast(), Boundary.<PlainDate>infiniteFuture());
+
     private static final long serialVersionUID = 8074261825266036014L;
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =

@@ -560,4 +560,12 @@ public class DateIntervalFormatTest {
             ChronoFormatter.ofDatePattern("MMMM d / uuuu", PatternType.CLDR, Locale.US));
     }
 
+    @Test
+    public void parseAlways() throws ParseException {
+        DateInterval always = DateInterval.ALWAYS;
+        assertThat(
+            DateInterval.parseISO("-∞/+∞"),
+            is(always));
+    }
+
 }
