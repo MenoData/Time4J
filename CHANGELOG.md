@@ -1,4 +1,6 @@
 ## [v3.31] not yet released
+### Fixed
+- NPE in IntervalTree containing interval with infinite end [#627]
 
 ## [v3.30] published on 2017-03-19
 ### Added
