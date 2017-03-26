@@ -165,6 +165,20 @@ public class IntervalTreeTest {
     }
 
     @Test
+    public void findIntersectionsUsingInfiniteBoundaries() {
+        DateInterval i1 = DateInterval.until(PlainDate.of(2017, 2, 11));
+        DateInterval i2 = DateInterval.since(PlainDate.of(2017, 2, 12));
+        IntervalTree<PlainDate, DateInterval> tree = IntervalTree.onDateAxis(Arrays.asList(i2, i1));
+
+        assertThat(
+            tree.findIntersections(PlainDate.of(2017, 1, 31)),
+            is(Arrays.asList(i1)));
+        assertThat(
+            tree.findIntersections(PlainDate.of(2017, 3, 31)),
+            is(Collections.singletonList(i2)));
+    }
+
+    @Test
     public void onTraditionalTimeLine() {
         SimpleInterval<Date> i1 =
             SimpleInterval.between(
