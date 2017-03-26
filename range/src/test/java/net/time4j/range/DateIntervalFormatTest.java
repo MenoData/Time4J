@@ -859,7 +859,7 @@ public class DateIntervalFormatTest {
 
     @Test
     public void parseAlways() throws ParseException {
-        DateInterval always = DateIntervalFactory.INSTANCE.between(Boundary.infinitePast(), Boundary.infiniteFuture());
+        DateInterval always = DateInterval.ALWAYS;
         assertThat(
             DateInterval.parseISO("-/-"),
             is(always));
