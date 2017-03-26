@@ -245,6 +245,28 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
 
     }
 
+    /**
+     * <p>Creates a combination of this interval with an associated value. </p>
+     *
+     * @param   <V> generic value type
+     * @param   value   associated value, not {@code null}
+     * @return  new value interval
+     * @since   3.31/4.26
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kombination dieses Intervalls mit einem assoziierten Wert. </p>
+     *
+     * @param   <V> generic value type
+     * @param   value   associated value, not {@code null}
+     * @return  new value interval
+     * @since   3.31/4.26
+     */
+    public <V> ValueInterval<PlainDate, T, V> withValue(V value) {
+
+        return new ValueInterval<>(this.getContext(), value);
+
+    }
+
     // helper method for toString() in subclasses
     static void formatYear(
         StringBuilder sb,
