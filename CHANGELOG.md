@@ -5,6 +5,7 @@
 - Support for Ewe language [#625]
 
 ### Fixed
+- NPE in IntervalTree containing interval with infinite end [#627]
 - ZonalDateTime.toString() should not contain UTC-literal [#623]
 
 ## [v4.25] published on 2017-02-22
