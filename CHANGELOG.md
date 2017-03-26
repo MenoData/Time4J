@@ -1,4 +1,10 @@
-## [v3.31] not yet released
+## [v3.32] not yet released
+
+## [v3.31] published on 2017-03-27
+### Added
+- Add ALWAYS-constant to DateInterval [#630]
+- Assignment of values to intervals [#629]
+
 ### Fixed
 - NPE in IntervalTree containing interval with infinite end [#627]
 
