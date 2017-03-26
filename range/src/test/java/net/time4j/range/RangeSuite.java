@@ -33,6 +33,7 @@ import org.junit.runners.Suite.SuiteClasses;
         SimpleIntervalTest.class,
         SingleUnitTest.class,
         TimestampIntervalFormatTest.class,
+        ValueIntervalTest.class,
         YearsTest.class
     }
 )

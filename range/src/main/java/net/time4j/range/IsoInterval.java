@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoInterval.java) is part of project Time4J.
  *
@@ -1899,6 +1899,28 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         }
 
         return (endA.isSimultaneous(startB) ^ startA.isSimultaneous(endB));
+
+    }
+
+    /**
+     * <p>Creates a combination of this interval with an associated value. </p>
+     *
+     * @param   <V> generic value type
+     * @param   value   associated value, not {@code null}
+     * @return  new value interval
+     * @since   3.31/4.26
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kombination dieses Intervalls mit einem assoziierten Wert. </p>
+     *
+     * @param   <V> generic value type
+     * @param   value   associated value, not {@code null}
+     * @return  new value interval
+     * @since   3.31/4.26
+     */
+    public <V> ValueInterval<T, I, V> withValue(V value) {
+
+        return new ValueInterval<T, I, V>(this.getContext(), value);
 
     }
 

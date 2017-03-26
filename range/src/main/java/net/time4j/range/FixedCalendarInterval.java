@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FixedCalendarInterval.java) is part of project Time4J.
  *
@@ -241,6 +241,28 @@ public abstract class FixedCalendarInterval<T extends FixedCalendarInterval<T>>
     public DateInterval toFlexInterval() {
 
         return new DateInterval(this.getStart(), this.getEnd());
+
+    }
+
+    /**
+     * <p>Creates a combination of this interval with an associated value. </p>
+     *
+     * @param   <V> generic value type
+     * @param   value   associated value, not {@code null}
+     * @return  new value interval
+     * @since   3.31/4.26
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kombination dieses Intervalls mit einem assoziierten Wert. </p>
+     *
+     * @param   <V> generic value type
+     * @param   value   associated value, not {@code null}
+     * @return  new value interval
+     * @since   3.31/4.26
+     */
+    public <V> ValueInterval<PlainDate, T, V> withValue(V value) {
+
+        return new ValueInterval<PlainDate, T, V>(this.getContext(), value);
 
     }
 
