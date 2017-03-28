@@ -1,4 +1,6 @@
 ## [v3.32] not yet released
+### Fixed
+- Converting geo longitude to ZonalOffset crashes [#632]
 
 ## [v3.31] published on 2017-03-27
 ### Added
