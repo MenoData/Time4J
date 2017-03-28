@@ -21,7 +21,10 @@
 
 package net.time4j.range;
 
+import java.io.IOException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.io.StreamCorruptedException;
 
 
 /**
@@ -56,6 +59,10 @@ import java.io.Serializable;
  */
 public class ValueInterval<T, I extends ChronoInterval<T>, V>
     implements ChronoInterval<T>, Serializable {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final long serialVersionUID = -5542033333136556857L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -247,6 +254,20 @@ public class ValueInterval<T, I extends ChronoInterval<T>, V>
     public String toString() {
 
         return this.interval + "=>" + this.value;
+
+    }
+
+    /**
+     * @serialData  Checks the consistency.
+     * @param       in      object input stream
+     * @throws      IOException if the data are not consistent
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        if ((this.interval == null) || (this.value == null)) {
+            throw new StreamCorruptedException();
+        }
 
     }
 
