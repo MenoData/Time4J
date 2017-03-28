@@ -174,55 +174,6 @@ public final class ZonalOffset
 
     //~ Methoden ----------------------------------------------------------
 
-//    /**
-//     * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
-//     * L&auml;ngenangabe. </p>
-//     *
-//     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
-//     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
-//     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. Diese
-//     * Methode ist weniger genau als die {@code BigDecimal}-Variante. Ein
-//     * Beispiel: </p>
-//     *
-//     * <pre>
-//     *  System.out.println(ZonalOffset.atLongitude(new BigDecimal("-14.001")));
-//     *  // Ausgabe: -00:56:00.240000000
-//     *  System.out.println(ZonalOffset.atLongitude(-14.001));
-//     *  // Ausgabe: -00:56:00.239999999
-//     * </pre>
-//     *
-//     * @param   longitude   geographical longitude in degrees defined in
-//     *                      range {@code -180.0 <= longitude <= 180.0}
-//     * @return  zonal offset in double precision
-//     * @throws  IllegalArgumentException if range check fails or if
-//     *          no defined longitude is given
-//     * @see     #atLongitude(BigDecimal)
-//     */
-//    public static ZonalOffset atLongitude(double longitude) {
-//
-//        if (Double.isNaN(longitude)) {
-//            throw new IllegalArgumentException("Undefined longitude.");
-//        } else if (Double.isInfinite(longitude)) {
-//            throw new IllegalArgumentException("Infinite longitude.");
-//        } else if (
-//            (Double.compare(180.0, longitude) < 0)
-//            || (Double.compare(-180.0, longitude) > 0)
-//        ) {
-//            throw new IllegalArgumentException("Out of range: " + longitude);
-//        }
-//
-//        double offset = longitude * 240.0; // (longitude * 3600 / 15.0)
-//        int total = (int) offset;
-//        int fraction = (int) ((offset - total) * 1000000000);
-//
-//        if (fraction == 0) {
-//            return ZonalOffset.ofTotalSeconds(total);
-//        } else {
-//            return new ZonalOffset(total, fraction);
-//        }
-//
-//    }
-
     /**
      * <p>Creates a new shift based on a geographical longitude. </p>
      *
@@ -260,14 +211,17 @@ public final class ZonalOffset
         BigDecimal offset = longitude.multiply(DECIMAL_240);
         BigDecimal integral = offset.setScale(0, RoundingMode.DOWN);
         BigDecimal delta = offset.subtract(integral);
-        BigDecimal decimal =
-            delta.setScale(9, RoundingMode.HALF_UP).multiply(MRD);
+        BigDecimal decimal = delta.setScale(9, RoundingMode.HALF_UP).multiply(MRD);
 
         int total = integral.intValueExact();
         int fraction = decimal.intValueExact();
 
         if (fraction == 0) {
             return ZonalOffset.ofTotalSeconds(total);
+        } else if (fraction == 1000000000) {
+            return ZonalOffset.ofTotalSeconds(total + 1);
+        } else if (fraction == -1000000000) {
+            return ZonalOffset.ofTotalSeconds(total - 1);
         } else {
             return new ZonalOffset(total, fraction);
         }
@@ -391,7 +345,7 @@ public final class ZonalOffset
         if (arcSeconds != 0) {
             BigDecimal arcSec =
                 BigDecimal.valueOf(arcSeconds)
-                    .setScale(15, RoundingMode.UNNECESSARY)
+                    .setScale(15, RoundingMode.FLOOR)
                     .divide(DECIMAL_3600, RoundingMode.HALF_UP);
             longitude = longitude.add(arcSec);
         }
