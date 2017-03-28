@@ -5,6 +5,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Platform;
+import net.time4j.SI;
 import net.time4j.ZonalDateTime;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.tz.Timezone;
@@ -127,6 +128,20 @@ public class ZonalDateTimeTest {
         assertThat(
             ZonalDateTime.parse("2012-07-01T09:00+0900", formatter),
             is(moment.inZonalView(tz.getID())));
+    }
+
+    @Test
+    public void toStringOutput() {
+        Moment moment = Moment.of(1278028825, TimeScale.UTC);
+        Timezone tz = Timezone.of("Asia/Tokyo");
+        ZonalDateTime zdt1 = moment.inZonalView(tz.getID());
+        assertThat(
+            zdt1.toString(),
+            is("2012-07-01T09:00:00+09:00[Asia/Tokyo]"));
+        ZonalDateTime zdt2 = moment.minus(1, SI.SECONDS).inZonalView(tz.getID());
+        assertThat(
+            zdt2.toString(),
+            is("2012-07-01T08:59:60+09:00[Asia/Tokyo]"));
     }
 
 }

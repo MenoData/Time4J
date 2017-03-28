@@ -69,7 +69,7 @@ public class OffsetTest {
     @Test
     public void atLongitudeArcus() {
         ZonalOffset offset =
-            ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 30, 45);
+            ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 30, 45.0);
         assertThat(
             offset.getIntegralAmount(),
             is(-3483)); // -14.5125 degrees
@@ -80,17 +80,17 @@ public class OffsetTest {
 
     @Test(expected=IllegalArgumentException.class)
     public void atLongitudeArcusOutOfRange1() {
-        ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 60, 45);
+        ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 60, 45.0);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void atLongitudeArcusOutOfRange2() {
-        ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 30, 60);
+        ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 30, 60.0);
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void atLongitudeArcusOutOfRange3() {
-        ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 180, 0, 1);
+        ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 180, 0, 1.0);
     }
 
     @Test
@@ -358,7 +358,7 @@ public class OffsetTest {
     public void serializeLongitudinal()
         throws IOException, ClassNotFoundException {
         ZonalOffset offset =
-            ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 90, 15, 40);
+            ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 90, 15, 40.5);
         assertThat(offset, is(roundtrip(offset)));
     }
 

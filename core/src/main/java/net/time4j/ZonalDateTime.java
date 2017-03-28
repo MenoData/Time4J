@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalDateTime.java) is part of project Time4J.
  *
@@ -651,19 +651,47 @@ public final class ZonalDateTime
     /**
      * <p>Yields a canonical representation in ISO-like-style. </p>
      *
-     * @return  String
+     * @return  String suitable only for debugging purposes
+     * @see     #print(TemporalFormatter)
      */
     /*[deutsch]
      * <p>Liefert eine kanonische Darstellung &auml;hnlich zu ISO-8601. </p>
      *
-     * @return  String
+     * @return  String suitable only for debugging purposes
+     * @see     #print(TemporalFormatter)
      */
     @Override
     public String toString() {
 
         StringBuilder sb = new StringBuilder(40);
-        sb.append(this.timestamp);
-        sb.append(this.getOffset().canonical());
+        sb.append(this.timestamp.getCalendarDate());
+        sb.append('T');
+        int hour = this.timestamp.getHour();
+        if (hour < 10) {
+            sb.append('0');
+        }
+        sb.append(hour);
+        sb.append(':');
+        int minute = this.timestamp.getMinute();
+        if (minute < 10) {
+            sb.append('0');
+        }
+        sb.append(minute);
+        sb.append(':');
+        if (this.isLeapSecond()) {
+            sb.append("60");
+        } else {
+            int second = this.timestamp.getSecond();
+            if (second < 10) {
+                sb.append('0');
+            }
+            sb.append(second);
+        }
+        int n = this.timestamp.getNanosecond();
+        if (n != 0) {
+            PlainTime.printNanos(sb, n);
+        }
+        sb.append(this.getOffset());
         TZID tzid = this.getTimezone();
         boolean offset = (tzid instanceof ZonalOffset);
 

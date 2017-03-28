@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianMonth.java) is part of project Time4J.
  *
@@ -186,7 +186,7 @@ public enum EthiopianMonth
      * @return  number of month in the range [1-13]
      * @since   3.11/4.8
      */
-    /**
+    /*[deutsch]
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert. </p>
      *
      * @return  number of month in the range [1-13]

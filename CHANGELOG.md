@@ -1,6 +1,16 @@
-## [v4.26] not yet released
+## [v4.27] not yet released
+
+## [v4.26] published on 2017-03-27
 ### Added
+- Add ALWAYS-constant to DateInterval [#630]
+- Assignment of values to intervals [#629]
+- Make zone offset calculation for geo-longitude more precise [#622]
 - Enable text-lookup for non-enum elements in formatting [#618]
+- Support for Ewe language [#625]
+
+### Fixed
+- NPE in IntervalTree containing interval with infinite end [#627]
+- ZonalDateTime.toString() should not contain UTC-literal [#623]
 
 ## [v4.25] published on 2017-02-22
 ### Added
