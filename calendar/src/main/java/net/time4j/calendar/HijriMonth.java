@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriMonth.java) is part of project Time4J.
  *
@@ -109,7 +109,7 @@ public enum HijriMonth
      * @return  number of month in the range [1-12]
      * @since   3.5/4.3
      */
-    /**
+    /*[deutsch]
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert. </p>
      *
      * @return  number of month in the range [1-12]

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PersianMonth.java) is part of project Time4J.
  *
@@ -178,7 +178,7 @@ public enum PersianMonth
      * @return  number of month in the range [1-12]
      * @since   3.9/4.6
      */
-    /**
+    /*[deutsch]
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert. </p>
      *
      * @return  number of month in the range [1-12]
