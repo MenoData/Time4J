@@ -25,6 +25,7 @@ import net.time4j.PlainDate;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
@@ -40,6 +41,8 @@ import java.io.DataInputStream;
 import java.io.EOFException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -89,7 +92,8 @@ import java.util.stream.Stream;
  * @since   3.31/4.26
  * @doctags.concurrency {immutable}
  */
-public final class Nengo {
+public final class Nengo
+    implements CalendarEra, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -322,16 +326,26 @@ public final class Nengo {
 
     private static final String[] MODERN_KEYS = { HEISEI_KEY, SHOWA_KEY, TAISHO_KEY, MEIJI_KEY };
 
+    private static final long serialVersionUID = -1427328237066822668L;
+
     //~ Instanzvariablen --------------------------------------------------
 
-    private final int relgregyear;
-    private final long start;
-    private final String kanji;
-    private final String chinese;
-    private final String korean;
-    private final String russian;
-    private final String romaji;
+    private transient final int relgregyear;
+    private transient final long start;
+    private transient final String kanji;
+    private transient final String chinese;
+    private transient final String korean;
+    private transient final String russian;
+    private transient final String romaji;
+
+    /**
+     * @serial  indicates if this nengo belongs to the northern or southern court of Nanboku-ch&#333; period
+     */
     private final byte court;
+
+    /**
+     * @serial  internal array index pointer
+     */
     private final int index;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -837,6 +851,48 @@ public final class Nengo {
 
     }
 
+    /**
+     * <p>Obtains a descriptive text with romaji and the relevant year interval. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Liefert einen Beschreibungstext mit romaji-Umschreibung und dem relevanten Jahrintervall. </p>
+     *
+     * @return  String
+     */
+    @Override
+    public String name() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(this.romaji);
+        sb.append(" (");
+        Optional<Nengo> next = this.findNext();
+        if (next.isPresent()) {
+            sb.append(this.relgregyear);
+            sb.append('-');
+            sb.append(next.get().relgregyear);
+        } else {
+            sb.append("since ");
+            sb.append(this.relgregyear);
+        }
+        sb.append(')');
+        return sb.toString();
+
+    }
+
+    @Override
+    @Deprecated
+    public int getValue() {
+
+        if (this.matches(Selector.NORTHERN_COURT)) {
+            return (this.index - NORTHERN_NENGOS.length + NENGO_OEI.index - Nengo.SHOWA.index + 1);
+        }
+
+        return (this.index - Nengo.SHOWA.index + 1);
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -998,6 +1054,12 @@ public final class Nengo {
             default:
                 return 0;
         }
+
+    }
+
+    private Object readResolve() throws ObjectStreamException {
+
+        return ((this.court == COURT_NORTHERN) ? NORTHERN_NENGOS[this.index] : OFFICIAL_NENGOS[this.index]);
 
     }
 

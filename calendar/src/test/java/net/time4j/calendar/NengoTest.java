@@ -12,9 +12,13 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.io.BufferedReader;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -221,6 +225,38 @@ public class NengoTest {
         int dom = Integer.parseInt(components[2]);
         HistoricDate hd = HistoricDate.of(HistoricEra.AD, year, month, dom);
         return ChronoHistory.ofFirstGregorianReform().convert(hd);
+    }
+
+    @Test
+    public void calendarEra() {
+        Nengo nengo = Nengo.ofRelatedGregorianYear(1393, Nengo.Selector.NORTHERN_COURT);
+        assertThat(nengo.name(), is("Meitoku (1390-1394)"));
+        assertThat(nengo.getValue(), is(-64));
+    }
+
+    @Test
+    public void serialization() throws IOException, ClassNotFoundException {
+        for (Nengo nengo : Nengo.list(Nengo.Selector.OFFICIAL)) {
+            roundtrip(nengo);
+        }
+        for (Nengo nengo : Nengo.list(Nengo.Selector.NORTHERN_COURT)) {
+            roundtrip(nengo);
+        }
+    }
+
+    private static int roundtrip(Object obj)
+        throws IOException, ClassNotFoundException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        assertThat(ois.readObject() == obj, is(true)); // identity check
+        ois.close();
+        return data.length;
     }
 
 }
