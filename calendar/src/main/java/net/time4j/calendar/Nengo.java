@@ -43,6 +43,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.io.StreamCorruptedException;
 import java.net.URI;
 import java.text.ParseException;
 import java.text.ParsePosition;
@@ -979,7 +980,7 @@ public final class Nengo
 
     }
 
-    private static String capitalize(
+    static String capitalize(
         CharSequence text,
         int offset
     ) {
@@ -1057,9 +1058,18 @@ public final class Nengo
 
     }
 
+    /**
+     * @serialData  Preserves the singleton semantic
+     * @return      cached singleton
+     * @throws      ObjectStreamException if deserializing is not possible
+     */
     private Object readResolve() throws ObjectStreamException {
 
-        return ((this.court == COURT_NORTHERN) ? NORTHERN_NENGOS[this.index] : OFFICIAL_NENGOS[this.index]);
+        try {
+            return ((this.court == COURT_NORTHERN) ? NORTHERN_NENGOS[this.index] : OFFICIAL_NENGOS[this.index]);
+        } catch (ArrayIndexOutOfBoundsException iooe) {
+            throw new StreamCorruptedException();
+        }
 
     }
 
