@@ -67,12 +67,24 @@ public class OffsetTest {
     }
 
     @Test
-    public void atLongitudeArcus() {
+    public void atLongitudeArcus1() {
         ZonalOffset offset =
             ZonalOffset.atLongitude(OffsetSign.BEHIND_UTC, 14, 30, 45.0);
         assertThat(
             offset.getIntegralAmount(),
             is(-3483)); // -14.5125 degrees
+        assertThat(
+            offset.getFractionalAmount(),
+            is(0));
+    }
+
+    @Test
+    public void atLongitudeArcus2() {
+        ZonalOffset offset =
+            ZonalOffset.atLongitude(OffsetSign.AHEAD_OF_UTC, 51, 26, 0.0);
+        assertThat(
+            offset.getIntegralAmount(),
+            is(12344));
         assertThat(
             offset.getFractionalAmount(),
             is(0));
