@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricEra.java) is part of project Time4J.
  *
@@ -136,7 +136,7 @@ public enum HistoricEra
      *
      * <p>See also: <a href="https://en.wikipedia.org/wiki/Ab_urbe_condita">Wikipedia</a>. </p>
      */
-    /**
+    /*[deutsch]
      * <p>Diese mit {@link #AD} &uuml;berlappende Alternative wurde von Chronisten verwendet,
      * um die Jahre seit der angenommenen Gr&uuml;ndung der Stadt Rom zu z&auml;hlen
      * (753 BC - version of Varro). </p>
