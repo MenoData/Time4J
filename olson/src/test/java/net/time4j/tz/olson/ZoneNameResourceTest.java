@@ -10,7 +10,6 @@ import net.time4j.format.expert.PatternType;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 
