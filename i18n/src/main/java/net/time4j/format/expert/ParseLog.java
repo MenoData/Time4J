@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ParseLog.java) is part of project Time4J.
  *
@@ -53,7 +53,6 @@ public class ParseLog {
     private ParsePosition pp;
     private String errorMessage;
     private ChronoEntity<?> rawValues;
-    private Boolean daylightSaving;
     private boolean warning;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -97,7 +96,6 @@ public class ParseLog {
         this.pp = new ParsePosition(offset);
         this.errorMessage = "";
         this.rawValues = null;
-        this.daylightSaving = null;
         this.warning = false;
 
     }
@@ -119,7 +117,6 @@ public class ParseLog {
         this.pp = pp;
         this.errorMessage = "";
         this.rawValues = null;
-        this.daylightSaving = null;
         this.warning = false;
 
     }
@@ -244,10 +241,6 @@ public class ParseLog {
             sb.append(", raw-values=");
             sb.append(this.rawValues);
         }
-        if (this.daylightSaving != null) {
-            sb.append(", daylight-saving=");
-            sb.append(this.daylightSaving);
-        }
         sb.append(']');
         return sb.toString();
 
@@ -364,7 +357,6 @@ public class ParseLog {
         this.errorMessage = "";
         this.warning = false;
         this.rawValues = null;
-        this.daylightSaving = null;
 
     }
 
@@ -397,27 +389,6 @@ public class ParseLog {
     void setRawValues(ChronoEntity<?> rawValues) {
 
         this.rawValues = rawValues;
-
-    }
-
-    /**
-     * <p>Ein Zeitzonenname wurde als <i>daylightSaving</i> erkannt. </p>
-     */
-    void setDaylightSaving(boolean dst) {
-
-        this.daylightSaving = Boolean.valueOf(dst);
-
-    }
-
-    /**
-     * <p>Wurde eine Sommer- oder Winterzeitform als Zeitzonenname gelesen? </p>
-     *
-     * @return  {@code Boolean.TRUE} wenn Sommerzeit, {@code Boolean.FALSE}
-     *          wenn Winterzeit (Normalzeit), sonst {@code null}
-     */
-    Boolean getDSTInfo() {
-
-        return this.daylightSaving;
 
     }
 

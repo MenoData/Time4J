@@ -41,6 +41,7 @@ import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.FlagElement;
 import net.time4j.engine.RealTime;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.Temporal;
@@ -59,6 +60,7 @@ import net.time4j.scale.LeapSecondEvent;
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.scale.UniversalTime;
+import net.time4j.tz.OverlapResolver;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -2863,7 +2865,7 @@ public final class Moment
             Moment result = null;
             boolean leapsecond = false;
 
-            if (entity.contains(LeapsecondElement.INSTANCE)) {
+            if (entity.contains(FlagElement.LEAP_SECOND)) {
                 leapsecond = true;
                 entity.with(SECOND_OF_MINUTE, 60);
             }
@@ -2890,9 +2892,15 @@ public final class Moment
             }
 
             if (tzid != null) {
-                if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                if (entity.contains(FlagElement.DAYLIGHT_SAVING)) {
+                    boolean dst = entity.get(FlagElement.DAYLIGHT_SAVING).booleanValue();
                     TransitionStrategy strategy =
-                        attrs.get(Attributes.TRANSITION_STRATEGY);
+                        attrs
+                            .get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY)
+                            .using(dst ? OverlapResolver.EARLIER_OFFSET : OverlapResolver.LATER_OFFSET);
+                    result = ts.in(Timezone.of(tzid).with(strategy));
+                } else if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                    TransitionStrategy strategy = attrs.get(Attributes.TRANSITION_STRATEGY);
                     result = ts.in(Timezone.of(tzid).with(strategy));
                 } else {
                     result = ts.inTimezone(tzid);

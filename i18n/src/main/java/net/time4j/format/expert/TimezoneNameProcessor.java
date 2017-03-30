@@ -25,6 +25,7 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.FlagElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.tz.NameStyle;
@@ -393,7 +394,7 @@ final class TimezoneNameProcessor
             parsedResult.put(TimezoneElement.TIMEZONE_ID, zones.get(0));
             status.setPosition(lenbuf[index]);
             if (tzNames.isDaylightSensitive()) {
-                status.setDaylightSaving(index == 1);
+                parsedResult.put(FlagElement.DAYLIGHT_SAVING, Boolean.valueOf(index == 1));
             }
         } else {
             status.setError(

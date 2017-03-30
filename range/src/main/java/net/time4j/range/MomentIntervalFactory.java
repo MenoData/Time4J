@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentIntervalFactory.java) is part of project Time4J.
  *
@@ -27,9 +27,11 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.FlagElement;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ParseLog;
+import net.time4j.tz.OverlapResolver;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -131,10 +133,15 @@ final class MomentIntervalFactory
         }
 
         if (tzid != null) {
-            if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+            if (entity.contains(FlagElement.DAYLIGHT_SAVING)) {
+                boolean dst = entity.get(FlagElement.DAYLIGHT_SAVING).booleanValue();
                 TransitionStrategy strategy =
-                    attrs.get(Attributes.TRANSITION_STRATEGY);
+                    attrs
+                        .get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY)
+                        .using(dst ? OverlapResolver.EARLIER_OFFSET : OverlapResolver.LATER_OFFSET);
                 return Timezone.of(tzid).with(strategy);
+            } else if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                return Timezone.of(tzid).with(attrs.get(Attributes.TRANSITION_STRATEGY));
             } else {
                 return Timezone.of(tzid);
             }

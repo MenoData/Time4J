@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionResolver.java) is part of project Time4J.
  *
@@ -228,6 +228,17 @@ final class TransitionResolver
         }
 
         return history.getValidOffsets(date, time).get(0);
+
+    }
+
+    @Override
+    public TransitionStrategy using(OverlapResolver resolver) {
+
+        if (resolver == this.overlapResolver) {
+            return this;
+        }
+
+        return this.gapResolver.and(resolver);
 
     }
 

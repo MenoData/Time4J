@@ -46,6 +46,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
+import net.time4j.engine.FlagElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
@@ -67,6 +68,7 @@ import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.history.internal.HistorizedElement;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.OverlapResolver;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -1001,9 +1003,15 @@ public final class ChronoFormatter<T>
             if (tzid != null) {
                 StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, merger.getDefaultStartOfDay());
 
-                if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
-                    TransitionStrategy strategy = attrs.get(Attributes.TRANSITION_STRATEGY);
+                if (parsed.contains(FlagElement.DAYLIGHT_SAVING)) {
+                    boolean dst = parsed.get(FlagElement.DAYLIGHT_SAVING).booleanValue();
+                    TransitionStrategy strategy =
+                        attrs
+                            .get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY)
+                            .using(dst ? OverlapResolver.EARLIER_OFFSET : OverlapResolver.LATER_OFFSET);
                     moment = tsp.in(Timezone.of(tzid).with(strategy), startOfDay);
+                } else if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                    moment = tsp.in(Timezone.of(tzid).with(attrs.get(Attributes.TRANSITION_STRATEGY)), startOfDay);
                 } else {
                     moment = tsp.in(Timezone.of(tzid), startOfDay);
                 }
@@ -3141,11 +3149,11 @@ public final class ChronoFormatter<T>
             }
 
             // check tz-naming
-            if (status.getDSTInfo() != null) {
+            if (parsed.contains(FlagElement.DAYLIGHT_SAVING)) {
                 TZID tzid = parsed.getTimezone();
                 try {
                     boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
-                    if (dst != status.getDSTInfo().booleanValue()) {
+                    if (dst != parsed.get(FlagElement.DAYLIGHT_SAVING).booleanValue()) {
                         StringBuilder reason = new StringBuilder(256);
                         reason.append("Conflict found: ");
                         reason.append("Parsed entity is ");
