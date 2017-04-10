@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistorizedTimezone.java) is part of project Time4J.
  *
@@ -141,7 +141,7 @@ final class HistorizedTimezone
     }
 
     @Override
-    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+    public ZonalOffset getDaylightSavingOffset(UnixTime ut) {
 
         ZonalTransition t = this.history.getStartTransition(ut);
 
