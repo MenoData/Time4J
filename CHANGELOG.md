@@ -1,5 +1,6 @@
 ## [v4.27] not yet released
 ### Fixed
+- TransitionHistory.getPreviousTransition() has improper description [#637]
 - Roundtrip of print/parse during zone offset overlap fails [#635]
 - Converting geo longitude to ZonalOffset crashes [#632]
 
