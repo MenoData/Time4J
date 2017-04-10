@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianEra.java) is part of project Time4J.
  *
@@ -31,11 +31,17 @@ import java.util.Locale;
 /**
  * <p>The Ethiopian calendar supports two eras. </p>
  *
+ * <p>Amete-Mihret is preferred in modern times (although both eras can still be used in parallel)
+ * but if mihret-years become smaller than 1 then Amete-Alem is used. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.11/4.8
  */
 /*[deutsch]
  * <p>Der &auml;tiopische Kalender unterst&uuml;tzt zwei &Auml;ras. </p>
+ *
+ * <p>Amete-Mihret ist heutzutage bevorzugt (obwohl immer noch beide &Auml;ren parallel benutzbar sind),
+ * aber wenn Mihret-Jahre kleiner als 1 zu werden drohen, wird immer Amete-Alem benutzt. </p>
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8

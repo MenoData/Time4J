@@ -1,8 +1,8 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (LeapsecondElement.java) is part of project Time4J.
+ * This file (FlagElement.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -19,37 +19,42 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j;
-
-import net.time4j.engine.BasicElement;
-
-import java.io.ObjectStreamException;
+package net.time4j.engine;
 
 
 /**
- * <p>Repr&auml;sentiert einen Zeiger auf eine Schaltsekundeninformation. </p>
+ * <p>A specialized element for indicating special state during parsing. </p>
  *
- * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
+ * @author  Meno Hochschild
+ * @since   3.32/4.27
  */
-final class LeapsecondElement
-    extends BasicElement<Boolean> {
+/*[deutsch]
+ * <p>Ein Spezialelement, das einen besonderen Zustand w&auml;hrend eines
+ * Interpretationsvorgangs anzeigen kann. </p>
+ *
+ * @author  Meno Hochschild
+ * @since   3.32/4.27
+ */
+public enum FlagElement
+    implements ChronoElement<Boolean> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * Singleton-Instanz.
+     * <p>Identifies the existence of a leap second in any parsed chronological entity. </p>
      */
-    static final LeapsecondElement INSTANCE = new LeapsecondElement();
+    /*[deutsch]
+     * <p>Markiert die Existenz einer Schaltsekunde in einer gegebenen chronologischen Entit&auml;t. </p>
+     */
+    LEAP_SECOND,
 
-    private static final long serialVersionUID = -5143702899727667978L;
-
-    //~ Konstruktoren -----------------------------------------------------
-
-    private LeapsecondElement() {
-        super("LEAPSECOND");
-
-    }
+    /**
+     * <p>Identifies a summer or winter time information in any parsed chronological entity. </p>
+     */
+    /*[deutsch]
+     * <p>Markiert eine Sommer- oder Winterzeitinformation in einer gegebenen chronologischen Entit&auml;t. </p>
+     */
+    DAYLIGHT_SAVING;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -57,6 +62,25 @@ final class LeapsecondElement
     public Class<Boolean> getType() {
 
         return Boolean.class;
+
+    }
+
+    @Override
+    public char getSymbol() {
+
+        return '\u0000';
+
+    }
+
+    @Override
+    public int compare(
+        ChronoDisplay o1,
+        ChronoDisplay o2
+    ) {
+
+        boolean b1 = o1.contains(this);
+        boolean b2 = o2.contains(this);
+        return ((b1 == b2) ? 0 : (b1 ? 1 : -1));
 
     }
 
@@ -89,15 +113,9 @@ final class LeapsecondElement
     }
 
     @Override
-    protected boolean isSingleton() {
+    public boolean isLenient() {
 
-        return true;
-
-    }
-
-    private Object readResolve() throws ObjectStreamException {
-
-        return INSTANCE;
+        return false;
 
     }
 

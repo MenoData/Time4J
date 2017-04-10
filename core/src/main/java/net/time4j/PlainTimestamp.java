@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTimestamp.java) is part of project Time4J.
  *
@@ -38,6 +38,7 @@ import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
+import net.time4j.engine.FlagElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.Normalizer;
 import net.time4j.engine.Temporal;
@@ -1731,13 +1732,8 @@ public final class PlainTimestamp
                             DAYS);
                 }
 
-                if (
-                    leapsecond
-                    && entity.isValid(LeapsecondElement.INSTANCE, Boolean.TRUE)
-                ) {
-                    entity.with(
-                        LeapsecondElement.INSTANCE,
-                        Boolean.TRUE);
+                if (leapsecond && entity.isValid(FlagElement.LEAP_SECOND, Boolean.TRUE)) {
+                    entity.with(FlagElement.LEAP_SECOND, Boolean.TRUE);
                 }
 
                 return PlainTimestamp.of(date, time);

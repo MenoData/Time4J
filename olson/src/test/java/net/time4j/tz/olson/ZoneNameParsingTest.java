@@ -25,6 +25,16 @@ public class ZoneNameParsingTest {
  	public static Iterable<Object[]> data() {
  		return Arrays.asList(
             new Object[][] {
+                {"d. MMMM uuuu HH:mm z",
+                    "de",
+                    "Europe/Berlin",
+                    "2017-10-29T00:30Z",
+                    "29. Oktober 2017 02:30 MESZ"},
+                {"d. MMMM uuuu HH:mm z",
+                    "de",
+                    "Europe/Berlin",
+                    "2017-10-29T01:30Z",
+                    "29. Oktober 2017 02:30 MEZ"},
                 {"MMMM/dd/uuuu HH:mm:ss z",
                         "us",
                         "America/Los_Angeles",
