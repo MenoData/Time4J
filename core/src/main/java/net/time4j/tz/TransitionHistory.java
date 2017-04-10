@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionHistory.java) is part of project Time4J.
  *
@@ -391,7 +391,7 @@ public interface TransitionHistory {
 
     /**
      * <p>Queries the previous transition which defines the offset
-     * for given preceding global timestamp. </p>
+     * for a global timestamp immediately before given reference timestamp. </p>
      *
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition}, not present if given reference time is not after any defined transition
