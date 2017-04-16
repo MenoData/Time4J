@@ -63,9 +63,9 @@ import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
-import net.time4j.history.internal.HistorizedElement;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.OverlapResolver;
@@ -271,7 +271,7 @@ public final class ChronoFormatter<T>
                 if (ix && !ParsedValues.isIndexed(element)) {
                     ix = false;
                 }
-                if (element instanceof HistorizedElement) {
+                if (element instanceof DualFormatElement) {
                     nh = true;
                 } else if (!dp && element.name().endsWith("_DAY_PERIOD")) {
                     dp = true;
