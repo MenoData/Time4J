@@ -492,7 +492,7 @@ public final class IsoTextProviderSPI
     private static ResourceBundle getBundle(Locale desired)
         throws MissingResourceException {
 
-        if (LANGUAGES.contains(LanguageMatch.getAlias(desired))) {
+        if (LANGUAGES.contains(LanguageMatch.getAlias(desired)) || desired.getLanguage().isEmpty()) {
             return ResourceBundle.getBundle(
                 "names/" + ISO_CALENDAR_TYPE,
                 desired,
