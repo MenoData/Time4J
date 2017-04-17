@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RelatedGregorianYearElement.java) is part of project Time4J.
  *
@@ -45,6 +45,8 @@ final class RelatedGregorianYearElement
     //~ Statische Felder/Initialisierungen --------------------------------
 
     static final RelatedGregorianYearElement SINGLETON = new RelatedGregorianYearElement();
+
+    private static final long serialVersionUID = -1117064522468823402L;
 
     //~ Konstruktoren -----------------------------------------------------
 
