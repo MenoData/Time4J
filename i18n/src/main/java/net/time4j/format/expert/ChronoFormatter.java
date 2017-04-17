@@ -4503,6 +4503,7 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
+         * @see     #addEnglishOrdinal(ChronoElement)
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -4550,6 +4551,7 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
+         * @see     #addEnglishOrdinal(ChronoElement)
          * @see     Chronology#isSupported(ChronoElement)
          */
         public Builder<T> addOrdinal(
