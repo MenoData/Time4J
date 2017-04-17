@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoTextProviderSPI.java) is part of project Time4J.
  *
@@ -492,7 +492,7 @@ public final class IsoTextProviderSPI
     private static ResourceBundle getBundle(Locale desired)
         throws MissingResourceException {
 
-        if (LANGUAGES.contains(LanguageMatch.getAlias(desired))) {
+        if (LANGUAGES.contains(LanguageMatch.getAlias(desired)) || desired.getLanguage().isEmpty()) {
             return ResourceBundle.getBundle(
                 "names/" + ISO_CALENDAR_TYPE,
                 desired,

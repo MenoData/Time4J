@@ -41,7 +41,7 @@ import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextWidth;
-import net.time4j.history.internal.HistorizedElement;
+import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.internal.StdHistoricalElement;
 
 import java.io.IOException;
@@ -62,7 +62,7 @@ import static net.time4j.history.YearDefinition.DUAL_DATING;
  */
 final class HistoricIntegerElement
     extends StdHistoricalElement
-    implements HistorizedElement {
+    implements DualFormatElement {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

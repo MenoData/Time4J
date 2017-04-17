@@ -41,8 +41,8 @@ import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
-import net.time4j.history.internal.HistorizedElement;
 import net.time4j.i18n.UltimateFormatEngine;
 import net.time4j.tz.NameStyle;
 
@@ -2208,15 +2208,15 @@ public enum PatternType
         TextElement<?> textElement;
         ChronoElement<Integer> intElement;
 
-        if (element.getType().isEnum() && (element instanceof TextElement)) {
-            textElement = cast(element);
-            intElement = null;
-        } else if (Integer.class.isAssignableFrom(element.getType())) {
+        if (Integer.class.isAssignableFrom(element.getType())) {
             textElement = null;
-            if (element instanceof HistorizedElement) {
+            if (element instanceof DualFormatElement) {
                 textElement = cast(element);
             }
             intElement = cast(element);
+        } else if (element instanceof TextElement) {
+            textElement = cast(element);
+            intElement = null;
         } else {
             throw new IllegalStateException("Implementation error: " + element + " in \"" + chronoType + "\"");
         }
@@ -2470,11 +2470,18 @@ public enum PatternType
         switch (count) {
             case 1:
             case 2:
-                ChronoElement<V> enumElement = cast(textElement);
-                if (count == 1) {
-                    builder.addNumerical(enumElement, 1, 2);
-                } else if (count == 2) {
-                    builder.addFixedNumerical(enumElement, 2);
+                if (Enum.class.isAssignableFrom(textElement.getType())) {
+                    ChronoElement<V> enumElement = cast(textElement);
+                    if (count == 1) {
+                        builder.addNumerical(enumElement, 1, 2);
+                    } else if (count == 2) {
+                        builder.addFixedNumerical(enumElement, 2);
+                    }
+                } else {
+                    builder.startSection(
+                        DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(count));
+                    builder.addText(textElement);
+                    builder.endSection();
                 }
                 break;
             case 3:

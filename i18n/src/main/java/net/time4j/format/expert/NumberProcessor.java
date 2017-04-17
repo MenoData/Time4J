@@ -29,7 +29,7 @@ import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.NumericalElement;
-import net.time4j.history.internal.HistorizedElement;
+import net.time4j.format.internal.DualFormatElement;
 
 import java.io.IOException;
 import java.util.Set;
@@ -227,8 +227,8 @@ class NumberProcessor<V>
                 buffer.append(Integer.toString(v));
             }
             printed += count;
-        } else if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
-            HistorizedElement te = HistorizedElement.class.cast(this.element);
+        } else if (this.yearOfEra && (this.element instanceof DualFormatElement)) {
+            DualFormatElement te = DualFormatElement.class.cast(this.element);
             StringBuilder sb = new StringBuilder();
             te.print(formattable, sb, attributes, numsys, zeroChar, this.minDigits, this.maxDigits);
             buffer.append(sb.toString());
@@ -448,8 +448,8 @@ class NumberProcessor<V>
             return;
         }
 
-        if (this.yearOfEra && (this.element instanceof HistorizedElement)) {
-            HistorizedElement te = HistorizedElement.class.cast(this.element);
+        if (this.yearOfEra && (this.element instanceof DualFormatElement)) {
+            DualFormatElement te = DualFormatElement.class.cast(this.element);
             Object value = te.parse(text, status.getPP(), attributes, parsedResult);
             if (status.isError()) {
                 status.setError(status.getErrorIndex(), "Unparseable element: " + this.element.name());
