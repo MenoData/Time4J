@@ -94,7 +94,7 @@ public final class EastAsianMonth
         CACHE = months;
     }
 
-    //private static final long serialVersionUID = 9057590169025081879L;
+    private static final long serialVersionUID = 7544059597266533279L;
 
     //~ Instanzvariablen --------------------------------------------------
 

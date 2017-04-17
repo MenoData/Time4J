@@ -73,7 +73,7 @@ import java.util.stream.Stream;
  * <p>&quot;-Dnet.time4j.calendar.japanese.supplemental.era name=newEra,kanji=KK,since=9999-12-31&quot;</p>
  *
  * @author  Meno Hochschild
- * @since   3.31/4.26
+ * @since   3.32/4.27
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
@@ -90,7 +90,7 @@ import java.util.stream.Stream;
  * <p>&quot;-Dnet.time4j.calendar.japanese.supplemental.era name=newEra,kanji=KK,since=9999-12-31&quot;</p>
  *
  * @author  Meno Hochschild
- * @since   3.31/4.26
+ * @since   3.32/4.27
  * @doctags.concurrency {immutable}
  */
 public final class Nengo
@@ -1402,6 +1402,8 @@ public final class Nengo
         //~ Statische Felder/Initialisierungen ----------------------------
 
         static final Element SINGLETON = new Element();
+
+        private static final long serialVersionUID = -1099321098836107792L;
 
         //~ Konstruktoren -------------------------------------------------
 

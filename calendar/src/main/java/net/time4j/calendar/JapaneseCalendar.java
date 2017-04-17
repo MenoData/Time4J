@@ -586,7 +586,7 @@ public final class JapaneseCalendar
         ENGINE = builder.build();
     }
 
-    //private static final long serialVersionUID = -8248846000788617742L;
+    private static final long serialVersionUID = -153630575450868922L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -2395,6 +2395,8 @@ public final class JapaneseCalendar
         //~ Statische Felder/Initialisierungen ----------------------------
 
         static final MonthPrimitiveElement SINGLETON = new MonthPrimitiveElement();
+
+        private static final long serialVersionUID = -2978966174642315851L;
 
         //~ Konstruktoren -------------------------------------------------
 
