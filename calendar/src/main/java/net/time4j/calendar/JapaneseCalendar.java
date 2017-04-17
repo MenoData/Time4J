@@ -325,8 +325,8 @@ public final class JapaneseCalendar
      * languages Japanese, Chinese and Korean usually define an extra literal behind the number for the
      * month. In such a case, the strong recommendation is to use numerical formatting together with the
      * literal, for example the pattern &quot;M月&quot; in Japanese. Patterns using &quot;MMM&quot; or even
-     * &quot;MMMM&quot; should only be used if the context is in modern times after 1872 and gregorian
-     * month names are wished. </p>
+     * &quot;MMMM&quot; (without the literal &quot;月&quot;) should only be used if the context is in modern
+     * times after 1872 and gregorian month names are wished. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den japanischen Monat. </p>
@@ -336,13 +336,109 @@ public final class JapaneseCalendar
      * ostasiatischen Sprachen Japanisch, Chinesisch und Koreanisch definieren ein besonderes Literalzeichen
      * hinter der Monatsnummer. In einem solchen Fall lautet die dringende Empfehlung, zur numerischen
      * Formatierung in Verbindung mit dem Literal zu wechseln, zum Beispiel das Formatmuster &quot;M月&quot;
-     * im Japanischen. Formatmuster, die &quot;MMM&quot; oder sogar &quot;MMMM&quot; enthalten, sollten nur
-     * dann verwendet werden, wenn der Kontext ein moderner ist (nach 1872) und gregorianische Monatsnamen
-     * gew&uuml;nscht sind. </p>
+     * im Japanischen. Formatmuster, die &quot;MMM&quot; oder sogar &quot;MMMM&quot; enthalten (ohne das
+     * Literal &quot;月&quot;), sollten nur dann verwendet werden, wenn der Kontext ein moderner ist (nach 1872)
+     * und gregorianische Monatsnamen gew&uuml;nscht sind. </p>
      */
     @FormattableElement(format = "M", standalone = "L")
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR =
         new MonthPrimitiveElement();
+
+    /**
+     * <p>Represents the ordinal index of a Japanese month. </p>
+     *
+     * <p>The value is only identical to the regular month number since Meiji 6 (1873). If users want
+     * to get the regular month number all times then it is only safe to use the expression
+     * {@code japaneseDate.get(MONTH_OF_YEAR).getNumber()}, not this element. Following example
+     * illustrates the difference for the lunisolar year Kaei-7 (1854) which contains a leap month: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <caption>Month number/index during the lunisolar year Kaei 7</caption>
+     * <tr>
+     *  <td>get(MONTH_OF_YEAR)</td>
+     *  <td>1</td>
+     *  <td>2</td>
+     *  <td>3</td>
+     *  <td>4</td>
+     *  <td>5</td>
+     *  <td>6</td>
+     *  <td>7</td>
+     *  <td>*7</td>
+     *  <td>8</td>
+     *  <td>9</td>
+     *  <td>10</td>
+     *  <td>11</td>
+     *  <td>12</td>
+     * </tr>
+     * <tr>
+     *  <td>get(MONTH_AS_ORDINAL)</td>
+     *  <td>1</td>
+     *  <td>2</td>
+     *  <td>3</td>
+     *  <td>4</td>
+     *  <td>5</td>
+     *  <td>6</td>
+     *  <td>7</td>
+     *  <td>8</td>
+     *  <td>9</td>
+     *  <td>10</td>
+     *  <td>11</td>
+     *  <td>12</td>
+     *  <td>13</td>
+     * </tr>
+     * </table>
+     * </div>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Ordnungsnummer eines japanischen Monats. </p>
+     *
+     * <p>Der Wert ist nur dann identisch mit der regul&auml;ren Monatsnummer seit Meiji 6 (1873).
+     * Wenn Anwender die regul&auml;re Monatsnummer f&uuml;r alle Zeiten brauchen, dann sollten sie
+     * sicherheitshalber  den Ausdruck {@code japaneseDate.get(MONTH_OF_YEAR).getNumber()} statt
+     * dieses Element verwenden. Folgendes Beispiel illustriert den Unterschied f&uuml;r das
+     * lunisolare Jahr Kaei-7 (1854), das einen Schaltmonat enth&auml;lt: </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     * <caption>Monatsnummer/-index w&auml;hrend des lunisolaren Jahres Kaei 7</caption>
+     * <tr>
+     *  <td>get(MONTH_OF_YEAR)</td>
+     *  <td>1</td>
+     *  <td>2</td>
+     *  <td>3</td>
+     *  <td>4</td>
+     *  <td>5</td>
+     *  <td>6</td>
+     *  <td>7</td>
+     *  <td>*7</td>
+     *  <td>8</td>
+     *  <td>9</td>
+     *  <td>10</td>
+     *  <td>11</td>
+     *  <td>12</td>
+     * </tr>
+     * <tr>
+     *  <td>get(MONTH_AS_ORDINAL)</td>
+     *  <td>1</td>
+     *  <td>2</td>
+     *  <td>3</td>
+     *  <td>4</td>
+     *  <td>5</td>
+     *  <td>6</td>
+     *  <td>7</td>
+     *  <td>8</td>
+     *  <td>9</td>
+     *  <td>10</td>
+     *  <td>11</td>
+     *  <td>12</td>
+     *  <td>13</td>
+     * </tr>
+     * </table>
+     * </div>
+     */
+    public static final StdCalendarElement<Integer, JapaneseCalendar> MONTH_AS_ORDINAL =
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", JapaneseCalendar.class, 1, 12, '\u0000', null, null);
 
     /**
      * <p>Represents the Japanese day of month. </p>
@@ -403,6 +499,10 @@ public final class JapaneseCalendar
             .appendElement(
                 MONTH_OF_YEAR,
                 MonthPrimitiveElement.SINGLETON,
+                Unit.MONTHS)
+            .appendElement(
+                MONTH_AS_ORDINAL,
+                new IntegerRule(MONTH_AS_ORDINAL_INDEX),
                 Unit.MONTHS)
             .appendElement(
                 DAY_OF_MONTH,
@@ -2019,6 +2119,8 @@ public final class JapaneseCalendar
                     return context.dayOfMonth;
                 case DAY_OF_YEAR_INDEX:
                     return context.dayOfYear;
+                case MONTH_AS_ORDINAL_INDEX:
+                    return getMonthIndex(context.relgregyear, context.month);
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return context.relgregyear;
                 default:
@@ -2033,6 +2135,7 @@ public final class JapaneseCalendar
                 case YEAR_OF_NENGO_INDEX:
                 case DAY_OF_MONTH_INDEX:
                 case DAY_OF_YEAR_INDEX:
+                case MONTH_AS_ORDINAL_INDEX:
                     return 1;
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return 701;
@@ -2058,6 +2161,8 @@ public final class JapaneseCalendar
                     return getLengthOfMonth(context.relgregyear, context.month);
                 case DAY_OF_YEAR_INDEX:
                     return getLengthOfYear(context.relgregyear);
+                case MONTH_AS_ORDINAL_INDEX:
+                    return (context.relgregyear >= 1873 || LEAP_INDICATORS[context.relgregyear - 701] == 0) ? 12 : 13;
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return 999_999_999;
                 default:
@@ -2076,6 +2181,7 @@ public final class JapaneseCalendar
                 case YEAR_OF_NENGO_INDEX:
                 case DAY_OF_MONTH_INDEX:
                 case DAY_OF_YEAR_INDEX:
+                case MONTH_AS_ORDINAL_INDEX:
                     return ((value >= 1) && (value <= this.getMax(context)));
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return (context.relgregyear == value);
@@ -2111,6 +2217,21 @@ public final class JapaneseCalendar
                         return JapaneseCalendar.create(context, context.relgregyear, context.month, value);
                     case DAY_OF_YEAR_INDEX:
                         return new JapaneseCalendar(context.nengo, context.relgregyear, value);
+                    case MONTH_AS_ORDINAL_INDEX:
+                        EastAsianMonth m;
+                        if (context.relgregyear >= 1873) {
+                            m = EastAsianMonth.valueOf(value);
+                        } else {
+                            byte b = LEAP_INDICATORS[context.relgregyear - 701];
+                            if (value == b) {
+                                m = EastAsianMonth.valueOf(value - 1).withLeap();
+                            } else if (value > b) {
+                                m = EastAsianMonth.valueOf(value - 1);
+                            } else {
+                                m = EastAsianMonth.valueOf(value);
+                            }
+                        }
+                        return context.with(MONTH_OF_YEAR, m);
                     case RELATED_GREGORIAN_YEAR_INDEX:
                         return context;
                     default:
@@ -2177,6 +2298,8 @@ public final class JapaneseCalendar
                 case DAY_OF_YEAR_INDEX:
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return null;
+                case MONTH_AS_ORDINAL_INDEX:
+                    return DAY_OF_MONTH;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }

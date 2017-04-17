@@ -125,24 +125,35 @@ public class JapaneseElementTest {
 
     @Test
     public void monthAsOrdinalElement() {
-//        assertThat(
-//            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.maximized()),
-//            is(JapaneseCalendar.of(enkyo, 2, EastAsianMonth.valueOf(12).withLeap(), 29)));
-//        assertThat(
-//            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.minimized()),
-//            is(JapaneseCalendar.of(enkyo, 2, EastAsianMonth.valueOf(1), 30)));
-//        assertThat(
-//            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.incremented()),
-//            is(JapaneseCalendar.of(enkyo, 2, EastAsianMonth.valueOf(4), 29)));
-//        assertThat(
-//            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.decremented()),
-//            is(JapaneseCalendar.of(enkyo, 2, EastAsianMonth.valueOf(2), 30)));
-//        assertThat(
-//            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.atFloor()),
-//            is(JapaneseCalendar.of(enkyo, 2, EastAsianMonth.valueOf(3), 1)));
-//        assertThat(
-//            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.atCeiling()),
-//            is(JapaneseCalendar.of(enkyo, 2, EastAsianMonth.valueOf(3), 30)));
+        Nengo kaei = Nengo.ofRelatedGregorianYear(1848);
+        JapaneseCalendar jcal = JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(9), 2);
+        assertThat(jcal.getMinimum(JapaneseCalendar.MONTH_AS_ORDINAL), is(1));
+        assertThat(jcal.getMaximum(JapaneseCalendar.MONTH_AS_ORDINAL), is(13));
+        assertThat(jcal.get(JapaneseCalendar.MONTH_AS_ORDINAL), is(10));
+        assertThat(jcal.isValid(JapaneseCalendar.MONTH_AS_ORDINAL, 13), is(true));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL, 12),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(11), 2)));
+        assertThat(JapaneseCalendar.MONTH_AS_ORDINAL.getDisplayName(Locale.ENGLISH), is("MONTH_AS_ORDINAL"));
+        assertThat(JapaneseCalendar.MONTH_AS_ORDINAL.getDisplayName(Locale.ROOT), is("MONTH_AS_ORDINAL"));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.maximized()),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(12), 2)));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.minimized()),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(1), 2)));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.incremented()),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(10), 2)));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.decremented()),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(8), 2)));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.atFloor()),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(9), 1)));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.atCeiling()),
+            is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(9), 29)));
     }
 
     @Test
