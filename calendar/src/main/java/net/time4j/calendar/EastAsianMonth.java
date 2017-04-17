@@ -21,6 +21,8 @@
 
 package net.time4j.calendar;
 
+import net.time4j.engine.AttributeKey;
+import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumberSystem;
 
@@ -67,6 +69,19 @@ public final class EastAsianMonth
     implements Comparable<EastAsianMonth>, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Format attribute which defines a symbol character for the leap month deviating from standard. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#with(AttributeKey, char)
+     */
+    /*[deutsch]
+     * <p>Formatattribut, das ein Symbolzeichen f&uuml;r den Schaltmonat abweichend vom Standard definiert. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#with(AttributeKey, char)
+     */
+    public static final AttributeKey<Character> LEAP_MONTH_INDICATOR =
+        Attributes.createKey("LEAP_MONTH_INDICATOR", Character.class);
 
     private static final EastAsianMonth[] CACHE;
 

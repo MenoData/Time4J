@@ -312,7 +312,22 @@ public class JapaneseElementTest {
     }
 
     @Test
-    public void parseLunisolar() throws ParseException {
+    public void parseLunisolarEnglish() throws ParseException {
+        ChronoFormatter<JapaneseCalendar> formatter =
+            ChronoFormatter.ofPattern(
+                "G-y-M-d",
+                PatternType.NON_ISO_DATE,
+                Locale.ENGLISH,
+                JapaneseCalendar.axis()
+            ).with(EastAsianMonth.LEAP_MONTH_INDICATOR, 'L');
+
+        Nengo kaei = Nengo.ofRelatedGregorianYear(1848);
+        JapaneseCalendar jcal = JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(7).withLeap(), 14);
+        assertThat(formatter.parse("Kaei-7-L7-14"), is(jcal));
+    }
+
+    @Test
+    public void parseLunisolarJapanese() throws ParseException {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "Gy年M月d日",
@@ -328,6 +343,18 @@ public class JapaneseElementTest {
         Nengo ansei = Nengo.ofRelatedGregorianYear(1854);
         JapaneseCalendar jcal2 = JapaneseCalendar.of(ansei, 1, EastAsianMonth.valueOf(7).withLeap(), 14, Leniency.LAX);
         assertThat(formatter.parse("安政1年閏7月14日"), is(jcal2));
+    }
+
+    @Test
+    public void kokiElement() {
+        JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 1, 14);
+        assertThat(jcal.getInt(JapaneseCalendar.KOKI), is(2677));
+
+        assertThat(
+            JapaneseCalendar.axis().getMaximum().get(JapaneseCalendar.KOKI),
+            is(jcal.getMaximum(JapaneseCalendar.KOKI)));
+        assertThat(jcal.with(JapaneseCalendar.KOKI, 2532),
+            is(JapaneseCalendar.of(Nengo.MEIJI, 5, EastAsianMonth.valueOf(1), 14)));
     }
 
     @Test

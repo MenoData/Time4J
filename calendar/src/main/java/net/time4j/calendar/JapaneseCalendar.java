@@ -84,6 +84,7 @@ import java.text.ParsePosition;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Optional;
 
 import static net.time4j.calendar.Nengo.Selector.*;
@@ -122,6 +123,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #KOKI}</li>
  *  <li>{@link #YEAR_OF_NENGO}</li>
  *  <li>{@link #NENGO}</li>
  * </ul>
@@ -188,8 +191,10 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
- *  <li>{@link #YEAR_OF_ERA}</li>
- *  <li>{@link #ERA}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #KOKI}</li>
+ *  <li>{@link #YEAR_OF_NENGO}</li>
+ *  <li>{@link #NENGO}</li>
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
@@ -232,6 +237,7 @@ public final class JapaneseCalendar
     private static final int DAY_OF_MONTH_INDEX = 2;
     private static final int DAY_OF_YEAR_INDEX = 3;
     private static final int RELATED_GREGORIAN_YEAR_INDEX = 4;
+    private static final int KOKI_INDEX = 5;
 
     private static final int MRD = 1_000_000_000;
     private static final long EPOCH_1873 = -36158L; // PlainDate.of(1873, 1, 1).getDaysSinceEpochUTC();
@@ -318,6 +324,31 @@ public final class JapaneseCalendar
             null);
 
     /**
+     * <p>Counts the years since the supposed foundation date of Japan by the legendary emperor Jimmu. </p>
+     *
+     * <p>This imperial way of counting years was used from 1873 until the end of Second World War (called
+     * K&#333;ki) and is 660 years in advance of gregorian years. However, the standard way of counting years
+     * in this calendar is the {@link #YEAR_OF_NENGO nengo-based year}. </p>
+     */
+    /*[deutsch]
+     * <p>Z&auml;hlt die Jahre seit dem angenommenen Gr&uuml;ndungsdatum Japans durch den mythischen
+     * Herrscher Jimmu. </p>
+     *
+     * <p>Diese imperiale Art der Jahresz&auml;hlung war im Gebrauch von 1873 bis zum Ende des zweiten
+     * Weltkriegs (genannt K&#333;ki) und eilt dem gregorianischen Jahr um 660 Jahre voraus. Jedoch ist
+     * die normale Jahresz&auml;hlung in diesem Kalender das {@link #YEAR_OF_NENGO nengo-basierte Jahr}. </p>
+     */
+    public static final ChronoElement<Integer> KOKI =
+        new StdIntegerDateElement<>(
+            "YEAR_OF_JIMMU",
+            JapaneseCalendar.class,
+            701 + 660,
+            MRD + 659,
+            '\u0000',
+            null,
+            null);
+
+    /**
      * <p>Represents the Japanese month. </p>
      *
      * <p>If used in combination with numeric formatting (via pattern length smaller than 3, M or MM) then
@@ -356,7 +387,7 @@ public final class JapaneseCalendar
      * <table border="1">
      * <caption>Month number/index during the lunisolar year Kaei 7</caption>
      * <tr>
-     *  <td>get(MONTH_OF_YEAR)</td>
+     *  <td>{@link #MONTH_OF_YEAR}</td>
      *  <td>1</td>
      *  <td>2</td>
      *  <td>3</td>
@@ -372,7 +403,7 @@ public final class JapaneseCalendar
      *  <td>12</td>
      * </tr>
      * <tr>
-     *  <td>get(MONTH_AS_ORDINAL)</td>
+     *  <td>MONTH_AS_ORDINAL</td>
      *  <td>1</td>
      *  <td>2</td>
      *  <td>3</td>
@@ -389,6 +420,9 @@ public final class JapaneseCalendar
      * </tr>
      * </table>
      * </div>
+     *
+     * <p>This element can be used in conjunction with
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) ordinal formatting}. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die Ordnungsnummer eines japanischen Monats. </p>
@@ -403,7 +437,7 @@ public final class JapaneseCalendar
      * <table border="1">
      * <caption>Monatsnummer/-index w&auml;hrend des lunisolaren Jahres Kaei 7</caption>
      * <tr>
-     *  <td>get(MONTH_OF_YEAR)</td>
+     *  <td>{@link #MONTH_OF_YEAR}</td>
      *  <td>1</td>
      *  <td>2</td>
      *  <td>3</td>
@@ -436,6 +470,10 @@ public final class JapaneseCalendar
      * </tr>
      * </table>
      * </div>
+     *
+     * <p>Dieses Element kann in Verbindung mit einem
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) OrdinalFormat}
+     * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, JapaneseCalendar> MONTH_AS_ORDINAL =
         new StdIntegerDateElement<>("MONTH_AS_ORDINAL", JapaneseCalendar.class, 1, 12, '\u0000', null, null);
@@ -516,6 +554,10 @@ public final class JapaneseCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                KOKI,
+                new IntegerRule(KOKI_INDEX),
+                Unit.YEARS)
             .appendElement(
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new IntegerRule(RELATED_GREGORIAN_YEAR_INDEX))
@@ -863,11 +905,13 @@ public final class JapaneseCalendar
      * <p>Yields the Japanese era (nengo). </p>
      *
      * @return  Nengo
+     * @see     #NENGO
      */
     /*[deutsch]
      * <p>Liefert die japanische &Auml;ra (Nengo). </p>
      *
      * @return  Nengo
+     * @see     #NENGO
      */
     public Nengo getEra() {
 
@@ -879,11 +923,13 @@ public final class JapaneseCalendar
      * <p>Yields the Japanese year which belongs to a nengo. </p>
      *
      * @return  int {@code >= 1}
+     * @see     #YEAR_OF_NENGO
      */
     /*[deutsch]
      * <p>Liefert das japanische Jahr, das mit einem Nengo verkn&uuml;pft ist. </p>
      *
      * @return  int {@code >= 1}
+     * @see     #YEAR_OF_NENGO
      */
     public int getYear() {
 
@@ -895,11 +941,13 @@ public final class JapaneseCalendar
      * <p>Yields the Japanese month. </p>
      *
      * @return  japanese month
+     * @see     #MONTH_OF_YEAR
      */
     /*[deutsch]
      * <p>Liefert den japanischen Monat. </p>
      *
      * @return  japanese month
+     * @see     #MONTH_OF_YEAR
      */
     public EastAsianMonth getMonth() {
 
@@ -910,12 +958,14 @@ public final class JapaneseCalendar
     /**
      * <p>Yields the Japanese day of month. </p>
      *
-     * @return int
+     * @return  int
+     * @see     #DAY_OF_MONTH
      */
     /*[deutsch]
      * <p>Liefert den japanischen Tag des Monats. </p>
      *
      * @return  int
+     * @see     #DAY_OF_MONTH
      */
     public int getDayOfMonth() {
 
@@ -928,7 +978,8 @@ public final class JapaneseCalendar
      *
      * <p>The Japanese calendar also uses a 7-day-week. </p>
      *
-     * @return Weekday
+     * @return  Weekday
+     * @see     #DAY_OF_WEEK
      */
     /*[deutsch]
      * <p>Ermittelt den Wochentag. </p>
@@ -936,6 +987,7 @@ public final class JapaneseCalendar
      * <p>Der japanische Kalendar verwendet ebenfalls eine 7-Tage-Woche. </p>
      *
      * @return  Weekday
+     * @see     #DAY_OF_WEEK
      */
     public Weekday getDayOfWeek() {
 
@@ -948,11 +1000,13 @@ public final class JapaneseCalendar
      * <p>Yields the Japanese day of year. </p>
      *
      * @return  int {@code >= 1}
+     * @see     #DAY_OF_YEAR
      */
     /*[deutsch]
      * <p>Liefert den japanischen Tag des Jahres. </p>
      *
      * @return  int {@code >= 1}
+     * @see     #DAY_OF_YEAR
      */
     public int getDayOfYear() {
 
@@ -2123,6 +2177,8 @@ public final class JapaneseCalendar
                     return getMonthIndex(context.relgregyear, context.month);
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return context.relgregyear;
+                case KOKI_INDEX:
+                    return context.relgregyear + 660;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -2139,6 +2195,8 @@ public final class JapaneseCalendar
                     return 1;
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return 701;
+                case KOKI_INDEX:
+                    return 701 + 660;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -2164,7 +2222,9 @@ public final class JapaneseCalendar
                 case MONTH_AS_ORDINAL_INDEX:
                     return (context.relgregyear >= 1873 || LEAP_INDICATORS[context.relgregyear - 701] == 0) ? 12 : 13;
                 case RELATED_GREGORIAN_YEAR_INDEX:
-                    return 999_999_999;
+                    return MRD - 1;
+                case KOKI_INDEX:
+                    return MRD + 660 - 1;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -2182,6 +2242,7 @@ public final class JapaneseCalendar
                 case DAY_OF_MONTH_INDEX:
                 case DAY_OF_YEAR_INDEX:
                 case MONTH_AS_ORDINAL_INDEX:
+                case KOKI_INDEX:
                     return ((value >= 1) && (value <= this.getMax(context)));
                 case RELATED_GREGORIAN_YEAR_INDEX:
                     return (context.relgregyear == value);
@@ -2201,18 +2262,7 @@ public final class JapaneseCalendar
             if (this.isValid(context, value)) {
                 switch (this.index) {
                     case YEAR_OF_NENGO_INDEX:
-                        int r = context.nengo.getFirstRelatedGregorianYear() + value - 1;
-                        EastAsianMonth month = context.month;
-                        int num = month.getNumber();
-                        if (r >= 1873) {
-                            if (month.isLeap()) {
-                                month = EastAsianMonth.valueOf(month.getNumber()); // no leap
-                            }
-                        } else if (month.isLeap() && (LEAP_INDICATORS[r - 701] != num + 1)) {
-                            month = EastAsianMonth.valueOf(month.getNumber()); // no leap
-                        }
-                        int dom = Math.min(context.dayOfMonth, getLengthOfMonth(r, month));
-                        return JapaneseCalendar.create(context, r, month, dom);
+                        return yearsAdded(context, context.nengo.getFirstRelatedGregorianYear() + value - 1);
                     case DAY_OF_MONTH_INDEX:
                         return JapaneseCalendar.create(context, context.relgregyear, context.month, value);
                     case DAY_OF_YEAR_INDEX:
@@ -2234,6 +2284,8 @@ public final class JapaneseCalendar
                         return context.with(MONTH_OF_YEAR, m);
                     case RELATED_GREGORIAN_YEAR_INDEX:
                         return context;
+                    case KOKI_INDEX:
+                        return yearsAdded(context, value - 660);
                     default:
                         throw new UnsupportedOperationException("Unknown element index: " + this.index);
                 }
@@ -2297,6 +2349,7 @@ public final class JapaneseCalendar
                 case DAY_OF_MONTH_INDEX:
                 case DAY_OF_YEAR_INDEX:
                 case RELATED_GREGORIAN_YEAR_INDEX:
+                case KOKI_INDEX:
                     return null;
                 case MONTH_AS_ORDINAL_INDEX:
                     return DAY_OF_MONTH;
@@ -2310,6 +2363,27 @@ public final class JapaneseCalendar
         public ChronoElement<?> getChildAtCeiling(JapaneseCalendar context) {
 
             return this.getChildAtFloor(context);
+
+        }
+
+        private static JapaneseCalendar yearsAdded(
+            JapaneseCalendar context,
+            int relgregyear
+        ) {
+
+            EastAsianMonth month = context.month;
+            int num = month.getNumber();
+
+            if (relgregyear >= 1873) {
+                if (month.isLeap()) {
+                    month = EastAsianMonth.valueOf(month.getNumber()); // no leap
+                }
+            } else if (month.isLeap() && (LEAP_INDICATORS[relgregyear - 701] != num + 1)) {
+                month = EastAsianMonth.valueOf(month.getNumber()); // no leap
+            }
+
+            int dom = Math.min(context.dayOfMonth, getLengthOfMonth(relgregyear, month));
+            return JapaneseCalendar.create(context, relgregyear, month, dom);
 
         }
 
@@ -2525,7 +2599,9 @@ public final class JapaneseCalendar
                 }
             } else {
                 if (eam.isLeap()) {
-                    buffer.append(CalendarText.getInstance("generic", loc).getTextForms().get("leap-month"));
+                    char defaultLI =
+                        CalendarText.getInstance("generic", loc).getTextForms().get("leap-month").charAt(0);
+                    buffer.append(attributes.get(EastAsianMonth.LEAP_MONTH_INDICATOR, defaultLI));
                 }
                 NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
                 buffer.append(numsys.toNumeral(num)); // no padding in lunisolar case
@@ -2560,13 +2636,15 @@ public final class JapaneseCalendar
                 }
             }
 
-            String li = CalendarText.getInstance("generic", loc).getTextForms().get("leap-month");
+            char defaultLI =
+                CalendarText.getInstance("generic", loc).getTextForms().get("leap-month").charAt(0);
+            char li = attributes.get(EastAsianMonth.LEAP_MONTH_INDICATOR, defaultLI).charValue();
             int pos = start;
             boolean leap = false;
 
-            if (text.subSequence(pos, pos + li.length()).toString().equals(li)) {
+            if (text.charAt(pos) == li) {
                 leap = true;
-                pos += li.length();
+                pos++;
             }
 
             NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
@@ -2766,8 +2844,29 @@ public final class JapaneseCalendar
                 return null;
             }
 
+            int relgregyear = nengo.getFirstRelatedGregorianYear() + year - 1;
+            EastAsianMonth month = null;
+
             if (entity.contains(MONTH_OF_YEAR)) {
-                EastAsianMonth month = entity.get(MONTH_OF_YEAR);
+                month = entity.get(MONTH_OF_YEAR);
+            } else if (entity.contains(MONTH_AS_ORDINAL)) {
+                int mIndex = entity.getInt(MONTH_AS_ORDINAL);
+
+                if (relgregyear >= 1873) {
+                    month = EastAsianMonth.valueOf(mIndex);
+                } else {
+                    byte b = LEAP_INDICATORS[relgregyear - 701];
+                    if (mIndex == b) {
+                        month = EastAsianMonth.valueOf(mIndex - 1).withLeap();
+                    } else if (mIndex > b) {
+                        month = EastAsianMonth.valueOf(mIndex - 1);
+                    } else {
+                        month = EastAsianMonth.valueOf(mIndex);
+                    }
+                }
+            }
+
+            if (month != null) {
                 int dom = entity.getInt(DAY_OF_MONTH);
                 if (dom == Integer.MIN_VALUE) {
                     entity.with(ValidationElement.ERROR_MESSAGE, "Missing Japanese day of month.");
@@ -2780,10 +2879,9 @@ public final class JapaneseCalendar
             } else {
                 int doy = entity.getInt(DAY_OF_YEAR);
                 if (doy != Integer.MIN_VALUE) {
-                    int relgregyear = nengo.getFirstRelatedGregorianYear() + year - 1;
                     if (doy <= getLengthOfYear(relgregyear)) {
                         try {
-                            EastAsianMonth month = getMonth(relgregyear, doy);
+                            month = getMonth(relgregyear, doy);
                             int dom = getDayOfMonth(relgregyear, doy);
                             Leniency leniency =
                                 (lenient ? Leniency.LAX : attributes.get(Attributes.LENIENCY, Leniency.SMART));
