@@ -321,13 +321,24 @@ public final class JapaneseCalendar
      * <p>Represents the Japanese month. </p>
      *
      * <p>If used in combination with numeric formatting (via pattern length smaller than 3, M or MM) then
-     * the format attribute {@link Attributes#NUMBER_SYSTEM} will be taken into account. </p>
+     * the format attribute {@link Attributes#NUMBER_SYSTEM} will be taken into account. The East Asian
+     * languages Japanese, Chinese and Korean usually define an extra literal behind the number for the
+     * month. In such a case, the strong recommendation is to use numerical formatting together with the
+     * literal, for example the pattern &quot;M月&quot; in Japanese. Patterns using &quot;MMM&quot; or even
+     * &quot;MMMM&quot; should only be used if the context is in modern times after 1872 and gregorian
+     * month names are wished. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den japanischen Monat. </p>
      *
      * <p>Wenn in Kombination mit numerischer Formatierung verwendet (Formatmusterl&auml;nge kleiner als 3,
-     * M oder MM), dann wird das Formatattribut {@link Attributes#NUMBER_SYSTEM} ber&uuml;cksichtigt. </p>
+     * M oder MM), dann wird das Formatattribut {@link Attributes#NUMBER_SYSTEM} ber&uuml;cksichtigt. Die
+     * ostasiatischen Sprachen Japanisch, Chinesisch und Koreanisch definieren ein besonderes Literalzeichen
+     * hinter der Monatsnummer. In einem solchen Fall lautet die dringende Empfehlung, zur numerischen
+     * Formatierung in Verbindung mit dem Literal zu wechseln, zum Beispiel das Formatmuster &quot;M月&quot;
+     * im Japanischen. Formatmuster, die &quot;MMM&quot; oder sogar &quot;MMMM&quot; enthalten, sollten nur
+     * dann verwendet werden, wenn der Kontext ein moderner ist (nach 1872) und gregorianische Monatsnamen
+     * gew&uuml;nscht sind. </p>
      */
     @FormattableElement(format = "M", standalone = "L")
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR =
