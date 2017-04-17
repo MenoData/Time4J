@@ -35,6 +35,23 @@ import static org.junit.Assert.assertThat;
 public class NengoTest {
 
     @Test
+    public void ofRelatedGregorianYearModern() {
+        assertThat(Nengo.ofRelatedGregorianYear(1989), is(Nengo.HEISEI));
+        assertThat(Nengo.ofRelatedGregorianYear(1988), is(Nengo.SHOWA));
+        assertThat(Nengo.ofRelatedGregorianYear(1926), is(Nengo.SHOWA));
+        assertThat(Nengo.ofRelatedGregorianYear(1925), is(Nengo.TAISHO));
+    }
+
+    @Test
+    public void ofRelatedGregorianYear749() { // 749 has two nengos!
+        PlainDate expectedStart =
+            ChronoHistory.ofFirstGregorianReform().convert(HistoricDate.of(HistoricEra.AD, 749, 8, 19));
+        assertThat(Nengo.ofRelatedGregorianYear(749).getStart(), is(expectedStart));
+        assertThat(Nengo.ofRelatedGregorianYear(749).findPrevious().get().getFirstRelatedGregorianYear(), is(749));
+        assertThat(Nengo.ofRelatedGregorianYear(749).getDisplayName(Locale.ROOT), is(Nengo.hepburn("Tenpyô-shôhô", 0)));
+    }
+
+    @Test
     public void parseAmbivalentRomaji() {
         List<Nengo> expected =
             Arrays.asList(Nengo.ofRelatedGregorianYear(834), Nengo.ofRelatedGregorianYear(1312), Nengo.SHOWA);
@@ -196,7 +213,7 @@ public class NengoTest {
 
     @Test
     public void parseRussianVariantCLDR() {
-        Nengo.Element element = new Nengo.Element();
+        Nengo.Element element = Nengo.Element.SINGLETON;
         Attributes attrs = new Attributes.Builder().setLanguage(new Locale("ru")).build();
         Nengo nengo =
             element.parse(
@@ -208,7 +225,7 @@ public class NengoTest {
 
     @Test
     public void parseRussianVariantWikipedia() {
-        Nengo.Element element = new Nengo.Element();
+        Nengo.Element element = Nengo.Element.SINGLETON;
         Attributes attrs = new Attributes.Builder().setLanguage(new Locale("ru")).build();
         Nengo nengo =
             element.parse(
@@ -216,15 +233,6 @@ public class NengoTest {
                 new ParsePosition(0),
                 attrs);
         assertThat(nengo, is(Nengo.SHOWA));
-    }
-
-    private static PlainDate convert(String date) {
-        String[] components = date.split("-");
-        int year = Integer.parseInt(components[0]);
-        int month = Integer.parseInt(components[1]);
-        int dom = Integer.parseInt(components[2]);
-        HistoricDate hd = HistoricDate.of(HistoricEra.AD, year, month, dom);
-        return ChronoHistory.ofFirstGregorianReform().convert(hd);
     }
 
     @Test
@@ -257,6 +265,15 @@ public class NengoTest {
         assertThat(ois.readObject() == obj, is(true)); // identity check
         ois.close();
         return data.length;
+    }
+
+    private static PlainDate convert(String date) {
+        String[] components = date.split("-");
+        int year = Integer.parseInt(components[0]);
+        int month = Integer.parseInt(components[1]);
+        int dom = Integer.parseInt(components[2]);
+        HistoricDate hd = HistoricDate.of(HistoricEra.AD, year, month, dom);
+        return ChronoHistory.ofFirstGregorianReform().convert(hd);
     }
 
 }

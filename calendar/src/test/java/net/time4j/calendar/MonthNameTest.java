@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 import org.junit.Test;
@@ -51,44 +52,38 @@ public class MonthNameTest {
     }
 
     @Test
-    public void getDisplayNameJapaneseGregorian() {
+    public void getDisplayNameOldJapanese() {
         assertThat(
-            JapaneseMonth.ofGregorian(1).getDisplayName(Locale.ENGLISH, TextWidth.WIDE, OutputContext.FORMAT),
-            is("January"));
+            EastAsianMonth.valueOf(1).getOldJapaneseName(Locale.ENGLISH),
+            is("Mutsuki"));
         assertThat(
-            JapaneseMonth.ofGregorian(1).getDisplayName(Locale.ENGLISH, TextWidth.ABBREVIATED, OutputContext.FORMAT),
-            is("Jan"));
+            EastAsianMonth.valueOf(1).withLeap().getOldJapaneseName(Locale.ENGLISH),
+            is("Mutsuki"));
         assertThat(
-            JapaneseMonth.ofGregorian(1).getDisplayName(Locale.ENGLISH, TextWidth.NARROW, OutputContext.FORMAT),
-            is("J"));
+            EastAsianMonth.valueOf(7).getOldJapaneseName(Locale.JAPANESE),
+            is("文月"));
     }
 
     @Test
-    public void getDisplayNameJapaneseLunisolar() {
+    public void getDisplayNameEastAsian() {
         assertThat(
-            JapaneseMonth.ofLunisolarStdType(1).getDisplayName(Locale.ENGLISH, TextWidth.WIDE, OutputContext.FORMAT),
+            EastAsianMonth.valueOf(1).getDisplayName(Locale.ENGLISH, NumberSystem.ARABIC),
             is("1"));
         assertThat(
-            JapaneseMonth.ofLunisolarStdType(1).getDisplayName(Locale.ENGLISH, TextWidth.WIDE, OutputContext.STANDALONE),
-            is("Mutsuki"));
+            EastAsianMonth.valueOf(1).withLeap().getDisplayName(Locale.ENGLISH, NumberSystem.ARABIC),
+            is("i1"));
         assertThat(
-            JapaneseMonth.ofLunisolarLeapType(1).getDisplayName(Locale.ENGLISH, TextWidth.WIDE, OutputContext.FORMAT),
-            is("*1"));
+            EastAsianMonth.valueOf(7).getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+            is("7月"));
         assertThat(
-            JapaneseMonth.ofLunisolarLeapType(1).getDisplayName(Locale.ENGLISH, TextWidth.WIDE, OutputContext.STANDALONE),
-            is("*Mutsuki"));
-        assertThat(
-            JapaneseMonth.ofLunisolarStdType(7).getDisplayName(Locale.JAPANESE, TextWidth.WIDE, OutputContext.FORMAT),
-            is("七月"));
-        assertThat(
-            JapaneseMonth.ofLunisolarStdType(7).getDisplayName(Locale.JAPANESE, TextWidth.WIDE, OutputContext.STANDALONE),
-            is("文月"));
-        assertThat(
-            JapaneseMonth.ofLunisolarLeapType(7).getDisplayName(Locale.JAPANESE, TextWidth.WIDE, OutputContext.FORMAT),
-            is("閏七月"));
-        assertThat(
-            JapaneseMonth.ofLunisolarLeapType(7).getDisplayName(Locale.JAPANESE, TextWidth.WIDE, OutputContext.STANDALONE),
-            is("閏文月"));
+            EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+            is("閏7月"));
+//        assertThat(
+//            EastAsianMonth.valueOf(7).getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+//            is("七月"));
+//        assertThat(
+//            EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+//            is("閏七月"));
     }
 
 }

@@ -327,7 +327,7 @@ public final class Nengo
 
     private static final String[] MODERN_KEYS = { HEISEI_KEY, SHOWA_KEY, TAISHO_KEY, MEIJI_KEY };
 
-    private static final long serialVersionUID = -1427328237066822668L;
+    private static final long serialVersionUID = 5696395761628504723L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -391,18 +391,26 @@ public final class Nengo
     /**
      * <p>Obtains the official nengo for given related gregorian year. </p>
      *
-     * @param   year        the gregorian year which relates to the first day of any Japanese year (New Year)
-     * @return  found nengo
-     * @throws  IllegalArgumentException if no suitable nengo could be found for given year
-     * @see     Nengo.Selector#OFFICIAL
-     */
-    /*[deutsch]
-     * <p>Liefert den offiziellen Nengo f&uuml;r das angegebene gregorianische Bezugsjahr. </p>
+     * <p>In case two or more nengos happen for one given year, Time4J will choose the latest nengo
+     * whose first related gregorian year is still smaller than or equal to given year. </p>
      *
      * @param   year        the gregorian year which relates to the first day of any Japanese year (New Year)
      * @return  found nengo
      * @throws  IllegalArgumentException if no suitable nengo could be found for given year
      * @see     Nengo.Selector#OFFICIAL
+     * @see     #ofRelatedGregorianYear(int, Selector)
+     */
+    /*[deutsch]
+     * <p>Liefert den offiziellen Nengo f&uuml;r das angegebene gregorianische Bezugsjahr. </p>
+     *
+     * <p>Falls zwei oder mehr Nengos zum Jahr passen, wird Time4J den letzten Nengo w&auml;hlen, dessen
+     * erstes gregorianisches Bezugsjahr noch kleiner oder gleich dem angegebenen Jahr ist. </p>
+     *
+     * @param   year        the gregorian year which relates to the first day of any Japanese year (New Year)
+     * @return  found nengo
+     * @throws  IllegalArgumentException if no suitable nengo could be found for given year
+     * @see     Nengo.Selector#OFFICIAL
+     * @see     #ofRelatedGregorianYear(int, Selector)
      */
     public static Nengo ofRelatedGregorianYear(int year) {
 
@@ -413,6 +421,9 @@ public final class Nengo
     /**
      * <p>Obtains the nengo for given related gregorian year and selector strategy. </p>
      *
+     * <p>In case two or more nengos happen for one given year, Time4J will choose the latest nengo
+     * whose first related gregorian year is still smaller than or equal to given year. </p>
+     *
      * @param   year        the gregorian year which relates to the first day of any Japanese year (New Year)
      * @param   selector    strategy how to select nengos
      * @return  found nengo
@@ -420,6 +431,9 @@ public final class Nengo
      */
     /*[deutsch]
      * <p>Liefert den passenden Nengo f&uuml;r die angegebenen Parameter. </p>
+     *
+     * <p>Falls zwei oder mehr Nengos zum Jahr passen, wird Time4J den letzten Nengo w&auml;hlen, dessen
+     * erstes gregorianisches Bezugsjahr noch kleiner oder gleich dem angegebenen Jahr ist. </p>
      *
      * @param   year        the gregorian year which relates to the first day of any Japanese year (New Year)
      * @param   selector    strategy how to select nengos
@@ -436,6 +450,25 @@ public final class Nengo
         if (year >= 701) {
             switch (selector) {
                 case OFFICIAL:
+                    if (year >= 1873) {
+                        return Nengo.ofRelatedGregorianYear(year, Selector.MODERN);
+                    } else {
+                        int low = 0;
+                        int high = OFFICIAL_NENGOS.length - 1;
+                        while (low <= high) {
+                            int middle = ((low + high) >> 1);
+                            if (OFFICIAL_NENGOS[middle].getFirstRelatedGregorianYear() <= year) {
+                                low = middle + 1;
+                            } else {
+                                high = middle - 1;
+                            }
+                        }
+                        if (low == 0) {
+                            break;
+                        } else {
+                            return OFFICIAL_NENGOS[low - 1];
+                        }
+                    }
                 case MODERN:
                     for (int i = OFFICIAL_NENGOS.length - 1, n = getLowerBound(selector); i >= n; i--) {
                         Nengo test = OFFICIAL_NENGOS[i];
@@ -447,19 +480,22 @@ public final class Nengo
                     break;
                 case NORTHERN_COURT:
                     if ((year >= 1332) && (year <= 1394)) {
-                        for (Nengo northern : NORTHERN_NENGOS) {
+                        for (int i = NORTHERN_NENGOS.length - 1; i >= 0; i--) {
+                            Nengo northern = NORTHERN_NENGOS[i];
                             if (northern.relgregyear <= year) {
                                 nengo = northern;
+                                break;
                             }
                         }
                     }
                     break;
                 case SOUTHERN_COURT:
                     if ((year >= 1334) && (year <= 1393)) {
-                        for (int i = NENGO_KENMU.index; OFFICIAL_NENGOS[i].court == COURT_SOUTHERN; i++) {
+                        for (int i = NENGO_OEI.index - 1; OFFICIAL_NENGOS[i].court == COURT_SOUTHERN; i--) {
                             Nengo southern = OFFICIAL_NENGOS[i];
                             if (southern.relgregyear <= year) {
                                 nengo = southern;
+                                break;
                             }
                         }
                     }
@@ -509,7 +545,7 @@ public final class Nengo
 
         if (nengo == null) {
             throw new IllegalArgumentException(
-                "Could not find nengo for japanese kanji: " + kanji);
+                "Could not find any nengo for Japanese kanji: " + kanji);
         } else {
             return nengo;
         }
@@ -784,7 +820,9 @@ public final class Nengo
         TextWidth width
     ) {
 
-        if (((this.index >= MEIJI.index)) && (this.index <= HEISEI.index) && !locale.getLanguage().equals("ru")) {
+        if (locale.getLanguage().isEmpty()) {
+            return this.romaji;
+        } else if (((this.index >= MEIJI.index)) && (this.index <= HEISEI.index) && !locale.getLanguage().equals("ru")) {
             String key;
             if (this.equals(HEISEI)) {
                 key = HEISEI_KEY;
@@ -824,7 +862,7 @@ public final class Nengo
      * the next nengo will be the next one of northern court only but not of southern court. If this
      * nengo is the last one of northern court then the next nengo will be &#332;ei (1394). </p>
      *
-     * @return  next nengo which is only present if this nengo is not the current nengo
+     * @return  next nengo which is only present if this nengo is not the newest nengo
      */
     /*[deutsch]
      * <p>Versucht, den n&auml;chsten Nengo in chronologischer Reihenfolge zu finden. </p>
@@ -834,7 +872,7 @@ public final class Nengo
      * S&uuml;dhof. Falls dieser Nengo der letzte des Nordhofs ist (Meitoku), dann ist der n&auml;chste
      * der Nengo &#332;ei (1394). </p>
      *
-     * @return  next nengo which is only present if this nengo is not the current nengo
+     * @return  next nengo which is only present if this nengo is not the newest nengo
      */
     public Optional<Nengo> findNext() {
 
@@ -848,6 +886,41 @@ public final class Nengo
             return Optional.empty();
         } else {
             return Optional.of(OFFICIAL_NENGOS[this.index + 1]);
+        }
+
+    }
+
+    /**
+     * <p>Tries to find the previous nengo in chronological order. </p>
+     *
+     * <p>Note: If this nengo represents a nengo of northern court in the Nanboku-ch&#333; period (1336-1392) then
+     * the previous nengo will be the previous one of northern court only but not of southern court. If this
+     * nengo is the first one of northern court then the previous nengo will be Genk&#333: (1391). </p>
+     *
+     * @return  previous nengo which is only present if this nengo is not the first nengo
+     */
+    /*[deutsch]
+     * <p>Versucht, den vorherigen Nengo in chronologischer Reihenfolge zu finden. </p>
+     *
+     * <p>Hinweis: Wenn dieser Nengo einen Nengo des Nordhofs in der Nanboku-ch&#333;-Zeit (1336-1392)
+     * repr&auml;sentiert, dann wird der vorherige Nengo ebenfalls vom Nordhof sein, aber nicht vom
+     * S&uuml;dhof. Falls dieser Nengo der erste des Nordhofs ist, dann ist der vorherige
+     * der Nengo Genk&#333: (1391). </p>
+     *
+     * @return  previous nengo which is only present if this nengo is not the first nengo
+     */
+    public Optional<Nengo> findPrevious() {
+
+        if (this.court == COURT_NORTHERN) {
+            if (this.index == 0) {
+                return Optional.of(OFFICIAL_NENGOS[NENGO_KENMU.index - 1]);
+            } else {
+                return Optional.of(NORTHERN_NENGOS[this.index - 1]);
+            }
+        } else if (this.index == 0) {
+            return Optional.empty();
+        } else {
+            return Optional.of(OFFICIAL_NENGOS[this.index - 1]);
         }
 
     }
@@ -883,7 +956,6 @@ public final class Nengo
     }
 
     @Override
-    @Deprecated
     public int getValue() {
 
         if (this.matches(Selector.NORTHERN_COURT)) {
@@ -946,6 +1018,27 @@ public final class Nengo
 
     }
 
+    // verwendet in JapaneseCalendar
+    long getStartAsDaysSinceEpochUTC() {
+
+        return this.start;
+
+    }
+
+    // verwendet in JapaneseCalendar
+    int getIndexOfficial() {
+
+        return this.index;
+
+    }
+
+    // verwendet in JapaneseCalendar
+    static Nengo ofIndexOfficial(int index) {
+
+        return OFFICIAL_NENGOS[index];
+
+    }
+
     // useful because some computer keyboards don't manage macrons, see => https://en.wikipedia.org/wiki/Macron
     static String hepburn(
         CharSequence text,
@@ -980,7 +1073,7 @@ public final class Nengo
 
     }
 
-    static String capitalize(
+    private static String capitalize(
         CharSequence text,
         int offset
     ) {
@@ -1058,6 +1151,15 @@ public final class Nengo
 
     }
 
+    private static Nengo of(
+        int index,
+        boolean northern
+    ) {
+
+        return (northern ? NORTHERN_NENGOS[index] : OFFICIAL_NENGOS[index]);
+
+    }
+
     /**
      * @serialData  Preserves the singleton semantic
      * @return      cached singleton
@@ -1066,7 +1168,7 @@ public final class Nengo
     private Object readResolve() throws ObjectStreamException {
 
         try {
-            return ((this.court == COURT_NORTHERN) ? NORTHERN_NENGOS[this.index] : OFFICIAL_NENGOS[this.index]);
+            return Nengo.of(this.index, (this.court == COURT_NORTHERN));
         } catch (ArrayIndexOutOfBoundsException iooe) {
             throw new StreamCorruptedException();
         }
@@ -1183,25 +1285,6 @@ public final class Nengo
         },
 
         /**
-         * <p>Selects the nengos of the southern court only (during the Nanboku-ch&#333; period 1336-1392). </p>
-         *
-         * <p>The southern variant of the Nengo Kenmu (Kenmu restoration) is also matched by this selector.
-         * Historical note: The last year 10 of nengo Gench&#x016B; was then replaced by Meitoku 4. </p>
-         */
-        /*[deutsch]
-         * <p>W&auml;hlt nur die Nengos des S&uuml;dhofs in der Nanboku-ch&#333;-Zeit (1336-1392) aus. </p>
-         *
-         * <p>Die S&uuml;dvariante des Nengo Kenmu (Kenmu Restauration) wird auch von diesem Selektor abgedeckt.
-         * Historische Bemerkung: Das letzte Jahr 10 des Nengo Gench&#x016B; wurde durch Meitoku 4 ersetzt. </p>
-         */
-        SOUTHERN_COURT {
-            @Override
-            public boolean test(Nengo nengo) {
-                return (nengo.court == COURT_SOUTHERN);
-            }
-        },
-
-        /**
          * <p>Selects the nengos of the northern court only (during the Nanboku-ch&#333; period 1336-1392
          * and in addition, the nengo Sh&#333;kei (1332)). </p>
          *
@@ -1217,6 +1300,25 @@ public final class Nengo
             @Override
             public boolean test(Nengo nengo) {
                 return (nengo.court == COURT_NORTHERN);
+            }
+        },
+
+        /**
+         * <p>Selects the nengos of the southern court only (during the Nanboku-ch&#333; period 1336-1392). </p>
+         *
+         * <p>The southern variant of the Nengo Kenmu (Kenmu restoration) is also matched by this selector.
+         * Historical note: The last year 10 of nengo Gench&#x016B; was then replaced by Meitoku 4. </p>
+         */
+        /*[deutsch]
+         * <p>W&auml;hlt nur die Nengos des S&uuml;dhofs in der Nanboku-ch&#333;-Zeit (1336-1392) aus. </p>
+         *
+         * <p>Die S&uuml;dvariante des Nengo Kenmu (Kenmu Restauration) wird auch von diesem Selektor abgedeckt.
+         * Historische Bemerkung: Das letzte Jahr 10 des Nengo Gench&#x016B; wurde durch Meitoku 4 ersetzt. </p>
+         */
+        SOUTHERN_COURT {
+            @Override
+            public boolean test(Nengo nengo) {
+                return (nengo.court == COURT_SOUTHERN);
             }
         },
 
@@ -1295,7 +1397,18 @@ public final class Nengo
     }
 
     static class Element
-        implements TextElement<Nengo> {
+        implements TextElement<Nengo>, Serializable {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final Element SINGLETON = new Element();
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Element() {
+            super();
+
+        }
 
         //~ Methoden ------------------------------------------------------
 
@@ -1566,6 +1679,25 @@ public final class Nengo
         public boolean isLenient() {
 
             return false;
+
+        }
+
+        @Override
+        public String getDisplayName(Locale language) {
+
+            String key = "L_era";
+            String lname = CalendarText.getIsoInstance(language).getTextForms().get(key);
+            return ((lname == null) ? this.name() : lname);
+
+        }
+
+        /**
+         * @serialData  Preserves the singleton semantic
+         * @return      singleton instance
+         */
+        private Object readResolve() throws ObjectStreamException {
+
+            return SINGLETON;
 
         }
 
