@@ -10,7 +10,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.DateFormat;
 import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -62,49 +66,49 @@ public class JapaneseElementTest {
     @Test
     public void eraElement() {
         JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 13);
-        assertThat(jcal.get(JapaneseCalendar.NENGO), is(jcal.getEra()));
-        assertThat(jcal.getMinimum(JapaneseCalendar.NENGO), is(JapaneseCalendar.NENGO.getDefaultMinimum()));
-        assertThat(jcal.getMaximum(JapaneseCalendar.NENGO), is(JapaneseCalendar.NENGO.getDefaultMaximum()));
-        assertThat(jcal.isValid(JapaneseCalendar.NENGO, null), is(false));
+        assertThat(jcal.get(JapaneseCalendar.ERA), is(jcal.getEra()));
+        assertThat(jcal.getMinimum(JapaneseCalendar.ERA), is(JapaneseCalendar.ERA.getDefaultMinimum()));
+        assertThat(jcal.getMaximum(JapaneseCalendar.ERA), is(JapaneseCalendar.ERA.getDefaultMaximum()));
+        assertThat(jcal.isValid(JapaneseCalendar.ERA, null), is(false));
         Nengo ansei = Nengo.ofRelatedGregorianYear(1854);
-        assertThat(jcal.isValid(JapaneseCalendar.NENGO, ansei), is(true));
+        assertThat(jcal.isValid(JapaneseCalendar.ERA, ansei), is(true));
         assertThat(
-            jcal.with(JapaneseCalendar.NENGO, ansei),
+            jcal.with(JapaneseCalendar.ERA, ansei),
             is(JapaneseCalendar.of(ansei, 7, EastAsianMonth.valueOf(4), 13)));
-        assertThat(JapaneseCalendar.NENGO.getDisplayName(Locale.ENGLISH), is("era"));
-        assertThat(JapaneseCalendar.NENGO.getDisplayName(Locale.ROOT), is("NENGO"));
+        assertThat(JapaneseCalendar.ERA.getDisplayName(Locale.ENGLISH), is("era"));
+        assertThat(JapaneseCalendar.ERA.getDisplayName(Locale.ROOT), is("ERA"));
     }
 
     @Test
     public void yearOfNengoElement() {
         Nengo ansei = Nengo.ofRelatedGregorianYear(1854);
         JapaneseCalendar jcal = JapaneseCalendar.of(ansei, 5, EastAsianMonth.valueOf(8), 30);
-        assertThat(jcal.getMinimum(JapaneseCalendar.YEAR_OF_NENGO), is(1));
-        assertThat(jcal.getMaximum(JapaneseCalendar.YEAR_OF_NENGO), is(7));
-        assertThat(jcal.getInt(JapaneseCalendar.YEAR_OF_NENGO), is(5));
-        assertThat(jcal.isValid(JapaneseCalendar.YEAR_OF_NENGO, 7), is(true));
+        assertThat(jcal.getMinimum(JapaneseCalendar.YEAR_OF_ERA), is(1));
+        assertThat(jcal.getMaximum(JapaneseCalendar.YEAR_OF_ERA), is(7));
+        assertThat(jcal.getInt(JapaneseCalendar.YEAR_OF_ERA), is(5));
+        assertThat(jcal.isValid(JapaneseCalendar.YEAR_OF_ERA, 7), is(true));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO, 6),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA, 6),
             is(JapaneseCalendar.of(ansei, 6, EastAsianMonth.valueOf(8), 29)));
-        assertThat(JapaneseCalendar.YEAR_OF_NENGO.getDisplayName(Locale.ENGLISH), is("year"));
-        assertThat(JapaneseCalendar.YEAR_OF_NENGO.getDisplayName(Locale.ROOT), is("YEAR_OF_NENGO"));
+        assertThat(JapaneseCalendar.YEAR_OF_ERA.getDisplayName(Locale.ENGLISH), is("year"));
+        assertThat(JapaneseCalendar.YEAR_OF_ERA.getDisplayName(Locale.ROOT), is("YEAR_OF_ERA"));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO.maximized()),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA.maximized()),
             is(JapaneseCalendar.of(ansei.findNext().get(), 1, EastAsianMonth.valueOf(8), 29)));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO.minimized()),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA.minimized()),
             is(JapaneseCalendar.of(ansei, 1, EastAsianMonth.valueOf(8), 30)));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO.incremented()),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA.incremented()),
             is(JapaneseCalendar.of(ansei, 6, EastAsianMonth.valueOf(8), 29)));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO.decremented()),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA.decremented()),
             is(JapaneseCalendar.of(ansei, 4, EastAsianMonth.valueOf(8), 30)));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO.atFloor()),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA.atFloor()),
             is(JapaneseCalendar.of(ansei, 5, EastAsianMonth.valueOf(1), 1)));
         assertThat(
-            jcal.with(JapaneseCalendar.YEAR_OF_NENGO.atCeiling()),
+            jcal.with(JapaneseCalendar.YEAR_OF_ERA.atCeiling()),
             is(JapaneseCalendar.of(ansei, 5, EastAsianMonth.valueOf(12), 30)));
     }
 
@@ -372,6 +376,17 @@ public class JapaneseElementTest {
             CommonElements.weekOfYear(JapaneseCalendar.axis(), JapaneseCalendar.getDefaultWeekmodel());
         assertThat(jcal.get(weekOfYear), is(2));
         assertThat(jcal.plus(1, JapaneseCalendar.Unit.DAYS).get(weekOfYear), is(3));
+    }
+
+    @Test
+    public void gannen() {
+        SimpleDateFormat sdf = new SimpleDateFormat("G yyyy", new Locale("en", "JP", "JP"));
+        DateFormat full = DateFormat.getDateInstance(DateFormat.FULL, new Locale("ja", "JP", "JP"));
+        Calendar cal = new GregorianCalendar(1989, 0, 8);
+        String s = sdf.format(cal.getTime());
+
+        System.out.println(s); // H 元
+        System.out.println(full.format(cal.getTime())); // Wednesday, February 8, 1989
     }
 
 }

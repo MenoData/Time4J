@@ -125,8 +125,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #KOKI}</li>
- *  <li>{@link #YEAR_OF_NENGO}</li>
- *  <li>{@link #NENGO}</li>
+ *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #ERA}</li>
  * </ul>
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
@@ -193,8 +193,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #KOKI}</li>
- *  <li>{@link #YEAR_OF_NENGO}</li>
- *  <li>{@link #NENGO}</li>
+ *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #ERA}</li>
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
@@ -300,7 +300,7 @@ public final class JapaneseCalendar
      * <p>Repr&auml;sentiert die japanische &Auml;ra (Nengo). </p>
      */
     @FormattableElement(format = "G")
-    public static final TextElement<Nengo> NENGO = Nengo.Element.SINGLETON;
+    public static final TextElement<Nengo> ERA = Nengo.Element.SINGLETON;
 
     /**
      * <p>Represents the Japanese year associated with a nengo. </p>
@@ -313,9 +313,9 @@ public final class JapaneseCalendar
      * <p>Sein Maximalwert entspricht dem Jahr 1 des n&auml;chsten Nengos, falls vorhanden. </p>
      */
     @FormattableElement(format = "y")
-    public static final StdCalendarElement<Integer, JapaneseCalendar> YEAR_OF_NENGO =
+    public static final StdCalendarElement<Integer, JapaneseCalendar> YEAR_OF_ERA =
         new StdIntegerDateElement<>(
-            "YEAR_OF_NENGO",
+            "YEAR_OF_ERA",
             JapaneseCalendar.class,
             1,
             MRD - Nengo.Element.SINGLETON.getDefaultMaximum().getFirstRelatedGregorianYear(),
@@ -328,7 +328,7 @@ public final class JapaneseCalendar
      *
      * <p>This imperial way of counting years was used from 1873 until the end of Second World War (called
      * K&#333;ki) and is 660 years in advance of gregorian years. However, the standard way of counting years
-     * in this calendar is the {@link #YEAR_OF_NENGO nengo-based year}. </p>
+     * in this calendar is the {@link #YEAR_OF_ERA nengo-based year}. </p>
      */
     /*[deutsch]
      * <p>Z&auml;hlt die Jahre seit dem angenommenen Gr&uuml;ndungsdatum Japans durch den mythischen
@@ -336,7 +336,7 @@ public final class JapaneseCalendar
      *
      * <p>Diese imperiale Art der Jahresz&auml;hlung war im Gebrauch von 1873 bis zum Ende des zweiten
      * Weltkriegs (genannt K&#333;ki) und eilt dem gregorianischen Jahr um 660 Jahre voraus. Jedoch ist
-     * die normale Jahresz&auml;hlung in diesem Kalender das {@link #YEAR_OF_NENGO nengo-basierte Jahr}. </p>
+     * die normale Jahresz&auml;hlung in diesem Kalender das {@link #YEAR_OF_ERA nengo-basierte Jahr}. </p>
      */
     public static final ChronoElement<Integer> KOKI =
         new StdIntegerDateElement<>(
@@ -527,11 +527,11 @@ public final class JapaneseCalendar
                 new Merger(),
                 CALSYS)
             .appendElement(
-                NENGO,
+                ERA,
                 new NengoRule(),
                 Unit.ERAS)
             .appendElement(
-                YEAR_OF_NENGO,
+                YEAR_OF_ERA,
                 new IntegerRule(YEAR_OF_NENGO_INDEX),
                 Unit.YEARS)
             .appendElement(
@@ -905,13 +905,13 @@ public final class JapaneseCalendar
      * <p>Yields the Japanese era (nengo). </p>
      *
      * @return  Nengo
-     * @see     #NENGO
+     * @see     #ERA
      */
     /*[deutsch]
      * <p>Liefert die japanische &Auml;ra (Nengo). </p>
      *
      * @return  Nengo
-     * @see     #NENGO
+     * @see     #ERA
      */
     public Nengo getEra() {
 
@@ -923,13 +923,13 @@ public final class JapaneseCalendar
      * <p>Yields the Japanese year which belongs to a nengo. </p>
      *
      * @return  int {@code >= 1}
-     * @see     #YEAR_OF_NENGO
+     * @see     #YEAR_OF_ERA
      */
     /*[deutsch]
      * <p>Liefert das japanische Jahr, das mit einem Nengo verkn&uuml;pft ist. </p>
      *
      * @return  int {@code >= 1}
-     * @see     #YEAR_OF_NENGO
+     * @see     #YEAR_OF_ERA
      */
     public int getYear() {
 
@@ -2069,14 +2069,14 @@ public final class JapaneseCalendar
         @Override
         public Nengo getMinimum(JapaneseCalendar context) {
 
-            return NENGO.getDefaultMinimum();
+            return ERA.getDefaultMinimum();
 
         }
 
         @Override
         public Nengo getMaximum(JapaneseCalendar context) {
 
-            return NENGO.getDefaultMaximum();
+            return ERA.getDefaultMaximum();
 
         }
 
@@ -2132,14 +2132,14 @@ public final class JapaneseCalendar
         @Override
         public ChronoElement<?> getChildAtFloor(JapaneseCalendar context) {
 
-            return YEAR_OF_NENGO;
+            return YEAR_OF_ERA;
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(JapaneseCalendar context) {
 
-            return YEAR_OF_NENGO;
+            return YEAR_OF_ERA;
 
         }
 
@@ -2832,14 +2832,14 @@ public final class JapaneseCalendar
             boolean preparsing
         ) {
 
-            Nengo nengo = entity.get(NENGO);
+            Nengo nengo = entity.get(ERA);
 
             if (nengo == null) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Japanese nengo/era.");
                 return null;
             }
 
-            int year = entity.getInt(YEAR_OF_NENGO);
+            int year = entity.getInt(YEAR_OF_ERA);
 
             if (year == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Japanese year.");

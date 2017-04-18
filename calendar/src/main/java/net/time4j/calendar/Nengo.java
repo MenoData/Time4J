@@ -1610,7 +1610,7 @@ public final class Nengo
         @Override
         public String name() {
 
-            return "NENGO";
+            return "ERA";
 
         }
 
