@@ -408,6 +408,13 @@ public class MiscellaneousTest {
         roundtrip(ThaiSolarCalendar.of(ThaiSolarEra.BUDDHIST, 2482, 2, 7));
     }
 
+    @Test
+    public void serializeJapanese() throws IOException, ClassNotFoundException {
+        roundtrip(JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 12));
+        roundtrip(JapaneseCalendar.ofGregorian(Nengo.SHOWA, 64, 1, 7)); // would fail in lax mode
+        roundtrip(JapaneseCalendar.of(Nengo.ofRelatedGregorianYear(1857), 4, EastAsianMonth.valueOf(5).withLeap(), 1));
+    }
+
     private static int roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericTextProviderSPI.java) is part of project Time4J.
  *
@@ -21,6 +21,7 @@
 
 package net.time4j.calendar.service;
 
+import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
@@ -106,7 +107,7 @@ public final class GenericTextProviderSPI
     @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "buddhist", "coptic", "ethiopic", "generic", "islamic", "persian", "roc" };
+        return new String[] { "buddhist", "coptic", "ethiopic", "generic", "islamic", "japanese", "persian", "roc" };
 
     }
 
@@ -129,6 +130,8 @@ public final class GenericTextProviderSPI
         if (calendarType.equals("roc") || calendarType.equals("buddhist")) {
             TextProvider p = new IsoTextProviderSPI();
             return p.months(calendarType, locale, tw, oc, leapForm);
+        } else if (calendarType.equals("japanese")) {
+            return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
         }
 
         ResourceBundle rb = getBundle(calendarType, locale);
@@ -196,6 +199,14 @@ public final class GenericTextProviderSPI
         Locale locale,
         TextWidth tw
     ) {
+
+        if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
+            if (tw == TextWidth.NARROW) {
+                return new String[] { "M", "T", "S", "H" };
+            } else {
+                return new String[] { "Meiji", "Taishō", "Shōwa", "Heisei" };
+            }
+        }
 
         ResourceBundle rb = getBundle(calendarType, locale);
 
