@@ -10,11 +10,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.DateFormat;
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -286,7 +282,7 @@ public class JapaneseElementTest {
 
         Nengo ansei = Nengo.ofRelatedGregorianYear(1854);
         JapaneseCalendar jcal2 = JapaneseCalendar.of(ansei, 1, EastAsianMonth.valueOf(7).withLeap(), 14, Leniency.LAX);
-        assertThat(formatter.format(jcal2), is("安政1年閏7月14日"));
+        assertThat(formatter.format(jcal2), is("安政元年閏7月14日"));
 
         assertThat(jcal.isSimultaneous(jcal2), is(true));
     }
@@ -379,14 +375,17 @@ public class JapaneseElementTest {
     }
 
     @Test
-    public void gannen() {
-        SimpleDateFormat sdf = new SimpleDateFormat("G yyyy", new Locale("en", "JP", "JP"));
-        DateFormat full = DateFormat.getDateInstance(DateFormat.FULL, new Locale("ja", "JP", "JP"));
-        Calendar cal = new GregorianCalendar(1989, 0, 8);
-        String s = sdf.format(cal.getTime());
-
-        System.out.println(s); // H 元
-        System.out.println(full.format(cal.getTime())); // Wednesday, February 8, 1989
+    public void gannen() throws ParseException {
+        ChronoFormatter<JapaneseCalendar> formatter =
+            ChronoFormatter.ofPattern(
+                "Gy年M月d日",
+                PatternType.NON_ISO_DATE,
+                Locale.JAPANESE,
+                JapaneseCalendar.axis()
+            );
+        JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 1, 1, 8);
+        assertThat(formatter.format(jcal), is("平成元年1月8日"));
+        assertThat(formatter.parse("平成元年1月8日"), is(jcal));
     }
 
 }

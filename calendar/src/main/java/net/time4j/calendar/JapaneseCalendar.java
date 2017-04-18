@@ -313,15 +313,7 @@ public final class JapaneseCalendar
      * <p>Sein Maximalwert entspricht dem Jahr 1 des n&auml;chsten Nengos, falls vorhanden. </p>
      */
     @FormattableElement(format = "y")
-    public static final StdCalendarElement<Integer, JapaneseCalendar> YEAR_OF_ERA =
-        new StdIntegerDateElement<>(
-            "YEAR_OF_ERA",
-            JapaneseCalendar.class,
-            1,
-            MRD - Nengo.Element.SINGLETON.getDefaultMaximum().getFirstRelatedGregorianYear(),
-            'y',
-            null,
-            null);
+    public static final StdCalendarElement<Integer, JapaneseCalendar> YEAR_OF_ERA = new YearOfNengoElement();
 
     /**
      * <p>Counts the years since the supposed foundation date of Japan by the legendary emperor Jimmu. </p>
@@ -372,8 +364,7 @@ public final class JapaneseCalendar
      * und gregorianische Monatsnamen gew&uuml;nscht sind. </p>
      */
     @FormattableElement(format = "M", standalone = "L")
-    public static final TextElement<EastAsianMonth> MONTH_OF_YEAR =
-        new MonthPrimitiveElement();
+    public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = new MonthPrimitiveElement();
 
     /**
      * <p>Represents the ordinal index of a Japanese month. </p>
@@ -2388,6 +2379,157 @@ public final class JapaneseCalendar
         }
 
     }
+
+    private static class YearOfNengoElement
+        extends StdIntegerDateElement<JapaneseCalendar>
+        implements DualFormatElement {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        // private static final long serialVersionUID = -2978966174642315851L;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private YearOfNengoElement() {
+            super("YEAR_OF_ERA",
+                JapaneseCalendar.class,
+                1,
+                MRD - Nengo.Element.SINGLETON.getDefaultMaximum().getFirstRelatedGregorianYear(),
+                'y',
+                null,
+                null);
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public void print(
+            ChronoDisplay context,
+            Appendable buffer,
+            AttributeQuery attributes
+        ) throws IOException, ChronoException {
+
+            NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+            char zeroChar = (
+                attributes.contains(Attributes.ZERO_DIGIT)
+                    ? attributes.get(Attributes.ZERO_DIGIT).charValue()
+                    : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
+            this.print(context, buffer, attributes, numsys, zeroChar, 1, 9);
+
+        }
+
+        @Override
+        public void print(
+            ChronoDisplay context,
+            Appendable buffer,
+            AttributeQuery attributes,
+            NumberSystem numsys,
+            char zeroChar,
+            int minDigits,
+            int maxDigits
+        ) throws IOException, ChronoException {
+
+            int num = context.getInt(this);
+
+            if (
+                (num == 1)
+                && (numsys == NumberSystem.ARABIC)
+                && attributes.get(Attributes.LANGUAGE, Locale.ROOT).getLanguage().equals("ja")
+            ) {
+                buffer.append('元'); // gannen
+            } else {
+                String s = numsys.toNumeral(num);
+                if (numsys.isDecimal()) {
+                    int len = s.length();
+                    for (int i = 0, n = minDigits - len; i < n; i++) {
+                        buffer.append(zeroChar);
+                    }
+                }
+                buffer.append(s);
+            }
+
+        }
+
+        @Override
+        public Integer parse(
+            CharSequence text,
+            ParsePosition status,
+            AttributeQuery attributes
+        ) {
+
+            NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+            int start = status.getIndex();
+            int pos = start;
+
+            if (
+                (numsys == NumberSystem.ARABIC)
+                && (text.charAt(pos) == '元')
+                && attributes.get(Attributes.LANGUAGE, Locale.ROOT).getLanguage().equals("ja")
+            ) {
+                status.setIndex(pos + 1);
+                return Integer.valueOf(1);
+            }
+
+            char zeroChar = (
+                attributes.contains(Attributes.ZERO_DIGIT)
+                    ? attributes.get(Attributes.ZERO_DIGIT).charValue()
+                    : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
+            Leniency leniency =
+                (numsys.isDecimal() ? Leniency.SMART : attributes.get(Attributes.LENIENCY, Leniency.SMART));
+            int value = 0;
+
+            if (numsys.isDecimal()) {
+                for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
+                    int digit = text.charAt(i) - zeroChar;
+                    if ((digit >= 0) && (digit <= 9)) {
+                        value = value * 10 + digit;
+                        pos++;
+                    } else {
+                        break;
+                    }
+                }
+            } else {
+                int len = 0;
+
+                for (int i = pos, n = text.length(); i < n; i++) {
+                    if (numsys.contains(text.charAt(i))) {
+                        len++;
+                    } else {
+                        break;
+                    }
+                }
+
+                if (len > 0) {
+                    value = numsys.toInteger(text.subSequence(pos, pos + len).toString(), leniency);
+                    pos += len;
+                }
+            }
+
+            if (pos == start) {
+                status.setErrorIndex(start);
+                return null;
+            } else {
+                status.setIndex(pos);
+                return Integer.valueOf(value);
+            }
+
+        }
+
+        @Override
+        public Integer parse(
+            CharSequence text,
+            ParsePosition status,
+            AttributeQuery attributes,
+            ChronoEntity<?> parsedResult
+        ) {
+
+            return this.parse(text, status, attributes);
+
+        }
+
+    }
+
+
 
     private static class MonthPrimitiveElement
         implements TextElement<EastAsianMonth>, ElementRule<JapaneseCalendar, EastAsianMonth>, Serializable {
