@@ -1,16 +1,12 @@
 package net.time4j.calendar;
 
-import net.time4j.PlainDate;
-import net.time4j.format.Attributes;
+import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
-import net.time4j.format.expert.ChronoFormatter;
-import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -53,6 +49,41 @@ public class MonthNameTest {
         assertThat(
             HijriMonth.DHU_AL_HIJJAH.getDisplayName(Locale.ROOT, TextWidth.SHORT, OutputContext.FORMAT),
             is("Dhuʻl-H."));
+    }
+
+    @Test
+    public void getDisplayNameOldJapanese() {
+        assertThat(
+            EastAsianMonth.valueOf(1).getOldJapaneseName(Locale.ENGLISH),
+            is("Mutsuki"));
+        assertThat(
+            EastAsianMonth.valueOf(1).withLeap().getOldJapaneseName(Locale.ENGLISH),
+            is("Mutsuki"));
+        assertThat(
+            EastAsianMonth.valueOf(7).getOldJapaneseName(Locale.JAPANESE),
+            is("文月"));
+    }
+
+    @Test
+    public void getDisplayNameEastAsian() {
+        assertThat(
+            EastAsianMonth.valueOf(1).getDisplayName(Locale.ENGLISH, NumberSystem.ARABIC),
+            is("1"));
+        assertThat(
+            EastAsianMonth.valueOf(1).withLeap().getDisplayName(Locale.ENGLISH, NumberSystem.ARABIC),
+            is("i1"));
+        assertThat(
+            EastAsianMonth.valueOf(7).getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+            is("7月"));
+        assertThat(
+            EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+            is("閏7月"));
+//        assertThat(
+//            EastAsianMonth.valueOf(7).getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+//            is("七月"));
+//        assertThat(
+//            EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
+//            is("閏七月"));
     }
 
 }

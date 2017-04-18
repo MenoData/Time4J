@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -69,6 +69,9 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int THAI_SOLAR = 8;
+
+    /** Serialisierungstyp. */
+    static final int JAPANESE = 9;
 
     private static final long serialVersionUID = 1L;
 
@@ -160,6 +163,9 @@ final class SPX
             case THAI_SOLAR:
                 this.writeThaiSolar(out);
                 break;
+            case JAPANESE:
+                this.writeJapanese(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -210,6 +216,9 @@ final class SPX
                 break;
             case THAI_SOLAR:
                 this.obj = this.readThaiSolar(in);
+                break;
+            case JAPANESE:
+                this.obj = this.readJapanese(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -391,6 +400,25 @@ final class SPX
 
         PlainDate iso = PlainDate.class.cast(in.readObject());
         return iso.transform(ThaiSolarCalendar.class);
+
+    }
+
+    private void writeJapanese(ObjectOutput out)
+        throws IOException {
+
+        JapaneseCalendar jcal = (JapaneseCalendar) this.obj;
+        out.writeInt(jcal.getYear() - 1 + jcal.getEra().getFirstRelatedGregorianYear());
+        out.writeInt(jcal.getDayOfYear());
+
+    }
+
+    private JapaneseCalendar readJapanese(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int relgregyear = in.readInt();
+        int doy = in.readInt();
+        long utcDays = JapaneseCalendar.transform(relgregyear, doy);
+        return JapaneseCalendar.axis().getCalendarSystem().transform(utcDays);
 
     }
 
