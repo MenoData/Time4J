@@ -1,4 +1,7 @@
 ## [v4.27] not yet released
+### Added
+- Japanese imperial calendar [#560]
+
 ### Fixed
 - Clarify usage of Ethiopian eras [#636]
 - TransitionHistory.getPreviousTransition() has improper description [#637]
