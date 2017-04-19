@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         DecimalNumberSystemTest.class,
         EthiopicNumberTest.class,
+        JapaneseNumberTest.class,
         RomanNumberTestForModernUsage.class,
         RomanNumberTestForOtherFormats.class
     }
