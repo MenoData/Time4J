@@ -2385,7 +2385,7 @@ public final class JapaneseCalendar
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        // private static final long serialVersionUID = -2978966174642315851L;
+        private static final long serialVersionUID = -8502388572788955989L;
 
         //~ Konstruktoren -------------------------------------------------
 
