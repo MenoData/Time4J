@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextAccessor.java) is part of project Time4J.
  *
@@ -27,7 +27,6 @@ import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
-import java.util.Locale;
 
 
 /**
@@ -51,7 +50,6 @@ public final class TextAccessor {
     //~ Instanzvariablen --------------------------------------------------
 
     private final List<String> textForms;
-    // private final Locale locale;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -59,17 +57,11 @@ public final class TextAccessor {
      * <p>Standard-Konstruktor. </p>
      *
      * @param   textForms   Array von Textformen
-     * @param   locale      Sprache
      */
-    TextAccessor(
-        String[] textForms,
-        Locale locale
-    ) {
+    TextAccessor(String[] textForms) {
         super();
 
-        this.textForms =
-            Collections.unmodifiableList(Arrays.asList(textForms));
-        // this.locale = locale;
+        this.textForms = Collections.unmodifiableList(Arrays.asList(textForms));
 
     }
 
@@ -238,6 +230,24 @@ public final class TextAccessor {
     }
 
     /**
+     * <p>Obtains a list of all underlying text forms. </p>
+     *
+     * @return  unmodifiable list of text resources
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * <p>Liefert eine Liste aller zugrundeliegenden Textformen. </p>
+     *
+     * @return  unmodifiable list of text resources
+     * @since   3.32/4.27
+     */
+    public List<String> getTextForms() {
+
+        return this.textForms;
+
+    }
+
+    /**
      * <p>Supports mainly debugging. </p>
      */
     /*[deutsch]
@@ -348,10 +358,6 @@ public final class TextAccessor {
             || Character.toLowerCase(c1) == Character.toLowerCase(c2)
         );
 
-// old code
-//        String s1 = String.valueOf(c1).toUpperCase(this.locale);
-//        String s2 = String.valueOf(c2).toUpperCase(this.locale);
-//        return s1.equals(s2);
     }
 
 }
