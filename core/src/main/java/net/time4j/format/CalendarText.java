@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -259,9 +259,7 @@ public final class CalendarText {
             for (OutputContext oc : OutputContext.values()) {
                 qo.put(
                     oc,
-                    new TextAccessor(
-                        p.quarters(calendarType, locale, tw, oc),
-                        locale));
+                    new TextAccessor(p.quarters(calendarType, locale, tw, oc)));
             }
             qt.put(tw, qo);
         }
@@ -276,9 +274,7 @@ public final class CalendarText {
             for (OutputContext oc : OutputContext.values()) {
                 wo.put(
                     oc,
-                    new TextAccessor(
-                        p.weekdays(calendarType, locale, tw, oc),
-                        locale));
+                    new TextAccessor(p.weekdays(calendarType, locale, tw, oc)));
             }
             wt.put(tw, wo);
         }
@@ -290,7 +286,7 @@ public final class CalendarText {
         for (TextWidth tw : TextWidth.values()) {
             et.put(
                 tw,
-                new TextAccessor(p.eras(calendarType, locale, tw), locale));
+                new TextAccessor(p.eras(calendarType, locale, tw)));
         }
 
         this.eras = Collections.unmodifiableMap(et);
@@ -303,9 +299,7 @@ public final class CalendarText {
             for (OutputContext oc : OutputContext.values()) {
                 mo.put(
                     oc,
-                    new TextAccessor(
-                        p.meridiems(calendarType, locale, tw, oc),
-                        locale));
+                    new TextAccessor(p.meridiems(calendarType, locale, tw, oc)));
             }
             mt.put(tw, mo);
         }
@@ -914,7 +908,7 @@ public final class CalendarText {
             }
         }
 
-        return new TextAccessor(tfs, this.locale);
+        return new TextAccessor(tfs);
 
     }
 
@@ -1136,15 +1130,15 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields the name of the internal {@link TextProvider}. </p>
+     * <p>Yields the name of the internal {@link TextProvider} in conjunction with the configuring locale. </p>
      */
     /*[deutsch]
-     * <p>Liefert den Namen des internen {@link TextProvider}. </p>
+     * <p>Liefert den Namen des internen {@link TextProvider} in Verbindung mit der konfigurierenden Sprache. </p>
      */
     @Override
     public String toString() {
 
-        return this.provider;
+        return this.provider + "-" + this.locale;
 
     }
 
@@ -1239,7 +1233,7 @@ public final class CalendarText {
                         p.months(calendarType, locale, tw, oc, false);
                     usesDifferentLeapForm = !Arrays.equals(std, ls);
                 }
-                mo.put(oc, new TextAccessor(ls, locale));
+                mo.put(oc, new TextAccessor(ls));
             }
             mt.put(tw, mo);
         }
