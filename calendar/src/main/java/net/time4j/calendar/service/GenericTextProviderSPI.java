@@ -21,14 +21,15 @@
 
 package net.time4j.calendar.service;
 
+import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
-import net.time4j.i18n.IsoTextProviderSPI;
 import net.time4j.i18n.UTF8ResourceControl;
 
 import java.util.Collections;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
 import java.util.ResourceBundle;
@@ -127,8 +128,8 @@ public final class GenericTextProviderSPI
     ) {
 
         if (calendarType.equals("roc") || calendarType.equals("buddhist")) {
-            TextProvider p = new IsoTextProviderSPI();
-            return p.months(calendarType, locale, tw, oc, leapForm);
+            List<String> months = CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms();
+            return months.toArray(new String[months.size()]);
         } else if (calendarType.equals("japanese")) {
             return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
         }
