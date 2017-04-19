@@ -213,6 +213,7 @@ public final class CalendarText {
 
     // Allgemeine Textformen spezifisch für eine Chronologie
     private final Map<String, String> textForms;
+    private final String calendarType;
     private final Locale locale;
     private final MissingResourceException mre;
 
@@ -314,6 +315,7 @@ public final class CalendarText {
         }
 
         this.textForms = Collections.unmodifiableMap(map);
+        this.calendarType = calendarType;
         this.locale = locale;
         this.mre = tmpMre;
 
@@ -1127,7 +1129,7 @@ public final class CalendarText {
     @Override
     public String toString() {
 
-        return this.provider + "-" + this.locale;
+        return this.provider + "(" + this.calendarType + "/" + this.locale + ")";
 
     }
 

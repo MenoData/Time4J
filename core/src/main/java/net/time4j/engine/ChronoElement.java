@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoElement.java) is part of project Time4J.
  *
@@ -175,7 +175,7 @@ public interface ChronoElement<V>
      * die Werte bez&uuml;glich dieses Elements verglichen. Es d&uuml;rfen
      * anders als im {@code Comparable}-Interface m&ouml;glich hierbei auch
      * Objekte verschiedener chronologischer Typen miteinander verglichen
-     * werden solange die zu vergleichenden Objekte dieses Element
+     * werden, solange die zu vergleichenden Objekte dieses Element
      * unterst&uuml;tzen. </p>
      *
      * <p>Es ist zu betonen, da&szlig; ein Elementwertvergleich im allgemeinen

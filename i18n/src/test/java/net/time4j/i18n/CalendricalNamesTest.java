@@ -69,7 +69,7 @@ public class CalendricalNamesTest {
         }
 
         result = CalendarText.getInstance("xyz", locale);
-        assertThat(result.toString(), is("FallbackProvider"));
+        assertThat(result.toString(), is("FallbackProvider(xyz/en_US)"));
     }
 
     @Test
