@@ -1,6 +1,8 @@
 ## [v4.27] not yet released
 ### Added
 - Japanese imperial calendar [#560]
+- Support for Japanese numbers [#639]
+- Improve text resource handling [#626]
 
 ### Fixed
 - Clarify usage of Ethiopian eras [#636]
