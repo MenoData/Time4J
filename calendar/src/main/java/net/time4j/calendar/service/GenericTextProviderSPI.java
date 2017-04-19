@@ -21,7 +21,6 @@
 
 package net.time4j.calendar.service;
 
-import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
