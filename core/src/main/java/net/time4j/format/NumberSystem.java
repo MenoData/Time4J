@@ -415,6 +415,135 @@ public enum NumberSystem {
     },
 
     /**
+     * The Japanese numbers limited to the range 1-9999.
+     *
+     * <p>See also <a href="https://en.wikipedia.org/wiki/Japanese_numerals">Wikipedia</a>. </p>
+     *
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * Die japanischen Zahlen begrenzt auf den Bereich 1-9999.
+     *
+     * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Japanische_Zahlschrift">Wikipedia</a>. </p>
+     *
+     * @since   3.32/4.27
+     */
+    JAPANESE() {
+        @Override
+        public String toNumeral(int number) {
+            if ((number < 1) || (number > 9999)) {
+                throw new IllegalArgumentException("Cannot convert: " + number);
+            }
+            String digits = this.getDigits();
+            int sen = number / 1000;
+            int r = number % 1000;
+            int hyaku = r / 100;
+            r = r % 100;
+            int ju = r / 10;
+            int n = r % 10;
+            StringBuilder numeral = new StringBuilder();
+            if (sen >= 1) {
+                if (sen > 1) {
+                    numeral.append(digits.charAt(sen - 1));
+                }
+                numeral.append('千');
+            }
+            if (hyaku >= 1) {
+                if (hyaku > 1) {
+                    numeral.append(digits.charAt(hyaku - 1));
+                }
+                numeral.append('百');
+            }
+            if (ju >= 1) {
+                if (ju > 1) {
+                    numeral.append(digits.charAt(ju - 1));
+                }
+                numeral.append('十');
+            }
+            if (n > 0) {
+                numeral.append(digits.charAt(n - 1));
+            }
+            return numeral.toString();
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            int total = 0;
+            int ju = 0;
+            int hyaku = 0;
+            int sen = 0;
+            String digits = this.getDigits();
+            for (int i = numeral.length() - 1; i >= 0; i--) {
+                char c = numeral.charAt(i);
+                switch (c) {
+                    case '十':
+                        if ((ju == 0) && (hyaku == 0) && (sen == 0)) {
+                            ju++;
+                        } else {
+                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
+                        }
+                        break;
+                    case '百':
+                        if ((hyaku == 0) && sen == 0) {
+                            hyaku++;
+                        } else {
+                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
+                        }
+                        break;
+                    case '千':
+                        if (sen == 0) {
+                            sen++;
+                        } else {
+                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
+                        }
+                        break;
+                    default:
+                        boolean ok = false;
+                        for (int k = 0; k < 9; k++) {
+                            if (digits.charAt(k) == c) {
+                                int n = k + 1;
+                                if (ju == 1) {
+                                    total += (n * 10);
+                                    ju = -1;
+                                } else if (hyaku == 1) {
+                                    total += (n * 100);
+                                    hyaku = -1;
+                                } else if (sen == 1) {
+                                    total += (n * 1000);
+                                    sen = -1;
+                                } else {
+                                    total += n;
+                                }
+                                ok = true;
+                                break;
+                            }
+                        }
+                        if (!ok) { // unknown digit
+                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
+                        }
+                }
+            }
+            if (ju == 1) {
+                total += 10;
+            }
+            if (hyaku == 1) {
+                total += 100;
+            }
+            if (sen == 1) {
+                total += 1000;
+            }
+            return total;
+        }
+        @Override
+        public String getDigits() {
+            return "一二三四五六七八九十百千";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
+        }
+    },
+
+    /**
      * Traditional number system used by Khmer people in Cambodia.
      *
      * <p>Note: Must not be negative. </p>
