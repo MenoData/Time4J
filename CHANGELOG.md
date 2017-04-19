@@ -1,4 +1,7 @@
 ## [v3.32] not yet released
+### Added
+- Japanese imperial calendar [#560]
+
 ### Fixed
 - Clarify usage of Ethiopian eras [#636]
 - Roundtrip of print/parse during zone offset overlap fails [#635]
