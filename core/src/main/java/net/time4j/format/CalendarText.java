@@ -417,10 +417,7 @@ public final class CalendarText {
             } else {
                 // ServiceLoader-Mechanismus (Suche nach externen Providern)
                 for (TextProvider tmp : ResourceLoader.getInstance().services(TextProvider.class)) {
-                    if (
-                        isCalendarTypeSupported(tmp, calendarType)
-                        && isLocaleSupported(tmp, locale)
-                    ) {
+                    if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
                         p = tmp;
                         break;
                     }
@@ -430,10 +427,7 @@ public final class CalendarText {
                 if (p == null) {
                     TextProvider tmp = JDK_PROVIDER;
 
-                    if (
-                        isCalendarTypeSupported(tmp, calendarType)
-                        && isLocaleSupported(tmp, locale)
-                    ) {
+                    if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
                         p = tmp;
                     }
 
@@ -1235,38 +1229,6 @@ public final class CalendarText {
 
     }
 
-    private static boolean isCalendarTypeSupported(
-        TextProvider p,
-        String calendarType
-    ) {
-
-        for (String c : p.getSupportedCalendarTypes()) {
-            if (c.equals(calendarType)) {
-                return true;
-            }
-        }
-
-        return false;
-
-    }
-
-    private static boolean isLocaleSupported(
-        TextProvider p,
-        Locale locale
-    ) {
-
-        String lang = locale.getLanguage();
-
-        for (Locale l : p.getAvailableLocales()) {
-            if (lang.equals(l.getLanguage())) {
-                return true;
-            }
-        }
-
-        return false;
-
-    }
-
     private String getKeyPrefix(String elementName) {
 
         if (
@@ -1391,6 +1353,28 @@ public final class CalendarText {
         implements TextProvider {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean supportsCalendarType(String calendarType) {
+
+            return ISO_CALENDAR_TYPE.equals(calendarType);
+
+        }
+
+        @Override
+        public boolean supportsLanguage(Locale language) {
+
+            String lang = language.getLanguage();
+
+            for (Locale test : DateFormatSymbols.getAvailableLocales()) {
+                if (test.getLanguage().equals(lang)) {
+                    return true;
+                }
+            }
+
+            return false;
+
+        }
 
         @Override
         public String[] getSupportedCalendarTypes() {
@@ -1602,6 +1586,20 @@ public final class CalendarText {
         implements TextProvider {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean supportsCalendarType(String calendarType) {
+
+            return true;
+
+        }
+
+        @Override
+        public boolean supportsLanguage(Locale language) {
+
+            return true;
+
+        }
 
         @Override
         public String[] getSupportedCalendarTypes() {

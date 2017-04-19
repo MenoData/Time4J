@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextProvider.java) is part of project Time4J.
  *
@@ -64,6 +64,40 @@ import java.util.ResourceBundle;
 public interface TextProvider {
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Queries if a calendar type is supported by this text provider. </p>
+     *
+     * @param   calendarType    the calendar type to be checked
+     * @return  {@code true} if given calendar type is supported else {@code false}
+     * @since   3.32/4.27
+     * @see     CalendarType
+     */
+    /*[deutsch]
+     * <p>Fragt die Unterst&uuml;tzung eines Kalendertyps durch diesen {@code TextProvider} ab. </p>
+     *
+     * @param   calendarType    the calendar type to be checked
+     * @return  {@code true} if given calendar type is supported else {@code false}
+     * @since   3.32/4.27
+     * @see     CalendarType
+     */
+    boolean supportsCalendarType(String calendarType);
+
+    /**
+     * <p>Queries if a language is supported by this text provider. </p>
+     *
+     * @param   language        the language to be checked
+     * @return  {@code true} if given language is supported else {@code false}
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * <p>Fragt die Unterst&uuml;tzung einer Sprache durch diesen {@code TextProvider} ab. </p>
+     *
+     * @param   language        the language to be checked
+     * @return  {@code true} if given language is supported else {@code false}
+     * @since   3.32/4.27
+     */
+    boolean supportsLanguage(Locale language);
 
     /**
      * <p>Defines the supported calendar types. </p>

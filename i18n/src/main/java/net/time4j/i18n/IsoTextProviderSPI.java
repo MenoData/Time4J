@@ -94,6 +94,20 @@ public final class IsoTextProviderSPI
     //~ Methoden ----------------------------------------------------------
 
     @Override
+    public boolean supportsCalendarType(String calendarType) {
+
+        return ISO_CALENDAR_TYPE.equals(calendarType);
+
+    }
+
+    @Override
+    public boolean supportsLanguage(Locale language) {
+
+        return LANGUAGES.contains(LanguageMatch.getAlias(language));
+
+    }
+
+    @Override
     public String[] getSupportedCalendarTypes() {
 
         return new String[] { ISO_CALENDAR_TYPE };
@@ -189,7 +203,7 @@ public final class IsoTextProviderSPI
         sb.append(toChar(mode));
         sb.append(")_d");
         String key = sb.toString();
-        return getPatterns(locale).getString(key);
+        return getBundle(locale).getString(key);
 
     }
 
@@ -222,7 +236,7 @@ public final class IsoTextProviderSPI
             key = sb.toString();
         }
 
-        return getPatterns(locale).getString(key);
+        return getBundle(locale).getString(key);
 
     }
 
@@ -244,14 +258,14 @@ public final class IsoTextProviderSPI
         sb.append(toChar(total));
         sb.append(")_dt");
         String key = sb.toString();
-        return getPatterns(locale).getString(key);
+        return getBundle(locale).getString(key);
 
     }
 
     @Override
     public String getIntervalPattern(Locale locale) {
 
-        return getPatterns(locale).getString("I");
+        return getBundle(locale).getString("I");
 
     }
 
@@ -491,20 +505,6 @@ public final class IsoTextProviderSPI
 
     private static ResourceBundle getBundle(Locale desired)
         throws MissingResourceException {
-
-        if (LANGUAGES.contains(LanguageMatch.getAlias(desired)) || desired.getLanguage().isEmpty()) {
-            return ResourceBundle.getBundle(
-                "names/" + ISO_CALENDAR_TYPE,
-                desired,
-                getDefaultLoader(),
-                UTF8ResourceControl.SINGLETON);
-        }
-
-        return null;
-
-    }
-
-    private static ResourceBundle getPatterns(Locale desired) {
 
         return ResourceBundle.getBundle(
             "names/" + ISO_CALENDAR_TYPE,

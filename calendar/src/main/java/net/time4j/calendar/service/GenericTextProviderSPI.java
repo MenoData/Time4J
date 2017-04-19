@@ -25,6 +25,7 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
+import net.time4j.i18n.LanguageMatch;
 import net.time4j.i18n.UTF8ResourceControl;
 
 import java.util.Collections;
@@ -53,6 +54,7 @@ public final class GenericTextProviderSPI
 
     private static final String[] EMPTY_STRINGS = new String[0];
 
+    private static final Set<String> TYPES;
     private static final Set<String> LANGUAGES;
     private static final Set<Locale> LOCALES;
     private static final ResourceBundle.Control CONTROL;
@@ -92,6 +94,17 @@ public final class GenericTextProviderSPI
         }
 
         LOCALES = Collections.unmodifiableSet(locs);
+
+        Set<String> types = new HashSet<String>();
+        types.add("buddhist");
+        types.add("coptic");
+        types.add("ethiopic");
+        types.add("generic");
+        types.add("islamic");
+        types.add("japanese");
+        types.add("persian");
+        types.add("roc");
+        TYPES = Collections.unmodifiableSet(types);
     }
 
     //~ Konstruktoren -----------------------------------------------------
@@ -105,9 +118,23 @@ public final class GenericTextProviderSPI
     //~ Methoden ----------------------------------------------------------
 
     @Override
+    public boolean supportsCalendarType(String calendarType) {
+
+        return TYPES.contains(calendarType);
+
+    }
+
+    @Override
+    public boolean supportsLanguage(Locale language) {
+
+        return true; // uses fallback Locale.ROOT if language does not fit
+
+    }
+
+    @Override
     public String[] getSupportedCalendarTypes() {
 
-        return new String[] { "buddhist", "coptic", "ethiopic", "generic", "islamic", "japanese", "persian", "roc" };
+        return TYPES.toArray(new String[TYPES.size()]);
 
     }
 
@@ -284,7 +311,7 @@ public final class GenericTextProviderSPI
 
         return ResourceBundle.getBundle(
             "names/" + calendarType,
-            LANGUAGES.contains(desired.getLanguage()) ? desired : Locale.ROOT,
+            LANGUAGES.contains(LanguageMatch.getAlias(desired)) ? desired : Locale.ROOT,
             getDefaultLoader(),
             CONTROL);
 
