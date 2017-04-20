@@ -153,6 +153,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     NumberSystem#JAPANESE
  * @since   3.32/4.27
  */
 /*[deutsch]
@@ -220,6 +221,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     NumberSystem#JAPANESE
  * @since   3.32/4.27
  */
 @CalendarType("japanese")

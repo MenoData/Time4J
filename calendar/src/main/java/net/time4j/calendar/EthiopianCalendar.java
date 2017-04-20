@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianCalendar.java) is part of project Time4J.
  *
@@ -110,6 +110,8 @@ import java.util.Locale;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     EthiopianTime
+ * @see     net.time4j.format.NumberSystem#ETHIOPIC
  * @since   3.11/4.8
  */
 /*[deutsch]
@@ -149,6 +151,8 @@ import java.util.Locale;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     EthiopianTime
+ * @see     net.time4j.format.NumberSystem#ETHIOPIC
  * @since   3.11/4.8
  */
 @CalendarType("ethiopic")
