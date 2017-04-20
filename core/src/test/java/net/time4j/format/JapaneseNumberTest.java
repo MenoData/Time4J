@@ -16,8 +16,8 @@ import static org.junit.Assert.assertThat;
 public class JapaneseNumberTest {
 
  	@Parameters(name= "{index}: [value={0} / numeral={1}")
- 	public static Iterable<Object[]> data() {
- 		return Arrays.asList(
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(
             new Object[][] {
                 {1, "一"},
                 {2, "二"},
@@ -60,11 +60,16 @@ public class JapaneseNumberTest {
                 {111, "百十一"},
                 {151, "百五十一"},
                 {302, "三百二"},
+                {310, "三百十"},
                 {452, "四百五十二"},
                 {469, "四百六十九"},
                 {1000, "千"},
                 {2006, "二千六"},
                 {2025, "二千二十五"},
+                {2110, "二千百十"},
+                {2117, "二千百十七"},
+                {2810, "二千八百十"},
+                {9999, "九千九百九十九"},
             }
         );
     }

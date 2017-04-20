@@ -501,15 +501,15 @@ public enum NumberSystem {
                         for (int k = 0; k < 9; k++) {
                             if (digits.charAt(k) == c) {
                                 int n = k + 1;
-                                if (ju == 1) {
-                                    total += (n * 10);
-                                    ju = -1;
+                                if (sen == 1) {
+                                    total += (n * 1000);
+                                    sen = -1;
                                 } else if (hyaku == 1) {
                                     total += (n * 100);
                                     hyaku = -1;
-                                } else if (sen == 1) {
-                                    total += (n * 1000);
-                                    sen = -1;
+                                } else if (ju == 1) {
+                                    total += (n * 10);
+                                    ju = -1;
                                 } else {
                                     total += n;
                                 }
