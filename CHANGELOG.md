@@ -1,6 +1,7 @@
 ## [v4.27] not yet released
 ### Added
 - Japanese imperial calendar [#560]
+- Make pivot-year for two-digit-years calendar-specific [#643]
 - Support for Japanese numbers [#639]
 - Improve text resource handling [#626]
 
