@@ -1,6 +1,5 @@
 package net.time4j.calendar;
 
-import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -29,7 +28,8 @@ public class HijriPatternTest {
                 {1436, 10, 1, "EEE, d. MMM yyyy", "Fri, 1. Shaw. 1436"},
                 {1436, 10, 2, "G yyyy, MM/dd", "AH 1436, 10/02"},
                 {1437, 1, 1, "yyyy (D)", "1437 (1)"},
-                {1439, 9, 29, "yy (D)", "39 (266)"}
+                {1401, 1, 1, "yy (D)", "01 (1)"},
+                {1499, 1, 1, "yy (D)", "99 (1)"},
             }
         );
     }
@@ -48,6 +48,18 @@ public class HijriPatternTest {
     ) throws ParseException {
         super();
 
+        if (year == 1401 || year == 1499) {
+            int py = HijriCalendar.family().getDefaultPivotYear();
+            int yearOfCentury = year % 100;
+            int century;
+            if (yearOfCentury >= (py % 100)) {
+                century = (((py / 100) - 1) * 100);
+            } else {
+                century = ((py / 100) * 100);
+            }
+            year = (century + yearOfCentury);
+        }
+
         this.umalqura = HijriCalendar.ofUmalqura(year, month, dom);
         Locale loc = Locale.ENGLISH;
         if (pattern.contains("LLLL")) {
@@ -56,13 +68,11 @@ public class HijriPatternTest {
         this.formatter =
             ChronoFormatter.setUp(HijriCalendar.class, loc)
                 .addPattern(pattern, PatternType.NON_ISO_DATE).build()
-                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
-                .with(Attributes.PIVOT_YEAR, 1500);
+                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA);
         this.cldrFormatter =
             ChronoFormatter.setUp(HijriCalendar.class, loc)
                 .addPattern(pattern, PatternType.CLDR).build()
-                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
-                .with(Attributes.PIVOT_YEAR, 1500);
+                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA);
         this.text = text;
     }
 
