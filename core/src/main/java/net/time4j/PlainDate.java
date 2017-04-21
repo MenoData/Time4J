@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainDate.java) is part of project Time4J.
  *
@@ -2251,6 +2251,18 @@ public final class PlainDate
     private static class Merger
         implements ChronoMerger<PlainDate> {
 
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final int DEFAULT_PIVOT_YEAR; // calculate only once during start up
+
+        static {
+            long mjd =
+                EpochDays.MODIFIED_JULIAN_DATE.transform(
+                    MathUtils.floorDivide(System.currentTimeMillis(), 86400 * 1000),
+                    EpochDays.UNIX);
+            DEFAULT_PIVOT_YEAR = (GregorianMath.readYear(GregorianMath.toPackedDate(mjd)) + 20);
+        }
+
         //~ Methoden ------------------------------------------------------
 
         @Override
@@ -2467,6 +2479,13 @@ public final class PlainDate
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return DEFAULT_PIVOT_YEAR;
 
         }
 

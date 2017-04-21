@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PersianCalendar.java) is part of project Time4J.
  *
@@ -1416,6 +1416,13 @@ public final class PersianCalendar
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear() - 621;
 
         }
 

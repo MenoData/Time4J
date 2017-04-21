@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoMerger.java) is part of project Time4J.
  *
@@ -299,5 +299,25 @@ public interface ChronoMerger<T> {
      * @since   3.11/4.8
      */
     StartOfDay getDefaultStartOfDay();
+
+    /**
+     * <p>Determines the default pivot year which might be calendar specific and serves for the
+     * formatting of two-digit-years. </p>
+     *
+     * <p>Most calendar chronologies should choose a pivot year 20 years in the future. </p>
+     *
+     * @return  default pivot year (must not be smaller than {@code 100})
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * <p>Bestimmt das &uuml;bliche kalender-spezifische Kippjahr, das zur Formatierung
+     * von zweistelligen Jahresangaben dient. </p>
+     *
+     * <p>Die meisten Kalenderchronologien sollten ein Kippjahr 20 Jahre in der Zukunft w&auml;hlen. </p>
+     *
+     * @return  default pivot year (must not be smaller than {@code 100})
+     * @since   3.32/4.27
+     */
+    int getDefaultPivotYear();
 
 }

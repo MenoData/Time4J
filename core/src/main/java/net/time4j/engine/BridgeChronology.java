@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BridgeChronology.java) is part of project Time4J.
  *
@@ -192,6 +192,13 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
     public StartOfDay getDefaultStartOfDay() {
 
         return this.delegate.getDefaultStartOfDay();
+
+    }
+
+    @Override
+    public int getDefaultPivotYear() {
+
+        return this.delegate.getDefaultPivotYear();
 
     }
 

@@ -3601,6 +3601,13 @@ public final class PlainTime
 
         }
 
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
+
+        }
+
     }
 
 }

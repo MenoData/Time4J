@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TwoDigitYearProcessor.java) is part of project Time4J.
  *
@@ -21,12 +21,10 @@
 
 package net.time4j.format.expert;
 
-import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 
@@ -42,19 +40,6 @@ import java.util.Set;
  */
 final class TwoDigitYearProcessor
     implements FormatProcessor<Integer> {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final Integer DEFAULT_PIVOT_YEAR;
-
-    static {
-        long mjd =
-            EpochDays.MODIFIED_JULIAN_DATE.transform(
-                MathUtils.floorDivide(System.currentTimeMillis(), 86400 * 1000),
-                EpochDays.UNIX);
-        DEFAULT_PIVOT_YEAR =
-            Integer.valueOf(GregorianMath.readYear(GregorianMath.toPackedDate(mjd)) + 20);
-    }
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -89,7 +74,7 @@ final class TwoDigitYearProcessor
         this.zeroDigit = '0';
         this.lenientMode = Leniency.SMART;
         this.protectedLength = 0;
-        this.pivotYear = DEFAULT_PIVOT_YEAR;
+        this.pivotYear = 100;
 
     }
 
@@ -135,7 +120,7 @@ final class TwoDigitYearProcessor
             }
         }
 
-        int yy = MathUtils.floorModulo(year, 100);
+        int yy = ((this.getPivotYear(quickPath, attributes) == 100) ? year : MathUtils.floorModulo(year, 100));
         String digits = Integer.toString(yy);
 
         char zeroChar = (
@@ -260,9 +245,8 @@ final class TwoDigitYearProcessor
         int value;
 
         if (pos == start + 2) {
-            int py = (quickPath ? this.pivotYear : attributes.get(Attributes.PIVOT_YEAR, DEFAULT_PIVOT_YEAR));
             assert ((yearOfCentury >= 0) && (yearOfCentury <= 99));
-            value = toYear(yearOfCentury, py);
+            value = toYear(yearOfCentury, this.getPivotYear(quickPath, attributes));
         } else {
             value = yearOfCentury; // absolutes Jahr (kein Kippjahr)
         }
@@ -343,7 +327,7 @@ final class TwoDigitYearProcessor
             attributes.get(Attributes.ZERO_DIGIT, Character.valueOf('0')).charValue(),
             attributes.get(Attributes.LENIENCY, Leniency.SMART),
             attributes.get(Attributes.PROTECTED_CHARACTERS, 0).intValue(),
-            attributes.get(Attributes.PIVOT_YEAR, DEFAULT_PIVOT_YEAR).intValue()
+            attributes.get(Attributes.PIVOT_YEAR, formatter.getChronology().getDefaultPivotYear()).intValue()
         );
 
     }
@@ -362,6 +346,21 @@ final class TwoDigitYearProcessor
         }
 
         return (century + yearOfCentury);
+
+    }
+
+    private int getPivotYear(
+        boolean quickPath,
+        AttributeQuery attributes
+    ) {
+
+        int py = (quickPath ? this.pivotYear : attributes.get(Attributes.PIVOT_YEAR, this.pivotYear));
+
+        if (py < 100) {
+            throw new IllegalArgumentException("Pivot year must not be smaller than 100: " + py);
+        }
+
+        return py;
 
     }
 

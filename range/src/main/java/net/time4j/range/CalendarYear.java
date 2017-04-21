@@ -652,6 +652,13 @@ public final class CalendarYear
 
         }
 
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
+
+        }
+
     }
 
     private static class YearRule

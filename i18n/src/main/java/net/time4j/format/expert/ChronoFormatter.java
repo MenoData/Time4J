@@ -7069,6 +7069,13 @@ public final class ChronoFormatter<T>
 
         }
 
+        @Override
+        public int getDefaultPivotYear() {
+
+            return this.override.getDefaultPivotYear();
+
+        }
+
         public List<ChronoExtension> getExtensions() {
 
             return this.extensions;

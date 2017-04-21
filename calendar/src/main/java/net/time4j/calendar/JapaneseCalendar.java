@@ -149,8 +149,12 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *         Locale.JAPANESE,
  *         JapaneseCalendar.axis()
  *       ).with(Leniency.LAX); // use parsed nengo (attention: Ansei-1 == Kaei-7)
- *     System.out.println(parser.parse(&quot;安政1年閏7月14日&quot;)); // Ansei-1(1854)-*7-14
+ *     System.out.println(parser.parse(&quot;安政元年閏7月14日&quot;)); // Ansei-1(1854)-*7-14
  * </pre>
+ *
+ * <p>The second example also uses the preferred form for the first year of a nengo as &quot;元&quot; (gannen).
+ * Another special feature: Two-digit-years using a pivot year are effectively switched off even if the pattern
+ * &quot;yy&quot; is used (but users should avoid this pattern and prefer &quot;y&quot;). </p>
  *
  * @author  Meno Hochschild
  * @see     NumberSystem#JAPANESE
@@ -217,8 +221,13 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *         Locale.JAPANESE,
  *         JapaneseCalendar.axis()
  *       ).with(Leniency.LAX); // verwende den Original-Nengo (beachte: Ansei-1 == Kaei-7)
- *     System.out.println(parser.parse(&quot;安政1年閏7月14日&quot;)); // Ansei-1(1854)-*7-14
+ *     System.out.println(parser.parse(&quot;安政元年閏7月14日&quot;)); // Ansei-1(1854)-*7-14
  * </pre>
+ *
+ * <p>Das zweite Beispiel verwendet die bevorzugte Form f&uuml;r das erste Jahr eines Nengo, n&auml;mlich
+ * &quot;元&quot; (gannen). Eine andere Spezialit&auml;t: Zweistellige Jahresangaben mit Kippjahr sind
+ * de facto ausgeschaltet, sogar dann, wenn das Formatmuster &quot;yy&quot; verwendet wird (aber Anwender
+ * sollten trotzdem das Muster &quot;y&quot; bevorzugen). </p>
  *
  * @author  Meno Hochschild
  * @see     NumberSystem#JAPANESE
@@ -2937,6 +2946,13 @@ public final class JapaneseCalendar
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return 100; // two-digit-years are effectively switched off
 
         }
 

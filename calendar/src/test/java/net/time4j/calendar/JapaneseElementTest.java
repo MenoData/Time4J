@@ -386,6 +386,16 @@ public class JapaneseElementTest {
         JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 1, 1, 8);
         assertThat(formatter.format(jcal), is("平成元年1月8日"));
         assertThat(formatter.parse("平成元年1月8日"), is(jcal));
+        assertThat(formatter.parse("平成1年1月8日"), is(jcal));
+    }
+
+    @Test
+    public void twoDigitYearFormat() throws ParseException { // see also JDK-8065557
+        ChronoFormatter<JapaneseCalendar> formatter =
+            ChronoFormatter.ofPattern("GGGGG.yy.MM.dd", PatternType.CLDR, Locale.US, JapaneseCalendar.axis());
+        assertThat(formatter.parse("H.10.11.12").getYear(), is(10));
+        assertThat(formatter.parse("H.20.11.12").getYear(), is(20));
+        assertThat(formatter.parse("H.105.11.12").getYear(), is(105));
     }
 
 }

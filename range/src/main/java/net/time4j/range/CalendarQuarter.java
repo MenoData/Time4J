@@ -713,6 +713,13 @@ public final class CalendarQuarter
 
         }
 
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
+
+        }
+
         private static String getFormatPattern(
             Map<String, String> map,
             String key

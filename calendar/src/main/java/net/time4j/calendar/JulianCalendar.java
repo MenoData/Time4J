@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JulianCalendar.java) is part of project Time4J.
  *
@@ -24,6 +24,7 @@ package net.time4j.calendar;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.Month;
+import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
@@ -1626,6 +1627,13 @@ public final class JulianCalendar
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
 
         }
 

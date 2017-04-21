@@ -2819,6 +2819,13 @@ public final class Moment
         }
 
         @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
+
+        }
+
+        @Override
         public Moment createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes

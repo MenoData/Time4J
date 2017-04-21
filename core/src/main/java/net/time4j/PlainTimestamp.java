@@ -1416,6 +1416,13 @@ public final class PlainTimestamp
         }
 
         @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
+
+        }
+
+        @Override
         public PlainTimestamp createFrom(
             TimeSource<?> clock,
             final AttributeQuery attributes

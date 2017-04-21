@@ -830,6 +830,13 @@ public final class CalendarWeek
 
         }
 
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear();
+
+        }
+
     }
 
     private static class YearRule

@@ -59,6 +59,7 @@ public class ClockTest {
         System.out.println(CopticCalendar.nowInSystemTime());
         System.out.println(EthiopianCalendar.nowInSystemTime());
         System.out.println(HijriCalendar.nowInSystemTime(HijriAlgorithm.WEST_ISLAMIC_CIVIL, StartOfDay.EVENING));
+        System.out.println(JapaneseCalendar.nowInSystemTime());
         System.out.println(JulianCalendar.nowInSystemTime());
         System.out.println(MinguoCalendar.nowInSystemTime());
         System.out.println(PersianCalendar.nowInSystemTime());

@@ -1691,6 +1691,13 @@ public final class EthiopianCalendar
 
         }
 
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear() - 8;
+
+        }
+
     }
 
     private static class EthiopianUnitRule

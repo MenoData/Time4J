@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianTime.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.calendar;
 
 import net.time4j.Meridiem;
+import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
@@ -1604,6 +1605,11 @@ public final class EthiopianTime
         @Override
         public StartOfDay getDefaultStartOfDay() {
             return StartOfDay.MORNING;
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+            return PlainDate.axis().getDefaultPivotYear() - 8;
         }
 
     }
