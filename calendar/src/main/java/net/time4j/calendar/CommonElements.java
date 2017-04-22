@@ -431,7 +431,7 @@ public class CommonElements {
         }
 
         @Override
-        public boolean doEquals(BasicElement<?> obj) {
+        protected boolean doEquals(BasicElement<?> obj) {
 
             if (super.doEquals(obj)) {
                 CalendarWeekElement<?> that = CalendarWeekElement.class.cast(obj);
@@ -772,7 +772,7 @@ public class CommonElements {
         }
 
         @Override
-        public boolean doEquals(BasicElement<?> obj) {
+        protected boolean doEquals(BasicElement<?> obj) {
 
             if (super.doEquals(obj)) {
                 DayOfWeekElement<?> that = DayOfWeekElement.class.cast(obj);

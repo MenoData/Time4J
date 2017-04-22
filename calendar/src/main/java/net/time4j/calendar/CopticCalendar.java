@@ -236,17 +236,23 @@ public final class CopticCalendar
      * <p>Represents the Coptic day of week. </p>
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the Coptic calendar week
-     * as starting on Saturday. </p>
+     * as starting on Saturday (like in Egypt). </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den koptischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die koptische
-     * Kalenderwoche so, da&szlig; sie am Samstag beginnt. </p>
+     * Kalenderwoche so, da&szlig; sie am Samstag beginnt (wie in &Auml;gypten). </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, CopticCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<CopticCalendar>(CopticCalendar.class);
+        new StdWeekdayElement<CopticCalendar>(CopticCalendar.class, getDefaultWeekmodel());
 
     private static final EraYearMonthDaySystem<CopticCalendar> CALSYS;
     private static final TimeAxis<CopticCalendar.Unit, CopticCalendar> ENGINE;

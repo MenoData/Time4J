@@ -255,16 +255,22 @@ public final class EthiopianCalendar
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the Ethiopian calendar week
      * as starting on Sunday (deviation from Coptic calendar). </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den &auml;thiopischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die &auml;thiopische
      * Kalenderwoche so, da&szlig; sie am Sonntag beginnt (Abweichung vom koptischen Kalender). </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, EthiopianCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<EthiopianCalendar>(EthiopianCalendar.class);
+        new StdWeekdayElement<EthiopianCalendar>(EthiopianCalendar.class, getDefaultWeekmodel());
 
     /**
      * <p>Represents the evangelist associated with a year of the Ethiopian leap year cycle. </p>

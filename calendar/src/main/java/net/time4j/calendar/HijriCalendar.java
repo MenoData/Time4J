@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriCalendar.java) is part of project Time4J.
  *
@@ -296,17 +296,25 @@ public final class HijriCalendar
      * <p>Represents the islamic day of week. </p>
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the islamic calendar week
-     * as starting on Sunday. </p>
+     * as starting on Sunday. This corresponds to Saudi-Arabia, but many islamic countries
+     * have a different week model. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den islamischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die islamische
-     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. </p>
+     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. Das entspricht Saudi-Arabien, aber viele
+     * islamische L&auml;nder haben ein abweichendes Wochenmodell. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, HijriCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<HijriCalendar>(HijriCalendar.class);
+        new StdWeekdayElement<HijriCalendar>(HijriCalendar.class, getDefaultWeekmodel());
 
     /**
      * The name of Umm-al-qura-variant.

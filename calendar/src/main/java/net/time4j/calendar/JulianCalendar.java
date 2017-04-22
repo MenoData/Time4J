@@ -242,16 +242,22 @@ public final class JulianCalendar
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the Julian calendar week
      * as starting on Sunday which is close to historic use. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den julianischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die julianische
      * Kalenderwoche so, da&szlig; sie am Sonntag beginnt, was dem historischen Gebrauch nahe kommt. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final ChronoElement<Weekday> DAY_OF_WEEK =
-        new StdWeekdayElement<JulianCalendar>(JulianCalendar.class);
+        new StdWeekdayElement<JulianCalendar>(JulianCalendar.class, getDefaultWeekmodel());
 
     private static final EraYearMonthDaySystem<JulianCalendar> CALSYS;
     private static final TimeAxis<JulianCalendar.Unit, JulianCalendar> ENGINE;

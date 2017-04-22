@@ -1,6 +1,8 @@
 package net.time4j.calendar;
 
 import net.time4j.CalendarUnit;
+import net.time4j.Month;
+import net.time4j.Weekday;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -10,7 +12,7 @@ import static org.junit.Assert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class MinguoOperatorTest {
+public class MinguoMiscellaneousTest {
 
     @Test
     public void plusYears() {
@@ -140,6 +142,31 @@ public class MinguoOperatorTest {
         assertThat(
             MinguoCalendar.of(MinguoEra.ROC, 89, 5, 2).with(MinguoCalendar.MONTH_OF_YEAR.atCeiling()),
             is(MinguoCalendar.of(MinguoEra.ROC, 89, 5, 31)));
+    }
+
+    @Test
+    public void minguoCalendarProperties() {
+        MinguoCalendar date = MinguoCalendar.of(MinguoEra.ROC, 89, Month.FEBRUARY, 14);
+        assertThat(
+            date.getDayOfMonth(),
+            is(14));
+        assertThat(
+            date.getMonth(),
+            is(Month.FEBRUARY));
+        assertThat(
+            date.lengthOfMonth(),
+            is(29));
+        assertThat(
+            date.lengthOfYear(),
+            is(366));
+        assertThat(
+            date.atTime(12, 0).toDate(),
+            is(date));
+    }
+
+    @Test
+    public void defaultFirstDayOfWeek() {
+        assertThat(MinguoCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
     }
 
 }
