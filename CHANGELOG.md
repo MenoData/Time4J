@@ -6,6 +6,7 @@
 - Improve text resource handling [#626]
 
 ### Fixed
+- DAY_OF_WEEK-element in some calendars inconsistent [#644]
 - Clarify usage of Ethiopian eras [#636]
 - TransitionHistory.getPreviousTransition() has improper description [#637]
 - Roundtrip of print/parse during zone offset overlap fails [#635]
