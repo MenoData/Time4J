@@ -6,6 +6,7 @@
 - Improve text resource handling [#626]
 
 ### Fixed
+- DAY_OF_WEEK-element in some calendars inconsistent [#644]
 - Clarify usage of Ethiopian eras [#636]
 - Roundtrip of print/parse during zone offset overlap fails [#635]
 - Converting geo longitude to ZonalOffset crashes [#632]
