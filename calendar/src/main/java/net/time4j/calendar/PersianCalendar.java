@@ -43,6 +43,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
+import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -235,16 +236,22 @@ public final class PersianCalendar
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the Persian calendar week
      * as starting on Saturday. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den persischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die persische
      * Kalenderwoche so, da&szlig; sie am Samstag beginnt. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, PersianCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<>(PersianCalendar.class);
+        new StdWeekdayElement<>(PersianCalendar.class, getDefaultWeekmodel());
 
     private static final EraYearMonthDaySystem<PersianCalendar> CALSYS;
     private static final TimeAxis<PersianCalendar.Unit, PersianCalendar> ENGINE;

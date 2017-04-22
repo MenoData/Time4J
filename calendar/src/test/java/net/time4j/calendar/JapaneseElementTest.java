@@ -346,14 +346,14 @@ public class JapaneseElementTest {
     }
 
     @Test
-    public void kokiElement() {
+    public void kokiYearElement() {
         JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 1, 14);
-        assertThat(jcal.getInt(JapaneseCalendar.KOKI), is(2677));
+        assertThat(jcal.getInt(JapaneseCalendar.KOKI_YEAR), is(2677));
 
         assertThat(
-            JapaneseCalendar.axis().getMaximum().get(JapaneseCalendar.KOKI),
-            is(jcal.getMaximum(JapaneseCalendar.KOKI)));
-        assertThat(jcal.with(JapaneseCalendar.KOKI, 2532),
+            JapaneseCalendar.axis().getMaximum().get(JapaneseCalendar.KOKI_YEAR),
+            is(jcal.getMaximum(JapaneseCalendar.KOKI_YEAR)));
+        assertThat(jcal.with(JapaneseCalendar.KOKI_YEAR, 2532),
             is(JapaneseCalendar.of(Nengo.MEIJI, 5, EastAsianMonth.valueOf(1), 14)));
     }
 
@@ -396,6 +396,11 @@ public class JapaneseElementTest {
         assertThat(formatter.parse("H.10.11.12").getYear(), is(10));
         assertThat(formatter.parse("H.20.11.12").getYear(), is(20));
         assertThat(formatter.parse("H.105.11.12").getYear(), is(105));
+    }
+
+    @Test
+    public void defaultFirstDayOfWeek() {
+        assertThat(JapaneseCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
     }
 
 }

@@ -198,16 +198,22 @@ public final class MinguoCalendar
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the calendar week
      * as starting on Sunday. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(net.time4j.engine.Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die
      * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, MinguoCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<>(MinguoCalendar.class);
+        new StdWeekdayElement<>(MinguoCalendar.class, getDefaultWeekmodel());
 
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final EraYearMonthDaySystem<MinguoCalendar> CALSYS;

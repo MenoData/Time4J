@@ -124,7 +124,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
- *  <li>{@link #KOKI}</li>
+ *  <li>{@link #KOKI_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -197,7 +197,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
- *  <li>{@link #KOKI}</li>
+ *  <li>{@link #KOKI_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -341,9 +341,9 @@ public final class JapaneseCalendar
      * Weltkriegs (genannt K&#333;ki) und eilt dem gregorianischen Jahr um 660 Jahre voraus. Jedoch ist
      * die normale Jahresz&auml;hlung in diesem Kalender das {@link #YEAR_OF_ERA nengo-basierte Jahr}. </p>
      */
-    public static final ChronoElement<Integer> KOKI =
+    public static final ChronoElement<Integer> KOKI_YEAR =
         new StdIntegerDateElement<>(
-            "YEAR_OF_JIMMU",
+            "KOKI_YEAR",
             JapaneseCalendar.class,
             701 + 660,
             MRD + 659,
@@ -505,16 +505,22 @@ public final class JapaneseCalendar
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the Japanese calendar week
      * as starting on Sunday. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den japanischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die japanische
      * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, JapaneseCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<>(JapaneseCalendar.class);
+        new StdWeekdayElement<>(JapaneseCalendar.class, getDefaultWeekmodel());
 
     private static final Transformer CALSYS;
     private static final TimeAxis<JapaneseCalendar.Unit, JapaneseCalendar> ENGINE;
@@ -557,7 +563,7 @@ public final class JapaneseCalendar
                 new WeekdayRule(),
                 Unit.DAYS)
             .appendElement(
-                KOKI,
+                KOKI_YEAR,
                 new IntegerRule(KOKI_INDEX),
                 Unit.YEARS)
             .appendElement(
