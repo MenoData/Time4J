@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarVariant.java) is part of project Time4J.
  *
@@ -143,6 +143,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      *
      * @param   variant     name of new variant
      * @return  copy of this instance with equal epoch-day-value but different variant
+     * @throws  ChronoException if given variant is not supported
      * @since   3.14/4.11
      */
     /*[deutsch]
@@ -153,6 +154,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      *
      * @param   variant     name of new variant
      * @return  copy of this instance with equal epoch-day-value but different variant
+     * @throws  ChronoException if given variant is not supported
      * @since   3.14/4.11
      */
     public D withVariant(String variant) {
