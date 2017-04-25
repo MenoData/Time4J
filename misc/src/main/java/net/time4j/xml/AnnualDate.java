@@ -24,6 +24,7 @@ package net.time4j.xml;
 import net.time4j.Moment;
 import net.time4j.Month;
 import net.time4j.PlainDate;
+import net.time4j.SystemClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;
@@ -277,6 +278,32 @@ public final class AnnualDate
 
         PlainDate iso = PlainDate.from(date); // includes validation
         return new AnnualDate(iso.getMonth(), iso.getDayOfMonth());
+
+    }
+
+    /**
+     * <p>Obtains the current annual date in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(AnnualDate.chronology())}. </p>
+     *
+     * @return  current annual date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * <p>Ermittelt den aktuellen Jahrestag in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(AnnualDate.chronology())}. </p>
+     *
+     * @return  current annual date in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.32/4.27
+     */
+    public static AnnualDate nowInSystemTime() {
+
+        return SystemClock.inLocalView().now(ENGINE);
 
     }
 

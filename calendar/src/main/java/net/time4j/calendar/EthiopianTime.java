@@ -24,6 +24,7 @@ package net.time4j.calendar;
 import net.time4j.Meridiem;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
+import net.time4j.SystemClock;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.EthiopianExtension;
@@ -660,6 +661,32 @@ public final class EthiopianTime
     ) {
 
         return EthiopianTime.of(true, hour, minute, second);
+
+    }
+
+    /**
+     * <p>Obtains the current Ethiopian time in system time. </p>
+     *
+     * <p>Convenient short-cut for: {@code EthiopianTime.from(PlainTime.nowInSystemTime())}. </p>
+     *
+     * @return  current Ethiopian time in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * <p>Ermittelt die aktuelle &auml;thiopische Uhrzeit in der Systemzeit. </p>
+     *
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code EthiopianTime.from(PlainTime.nowInSystemTime())}. </p>
+     *
+     * @return  current Ethiopian time in system time zone using the system clock
+     * @see     SystemClock#inLocalView()
+     * @see     net.time4j.ZonalClock#now(net.time4j.engine.Chronology)
+     * @since   3.32/4.27
+     */
+    public static EthiopianTime nowInSystemTime() {
+
+        return EthiopianTime.from(PlainTime.nowInSystemTime());
 
     }
 

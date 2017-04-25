@@ -186,7 +186,7 @@ public class AnnualDateTest {
         ZonalClock clock = SystemClock.inLocalView();
         PlainDate date = clock.today();
         assertThat(
-            clock.now(AnnualDate.chronology()).atYear(date.getYear()),
+            AnnualDate.nowInSystemTime().atYear(date.getYear()),
             is(date));
     }
 
