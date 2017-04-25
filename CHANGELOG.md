@@ -5,6 +5,7 @@
 - Support for Japanese numbers [#639]
 - Improve text resource handling [#626]
 - Method nowInSystemTime() for `AnnualDate` and `EthiopianTime` [#646]
+- Enable calendar lookup by names [#614]
 
 ### Fixed
 - DAY_OF_WEEK-element in some calendars inconsistent [#644]
