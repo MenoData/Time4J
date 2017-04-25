@@ -1400,16 +1400,16 @@ public enum PatternType
             case CLDR:
                 return cldr(builder, locale, symbol, count);
             case SIMPLE_DATE_FORMAT:
-                return sdf(builder, locale, symbol, count);
+                return sdf(builder, builder.getChronology(), locale, symbol, count);
             case THREETEN:
-                return threeten(builder, locale, symbol, count);
+                return threeten(builder, builder.getChronology(), locale, symbol, count);
             case CLDR_24:
                 return cldr24(builder, locale, symbol, count);
             case NON_ISO_DATE:
                 if (isISO(builder.getChronology())) {
                     throw new IllegalArgumentException("Choose CLDR or CLDR_24 for ISO-8601-chronology.");
                 }
-                return general(builder, symbol, count, locale);
+                return general(builder, builder.getChronology(), symbol, count, locale);
             case DYNAMIC:
                 return dynamic(builder, symbol, count, locale);
             default:
@@ -1476,23 +1476,28 @@ public enum PatternType
 
         Chronology<?> chronology = builder.getChronology();
 
+        while (chronology instanceof BridgeChronology) {
+            chronology = chronology.preparser();
+        }
+
         if (isGeneralSymbol(symbol) && !isISO(chronology)) {
-            return this.general(builder, symbol, count, locale);
+            return this.general(builder, chronology, symbol, count, locale);
         } else if ((symbol == 'h') && getCalendarType(chronology).equals("ethiopic")) {
-            ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
+            ChronoElement<Integer> ethioHour = findEthiopianHour(chronology);
             if (ethioHour == null) {
                 throw new IllegalArgumentException("Ethiopian time not available.");
             }
             addNumber(ethioHour, symbol, builder, count, false);
             return Collections.emptyMap();
         } else {
-            return this.cldrISO(builder, locale, symbol, count, false);
+            return this.cldrISO(builder, chronology, locale, symbol, count, false);
         }
 
     }
 
     private Map<ChronoElement<?>, ChronoElement<?>> cldrISO(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         Locale locale,
         char symbol,
         int count,
@@ -1641,7 +1646,7 @@ public enum PatternType
                     builder.addFixedNumerical(
                         Weekmodel.of(locale).localDayOfWeek(), count);
                 } else {
-                    cldrISO(builder, locale, 'E', count, sdf);
+                    cldrISO(builder, chronology, locale, 'E', count, sdf);
                 }
                 break;
             case 'c':
@@ -1656,7 +1661,7 @@ public enum PatternType
                         builder.addFixedNumerical(
                             Weekmodel.of(locale).localDayOfWeek(), 1);
                     } else {
-                        cldrISO(builder, locale, 'E', count, sdf);
+                        cldrISO(builder, chronology, locale, 'E', count, sdf);
                     }
                 } finally {
                     builder.endSection();
@@ -1667,9 +1672,9 @@ public enum PatternType
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(PlainTime.AM_PM_OF_DAY);
                 builder.endSection();
-                if (getCalendarType(builder.getChronology()).equals("ethiopic")) {
+                if (getCalendarType(chronology).equals("ethiopic")) {
                     // AM/PM-marker denotes western reference!
-                    ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
+                    ChronoElement<Integer> ethioHour = findEthiopianHour(chronology);
                     if (ethioHour == null) {
                         throw new IllegalArgumentException("Ethiopian time not available.");
                     }
@@ -1811,6 +1816,7 @@ public enum PatternType
 
     private Map<ChronoElement<?>, ChronoElement<?>> sdf(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         Locale locale,
         char symbol,
         int count
@@ -1852,9 +1858,9 @@ public enum PatternType
                     throw new IllegalArgumentException(
                         "Too many pattern letters (X): " + count);
                 }
-                return cldrISO(builder, locale, 'X', count, true);
+                return cldrISO(builder, chronology, locale, 'X', count, true);
             default:
-                return cldrISO(builder, locale, symbol, count, true);
+                return cldrISO(builder, chronology, locale, symbol, count, true);
         }
 
         return Collections.emptyMap();
@@ -1863,6 +1869,7 @@ public enum PatternType
 
     private Map<ChronoElement<?>, ChronoElement<?>> threeten(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         Locale locale,
         char symbol,
         int count
@@ -1951,7 +1958,7 @@ public enum PatternType
                     builder.addFixedNumerical(
                         Weekmodel.of(locale).localDayOfWeek(), count);
                 } else {
-                    threeten(builder, locale, 'E', count);
+                    threeten(builder, chronology, locale, 'E', count);
                 }
                 break;
             case 'c':
@@ -1962,7 +1969,7 @@ public enum PatternType
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
                 try {
-                    threeten(builder, locale, 'e', count);
+                    threeten(builder, chronology, locale, 'e', count);
                 } finally {
                     builder.endSection();
                 }
@@ -1989,7 +1996,7 @@ public enum PatternType
             case 's':
             case 'S':
             case 'A':
-                return cldrISO(builder, locale, symbol, count, false);
+                return cldrISO(builder, chronology, locale, symbol, count, false);
             case 'n':
                 builder.addInteger(PlainTime.NANO_OF_SECOND, count, 9);
                 break;
@@ -1997,8 +2004,8 @@ public enum PatternType
                 builder.addLongNumber(PlainTime.NANO_OF_DAY, count, 18, SignPolicy.SHOW_NEVER);
                 break;
             case 'z':
-                if (ChronoFormatter.hasUnixChronology(builder.getChronology())) {
-                    return cldrISO(builder, locale, 'z', count, false);
+                if (ChronoFormatter.hasUnixChronology(chronology)) {
+                    return cldrISO(builder, chronology, locale, 'z', count, false);
                 } else if (count <= 3) {
                     builder.addTimezoneName(NameStyle.SHORT_GENERIC_TIME);
                 } else if (count == 4) {
@@ -2030,7 +2037,7 @@ public enum PatternType
             case 'V':
             case 'X':
             case 'x':
-                return cldrISO(builder, locale, symbol, count, false);
+                return cldrISO(builder, chronology, locale, symbol, count, false);
             case 'p':
                 builder.padNext(count);
                 break;
@@ -2197,13 +2204,14 @@ public enum PatternType
 
     private Map<ChronoElement<?>, ChronoElement<?>> general(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         char symbol,
         int count,
         Locale locale
     ) {
 
-        Set<ChronoElement<?>> elements = getElements(builder, symbol, locale);
-        String chronoType = builder.getChronology().getChronoType().getName();
+        Set<ChronoElement<?>> elements = getElements(chronology, symbol, locale);
+        String chronoType = chronology.getChronoType().getName();
         ChronoElement<?> element = find(elements, symbol, chronoType);
         TextElement<?> textElement;
         ChronoElement<Integer> intElement;
@@ -2240,7 +2248,7 @@ public enum PatternType
                 break;
             case 'y':
                 boolean hasSpecialAttribute = false;
-                if (locale.getLanguage().equals("am") && getCalendarType(builder.getChronology()).equals("ethiopic")) {
+                if (locale.getLanguage().equals("am") && getCalendarType(chronology).equals("ethiopic")) {
                     hasSpecialAttribute = true;
                     builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC);
                 }
@@ -2319,7 +2327,7 @@ public enum PatternType
                     ChronoElement<Weekday> wde = cast(element);
                     builder.addFixedNumerical(wde, count);
                 } else {
-                    general(builder, 'E', count, locale);
+                    general(builder, chronology, 'E', count, locale);
                 }
                 break;
             case 'c':
@@ -2334,7 +2342,7 @@ public enum PatternType
                         ChronoElement<Weekday> wde = cast(element);
                         builder.addFixedNumerical(wde, 1);
                     } else {
-                        general(builder, 'E', count, locale);
+                        general(builder, chronology, 'E', count, locale);
                     }
                 } finally {
                     builder.endSection();
@@ -2359,7 +2367,7 @@ public enum PatternType
         ChronoElement<?> found = null;
         Chronology<?> chronology = builder.getChronology();
 
-        if (chronology instanceof BridgeChronology) {
+        while (chronology instanceof BridgeChronology) {
             chronology = chronology.preparser();
         }
 
@@ -2418,13 +2426,13 @@ public enum PatternType
     }
 
     private static Set<ChronoElement<?>> getElements(
-        ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         char symbol,
         Locale locale
     ) {
 
         if ((symbol == 'w') || (symbol == 'W') || (symbol == 'e') || (symbol == 'c')) {
-            for (ChronoExtension extension : builder.getChronology().getExtensions()) {
+            for (ChronoExtension extension : chronology.getExtensions()) {
                 for (ChronoElement<?> element : extension.getElements(locale, Attributes.empty())) {
                     if (
                         ((symbol == 'e' || symbol == 'c') && element.name().equals("LOCAL_DAY_OF_WEEK"))
@@ -2437,7 +2445,7 @@ public enum PatternType
             }
             return Collections.emptySet();
         } else {
-            return builder.getChronology().getRegisteredElements();
+            return chronology.getRegisteredElements();
         }
 
     }

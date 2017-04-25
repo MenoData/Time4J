@@ -33,6 +33,7 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BridgeChronology;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Calendrical;
@@ -359,9 +360,10 @@ public final class ChronoFormatter<T>
             ChronoElement<?> element = step.getProcessor().getElement();
             Chronology<?> c = this.chronology;
 
-            if (c instanceof BridgeChronology) {
+            while (c instanceof BridgeChronology) {
                 c = c.preparser();
             }
+
             if (c == Moment.axis()) {
                 c = c.preparser();
             }
@@ -2431,6 +2433,48 @@ public final class ChronoFormatter<T>
         } catch (IllegalStateException ise) {
             throw new IllegalArgumentException(ise);
         }
+
+    }
+
+    /**
+     * <p>Constructs a CLDR-pattern-based formatter for general calendar chronologies. </p>
+     *
+     * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
+     * chronology if available. Following example will obtain a formatter for the Persian calendar: </p>
+     *
+     * <pre></pre>
+     *
+     * @param   pattern     format pattern
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
+     * @see     ChronoFormatter#ofPattern(String, PatternType, Locale, Chronology)
+     * @see     PatternType#CLDR
+     * @since   4.27
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r allgemeine Kalenderchronologien mit Hilfe
+     * eines CLDR-Formatmusters. </p>
+     *
+     * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
+     * eine geeignete Kalenderchronologie zu laden falls vorhanden. Folgendes Beispiel wird einen
+     * Formatierer f&uuml;r den persischen Kalender liefern: </p>
+     *
+     * @param   pattern     format pattern
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
+     * @see     ChronoFormatter#ofPattern(String, PatternType, Locale, Chronology)
+     * @see     PatternType#CLDR
+     * @since   4.27
+     */
+    public static ChronoFormatter<CalendarDate> ofCalendarPattern(
+        String pattern,
+        Locale locale
+    ) {
+
+        Chronology<CalendarDate> chronology = CalendarConverter.getChronology(locale);
+        return ChronoFormatter.ofPattern(pattern, PatternType.CLDR, locale, chronology);
 
     }
 

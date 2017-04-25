@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (CalendarDate.java) is part of project Time4J.
+ * This file (IsoCalendarProviderSPI.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -19,40 +19,40 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.engine;
+package net.time4j.i18n;
+
+import net.time4j.PlainDate;
+import net.time4j.engine.CalendarDate;
+import net.time4j.engine.CalendarProvider;
+import net.time4j.engine.Chronology;
+import net.time4j.format.CalendarText;
+
+import java.util.Optional;
 
 
 /**
- * <p>Represents a general calendar date. </p>
+ * <p>SPI-implementation for providing the proleptic gregorian calendar chronology. </p>
  *
  * @author  Meno Hochschild
- * @since   3.8/4.5
+ * @since   4.27
  */
-/*[deutsch]
- * <p>Repr&auml;sentiert ein allgemeines Kalenderdatum. </p>
- *
- * @author  Meno Hochschild
- * @since   3.8/4.5
- */
-public interface CalendarDate
-    extends Temporal<CalendarDate> {
+public class IsoCalendarProviderSPI
+    implements CalendarProvider {
 
     //~ Methoden ----------------------------------------------------------
 
-    /**
-     * <p>Counts the elapsed days since UTC epoch. </p>
-     *
-     * @return  count of days relative to UTC epoch [1972-01-01]
-     * @see     EpochDays#UTC
-     * @since   3.8/4.5
-     */
-    /*[deutsch]
-     * <p>Z&auml;hlt die seit der UTC-Epoche verstrichenen Tage. </p>
-     *
-     * @return  count of days relative to UTC epoch [1972-01-01]
-     * @see     EpochDays#UTC
-     * @since   3.8/4.5
-     */
-    long getDaysSinceEpochUTC();
+    @Override
+    public Optional<Chronology<? extends CalendarDate>> findChronology(String name) {
+
+        switch (name) {
+            case "gregory":
+            case "gregorian":
+            case CalendarText.ISO_CALENDAR_TYPE:
+                return Optional.of(PlainDate.axis());
+            default:
+                return Optional.empty();
+        }
+
+    }
 
 }

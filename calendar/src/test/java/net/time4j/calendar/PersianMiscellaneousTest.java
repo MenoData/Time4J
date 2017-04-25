@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -99,6 +100,15 @@ public class PersianMiscellaneousTest {
         assertThat(formatted, is(expected));
 
         assertThat(jalali.transform(PlainDate.class), is(PlainDate.of(2014, 4, 30)));
+    }
+
+    @Test
+    public void formatGenericCalendar() {
+        Locale loc = Locale.forLanguageTag("de-IR-u-ca-persian");
+        System.out.println(loc);
+        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofCalendarPattern("G y MMMM d, EEEE", loc);
+        PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
+        assertThat(formatter.format(jalali), is("AP 1393 Farwardin 10, Sonntag"));
     }
 
     @Test
