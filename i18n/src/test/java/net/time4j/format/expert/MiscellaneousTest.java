@@ -115,6 +115,19 @@ public class MiscellaneousTest {
             is("Nobyembre"));
     }
 
+    @Test(expected=NullPointerException.class)
+    public void nullPattern() {
+        ChronoFormatter.ofDatePattern(null, PatternType.CLDR, Locale.ENGLISH);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void emptyPattern() {
+        ChronoFormatter
+            .setUp(PlainDate.class, Locale.ENGLISH).addPattern("", PatternType.CLDR)
+            .addLiteral('x')
+            .build();
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void printWithGenericPattern() {
         ChronoFormatter<PlainDate> formatter =
