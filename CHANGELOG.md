@@ -4,6 +4,7 @@
 - Make pivot-year for two-digit-years calendar-specific [#643]
 - Support for Japanese numbers [#639]
 - Improve text resource handling [#626]
+- Method nowInSystemTime() for `AnnualDate` and `EthiopianTime` [#646]
 
 ### Fixed
 - DAY_OF_WEEK-element in some calendars inconsistent [#644]
