@@ -36,7 +36,7 @@ import java.util.function.Predicate;
 
 
 /**
- * <p>Represents a rule how to find a non-business days. </p>
+ * <p>Represents a rule how to find a non-business day. </p>
  *
  * @author  Meno Hochschild
  * @see     DateInterval#streamExcluding(Predicate)
