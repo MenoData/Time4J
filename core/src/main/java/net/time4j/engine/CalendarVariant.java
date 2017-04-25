@@ -141,6 +141,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      *
      * @param   variant     name of new variant
      * @return  copy of this instance with equal epoch-day-value but different variant
+     * @throws  ChronoException if given variant is not supported
      * @since   3.14/4.11
      */
     /*[deutsch]
@@ -151,6 +152,7 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
      *
      * @param   variant     name of new variant
      * @return  copy of this instance with equal epoch-day-value but different variant
+     * @throws  ChronoException if given variant is not supported
      * @since   3.14/4.11
      */
     public D withVariant(String variant) {

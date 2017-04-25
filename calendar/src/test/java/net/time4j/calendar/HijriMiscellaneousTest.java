@@ -3,6 +3,7 @@ package net.time4j.calendar;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.calendar.service.GenericDatePatterns;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -55,6 +56,12 @@ public class HijriMiscellaneousTest {
     @Test
     public void defaultFirstDayOfWeek() {
         assertThat(HijriCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
+    }
+
+    @Test(expected=ChronoException.class)
+    public void withVariantInvalid() {
+        HijriCalendar hijri = HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 5);
+        hijri.withVariant("invalid");
     }
 
 }
