@@ -75,7 +75,7 @@ public final class DateInterval
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * Constant for a date interval from infinite past to infinitefuture.
+     * Constant for a date interval from infinite past to infinite future.
      */
     /*[deutsch]
      * Konstante f&uuml;r ein Datumsintervall, das von der unbegrenzten Vergangenheit

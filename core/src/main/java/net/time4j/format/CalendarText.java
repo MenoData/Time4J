@@ -22,6 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.base.ResourceLoader;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
@@ -1177,8 +1178,11 @@ public final class CalendarText {
      */
     static String extractCalendarType(Chronology<?> chronology) {
 
-        CalendarType ft =
-            chronology.getChronoType().getAnnotation(CalendarType.class);
+        while (chronology instanceof BridgeChronology) {
+            chronology = chronology.preparser();
+        }
+
+        CalendarType ft = chronology.getChronoType().getAnnotation(CalendarType.class);
         return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
 
     }

@@ -357,9 +357,10 @@ public final class ChronoFormatter<T>
             ChronoElement<?> element = step.getProcessor().getElement();
             Chronology<?> c = this.chronology;
 
-            if (c instanceof BridgeChronology) {
+            while (c instanceof BridgeChronology) {
                 c = c.preparser();
             }
+
             if (c == Moment.axis()) {
                 c = c.preparser();
             }
