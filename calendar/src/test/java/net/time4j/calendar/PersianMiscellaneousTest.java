@@ -105,10 +105,13 @@ public class PersianMiscellaneousTest {
     @Test
     public void formatGenericCalendar() {
         Locale loc = Locale.forLanguageTag("de-IR-u-ca-persian");
-        System.out.println(loc);
-        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofCalendarPattern("G y MMMM d, EEEE", loc);
+        System.out.println(loc); // de_IR_#u-ca-persian
+        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofGenericCalendarPattern("G y MMMM d, EEEE", loc);
         PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
+        PlainDate gregorian = jalali.transform(PlainDate.class);
         assertThat(formatter.format(jalali), is("AP 1393 Farwardin 10, Sonntag"));
+        assertThat(formatter.format(gregorian), is("AP 1393 Farwardin 10, Sonntag"));
+        assertThat(formatter.with(Locale.US).format(jalali), is("AD 2014 March 30, Sunday")); // converted to gregorian
     }
 
     @Test
