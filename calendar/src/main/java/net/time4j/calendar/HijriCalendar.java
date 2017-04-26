@@ -367,7 +367,7 @@ public final class HijriCalendar
         Map<String, EraYearMonthDaySystem<HijriCalendar>> calsys = new VariantMap();
         calsys.put(VARIANT_UMALQURA, AstronomicalHijriData.UMALQURA);
         for (HijriAlgorithm algo : HijriAlgorithm.values()) {
-            calsys.put(algo.getVariant(), algo.getCalendarSystem());
+            calsys.put(algo.getVariant(), algo.getCalendarSystem(0));
         }
         CALSYS = calsys;
 
@@ -1415,10 +1415,24 @@ public final class HijriCalendar
                 if (key.equals(VARIANT_UMALQURA)) {
                     calsys = AstronomicalHijriData.UMALQURA;
                 } else {
-                    try {
-                        calsys = new AstronomicalHijriData(variant);
-                    } catch (IOException ioe) {
-                        return null;
+                    HijriAdjustment ha = HijriAdjustment.from(variant);
+                    String baseVariant = ha.getBaseVariant();
+
+                    for (HijriAlgorithm algo : HijriAlgorithm.values()) {
+                        if (algo.getVariant().equals(baseVariant)) {
+                            calsys = algo.getCalendarSystem(ha.getValue());
+                            break;
+                        }
+                    }
+
+                    if (calsys == null) {
+                        try {
+                            calsys = new AstronomicalHijriData(variant);
+                        } catch (ChronoException ce) {
+                            return null;
+                        } catch (IOException ioe) {
+                            return null;
+                        }
                     }
                 }
 

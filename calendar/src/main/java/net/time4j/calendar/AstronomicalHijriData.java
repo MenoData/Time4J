@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AstronomicalHijriData.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.base.MathUtils;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.EpochDays;
@@ -64,6 +65,7 @@ final class AstronomicalHijriData
     //~ Instanzvariablen --------------------------------------------------
 
     private final String variant;
+    private final int adjustment;
     private final String version;
     private final int minYear;
     private final int maxYear;
@@ -78,13 +80,17 @@ final class AstronomicalHijriData
      * <p>Creates a new instance for given variant loading its resource data. </p>
      *
      * @param   variant     name of calendar variant
+     * @throws  net.time4j.engine.ChronoException if the variant contains an invalid day adjustment
      * @throws  IOException in case of any data inconsistencies
      */
     AstronomicalHijriData(String variant) throws IOException {
         super();
 
+        HijriAdjustment ha = HijriAdjustment.from(variant);
         this.variant = variant;
-        String name = "data/" + variant.replace('-', '_') + ".data";
+        String baseVariant = ha.getBaseVariant();
+        this.adjustment = ha.getValue();
+        String name = "data/" + baseVariant.replace('-', '_') + ".data";
         URI uri = ResourceLoader.getInstance().locate("calendar", AstronomicalHijriData.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
@@ -96,8 +102,8 @@ final class AstronomicalHijriData
             Properties properties = new Properties();
             properties.load(is);
             String calendarType = properties.getProperty("type");
-            if (!variant.equals(calendarType)) {
-                throw new IOException("Wrong hijri variant: expected=" + variant + ", found=" + calendarType);
+            if (!baseVariant.equals(calendarType)) {
+                throw new IOException("Wrong hijri variant: expected=" + baseVariant + ", found=" + calendarType);
             }
             this.version = properties.getProperty("version", "1.0");
 
@@ -161,16 +167,17 @@ final class AstronomicalHijriData
     @Override
     public HijriCalendar transform(long utcDays) {
 
-        int monthStart = search(utcDays, this.firstOfMonth);
+        long realDays = MathUtils.safeAdd(utcDays, this.adjustment);
+        int monthStart = search(realDays, this.firstOfMonth);
 
         if (monthStart >= 0) {
             if (
                 (monthStart < this.firstOfMonth.length - 1)
-                || (this.firstOfMonth[monthStart] + this.lengthOfMonth[monthStart] > utcDays)
+                || (this.firstOfMonth[monthStart] + this.lengthOfMonth[monthStart] > realDays)
             ) {
                 int hyear = (monthStart / 12) + this.minYear;
                 int hmonth = (monthStart % 12) + 1;
-                int hdom = (int) (utcDays - this.firstOfMonth[monthStart] + 1);
+                int hdom = (int) (realDays - this.firstOfMonth[monthStart] + 1);
                 return HijriCalendar.of(this.variant, hyear, hmonth, hdom);
             }
         }
@@ -190,21 +197,21 @@ final class AstronomicalHijriData
         }
 
         int index = (date.getYear() - this.minYear) * 12 + date.getMonth().getValue() - 1;
-        return this.firstOfMonth[index] + date.getDayOfMonth() - 1;
+        return MathUtils.safeSubtract(this.firstOfMonth[index] + date.getDayOfMonth() - 1, this.adjustment);
 
     }
 
     @Override
     public long getMinimumSinceUTC() {
 
-        return this.minUTC;
+        return MathUtils.safeSubtract(this.minUTC, this.adjustment);
 
     }
 
     @Override
     public long getMaximumSinceUTC() {
 
-        return this.maxUTC;
+        return MathUtils.safeSubtract(this.maxUTC, this.adjustment);
 
     }
 
