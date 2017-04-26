@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriAlgorithm.java) is part of project Time4J.
  *
@@ -195,7 +195,7 @@ public enum HijriAlgorithm
 		int[] intercalaries, 
 		boolean civil
 	) {
-		this.calsys = new Transformer(variant, intercalaries, civil);
+		this.calsys = new Transformer(variant, intercalaries, civil, 0);
 
 	}
 
@@ -209,9 +209,14 @@ public enum HijriAlgorithm
 	}
 
 	// yields the calculation engine
-	EraYearMonthDaySystem<HijriCalendar> getCalendarSystem() {
+	EraYearMonthDaySystem<HijriCalendar> getCalendarSystem(int adjustment) {
 
-		return this.calsys;
+		if (adjustment == 0) {
+			return this.calsys;
+		}
+
+		HijriAdjustment ha = HijriAdjustment.of(this.getVariant(), adjustment);
+		return new Transformer(ha.getVariant(), this.calsys.intercalaries, this.calsys.civil, adjustment);
 
 	}
 
@@ -225,19 +230,22 @@ public enum HijriAlgorithm
 		private final String variant;
 		private final int[] intercalaries;
 		private final boolean civil;
+		private final int adjustment;
 
 		//~ Konstruktoren -------------------------------------------------
 
 		Transformer(
 			String variant,
 			int[] intercalaries,
-			boolean civil
+			boolean civil,
+			int adjustment
 		) {
 			super();
 
 			this.variant = variant;
 			this.intercalaries = intercalaries;
 			this.civil = civil;
+			this.adjustment = adjustment;
 
 		}
 
@@ -307,13 +315,14 @@ public enum HijriAlgorithm
 		@Override
 		public HijriCalendar transform(long utcDays) {
 
-			long start = this.getMinimumSinceUTC();
+			long realDays = Math.addExact(utcDays, this.adjustment);
+			long start = (this.civil ? START_622_07_16 : START_622_07_15);
 
-			if ((utcDays < start) || (utcDays > this.getMaximumSinceUTC())) {
+			if ((realDays < start) || (realDays > (this.civil ? CIVIL_1600_12_29 : ASTRO_1600_12_29))) {
 				throw new IllegalArgumentException("Out of supported range: " + utcDays);
 			}
 
-			long days = Math.subtractExact(utcDays, start);
+			long days = Math.subtractExact(realDays, start);
 
 			int hyear = 1;
 			int hmonth = 1;
@@ -412,21 +421,21 @@ public enum HijriAlgorithm
 			}
 
 			days += hdom;
-			return this.getMinimumSinceUTC() + days - 1;
+			return Math.subtractExact(this.getMinimumSinceUTC() + days - 1, this.adjustment);
 
 		}
 
 		@Override
 		public long getMinimumSinceUTC() {
 
-			return (this.civil ? START_622_07_16 : START_622_07_15);
+			return Math.subtractExact(this.civil ? START_622_07_16 : START_622_07_15, this.adjustment);
 
 		}
 
 		@Override
 		public long getMaximumSinceUTC() {
 
-			return (this.civil ? CIVIL_1600_12_29 : ASTRO_1600_12_29);
+			return Math.subtractExact(this.civil ? CIVIL_1600_12_29 : ASTRO_1600_12_29, this.adjustment);
 
 		}
 
