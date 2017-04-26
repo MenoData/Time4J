@@ -145,6 +145,17 @@ public class NengoTest {
     }
 
     @Test
+    public void newest() {
+        assertThat(
+            Nengo.NEWEST.getFirstRelatedGregorianYear() >= Nengo.HEISEI.getFirstRelatedGregorianYear(),
+            is(true));
+        List<Nengo> nengos = Nengo.list(Nengo.Selector.MODERN);
+        assertThat(
+            Nengo.NEWEST,
+            is(nengos.get(nengos.size() - 1))); // last nengo
+    }
+
+    @Test
     public void sanityCheck() throws IOException, ParseException {
         String path = "data/nengo.txt";
         URI uri = ResourceLoader.getInstance().locate("calendar", Nengo.class, path);

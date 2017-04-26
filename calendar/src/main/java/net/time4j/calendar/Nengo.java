@@ -305,6 +305,14 @@ public final class Nengo
     public static final Nengo HEISEI = OFFICIAL_NENGOS[226];
 
     /**
+     * <p>The newest known nengo. </p>
+     */
+    /*[deutsch]
+     * <p>Der neueste bekannte Nengo. </p>
+     */
+    public static final Nengo NEWEST = OFFICIAL_NENGOS[OFFICIAL_NENGOS.length - 1];
+
+    /**
      * Format attribute which helps to resolve possible ambivalences in parsing.
      *
      * <p>Standard value is: {@link Selector#OFFICIAL}</p>
