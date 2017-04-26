@@ -1,6 +1,7 @@
 ## [v3.32] not yet released
 ### Added
 - Japanese imperial calendar [#560]
+- Custom day adjustments on HijriCalendar [#649]
 - Make pivot-year for two-digit-years calendar-specific [#643]
 - Support for Japanese numbers [#639]
 - Improve text resource handling [#626]
