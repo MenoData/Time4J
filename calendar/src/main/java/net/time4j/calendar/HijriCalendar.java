@@ -141,6 +141,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     HijriEra
+ * @see     HijriMonth
+ * @see     HijriAlgorithm
+ * @see     HijriAdjustment
+ * @see     net.time4j.format.NumberSystem#ARABIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC_EXT
  * @since   3.5/4.3
  * @doctags.concurrency {immutable}
  */
@@ -219,6 +226,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     HijriEra
+ * @see     HijriMonth
+ * @see     HijriAlgorithm
+ * @see     HijriAdjustment
+ * @see     net.time4j.format.NumberSystem#ARABIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC_EXT
  * @since   3.5/4.3
  * @doctags.concurrency {immutable}
  */

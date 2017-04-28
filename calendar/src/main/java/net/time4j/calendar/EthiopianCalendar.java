@@ -125,6 +125,8 @@ import java.util.Locale;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     EthiopianEra
+ * @see     EthiopianMonth
  * @see     EthiopianTime
  * @see     net.time4j.format.NumberSystem#ETHIOPIC
  * @since   3.11/4.8
@@ -182,6 +184,8 @@ import java.util.Locale;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     EthiopianEra
+ * @see     EthiopianMonth
  * @see     EthiopianTime
  * @see     net.time4j.format.NumberSystem#ETHIOPIC
  * @since   3.11/4.8

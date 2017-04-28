@@ -158,6 +158,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * &quot;yy&quot; is used (but users should avoid this pattern and prefer &quot;y&quot;). </p>
  *
  * @author  Meno Hochschild
+ * @see     Nengo
+ * @see     EastAsianMonth
  * @see     NumberSystem#JAPANESE
  * @since   3.32/4.27
  * @doctags.concurrency {immutable}
@@ -232,6 +234,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * sollten trotzdem das Muster &quot;y&quot; bevorzugen). </p>
  *
  * @author  Meno Hochschild
+ * @see     Nengo
+ * @see     EastAsianMonth
  * @see     NumberSystem#JAPANESE
  * @since   3.32/4.27
  * @doctags.concurrency {immutable}
