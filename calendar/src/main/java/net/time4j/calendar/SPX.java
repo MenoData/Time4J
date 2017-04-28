@@ -73,6 +73,9 @@ final class SPX
     /** Serialisierungstyp. */
     static final int JAPANESE = 9;
 
+    /** Serialisierungstyp. */
+    static final int INDIAN = 10;
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -166,6 +169,9 @@ final class SPX
             case JAPANESE:
                 this.writeJapanese(out);
                 break;
+            case INDIAN:
+                this.writeIndian(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -219,6 +225,9 @@ final class SPX
                 break;
             case JAPANESE:
                 this.obj = this.readJapanese(in);
+                break;
+            case INDIAN:
+                this.obj = this.readIndian(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -419,6 +428,26 @@ final class SPX
         int doy = in.readInt();
         long utcDays = JapaneseCalendar.transform(relgregyear, doy);
         return JapaneseCalendar.axis().getCalendarSystem().transform(utcDays);
+
+    }
+
+    private void writeIndian(ObjectOutput out)
+        throws IOException {
+
+        IndianCalendar indian = (IndianCalendar) this.obj;
+        out.writeInt(indian.getYear());
+        out.writeByte(indian.getMonth().getValue());
+        out.writeByte(indian.getDayOfMonth());
+
+    }
+
+    private IndianCalendar readIndian(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int year = in.readInt();
+        int month = in.readByte();
+        int dom = in.readByte();
+        return IndianCalendar.of(year, month, dom);
 
     }
 

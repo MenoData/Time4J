@@ -45,6 +45,13 @@ public class MonthNameTest {
     }
 
     @Test
+    public void getDisplayNameWideIndian() {
+        assertThat(
+            IndianMonth.CHAITRA.getDisplayName(Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT),
+            is("Chaitra"));
+    }
+
+    @Test
     public void getDisplayNameShortHijri() {
         assertThat(
             HijriMonth.DHU_AL_HIJJAH.getDisplayName(Locale.ROOT, TextWidth.SHORT, OutputContext.FORMAT),
