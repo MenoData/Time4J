@@ -65,6 +65,11 @@ public class SerializationTest {
         roundtrip(JapaneseCalendar.of(Nengo.ofRelatedGregorianYear(1857), 4, EastAsianMonth.valueOf(5).withLeap(), 1));
     }
 
+    @Test
+    public void serializeIndian() throws IOException, ClassNotFoundException {
+        roundtrip(IndianCalendar.of(1912, 5, 31));
+    }
+
     private static int roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

@@ -45,6 +45,13 @@ public class MonthNameTest {
     }
 
     @Test
+    public void getDisplayNameWideIndian() {
+        assertThat(
+            IndianMonth.CHAITRA.getDisplayName(Locale.ROOT, TextWidth.WIDE, OutputContext.FORMAT),
+            is("Chaitra"));
+    }
+
+    @Test
     public void getDisplayNameShortHijri() {
         assertThat(
             HijriMonth.DHU_AL_HIJJAH.getDisplayName(Locale.ROOT, TextWidth.SHORT, OutputContext.FORMAT),
@@ -78,12 +85,12 @@ public class MonthNameTest {
         assertThat(
             EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
             is("閏7月"));
-//        assertThat(
-//            EastAsianMonth.valueOf(7).getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
-//            is("七月"));
-//        assertThat(
-//            EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.ARABIC),
-//            is("閏七月"));
+        assertThat(
+            EastAsianMonth.valueOf(7).getDisplayName(Locale.JAPANESE, NumberSystem.JAPANESE),
+            is("七月"));
+        assertThat(
+            EastAsianMonth.valueOf(7).withLeap().getDisplayName(Locale.JAPANESE, NumberSystem.JAPANESE),
+            is("閏七月"));
     }
 
 }
