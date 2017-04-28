@@ -135,6 +135,21 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *     java.util.Date d = f.parse(&quot;10/26/2016&quot;);
  * </pre>
  *
+ * <p><strong>Support for unicode extensions:</strong></p>
+ *
+ * <dl>
+ *     <dt><em>nu</em></dt>
+ *     <dd>All number systems listed in the enum {@link net.time4j.format.NumberSystem} support
+ *     the nu-extension. Example: {@code Locale.forLanguageTag(&quot;th-TH-u-nu-thai&quot;)} will use
+ *     Thai numerals in printing and parsing. Normally the number system is determined by the language
+ *     and country but the nu-extension enables to override the default. </dd>
+ *     <dt><em>ca</em></dt>
+ *     <dd>All calendars compatible with the CLDR-pattern support the ca-extension. The support is
+ *     realized by all static factory methods with the name {@code ofGenericXYZ(...)}. Example: The expression
+ *     {@code ofGenericCalendarStyle(DisplayMode.FULL, Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;))}
+ *     will use the calendar of Saudi-Arabia in printing and parsing. </dd>
+ * </dl>
+ *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
@@ -169,6 +184,23 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *     System.out.println(f.format(new java.util.Date()));
  *     java.util.Date d = f.parse(&quot;10/26/2016&quot;);
  * </pre>
+ *
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-Erweiterungen:</strong></p>
+ *
+ * <dl>
+ *     <dt><em>nu</em></dt>
+ *     <dd>Alle Zahlsysteme, die im Enum {@link net.time4j.format.NumberSystem} definiert sind,
+ *     unterst&uuml;tzen die nu-Erweiterung. Beispiel:
+ *     {@code Locale.forLanguageTag(&quot;th-TH-u-nu-thai&quot;)} wird Thai-Numerale in der Ausgabe und
+ *     Interpretation verwenden. Normalerweise wird das Zahlsystem durch die Sprache und das Land
+ *     bestimmt, aber die nu-Erweiterung kann die Vorgabe &uuml;berschreiben. </dd>
+ *     <dt><em>ca</em></dt>
+ *     <dd>Alle Kalender, die kompatibel mit der CLDR-Formatmusterdefinition sind, unterst&uuml;tzen die
+ *     ca-Erweiterung. Die Unterst&uuml;tzung erfolgt mit Hilfe von statischen Fabrikmethoden, deren Namen
+ *     mit {@code ofGenericXYZ(...)} beginnen. Beispiel: Der Ausdruck
+ *     {@code ofGenericCalendarStyle(DisplayMode.FULL, Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;))}
+ *     wird den Kalender von Saudi-Arabien in der Ausgabe und Interpretation verwenden. </dd>
+ * </dl>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
