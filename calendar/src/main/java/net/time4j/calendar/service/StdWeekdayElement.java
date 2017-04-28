@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdWeekdayElement.java) is part of project Time4J.
  *
@@ -44,7 +44,11 @@ public final class StdWeekdayElement<T extends ChronoEntity<T>>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    //private static final long serialVersionUID = -2452569351302286113L;
+    private static final long serialVersionUID = -84764920511581480L;
+
+    //~ Instanzvariablen --------------------------------------------------
+
+    private transient final Weekmodel model;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -52,14 +56,21 @@ public final class StdWeekdayElement<T extends ChronoEntity<T>>
      * <p>Standard constructor. </p>
      *
      * @param   chrono      chronological type which registers this element
+     * @param   model       default week model
      */
     /*[deutsch]
      * <p>Standard-Konstruktor. </p>
      *
      * @param   chrono      chronological type which registers this element
+     * @param   model       default week model
      */
-    public StdWeekdayElement(Class<T> chrono) {
+    public StdWeekdayElement(
+        Class<T> chrono,
+        Weekmodel model
+    ) {
         super("DAY_OF_WEEK", chrono, Weekday.class, 'E');
+
+        this.model = model;
 
     }
 
@@ -68,34 +79,33 @@ public final class StdWeekdayElement<T extends ChronoEntity<T>>
     @Override
     public Weekday getDefaultMinimum() {
 
-        return Weekday.SUNDAY;
+        return this.model.getFirstDayOfWeek();
 
     }
 
     @Override
     public Weekday getDefaultMaximum() {
 
-        return Weekday.SATURDAY;
+        return this.model.getFirstDayOfWeek().roll(6);
 
     }
 
     @Override
     public int numerical(Weekday value) {
 
-        return value.getValue(Weekmodel.of(Weekday.SUNDAY, 1));
+        return value.getValue(this.model);
 
     }
 
     @Override
     public int compare(
-        ChronoDisplay c1,
-        ChronoDisplay c2
+        ChronoDisplay o1,
+        ChronoDisplay o2
     ) {
 
-        Weekmodel model = Weekmodel.of(Weekday.SUNDAY, 1);
-        int d1 = c1.get(this).getValue(model);
-        int d2 = c2.get(this).getValue(model);
-        return d1 - d2;
+        int i1 = o1.get(this).getValue(this.model);
+        int i2 = o2.get(this).getValue(this.model);
+        return ((i1 < i2) ? -1 : ((i1 == i2) ? 0 : 1));
 
     }
 

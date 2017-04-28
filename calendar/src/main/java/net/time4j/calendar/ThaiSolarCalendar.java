@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ThaiSolarCalendar.java) is part of project Time4J.
  *
@@ -221,16 +221,22 @@ public final class ThaiSolarCalendar
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the calendar week
      * as starting on Sunday. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die
      * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, ThaiSolarCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<>(ThaiSolarCalendar.class);
+        new StdWeekdayElement<>(ThaiSolarCalendar.class, getDefaultWeekmodel());
 
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final EraYearMonthDaySystem<ThaiSolarCalendar> CALSYS;
@@ -1157,6 +1163,13 @@ public final class ThaiSolarCalendar
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.MIDNIGHT;
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return PlainDate.axis().getDefaultPivotYear() + 543;
 
         }
 

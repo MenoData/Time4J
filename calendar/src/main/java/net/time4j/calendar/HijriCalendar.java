@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriCalendar.java) is part of project Time4J.
  *
@@ -141,6 +141,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     HijriEra
+ * @see     HijriMonth
+ * @see     HijriAlgorithm
+ * @see     HijriAdjustment
+ * @see     net.time4j.format.NumberSystem#ARABIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC_EXT
  * @since   3.5/4.3
  * @doctags.concurrency {immutable}
  */
@@ -219,6 +226,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     HijriEra
+ * @see     HijriMonth
+ * @see     HijriAlgorithm
+ * @see     HijriAdjustment
+ * @see     net.time4j.format.NumberSystem#ARABIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC
+ * @see     net.time4j.format.NumberSystem#ARABIC_INDIC_EXT
  * @since   3.5/4.3
  * @doctags.concurrency {immutable}
  */
@@ -300,17 +314,25 @@ public final class HijriCalendar
      * <p>Represents the islamic day of week. </p>
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the islamic calendar week
-     * as starting on Sunday. </p>
+     * as starting on Sunday. This corresponds to Saudi-Arabia, but many islamic countries
+     * have a different week model. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(net.time4j.engine.Chronology, Weekmodel)
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den islamischen Tag der Woche. </p>
      *
      * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die islamische
-     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. </p>
+     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt. Das entspricht Saudi-Arabien, aber viele
+     * islamische L&auml;nder haben ein abweichendes Wochenmodell. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     @FormattableElement(format = "E")
     public static final StdCalendarElement<Weekday, HijriCalendar> DAY_OF_WEEK =
-        new StdWeekdayElement<>(HijriCalendar.class);
+        new StdWeekdayElement<>(HijriCalendar.class, getDefaultWeekmodel());
 
     /**
      * The name of Umm-al-qura-variant.
@@ -363,7 +385,7 @@ public final class HijriCalendar
         Map<String, EraYearMonthDaySystem<HijriCalendar>> calsys = new VariantMap();
         calsys.put(VARIANT_UMALQURA, AstronomicalHijriData.UMALQURA);
         for (HijriAlgorithm algo : HijriAlgorithm.values()) {
-            calsys.put(algo.getVariant(), algo.getCalendarSystem());
+            calsys.put(algo.getVariant(), algo.getCalendarSystem(0));
         }
         CALSYS = calsys;
 
@@ -807,7 +829,7 @@ public final class HijriCalendar
      */
     public Weekday getDayOfWeek() {
 
-        long utcDays = getCalendarSystem(variant).transform(this);
+        long utcDays = getCalendarSystem(this.variant).transform(this);
         return Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1);
 
     }
@@ -1411,10 +1433,22 @@ public final class HijriCalendar
                 if (key.equals(VARIANT_UMALQURA)) {
                     calsys = AstronomicalHijriData.UMALQURA;
                 } else {
-                    try {
-                        calsys = new AstronomicalHijriData(variant);
-                    } catch (IOException ioe) {
-                        return null;
+                    HijriAdjustment ha = HijriAdjustment.from(variant);
+                    String baseVariant = ha.getBaseVariant();
+
+                    for (HijriAlgorithm algo : HijriAlgorithm.values()) {
+                        if (algo.getVariant().equals(baseVariant)) {
+                            calsys = algo.getCalendarSystem(ha.getValue());
+                            break;
+                        }
+                    }
+
+                    if (calsys == null) {
+                        try {
+                            calsys = new AstronomicalHijriData(variant);
+                        } catch (ChronoException | IOException ex) {
+                            return null;
+                        }
                     }
                 }
 
@@ -1922,6 +1956,13 @@ public final class HijriCalendar
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.EVENING;
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return HijriCalendar.nowInSystemTime(HijriAlgorithm.WEST_ISLAMIC_CIVIL,StartOfDay.MIDNIGHT).getYear() + 20;
 
         }
 

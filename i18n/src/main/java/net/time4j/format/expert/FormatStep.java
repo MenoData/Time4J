@@ -27,7 +27,7 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
-import net.time4j.history.internal.HistorizedElement;
+import net.time4j.format.internal.DualFormatElement;
 
 import java.io.IOException;
 import java.util.LinkedHashSet;
@@ -706,7 +706,7 @@ final class FormatStep {
             return fp;
         } else if (
             (fp.getElement().getType() != element.getType())
-            && !(element instanceof HistorizedElement)
+            && !(element instanceof DualFormatElement)
         ) {
             throw new IllegalArgumentException(
                 "Cannot change element value type: " + element.name());

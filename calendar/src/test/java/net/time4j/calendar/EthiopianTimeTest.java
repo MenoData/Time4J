@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.Meridiem;
 import net.time4j.PlainTime;
+import net.time4j.SystemClock;
 import net.time4j.format.Leniency;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
@@ -404,6 +405,11 @@ public class EthiopianTimeTest {
         assertThat(
             f.parse("6:30 እኩለ ሌሊት").toISO(),
             is(PlainTime.of(0, 30)));
+    }
+
+    @Test
+    public void nowInSystemTime() {
+        assertThat(EthiopianTime.nowInSystemTime(), is(SystemClock.inLocalView().now(EthiopianTime.axis())));
     }
 
 }

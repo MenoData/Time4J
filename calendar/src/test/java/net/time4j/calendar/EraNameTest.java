@@ -128,4 +128,14 @@ public class EraNameTest {
             is("BE"));
     }
 
+    @Test
+    public void getDisplayNameIndian() {
+        assertThat(
+            IndianEra.SAKA.getDisplayName(Locale.ENGLISH),
+            is("Saka"));
+        assertThat(
+            IndianEra.SAKA.getDisplayName(new Locale("hi", "IN")),
+            is("शक"));
+    }
+
 }

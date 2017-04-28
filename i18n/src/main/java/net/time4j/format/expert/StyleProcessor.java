@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StyleProcessor.java) is part of project Time4J.
  *
@@ -26,6 +26,8 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.BridgeChronology;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
@@ -101,8 +103,8 @@ final class StyleProcessor<T>
         boolean quickPath
     ) throws IOException {
 
-        Set<ElementPosition> newPositions =
-            this.formatter.print(formattable, buffer, attributes, positions != null);
+        ChronoFormatter<T> cf = this.getFormatter(attributes, quickPath);
+        Set<ElementPosition> newPositions = cf.print(formattable, buffer, attributes, positions != null);
 
         if (positions != null) {
             positions.addAll(newPositions);
@@ -119,30 +121,7 @@ final class StyleProcessor<T>
         boolean quickPath
     ) {
 
-        ChronoFormatter<T> cf;
-
-        if (quickPath) {
-            cf = this.formatter;
-        } else {
-            AttributeQuery internal = this.formatter.getAttributes();
-            TransitionStrategy strategy =
-                attributes.get(
-                    Attributes.TRANSITION_STRATEGY,
-                    internal.get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY));
-            TZID tzid =
-                attributes.get(
-                    Attributes.TIMEZONE_ID,
-                    internal.get(Attributes.TIMEZONE_ID, null));
-            Timezone tz = ((tzid == null) ? null : Timezone.of(tzid).with(strategy));
-            cf = createFormatter(
-                this.formatter.getChronology(),
-                this.dateStyle,
-                this.timeStyle,
-                attributes.get(Attributes.LANGUAGE, this.formatter.getLocale()),
-                attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
-                tz);
-        }
-
+        ChronoFormatter<T> cf = this.getFormatter(attributes, quickPath);
         T result = cf.parse(text, status, attributes);
 
         if (!status.isError() && (result != null)) {
@@ -240,6 +219,51 @@ final class StyleProcessor<T>
 
     }
 
+    /**
+     * <p>Supports changing the locale. </p>
+     *
+     * @return  date style
+     * @since   4.27
+     */
+    DisplayStyle getDateStyle() {
+
+        return this.dateStyle;
+
+    }
+
+    private ChronoFormatter<T> getFormatter(
+        AttributeQuery attributes,
+        boolean quickPath
+    ) {
+
+        ChronoFormatter<T> cf;
+
+        if (quickPath) {
+            cf = this.formatter;
+        } else {
+            AttributeQuery internal = this.formatter.getAttributes();
+            TransitionStrategy strategy =
+                attributes.get(
+                    Attributes.TRANSITION_STRATEGY,
+                    internal.get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY));
+            TZID tzid =
+                attributes.get(
+                    Attributes.TIMEZONE_ID,
+                    internal.get(Attributes.TIMEZONE_ID, null));
+            Timezone tz = ((tzid == null) ? null : Timezone.of(tzid).with(strategy));
+            cf = createFormatter(
+                this.formatter.getChronology(),
+                this.dateStyle,
+                this.timeStyle,
+                attributes.get(Attributes.LANGUAGE, this.formatter.getLocale()),
+                attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
+                tz);
+        }
+
+        return cf;
+
+    }
+
     @SuppressWarnings("unchecked")
     private static <T> ChronoFormatter<T> createFormatter(
         Chronology<?> chronology,
@@ -260,6 +284,17 @@ final class StyleProcessor<T>
             pattern = CalendarText.patternForTimestamp((DisplayMode) dateStyle, (DisplayMode) timeStyle, locale);
         } else if (chronology.equals(Moment.axis())) {
             pattern = CalendarText.patternForMoment((DisplayMode) dateStyle, (DisplayMode) timeStyle, locale);
+        } else if (chronology.getChronoType() == CalendarDate.class) {
+            Chronology<?> c = chronology;
+            while (c instanceof BridgeChronology) {
+                c = c.preparser();
+            }
+            if (LocalizedPatternSupport.class.isAssignableFrom(c.getChronoType())) {
+                assert (dateStyle == timeStyle);
+                pattern = c.getFormatPattern(dateStyle, locale);
+            } else {
+                throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
+            }
         } else if (LocalizedPatternSupport.class.isAssignableFrom(chronology.getChronoType())) {
             assert (dateStyle == timeStyle);
             pattern = chronology.getFormatPattern(dateStyle, locale);
@@ -269,6 +304,10 @@ final class StyleProcessor<T>
 
         if (fourDigitYear && pattern.contains("yy") && !pattern.contains("yyy")) {
             pattern = pattern.replace("yy", "yyyy");
+        }
+
+        if (chronology.getChronoType() == CalendarDate.class) {
+            return (ChronoFormatter<T>) ChronoFormatter.ofGenericCalendarPattern(pattern, locale);
         }
 
         ChronoFormatter<?> cf = ChronoFormatter.ofPattern(pattern, PatternType.CLDR, locale, chronology);

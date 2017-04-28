@@ -1,9 +1,34 @@
-## [v4.26] not yet released
+## [v4.28] not yet released
+
+## [v4.27] published on 2017-04-28
 ### Added
-- Make zone offset calculation for geo-longitude more precise [#622]
-- Enable text-lookup for non-enum elements in formatting [#618]
+- Japanese imperial calendar [#560]
+- Indian national calendar (Saka) [#642]
+- Custom day adjustments on HijriCalendar [#649]
+- Make pivot-year for two-digit-years calendar-specific [#643]
+- Support for Japanese numbers [#639]
+- Improve text resource handling [#626]
+- Method nowInSystemTime() for `AnnualDate` and `EthiopianTime` [#646]
+- Enable calendar lookup by names [#614]
+- Make transformation between calendar dates easier [#648]
 
 ### Fixed
+- DAY_OF_WEEK-element in some calendars inconsistent [#644]
+- Clarify usage of Ethiopian eras [#636]
+- TransitionHistory.getPreviousTransition() has improper description [#637]
+- Roundtrip of print/parse during zone offset overlap fails [#635]
+- Converting geo longitude to ZonalOffset crashes [#632]
+
+## [v4.26] published on 2017-03-27
+### Added
+- Add ALWAYS-constant to DateInterval [#630]
+- Assignment of values to intervals [#629]
+- Make zone offset calculation for geo-longitude more precise [#622]
+- Enable text-lookup for non-enum elements in formatting [#618]
+- Support for Ewe language [#625]
+
+### Fixed
+- NPE in IntervalTree containing interval with infinite end [#627]
 - ZonalDateTime.toString() should not contain UTC-literal [#623]
 
 ## [v4.25] published on 2017-02-22

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.base.ResourceLoader;
+import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
@@ -223,6 +224,7 @@ public final class CalendarText {
 
     // Allgemeine Textformen spezifisch für eine Chronologie
     private final Map<String, String> textForms;
+    private final String calendarType;
     private final Locale locale;
     private final MissingResourceException mre;
 
@@ -259,9 +261,7 @@ public final class CalendarText {
             for (OutputContext oc : OutputContext.values()) {
                 qo.put(
                     oc,
-                    new TextAccessor(
-                        p.quarters(calendarType, locale, tw, oc),
-                        locale));
+                    new TextAccessor(p.quarters(calendarType, locale, tw, oc)));
             }
             qt.put(tw, qo);
         }
@@ -276,9 +276,7 @@ public final class CalendarText {
             for (OutputContext oc : OutputContext.values()) {
                 wo.put(
                     oc,
-                    new TextAccessor(
-                        p.weekdays(calendarType, locale, tw, oc),
-                        locale));
+                    new TextAccessor(p.weekdays(calendarType, locale, tw, oc)));
             }
             wt.put(tw, wo);
         }
@@ -290,7 +288,7 @@ public final class CalendarText {
         for (TextWidth tw : TextWidth.values()) {
             et.put(
                 tw,
-                new TextAccessor(p.eras(calendarType, locale, tw), locale));
+                new TextAccessor(p.eras(calendarType, locale, tw)));
         }
 
         this.eras = Collections.unmodifiableMap(et);
@@ -303,9 +301,7 @@ public final class CalendarText {
             for (OutputContext oc : OutputContext.values()) {
                 mo.put(
                     oc,
-                    new TextAccessor(
-                        p.meridiems(calendarType, locale, tw, oc),
-                        locale));
+                    new TextAccessor(p.meridiems(calendarType, locale, tw, oc)));
             }
             mt.put(tw, mo);
         }
@@ -331,6 +327,7 @@ public final class CalendarText {
         }
 
         this.textForms = Collections.unmodifiableMap(map);
+        this.calendarType = calendarType;
         this.locale = locale;
         this.mre = tmpMre;
 
@@ -432,10 +429,7 @@ public final class CalendarText {
             } else {
                 // ServiceLoader-Mechanismus (Suche nach externen Providern)
                 for (TextProvider tmp : ResourceLoader.getInstance().services(TextProvider.class)) {
-                    if (
-                        isCalendarTypeSupported(tmp, calendarType)
-                        && isLocaleSupported(tmp, locale)
-                    ) {
+                    if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
                         p = tmp;
                         break;
                     }
@@ -445,10 +439,7 @@ public final class CalendarText {
                 if (p == null) {
                     TextProvider tmp = JDK_PROVIDER;
 
-                    if (
-                        isCalendarTypeSupported(tmp, calendarType)
-                        && isLocaleSupported(tmp, locale)
-                    ) {
+                    if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
                         p = tmp;
                     }
 
@@ -914,7 +905,7 @@ public final class CalendarText {
             }
         }
 
-        return new TextAccessor(tfs, this.locale);
+        return new TextAccessor(tfs);
 
     }
 
@@ -1136,15 +1127,15 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields the name of the internal {@link TextProvider}. </p>
+     * <p>Yields the name of the internal {@link TextProvider} in conjunction with the configuring locale. </p>
      */
     /*[deutsch]
-     * <p>Liefert den Namen des internen {@link TextProvider}. </p>
+     * <p>Liefert den Namen des internen {@link TextProvider} in Verbindung mit der konfigurierenden Sprache. </p>
      */
     @Override
     public String toString() {
 
-        return this.provider;
+        return this.provider + "(" + this.calendarType + "/" + this.locale + ")";
 
     }
 
@@ -1198,8 +1189,11 @@ public final class CalendarText {
      */
     static String extractCalendarType(Chronology<?> chronology) {
 
-        CalendarType ft =
-            chronology.getChronoType().getAnnotation(CalendarType.class);
+        while (chronology instanceof BridgeChronology) {
+            chronology = chronology.preparser();
+        }
+
+        CalendarType ft = chronology.getChronoType().getAnnotation(CalendarType.class);
         return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
 
     }
@@ -1239,44 +1233,12 @@ public final class CalendarText {
                         p.months(calendarType, locale, tw, oc, false);
                     usesDifferentLeapForm = !Arrays.equals(std, ls);
                 }
-                mo.put(oc, new TextAccessor(ls, locale));
+                mo.put(oc, new TextAccessor(ls));
             }
             mt.put(tw, mo);
         }
 
         return ((!leapForm || usesDifferentLeapForm) ? mt : null);
-
-    }
-
-    private static boolean isCalendarTypeSupported(
-        TextProvider p,
-        String calendarType
-    ) {
-
-        for (String c : p.getSupportedCalendarTypes()) {
-            if (c.equals(calendarType)) {
-                return true;
-            }
-        }
-
-        return false;
-
-    }
-
-    private static boolean isLocaleSupported(
-        TextProvider p,
-        Locale locale
-    ) {
-
-        String lang = locale.getLanguage();
-
-        for (Locale l : p.getAvailableLocales()) {
-            if (lang.equals(l.getLanguage())) {
-                return true;
-            }
-        }
-
-        return false;
 
     }
 
@@ -1404,6 +1366,28 @@ public final class CalendarText {
         implements TextProvider {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean supportsCalendarType(String calendarType) {
+
+            return ISO_CALENDAR_TYPE.equals(calendarType);
+
+        }
+
+        @Override
+        public boolean supportsLanguage(Locale language) {
+
+            String lang = language.getLanguage();
+
+            for (Locale test : DateFormatSymbols.getAvailableLocales()) {
+                if (test.getLanguage().equals(lang)) {
+                    return true;
+                }
+            }
+
+            return false;
+
+        }
 
         @Override
         public String[] getSupportedCalendarTypes() {
@@ -1570,6 +1554,20 @@ public final class CalendarText {
         implements TextProvider {
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean supportsCalendarType(String calendarType) {
+
+            return true;
+
+        }
+
+        @Override
+        public boolean supportsLanguage(Locale language) {
+
+            return true;
+
+        }
 
         @Override
         public String[] getSupportedCalendarTypes() {

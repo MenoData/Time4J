@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2017-02-22 the version v4.25 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
+On 2017-04-28 the version v4.27 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
 
 - **time4j-olson** contains predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
 - **time4j-tzdata** is the timezone repository of Time4J based on the IANA-TZDB
@@ -127,12 +127,25 @@ d) **Temporal arithmetic**: Another way of manipulation is date/time-arithmetic 
 
 e) **Global versus local**: Time4J rejects the design idea of JSR-310 to separate between "machine time" and "human time". This is considered as artificial. So all four basic types offer both aspects in one. For example a calendar date is simultaneously a human time consisting of several meaningful elements like year, month etc. and also a kind of machine or technical time counter because you can define a single incrementing number represented by julian days. In a similar way a UTC-moment has both a technical counter (the number of SI-seconds since UTC-epoch) AND a human representation visible in its canonical output produced by `toString()`-method (example: 2014-04-21T19:45:30Z). However, Time4J emphasizes the difference between local and global types. Conversion between these types always require a timezone or an offset.
 
-f) **Internationalization**: Time4J defines its own i18n-resources for many languages (**85 languages in version 4.25**) in order to defend its i18n-behaviour against poor or insufficient platform resources (which only serve as fallback). Especially localized formatting of durations is not a supported feature on any platform, so Time4J fills an important gap.
+f) **Internationalization**: Time4J defines its own i18n-resources for many languages (**86 languages in version 4.27**) in order to defend its i18n-behaviour against poor or insufficient platform resources (which only serve as fallback). Especially localized formatting of durations is not a supported feature on any platform, so Time4J fills an important gap.
 
 g) **Powerful format engine**: The built-in format engine located in format/expert-package offers overwhelmingly many features, general interfaces for customization and outstanding parsing performance (better than in Joda-Time or JSR-310).
 
-Plans for next releases:
+Support for alternative calendars:
 ----------------------------------
+
+- Coptic
+- Ethiopian (including support for Ethiopian time)
+- Hijri (Islamic) with a lot of customizable variants
+- Indian national (Saka)
+- Japanese (including lunisolar part since AD 701)
+- Julian
+- Minguo (Taiwan)
+- Persian (3000 years)
+- ThaiSolar (Suriyakati), also valid before 1941
+
+Plans for next releases:
+------------------------
 
 There are no fixed predictions when some features will be introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/milestones.
 

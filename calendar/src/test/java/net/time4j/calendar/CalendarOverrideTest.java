@@ -86,13 +86,27 @@ public class CalendarOverrideTest {
     }
 
     @Test
-    public void printEthiopian() {
+    public void printEthiopian1() {
         ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
         ChronoFormatter<Moment> f =
             ChronoFormatter.setUpWithOverride(Locale.ENGLISH, EthiopianCalendar.axis())
                 .addPattern("G, yyyy-MM-dd hh:mm a XXX", PatternType.CLDR)
                 .build()
                 .withTimezone(offset);
+        Moment m = PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset);
+        assertThat(
+            f.format(m),
+            is("Amete Mihret, 2008-03-09 09:45 pm +03:00"));
+    }
+
+    @Test
+    public void printEthiopian2() {
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.ofGenericMomentPattern(
+                "G, yyyy-MM-dd hh:mm a XXX",
+                Locale.forLanguageTag("en-US-u-ca-ethiopic")
+            ).withTimezone(offset);
         Moment m = PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset);
         assertThat(
             f.format(m),
@@ -138,6 +152,22 @@ public class CalendarOverrideTest {
         assertThat(
             EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 1997, EthiopianMonth.TEKEMT, 11),
             is(PlainDate.of(2004, 10, 21).transform(EthiopianCalendar.class)));
+    }
+
+    @Test
+    public void parseEthiopian3() throws ParseException {
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.ofGenericMomentPattern(
+                "G, yyyy-MM-dd hh:mm a XXX",
+                Locale.ENGLISH
+            )
+            .withTimezone(offset)
+            .with(Locale.forLanguageTag("en-US-u-ca-ethiopic"));
+        assertThat(
+            f.parse("Amete Mihret, 2008-03-09 09:45 pm +03:00"),
+            is(PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset))
+        );
     }
 
     @Test

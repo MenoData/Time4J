@@ -33,6 +33,7 @@ import net.time4j.base.UnixTime;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BridgeChronology;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Calendrical;
@@ -46,6 +47,7 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
+import net.time4j.engine.FlagElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
@@ -62,11 +64,12 @@ import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
-import net.time4j.history.internal.HistorizedElement;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.OverlapResolver;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
@@ -132,6 +135,21 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *     java.util.Date d = f.parse(&quot;10/26/2016&quot;);
  * </pre>
  *
+ * <p><strong>Support for unicode extensions:</strong></p>
+ *
+ * <dl>
+ *     <dt><em>nu</em></dt>
+ *     <dd>All number systems listed in the enum {@link net.time4j.format.NumberSystem} support
+ *     the nu-extension. Example: {@code Locale.forLanguageTag(&quot;th-TH-u-nu-thai&quot;)} will use
+ *     Thai numerals in printing and parsing. Normally the number system is determined by the language
+ *     and country but the nu-extension enables to override the default. </dd>
+ *     <dt><em>ca</em></dt>
+ *     <dd>All calendars compatible with the CLDR-pattern support the ca-extension. The support is
+ *     realized by all static factory methods with the name {@code ofGenericXYZ(...)}. Example: The expression
+ *     {@code ofGenericCalendarStyle(DisplayMode.FULL, Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;))}
+ *     will use the calendar of Saudi-Arabia in printing and parsing. </dd>
+ * </dl>
+ *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
@@ -166,6 +184,23 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *     System.out.println(f.format(new java.util.Date()));
  *     java.util.Date d = f.parse(&quot;10/26/2016&quot;);
  * </pre>
+ *
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-Erweiterungen:</strong></p>
+ *
+ * <dl>
+ *     <dt><em>nu</em></dt>
+ *     <dd>Alle Zahlsysteme, die im Enum {@link net.time4j.format.NumberSystem} definiert sind,
+ *     unterst&uuml;tzen die nu-Erweiterung. Beispiel:
+ *     {@code Locale.forLanguageTag(&quot;th-TH-u-nu-thai&quot;)} wird Thai-Numerale in der Ausgabe und
+ *     Interpretation verwenden. Normalerweise wird das Zahlsystem durch die Sprache und das Land
+ *     bestimmt, aber die nu-Erweiterung kann die Vorgabe &uuml;berschreiben. </dd>
+ *     <dt><em>ca</em></dt>
+ *     <dd>Alle Kalender, die kompatibel mit der CLDR-Formatmusterdefinition sind, unterst&uuml;tzen die
+ *     ca-Erweiterung. Die Unterst&uuml;tzung erfolgt mit Hilfe von statischen Fabrikmethoden, deren Namen
+ *     mit {@code ofGenericXYZ(...)} beginnen. Beispiel: Der Ausdruck
+ *     {@code ofGenericCalendarStyle(DisplayMode.FULL, Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;))}
+ *     wird den Kalender von Saudi-Arabien in der Ausgabe und Interpretation verwenden. </dd>
+ * </dl>
  *
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
@@ -271,7 +306,7 @@ public final class ChronoFormatter<T>
                 if (ix && !ParsedValues.isIndexed(element)) {
                     ix = false;
                 }
-                if (element instanceof HistorizedElement) {
+                if (element instanceof DualFormatElement) {
                     nh = true;
                 } else if (!dp && element.name().endsWith("_DAY_PERIOD")) {
                     dp = true;
@@ -314,7 +349,7 @@ public final class ChronoFormatter<T>
 
     }
 
-    // Aufruf durch with(Locale)-Methode
+    // Aufruf durch with(Timezone)- oder with(Locale)-Methode
     private ChronoFormatter(
         ChronoFormatter<T> old,
         AttributeSet globalAttributes
@@ -352,17 +387,19 @@ public final class ChronoFormatter<T>
         List<FormatStep> copy = new ArrayList<>(old.steps);
         boolean ix = old.indexable;
 
+        Chronology<?> c = this.chronology;
+
+        while (c instanceof BridgeChronology) {
+            c = c.preparser();
+        }
+
+        if (c == Moment.axis()) {
+            c = c.preparser();
+        }
+
         for (int i = 0; i < len; i++) {
             FormatStep step = copy.get(i);
             ChronoElement<?> element = step.getProcessor().getElement();
-            Chronology<?> c = this.chronology;
-
-            if (c instanceof BridgeChronology) {
-                c = c.preparser();
-            }
-            if (c == Moment.axis()) {
-                c = c.preparser();
-            }
 
             // update extension elements
             if (
@@ -1048,9 +1085,15 @@ public final class ChronoFormatter<T>
             if (tzid != null) {
                 StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, merger.getDefaultStartOfDay());
 
-                if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
-                    TransitionStrategy strategy = attrs.get(Attributes.TRANSITION_STRATEGY);
+                if (parsed.contains(FlagElement.DAYLIGHT_SAVING)) {
+                    boolean dst = parsed.get(FlagElement.DAYLIGHT_SAVING).booleanValue();
+                    TransitionStrategy strategy =
+                        attrs
+                            .get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY)
+                            .using(dst ? OverlapResolver.EARLIER_OFFSET : OverlapResolver.LATER_OFFSET);
                     moment = tsp.in(Timezone.of(tzid).with(strategy), startOfDay);
+                } else if (attrs.contains(Attributes.TRANSITION_STRATEGY)) {
+                    moment = tsp.in(Timezone.of(tzid).with(attrs.get(Attributes.TRANSITION_STRATEGY)), startOfDay);
                 } else {
                     moment = tsp.in(Timezone.of(tzid), startOfDay);
                 }
@@ -1244,11 +1287,30 @@ public final class ChronoFormatter<T>
      *          this instance remains unaffected
      * @throws  IllegalArgumentException if an unicode extension is not recognized or supported
      */
+    @SuppressWarnings("unchecked")
     @Override
     public ChronoFormatter<T> with(Locale locale) {
 
         if (locale.equals(this.globalAttributes.getLocale())) {
             return this;
+        } else if (this.chronology.getChronoType() == CalendarDate.class) {
+            String pattern = this.globalAttributes.get(Builder.FORMAT_PATTERN, "");
+            if (pattern.isEmpty()) {
+                FormatProcessor<?> processor = this.steps.get(0).getProcessor();
+                if (processor instanceof StyleProcessor) {
+                    DisplayMode style =
+                        DisplayMode.ofStyle(
+                            StyleProcessor.class.cast(processor).getDateStyle().getStyleValue());
+                    return (ChronoFormatter<T>) ChronoFormatter.ofGenericCalendarStyle(style, locale);
+                }
+            } else {
+                return (ChronoFormatter<T>) ChronoFormatter.ofGenericCalendarPattern(pattern, locale);
+            }
+        } else if ((this.overrideHandler != null) && this.overrideHandler.isGeneric()) {
+            String pattern = this.globalAttributes.get(Builder.FORMAT_PATTERN, "");
+            if (!pattern.isEmpty()) {
+                return (ChronoFormatter<T>) ChronoFormatter.ofGenericMomentPattern(pattern, locale);
+            }
         }
 
         return new ChronoFormatter<>(this, this.globalAttributes.withLocale(locale));
@@ -2595,6 +2657,180 @@ public final class ChronoFormatter<T>
     }
 
     /**
+     * <p>Constructs a CLDR-pattern-based formatter for general calendar chronologies. </p>
+     *
+     * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
+     * chronology if available. Otherwise ISO-8601 will be used. Following example will obtain a formatter
+     * for the Persian calendar: </p>
+     *
+     * <pre>
+     *     Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
+     *     ChronoFormatter&lt;CalendarDate&gt; formatter =
+     *       ChronoFormatter.ofGenericCalendarPattern(&quot;G y MMMM d, EEEE&quot;, loc);
+     *     PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
+     *     PlainDate gregorian = jalali.transform(PlainDate.class);
+     *     assertThat(formatter.format(jalali), is(&quot;AP 1393 Farwardin 10, Sonntag&quot;));
+     *     assertThat(formatter.format(gregorian), is(&quot;AP 1393 Farwardin 10, Sonntag&quot;));
+     * </pre>
+     *
+     * <p>This example also demonstrates that the chronology will be inferred from the locale and not
+     * from the object to be formatted. However, most applications should set the chronology explicitly
+     * for performance and clarity. This method will not work for chronologies which require a pattern
+     * type deviating from CLDR, for example the Mayan calendar. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
+     * @see     #ofGenericCalendarStyle(DisplayMode, Locale)
+     * @see     #with(Locale)
+     * @see     PatternType#CLDR
+     * @see     Locale#forLanguageTag(String)
+     * @since   4.27
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r allgemeine Kalenderchronologien mit Hilfe
+     * eines CLDR-Formatmusters. </p>
+     *
+     * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
+     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet.
+     * Folgendes Beispiel wird einen Formatierer f&uuml;r den persischen Kalender liefern: </p>
+     *
+     * <pre>
+     *     Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
+     *     ChronoFormatter&lt;CalendarDate&gt; formatter =
+     *       ChronoFormatter.ofGenericCalendarPattern(&quot;G y MMMM d, EEEE&quot;, loc);
+     *     PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
+     *     PlainDate gregorian = jalali.transform(PlainDate.class);
+     *     assertThat(formatter.format(jalali), is(&quot;AP 1393 Farwardin 10, Sonntag&quot;));
+     *     assertThat(formatter.format(gregorian), is(&quot;AP 1393 Farwardin 10, Sonntag&quot;));
+     * </pre>
+     *
+     * <p>Dieses Beispiel demonstriert auch, da&szlig; die Chronologie mit Hilfe von {@code locale}
+     * ermittelt wird, statt &uuml;ber das zu formatierende Objekt. Jedoch sollten die meisten
+     * Anwendungen die Chronologie aus Gr&uuml;nden der Performance und Klarheit mit anderen Fabrikmethoden
+     * explizit setzen. Diese Methode funktioniert nicht f&uuml;r Chronologien, die einen anderen
+     * Formatmustertyp als CLDR voraussetzen, zum Beispiel der Maya-Kalender. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
+     * @see     #ofGenericCalendarStyle(DisplayMode, Locale)
+     * @see     #with(Locale)
+     * @see     PatternType#CLDR
+     * @see     Locale#forLanguageTag(String)
+     * @since   4.27
+     */
+    public static ChronoFormatter<CalendarDate> ofGenericCalendarPattern(
+        String pattern,
+        Locale locale
+    ) {
+
+        Chronology<CalendarDate> chronology = CalendarConverter.getChronology(locale);
+        return ChronoFormatter.ofPattern(pattern, PatternType.CLDR, locale, chronology);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for general calendar chronologies. </p>
+     *
+     * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
+     * chronology if available. Otherwise ISO-8601 will be used. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     #ofGenericCalendarPattern(String, Locale)
+     * @see     #with(Locale)
+     * @see     Locale#forLanguageTag(String)
+     * @since   4.27
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
+     *
+     * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
+     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     #ofGenericCalendarPattern(String, Locale)
+     * @see     #with(Locale)
+     * @see     Locale#forLanguageTag(String)
+     * @since   4.27
+     */
+    public static ChronoFormatter<CalendarDate> ofGenericCalendarStyle(
+        DisplayMode style,
+        Locale locale
+    ) {
+
+        Chronology<CalendarDate> chronology = CalendarConverter.getChronology(locale);
+        Builder<CalendarDate> builder = new Builder<>(chronology, locale);
+        builder.addProcessor(new StyleProcessor<>(style, style));
+        return builder.build();
+
+    }
+
+    /**
+     * <p>Constructs a CLDR-pattern-based formatter for universal timestamps
+     * with calendar override derived from given locale. </p>
+     *
+     * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable override
+     * chronology if available. Otherwise ISO-8601 will be used. For formatting, it is necessary to set
+     * the timezone on the built formatter. </p>
+     *
+     * @param   pattern     format pattern
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
+     * @see     #with(Locale)
+     * @see     PatternType#CLDR
+     * @see     Locale#forLanguageTag(String)
+     * @since   4.27
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen generischen Formatierer f&uuml;r universelle Zeitstempel mit Hilfe
+     * eines CLDR-Formatmusters und einer von der angegebenen Sprache abgeleiteten Kalenderchronologie. </p>
+     *
+     * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
+     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet. Zum
+     * Formatieren ist es notwendig, die Zeitzone am fertiggestellten Formatierer zu setzen.</p>
+     *
+     * @param   pattern     format pattern
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
+     * @see     #ofPattern(String, PatternType, Locale, Chronology)
+     * @see     #with(Locale)
+     * @see     PatternType#CLDR
+     * @see     Locale#forLanguageTag(String)
+     * @since   4.27
+     */
+    public static ChronoFormatter<Moment> ofGenericMomentPattern(
+        String pattern,
+        Locale locale
+    ) {
+
+        // Note: ---------------------------------------------------------------------------
+        //      Style-based formatters with override are not possible
+        //      because there are no non-iso-generic format patterns including date AND time
+        // ---------------------------------------------------------------------------------
+
+        try {
+            Chronology<CalendarDate> overrideCalendar = CalendarConverter.getChronology(locale);
+            Builder<Moment> builder = new Builder<>(Moment.axis(), locale, overrideCalendar);
+            return builder.addPattern(pattern, PatternType.CLDR).build();
+        } catch (IllegalStateException ise) {
+            throw new IllegalArgumentException(ise);
+        }
+
+    }
+
+    /**
      * <p>Constructs a builder for creating formatters. </p>
      *
      * @param   <T> generic chronological type (subtype of {@code ChronoEntity})
@@ -3341,11 +3577,11 @@ public final class ChronoFormatter<T>
             }
 
             // check tz-naming
-            if (status.getDSTInfo() != null) {
+            if (parsed.contains(FlagElement.DAYLIGHT_SAVING)) {
                 TZID tzid = parsed.getTimezone();
                 try {
                     boolean dst = Timezone.of(tzid).isDaylightSaving(ut);
-                    if (dst != status.getDSTInfo().booleanValue()) {
+                    if (dst != parsed.get(FlagElement.DAYLIGHT_SAVING).booleanValue()) {
                         StringBuilder reason = new StringBuilder(256);
                         reason.append("Conflict found: ");
                         reason.append("Parsed entity is ");
@@ -3662,8 +3898,13 @@ public final class ChronoFormatter<T>
                     return child;
                 }
             }
-        } else if (element.isDateElement() && override.isSupported(element)) {
-            return override;
+        } else if (element.isDateElement()) {
+            while (override instanceof BridgeChronology) {
+                override = override.preparser();
+            }
+            if (override.isSupported(element)) {
+                return override;
+            }
         } else if (element.isTimeElement() && PlainTime.axis().isSupported(element)) {
             return PlainTime.axis();
         }
@@ -3746,6 +3987,9 @@ public final class ChronoFormatter<T>
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
+        private static final AttributeKey<String> FORMAT_PATTERN =
+            Attributes.createKey("FORMAT_PATTERN", String.class);
+
         private static final AttributeKey<DayPeriod> CUSTOM_DAY_PERIOD =
             Attributes.createKey("CUSTOM_DAY_PERIOD", DayPeriod.class);
 
@@ -3760,6 +4004,7 @@ public final class ChronoFormatter<T>
         private int reservedIndex;
         private int leftPadWidth;
         private boolean prolepticGregorian;
+        private String pattern;
         private DayPeriod dayPeriod;
         private Map<ChronoElement<?>, Object> defaultMap;
 
@@ -3798,6 +4043,7 @@ public final class ChronoFormatter<T>
             this.reservedIndex = -1;
             this.leftPadWidth = 0;
             this.prolepticGregorian = false;
+            this.pattern = null;
             this.dayPeriod = null;
             this.defaultMap = new HashMap<>();
 
@@ -4720,6 +4966,7 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
+         * @see     #addEnglishOrdinal(ChronoElement)
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
@@ -4767,6 +5014,7 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @since   1.2
+         * @see     #addEnglishOrdinal(ChronoElement)
          * @see     Chronology#isSupported(ChronoElement)
          */
         public Builder<T> addOrdinal(
@@ -5081,6 +5329,8 @@ public final class ChronoFormatter<T>
 
             if (patternType == null) {
                 throw new NullPointerException("Missing pattern type.");
+            } else if (formatPattern.isEmpty()) {
+                throw new IllegalArgumentException("Empty format pattern.");
             }
 
             Map<ChronoElement<?>, ChronoElement<?>> replacement = Collections.emptyMap();
@@ -5184,6 +5434,8 @@ public final class ChronoFormatter<T>
                 }
             }
 
+            // ensure that pattern is only set if it is the only one
+            this.pattern = ((this.pattern == null) ? formatPattern : "");
             return this;
 
         }
@@ -6718,9 +6970,14 @@ public final class ChronoFormatter<T>
                 formatter = formatter.with(ChronoHistory.PROLEPTIC_GREGORIAN);
             }
 
-            if (this.dayPeriod != null) {
+            if ((this.dayPeriod != null) || (this.pattern != null && !this.pattern.isEmpty())) {
                 AttributeSet as = formatter.globalAttributes;
-                as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
+                if (this.pattern != null) {
+                    as = as.withInternal(FORMAT_PATTERN, this.pattern);
+                }
+                if (this.dayPeriod != null) {
+                    as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
+                }
                 formatter = new ChronoFormatter<>(formatter, as);
             }
 
@@ -7261,13 +7518,18 @@ public final class ChronoFormatter<T>
 
         private final Chronology<C> override;
         private final List<ChronoExtension> extensions;
+        private final boolean generic;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private OverrideHandler(Chronology<C> override) {
+        private OverrideHandler(
+            Chronology<C> override,
+            boolean generic
+        ) {
             super();
 
             this.override = override;
+            this.generic = generic;
 
             List<ChronoExtension> list = new ArrayList<>();
             list.addAll(this.override.getExtensions());
@@ -7278,13 +7540,38 @@ public final class ChronoFormatter<T>
 
         //~ Methoden ------------------------------------------------------
 
-        static <C> OverrideHandler<C> of(Chronology<C> override) {
+        boolean isGeneric() {
+
+            return this.generic;
+
+        }
+
+        static OverrideHandler<?> of(Chronology<?> override) {
 
             if (override == null) {
                 return null;
             }
 
-            return new OverrideHandler<>(override);
+            boolean generic = false;
+
+            while (override instanceof BridgeChronology) {
+                if (override.getChronoType() == CalendarDate.class) {
+                    generic = true;
+                }
+                override = override.preparser();
+            }
+
+            return OverrideHandler.of(override, generic);
+
+        }
+
+        // wildcard capture
+        private static <C> OverrideHandler<C> of(
+            Chronology<C> override,
+            boolean generic
+        ) {
+
+            return new OverrideHandler<>(override, generic);
 
         }
 
@@ -7329,6 +7616,13 @@ public final class ChronoFormatter<T>
         public StartOfDay getDefaultStartOfDay() {
 
             return this.override.getDefaultStartOfDay();
+
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+
+            return this.override.getDefaultPivotYear();
 
         }
 

@@ -36,6 +36,7 @@ import org.junit.runners.Suite.SuiteClasses;
         SingleUnitTest.class,
         SpanOfWeekdaysTest.class,
         TimestampIntervalFormatTest.class,
+        ValueIntervalTest.class,
         YearsTest.class
     }
 )

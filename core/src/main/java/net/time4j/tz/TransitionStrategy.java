@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionStrategy.java) is part of project Time4J.
  *
@@ -109,5 +109,28 @@ public interface TransitionStrategy {
         WallTime localTime,
         Timezone timezone
     );
+
+    /**
+     * <p>Tries to change the overlap handling. </p>
+     *
+     * <p>The default implementation does nothing. </p>
+     *
+     * @param   resolver    strategy how to handle ambivalent mappings during an offset overlap
+     * @return  possibly adjusted transition strategy
+     * @since   3.32/4.27
+     */
+    /*[deutsch]
+     * <p>Versucht, die &Uuml;bergangsstrategie f&uuml;r &Uuml;berlappungen auf dem lokalen Zeitstrahl
+     * zu &auml;ndern. </p>
+     *
+     * <p>Die Standardimplementierung macht nichts. </p>
+     *
+     * @param   resolver    strategy how to handle ambivalent mappings during an offset overlap
+     * @return  possibly adjusted transition strategy
+     * @since   3.32/4.27
+     */
+    default TransitionStrategy using(OverlapResolver resolver) {
+        return this;
+    }
 
 }
