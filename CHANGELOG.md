@@ -1,6 +1,9 @@
-## [v3.32] not yet released
+## [v3.33] not yet released
+
+## [v3.32] published on 2017-04-28
 ### Added
 - Japanese imperial calendar [#560]
+- Indian national calendar (Saka) [#642]
 - Custom day adjustments on HijriCalendar [#649]
 - Make pivot-year for two-digit-years calendar-specific [#643]
 - Support for Japanese numbers [#639]
