@@ -246,6 +246,7 @@ public final class EastAsianMonth
      * The East Asian languages Japanese, Chinese and Korean have their own special characters. </p>
      *
      * @param   locale      language setting
+     * @param   numsys      number system
      * @return  descriptive text (never {@code null})
      */
     /*[deutsch]
@@ -265,6 +266,7 @@ public final class EastAsianMonth
      * ostasiatischen Sprachen Japanisch, Chinesisch und Koreanisch haben ihre eigenen Sonderzeichen. </p>
      *
      * @param   locale      language setting
+     * @param   numsys      number system
      * @return  descriptive text (never {@code null})
      */
     public String getDisplayName(
