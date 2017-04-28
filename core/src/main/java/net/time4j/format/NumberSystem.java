@@ -446,19 +446,19 @@ public enum NumberSystem {
                 if (sen > 1) {
                     numeral.append(digits.charAt(sen - 1));
                 }
-                numeral.append('千');
+                numeral.append('\u5343');
             }
             if (hyaku >= 1) {
                 if (hyaku > 1) {
                     numeral.append(digits.charAt(hyaku - 1));
                 }
-                numeral.append('百');
+                numeral.append('\u767e');
             }
             if (ju >= 1) {
                 if (ju > 1) {
                     numeral.append(digits.charAt(ju - 1));
                 }
-                numeral.append('十');
+                numeral.append('\u5341');
             }
             if (n > 0) {
                 numeral.append(digits.charAt(n - 1));
@@ -483,7 +483,7 @@ public enum NumberSystem {
                         }
                         break;
                     case '百':
-                        if ((hyaku == 0) && sen == 0) {
+                        if ((hyaku == 0) && (sen == 0)) {
                             hyaku++;
                         } else {
                             throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);

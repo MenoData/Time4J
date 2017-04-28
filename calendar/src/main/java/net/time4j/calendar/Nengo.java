@@ -852,7 +852,7 @@ public final class Nengo
      *
      * <p>Note: If this nengo represents a nengo of northern court in the Nanboku-ch&#333; period (1336-1392) then
      * the previous nengo will be the previous one of northern court only but not of southern court. If this
-     * nengo is the first one of northern court then the previous nengo will be Genk&#333: (1391). </p>
+     * nengo is the first one of northern court then the previous nengo will be Genk&#333;: (1391). </p>
      *
      * @return  previous nengo which is only present if this nengo is not the first nengo else {@code null}
      */
@@ -862,7 +862,7 @@ public final class Nengo
      * <p>Hinweis: Wenn dieser Nengo einen Nengo des Nordhofs in der Nanboku-ch&#333;-Zeit (1336-1392)
      * repr&auml;sentiert, dann wird der vorherige Nengo ebenfalls vom Nordhof sein, aber nicht vom
      * S&uuml;dhof. Falls dieser Nengo der erste des Nordhofs ist, dann ist der vorherige
-     * der Nengo Genk&#333: (1391). </p>
+     * der Nengo Genk&#333;: (1391). </p>
      *
      * @return  previous nengo which is only present if this nengo is not the first nengo else {@code null}
      */
@@ -1009,11 +1009,11 @@ public final class Nengo
             final char c = text.charAt(i);
             char std;
             if (i == offset) { // capitalization
-                std = ((c == 'Ô') || (c == 'ô') || (c == 'ō') ? 'Ō' : Character.toUpperCase(c));
-                std = ((c == 'Û') || (c == 'û') || (c == 'ū') ? 'Ū' : std);
+                std = ((c == '\u00D4') || (c == '\u00F4') || (c == '\u014D') ? '\u014C' : Character.toUpperCase(c));
+                std = ((c == '\u00DB') || (c == '\u00FB') || (c == '\u016B') ? '\u016A' : std);
             } else {
-                std = ((c == 'Ô') || (c == 'ô') || (c == 'Ō') ? 'ō' : Character.toLowerCase(c));
-                std = ((c == 'Û') || (c == 'û') || (c == 'Ū') ? 'ū' : std);
+                std = ((c == '\u00D4') || (c == '\u00F4') || (c == '\u014C') ? '\u014D' : Character.toLowerCase(c));
+                std = ((c == '\u00DB') || (c == '\u00FB') || (c == '\u016A') ? '\u016B' : std);
             }
             std = ((c == '\'') ? '\u2019' : std); // use ’ as apostroph
             std = ((c == ' ') ? '-' : std); // use hyphen instead of space
