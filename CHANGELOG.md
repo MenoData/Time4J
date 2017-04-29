@@ -1,6 +1,7 @@
 ## [v4.28] not yet released
 
 ## [v4.27.1] published on 2017-04-29
+### Fixed
 - Setting the number system via nu-extension in locale broken [#650]
 
 ## [v4.27] published on 2017-04-28
