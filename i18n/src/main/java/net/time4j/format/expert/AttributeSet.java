@@ -397,6 +397,7 @@ final class AttributeSet
             }
 
             String code = locale.getUnicodeLocaleType("nu");
+            char zeroChar = symbols.zeroDigit;
             NumberSystem numsys;
 
             if (code == null) {
@@ -406,6 +407,9 @@ final class AttributeSet
                 for (NumberSystem ns : NumberSystem.values()) {
                     if (code.equals(ns.getCode())) {
                         numsys = ns;
+                        if (numsys.isDecimal()) {
+                            zeroChar = numsys.getDigits().charAt(0);
+                        }
                         break;
                     }
                 }
@@ -415,7 +419,7 @@ final class AttributeSet
             }
 
             builder.set(Attributes.NUMBER_SYSTEM, numsys);
-            builder.set(Attributes.ZERO_DIGIT, symbols.zeroDigit); // allow deviation
+            builder.set(Attributes.ZERO_DIGIT, zeroChar);
             builder.set(Attributes.DECIMAL_SEPARATOR, symbols.decimalSeparator);
             plus = symbols.plus;
             minus = symbols.minus;

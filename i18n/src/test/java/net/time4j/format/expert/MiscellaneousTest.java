@@ -54,6 +54,15 @@ import static org.junit.Assert.fail;
 public class MiscellaneousTest {
 
     @Test
+    public void arabicNuExtensionTest() throws ParseException {
+        String input = "الاثنين 24 أبريل 2017 - 15:00";
+        Locale locale = Locale.forLanguageTag("ar-SA-u-nu-" + NumberSystem.ARABIC.getCode());
+        ChronoFormatter<PlainTimestamp> f1 =
+            ChronoFormatter.ofTimestampPattern("EEEE d MMMM yyyy - HH:mm", PatternType.CLDR, locale);
+        assertThat(f1.parse(input), is(PlainTimestamp.of(2017, 4, 24, 15, 0)));
+    }
+
+    @Test
     public void divisionByTen() {
         for (int i = 0; i < 100; i++) {
             int expected = i / 10;
