@@ -19,25 +19,25 @@
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-core</artifactId>
-            <version>[4.28,)</version>
+            <version>4.28</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-i18n</artifactId>
-            <version>[4.28,)</version>
+            <version>4.28</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-range</artifactId>
-            <version>[4.28,)</version>
+            <version>4.28</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>net.time4j</groupId>
             <artifactId>time4j-calendar</artifactId>
-            <version>[4.28,)</version>
+            <version>4.28</version>
             <scope>compile</scope>
         </dependency>
         <dependency>
