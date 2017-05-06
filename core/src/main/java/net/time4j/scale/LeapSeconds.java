@@ -694,7 +694,7 @@ public final class LeapSeconds
 
         long epochTime = unixTime - UNIX_OFFSET;
 
-        if (unixTime <= 0) {
+        if (epochTime < 0) {
             return epochTime;
         }
 

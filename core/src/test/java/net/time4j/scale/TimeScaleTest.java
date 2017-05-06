@@ -128,6 +128,24 @@ public class TimeScaleTest {
     }
 
     @Test
+    public void getElapsedTimeTT() {
+        Moment m1971 = PlainTimestamp.of(1971, 12, 31, 23, 59, 59).with(PlainTime.MILLI_OF_SECOND, 999).atUTC();
+        Moment m1972_a = PlainTimestamp.of(1972, 1, 1, 0, 0, 0).with(PlainTime.MILLI_OF_SECOND, 1).atUTC();
+        Moment m1972_b = PlainTimestamp.of(1972, 1, 1, 0, 0, 0).with(PlainTime.MILLI_OF_SECOND, 987).atUTC();
+        assertThat(m1971.getElapsedTime(TimeScale.TT), is(42L));
+        assertThat(m1972_a.getElapsedTime(TimeScale.TT), is(42L));
+        assertThat(m1972_b.getElapsedTime(TimeScale.TT), is(43L));
+    }
+
+    @Test
+    public void getElapsedTimeUT() {
+        Moment m1971 = PlainTimestamp.of(1971, 12, 31, 23, 59, 59).with(PlainTime.MILLI_OF_SECOND, 999).atUTC();
+        Moment m1972 = PlainTimestamp.of(1972, 1, 1, 0, 0, 0).with(PlainTime.MILLI_OF_SECOND, 1).atUTC();
+        assertThat(m1971.getElapsedTime(TimeScale.UT), is(-1L));
+        assertThat(m1972.getElapsedTime(TimeScale.UT), is(-1L));
+    }
+
+    @Test
     public void getNanosecondUTC() {
         Moment utc =
             PlainTimestamp.of(
@@ -173,6 +191,24 @@ public class TimeScaleTest {
         assertThat(
             utc.getNanosecond(TimeScale.POSIX),
             is(123456789));
+    }
+
+    @Test
+    public void getNanosecondTT() {
+        Moment m1971 = PlainTimestamp.of(1971, 12, 31, 23, 59, 59).with(PlainTime.MILLI_OF_SECOND, 999).atUTC();
+        Moment m1972_a = PlainTimestamp.of(1972, 1, 1, 0, 0, 0).with(PlainTime.MILLI_OF_SECOND, 1).atUTC();
+        Moment m1972_b = PlainTimestamp.of(1972, 1, 1, 0, 0, 0).with(PlainTime.MILLI_OF_SECOND, 987).atUTC();
+        assertThat(m1971.getNanosecond(TimeScale.TT), is(242_734_838)); // approximation
+        assertThat(m1972_a.getNanosecond(TimeScale.TT), is(185_000_000));
+        assertThat(m1972_b.getNanosecond(TimeScale.TT), is(171_000_000));
+    }
+
+    @Test
+    public void getNanosecondUT() {
+        Moment m1971 = PlainTimestamp.of(1971, 12, 31, 23, 59, 59).with(PlainTime.MILLI_OF_SECOND, 999).atUTC();
+        Moment m1972 = PlainTimestamp.of(1972, 1, 1, 0, 0, 0).with(PlainTime.MILLI_OF_SECOND, 1).atUTC();
+        assertThat(m1971.getNanosecond(TimeScale.UT), is(999_000_000));
+        assertThat(m1972.getNanosecond(TimeScale.UT), is(855_482_401)); // approximation
     }
 
     @Test

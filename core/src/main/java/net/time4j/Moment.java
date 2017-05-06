@@ -274,9 +274,12 @@ public final class Moment
     private static final long POSIX_GPS_DELTA =
         POSIX_UTC_DELTA + UTC_GPS_DELTA - 9; // -9 => without leap seconds
 
-    private static final int MIO = 1000000;
-    private static final int MRD = 1000000000;
+    private static final int MIO = 1000_000;
+    private static final int MRD = 1000_000_000;
     private static final int POSITIVE_LEAP_MASK = 0x40000000;
+
+    private static final BigDecimal DECIMAL_42184 = new BigDecimal("42.184");
+    private static final BigDecimal DECIMAL_MRD = new BigDecimal(MRD);
 
     private static final long MIN_LIMIT;
     private static final long MAX_LIMIT;
@@ -689,16 +692,15 @@ public final class Moment
     @Override
     public long getElapsedTime(TimeScale scale) {
 
-        if (scale == POSIX) {
-            return this.posixTime;
-        }
-
-        long utc = this.getEpochTime();
+        long utc;
 
         switch (scale) {
+            case POSIX:
+                return this.posixTime;
             case UTC:
-                return utc;
+                return this.getEpochTime();
             case TAI:
+                utc = this.getEpochTime();
                 if (utc < 0) {
                     throw new IllegalArgumentException(
                         "TAI not supported before 1972-01-01: " + this);
@@ -706,15 +708,24 @@ public final class Moment
                     return utc + 10;
                 }
             case GPS:
+                utc = this.getEpochTime();
                 if (LeapSeconds.getInstance().strip(utc) < POSIX_GPS_DELTA) {
                     throw new IllegalArgumentException(
                         "GPS not supported before 1980-01-06: " + this);
                 } else {
-                    long gps =
-                        LeapSeconds.getInstance().isEnabled()
-                        ? utc
-                        : (utc + 9);
+                    long gps = LeapSeconds.getInstance().isEnabled() ? utc : (utc + 9);
                     return gps - UTC_GPS_DELTA;
+                }
+            case TT:
+                double ttValue = this.getTT();
+                return (long) Math.floor(ttValue);
+            case UT:
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    return (this.posixTime - POSIX_UTC_DELTA);
+                } else {
+                    PlainDate date = this.getDateUTC();
+                    double utValue = this.getTT() - TimeScale.deltaT(date.getYear(), date.getMonth());
+                    return (long) Math.floor(utValue);
                 }
             default:
                 throw new UnsupportedOperationException(
@@ -733,6 +744,8 @@ public final class Moment
     @Override
     public int getNanosecond(TimeScale scale) {
 
+        long utc;
+
         switch (scale) {
             case POSIX:
             case UTC:
@@ -745,12 +758,23 @@ public final class Moment
                     return this.getNanosecond();
                 }
             case GPS:
-                long utc = this.getEpochTime();
+                utc = this.getEpochTime();
                 if (LeapSeconds.getInstance().strip(utc) < POSIX_GPS_DELTA) {
                     throw new IllegalArgumentException(
                         "GPS not supported before 1980-01-06: " + this);
                 } else {
                     return this.getNanosecond();
+                }
+            case TT:
+                double ttValue = this.getTT();
+                return (int) ((ttValue * MRD) - (Math.floor(ttValue) * MRD));
+            case UT:
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    return this.getNanosecond();
+                } else {
+                    PlainDate date = this.getDateUTC();
+                    double utValue = this.getTT() - TimeScale.deltaT(date.getYear(), date.getMonth());
+                    return (int) ((utValue * MRD) - (Math.floor(utValue) * MRD));
                 }
             default:
                 throw new UnsupportedOperationException(
@@ -1847,6 +1871,28 @@ public final class Moment
         int nano = this.getNanosecond();
 
         return PlainTime.of(hour, minute, second, nano);
+
+    }
+
+    private double getTT() {
+
+        long utc = this.getEpochTime();
+        double ttValue;
+
+        if (utc < 0) {
+            PlainDate date = this.getDateUTC();
+            ttValue = TimeScale.deltaT(date.getYear(), date.getMonth());
+            ttValue += (this.posixTime - POSIX_UTC_DELTA);
+            ttValue += (this.getNanosecond() / (MRD * 1.0));
+        } else {
+            BigDecimal nanoPart = new BigDecimal(this.getNanosecond());
+            nanoPart = nanoPart.setScale(15, RoundingMode.UNNECESSARY);
+            nanoPart = nanoPart.divide(DECIMAL_MRD, RoundingMode.FLOOR);
+            nanoPart = nanoPart.add(DECIMAL_42184); // offset TT-UTC
+            ttValue = (utc + nanoPart.doubleValue());
+        }
+
+        return ttValue;
 
     }
 

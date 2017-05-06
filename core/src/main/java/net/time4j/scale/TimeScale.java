@@ -121,7 +121,7 @@ public enum TimeScale {
      * inclusive all leap seconds. </p>
      *
      * <p>Time4J handles all {@code UniversalTime}-timestamps before
-     * the UTC-epoch as mean solar time (UT1). The second is therefore
+     * the UTC-epoch as mean solar time (UT). The second is therefore
      * defined as the 86400th part of the mean solar day before 1972.
      * After the UTC-epoch 1972-01-01 the second is always the
      * SI-second based on atomic clocks. </p>
@@ -135,7 +135,7 @@ public enum TimeScale {
      *
      * <p>Time4J behandelt in allen {@code UniversalTime}-Implementierungen
      * Zeitangaben vor der UTC-Epoche r&uuml;ckwirkend als mittlere Sonnenzeit
-     * UT1. Vor der UTC-Epoche 1972-01-01 wird also die Sekunde als der 86400-te
+     * UT. Vor der UTC-Epoche 1972-01-01 wird also die Sekunde als der 86400-te
      * Teil des mittleren Sonnentags definiert. Danach ist die Sekunde stets
      * die SI-Sekunde auf Atomuhrzeitbasis. </p>
      *
@@ -234,38 +234,91 @@ public enum TimeScale {
      *
      * @see     #TAI
      */
-    GPS;
+    GPS,
 
-//    /**
-//     * <p>Die <i>Terrestrial Time</i> ist nicht an die Erdrotation gebunden
-//     * und ist als dynamische Zeit aus Bewegungss&auml;tzen abgeleitet
-//     * (theoretisches Ideal). </p>
-//     *
-//     * <p>Ab 1991 unter Ber&uuml;cksichtigung der H&ouml;he einer Atomuhr
-//     * relativ zur Erdoberfl&auml;che (allgemeine Relativit&auml;tstheorie)
-//     * neu definiert. Die Vorg&auml;nger ET (Ephemeris Time) und TDT
-//     * (Terrestrial Dynamic Time) sind jedoch bis in den Millisekundenbereich
-//     * hinein nahezu gleich. Time4J verwendet als N&auml;herung die Formel
-//     * TT = TDT = ET = TAI + 32,184 Sekunden. </p>
-//     *
-//     * @see     #TAI
-//     */
-//    TT,
-//
-//    /**
-//     * <p>Mittlere Sonnenzeit mit variabler erdrotationsgebundener Sekunde. </p>
-//     *
-//     * <p>UT1 wird h&auml;ufig mit UTC verwechselt, weil Schaltsekunden selten
-//     * auftreten und im zivilen Alltag mit seinen meist deutlich geringeren
-//     * Anforderungen an die Genauigkeit kaum wahrnehmbar sind. Die Abweichung
-//     * von UT1 relativ zu TT (historisch eigentlich zu ET, Differenz TT - UT1)
-//     * wird in der Astronomie als Delta-T bezeichnet und wird laufend vom IERS
-//     * ver&ouml;ffentlicht. Time4J verwendet zum Absch&auml;tzen von Delta-T
-//     * polynomiale Ausdr&uuml;cke, die auf den belgischen Astronomen Jean Meeus
-//     * zur&uuml;ckgehen und kann so begrenzt zwischen UT1 und den anderen
-//     * nicht an die Erdrotation gebundenen Zeitskalen umrechnen. </p>
-//     */
-//    UT1;
+    /**
+     * <p>The <i>Terrestrial Time</i> is not bound to the rotation of the earth
+     * and is a dynamic time derived from ephmerides (theoretical ideal). </p>
+     *
+     * <p>This standard was redefined since 1991 taking into account the altitude
+     * of an atomic clock relative to the surface of the earth. The predecessors
+     * ET (Ephemeris Time) and TDT (Terrestrial Dynamic Time) are equivalent to TT
+     * with millisecond precision. Time4J uses the approximation formula
+     * TT = TDT = ET = TAI + 32,184 SI-seconds. See also:
+     * <a href="https://en.wikipedia.org/wiki/Terrestrial_Time">Wikipedia</a>. </p>
+     *
+     * <p>Due to the uncertainty of estimating delta-T, this time scale is not
+     * supported before the year -2000. Keep also in mind that this scale is NOT
+     * always monotone for any time around the year 1972 or earlier. <strong>Users
+     * should handle this scale as approximation for those ancient times.</strong> </p>
+     *
+     * @see     #TAI
+     * @see     #deltaT(int, int)
+     */
+    /*[deutsch]
+     * <p>Die <i>Terrestrial Time</i> ist nicht an die Erdrotation gebunden
+     * und ist als dynamische Zeit aus Bewegungss&auml;tzen abgeleitet
+     * (theoretisches Ideal). </p>
+     *
+     * <p>Ab 1991 unter Ber&uuml;cksichtigung der H&ouml;he einer Atomuhr
+     * relativ zur Erdoberfl&auml;che (allgemeine Relativit&auml;tstheorie)
+     * neu definiert. Die Vorg&auml;nger ET (Ephemeris Time) und TDT
+     * (Terrestrial Dynamic Time) sind jedoch bis in den Millisekundenbereich
+     * hinein nahezu gleich. Time4J verwendet als N&auml;herung die Formel
+     * TT = TDT = ET = TAI + 32,184 SI-Sekunden. Siehe auch:
+     * <a href="https://de.wikipedia.org/wiki/Dynamische_Zeit">Wikipedia</a>. </p>
+     *
+     * <p>Wegen der Unsicherheiten in der Bestimmung von delta-T wird diese Zeitskala
+     * nicht vor dem Jahr -2000 unterst&uuml;tzt. Es ist auch zu ber&uuml;cksichtigen,
+     * da&szlig; diese Skala um das Jahr 1972 herum oder fr&uuml;her NICHT immer monoton
+     * ist. <strong>Anwender sollten daher diese Skala in jenen alten Zeiten als N&auml;herung
+     * betrachten.</strong> </p>
+     *
+     * @see     #TAI
+     * @see     #deltaT(int, int)
+     */
+    TT,
+
+    /**
+     * <p>Mean solar time with variable seconds bound to the rotation of the earth. </p>
+     *
+     * <p>UT is technically labelled as UT1 and often mixed up with UTC because leap seconds
+     * are rare events and hardly noticed in civil life. The deviation of UT relative to TT
+     * is called &quot;delta-T&quot (difference TT - UT) and is regularly published by IERS.
+     * Time4J uses polynomial expressions for the estimation of delta-T. These expressions
+     * are based on the work of the Belgian astronomer Jean Meeus and allow the limited conversion
+     * between UT and the other scales not bound to the rotation of the earth. </p>
+     *
+     * <p>Due to the uncertainty of estimating delta-T, this time scale is not
+     * supported after the year +3000. Keep also in mind that this scale is NOT
+     * monotone, especially not after the start of year 1972. <strong>Users should generally
+     * handle this scale as approximation.</strong> </p>
+     *
+     * @see     #UTC
+     * @see     #deltaT(int, int)
+     */
+    /*[deutsch]
+     * <p>Mittlere Sonnenzeit mit variabler erdrotationsgebundener Sekunde. </p>
+     *
+     * <p>UT wird technisch auch als UT1 bezeichnet und wird h&auml;ufig mit UTC verwechselt,
+     * weil Schaltsekunden selten auftreten und im zivilen Alltag mit seinen meist deutlich
+     * geringeren Anforderungen an die Genauigkeit kaum wahrnehmbar sind. Die Abweichung
+     * von UT1 relativ zu TT (historisch eigentlich zu ET, Differenz TT - UT1)
+     * wird in der Astronomie als Delta-T bezeichnet und wird laufend vom IERS
+     * ver&ouml;ffentlicht. Time4J verwendet zum Absch&auml;tzen von Delta-T
+     * polynomiale Ausdr&uuml;cke, die auf den belgischen Astronomen Jean Meeus
+     * zur&uuml;ckgehen und kann so begrenzt zwischen UT1 und den anderen
+     * nicht an die Erdrotation gebundenen Zeitskalen umrechnen. </p>
+     *
+     * <p>Wegen der Unsicherheiten in der Bestimmung von delta-T wird diese Zeitskala
+     * nicht nach dem Jahr +3000 unterst&uuml;tzt. Es ist auch zu ber&uuml;cksichtigen,
+     * da&szlig; diese Skala NICHT monoton ist, besonders nicht nach dem Start des Jahres
+     * 1972. <strong>Anwender sollten im allgemeinen diese Skala als N&auml;herung betrachten.</strong> </p>
+     *
+     * @see     #UTC
+     * @see     #deltaT(int, int)
+     */
+    UT;
 
     /**
      * <p>Estimates the delta between TT and UT1 in decimal seconds depending on given year and month. </p>
@@ -275,7 +328,7 @@ public enum TimeScale {
      *
      * @param   year    gregorian/julian year from -2000 until +3000
      * @param   month   gregorian/julian month in range 1-12
-     * @return  estimated difference deltaT = TT - UT1 in seconds
+     * @return  estimated difference deltaT = TT - UT in seconds
      * @throws  IllegalArgumentException if any parameter is out of range
      * @since   3.33/4.28
      */
@@ -288,7 +341,7 @@ public enum TimeScale {
      *
      * @param   year    gregorian/julian year from -2000 until +3000
      * @param   month   gregorian/julian month in range 1-12
-     * @return  estimated difference deltaT = TT - UT1 in seconds
+     * @return  estimated difference deltaT = TT - UT in seconds
      * @throws  IllegalArgumentException if any parameter is out of range
      * @since   3.33/4.28
      */
