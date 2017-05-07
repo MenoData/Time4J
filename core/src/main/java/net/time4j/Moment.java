@@ -692,40 +692,48 @@ public final class Moment
     @Override
     public long getElapsedTime(TimeScale scale) {
 
-        long utc;
-
         switch (scale) {
             case POSIX:
                 return this.posixTime;
             case UTC:
                 return this.getEpochTime();
             case TAI:
-                utc = this.getEpochTime();
-                if (utc < 0) {
+                long utcT = this.getEpochTime();
+                if (utcT < 0) {
                     throw new IllegalArgumentException(
                         "TAI not supported before 1972-01-01: " + this);
                 } else {
-                    return utc + 10;
+                    return utcT + 10;
                 }
             case GPS:
-                utc = this.getEpochTime();
-                if (LeapSeconds.getInstance().strip(utc) < POSIX_GPS_DELTA) {
+                long utcG = this.getEpochTime();
+                if (LeapSeconds.getInstance().strip(utcG) < POSIX_GPS_DELTA) {
                     throw new IllegalArgumentException(
                         "GPS not supported before 1980-01-06: " + this);
                 } else {
-                    long gps = LeapSeconds.getInstance().isEnabled() ? utc : (utc + 9);
+                    long gps = LeapSeconds.getInstance().isEnabled() ? utcG : (utcG + 9);
                     return gps - UTC_GPS_DELTA;
                 }
             case TT:
-                double ttValue = this.getTT();
-                return (long) Math.floor(ttValue);
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    PlainDate date = this.getDateUTC();
+                    double ttValue = TimeScale.deltaT(date.getYear(), date.getMonth());
+                    ttValue += (this.posixTime - POSIX_UTC_DELTA);
+                    ttValue += (this.getNanosecond() / (MRD * 1.0));
+                    return (long) Math.floor(ttValue);
+                } else {
+                    BigDecimal decimal = new BigDecimal(this.getNanosecond());
+                    decimal = decimal.setScale(15, RoundingMode.UNNECESSARY);
+                    decimal = decimal.divide(DECIMAL_MRD, RoundingMode.FLOOR);
+                    decimal = decimal.add(DECIMAL_42184); // offset TT-UTC
+                    decimal = decimal.add(new BigDecimal(this.getEpochTime()));
+                    return decimal.setScale(0, RoundingMode.FLOOR).longValueExact();
+                }
             case UT:
                 if (this.posixTime < POSIX_UTC_DELTA) {
                     return (this.posixTime - POSIX_UTC_DELTA);
                 } else {
-                    PlainDate date = this.getDateUTC();
-                    double utValue = this.getTT() - TimeScale.deltaT(date.getYear(), date.getMonth());
-                    return (long) Math.floor(utValue);
+                    return (long) Math.floor(this.getModernUT());
                 }
             default:
                 throw new UnsupportedOperationException(
@@ -744,8 +752,6 @@ public final class Moment
     @Override
     public int getNanosecond(TimeScale scale) {
 
-        long utc;
-
         switch (scale) {
             case POSIX:
             case UTC:
@@ -758,7 +764,7 @@ public final class Moment
                     return this.getNanosecond();
                 }
             case GPS:
-                utc = this.getEpochTime();
+                long utc = this.getEpochTime();
                 if (LeapSeconds.getInstance().strip(utc) < POSIX_GPS_DELTA) {
                     throw new IllegalArgumentException(
                         "GPS not supported before 1980-01-06: " + this);
@@ -766,14 +772,26 @@ public final class Moment
                     return this.getNanosecond();
                 }
             case TT:
-                double ttValue = this.getTT();
-                return (int) ((ttValue * MRD) - (Math.floor(ttValue) * MRD));
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    PlainDate date = this.getDateUTC();
+                    double ttValue = TimeScale.deltaT(date.getYear(), date.getMonth());
+                    ttValue += (this.posixTime - POSIX_UTC_DELTA);
+                    ttValue += (this.getNanosecond() / (MRD * 1.0));
+                    return (int) ((ttValue * MRD) - (Math.floor(ttValue) * MRD));
+                } else {
+                    BigDecimal decimal = new BigDecimal(this.getNanosecond());
+                    decimal = decimal.setScale(15, RoundingMode.UNNECESSARY);
+                    decimal = decimal.divide(DECIMAL_MRD, RoundingMode.FLOOR);
+                    decimal = decimal.add(DECIMAL_42184); // offset TT-UTC
+                    decimal = decimal.add(new BigDecimal(this.getEpochTime()));
+                    BigDecimal floor = decimal.setScale(0, RoundingMode.FLOOR);
+                    return decimal.subtract(floor).multiply(DECIMAL_MRD).intValueExact();
+                }
             case UT:
                 if (this.posixTime < POSIX_UTC_DELTA) {
                     return this.getNanosecond();
                 } else {
-                    PlainDate date = this.getDateUTC();
-                    double utValue = this.getTT() - TimeScale.deltaT(date.getYear(), date.getMonth());
+                    double utValue = this.getModernUT();
                     return (int) ((utValue * MRD) - (Math.floor(utValue) * MRD));
                 }
             default:
@@ -1718,13 +1736,11 @@ public final class Moment
                 sb.append(this.toString());
                 break;
             case TAI:
-                Moment tai = this.transformForPrint(scale);
-                sb.append(PlainTimestamp.from(tai, ZonalOffset.UTC));
-                sb.append('Z');
-                break;
             case GPS:
-                Moment gps = this.transformForPrint(scale);
-                sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
+            case TT:
+            case UT:
+                Moment adjusted = this.transformForPrint(scale);
+                sb.append(PlainTimestamp.from(adjusted, ZonalOffset.UTC));
                 sb.append('Z');
                 break;
             default:
@@ -1874,24 +1890,13 @@ public final class Moment
 
     }
 
-    private double getTT() {
+    private double getModernUT() {
 
-        long utc = this.getEpochTime();
-        double ttValue;
-
-        if (utc < 0) {
-            PlainDate date = this.getDateUTC();
-            ttValue = TimeScale.deltaT(date.getYear(), date.getMonth());
-            ttValue += (this.posixTime - POSIX_UTC_DELTA);
-            ttValue += (this.getNanosecond() / (MRD * 1.0));
-        } else {
-            BigDecimal nanoPart = new BigDecimal(this.getNanosecond());
-            nanoPart = nanoPart.setScale(15, RoundingMode.UNNECESSARY);
-            nanoPart = nanoPart.divide(DECIMAL_MRD, RoundingMode.FLOOR);
-            nanoPart = nanoPart.add(DECIMAL_42184); // offset TT-UTC
-            ttValue = (utc + nanoPart.doubleValue());
-        }
-
+        PlainDate date = this.getDateUTC();
+        double ttValue = this.getEpochTime();
+        ttValue += 42.184;
+        ttValue += (this.getNanosecond() / (MRD * 1.0));
+        ttValue -= TimeScale.deltaT(date.getYear(), date.getMonth());
         return ttValue;
 
     }
@@ -1917,12 +1922,9 @@ public final class Moment
 
     private static void checkUnixTime(long unixTime) {
 
-        if (
-            (unixTime > MAX_LIMIT)
-            || (unixTime < MIN_LIMIT)
-        ) {
+        if ((unixTime > MAX_LIMIT) || (unixTime < MIN_LIMIT)) {
             throw new IllegalArgumentException(
-                "UNIX time (UT1) out of supported range: " + unixTime);
+                "UNIX time (UT) out of supported range: " + unixTime);
         }
 
     }
@@ -1951,10 +1953,12 @@ public final class Moment
             case UTC:
                 return this;
             case TAI:
+            case TT:
+            case UT:
                 return new Moment(
-                    this.getNanosecond(),
+                    this.getNanosecond(scale),
                     Math.addExact(
-                        this.getElapsedTime(TAI),
+                        this.getElapsedTime(scale),
                         POSIX_UTC_DELTA)
                 );
             case GPS:
