@@ -8,6 +8,8 @@ import net.time4j.SI;
 import net.time4j.tz.ZonalOffset;
 
 import java.math.BigDecimal;
+import java.util.concurrent.TimeUnit;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -77,6 +79,52 @@ public class TimeScaleTest {
         assertThat(
             Moment.of(315964800L, 123456789, TimeScale.POSIX),
             is(utc));
+    }
+
+    @Test
+    public void transformTT() {
+        Moment utc =
+            PlainTimestamp.of(
+                PlainDate.of(1973, 1, 1),
+                PlainTime.of(0, 0, 0, 999_000_000)
+            ).inTimezone(ZonalOffset.UTC);
+        assertThat(
+            utc.transform(TimeScale.TT),
+            is(new BigDecimal("31622445.183000000")));
+        assertThat(
+            Moment.of(31622445, 183_000_000, TimeScale.TT),
+            is(utc));
+        Moment ut =
+            PlainTimestamp.of(
+                PlainDate.of(1971, 1, 1),
+                PlainTime.of(0, 0, 0, 0)
+            ).inTimezone(ZonalOffset.UTC);
+        assertThat(
+            ut.transform(TimeScale.TT),
+            is(new BigDecimal("-31535958.687161776")));
+        assertThat(
+            Moment.of(-31535959, 1_000_000_000 - 687_161_776, TimeScale.TT),
+            is(ut));
+    }
+
+    @Test
+    public void transformUT() {
+        Moment utc =
+            PlainDate.of(1973, 1, 1).atStartOfDay().inTimezone(ZonalOffset.UTC);
+        assertThat(
+            utc.transform(TimeScale.UT),
+            is(new BigDecimal("31622400.813081576")));
+        assertThat(
+            Moment.of(31622400, 813_081_576, TimeScale.UT),
+            is(utc));
+        Moment ut =
+            PlainDate.of(1971, 1, 1).atStartOfDay().inTimezone(ZonalOffset.UTC);
+        assertThat(
+            ut.transform(TimeScale.UT),
+            is(new BigDecimal("-31536000.000000000")));
+        assertThat(
+            Moment.of(-31536000, 0, TimeScale.UT),
+            is(ut));
     }
 
     @Test
@@ -275,6 +323,39 @@ public class TimeScaleTest {
             is("POSIX-2012-06-30T23:59:59,123456789Z"));
     }
 
+    @Test
+    public void toStringTT() {
+        Moment utc1 =
+            PlainTimestamp.of(
+                PlainDate.of(2012, 6, 30),
+                PlainTime.of(23, 59, 59, 123456789)
+            ).inTimezone(ZonalOffset.UTC).plus(1, SI.SECONDS);
+        assertThat(
+            utc1.toString(TimeScale.TT),
+            is("TT-2012-07-01T00:01:06,307456789Z"));
+        Moment utc2 =
+            PlainTimestamp.of(
+                PlainDate.of(2012, 7, 1),
+                PlainTime.of(0, 0, 0, 123456789)
+            ).inTimezone(ZonalOffset.UTC);
+        assertThat(
+            utc2.toString(TimeScale.TT),
+            is("TT-2012-07-01T00:01:07,307456789Z"));
+    }
+
+    @Test
+    public void toStringUT() {
+        Moment ut1 =
+            PlainTimestamp.of(1971, 1, 1, 0, 0, 0).with(PlainTime.NANO_OF_SECOND, 123456789).atUTC();
+        assertThat(
+            ut1.toString(TimeScale.UT),
+            is("UT-1971-01-01T00:00:00,123456789Z"));
+        Moment ut2 = Moment.of(31622400, 813_081_576, TimeScale.UT); // 1973-01-01T00:00
+        assertThat(
+            ut2.toString(TimeScale.UT),
+            is("UT-1973-01-01T00:00:00,813081576Z"));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void getElapsedTimeGPSBefore1980() {
         Moment utc =
@@ -314,5 +395,90 @@ public class TimeScaleTest {
             ).inTimezone(ZonalOffset.UTC);
         utc.getNanosecond(TimeScale.TAI);
     }
+
+//    @Test
+//    public void toStringTT1972() {
+//        Moment moment =
+//            PlainDate.of(1972, 1, 1).atStartOfDay().atUTC();
+//        System.out.println(moment.minus(1, TimeUnit.SECONDS).toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UTC));
+//
+//        System.out.println(moment.minus(1, TimeUnit.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, TimeUnit.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, TimeUnit.SECONDS).toString(TimeScale.UT));
+//    }
+//
+//    @Test
+//    public void toStringUT1972() {
+//        Moment moment =
+//            PlainDate.of(1972, 6, 30)
+//                .at(PlainTime.of(23, 59, 59))
+//                .atUTC();
+//        System.out.println(moment.toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, SI.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, SI.SECONDS).toString(TimeScale.UT));
+//    }
+//
+//    @Test
+//    public void toStringUT1977() {
+//        Moment moment =
+//            PlainDate.of(1977, 12, 31)
+//                .at(PlainTime.of(23, 59, 59))
+//                .atUTC();
+//        System.out.println(moment.toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, SI.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, SI.SECONDS).toString(TimeScale.UT));
+//    }
+//
+//    @Test
+//    public void toStringUT1998() {
+//        Moment moment =
+//            PlainDate.of(1998, 12, 31)
+//                .at(PlainTime.of(23, 59, 59))
+//                .atUTC();
+//        System.out.println(moment.toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, SI.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, SI.SECONDS).toString(TimeScale.UT));
+//    }
+//
+//    @Test
+//    public void toStringUT2005() {
+//        Moment moment =
+//            PlainDate.of(2005, 12, 31)
+//                .at(PlainTime.of(23, 59, 59))
+//                .atUTC();
+//        System.out.println(moment.toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, SI.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, SI.SECONDS).toString(TimeScale.UT));
+//    }
+//
+//    @Test
+//    public void toStringUT2008() {
+//        Moment moment =
+//            PlainDate.of(2008, 12, 31)
+//                .at(PlainTime.of(23, 59, 59))
+//                .atUTC();
+//        System.out.println(moment.toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, SI.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, SI.SECONDS).toString(TimeScale.UT));
+//    }
+//
+//    @Test
+//    public void toStringUT2012() {
+//        Moment moment =
+//            PlainDate.of(2012, 6, 30)
+//                .at(PlainTime.of(23, 59, 59))
+//                .atUTC();
+//        System.out.println(moment.toString(TimeScale.UTC));
+//        System.out.println(moment.toString(TimeScale.UT));
+//        System.out.println(moment.plus(1, SI.SECONDS).toString(TimeScale.UT));
+//        System.out.println(moment.plus(2, SI.SECONDS).toString(TimeScale.UT));
+//    }
 
 }

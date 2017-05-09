@@ -461,6 +461,34 @@ public final class Moment
                         throw new IllegalArgumentException(
                             "GPS not supported before 1980-01-06: " + elapsedTime);
                     }
+                } else if (scale == TT) {
+                    if ((elapsedTime < 42L) || ((elapsedTime == 42L) && (nanosecond < 184_000_000))) {
+                        double tt = ((double) elapsedTime) + (nanosecond / (MRD * 1.0));
+                        PlainDate date = // approximation
+                            PlainDate.of(Math.floorDiv((long) (tt - 42.184), 86400), EpochDays.UTC);
+                        double utValue = tt - TimeScale.deltaT(date.getYear(), date.getMonth());
+                        utcTime = (long) Math.floor(utValue);
+                        nanosecond = (int) ((utValue - utcTime) * MRD);
+                    } else {
+                        elapsedTime -= 42;
+                        nanosecond -= 184_000_000;
+                        if (nanosecond < 0) {
+                            elapsedTime--;
+                            nanosecond += MRD;
+                        }
+                        utcTime = elapsedTime;
+                    }
+                } else if (scale == UT) {
+                    if (elapsedTime < 0L) {
+                        utcTime = elapsedTime;
+                    } else {
+                        PlainDate date = // approximation
+                            PlainDate.of(Math.floorDiv(elapsedTime, 86400), EpochDays.UTC);
+                        double ut = ((double) elapsedTime) + (nanosecond / (MRD * 1.0));
+                        double utc = ut + TimeScale.deltaT(date.getYear(), date.getMonth()) - 42.184;
+                        utcTime = (long) Math.floor(utc);
+                        nanosecond = (int) ((utc - utcTime) * MRD);
+                    }
                 } else {
                     throw new UnsupportedOperationException(
                         "Not yet implemented: " + scale.name());
@@ -470,10 +498,7 @@ public final class Moment
                 long diff = (utcTime - ls.enhance(unix));
                 this.posixTime = unix;
 
-                if (
-                    (diff == 0)
-                    || (unix == MAX_LIMIT)
-                ) {
+                if ((diff == 0) || (unix == MAX_LIMIT)) {
                     this.fraction = nanosecond;
                 } else if (diff == 1) { // positive Schaltsekunde
                     this.fraction = (nanosecond | POSITIVE_LEAP_MASK);
@@ -1986,6 +2011,8 @@ public final class Moment
             case POSIX:
                 return this;
             case TAI:
+            case TT:
+            case UT:
                 return new Moment(
                     Math.subtractExact(
                         this.posixTime,
