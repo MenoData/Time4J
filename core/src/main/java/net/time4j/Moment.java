@@ -278,9 +278,6 @@ public final class Moment
     private static final int MRD = 1000_000_000;
     private static final int POSITIVE_LEAP_MASK = 0x40000000;
 
-    private static final BigDecimal DECIMAL_42184 = new BigDecimal("42.184");
-    private static final BigDecimal DECIMAL_MRD = new BigDecimal(MRD);
-
     private static final long MIN_LIMIT;
     private static final long MAX_LIMIT;
 
@@ -747,12 +744,11 @@ public final class Moment
                     ttValue += (this.getNanosecond() / (MRD * 1.0));
                     return (long) Math.floor(ttValue);
                 } else {
-                    BigDecimal decimal = new BigDecimal(this.getNanosecond());
-                    decimal = decimal.setScale(15, RoundingMode.UNNECESSARY);
-                    decimal = decimal.divide(DECIMAL_MRD, RoundingMode.FLOOR);
-                    decimal = decimal.add(DECIMAL_42184); // offset TT-UTC
-                    decimal = decimal.add(new BigDecimal(this.getEpochTime()));
-                    return decimal.setScale(0, RoundingMode.FLOOR).longValueExact();
+                    long tt = this.getEpochTime() + 42;
+                    if (this.getNanosecond() + 184_000_000 >= MRD) {
+                        tt++;
+                    }
+                    return tt;
                 }
             case UT:
                 if (this.posixTime < POSIX_UTC_DELTA) {
@@ -804,13 +800,11 @@ public final class Moment
                     ttValue += (this.getNanosecond() / (MRD * 1.0));
                     return (int) ((ttValue * MRD) - (Math.floor(ttValue) * MRD));
                 } else {
-                    BigDecimal decimal = new BigDecimal(this.getNanosecond());
-                    decimal = decimal.setScale(15, RoundingMode.UNNECESSARY);
-                    decimal = decimal.divide(DECIMAL_MRD, RoundingMode.FLOOR);
-                    decimal = decimal.add(DECIMAL_42184); // offset TT-UTC
-                    decimal = decimal.add(new BigDecimal(this.getEpochTime()));
-                    BigDecimal floor = decimal.setScale(0, RoundingMode.FLOOR);
-                    return decimal.subtract(floor).multiply(DECIMAL_MRD).intValueExact();
+                    int ns = this.getNanosecond() + 184_000_000;
+                    if (ns >= MRD) {
+                        ns -= MRD;
+                    }
+                    return ns;
                 }
             case UT:
                 if (this.posixTime < POSIX_UTC_DELTA) {
