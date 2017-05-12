@@ -166,9 +166,22 @@ import static net.time4j.scale.TimeScale.*;
  *     <td>1167264016<br>1167264017<br>1167264018</td>
  *     <td>2017-01-01T00:00:16.000Z<br>2017-01-01T00:00:17.000Z<br>2017-01-01T00:00:18.000Z</td>
  * </tr>
+ * <tr>
+ *     <td>TT</td>
+ *     <td>1971-12-31T23:59:17,716215710Z **)<br />(representation as UT)</td>
+ *     <td>1420156867.184<br>1420156868.184<br>1420156869.184</td>
+ *     <td>2017-01-01T00:01:07,184Z<br>2017-01-01T00:01:08,184Z<br>2017-01-01T00:01:09,184Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UT</td>
+ *     <td>1972-01-01T00:00:00,102604456Z **)<br />(representation as UTC)</td>
+ *     <td>1420156798.600<br>1420156799.600<br>1420156800.599</td>
+ *     <td>2016-12-31T23:59:58,600Z<br>2016-12-31T23:59:59,600Z<br>2017-01-01T00:00:00,599Z</td>
+ * </tr>
  * </table>
- * <p style="font-size: 0.9em;">*) This value is only virtual
+ * <p style="font-size: 0.9em;">*) This representation is only virtual
  * since TAI is really supported first at UTC epoch (10 seconds later). </p>
+ * <p style="font-size: 0.9em;">**) Approximation based on the calculation of delta-T. </p>
  * </div>
  *
  * @author      Meno Hochschild
@@ -252,9 +265,22 @@ import static net.time4j.scale.TimeScale.*;
  *     <td>1167264016<br>1167264017<br>1167264018</td>
  *     <td>2017-01-01T00:00:16.000Z<br>2017-01-01T00:00:17.000Z<br>2017-01-01T00:00:18.000Z</td>
  * </tr>
+ * <tr>
+ *     <td>TT</td>
+ *     <td>1971-12-31T23:59:17,716215710Z **)<br />(Anzeige als UT)</td>
+ *     <td>1420156867.184<br>1420156868.184<br>1420156869.184</td>
+ *     <td>2017-01-01T00:01:07,184Z<br>2017-01-01T00:01:08,184Z<br>2017-01-01T00:01:09,184Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UT</td>
+ *     <td>1972-01-01T00:00:00,102604456Z **)<br />(Anzeige als UTC)</td>
+ *     <td>1420156798.600<br>1420156799.600<br>1420156800.599</td>
+ *     <td>2016-12-31T23:59:58,600Z<br>2016-12-31T23:59:59,600Z<br>2017-01-01T00:00:00,599Z</td>
+ * </tr>
  * </table>
- * <p style="font-size: 0.9em;">*) Dieser Wert ist nur virtuell, weil TAI erst ab
+ * <p style="font-size: 0.9em;">*) Diese Anzeige ist nur virtuell, weil TAI erst ab
  * der UTC-Epoche unterst&uuml;tzt wird (10 Sekunden sp&auml;ter). </p>
+ * <p style="font-size: 0.9em;">**) N&auml;herung, die auf der Berechnung von delta-T beruht. </p>
  * </div>
  *
  * @author      Meno Hochschild

@@ -7,14 +7,13 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.tz.ZonalOffset;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
