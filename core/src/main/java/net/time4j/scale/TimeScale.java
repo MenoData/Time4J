@@ -21,8 +21,9 @@
 
 package net.time4j.scale;
 
+import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
 
-import net.time4j.PlainDate;
 
 /**
  * <p>Defines some time scales for usage both in civil life and in science. </p>
@@ -384,10 +385,23 @@ public enum TimeScale {
      * @throws  IllegalArgumentException if the date is out of range
      * @since   3.33/4.28
      */
-    public static double deltaT(PlainDate date) {
+    public static double deltaT(GregorianDate date) {
 
         int year = date.getYear();
-        double y = year + ((date.getDayOfYear() - 1.0) / (date.isLeapYear() ? 366.0 : 365.0));
+        int len = GregorianMath.isLeapYear(year) ? 366 : 365;
+        int doy = 0;
+
+        for (int m = 1, max = date.getMonth(); m < max; m++) {
+            doy += GregorianMath.getLengthOfMonth(year, m);
+        }
+
+        doy += date.getDayOfMonth();
+
+        if (doy > len) {
+            throw new IllegalArgumentException(date.toString());
+        }
+
+        double y = year + ((doy - 1.0) / len);
         return deltaT(year, y);
 
     }
