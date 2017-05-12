@@ -36,7 +36,7 @@
                         </property>
                         <property>
                             <name>net.time4j.scale.leapseconds.path</name>
-                            <value>data/leapseconds2012.data</value>
+                            <value>data/leapseconds2017.data</value>
                         </property>
                         <property>
                             <name>maven.junit.sysproperties</name>

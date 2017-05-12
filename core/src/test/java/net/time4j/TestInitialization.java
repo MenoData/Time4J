@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.scale.LeapSecondTest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -12,7 +13,7 @@ public class TestInitialization {
     public void execute() {
         System.setProperty(
             "net.time4j.scale.leapseconds.path",
-            "data/leapseconds2012.data");
+            LeapSecondTest.TEST_DATA);
         System.setProperty(
             "net.time4j.tz.repository.version",
             "2012c");
