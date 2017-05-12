@@ -396,6 +396,11 @@ public enum TimeScale {
         }
 
         doy += date.getDayOfMonth();
+
+        if (doy > len) {
+            throw new IllegalArgumentException(date.toString());
+        }
+
         double y = year + ((doy - 1.0) / len);
         return deltaT(year, y);
 
