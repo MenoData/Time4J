@@ -26,6 +26,9 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class LeapSecondTest {
 
+    // in case of change, please also update pom-file of core-module
+    public static final String TEST_DATA = "data/leapseconds2017.data";
+
     private static final int UTC_OFFSET = 2 * 365 * 86400;
     private static final long NLS_OFFSET =
         (31 + 31 + 30 + 31 + 30 + 31 + 100 * 365 + 24) * 86400L;
@@ -35,10 +38,10 @@ public class LeapSecondTest {
     public static void initNegativeLS() {
         System.setProperty(
             "net.time4j.scale.leapseconds.path",
-            "data/leapseconds2012.data");
+            TEST_DATA);
 
         LeapSeconds instance = LeapSeconds.getInstance();
-        System.out.println("Initialization => " + instance);
+        System.out.println("LS-Initialization => " + instance);
 
         if (instance.iterator().next().getDate().getYear() != 2112) {
             int year = 2112;
@@ -68,9 +71,9 @@ public class LeapSecondTest {
     @Test
     public void getCount() {
         LeapSeconds instance = LeapSeconds.getInstance();
-        int expected = 25;
+        int expected = 27;
         if (instance.iterator().next().getDate().getYear() == 2112) {
-            expected = 26;
+            expected = 28;
         }
         assertThat(
             LeapSeconds.getInstance().getCount(),
@@ -105,6 +108,7 @@ public class LeapSecondTest {
                 ((ExtendedLSE) lse).utc(),
                 is(UTC_2012_06_30_LS // 2112-12-31 (UTC)
                 + NLS_OFFSET
+                + 2 // leap seconds of 2015 + 2016
                 - 1)); // negative LS
             break;
         }
@@ -138,82 +142,88 @@ public class LeapSecondTest {
         int i = 0;
         for (LeapSecondEvent lse : LeapSeconds.getInstance()) {
             PlainDate date = toPlainDate(lse.getDate());
-            if (date.getYear() < 2013) {
+            if (date.getYear() < 2017) {
                 assertThat(lse.getShift(), is(1));
                 switch (i) {
                     case 0:
-                        assertThat(date, is(PlainDate.of(2012, 6, 30)));
+                        assertThat(date, is(PlainDate.of(2016, 12, 31)));
                         break;
                     case 1:
-                        assertThat(date, is(PlainDate.of(2008, 12, 31)));
+                        assertThat(date, is(PlainDate.of(2015, 6, 30)));
                         break;
                     case 2:
-                        assertThat(date, is(PlainDate.of(2005, 12, 31)));
+                        assertThat(date, is(PlainDate.of(2012, 6, 30)));
                         break;
                     case 3:
-                        assertThat(date, is(PlainDate.of(1998, 12, 31)));
+                        assertThat(date, is(PlainDate.of(2008, 12, 31)));
                         break;
                     case 4:
-                        assertThat(date, is(PlainDate.of(1997, 6, 30)));
+                        assertThat(date, is(PlainDate.of(2005, 12, 31)));
                         break;
                     case 5:
-                        assertThat(date, is(PlainDate.of(1995, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1998, 12, 31)));
                         break;
                     case 6:
-                        assertThat(date, is(PlainDate.of(1994, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1997, 6, 30)));
                         break;
                     case 7:
-                        assertThat(date, is(PlainDate.of(1993, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1995, 12, 31)));
                         break;
                     case 8:
-                        assertThat(date, is(PlainDate.of(1992, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1994, 6, 30)));
                         break;
                     case 9:
-                        assertThat(date, is(PlainDate.of(1990, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1993, 6, 30)));
                         break;
                     case 10:
-                        assertThat(date, is(PlainDate.of(1989, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1992, 6, 30)));
                         break;
                     case 11:
-                        assertThat(date, is(PlainDate.of(1987, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1990, 12, 31)));
                         break;
                     case 12:
-                        assertThat(date, is(PlainDate.of(1985, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1989, 12, 31)));
                         break;
                     case 13:
-                        assertThat(date, is(PlainDate.of(1983, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1987, 12, 31)));
                         break;
                     case 14:
-                        assertThat(date, is(PlainDate.of(1982, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1985, 6, 30)));
                         break;
                     case 15:
-                        assertThat(date, is(PlainDate.of(1981, 6, 30)));
+                        assertThat(date, is(PlainDate.of(1983, 6, 30)));
                         break;
                     case 16:
-                        assertThat(date, is(PlainDate.of(1979, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1982, 6, 30)));
                         break;
                     case 17:
-                        assertThat(date, is(PlainDate.of(1978, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1981, 6, 30)));
                         break;
                     case 18:
-                        assertThat(date, is(PlainDate.of(1977, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1979, 12, 31)));
                         break;
                     case 19:
-                        assertThat(date, is(PlainDate.of(1976, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1978, 12, 31)));
                         break;
                     case 20:
-                        assertThat(date, is(PlainDate.of(1975, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1977, 12, 31)));
                         break;
                     case 21:
-                        assertThat(date, is(PlainDate.of(1974, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1976, 12, 31)));
                         break;
                     case 22:
-                        assertThat(date, is(PlainDate.of(1973, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1975, 12, 31)));
                         break;
                     case 23:
-                        assertThat(date, is(PlainDate.of(1972, 12, 31)));
+                        assertThat(date, is(PlainDate.of(1974, 12, 31)));
                         break;
                     case 24:
+                        assertThat(date, is(PlainDate.of(1973, 12, 31)));
+                        break;
+                    case 25:
+                        assertThat(date, is(PlainDate.of(1972, 12, 31)));
+                        break;
+                    case 26:
                         assertThat(date, is(PlainDate.of(1972, 6, 30)));
                         break;
                     default:
@@ -222,7 +232,7 @@ public class LeapSecondTest {
                 i++;
             }
         }
-        assertThat(i, is(25));
+        assertThat(i, is(27));
     }
 
     @Test
@@ -253,13 +263,13 @@ public class LeapSecondTest {
             is(UTC_2012_06_30_LS + 2));
         assertThat(
             instance.enhance(1341100799L + NLS_OFFSET),
-            is(UTC_2012_06_30_LS + NLS_OFFSET));
+            is(UTC_2012_06_30_LS + 2 + NLS_OFFSET));
         assertThat(
             instance.enhance(1341100800L + NLS_OFFSET),
-            is(UTC_2012_06_30_LS + NLS_OFFSET));
+            is(UTC_2012_06_30_LS + 2 + NLS_OFFSET));
         assertThat(
             instance.enhance(1341100801L + NLS_OFFSET),
-            is(UTC_2012_06_30_LS + 1 + NLS_OFFSET));
+            is(UTC_2012_06_30_LS + 3 + NLS_OFFSET));
     }
 
     @Test
@@ -275,19 +285,19 @@ public class LeapSecondTest {
             instance.strip(UTC_2012_06_30_LS - 1),
             is(1341100799L));
         assertThat(
-            instance.strip(UTC_2012_06_30_LS - 1 + NLS_OFFSET),
+            instance.strip(UTC_2012_06_30_LS + 1 + NLS_OFFSET),
             is(1341100798L + NLS_OFFSET));
         assertThat(
-            instance.strip(UTC_2012_06_30_LS + NLS_OFFSET),
+            instance.strip(UTC_2012_06_30_LS + 2 + NLS_OFFSET),
             is(1341100800L + NLS_OFFSET));
         assertThat(
-            instance.strip(UTC_2012_06_30_LS + 1 + NLS_OFFSET),
+            instance.strip(UTC_2012_06_30_LS + 3 + NLS_OFFSET),
             is(1341100801L + NLS_OFFSET));
     }
 
     @Test
     public void getDateOfExpiration() {
-        GregorianDate expected = PlainDate.of(2012, 12, 28);
+        GregorianDate expected = PlainDate.of(2017, 12, 28);
         assertThat(
             LeapSeconds.getInstance().getDateOfExpiration(),
             is(expected));

@@ -463,7 +463,7 @@ public final class Moment
                         double tt = ((double) elapsedTime) + (nanosecond / (MRD * 1.0));
                         PlainDate date = // approximation
                             PlainDate.of(Math.floorDiv((long) (tt - 42.184), 86400), EpochDays.UTC);
-                        double utValue = tt - TimeScale.deltaT(date.getYear(), date.getMonth());
+                        double utValue = tt - TimeScale.deltaT(date);
                         utcTime = (long) Math.floor(utValue);
                         nanosecond = (int) ((utValue - utcTime) * MRD);
                     } else {
@@ -482,7 +482,7 @@ public final class Moment
                         PlainDate date = // approximation
                             PlainDate.of(Math.floorDiv(elapsedTime, 86400), EpochDays.UTC);
                         double ut = ((double) elapsedTime) + (nanosecond / (MRD * 1.0));
-                        double utc = ut + TimeScale.deltaT(date.getYear(), date.getMonth()) - 42.184;
+                        double utc = ut + TimeScale.deltaT(date) - 42.184;
                         utcTime = (long) Math.floor(utc);
                         nanosecond = (int) ((utc - utcTime) * MRD);
                     }
@@ -739,7 +739,7 @@ public final class Moment
             case TT:
                 if (this.posixTime < POSIX_UTC_DELTA) {
                     PlainDate date = this.getDateUTC();
-                    double ttValue = TimeScale.deltaT(date.getYear(), date.getMonth());
+                    double ttValue = TimeScale.deltaT(date);
                     ttValue += (this.posixTime - POSIX_UTC_DELTA);
                     ttValue += (this.getNanosecond() / (MRD * 1.0));
                     return (long) Math.floor(ttValue);
@@ -795,7 +795,7 @@ public final class Moment
             case TT:
                 if (this.posixTime < POSIX_UTC_DELTA) {
                     PlainDate date = this.getDateUTC();
-                    double ttValue = TimeScale.deltaT(date.getYear(), date.getMonth());
+                    double ttValue = TimeScale.deltaT(date);
                     ttValue += (this.posixTime - POSIX_UTC_DELTA);
                     ttValue += (this.getNanosecond() / (MRD * 1.0));
                     return (int) ((ttValue * MRD) - (Math.floor(ttValue) * MRD));
@@ -1915,7 +1915,7 @@ public final class Moment
         double ttValue = this.getEpochTime();
         ttValue += 42.184;
         ttValue += (this.getNanosecond() / (MRD * 1.0));
-        ttValue -= TimeScale.deltaT(date.getYear(), date.getMonth());
+        ttValue -= TimeScale.deltaT(date);
         return ttValue;
 
     }

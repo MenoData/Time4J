@@ -22,6 +22,8 @@
 package net.time4j.scale;
 
 
+import net.time4j.PlainDate;
+
 /**
  * <p>Defines some time scales for usage both in civil life and in science. </p>
  *
@@ -323,7 +325,7 @@ public enum TimeScale {
     /**
      * <p>Estimates the delta between TT and UT1 in decimal seconds depending on given year and month. </p>
      *
-     * <p>The estimation is based
+     * <p>The estimation is mainly based
      * on a <a href="https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html">polynomial expression of the NASA</a>. </p>
      *
      * @param   year    gregorian/julian year from -2000 until +3000
@@ -336,7 +338,7 @@ public enum TimeScale {
      * <p>Liefert eine Sch&auml;tzung der Differenz zwischen TT und UT1 in dezimalen Sekunden
      * abh&auml;ngig von den angegebenen Parametern Jahr und Monat. </p>
      *
-     * <p>Die Sch&auml;tzung basiert auf einem
+     * <p>Die Sch&auml;tzung basiert haupts&auml;chlich auf einem
      * <a href="https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html">Polynom-Ausdruck der NASA</a>. </p>
      *
      * @param   year    gregorian/julian year from -2000 until +3000
@@ -350,23 +352,65 @@ public enum TimeScale {
         int month
     ) {
 
-        if ((year < -2000) || (year > 3000)) {
-            throw new IllegalArgumentException("Year out of range: " + year);
-        } else if ((month < 1) || (month > 12)) {
+        if ((month < 1) || (month > 12)) {
             throw new IllegalArgumentException("Month out of range: " + month);
         }
 
         double y = year + (month - 0.5) / 12;
+        return deltaT(year, y);
 
-        if (year > 2150) {
+    }
+
+    /**
+     * <p>Estimates the delta between TT and UT1 in decimal seconds depending on given date. </p>
+     *
+     * <p>The estimation is mainly based
+     * on a <a href="https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html">polynomial expression of the NASA</a>. </p>
+     *
+     * @param   date    gregorian date from year -2000 until year +3000
+     * @return  estimated difference deltaT = TT - UT in seconds
+     * @throws  IllegalArgumentException if the date is out of range
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Liefert eine Sch&auml;tzung der Differenz zwischen TT und UT1 in dezimalen Sekunden
+     * abh&auml;ngig vom angegebenen Datum. </p>
+     *
+     * <p>Die Sch&auml;tzung basiert haupts&auml;chlich auf einem
+     * <a href="https://eclipse.gsfc.nasa.gov/SEcat5/deltatpoly.html">Polynom-Ausdruck der NASA</a>. </p>
+     *
+     * @param   date    gregorian date from year -2000 until year +3000
+     * @return  estimated difference deltaT = TT - UT in seconds
+     * @throws  IllegalArgumentException if the date is out of range
+     * @since   3.33/4.28
+     */
+    public static double deltaT(PlainDate date) {
+
+        int year = date.getYear();
+        double y = year + ((date.getDayOfYear() - 1.0) / (date.isLeapYear() ? 366.0 : 365.0));
+        return deltaT(year, y);
+
+    }
+
+    private static double deltaT(
+        int year,
+        double y
+    ) {
+
+        if ((year < -2000) || (year > 3000)) {
+            throw new IllegalArgumentException("Year out of range: " + year);
+        }
+
+        if (year > 2050) {
             double t = (y - 1820) / 100;
             return -20 + 32 * t * t;
-        } else if (year >= 2050) {
-            double t = (y - 1820) / 100;
-            return -205.724 + (56.28 + 32 * t) * t;
+        } else if (year >= 2018) {
+            double t = y - 2000;
+            return 64.16 + (0.0533 + 0.012125 * t) * t; // prediction for near future
         } else if (year >= 2005) {
             double t = y - 2000;
-            return 62.92 + (0.32217 + 0.005589 * t) * t;
+            return 63.5934 + (0.171417 + (0.014201 + (-0.00112745 + 0.000042060317 * t) * t) * t) * t;
+            // old imprecise nasa expression: return 62.92 + (0.32217 + 0.005589 * t) * t;
         } else if (year >= 1986) {
             double t = y - 2000;
             return 63.86 + (0.3345 + (-0.060374 + (0.0017275 + (0.000651814 + 0.00002373599 * t) * t) * t) * t) * t;
