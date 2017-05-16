@@ -1,4 +1,6 @@
 ## [v4.28] not yet released
+### Added
+- Implement timescales TT and UT1 [#93]
 
 ## [v4.27.2] published on 2017-04-29
 ### Fixed
