@@ -2,6 +2,9 @@
 ### Added
 - Implement timescales TT and UT1 [#93]
 
+### Changed
+- Redefine value space and epoch of TAI [#652]
+
 ## [v4.27.2] published on 2017-04-29
 ### Fixed
 - Setting the number system via nu-extension in locale broken [#650]
