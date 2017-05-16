@@ -70,38 +70,4 @@ public class MomentCreationTest {
                 .plus(999999999, ClockUnit.NANOS).atUTC()));
     }
 
-    @Test
-    public void epochPOSIX() {
-        assertThat(
-            Moment.of(1277942400 + 2 * 365 * 86400, TimeScale.POSIX),
-            is(PlainDate.of(2012, 6, 30).atStartOfDay().atUTC()));
-        assertThat(
-            Moment.of(0, TimeScale.POSIX),
-            is(PlainDate.of(1970, 1, 1).atStartOfDay().atUTC()));
-    }
-
-    @Test
-    public void epochUTC() {
-        assertThat(
-            Moment.of(1277942424, TimeScale.UTC),
-            is(PlainDate.of(2012, 6, 30).atStartOfDay().atUTC()));
-        assertThat(
-            Moment.of(0, TimeScale.UTC),
-            is(PlainDate.of(1972, 1, 1).atStartOfDay().atUTC()));
-    }
-
-    @Test
-    public void epochGPS() {
-        assertThat(
-            Moment.of(0, TimeScale.GPS),
-            is(PlainDate.of(1980, 1, 6).atStartOfDay().atUTC()));
-    }
-
-    @Test
-    public void epochTAI() {
-        assertThat(
-            Moment.of(10, TimeScale.TAI),
-            is(PlainDate.of(1972, 1, 1).atStartOfDay().atUTC()));
-    }
-
 }

@@ -7,14 +7,13 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.SI;
 import net.time4j.tz.ZonalOffset;
-
-import java.math.BigDecimal;
-import java.util.Arrays;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.math.BigDecimal;
+import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -23,11 +22,29 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class TimeScaleTest {
 
+    private static final long UTC_TAI_DELTA = ((1972 - 1958) * 365 + 3) * 86400;
+
     @BeforeClass
     public static void useTestDataForLeapSeconds() {
         System.setProperty(
             "net.time4j.scale.leapseconds.path",
             LeapSecondTest.TEST_DATA);
+    }
+
+    @Test
+    public void epoch() {
+        for (TimeScale scale : TimeScale.values()) {
+            Moment epoch = Moment.of(0, scale);
+            assertThat(
+                "Error in elapsed time of: " + scale,
+                epoch.getElapsedTime(scale),
+                is(0L));
+            assertThat(
+                "Error in fraction value of: " + scale,
+                epoch.getNanosecond(scale),
+                is(0));
+            System.out.println(scale + "-" + epoch.toString());
+        }
     }
 
     @Test
@@ -66,12 +83,18 @@ public class TimeScaleTest {
             PlainTimestamp.of(
                 PlainDate.of(1980, 1, 5),
                 PlainTime.of(23, 59, 50, 123456789)
-            ).inTimezone(ZonalOffset.UTC); // 10 secs before GPS epoch
+            ).inTimezone(ZonalOffset.UTC);
+        long expectedSecs =
+            UTC_TAI_DELTA
+                + (8 * 365 + 2 + 5) * 86400 // 1972-01-01/1980-01-06
+                - 10 // 10 secs before GPS epoch
+                + 10 // TAI = UTC + 10 after 1972
+                + LeapSeconds.getInstance().getCount(utc); // 9
         assertThat(
             utc.transform(TimeScale.TAI),
-            is(new BigDecimal("252892809.123456789")));
+            is(new BigDecimal("694656009.123456789")));
         assertThat(
-            Moment.of(252892809, 123456789, TimeScale.TAI),
+            Moment.of(expectedSecs, 123456789, TimeScale.TAI),
             is(utc));
     }
 
@@ -157,7 +180,7 @@ public class TimeScaleTest {
             ).inTimezone(ZonalOffset.UTC); // 10 secs before GPS epoch
         assertThat(
             utc.getElapsedTime(TimeScale.TAI),
-            is(315964800 + 9 - 2 * 365 * 86400L));
+            is(UTC_TAI_DELTA + (8 * 365 + 2 + 5) * 86400 - 10 + 9 + 10));
     }
 
     @Test
@@ -302,6 +325,16 @@ public class TimeScaleTest {
 
     @Test
     public void toStringTAI() {
+        Moment m1971 =
+            PlainTimestamp.of(1971, 12, 31, 0, 0).atUTC();
+        assertThat(
+            m1971.toString(TimeScale.TAI),
+            is("TAI-1971-12-31T00:00:10,099784289Z"));
+        Moment m1972 =
+            PlainTimestamp.of(1972, 1, 1, 0, 0).atUTC();
+        assertThat(
+            m1972.toString(TimeScale.TAI),
+            is("TAI-1972-01-01T00:00:10Z"));
         Moment utc1 =
             PlainTimestamp.of(
                 PlainDate.of(2012, 6, 30),
@@ -386,20 +419,20 @@ public class TimeScaleTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void getElapsedTimeTAIBefore1972() {
+    public void getElapsedTimeTAIBefore1958() {
         Moment utc =
             PlainTimestamp.of(
-                PlainDate.of(1971, 12, 31),
+                PlainDate.of(1957, 12, 31),
                 PlainTime.of(23, 59, 59, 123456789)
             ).inTimezone(ZonalOffset.UTC);
         utc.getElapsedTime(TimeScale.TAI);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void getNanosecondTAIBefore1972() {
+    public void getNanosecondTAIBefore1958() {
         Moment utc =
             PlainTimestamp.of(
-                PlainDate.of(1971, 12, 31),
+                PlainDate.of(1957, 12, 31),
                 PlainTime.of(23, 59, 59, 123456789)
             ).inTimezone(ZonalOffset.UTC);
         utc.getNanosecond(TimeScale.TAI);
