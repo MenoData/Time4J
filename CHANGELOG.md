@@ -2,6 +2,9 @@
 ### Added
 - Implement timescales TT and UT1 [#93]
 
+### Changed
+- Redefine value space and epoch of TAI [#652]
+
 ## [v3.32] published on 2017-04-28
 ### Added
 - Japanese imperial calendar [#560]
