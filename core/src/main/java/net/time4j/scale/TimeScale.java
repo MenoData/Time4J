@@ -148,7 +148,7 @@ public enum TimeScale {
 
     /**
      * <p>International atomic time which is based on the SI-seconds of an
-     * atomic clock and presents a continuous scale relative to 1972-01-01. </p>
+     * atomic clock and presents a continuous scale relative to 1958-01-01. </p>
      *
      * <p>There is no second which is interpreted respective labelled as
      * leapsecond. Hence this scale is decoupled from civil day and only
@@ -160,25 +160,26 @@ public enum TimeScale {
      * around 250 atomic clocks worldwide is used. But the deviations are
      * in picoseconds or smaller which is not in the focus of this API. </p>
      *
-     * <p>Although TAI knows historical ancestors already since 1958
-     * Time4J only supports TAI from UTC-epoch 1972-01-01. First to note
-     * the SI-second was introduced in year 1967. Second, the nowadays
-     * used TAI-scale had got its name on a conference in year 1971, third
-     * to note, the TAI-ancestors were still directly synchronized with
-     * UT2 hence had still got a vague astronomical reference. At the
-     * calendar date 1972-01-01 the difference between TAI and UTC was
-     * defined as exactly 10 seconds (TAI = UTC + 10). This difference is
-     * fixed for all timestamps in epoch seconds because both TAI and UTC
-     * counts in pure SI-seconds. But note: If TAI and UTC are resolved
-     * to an element-oriented notation (YYYY-MM-DD HH:MM:SS) then the
-     * difference between TAI and UTC increases with every inserted
-     * leap second because of the different labelling. A TAI day does not
-     * know leap seconds. In the year 2017 this difference between a TAI
-     * day and an UTC day has increased to 37 seconds. </p>
+     * <p>Users need to be careful about the period between 1958 and 1972
+     * because Time4J applies approximations here: First to note, the SI-second was
+     * introduced in year 1967 so we can just speak about <em>atomic</em> seconds
+     * before that date in an approximated way. Second, the nowadays used TAI-scale
+     * had got its name on a conference in year 1971, third to note, the TAI-ancestors
+     * were still directly synchronized with UT2 hence had still got a vague
+     * astronomical reference. At the calendar date 1972-01-01, the difference
+     * between TAI and UTC was defined as exactly 10 seconds (TAI = UTC + 10),
+     * plus the count of atomic seconds between 1958 and 1972. This difference
+     * is fixed for all timestamps in epoch seconds because both TAI and UTC
+     * counts in pure SI-seconds since 1972. But note: If TAI and UTC are resolved
+     * to an element-oriented notation (YYYY-MM-DD HH:MM:SS) then the difference
+     * between TAI and UTC increases with every inserted leap second because of
+     * the different labelling. A TAI day does not know leap seconds. In the year
+     * 2017 this difference between a TAI day and an UTC day has increased to
+     * 37 seconds. </p>
      */
     /*[deutsch]
      * <p>Internationale Atomuhrzeit, die auf den SI-Sekunden einer Atomuhr
-     * basiert und eine monoton fortlaufende Skala relativ zu 1972-01-01
+     * basiert und eine monoton fortlaufende Skala relativ zu 1958-01-01
      * darstellt. </p>
      *
      * <p>Es werden also keine Sekunden als Schaltsekunden interpretiert.
@@ -193,16 +194,18 @@ public enum TimeScale {
      * Abweichung im Bereich von Pikosekunden, was nicht im Fokus dieses API
      * liegt. </p>
      *
-     * <p>Obwohl Vorg&auml;nger von TAI schon seit 1958 bekannt sind, erlaubt
-     * Time4J TAI-Angaben nur ab der UTC-Epoche 1972-01-01. Erstens wurde die
-     * SI-Sekunde erst ab 1967 definiert, zweitens bekam die heutige TAI-Skala
-     * ihren Namen auf einer Konferenz im Jahre 1971, drittens waren die
-     * Vorg&auml;nger von TAI noch direkt mit UT2 synchronisiert, hatten
-     * also noch einen etwas vagen astronomischen Bezug. Zum Datum 1972-01-01
-     * wurde der Versatz zwischen TAI und UTC genau auf 10 Sekunden festgelegt
-     * (TAI = UTC + 10). Diese Differenz gilt fest f&uuml;r alle Zeitangaben
-     * in Epochensekunden, weil sowohl TAI als auch UTC in reinen SI-Sekunden
-     * z&auml;hlen. Aber: Werden TAI und UTC zu Zeitstempeln in einer
+     * <p>Anwender m&uuml;ssen f&uuml;r Zeiten von 1958 bis 1972 vorsichtig
+     * sein, denn Time4J verwendet hier lediglich N&auml;herungen: Erstens wurde
+     * die SI-Sekunde erst ab 1967 definiert, so da&szlig; vor jenem Jahr nur
+     * n&auml;herungsweise von <em>Atomsekunden</em> gesprochen werden kann,
+     * zweitens bekam die heutige TAI-Skala ihren Namen auf einer Konferenz
+     * im Jahre 1971, drittens waren die Vorg&auml;nger von TAI noch direkt mit
+     * UT2 synchronisiert, hatten also noch einen etwas vagen astronomischen Bezug.
+     * Zum Datum 1972-01-01 wurde der Versatz zwischen TAI und UTC genau auf
+     * 10 Sekunden festgelegt (TAI = UTC + 10), zuz&uuml;glich der Anzahl der
+     * Atomsekunden zwischen 1958 und 1972. Diese Differenz gilt fest f&uuml;r
+     * alle Zeitangaben in Epochensekunden, weil sowohl TAI als auch UTC in reinen
+     * SI-Sekunden z&auml;hlen. Aber: Werden TAI und UTC zu Zeitstempeln in einer
      * feldorientierten Notation (YYYY-MM-DD HH:MM:SS) aufgel&ouml;st,
      * dann &auml;ndert sich der Versatz seit 1972 laufend mit jeder
      * eingef&uuml;gten Schaltsekunde, weil ein TAI-Tag keine Schaltsekunden
