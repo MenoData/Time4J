@@ -1794,7 +1794,7 @@ public final class Moment
     }
 
     /**
-     * <p>Creates a formatted view of this instance taking in account
+     * <p>Creates a formatted view of this instance taking into account
      * given time scale. </p>
      *
      * <pre>
