@@ -1,5 +1,7 @@
 ## [v4.28] not yet released
 ### Added
+- Calculation of astronomical seasons [#628]
+- Support for Julian Day Number [#527]
 - Implement timescales TT and UT1 [#93]
 
 ### Changed
