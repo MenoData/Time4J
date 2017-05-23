@@ -56,10 +56,19 @@ public class MiscellaneousTest {
     @Test
     public void arabicNuExtensionTest() throws ParseException {
         String input = "الاثنين 24 أبريل 2017 - 15:00";
-        Locale locale = Locale.forLanguageTag("ar-SA-u-nu-" + NumberSystem.ARABIC.getCode());
+
+        // first test with nu-extension
+        Locale loc1 = Locale.forLanguageTag("ar-SA-u-nu-" + NumberSystem.ARABIC.getCode());
         ChronoFormatter<PlainTimestamp> f1 =
-            ChronoFormatter.ofTimestampPattern("EEEE d MMMM yyyy - HH:mm", PatternType.CLDR, locale);
+            ChronoFormatter.ofTimestampPattern("EEEE d MMMM yyyy - HH:mm", PatternType.CLDR, loc1);
         assertThat(f1.parse(input), is(PlainTimestamp.of(2017, 4, 24, 15, 0)));
+
+        // second test without nu-extension but with explicit format attribute
+        Locale loc2 = new Locale("ar", "SA");
+        ChronoFormatter<PlainTimestamp> f2 =
+            ChronoFormatter.ofTimestampPattern("EEEE d MMMM yyyy - HH:mm", PatternType.CLDR, loc2)
+            .with(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
+        assertThat(f2.parse(input), is(PlainTimestamp.of(2017, 4, 24, 15, 0)));
     }
 
     @Test
