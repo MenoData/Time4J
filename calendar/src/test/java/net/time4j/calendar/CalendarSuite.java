@@ -10,7 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        AstroTest.class,
+        //AstroTest.class,
         CalendarOverrideTest.class,
         ClockTest.class,
         CopticCalendarTest.class,
