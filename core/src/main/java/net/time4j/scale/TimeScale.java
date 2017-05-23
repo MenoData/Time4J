@@ -404,6 +404,11 @@ public enum TimeScale {
             throw new IllegalArgumentException(date.toString());
         }
 
+        if ((year == -2001) && (doy == 365)) { // edge case
+            year = -2000;
+            doy = 1;
+        }
+
         double y = year + ((doy - 1.0) / len);
         return deltaT(year, y);
 
