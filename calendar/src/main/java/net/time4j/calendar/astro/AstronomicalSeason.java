@@ -113,7 +113,7 @@ public enum AstronomicalSeason {
 		}
 
 		long seconds = (long) Math.floor(utc);
-		int nanos = (int) (utc - seconds) * 1_000_000_000;
+		int nanos = (int) ((utc - seconds) * 1_000_000_000);
 
 		return Moment.of(seconds, nanos, TimeScale.UTC);
 
