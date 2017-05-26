@@ -3,11 +3,15 @@ package net.time4j.calendar.astro;
 import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
+import net.time4j.engine.CalendarDays;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.OffsetSign;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.math.BigDecimal;
 
 import static net.time4j.calendar.astro.AstronomicalSeason.*;
 import static org.hamcrest.CoreMatchers.is;
@@ -173,6 +177,80 @@ public class AstroTest {
     @Test
     public void countOfSeasons() {
         assertThat(AstronomicalSeason.values().length, is(4));
+    }
+
+    @Test
+    public void solarTimeTeheran() {
+        ZonalOffset teheran = ZonalOffset.atLongitude(OffsetSign.AHEAD_OF_UTC, 52, 30, 0.0); // +03:30
+        Moment spring2024 = AstronomicalSeason.VERNAL_EQUINOX.inYear(2024);
+        Moment spring2025 = AstronomicalSeason.VERNAL_EQUINOX.inYear(2025);
+        PlainTimestamp tsp2024 = spring2024.get(SolarTime.at(teheran));
+        PlainTimestamp tsp2025 = spring2025.get(SolarTime.at(teheran));
+        System.out.println("apparent solar time of Teheran: " + spring2024.get(SolarTime.at(teheran)));
+        System.out.println("apparent solar time of Teheran: " + spring2025.get(SolarTime.at(teheran)));
+        assertThat(tsp2024.getHour() < 12, is(true));
+        assertThat(tsp2025.getHour() >= 12, is(true));
+        assertThat(
+            CalendarDays.between(tsp2024.toDate(), tsp2025.toDate().plus(CalendarDays.ONE)).getAmount(),
+            is(366L)); // includes noon correction
+    }
+
+    @Test
+    public void equationOfTime() {
+        // maximum deviation: about 1/100 min
+        // see also => https://www.esrl.noaa.gov/gmd/grad/solcalc/
+        ZonalOffset offset = ZonalOffset.atLongitude(new BigDecimal(-98.583)); // middle of US
+        assertThat(
+            equationOfTimeRounded(2017, 1, 25, 6, 26, 14, offset),
+            is(-1239));
+        assertThat(
+            equationOfTimeRounded(2017, 2, 25, 6, 26, 14, offset),
+            is(-1301));
+        assertThat(
+            equationOfTimeRounded(2017, 3, 25, 6, 26, 14, offset),
+            is(-587));
+        assertThat(
+            equationOfTimeRounded(2017, 4, 25, 6, 26, 14, offset),
+            is(208));
+        assertThat(
+            equationOfTimeRounded(2017, 5, 25, 6, 26, 14, offset),
+            is(303));
+        assertThat(
+            equationOfTimeRounded(2017, 6, 25, 6, 26, 14, offset),
+            is(-271));
+        assertThat(
+            equationOfTimeRounded(2017, 7, 25, 6, 26, 14, offset),
+            is(-654));
+        assertThat(
+            equationOfTimeRounded(2017, 8, 25, 6, 26, 14, offset),
+            is(-203));
+        assertThat(
+            equationOfTimeRounded(2017, 9, 25, 6, 26, 14, offset),
+            is(839));
+        assertThat(
+            equationOfTimeRounded(2017, 10, 25, 6, 26, 14, offset),
+            is(1599));
+        assertThat(
+            equationOfTimeRounded(2017, 11, 25, 6, 26, 14, offset),
+            is(1295));
+        assertThat(
+            equationOfTimeRounded(2017, 12, 25, 6, 26, 14, offset),
+            is(-19));
+    }
+
+    private int equationOfTimeRounded( // multiplied by 100 and then rounded to minutes
+        int year,
+        int month,
+        int dom,
+        int hour,
+        int minute,
+        int second,
+        ZonalOffset offset
+    ) {
+        PlainTimestamp tsp = PlainTimestamp.of(year, month, dom, hour, minute, second);
+        Moment moment = tsp.at(offset);
+        double eot = SolarTime.equationOfTime(moment) / 60;
+        return (int) Math.round(eot * 100);
     }
 
 }
