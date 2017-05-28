@@ -68,13 +68,72 @@ public class PersianMiscellaneousTest {
     }
 
     @Test
-    public void khayam() {
+    public void khayamIsEqualToBorkowskiInRange1178To1633() {
         for (int pyear = 1178; pyear <= 1633; pyear++) {
-            int m = pyear % 33;
-            boolean leapKhayam = (m == 1 || m == 5 || m == 9 || m == 13 || m == 17 || m == 22 || m == 26 || m == 30);
             assertThat(
                 PersianCalendar.of(pyear, 1, 1).isLeapYear(),
-                is(leapKhayam));
+                is(PersianAlgorithm.KHAYYAM.isLeapYear(pyear)));
+        }
+        PersianCalendar pcal = PersianCalendar.of(1178, 1, 1);
+        long utcDays = pcal.getDaysSinceEpochUTC();
+        long max = PersianCalendar.of(1634, 12, 29).getDaysSinceEpochUTC();
+        while (utcDays <= max) {
+            PersianCalendar khayyam = PersianAlgorithm.KHAYYAM.transform(utcDays);
+            PersianCalendar expected = PersianCalendar.axis().getCalendarSystem().transform(utcDays);
+            assertThat(khayyam, is(expected));
+            utcDays++;
+        }
+    }
+
+    @Test
+    public void khayamOverFullRange() {
+        long min = PersianCalendar.axis().getCalendarSystem().getMinimumSinceUTC();
+        long max = PersianCalendar.axis().getCalendarSystem().getMaximumSinceUTC();
+        for (long utcDays = min; utcDays <= max; utcDays++) {
+            PersianCalendar khayyam = PersianAlgorithm.KHAYYAM.transform(utcDays);
+            assertThat(PersianAlgorithm.KHAYYAM.transform(khayyam), is(utcDays));
+        }
+    }
+
+    @Test
+    public void birashkIsEqualToBorkowskiInRange1244To1402() {
+        for (int pyear = 1244; pyear <= 1402; pyear++) {
+            assertThat(
+                PersianCalendar.of(pyear, 1, 1).isLeapYear(),
+                is(PersianAlgorithm.BIRASHK.isLeapYear(pyear)));
+        }
+        long utcDays = PersianCalendar.of(1244, 1, 1).getDaysSinceEpochUTC();
+        long max = PersianCalendar.of(1403, 12, 29).getDaysSinceEpochUTC();
+        System.out.println(PersianCalendar.of(1403, 12, 29).transform(PlainDate.class)); // 2025-03-19
+        while (utcDays <= max) {
+            PersianCalendar birashk = PersianAlgorithm.BIRASHK.transform(utcDays);
+            PersianCalendar expected = PersianCalendar.axis().getCalendarSystem().transform(utcDays);
+            assertThat(birashk, is(expected));
+            utcDays++;
+        }
+    }
+
+    @Test
+    public void birashkError2025() {
+        long vernalEquinox = PlainDate.of(2025, 3, 21).getDaysSinceEpochUTC();
+        assertThat(
+            PersianAlgorithm.BIRASHK.transform(vernalEquinox),
+            is(new PersianCalendar(1404, 1, 2)));
+        assertThat(
+            PersianAlgorithm.BIRASHK.isLeapYear(1403),
+            is(false));
+        assertThat(
+            PersianCalendar.of(1403, 12, 30).isLeapYear(),
+            is(true));
+    }
+
+    @Test
+    public void birashkOverFullRange() {
+        long min = PersianCalendar.axis().getCalendarSystem().getMinimumSinceUTC();
+        long max = PersianCalendar.axis().getCalendarSystem().getMaximumSinceUTC();
+        for (long utcDays = min; utcDays <= max; utcDays++) {
+            PersianCalendar birashk = PersianAlgorithm.BIRASHK.transform(utcDays);
+            assertThat(PersianAlgorithm.BIRASHK.transform(birashk), is(utcDays));
         }
     }
 

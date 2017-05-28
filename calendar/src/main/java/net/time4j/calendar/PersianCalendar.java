@@ -332,7 +332,8 @@ public final class PersianCalendar
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private PersianCalendar(
+    // must not be called outside of package
+    PersianCalendar(
         int pyear,
         int pmonth,
         int pdom
