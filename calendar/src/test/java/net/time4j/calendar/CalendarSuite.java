@@ -1,5 +1,7 @@
 package net.time4j.calendar;
 
+import net.time4j.calendar.astro.AstroTest;
+import net.time4j.calendar.astro.JulianDayTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -8,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        AstroTest.class,
         CalendarOverrideTest.class,
         ClockTest.class,
         CopticCalendarTest.class,
@@ -35,6 +38,7 @@ import org.junit.runners.Suite.SuiteClasses;
         JapaneseTransitionTest.class,
         JapaneseUnitTest.class,
         JulianCalendarTest.class,
+        JulianDayTest.class,
         JulianMiscellaneousTest.class,
         MinguoCalendarTest.class,
         MinguoMiscellaneousTest.class,

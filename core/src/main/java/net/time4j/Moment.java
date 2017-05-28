@@ -131,44 +131,99 @@ import static net.time4j.scale.TimeScale.*;
  *
  * <p>Following table illustrates how a time scale affects values and representations
  * before, during and after a leap second event. Two views exist, either interpreting
- * a moment as count of seconds elapsed since an epoch or printed in a scale-specific representation. </p>
+ * a moment as count of seconds elapsed since an epoch (value space) or printed in a
+ * lexical representation. In latter case, a combination of a {@code ChronoFormatter}
+ * with the format attribute {@link Attributes#TIME_SCALE} can achieve a more flexible
+ * lexical representation. </p>
  *
  * <div style="margin-top:5px;">
  * <table border="1">
- * <caption>What does happen around a leap second?</caption>
+ * <caption>Scale-specific epoch =&gt; <code>Moment.of(0, scale)</code></caption>
  * <tr>
  *     <th>time scale</th>
- *     <th>epoch<br><code>Moment.of(0, scale)</code></th>
- *     <th>value space<br><code>getElapsedTime(scale)</code></th>
+ *     <th>value space<br><code>getElapsedTime(scale)</code><br><code>getNanosecond(scale)</code></th>
+ *     <th>lexical space<br><code>toString(scale)</code></th>
+ *     <th>in UT/UTC<br><code>toString()</code></th>
+ * </tr>
+ * <tr>
+ *     <td>POSIX</td>
+ *     <td>0.000</td>
+ *     <td>POSIX-1970-01-01T00Z</td>
+ *     <td>1970-01-01T00:00:00Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UTC</td>
+ *     <td>0.000</td>
+ *     <td>UTC-1972-01-01T00Z</td>
+ *     <td>1972-01-01T00:00:00Z</td>
+ * </tr>
+ * <tr>
+ *     <td>TAI</td>
+ *     <td>0.000</td>
+ *     <td>TAI-1958-01-01T00Z</td>
+ *     <td>TAI-1957-12-31T23:59:59,658300736Z *)</td>
+ * </tr>
+ * <tr>
+ *     <td>GPS</td>
+ *     <td>0.000</td>
+ *     <td>GPS-1980-01-06T00Z</td>
+ *     <td>1980-01-06T00:00:00Z</td>
+ * </tr>
+ * <tr>
+ *     <td>TT</td>
+ *     <td>0.000</td>
+ *     <td>TT-1972-01-01T00Z</td>
+ *     <td>1971-12-31T23:59:17,716215710Z *)</td>
+ * </tr>
+ * <tr>
+ *     <td>UT</td>
+ *     <td>0.000</td>
+ *     <td>UT-1972-01-01T00Z</td>
+ *     <td>1972-01-01T00:00:00,102604456Z *)</td>
+ * </tr>
+ * </table>
+ * <p style="font-size: 0.9em;">*) Approximation based on the calculation of delta-T. </p>
+ * </div>
+ *
+ * <div style="margin-top:5px;">
+ * <table border="1">
+ * <caption>What does happen around a leap second (at the end of 2016)?</caption>
+ * <tr>
+ *     <th>time scale</th>
+ *     <th>value space<br><code>getElapsedTime(scale)</code><br><code>getNanosecond(scale)</code></th>
  *     <th>lexical space<br><code>toString(scale)</code></th>
  * </tr>
  * <tr>
  *     <td>POSIX</td>
- *     <td>1970-01-01T00:00:00.000Z</td>
- *     <td>1483228799<br>1483228799<br>1483228800</td>
+ *     <td>1483228799.000<br>1483228799.000<br>1483228800.000</td>
  *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:59.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>UTC</td>
- *     <td>1972-01-01T00:00:00.000Z</td>
- *     <td>1420156825<br>1420156826<br>1420156827</td>
+ *     <td>1420156825.000<br>1420156826.000<br>1420156827.000</td>
  *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:60.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>TAI</td>
- *     <td>1971-12-31T23:59:50.000Z *)</td>
- *     <td>1420156835<br>1420156836<br>1420156837</td>
+ *     <td>1861920035.000<br>1861920036.000<br>1861920037.000</td>
  *     <td>2017-01-01T00:00:35.000Z<br>2017-01-01T00:00:36.000Z<br>2017-01-01T00:00:37.000Z</td>
  * </tr>
  * <tr>
  *     <td>GPS</td>
- *     <td>1980-01-06T00:00:00.000Z</td>
- *     <td>1167264016<br>1167264017<br>1167264018</td>
+ *     <td>1167264016.000<br>1167264017.000<br>1167264018.000</td>
  *     <td>2017-01-01T00:00:16.000Z<br>2017-01-01T00:00:17.000Z<br>2017-01-01T00:00:18.000Z</td>
  * </tr>
+ * <tr>
+ *     <td>TT</td>
+ *     <td>1420156867.184<br>1420156868.184<br>1420156869.184</td>
+ *     <td>2017-01-01T00:01:07,184Z<br>2017-01-01T00:01:08,184Z<br>2017-01-01T00:01:09,184Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UT</td>
+ *     <td>1420156798.600<br>1420156799.600<br>1420156800.599</td>
+ *     <td>2016-12-31T23:59:58,600Z<br>2016-12-31T23:59:59,600Z<br>2017-01-01T00:00:00,599Z</td>
+ * </tr>
  * </table>
- * <p style="font-size: 0.9em;">*) This value is only virtual
- * since TAI is really supported first at UTC epoch (10 seconds later). </p>
  * </div>
  *
  * @author      Meno Hochschild
@@ -215,46 +270,100 @@ import static net.time4j.scale.TimeScale.*;
  *
  * <p>Folgende Tabelle illustriert, wie eine Zeitskala Werte und Darstellungen
  * von <code>Moment</code>-Objekten vor, w&auml;hrend und nach einer Schaltsekunde
- * beeinflu&szlig;t. Zwei Ansichten gibt es, entweder wird ein Moment als
- * seit einer Epoche verstrichene Anzahl von Sekunden interpretiert, oder der Moment
- * wird in einer skalenspezifischen Darstellung ausgegeben. </p>
+ * beeinflu&szlig;t. Zwei Ansichten gibt es, entweder wird ein Moment als seit
+ * einer Epoche verstrichene Anzahl von Sekunden interpretiert (Wertraum), oder
+ * der Moment wird in einer lexikalischen Darstellung ausgegeben. In letzterem Fall
+ * kann eine Kombination aus einem {@code ChronoFormatter} und dem Formatattribut
+ * {@link Attributes#TIME_SCALE} eine flexiblere lexikalische Darstellung erm&ouml;glichen. </p>
  *
  * <div style="margin-top:5px;">
  * <table border="1">
- * <caption>Was passiert zu einer Schaltsekunde?</caption>
+ * <caption>Skalenspezifische Epoche =&gt; <code>Moment.of(0, scale)</code></caption>
  * <tr>
- *     <th>time scale</th>
- *     <th>epoch<br><code>Moment.of(0, scale)</code></th>
- *     <th>value space<br><code>getElapsedTime(scale)</code></th>
- *     <th>lexical space<br><code>toString(scale)</code></th>
+ *     <th>Zeitskala</th>
+ *     <th>Wertraum<br><code>getElapsedTime(scale)</code><br><code>getNanosecond(scale)</code></th>
+ *     <th>Lexikalische Darstellung<br><code>toString(scale)</code></th>
+ *     <th>in UT/UTC<br><code>toString()</code></th>
  * </tr>
  * <tr>
  *     <td>POSIX</td>
- *     <td>1970-01-01T00:00:00.000Z</td>
- *     <td>1483228799<br>1483228799<br>1483228800</td>
+ *     <td>0.000</td>
+ *     <td>POSIX-1970-01-01T00Z</td>
+ *     <td>1970-01-01T00:00:00Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UTC</td>
+ *     <td>0.000</td>
+ *     <td>UTC-1972-01-01T00Z</td>
+ *     <td>1972-01-01T00:00:00Z</td>
+ * </tr>
+ * <tr>
+ *     <td>TAI</td>
+ *     <td>0.000</td>
+ *     <td>TAI-1958-01-01T00Z</td>
+ *     <td>TAI-1957-12-31T23:59:59,658300736Z *)</td>
+ * </tr>
+ * <tr>
+ *     <td>GPS</td>
+ *     <td>0.000</td>
+ *     <td>GPS-1980-01-06T00Z</td>
+ *     <td>1980-01-06T00:00:00Z</td>
+ * </tr>
+ * <tr>
+ *     <td>TT</td>
+ *     <td>0.000</td>
+ *     <td>TT-1972-01-01T00Z</td>
+ *     <td>1971-12-31T23:59:17,716215710Z *)</td>
+ * </tr>
+ * <tr>
+ *     <td>UT</td>
+ *     <td>0.000</td>
+ *     <td>UT-1972-01-01T00Z</td>
+ *     <td>1972-01-01T00:00:00,102604456Z *)</td>
+ * </tr>
+ * </table>
+ * <p style="font-size: 0.9em;">*) N&auml;herung, die auf Delta-T-Berechnungen fu&szlig;t. </p>
+ * </div>
+ *
+ * <div style="margin-top:5px;">
+ * <table border="1">
+ * <caption>Was passiert um eine Schaltsekunde herum (Ende 2016)?</caption>
+ * <tr>
+ *     <th>Zeitskala</th>
+ *     <th>Wertraum<br><code>getElapsedTime(scale)</code><br><code>getNanosecond(scale)</code></th>
+ *     <th>Lexikalische Darstellung<br><code>toString(scale)</code></th>
+ * </tr>
+ * <tr>
+ *     <td>POSIX</td>
+ *     <td>1483228799.000<br>1483228799.000<br>1483228800.000</td>
  *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:59.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>UTC</td>
- *     <td>1972-01-01T00:00:00.000Z</td>
- *     <td>1420156825<br>1420156826<br>1420156827</td>
+ *     <td>1420156825.000<br>1420156826.000<br>1420156827.000</td>
  *     <td>2016-12-31T23:59:59.000Z<br>2016-12-31T23:59:60.000Z<br>2017-01-01T00:00:00.000Z</td>
  * </tr>
  * <tr>
  *     <td>TAI</td>
- *     <td>1971-12-31T23:59:50.000Z *)</td>
- *     <td>1420156835<br>1420156836<br>1420156837</td>
+ *     <td>1861920035.000<br>1861920036.000<br>1861920037.000</td>
  *     <td>2017-01-01T00:00:35.000Z<br>2017-01-01T00:00:36.000Z<br>2017-01-01T00:00:37.000Z</td>
  * </tr>
  * <tr>
  *     <td>GPS</td>
- *     <td>1980-01-06T00:00:00.000Z</td>
- *     <td>1167264016<br>1167264017<br>1167264018</td>
+ *     <td>1167264016.000<br>1167264017.000<br>1167264018.000</td>
  *     <td>2017-01-01T00:00:16.000Z<br>2017-01-01T00:00:17.000Z<br>2017-01-01T00:00:18.000Z</td>
  * </tr>
+ * <tr>
+ *     <td>TT</td>
+ *     <td>1420156867.184<br>1420156868.184<br>1420156869.184</td>
+ *     <td>2017-01-01T00:01:07,184Z<br>2017-01-01T00:01:08,184Z<br>2017-01-01T00:01:09,184Z</td>
+ * </tr>
+ * <tr>
+ *     <td>UT</td>
+ *     <td>1420156798.600<br>1420156799.600<br>1420156800.599</td>
+ *     <td>2016-12-31T23:59:58,600Z<br>2016-12-31T23:59:59,600Z<br>2017-01-01T00:00:00,599Z</td>
+ * </tr>
  * </table>
- * <p style="font-size: 0.9em;">*) Dieser Wert ist nur virtuell, weil TAI erst ab
- * der UTC-Epoche unterst&uuml;tzt wird (10 Sekunden sp&auml;ter). </p>
  * </div>
  *
  * @author      Meno Hochschild
@@ -273,9 +382,11 @@ public final class Moment
         2 * 365 * 86400;
     private static final long POSIX_GPS_DELTA =
         POSIX_UTC_DELTA + UTC_GPS_DELTA - 9; // -9 => without leap seconds
+    private static final long UTC_TAI_DELTA =
+        ((1972 - 1958) * 365 + 3) * 86400;
 
-    private static final int MIO = 1000000;
-    private static final int MRD = 1000000000;
+    private static final int MIO = 1000_000;
+    private static final int MRD = 1000_000_000;
     private static final int POSITIVE_LEAP_MASK = 0x40000000;
 
     private static final long MIN_LIMIT;
@@ -445,18 +556,58 @@ public final class Moment
                 if (scale == UTC) {
                     utcTime = elapsedTime;
                 } else if (scale == TAI) {
-                    utcTime = Math.subtractExact(elapsedTime, 10);
-
-                    if (utcTime < 0) {
+                    if (elapsedTime < 0) {
                         throw new IllegalArgumentException(
-                            "TAI not supported before 1972-01-01: " + elapsedTime);
+                            "TAI not supported before 1958-01-01: " + elapsedTime);
+                    } else if (elapsedTime < UTC_TAI_DELTA) {
+                        long tv = Math.addExact(elapsedTime, 32 - UTC_TAI_DELTA);
+                        nanosecond = Math.addExact(nanosecond, 184_000_000);
+                        if (nanosecond >= MRD) {
+                            tv = Math.incrementExact(tv);
+                            nanosecond = Math.subtractExact(nanosecond, MRD);
+                        }
+                        double tt = tv + (nanosecond / (MRD * 1.0));
+                        PlainDate date = // approximation
+                            PlainDate.of(Math.floorDiv((long) (tt - 42.184), 86400), EpochDays.UTC);
+                        double utValue = tt - TimeScale.deltaT(date);
+                        utcTime = (long) Math.floor(utValue);
+                        nanosecond = toNanos(utValue, utcTime);
+                    } else {
+                        utcTime = Math.subtractExact(elapsedTime, UTC_TAI_DELTA + 10);
                     }
                 } else if (scale == GPS) {
                     utcTime = Math.addExact(elapsedTime, UTC_GPS_DELTA);
-
                     if (utcTime < UTC_GPS_DELTA) {
                         throw new IllegalArgumentException(
                             "GPS not supported before 1980-01-06: " + elapsedTime);
+                    }
+                } else if (scale == TT) {
+                    if ((elapsedTime < 42L) || ((elapsedTime == 42L) && (nanosecond < 184_000_000))) {
+                        double tt = ((double) elapsedTime) + (nanosecond / (MRD * 1.0));
+                        PlainDate date = // approximation
+                            PlainDate.of(Math.floorDiv((long) (tt - 42.184), 86400), EpochDays.UTC);
+                        double utValue = tt - TimeScale.deltaT(date);
+                        utcTime = (long) Math.floor(utValue);
+                        nanosecond = toNanos(utValue, utcTime);
+                    } else {
+                        elapsedTime = Math.subtractExact(elapsedTime, 42);
+                        nanosecond = Math.subtractExact(nanosecond, 184_000_000);
+                        if (nanosecond < 0) {
+                            elapsedTime = Math.decrementExact(elapsedTime);
+                            nanosecond = Math.addExact(nanosecond, MRD);
+                        }
+                        utcTime = elapsedTime;
+                    }
+                } else if (scale == UT) {
+                    if (elapsedTime < 0L) {
+                        utcTime = elapsedTime;
+                    } else {
+                        PlainDate date = // approximation
+                            PlainDate.of(Math.floorDiv(elapsedTime, 86400), EpochDays.UTC);
+                        double ut = ((double) elapsedTime) + (nanosecond / (MRD * 1.0));
+                        double utc = ut + TimeScale.deltaT(date) - 42.184;
+                        utcTime = (long) Math.floor(utc);
+                        nanosecond = toNanos(utc, utcTime);
                     }
                 } else {
                     throw new UnsupportedOperationException(
@@ -467,10 +618,7 @@ public final class Moment
                 long diff = (utcTime - ls.enhance(unix));
                 this.posixTime = unix;
 
-                if (
-                    (diff == 0)
-                    || (unix == MAX_LIMIT)
-                ) {
+                if ((diff == 0) || (unix == MAX_LIMIT)) {
                     this.fraction = nanosecond;
                 } else if (diff == 1) { // positive Schaltsekunde
                     this.fraction = (nanosecond | POSITIVE_LEAP_MASK);
@@ -545,8 +693,8 @@ public final class Moment
      *
      * <p>The given elapsed time {@code elapsedTime} will be internally
      * transformed into the UTC-epochtime, should another time scale than UTC
-     * be given. The time scale TAI will only be supported earliest on UTC
-     * start 1972-01-01, the time scale GPS earliest on 1980-01-06. </p>
+     * be given. The time scale TAI will only be supported earliest on TAI
+     * start 1958-01-01, the time scale GPS earliest on 1980-01-06. </p>
      *
      * @param   elapsedTime     elapsed seconds on given time scale
      * @param   nanosecond      nanosecond fraction of last second
@@ -566,8 +714,8 @@ public final class Moment
      *
      * <p>Die angegebene verstrichene Zeit {@code elapsedTime} wird intern
      * in die UTC-Epochenzeit umgerechnet, sollte eine andere Zeitskala als
-     * UTC angegeben sein. Die Zeitskala TAI wird erst ab der UTC-Epoche
-     * 1972-01-01 unterst&uuml;tzt, die Zeitskala GPS erst ab 1980-01-06. </p>
+     * UTC angegeben sein. Die Zeitskala TAI wird erst ab der TAI-Epoche
+     * 1958-01-01 unterst&uuml;tzt, die Zeitskala GPS erst ab 1980-01-06. </p>
      *
      * @param   elapsedTime     elapsed seconds on given time scale
      * @param   nanosecond      nanosecond fraction of last second
@@ -638,7 +786,7 @@ public final class Moment
     public static Moment from(UnixTime ut) {
 
         if (ut instanceof Moment) {
-            return Moment.class.cast(ut);
+            return (Moment) ut;
         } else if (
             (ut instanceof UniversalTime)
             && LeapSeconds.getInstance().isEnabled()
@@ -689,32 +837,73 @@ public final class Moment
     @Override
     public long getElapsedTime(TimeScale scale) {
 
-        if (scale == POSIX) {
-            return this.posixTime;
-        }
-
-        long utc = this.getEpochTime();
-
         switch (scale) {
+            case POSIX:
+                return this.posixTime;
             case UTC:
-                return utc;
+                return this.getElapsedTimeUTC();
             case TAI:
-                if (utc < 0) {
-                    throw new IllegalArgumentException(
-                        "TAI not supported before 1972-01-01: " + this);
+                long tai;
+                int nano;
+                if (this.getElapsedTimeUTC() < 0) {
+                    PlainDate date = this.getDateUTC();
+                    double ttValue = TimeScale.deltaT(date);
+                    ttValue += (this.posixTime - POSIX_UTC_DELTA);
+                    ttValue += (this.getNanosecond() / (MRD * 1.0));
+                    long tv = (long) Math.floor(ttValue);
+                    if (Double.compare(MRD - (ttValue - tv) * MRD, 1.0) < 0) {
+                        tv++;
+                        nano = 0;
+                    } else {
+                        nano = toNanos(ttValue, tv);
+                    }
+                    tai = tv - 32 + UTC_TAI_DELTA;
+                    nano -= 184_000_000;
+                    if (nano < 0) {
+                        tai--;
+                    }
                 } else {
-                    return utc + 10;
+                    tai = this.getElapsedTimeUTC() + UTC_TAI_DELTA + 10;
+                }
+                if (tai < 0) {
+                    throw new IllegalArgumentException(
+                        "TAI not supported before 1958-01-01: " + this);
+                } else {
+                    return tai;
                 }
             case GPS:
-                if (LeapSeconds.getInstance().strip(utc) < POSIX_GPS_DELTA) {
+                long utcG = this.getElapsedTimeUTC();
+                if (LeapSeconds.getInstance().strip(utcG) < POSIX_GPS_DELTA) {
                     throw new IllegalArgumentException(
                         "GPS not supported before 1980-01-06: " + this);
                 } else {
-                    long gps =
-                        LeapSeconds.getInstance().isEnabled()
-                        ? utc
-                        : (utc + 9);
+                    long gps = LeapSeconds.getInstance().isEnabled() ? utcG : (utcG + 9);
                     return gps - UTC_GPS_DELTA;
+                }
+            case TT:
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    PlainDate date = this.getDateUTC();
+                    double ttValue = TimeScale.deltaT(date);
+                    ttValue += (this.posixTime - POSIX_UTC_DELTA);
+                    ttValue += (this.getNanosecond() / (MRD * 1.0));
+                    long tt = (long) Math.floor(ttValue);
+                    if (Double.compare(MRD - (ttValue - tt) * MRD, 1.0) < 0) {
+                        return tt + 1;
+                    }
+                    return tt;
+                } else {
+                    long tt = this.getElapsedTimeUTC() + 42;
+                    if (this.getNanosecond() + 184_000_000 >= MRD) {
+                        tt++;
+                    }
+                    return tt;
+                }
+            case UT:
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    return (this.posixTime - POSIX_UTC_DELTA);
+                } else {
+                    double utValue = this.getModernUT();
+                    return (long) Math.floor(utValue);
                 }
             default:
                 throw new UnsupportedOperationException(
@@ -733,24 +922,76 @@ public final class Moment
     @Override
     public int getNanosecond(TimeScale scale) {
 
+        int nano;
+
         switch (scale) {
             case POSIX:
             case UTC:
                 return this.getNanosecond();
             case TAI:
-                if (this.posixTime < POSIX_UTC_DELTA) {
-                    throw new IllegalArgumentException(
-                        "TAI not supported before 1972-01-01: " + this);
+                long tai;
+                if (this.getElapsedTimeUTC() < 0) {
+                    PlainDate date = this.getDateUTC();
+                    double ttValue = TimeScale.deltaT(date);
+                    ttValue += (this.posixTime - POSIX_UTC_DELTA);
+                    ttValue += (this.getNanosecond() / (MRD * 1.0));
+                    long tv = (long) Math.floor(ttValue);
+                    if (Double.compare(MRD - (ttValue - tv) * MRD, 1.0) < 0) {
+                        tv++;
+                        nano = 0;
+                    } else {
+                        nano = toNanos(ttValue, tv);
+                    }
+                    tai = tv - 32 + UTC_TAI_DELTA;
+                    nano -= 184_000_000;
+                    if (nano < 0) {
+                        tai--;
+                        nano += MRD;
+                    }
                 } else {
-                    return this.getNanosecond();
+                    tai = this.getElapsedTimeUTC() + UTC_TAI_DELTA;
+                    nano = this.getNanosecond();
+                }
+                if (tai < 0) {
+                    throw new IllegalArgumentException(
+                        "TAI not supported before 1958-01-01: " + this);
+                } else {
+                    return nano;
                 }
             case GPS:
-                long utc = this.getEpochTime();
+                long utc = this.getElapsedTimeUTC();
                 if (LeapSeconds.getInstance().strip(utc) < POSIX_GPS_DELTA) {
                     throw new IllegalArgumentException(
                         "GPS not supported before 1980-01-06: " + this);
                 } else {
                     return this.getNanosecond();
+                }
+            case TT:
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    PlainDate date = this.getDateUTC();
+                    double ttValue = TimeScale.deltaT(date);
+                    ttValue += (this.posixTime - POSIX_UTC_DELTA);
+                    ttValue += (this.getNanosecond() / (MRD * 1.0));
+                    long tt = (long) Math.floor(ttValue);
+                    if (Double.compare(MRD - (ttValue - tt) * MRD, 1.0) < 0) {
+                        nano = 0;
+                    } else {
+                        nano = toNanos(ttValue, tt);
+                    }
+                } else {
+                    nano = this.getNanosecond() + 184_000_000;
+                    if (nano >= MRD) {
+                        nano -= MRD;
+                    }
+                }
+                return nano;
+            case UT:
+                if (this.posixTime < POSIX_UTC_DELTA) {
+                    return this.getNanosecond();
+                } else {
+                    double utValue = this.getModernUT();
+                    long ut = (long) Math.floor(utValue);
+                    return toNanos(utValue, ut);
                 }
             default:
                 throw new UnsupportedOperationException(
@@ -1146,7 +1387,7 @@ public final class Moment
                 case SECONDS:
                     if (LeapSeconds.getInstance().isEnabled()) {
                         result = new Moment(
-                            Math.addExact(this.getEpochTime(), amount),
+                            Math.addExact(this.getElapsedTimeUTC(), amount),
                             this.getNanosecond(),
                             UTC);
                     } else {
@@ -1165,7 +1406,7 @@ public final class Moment
 
                     if (LeapSeconds.getInstance().isEnabled()) {
                         result = new Moment(
-                            Math.addExact(this.getEpochTime(), second),
+                            Math.addExact(this.getElapsedTimeUTC(), second),
                             nano,
                             UTC
                         );
@@ -1506,8 +1747,8 @@ public final class Moment
     @Override
     public int compareTo(Moment moment) {
 
-        long u1 = this.getEpochTime();
-        long u2 = moment.getEpochTime();
+        long u1 = this.getElapsedTimeUTC();
+        long u2 = moment.getElapsedTimeUTC();
 
         if (u1 < u2) {
             return -1;
@@ -1574,51 +1815,12 @@ public final class Moment
     @Override
     public String toString() {
 
-        // Datum berechnen
-        PlainDate date = this.getDateUTC();
-
-        // Uhrzeit berechnen
-        int timeOfDay = getTimeOfDay(this);
-        int minutes = timeOfDay / 60;
-        int hour = minutes / 60;
-        int minute = minutes % 60;
-        int second = timeOfDay % 60;
-
-        // LS-Korrektur (negative LS => 59!!!, positive LS => 60)
-        second += LeapSeconds.getInstance().getShift(this.getEpochTime());
-
-        StringBuilder sb = new StringBuilder(50);
-
-        // Datum formatieren
-        sb.append(date);
-
-        // Separator
-        sb.append('T');
-
-        // Uhrzeit formatieren
-        format(hour, 2, sb);
-        sb.append(':');
-        format(minute, 2, sb);
-        sb.append(':');
-        format(second, 2, sb);
-
-        // Fraktionaler Sekundenteil
-        int nano = this.getNanosecond();
-
-        if (nano > 0) {
-            sb.append(',');
-            format(nano, 9, sb);
-        }
-
-        // UTC-Symbol anhängen
-        sb.append('Z');
-
-        return sb.toString();
+        return this.toStringUTC(true);
 
     }
 
     /**
-     * <p>Creates a formatted view of this instance taking in account
+     * <p>Creates a formatted view of this instance taking into account
      * given time scale. </p>
      *
      * <pre>
@@ -1639,6 +1841,12 @@ public final class Moment
      *
      *  System.out.println(moment.toString(TimeScale.GPS));
      *  // Output: GPS-2012-07-01T00:00:15,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.TT));
+     *  // Output: TT-2012-07-01T00:01:07,183999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.UT));
+     *  // Output: UT-2012-07-01T00:00:00,405953024Z
      * </pre>
      *
      * @param   scale   time scale to be used for formatting
@@ -1670,6 +1878,12 @@ public final class Moment
      *
      *  System.out.println(moment.toString(TimeScale.GPS));
      *  // Ausgabe: GPS-2012-07-01T00:00:15,999999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.TT));
+     *  // Output: TT-2012-07-01T00:01:07,183999999Z
+     *
+     *  System.out.println(moment.toString(TimeScale.UT));
+     *  // Output: UT-2012-07-01T00:00:00,405953024Z
      * </pre>
      *
      * @param   scale   time scale to be used for formatting
@@ -1691,16 +1905,14 @@ public final class Moment
                 sb.append('Z');
                 break;
             case UTC:
-                sb.append(this.toString());
+                sb.append(this.toStringUTC(false));
                 break;
             case TAI:
-                Moment tai = this.transformForPrint(scale);
-                sb.append(PlainTimestamp.from(tai, ZonalOffset.UTC));
-                sb.append('Z');
-                break;
             case GPS:
-                Moment gps = this.transformForPrint(scale);
-                sb.append(PlainTimestamp.from(gps, ZonalOffset.UTC));
+            case TT:
+            case UT:
+                Moment adjusted = this.transformForPrint(scale);
+                sb.append(PlainTimestamp.from(adjusted, ZonalOffset.UTC));
                 sb.append('Z');
                 break;
             default:
@@ -1816,7 +2028,58 @@ public final class Moment
 
     }
 
-    private long getEpochTime() {
+    private String toStringUTC(boolean extended) {
+
+        // Datum berechnen
+        PlainDate date = this.getDateUTC();
+
+        // Uhrzeit berechnen
+        int timeOfDay = getTimeOfDay(this);
+        int minutes = timeOfDay / 60;
+        int hour = minutes / 60;
+        int minute = minutes % 60;
+        int second = timeOfDay % 60;
+
+        // LS-Korrektur (negative LS => 59!!!, positive LS => 60)
+        second += LeapSeconds.getInstance().getShift(this.getElapsedTimeUTC());
+
+        // Fraktionaler Sekundenteil
+        int nano = this.getNanosecond();
+
+        StringBuilder sb = new StringBuilder(50);
+
+        // Datum formatieren
+        sb.append(date);
+
+        // Separator
+        sb.append('T');
+
+        // Uhrzeit formatieren
+        format(hour, 2, sb);
+
+        if (extended || ((minute | second | nano) != 0)) {
+            sb.append(':');
+            format(minute, 2, sb);
+
+            if (extended || ((second | nano) != 0)) {
+                sb.append(':');
+                format(second, 2, sb);
+
+                if (nano > 0) {
+                    sb.append(',');
+                    format(nano, 9, sb);
+                }
+            }
+        }
+
+        // UTC-Symbol anhängen
+        sb.append('Z');
+
+        return sb.toString();
+
+    }
+
+    private long getElapsedTimeUTC() {
 
         if (LeapSeconds.getInstance().isEnabled()) {
             long time = LeapSeconds.getInstance().enhance(this.posixTime);
@@ -1850,6 +2113,36 @@ public final class Moment
 
     }
 
+    private double getModernUT() {
+
+        PlainDate date = this.getDateUTC();
+        double utValue = this.getElapsedTimeUTC();
+        utValue += 42.184;
+        utValue += (this.getNanosecond() / (MRD * 1.0));
+        utValue -= TimeScale.deltaT(date);
+        long ut = (long) Math.floor(utValue);
+
+        if (Double.compare(MRD - (utValue - ut) * MRD, 1.0) < 0) {
+            return ut + 1; // prevents rounding errors
+        }
+
+        return utValue;
+
+    }
+
+    private static int toNanos(
+        double value,
+        long floor
+    ) {
+
+        try {
+            return (int) (value * MRD - Math.multiplyExact(floor, MRD));
+        } catch (ArithmeticException ae) {
+            return (int) ((value - floor) * MRD); // less precise
+        }
+
+    }
+
     private boolean isPositiveLS() {
 
         return ((this.fraction >>> 30) != 0);
@@ -1871,12 +2164,9 @@ public final class Moment
 
     private static void checkUnixTime(long unixTime) {
 
-        if (
-            (unixTime > MAX_LIMIT)
-            || (unixTime < MIN_LIMIT)
-        ) {
+        if ((unixTime > MAX_LIMIT) || (unixTime < MIN_LIMIT)) {
             throw new IllegalArgumentException(
-                "UNIX time (UT1) out of supported range: " + unixTime);
+                "UNIX time (UT) out of supported range: " + unixTime);
         }
 
     }
@@ -1906,9 +2196,17 @@ public final class Moment
                 return this;
             case TAI:
                 return new Moment(
-                    this.getNanosecond(),
+                    this.getNanosecond(scale),
                     Math.addExact(
-                        this.getElapsedTime(TAI),
+                        this.getElapsedTime(scale),
+                        POSIX_UTC_DELTA - UTC_TAI_DELTA)
+                );
+            case TT:
+            case UT:
+                return new Moment(
+                    this.getNanosecond(scale),
+                    Math.addExact(
+                        this.getElapsedTime(scale),
                         POSIX_UTC_DELTA)
                 );
             case GPS:
@@ -1936,6 +2234,15 @@ public final class Moment
             case POSIX:
                 return this;
             case TAI:
+                return new Moment(
+                    Math.subtractExact(
+                        this.posixTime,
+                        POSIX_UTC_DELTA - UTC_TAI_DELTA),
+                    this.getNanosecond(),
+                    scale
+                );
+            case TT:
+            case UT:
                 return new Moment(
                     Math.subtractExact(
                         this.posixTime,
