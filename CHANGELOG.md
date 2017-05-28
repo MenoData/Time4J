@@ -8,6 +8,9 @@
 ### Changed
 - Redefine value space and epoch of TAI [#652]
 
+### Deprecated
+- Prepare StartOfDay-change for next major release [#655]
+
 ## [v3.32] published on 2017-04-28
 ### Added
 - Japanese imperial calendar [#560]
