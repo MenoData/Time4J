@@ -1,5 +1,6 @@
 package net.time4j.calendar;
 
+import net.time4j.calendar.astro.JulianDay;
 import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -68,6 +69,11 @@ public class SerializationTest {
     @Test
     public void serializeIndian() throws IOException, ClassNotFoundException {
         roundtrip(IndianCalendar.of(1912, 5, 31));
+    }
+
+    @Test
+    public void serializeJulianDay() throws IOException, ClassNotFoundException {
+        roundtrip(JulianDay.ofEphemerisTime(2451545.0));
     }
 
     private static int roundtrip(Object obj)
