@@ -21,7 +21,6 @@
 
 package net.time4j.calendar;
 
-import net.time4j.CalendarUnit;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
@@ -46,7 +45,6 @@ import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
-import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
@@ -253,6 +251,7 @@ public final class PersianCalendar
     public static final StdCalendarElement<Weekday, PersianCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<>(PersianCalendar.class, getDefaultWeekmodel());
 
+    private static final PersianAlgorithm DEFAULT_COMPUTATION = PersianAlgorithm.BORKOWSKI;
     private static final EraYearMonthDaySystem<PersianCalendar> CALSYS;
     private static final TimeAxis<PersianCalendar.Unit, PersianCalendar> ENGINE;
 
@@ -934,62 +933,21 @@ public final class PersianCalendar
                 throw new IllegalArgumentException("Invalid era: " + era);
             }
 
-            if (
-                (yearOfEra >= 1)
-                && (yearOfEra <= 3000)
-            ) {
-                PersianCalendar nextYear = new PersianCalendar(yearOfEra + 1, 1, 1);
-                PersianCalendar thisYear = new PersianCalendar(yearOfEra, 1, 1);
-                return (int) (this.transform(nextYear) - this.transform(thisYear));
-            }
-
-            throw new IllegalArgumentException("Out of bounds: year=" + yearOfEra);
+            return DEFAULT_COMPUTATION.isLeapYear(yearOfEra) ? 366 : 365;
 
         }
 
         @Override
         public PersianCalendar transform(long utcDays) {
 
-            PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
-            int pyear = date.getYear() - 621;
-
-            if (date.getMonth() < 3) {
-                pyear--; // optimization
-            }
-
-            PlainDate equinox = vernalEquinox(pyear);
-            long delta = CalendarUnit.DAYS.between(equinox, date);
-
-            while (delta < 0) {
-                pyear--;
-                equinox = vernalEquinox(pyear);
-                delta = CalendarUnit.DAYS.between(equinox, date);
-            }
-
-            int pmonth = 1;
-
-            while (pmonth < 12) {
-                int len = ((pmonth <= 6) ? 31 : 30);
-
-                if (delta < len) {
-                    break;
-                } else {
-                    delta -= len;
-                    pmonth++;
-                }
-            }
-
-            int pdom = (int) (delta + 1);
-            return PersianCalendar.of(pyear, pmonth, pdom);
+            return DEFAULT_COMPUTATION.transform(utcDays);
 
         }
 
         @Override
         public long transform(PersianCalendar date) {
 
-            long utcDays = vernalEquinox(date.pyear).getDaysSinceEpochUTC();
-            utcDays += ((date.pmonth - 1) * 31 - ((date.pmonth / 7) * (date.pmonth - 7)) + date.pdom - 1);
-            return utcDays;
+            return DEFAULT_COMPUTATION.transform(date);
 
         }
 
@@ -1014,49 +972,6 @@ public final class PersianCalendar
 
             CalendarEra era = PersianEra.ANNO_PERSICO;
             return Collections.singletonList(era);
-
-        }
-
-        private static PlainDate vernalEquinox(int pyear) {
-
-            int[] breaks =
-                new int[] {
-                    -61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181,
-                    1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178
-                };
-            int max = breaks[breaks.length - 1];
-
-            if ((pyear < 1) || (pyear >= max)) {
-                throw new IllegalArgumentException("Persian year out of range 1-" + max + ": " + pyear);
-            }
-
-            int gyear = pyear + 621;
-            int leapP = -14;
-            int previousY = breaks[0];
-            int delta = 0;
-
-            for (int i = 1; i < breaks.length; i++) {
-                int currentY = breaks[i];
-                delta = currentY - previousY;
-
-                if (pyear < currentY) {
-                    break;
-                }
-
-                leapP += ((delta / 33) * 8 + (delta % 33) / 4);
-                previousY = currentY;
-            }
-
-            int n = pyear - previousY;
-            leapP += ((n / 33) * 8 + ((n % 33) + 3) / 4);
-
-            if (((delta % 33) == 4) && (delta - n == 4)) {
-                leapP++;
-            }
-
-            int leapG = gyear / 4 - ((gyear / 100 + 1) * 3) / 4 - 150;
-            int marchDay = 20 + leapP - leapG;
-            return PlainDate.of(gyear, 3, marchDay);
 
         }
 

@@ -21,7 +21,10 @@
 
 package net.time4j.calendar;
 
+import net.time4j.CalendarUnit;
+import net.time4j.PlainDate;
 import net.time4j.engine.CalendarSystem;
+import net.time4j.engine.EpochDays;
 
 
 /**
@@ -57,15 +60,77 @@ public enum PersianAlgorithm {
     BORKOWSKI() {
         @Override
         public boolean isLeapYear(int pYear) {
-            return PersianCalendar.of(pYear, 1, 1).isLeapYear();
+            super.isLeapYear(pYear); // range-check
+            PersianCalendar nextYear = new PersianCalendar(pYear + 1, 1, 1);
+            PersianCalendar thisYear = new PersianCalendar(pYear, 1, 1);
+            return (this.transform(nextYear) - this.transform(thisYear) == 366L);
         }
         @Override
         PersianCalendar transform(long utcDays) {
-            return PersianCalendar.axis().getCalendarSystem().transform(utcDays);
+            PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
+            int pyear = date.getYear() - 621;
+            if (date.getMonth() < 3) {
+                pyear--; // optimization
+            }
+            PlainDate equinox = vernalEquinox(pyear);
+            long delta = CalendarUnit.DAYS.between(equinox, date);
+            while (delta < 0) {
+                pyear--;
+                equinox = vernalEquinox(pyear);
+                delta = CalendarUnit.DAYS.between(equinox, date);
+            }
+            int pmonth = 1;
+            while (pmonth < 12) {
+                int len = ((pmonth <= 6) ? 31 : 30);
+                if (delta < len) {
+                    break;
+                } else {
+                    delta -= len;
+                    pmonth++;
+                }
+            }
+            int pdom = (int) (delta + 1);
+            return PersianCalendar.of(pyear, pmonth, pdom);
         }
         @Override
         long transform(PersianCalendar date) {
-            return PersianCalendar.axis().getCalendarSystem().transform(date);
+            int pyear = date.getYear();
+            int pmonth = date.getMonth().getValue();
+            long utcDays = vernalEquinox(pyear).getDaysSinceEpochUTC();
+            utcDays += ((pmonth) - 1) * 31 - ((pmonth / 7) * (pmonth - 7)) + date.getDayOfMonth() - 1;
+            return utcDays;
+        }
+        private PlainDate vernalEquinox(int pyear) {
+            int[] breaks =
+                new int[] {
+                    -61, 9, 38, 199, 426, 686, 756, 818, 1111, 1181,
+                    1210, 1635, 2060, 2097, 2192, 2262, 2324, 2394, 2456, 3178
+                };
+            int max = breaks[breaks.length - 1];
+            if ((pyear < 1) || (pyear >= max)) {
+                throw new IllegalArgumentException("Persian year out of range 1-" + max + ": " + pyear);
+            }
+            int gyear = pyear + 621;
+            int leapP = -14;
+            int previousY = breaks[0];
+            int delta = 0;
+            for (int i = 1; i < breaks.length; i++) {
+                int currentY = breaks[i];
+                delta = currentY - previousY;
+                if (pyear < currentY) {
+                    break;
+                }
+                leapP += ((delta / 33) * 8 + (delta % 33) / 4);
+                previousY = currentY;
+            }
+            int n = pyear - previousY;
+            leapP += ((n / 33) * 8 + ((n % 33) + 3) / 4);
+            if (((delta % 33) == 4) && (delta - n == 4)) {
+                leapP++;
+            }
+            int leapG = gyear / 4 - ((gyear / 100 + 1) * 3) / 4 - 150;
+            int marchDay = 20 + leapP - leapG;
+            return PlainDate.of(gyear, 3, marchDay);
         }
     },
 
