@@ -457,13 +457,15 @@ public final class JulianDay
      * @serialData  Checks the consistency of deserialized data.
      * @param       in      object input stream
      * @throws      StreamCorruptedException if the data are not consistent
+     * @throws      IOException if the data cannot be read
      */
     private void readObject(ObjectInputStream in)
         throws IOException {
 
         try {
+            in.defaultReadObject();
             check(this.value, this.scale);
-        } catch (IllegalArgumentException re) {
+        } catch (IllegalArgumentException | ClassNotFoundException ex) {
             throw new StreamCorruptedException();
         }
 
