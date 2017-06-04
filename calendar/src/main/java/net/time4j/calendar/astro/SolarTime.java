@@ -24,13 +24,10 @@ package net.time4j.calendar.astro;
 import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
-import net.time4j.SystemClock;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.ZonalOffset;
-
-import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -75,7 +72,7 @@ public class SolarTime {
      * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
      * @see     #equationOfTime(Moment)
      */
-    public static ChronoFunction<Moment, PlainTimestamp> at(ZonalOffset offset) {
+    public static ChronoFunction<Moment, PlainTimestamp> apparentAt(ZonalOffset offset) {
 
         return context -> {
             PlainTimestamp meanSolarTime = onAverage(context, offset);
@@ -84,6 +81,26 @@ public class SolarTime {
             int nanos = (int) ((eot - secs) * 1_000_000_000);
             return meanSolarTime.plus(secs, ClockUnit.SECONDS).plus(nanos, ClockUnit.NANOS);
         };
+
+    }
+
+    /**
+     * <p>Determines the mean solar time of any moment at given local time zone offset. </p>
+     *
+     * @param   offset      the time zone offset which might depend on the geographical longitude
+     * @return  function for getting the mean solar time
+     * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
+     */
+    /*[deutsch]
+     * <p>Ermittelt die mittlere Ortszeit zur angegebenen lokalen Zeitzonendifferenz. </p>
+     *
+     * @param   offset      the time zone offset which might depend on the geographical longitude
+     * @return  function for getting the mean solar time
+     * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
+     */
+    public static ChronoFunction<Moment, PlainTimestamp> onAverage(ZonalOffset offset) {
+
+        return context -> onAverage(context, offset);
 
     }
 
@@ -165,21 +182,11 @@ public class SolarTime {
 
     private static PlainTimestamp onAverage(Moment context, ZonalOffset offset) {
 
-        Moment ut;
-
-        if (context.isBefore(SystemClock.currentMoment().plus(180, TimeUnit.DAYS))) {
-            ut =
-                Moment.of(
-                    context.getElapsedTime(TimeScale.UT) + 2 * 365 * 86400,
-                    context.getNanosecond(TimeScale.UT),
-                    TimeScale.POSIX);
-        } else {
-            // for future timestamps when we don't know how many leap seconds will be inserted,
-            // we simply use POSIX because UT-timestamps do depend on future leap seconds
-            // and POSIX is a better approximation in the future provided that leap seconds continue
-            ut = context;
-        }
-
+        Moment ut =
+            Moment.of(
+                context.getElapsedTime(TimeScale.UT) + 2 * 365 * 86400,
+                context.getNanosecond(TimeScale.UT),
+                TimeScale.POSIX);
         return ut.toZonalTimestamp(offset);
 
     }
