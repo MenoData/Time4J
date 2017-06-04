@@ -48,14 +48,41 @@ public enum PersianAlgorithm {
      * <a href="http://www.astro.uni.torun.pl/~kb/Papers/EMP/PersianC-EMP.htm">Kazimierz Borkowski</a>. </p>
      *
      * <p>This is the default and uses a refinement of the Khayyam 33-year-rule based on astronomical
-     * calculations for the Iranian Standard Time. </p>
+     * calculations for the Teheran mean time. However, users should keep following things in mind when
+     * discussing the possible errors: </p>
+     *
+     * <ul>
+     *     <li>Borkowski uses the offset of {@code +03:25:30} which deviates from the Iranian Standard Time
+     *     {@code +03:30}. In addition, it is questionable if the historic ancestor of the Persian calendar
+     *     has used any of these offsets in ancient times. </li>
+     *     <li>The astronomical calculations are not published in detail but seem to deviate by several minutes
+     *     compared with what we can derive from the work of the Belgian astronomer Jean Meeus. </li>
+     *     <li>The delta-T-calculation is somehow simplistic compared with the more accurate formulas
+     *     used in Time4J. </li>
+     *     <li>The mean solar time is used. It is for debate if the Persian calendar is rather based
+     *     on the apparent solar time. </li>
+     * </ul>
      */
     /*[deutsch]
      * <p>Fu&szlig;t auf der Arbeit des polnischen Astronomen
      * <a href="http://www.astro.uni.torun.pl/~kb/Papers/EMP/PersianC-EMP.htm">Kazimierz Borkowski</a>. </p>
      *
      * <p>Diese Standardeinstellung verwendet eine Verfeinerung der Khayyam-33-Jahreszyklus-Regel,
-     * indem astronomische Berechnungen f&uuml;r die Standardzeit des Iran zugrundegelegt werden. </p>
+     * indem astronomische Berechnungen f&uuml;r die mittlere Zeit von Teheran zugrundegelegt werden.
+     * Zur Fehlerdiskussion gibt es allerdings folgende Punkte zu bedenken: </p>
+     *
+     * <ul>
+     *     <li>Borkowski verwendet die Zeitverschiebung von {@code +03:25:30}, die von der Standardzeit
+     *     des Iran abweicht {@code +03:30}. Au&szlig;erdem ist es fraglich, ob der historische Vorg&auml;nger
+     *     des persischen Kalenders irgendeine solche Verschiebung in alten Zeiten benutzt hat. </li>
+     *     <li>Die astronomischen Grundlagen sind von Borkowski nicht im Detail ver&ouml;ffentlicht worden,
+     *     scheinen aber von dem, was wir aus der Arbeit des belgischen Astronomen Jean Meeus bekommen
+     *     k&ouml;nnen, um mehrere Minuten abzuweichen. </li>
+     *     <li>Die Delta-T-Berechnung ist verglichen mit den genaueren Formeln, die in Time4J verwendet
+     *     werden, besonders in der fernen Zukunft stark vereinfacht. </li>
+     *     <li>Es wird die mittlere Ortszeit verwendet. Allerdings kann dar&uuml;ber debattiert werden,
+     *     ob nicht die wahre Ortszeit herangezogen werden sollte. </li>
+     * </ul>
      */
     BORKOWSKI() {
         @Override

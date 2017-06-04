@@ -1,11 +1,18 @@
 package net.time4j.calendar;
 
+import net.time4j.CalendarUnit;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
+import net.time4j.calendar.astro.AstronomicalSeason;
+import net.time4j.calendar.astro.JulianDay;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -134,6 +141,59 @@ public class PersianMiscellaneousTest {
         for (long utcDays = min; utcDays <= max; utcDays++) {
             PersianCalendar birashk = PersianAlgorithm.BIRASHK.transform(utcDays);
             assertThat(PersianAlgorithm.BIRASHK.transform(birashk), is(utcDays));
+        }
+    }
+
+    @Test
+    public void borkowskiAstronomical() {
+        int year = PersianCalendar.of(1, 1, 1).getInt(CommonElements.RELATED_GREGORIAN_YEAR);
+        ZonalOffset offset = ZonalOffset.ofTotalSeconds((int) (3.425 * 3600)); // +03:25:30 (used by Borkowski)
+        while (year <= 3000) {
+            JulianDay jd = AstronomicalSeason.VERNAL_EQUINOX.julianDay(year);
+            double tt = (jd.getValue() - 2441317.5) * 86400.0;
+            double deltaT; // formula of Borkowski
+            int t = (year - 1800) / 100;
+            if (year < 948) {
+                deltaT = (44.3 * t + 320) * t + 1360;
+            } else if (year < 1637) {
+                deltaT = 25.5 * t * t;
+            } else if (year > 2005) {
+                deltaT = 25.5 * t * t - 36;
+            } else {
+                deltaT = TimeScale.deltaT(year, 3);
+            }
+            double ut = tt - deltaT;
+            long seconds = (long) Math.floor(ut);
+            int nanos = (int) ((ut - seconds) * 1_000_000_000);
+
+            PlainTimestamp tsp =
+                // Borkowski uses mean solar time
+                Moment.of(
+                    seconds + 2 * 365 * 86400,
+                    nanos,
+                    TimeScale.POSIX
+                ).toZonalTimestamp(offset);
+            if (tsp.getHour() >= 12) {
+                tsp = tsp.plus(1, CalendarUnit.DAYS); // determine equinox day nearest to midnight
+            }
+            PlainDate cal = PersianCalendar.of(year - 621, 1, 1).transform(PlainDate.axis()); // algorithmic date
+            try {
+                assertThat(cal, is(tsp.getCalendarDate()));
+            } catch (Throwable th) {
+                switch (year) {
+                    case 659:
+                    case 1113:
+                    case 1307:
+                    case 2487:
+                    case 2681:
+                    case 2846:
+                        System.out.println(tsp); // tolerated deviation, probably caused by slightly different astronomy
+                        break;
+                    default:
+                        throw th;
+                }
+            }
+            year++;
         }
     }
 
