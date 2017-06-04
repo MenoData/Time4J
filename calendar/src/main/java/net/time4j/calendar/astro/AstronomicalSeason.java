@@ -119,6 +119,35 @@ public enum AstronomicalSeason {
 
 	}
 
+	/**
+	 * <p>Determines the Julian day of this astronomical event in given year. </p>
+	 *
+	 * <p>The precision is for modern times (around 2000) better than a minute. The underlying astronomical
+	 * calculations are based on formula given by Jean Meeus in his book &quot;Astronomical algorithms&quot;. </p>
+	 *
+	 * @param 	year	gregorian/julian year
+	 * @return	JD(TT) of this astronomical event (equinox or solstice) in given year
+	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 * @see 	JulianDay#ofEphemerisTime(double)
+	 */
+	/*[deutsch]
+	 * <p>Berechnet den julianischen Tag, wann dieses astronomische Ereignis im angegebenen Jahr auftritt. </p>
+	 *
+	 * <p>Die Genauigkeit ist f&uuml;r moderne Zeiten (um das Jahr 2000 herum) besser als eine Minute.
+	 * Die zugrundeliegenden astronomischen Berechnungen fu&szlig;en auf Formeln aus dem Buch
+	 * &quot;Astronomical algorithms&quot; von Jean Meeus. </p>
+	 *
+	 * @param 	year	gregorian/julian year
+	 * @return	JD(TT) of this astronomical event (equinox or solstice) in given year
+	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 * @see 	JulianDay#ofEphemerisTime(double)
+	 */
+	public JulianDay julianDay(int year) {
+
+		return JulianDay.ofEphemerisTime(this.jdEphemerisDays(year));
+
+	}
+
 	private double jdEphemerisDays(int year) {
 
 		double jd0 = this.jdMean(year);
@@ -138,20 +167,16 @@ public enum AstronomicalSeason {
 			switch (this) {
 
 				case VERNAL_EQUINOX :
-					return 1721139.29189 + 365242.13740 * y + 0.06134 * Math.pow(y, 2)
-					+ 0.00111 * Math.pow(y, 3) - 0.00071 * Math.pow(y, 4);
+					return 1721139.29189 + (365242.13740 + (0.06134 + (0.00111 - 0.00071 * y) * y) * y) * y;
 
 				case SUMMER_SOLSTICE :
-					return 1721233.25401 + 365241.72562 * y - 0.05323 * Math.pow(y, 2)
-					+ 0.00907 * Math.pow(y, 3) + 0.00025 * Math.pow(y, 4);
+					return 1721233.25401 + (365241.72562 + (-0.05323 + (0.00907 + 0.00025 * y) * y) * y) * y;
 
 				case AUTUMNAL_EQUINOX :
-					return 1721325.70455 + 365242.49558 * y - 0.11677 * Math.pow(y, 2)
-					- 0.00297 * Math.pow(y, 3) + 0.00074 * Math.pow(y, 4);
+					return 1721325.70455 + (365242.49558 + (-0.11677 + (-0.00297 + 0.00074 * y) * y) * y) * y;
 
 				case WINTER_SOLSTICE :
-					return 1721414.39987 + 365242.88257 * y - 0.00769 * Math.pow(y, 2)
-					- 0.00933 * Math.pow(y, 3) - 0.00006 * Math.pow(y, 4);
+					return 1721414.39987 + (365242.88257 + (-0.00769 + (-0.00933 - 0.00006 * y) * y) * y) * y;
 
 				default :
 					throw new AssertionError(this);
@@ -162,20 +187,16 @@ public enum AstronomicalSeason {
 			switch (this) {
 
 				case VERNAL_EQUINOX :
-					return 2451623.80984 + 365242.37404 * y + 0.05169 * Math.pow(y, 2)
-					- 0.00411 * Math.pow(y, 3) - 0.00057 * Math.pow(y, 4);
+					return 2451623.80984 + (365242.37404 + (0.05169 + (-0.00411 - 0.00057 * y) * y) * y) * y;
 
 				case SUMMER_SOLSTICE :
-					return 2451716.56767 + 365241.62603 * y + 0.00325 * Math.pow(y, 2)
-					+ 0.00888 * Math.pow(y, 3) - 0.00030 * Math.pow(y, 4);
+					return 2451716.56767 + (365241.62603 + (0.00325 + (0.00888 - 0.00030 * y) * y) * y) * y;
 
 				case AUTUMNAL_EQUINOX :
-					return 2451810.21715 + 365242.01767 * y - 0.11575 * Math.pow(y, 2)
-					+ 0.00337 * Math.pow(y, 3) + 0.00078 * Math.pow(y, 4);
+					return 2451810.21715 + (365242.01767 + (-0.11575 + (0.00337 + 0.00078 * y) * y) * y) * y;
 
 				case WINTER_SOLSTICE :
-					return 2451900.05952 + 365242.74049 * y - 0.06223 * Math.pow(y, 2)
-					- 0.00823 * Math.pow(y, 3) + 0.00032 * Math.pow(y, 4);
+					return 2451900.05952 + (365242.74049 + (-0.06223 + (-0.00823 + 0.00032 * y) * y) * y) * y;
 
 				default :
 					throw new AssertionError(this);

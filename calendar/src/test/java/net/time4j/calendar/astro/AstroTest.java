@@ -4,7 +4,6 @@ import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDays;
-import net.time4j.scale.TimeScale;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -160,17 +159,10 @@ public class AstroTest {
         AstronomicalSeason season,
         PlainTimestamp expected
     ) {
-        Moment utc =
-            season.inYear(year);
-        Moment ut =
-            Moment.of(
-                utc.getElapsedTime(TimeScale.UT) + 2 * 365 * 86400,
-                utc.getNanosecond(TimeScale.UT),
-                TimeScale.POSIX);
-        PlainTimestamp tsp = ut.toZonalTimestamp(ZonalOffset.UTC);
+        PlainTimestamp ut = season.inYear(year).get(SolarTime.onAverage(ZonalOffset.UTC));
 
-        if (Math.abs(ClockUnit.MINUTES.between(tsp, expected)) > 0L) {
-            fail("Expected: " + expected + ", but was: " + tsp);
+        if (Math.abs(ClockUnit.MINUTES.between(ut, expected)) > 0L) {
+            fail("Expected: " + expected + ", but was: " + ut);
         }
     }
 
@@ -184,10 +176,10 @@ public class AstroTest {
         ZonalOffset teheran = ZonalOffset.atLongitude(OffsetSign.AHEAD_OF_UTC, 52, 30, 0.0); // +03:30
         Moment spring2024 = AstronomicalSeason.VERNAL_EQUINOX.inYear(2024);
         Moment spring2025 = AstronomicalSeason.VERNAL_EQUINOX.inYear(2025);
-        PlainTimestamp tsp2024 = spring2024.get(SolarTime.at(teheran));
-        PlainTimestamp tsp2025 = spring2025.get(SolarTime.at(teheran));
-        System.out.println("apparent solar time of Teheran: " + spring2024.get(SolarTime.at(teheran)));
-        System.out.println("apparent solar time of Teheran: " + spring2025.get(SolarTime.at(teheran)));
+        PlainTimestamp tsp2024 = spring2024.get(SolarTime.apparentAt(teheran));
+        PlainTimestamp tsp2025 = spring2025.get(SolarTime.apparentAt(teheran));
+        System.out.println("apparent solar time of Teheran: " + spring2024.get(SolarTime.apparentAt(teheran)));
+        System.out.println("apparent solar time of Teheran: " + spring2025.get(SolarTime.apparentAt(teheran)));
         assertThat(tsp2024.getHour() < 12, is(true));
         assertThat(tsp2025.getHour() >= 12, is(true));
         assertThat(
