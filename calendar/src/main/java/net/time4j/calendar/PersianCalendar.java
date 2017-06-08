@@ -38,8 +38,10 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
@@ -56,6 +58,7 @@ import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -552,6 +555,67 @@ public final class PersianCalendar
     }
 
     /**
+     * <p>Obtains an alternative date view specific for given algorithm. </p>
+     *
+     * @param   algorithm   calendar computation
+     * @return  Persian date
+     * @throws  IllegalArgumentException in case of date overflow
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Erh&auml;lt eine alternative Datumssicht spezifisch f&uuml;r den angegebenen Algorithmus. </p>
+     *
+     * @param   algorithm   calendar computation
+     * @return  Persian date
+     * @throws  IllegalArgumentException in case of date overflow
+     * @since   3.33/4.28
+     */
+    public Date getDate(PersianAlgorithm algorithm) {
+
+        ZonalOffset offset = PersianAlgorithm.STD_OFFSET;
+
+        if (algorithm == DEFAULT_COMPUTATION) {
+            return new Date(this, DEFAULT_COMPUTATION, offset);
+        }
+
+        long utcDays = DEFAULT_COMPUTATION.transform(this, offset);
+        return new Date(algorithm.transform(utcDays, offset), algorithm, offset);
+
+    }
+
+    /**
+     * <p>Obtains an astronomical date view specific for given timezone offset. </p>
+     *
+     * @param   offset      timezone offset
+     * @return  Persian date based on astronomical calculations for given offset
+     * @throws  IllegalArgumentException in case of date overflow
+     * @see     PersianAlgorithm#ASTRONOMICAL
+     * @see     #getDate(PersianAlgorithm)
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Erh&auml;lt eine astronomische Datumssicht spezifisch f&uuml;r die angegebene Zeitzonenverschiebung. </p>
+     *
+     * @param   offset      timezone offset
+     * @return  Persian date based on astronomical calculations for given offset
+     * @throws  IllegalArgumentException in case of date overflow
+     * @see     PersianAlgorithm#ASTRONOMICAL
+     * @see     #getDate(PersianAlgorithm)
+     * @since   3.33/4.28
+     */
+    public Date getDate(ZonalOffset offset) {
+
+        if (offset == null) {
+            throw new NullPointerException("Missing timezone offset.");
+        }
+
+        PersianAlgorithm algorithm = PersianAlgorithm.ASTRONOMICAL;
+        long utcDays = DEFAULT_COMPUTATION.transform(this, PersianAlgorithm.STD_OFFSET);
+        return new Date(algorithm.transform(utcDays, offset), algorithm, offset);
+
+    }
+
+    /**
      * <p>Yields the length of current Persian month in days. </p>
      *
      * @return  int
@@ -867,6 +931,229 @@ public final class PersianCalendar
 
     }
 
+    /**
+     * <p>Static view of calendar date taking into account possibly different calendar algorithms. </p>
+     *
+     * <p>Following example demonstrates the difference between the standard algorithm and the algorithm
+     * proposed by A. Birashk: </p>
+     *
+     * <pre>
+     *      PersianCalendar pcal = PersianCalendar.of(1403, 12, 30); // = 2025-03-20 (gregorian)
+     *      PersianCalendar.Date birashk = pcal.getDate(PersianAlgorithm.BIRASHK); // AP-1404-01-01[BIRASHK]
+     *
+     *      assertThat(birashk.get(PersianCalendar.YEAR_OF_ERA), is(Integer.valueOf(1404)));
+     *      assertThat(birashk.getInt(PersianCalendar.YEAR_OF_ERA), is(1404));
+     *      assertThat(birashk.get(PersianCalendar.MONTH_OF_YEAR), is(PersianMonth.FARVARDIN));
+     *      assertThat(birashk.getInt(PersianCalendar.DAY_OF_MONTH), is(1));
+     *      assertThat(birashk.getInt(PersianCalendar.DAY_OF_YEAR), is(1));
+     *      assertThat(birashk.get(PersianCalendar.DAY_OF_WEEK), is(pcal.getDayOfWeek()));
+     *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_MONTH), is(31));
+     *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_YEAR), is(366));
+     * </pre>
+     *
+     * @see     #getDate(PersianAlgorithm)
+     * @see     #getDate(ZonalOffset)
+     * @see     PersianAlgorithm#attribute()
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Statische Ansicht eines Kalenderdatums, das auf verschiedenen Kalenderalgorithmen basieren kann. </p>
+     *
+     * <p>Das folgende Beispiel zeigt den Unterschied zwischen dem Standardalgorithmus und dem
+     * von A. Birashk vorgeschlagenen Algorithmus: </p>
+     *
+     * <pre>
+     *      PersianCalendar pcal = PersianCalendar.of(1403, 12, 30); // = 2025-03-20 (gregorian)
+     *      PersianCalendar.Date birashk = pcal.getDate(PersianAlgorithm.BIRASHK); // AP-1404-01-01[BIRASHK]
+     *
+     *      assertThat(birashk.get(PersianCalendar.YEAR_OF_ERA), is(Integer.valueOf(1404)));
+     *      assertThat(birashk.getInt(PersianCalendar.YEAR_OF_ERA), is(1404));
+     *      assertThat(birashk.get(PersianCalendar.MONTH_OF_YEAR), is(PersianMonth.FARVARDIN));
+     *      assertThat(birashk.getInt(PersianCalendar.DAY_OF_MONTH), is(1));
+     *      assertThat(birashk.getInt(PersianCalendar.DAY_OF_YEAR), is(1));
+     *      assertThat(birashk.get(PersianCalendar.DAY_OF_WEEK), is(pcal.getDayOfWeek()));
+     *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_MONTH), is(31));
+     *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_YEAR), is(366));
+     * </pre>
+     *
+     * @see     #getDate(PersianAlgorithm)
+     * @see     #getDate(ZonalOffset)
+     * @see     PersianAlgorithm#attribute()
+     * @since   3.33/4.28
+     */
+    public static final class Date
+        implements ChronoDisplay {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final PersianCalendar delegate;
+        private final PersianAlgorithm algorithm;
+        private final ZonalOffset offset;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Date(
+            PersianCalendar delegate,
+            PersianAlgorithm algorithm,
+            ZonalOffset offset
+        ) {
+            super();
+
+            this.delegate = delegate;
+            this.algorithm = algorithm;
+            this.offset = offset;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean contains(ChronoElement<?> element) {
+            return this.delegate.contains(element);
+        }
+
+        @Override
+        public <V> V get(ChronoElement<V> element) {
+            if (element == DAY_OF_WEEK) {
+                long utcDays = this.algorithm.transform(this.delegate, this.offset);
+                return element.getType().cast(Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1));
+            } else if (element == DAY_OF_YEAR) {
+                int doy = 0;
+                for (int m = 1; m < this.delegate.pmonth; m++) {
+                    if (m <= 6) {
+                        doy += 31;
+                    } else {
+                        doy += 30;
+                    }
+                }
+                return element.getType().cast(Integer.valueOf(doy + this.delegate.pdom));
+            }
+            return this.delegate.get(element);
+        }
+
+        @Override
+        public int getInt(ChronoElement<Integer> element) {
+            if (element == DAY_OF_MONTH) {
+                return this.delegate.pdom;
+            } else if (element == YEAR_OF_ERA) {
+                return this.delegate.pyear;
+            } else if (element == DAY_OF_YEAR) {
+                int doy = 0;
+                for (int m = 1; m < this.delegate.pmonth; m++) {
+                    if (m <= 6) {
+                        doy += 31;
+                    } else {
+                        doy += 30;
+                    }
+                }
+                return doy + this.delegate.pdom;
+            }
+            return this.delegate.getInt(element);
+        }
+
+        @Override
+        public <V> V getMinimum(ChronoElement<V> element) {
+            return this.delegate.getMinimum(element);
+        }
+
+        @Override
+        public <V> V getMaximum(ChronoElement<V> element) {
+            if (element == DAY_OF_MONTH) {
+                int month = this.delegate.pmonth;
+                int max;
+                if (month <= 6) {
+                    max = 31;
+                } else if (month <= 11) {
+                    max = 30;
+                } else {
+                    max = (this.algorithm.isLeapYear(this.delegate.pyear, this.offset) ? 30 : 29);
+                }
+                return element.getType().cast(Integer.valueOf(max));
+            } else if (element == DAY_OF_YEAR) {
+                int max = (this.algorithm.isLeapYear(this.delegate.pyear, this.offset) ? 366 : 365);
+                return element.getType().cast(Integer.valueOf(max));
+            }
+            return this.delegate.getMaximum(element);
+        }
+
+        /**
+         * <p>This date can only have a timezone (offset) if the underlying algorithm is
+         * {@link PersianAlgorithm#ASTRONOMICAL}. </p>
+         *
+         * @return  boolean
+         */
+        /*[deutsch]
+         * <p>Dieses Datum kann nur dann eine Zeitzonenverschiebung haben, wenn der zugrundeliegende
+         * Algorithmus {@link PersianAlgorithm#ASTRONOMICAL} ist. </p>
+         *
+         * @return  boolean
+         */
+        @Override
+        public boolean hasTimezone() {
+            return (this.algorithm == PersianAlgorithm.ASTRONOMICAL);
+        }
+
+        /**
+         * <p>If the underlying algorithm is {@link PersianAlgorithm#ASTRONOMICAL} then
+         * this method will yield the timezone offset, usually Teheran Standard Time. </p>
+         *
+         * @return  timezone offset
+         * @throws  ChronoException if the algorithm is not astronomical
+         */
+        /*[deutsch]
+         * <p>Wenn der zugrundeliegende Algorithmus {@link PersianAlgorithm#ASTRONOMICAL} ist,
+         * liefert diese Methode die Zeitzonenverschiebung, normalerweise die Standardzeit des Iran. </p>
+         *
+         * @return  timezone offset
+         * @throws  ChronoException if the algorithm is not astronomical
+         */
+        @Override
+        public ZonalOffset getTimezone() {
+            if (this.hasTimezone()) {
+                return this.offset;
+            } else {
+                throw new ChronoException("Timezone offset not defined.");
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof Date) {
+                Date that = (Date) obj;
+                if (this.algorithm != that.algorithm) {
+                    return false;
+                } else if ((this.algorithm == PersianAlgorithm.ASTRONOMICAL) && !this.offset.equals(that.offset)) {
+                    return false;
+                } else {
+                    return this.delegate.equals(that.delegate);
+                }
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return 7 * this.delegate.hashCode() + 31 * this.algorithm.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(this.delegate);
+            sb.append('[');
+            sb.append(this.algorithm);
+            if (this.algorithm == PersianAlgorithm.ASTRONOMICAL) {
+                sb.append(this.offset.toString());
+            }
+            sb.append(']');
+            return sb.toString();
+        }
+
+    }
+
     private static class Transformer
         implements EraYearMonthDaySystem<PersianCalendar> {
 
@@ -940,14 +1227,14 @@ public final class PersianCalendar
         @Override
         public PersianCalendar transform(long utcDays) {
 
-            return DEFAULT_COMPUTATION.transform(utcDays);
+            return DEFAULT_COMPUTATION.transform(utcDays, PersianAlgorithm.STD_OFFSET);
 
         }
 
         @Override
         public long transform(PersianCalendar date) {
 
-            return DEFAULT_COMPUTATION.transform(date);
+            return DEFAULT_COMPUTATION.transform(date, PersianAlgorithm.STD_OFFSET);
 
         }
 
@@ -1384,12 +1671,27 @@ public final class PersianCalendar
                 return null;
             }
 
+            PersianAlgorithm algorithm = attributes.get(PersianAlgorithm.attribute(), DEFAULT_COMPUTATION);
+            ZonalOffset offset = PersianAlgorithm.STD_OFFSET;
+
+            if ((algorithm == PersianAlgorithm.ASTRONOMICAL) && attributes.contains(Attributes.TIMEZONE_ID)) {
+                TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
+                if (tzid instanceof ZonalOffset) {
+                    offset = (ZonalOffset) tzid;
+                }
+            }
+
             if (entity.contains(MONTH_OF_YEAR)) {
                 int pmonth = entity.get(MONTH_OF_YEAR).getValue();
                 int pdom = entity.getInt(DAY_OF_MONTH);
                 if (pdom != Integer.MIN_VALUE) {
-                    if (CALSYS.isValid(PersianEra.ANNO_PERSICO, pyear, pmonth, pdom)) {
-                        return PersianCalendar.of(pyear, pmonth, pdom);
+                    if (algorithm.isValid(pyear, pmonth, pdom, offset)) {
+                        PersianCalendar cal = new PersianCalendar(pyear, pmonth, pdom);
+                        if (algorithm != DEFAULT_COMPUTATION) {
+                            long utcDays = algorithm.transform(cal, offset);
+                            cal = DEFAULT_COMPUTATION.transform(utcDays, PersianAlgorithm.STD_OFFSET);
+                        }
+                        return cal;
                     } else {
                         entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Persian date.");
                     }
@@ -1401,13 +1703,26 @@ public final class PersianCalendar
                         int pmonth = 1;
                         int daycount = 0;
                         while (pmonth <= 12) {
-                            int len = CALSYS.getLengthOfMonth(PersianEra.ANNO_PERSICO, pyear, pmonth);
+                            int len;
+                            if (pmonth <= 6) {
+                                len = 31;
+                            } else if (pmonth <= 11) {
+                                len = 30;
+                            } else {
+                                len = (algorithm.isLeapYear(pyear, offset) ? 30 : 29);
+                            }
                             if (pdoy > daycount + len) {
                                 pmonth++;
                                 daycount += len;
+                            } else if (algorithm.isValid(pyear, pmonth, pdoy - daycount, offset)) {
+                                PersianCalendar cal = new PersianCalendar(pyear, pmonth, pdoy - daycount);
+                                if (algorithm != DEFAULT_COMPUTATION) {
+                                    long utcDays = algorithm.transform(cal, offset);
+                                    cal = DEFAULT_COMPUTATION.transform(utcDays, PersianAlgorithm.STD_OFFSET);
+                                }
+                                return cal;
                             } else {
-                                int pdom = pdoy - daycount;
-                                return PersianCalendar.of(pyear, pmonth, pdom);
+                                break;
                             }
                         }
                     }
@@ -1423,6 +1738,31 @@ public final class PersianCalendar
         public int getDefaultPivotYear() {
 
             return PlainDate.axis().getDefaultPivotYear() - 621;
+
+        }
+
+        @Override
+        public ChronoDisplay preformat(
+            PersianCalendar context,
+            AttributeQuery attributes
+        ) {
+
+            PersianAlgorithm algorithm = attributes.get(PersianAlgorithm.attribute(), DEFAULT_COMPUTATION);
+
+            if (algorithm == DEFAULT_COMPUTATION) {
+                return context;
+            }
+
+            if ((algorithm == PersianAlgorithm.ASTRONOMICAL) && attributes.contains(Attributes.TIMEZONE_ID)) {
+                ZonalOffset offset = PersianAlgorithm.STD_OFFSET;
+                TZID tzid = attributes.get(Attributes.TIMEZONE_ID);
+                if (tzid instanceof ZonalOffset) {
+                    offset = (ZonalOffset) tzid;
+                }
+                return context.getDate(offset);
+            }
+
+            return context.getDate(algorithm);
 
         }
 
