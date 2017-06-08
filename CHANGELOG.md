@@ -1,6 +1,6 @@
 ## [v4.28] not yet released
 ### Added
-- Conversion methods for Weekday and Month [#[657]]
+- Conversion methods for Weekday and Month [#657]
 - Alternative calculations for PersianCalendar [#634]
 - Calculation of astronomical seasons [#628]
 - Support for apparent solar time [#633]
