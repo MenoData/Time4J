@@ -3074,17 +3074,23 @@ public final class ChronoFormatter<T>
             char c = pattern.charAt(i);
 
             if (c == '\'') {
-                i++;
-                while (i < n) {
-                    if (pattern.charAt(i) == '\'') {
-                        if ((i + 1 < n) && (pattern.charAt(i + 1) == '\'')) {
-                            i++;
+                int j = i + 1;
+                boolean z = (pattern.charAt(j) == 'Z');
+                while (j < n) {
+                    if (pattern.charAt(j) == '\'') {
+                        if ((j + 1 < n) && (pattern.charAt(j + 1) == '\'')) {
+                            j++;
                         } else {
+                            if (z && (j == i + 2) && Builder.hasUnixChronology(builder.chronology)) {
+                                throw new IllegalArgumentException(
+                                    "Z-literal (=UTC+00) should not be escaped: " + pattern);
+                            }
                             break;
                         }
                     }
-                    i++;
+                    j++;
                 }
+                i = j;
             } else {
                 sb.append(c);
             }

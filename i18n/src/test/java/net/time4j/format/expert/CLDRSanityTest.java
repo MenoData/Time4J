@@ -85,4 +85,10 @@ public class CLDRSanityTest {
         assertThat(cf.format(Moment.UNIX_EPOCH), is("Thursday, 1 January 1970 à 00.00:00 h GMT"));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void zLiteralEscaped() {
+        ChronoFormatter.ofMomentPattern(
+            "dd.MM.uuuu HH:mm 'Z'", PatternType.CLDR, Locale.ROOT, ZonalOffset.UTC);
+    }
+
 }
