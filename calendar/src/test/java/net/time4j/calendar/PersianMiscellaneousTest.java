@@ -159,6 +159,39 @@ public class PersianMiscellaneousTest {
     }
 
     @Test
+    public void minmaxBorkowski() {
+        PersianCalendar min = PersianCalendar.axis().getMinimum();
+        PersianCalendar max = PersianCalendar.axis().getMaximum();
+        assertThat(min.getDate(PersianAlgorithm.BORKOWSKI).toString(), is("AP-0001-01-01[BORKOWSKI]"));
+        assertThat(max.getDate(PersianAlgorithm.BORKOWSKI).toString(), is("AP-3000-12-30[BORKOWSKI]"));
+    }
+
+    @Test
+    public void minmaxKhayam() {
+        PersianCalendar min = PersianCalendar.axis().getMinimum();
+        PersianCalendar max = PersianCalendar.axis().getMaximum();
+        assertThat(min.getDate(PersianAlgorithm.KHAYYAM).toString(), is("AP-0001-01-02[KHAYYAM]"));
+        assertThat(max.getDate(PersianAlgorithm.KHAYYAM).toString(), is("AP-3000-12-30[KHAYYAM]"));
+    }
+
+    @Test
+    public void minmaxBirashk() {
+        PersianCalendar min = PersianCalendar.axis().getMinimum();
+        PersianCalendar max = PersianCalendar.axis().getMaximum();
+        assertThat(min.getDate(PersianAlgorithm.BIRASHK).toString(), is("AP-0001-01-01[BIRASHK]"));
+        assertThat(max.getDate(PersianAlgorithm.BIRASHK).toString(), is("AP-3001-01-01[BIRASHK]"));
+    }
+
+    @Test
+    public void minmaxAstronomical() {
+        PersianCalendar min = PersianCalendar.axis().getMinimum();
+        PersianCalendar max = PersianCalendar.of(3000 - 622, 12, 29);
+        assertThat(min.getDate(PersianAlgorithm.ASTRONOMICAL).toString(), is("AP-0001-01-01[ASTRONOMICAL+03:30]"));
+        assertThat(max.getDate(PersianAlgorithm.ASTRONOMICAL).toString(), is("AP-2378-12-29[ASTRONOMICAL+03:30]"));
+        assertThat(max.getDate(PersianAlgorithm.ASTRONOMICAL).getMaximum(PersianCalendar.DAY_OF_MONTH), is(29));
+    }
+
+    @Test
     public void attribute() throws ParseException {
         PersianCalendar pcal = PersianCalendar.of(1403, 12, 30); // 2025-03-20
         ChronoFormatter<PersianCalendar> f =

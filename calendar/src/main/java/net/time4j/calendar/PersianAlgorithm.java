@@ -347,6 +347,7 @@ public enum PersianAlgorithm {
      *     <li>The vernal equinox is evaluated by {@link net.time4j.calendar.astro.AstronomicalSeason#inYear(int)}.</li>
      *     <li>The time zone offset is chosen as {@code UTC+03:30} if not specified otherwise. </li>
      *     <li>If the apparent vernal equinox is after noon then the next day is the start of Persian year. </li>
+     *     <li>The maximum supported Persian year is 2378. </li>
      * </ul>
      */
     /*[deutsch]
@@ -361,15 +362,22 @@ public enum PersianAlgorithm {
      *     <li>Die Zeitzonenverschiebung wird als {@code UTC+03:30} angenommen, wenn nicht anders angegeben. </li>
      *     <li>Wenn der Fr&uuml;hlingsbeginn (wahre Ortszeit) nach dem Mittag liegt, wird der n&auml;chste
      *     Tag der Start des persischen Jahres sein. </li>
+     *     <li>Das maximal unterst&uuml;tzte persische Jahr ist 2378. </li>
      * </ul>
      */
     ASTRONOMICAL() {
+        @Override
+        int getMaxPersianYear() {
+            return 3000 - 622;
+        }
         @Override
         boolean isLeapYear(
             int pYear,
             ZonalOffset offset
         ) {
-            checkYear(pYear);
+            if (pYear < 1 || pYear > this.getMaxPersianYear()) {
+                throw new IllegalArgumentException("Out of range: " + pYear);
+            }
             PersianCalendar nextYear = new PersianCalendar(pYear + 1, 1, 1);
             PersianCalendar thisYear = new PersianCalendar(pYear, 1, 1);
             return (this.transform(nextYear, offset) - this.transform(thisYear, offset) == 366L);
@@ -379,7 +387,9 @@ public enum PersianAlgorithm {
             long utcDays,
             ZonalOffset offset
         ) {
-            checkRange(utcDays);
+            if ((utcDays < -492997L) || (utcDays > 375548L)) {
+                throw new IllegalArgumentException("Out of range: " + utcDays);
+            }
             PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
             int pyear = date.getYear() - 621;
             if (date.getMonth() < 3) {
@@ -527,6 +537,13 @@ public enum PersianAlgorithm {
         ZonalOffset offset
     );
 
+    // default value: 3000
+    int getMaxPersianYear() {
+
+        return 3000;
+
+    }
+
     // validation
     boolean isValid(
         int pYear,
@@ -535,7 +552,7 @@ public enum PersianAlgorithm {
         ZonalOffset offset
     ) {
 
-        if (pYear < 1 || pYear > 3000 || pMonth < 1 || pMonth > 12 || pDayOfMonth < 1) {
+        if (pYear < 1 || pYear > this.getMaxPersianYear() || pMonth < 1 || pMonth > 12 || pDayOfMonth < 1) {
             return false;
         } else if (pMonth <= 6) {
             return pDayOfMonth <= 31;
