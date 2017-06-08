@@ -1,10 +1,18 @@
 package net.time4j.calendar;
 
+import net.time4j.CalendarUnit;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
+import net.time4j.calendar.astro.AstronomicalSeason;
+import net.time4j.calendar.astro.JulianDay;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
+import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -67,13 +75,162 @@ public class PersianMiscellaneousTest {
     }
 
     @Test
-    public void khayam() {
+    public void khayamIsEqualToBorkowskiInRange1178To1633() {
         for (int pyear = 1178; pyear <= 1633; pyear++) {
-            int m = pyear % 33;
-            boolean leapKhayam = (m == 1 || m == 5 || m == 9 || m == 13 || m == 17 || m == 22 || m == 26 || m == 30);
             assertThat(
                 PersianCalendar.of(pyear, 1, 1).isLeapYear(),
-                is(leapKhayam));
+                is(PersianAlgorithm.KHAYYAM.isLeapYear(pyear)));
+        }
+        PersianCalendar pcal = PersianCalendar.of(1178, 1, 1);
+        long utcDays = pcal.getDaysSinceEpochUTC();
+        long max = PersianCalendar.of(1634, 12, 29).getDaysSinceEpochUTC();
+        while (utcDays <= max) {
+            PersianCalendar khayyam = PersianAlgorithm.KHAYYAM.transform(utcDays, null);
+            PersianCalendar expected = PersianCalendar.axis().getCalendarSystem().transform(utcDays);
+            assertThat(khayyam, is(expected));
+            utcDays++;
+        }
+    }
+
+    @Test
+    public void khayamOverFullRange() {
+        long min = PersianCalendar.axis().getCalendarSystem().getMinimumSinceUTC();
+        long max = PersianCalendar.axis().getCalendarSystem().getMaximumSinceUTC();
+        for (long utcDays = min; utcDays <= max; utcDays++) {
+            PersianCalendar khayyam = PersianAlgorithm.KHAYYAM.transform(utcDays, null);
+            assertThat(PersianAlgorithm.KHAYYAM.transform(khayyam, null), is(utcDays));
+        }
+    }
+
+    @Test
+    public void birashkIsEqualToBorkowskiInRange1244To1402() {
+        for (int pyear = 1244; pyear <= 1402; pyear++) {
+            assertThat(
+                PersianCalendar.of(pyear, 1, 1).isLeapYear(),
+                is(PersianAlgorithm.BIRASHK.isLeapYear(pyear)));
+        }
+        long utcDays = PersianCalendar.of(1244, 1, 1).getDaysSinceEpochUTC();
+        long max = PersianCalendar.of(1403, 12, 29).getDaysSinceEpochUTC();
+        System.out.println(PersianCalendar.of(1403, 12, 29).transform(PlainDate.class)); // 2025-03-19
+        while (utcDays <= max) {
+            PersianCalendar birashk = PersianAlgorithm.BIRASHK.transform(utcDays, null);
+            PersianCalendar expected = PersianCalendar.axis().getCalendarSystem().transform(utcDays);
+            assertThat(birashk, is(expected));
+            utcDays++;
+        }
+    }
+
+    @Test
+    public void birashkError2025() {
+        long vernalEquinox = PlainDate.of(2025, 3, 21).getDaysSinceEpochUTC();
+        assertThat(
+            PersianAlgorithm.BIRASHK.transform(vernalEquinox, null),
+            is(new PersianCalendar(1404, 1, 2)));
+        assertThat(
+            PersianAlgorithm.BIRASHK.isLeapYear(1403),
+            is(false));
+        assertThat(
+            PersianCalendar.of(1403, 12, 30).isLeapYear(),
+            is(true));
+    }
+
+    @Test
+    public void birashkOverFullRange() {
+        long min = PersianCalendar.axis().getCalendarSystem().getMinimumSinceUTC();
+        long max = PersianCalendar.axis().getCalendarSystem().getMaximumSinceUTC();
+        for (long utcDays = min; utcDays <= max; utcDays++) {
+            PersianCalendar birashk = PersianAlgorithm.BIRASHK.transform(utcDays, null);
+            assertThat(PersianAlgorithm.BIRASHK.transform(birashk, null), is(utcDays));
+        }
+    }
+
+    @Test
+    public void birashkDate() {
+        PersianCalendar pcal = PersianCalendar.of(1403, 12, 30); // 2025-03-20
+        PersianCalendar.Date birashk = pcal.getDate(PersianAlgorithm.BIRASHK); // AP-1404-01-01[BIRASHK]
+        assertThat(birashk.get(PersianCalendar.YEAR_OF_ERA), is(Integer.valueOf(1404)));
+        assertThat(birashk.getInt(PersianCalendar.YEAR_OF_ERA), is(1404));
+        assertThat(birashk.get(PersianCalendar.MONTH_OF_YEAR), is(PersianMonth.FARVARDIN));
+        assertThat(birashk.getInt(PersianCalendar.DAY_OF_MONTH), is(1));
+        assertThat(birashk.getInt(PersianCalendar.DAY_OF_YEAR), is(1));
+        assertThat(birashk.get(PersianCalendar.DAY_OF_WEEK), is(pcal.getDayOfWeek()));
+        assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_MONTH), is(31));
+        assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_YEAR), is(366));
+    }
+
+    @Test
+    public void attribute() throws ParseException {
+        PersianCalendar pcal = PersianCalendar.of(1403, 12, 30); // 2025-03-20
+        ChronoFormatter<PersianCalendar> f =
+            ChronoFormatter
+                .ofPattern("dd.MM.yyyy G", PatternType.CLDR, Locale.ROOT, PersianCalendar.axis())
+                .with(PersianAlgorithm.attribute(), PersianAlgorithm.BIRASHK);
+        assertThat(f.parse("01.01.1404 AP"), is(pcal));
+        assertThat(f.format(pcal), is("01.01.1404 AP"));
+    }
+
+    @Test
+    public void borkowskiAstronomicalBase() throws Throwable {
+        int year = PersianCalendar.of(1, 1, 1).getInt(CommonElements.RELATED_GREGORIAN_YEAR);
+        ZonalOffset offset = ZonalOffset.ofTotalSeconds((int) (3.425 * 3600)); // +03:25:30 (used by Borkowski)
+        while (year <= 3000) {
+            JulianDay jd = AstronomicalSeason.VERNAL_EQUINOX.julianDay(year);
+            double tt = (jd.getValue() - 2441317.5) * 86400.0;
+            double deltaT; // formula of Borkowski
+            int t = (year - 1800) / 100;
+            if (year < 948) {
+                deltaT = (44.3 * t + 320) * t + 1360;
+            } else if (year < 1637) {
+                deltaT = 25.5 * t * t;
+            } else if (year > 2005) {
+                deltaT = 25.5 * t * t - 36;
+            } else {
+                deltaT = TimeScale.deltaT(year, 3);
+            }
+            double ut = tt - deltaT;
+            long seconds = (long) Math.floor(ut);
+            int nanos = (int) ((ut - seconds) * 1000000000);
+
+            PlainTimestamp tsp =
+                // Borkowski uses mean solar time
+                Moment.of(
+                    seconds + 2 * 365 * 86400,
+                    nanos,
+                    TimeScale.POSIX
+                ).toZonalTimestamp(offset);
+            if (tsp.getHour() >= 12) {
+                tsp = tsp.plus(1, CalendarUnit.DAYS); // determine equinox day nearest to midnight
+            }
+            PlainDate cal = PersianCalendar.of(year - 621, 1, 1).transform(PlainDate.class); // algorithmic date
+            try {
+                assertThat(cal, is(tsp.getCalendarDate()));
+            } catch (Throwable th) {
+                switch (year) {
+                    case 659:
+                    case 1113:
+                    case 1307:
+                    case 2487:
+                    case 2681:
+                    case 2846:
+                        System.out.println(tsp); // tolerated deviation, probably caused by slightly different astronomy
+                        break;
+                    default:
+                        throw th;
+                }
+            }
+            year++;
+        }
+    }
+
+    @Test
+    public void astronomicalIsEqualToBorkowskiInRange1178To1502() {
+        for (int year = 1178; year <= 1502; year++) { // 1799-2123
+            PersianCalendar pcal = PersianCalendar.of(year, 1, 1);
+            PersianCalendar.Date date = pcal.getDate(PersianAlgorithm.ASTRONOMICAL);
+            assertThat(date, is(pcal.getDate(PersianAlgorithm.STD_OFFSET)));
+            assertThat(pcal.getYear(), is(date.getInt(PersianCalendar.YEAR_OF_ERA)));
+            assertThat(pcal.getMonth(), is(date.get(PersianCalendar.MONTH_OF_YEAR)));
+            assertThat(pcal.getDayOfMonth(), is(date.getInt(PersianCalendar.DAY_OF_MONTH)));
         }
     }
 
