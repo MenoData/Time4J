@@ -28,6 +28,7 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
+import java.time.DayOfWeek;
 import java.util.Locale;
 
 
@@ -435,6 +436,48 @@ public enum Weekday
         int dom = context.getDayOfMonth();
         
         return (GregorianMath.getDayOfWeek(y, m, dom) == this.getValue());
+
+    }
+
+    /**
+     * <p>Conversion to the {@code java.time}-equivalent. </p>
+     *
+     * @return  DayOfWeek
+     * @see     #from(DayOfWeek)
+     * @since   4.28
+     */
+    /*[deutsch]
+     * <p>Konversion zum {@code java.time}-&Auml;quivalent. </p>
+     *
+     * @return  DayOfWeek
+     * @see     #from(DayOfWeek)
+     * @since   4.28
+     */
+    public DayOfWeek toTemporalAccessor() {
+
+        return DayOfWeek.of(this.getValue());
+
+    }
+
+    /**
+     * <p>Conversion from the {@code java.time}-equivalent. </p>
+     *
+     * @param   dayOfWeek   the day of week to be converted
+     * @return  Weekday
+     * @see     #toTemporalAccessor()
+     * @since   4.28
+     */
+    /*[deutsch]
+     * <p>Konversion vom {@code java.time}-&Auml;quivalent. </p>
+     *
+     * @param   dayOfWeek   the day of week to be converted
+     * @return  Weekday
+     * @see     #toTemporalAccessor()
+     * @since   4.28
+     */
+    public static Weekday from(DayOfWeek dayOfWeek) {
+
+        return Weekday.valueOf(dayOfWeek.getValue());
 
     }
 

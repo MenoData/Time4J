@@ -380,4 +380,46 @@ public enum Month
 
     }
 
+    /**
+     * <p>Conversion to the {@code java.time}-equivalent. </p>
+     *
+     * @return  java.time.Month
+     * @see     #from(java.time.Month)
+     * @since   4.28
+     */
+    /*[deutsch]
+     * <p>Konversion zum {@code java.time}-&Auml;quivalent. </p>
+     *
+     * @return  java.time.Month
+     * @see     #from(java.time.Month)
+     * @since   4.28
+     */
+    public java.time.Month toTemporalAccessor() {
+
+        return java.time.Month.of(this.getValue());
+
+    }
+
+    /**
+     * <p>Conversion from the {@code java.time}-equivalent. </p>
+     *
+     * @param   threetenMonth   month value to be converted
+     * @return  Month
+     * @see     #toTemporalAccessor()
+     * @since   4.28
+     */
+    /*[deutsch]
+     * <p>Konversion vom {@code java.time}-&Auml;quivalent. </p>
+     *
+     * @param   threetenMonth   month value to be converted
+     * @return  Month
+     * @see     #toTemporalAccessor()
+     * @since   4.28
+     */
+    public static Month from(java.time.Month threetenMonth) {
+
+        return Month.valueOf(threetenMonth.getValue());
+
+    }
+
 }

@@ -117,4 +117,13 @@ public class MonthValueTest {
         );
     }
 
+    @Test
+    public void threetenConversion() {
+        assertThat(Month.JANUARY.toTemporalAccessor(), is(java.time.Month.JANUARY));
+        assertThat(Month.DECEMBER.toTemporalAccessor(), is(java.time.Month.DECEMBER));
+
+        assertThat(Month.from(java.time.Month.JANUARY), is(Month.JANUARY));
+        assertThat(Month.from(java.time.Month.DECEMBER), is(Month.DECEMBER));
+    }
+
 }

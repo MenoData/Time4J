@@ -2,6 +2,7 @@ package net.time4j;
 
 
 
+import java.time.DayOfWeek;
 import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -85,6 +86,25 @@ public class WeekdayValueTest {
     @Test
     public void test() {
         assertThat(Weekday.FRIDAY.test(PlainDate.of(2014, 4, 11)), is(true));
+    }
+
+    @Test
+    public void threetenConversion() {
+        assertThat(Weekday.MONDAY.toTemporalAccessor(), is(DayOfWeek.MONDAY));
+        assertThat(Weekday.TUESDAY.toTemporalAccessor(), is(DayOfWeek.TUESDAY));
+        assertThat(Weekday.WEDNESDAY.toTemporalAccessor(), is(DayOfWeek.WEDNESDAY));
+        assertThat(Weekday.THURSDAY.toTemporalAccessor(), is(DayOfWeek.THURSDAY));
+        assertThat(Weekday.FRIDAY.toTemporalAccessor(), is(DayOfWeek.FRIDAY));
+        assertThat(Weekday.SATURDAY.toTemporalAccessor(), is(DayOfWeek.SATURDAY));
+        assertThat(Weekday.SUNDAY.toTemporalAccessor(), is(DayOfWeek.SUNDAY));
+
+        assertThat(Weekday.from(DayOfWeek.MONDAY), is(Weekday.MONDAY));
+        assertThat(Weekday.from(DayOfWeek.TUESDAY), is(Weekday.TUESDAY));
+        assertThat(Weekday.from(DayOfWeek.WEDNESDAY), is(Weekday.WEDNESDAY));
+        assertThat(Weekday.from(DayOfWeek.THURSDAY), is(Weekday.THURSDAY));
+        assertThat(Weekday.from(DayOfWeek.FRIDAY), is(Weekday.FRIDAY));
+        assertThat(Weekday.from(DayOfWeek.SATURDAY), is(Weekday.SATURDAY));
+        assertThat(Weekday.from(DayOfWeek.SUNDAY), is(Weekday.SUNDAY));
     }
 
 }
