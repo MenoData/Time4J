@@ -1,5 +1,6 @@
 ## [v4.28] not yet released
 ### Added
+- Prevent escaping of Z-literal in format patterns [#658]
 - Conversion methods for Weekday and Month [#657]
 - Alternative calculations for PersianCalendar [#634]
 - Calculation of astronomical seasons [#628]
