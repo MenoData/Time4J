@@ -185,7 +185,7 @@ public enum PatternType
      *      then this symbol will simply be mapped to {@link PlainDate#DAY_OF_YEAR}. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#WEEKDAY_IN_MONTH}</td>
+     *      <td>WEEKDAY_IN_MONTH</td>
      *      <td>F</td>
      *      <td>One symbol for the weekday in month. </td>
      *  </tr>
@@ -462,7 +462,7 @@ public enum PatternType
      *      Symbol dem Element {@link PlainDate#DAY_OF_YEAR} zugeordnet. </td>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainDate#WEEKDAY_IN_MONTH}</td>
+     *      <td>WEEKDAY_IN_MONTH</td>
      *      <td>F</td>
      *      <td>Ein Symbol f&uuml;r den Wochentag im Monat. </td>
      *  </tr>
@@ -1182,6 +1182,11 @@ public enum PatternType
      *      name, five for a letter symbol or six for the short form. </td>
      *  </tr>
      *  <tr>
+     *      <td>WEEKDAY_IN_MONTH</td>
+     *      <td>F</td>
+     *      <td>One symbol for the weekday in month. </td>
+     *  </tr>
+     *  <tr>
      *      <td>LOCAL_DAY_OF_WEEK</td>
      *      <td>e</td>
      *      <td>Like E, but if there are only one or two symbols then the
@@ -1289,6 +1294,11 @@ public enum PatternType
      *      oder sechs f&uuml;r die Kurzform. </td>
      *  </tr>
      *  <tr>
+     *      <td>WEEKDAY_IN_MONTH</td>
+     *      <td>F</td>
+     *      <td>Ein Symbol f&uuml;r den Wochentag im Monat. </td>
+     *  </tr>
+     *  <tr>
      *      <td>LOCAL_DAY_OF_WEEK</td>
      *      <td>e</td>
      *      <td>Wie E, aber wenn ein oder zwei Symbole angegeben sind, dann
@@ -1331,7 +1341,7 @@ public enum PatternType
      * defined by any external standard. The elements associated with symbols are looked up among the registered
      * elements of a chronology including those which can be found via any chronological extension. If the
      * found element is a {@link TextElement text element} then it will be treated as such, and the count of
-     * symbols is determines the text width (1 = NARROW, 2 = SHORT, 3 = ABBREVIATED, 4 = WIDE). Otherwise
+     * symbols determines the text width (1 = NARROW, 2 = SHORT, 3 = ABBREVIATED, 4 = WIDE). Otherwise
      * this pattern type tries to resolve the element in question as {@code ChronoElement<Integer>}, and
      * the count of symbols will determine the min width of displayed/parsed digits and apply some padding
      * if necessary. The maximum width is always 9, and no sign is used. </p>
@@ -1433,6 +1443,7 @@ public enum PatternType
             case 'W':
             case 'e':
             case 'c':
+            case 'F':
                 return true;
             default:
                 return false;
@@ -2346,6 +2357,14 @@ public enum PatternType
                     }
                 } finally {
                     builder.endSection();
+                }
+                break;
+            case 'F':
+                if (count == 1) {
+                    builder.addFixedInteger(intElement, count);
+                } else {
+                    throw new IllegalArgumentException(
+                        "Too many pattern letters (F): " + count);
                 }
                 break;
             default:
