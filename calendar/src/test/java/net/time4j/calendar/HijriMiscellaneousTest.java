@@ -161,4 +161,123 @@ public class HijriMiscellaneousTest {
         assertThat(maxHijri.toString(), is("AH-1600-12-29[islamic-civil:+3]"));
     }
 
+    @Test
+    public void weekdayInMonth() {
+        HijriCalendar hijri =
+            HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 1); // Sunday, 1975-09-07
+        HijriCalendar h2 =
+            HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 3);
+
+        assertThat(hijri.getMinimum(HijriCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(hijri.getMaximum(HijriCalendar.WEEKDAY_IN_MONTH), is(5));
+        assertThat(hijri.isValid(HijriCalendar.WEEKDAY_IN_MONTH, 5), is(true));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH, 5),
+            is(hijri.plus(28, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.minimized()),
+            is(hijri));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.maximized()),
+            is(hijri.plus(28, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.decremented()),
+            is(hijri.minus(7, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.incremented()),
+            is(hijri.plus(7, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.atFloor()),
+            is(hijri));
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.atCeiling()),
+            is(hijri));
+
+        assertThat(h2.getMinimum(HijriCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(h2.getMaximum(HijriCalendar.WEEKDAY_IN_MONTH), is(4));
+        assertThat(h2.isValid(HijriCalendar.WEEKDAY_IN_MONTH, 5), is(false));
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.minimized()),
+            is(h2));
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.maximized()),
+            is(h2.plus(21, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.decremented()),
+            is(h2.minus(7, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.incremented()),
+            is(h2.plus(7, HijriCalendar.Unit.DAYS)));
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.atFloor()),
+            is(h2));
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.atCeiling()),
+            is(h2));
+
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setToFirst(Weekday.MONDAY)),
+            is(hijri.plus(1, HijriCalendar.Unit.DAYS))); // AH-1395-09-02
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.setToFirst(Weekday.MONDAY)),
+            is(h2.minus(1, HijriCalendar.Unit.DAYS))); // AH-1395-09-02
+
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setTo(3, Weekday.WEDNESDAY)),
+            is(hijri.plus(17, HijriCalendar.Unit.DAYS))); // AH-1395-09-18
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.setTo(3, Weekday.WEDNESDAY)),
+            is(h2.plus(15, HijriCalendar.Unit.DAYS))); // AH-1395-09-18
+
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.SATURDAY)),
+            is(hijri.plus(27, HijriCalendar.Unit.DAYS))); // AH-1395-09-28
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.SATURDAY)),
+            is(h2.plus(25, HijriCalendar.Unit.DAYS))); // AH-1395-09-28
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.MONDAY)),
+            is(hijri.plus(29, HijriCalendar.Unit.DAYS))); // AH-1395-09-30
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.MONDAY)),
+            is(h2.plus(27, HijriCalendar.Unit.DAYS))); // AH-1395-09-30
+        assertThat(
+            hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.TUESDAY)),
+            is(hijri.plus(23, HijriCalendar.Unit.DAYS))); // AH-1395-09-24
+        assertThat(
+            h2.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.TUESDAY)),
+            is(h2.plus(21, HijriCalendar.Unit.DAYS))); // AH-1395-09-24
+
+        HijriCalendar current = hijri;
+        for (int i = 0; i < hijri.lengthOfMonth(); i++) {
+            int expected = (i / 7) + 1;
+            assertThat(current.get(HijriCalendar.WEEKDAY_IN_MONTH), is(expected));
+            current = current.nextDay();
+        }
+    }
+
+    @Test
+    public void weekdayInMonthFormat() {
+        HijriCalendar hijri =
+            HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 1); // Sunday, 1975-09-07
+
+        ChronoFormatter<HijriCalendar> f1 =
+            ChronoFormatter.setUp(HijriCalendar.family(), Locale.ENGLISH)
+                .addEnglishOrdinal(HijriCalendar.WEEKDAY_IN_MONTH)
+                .addPattern(" EEEE 'in' MMMM", PatternType.CLDR)
+                .build();
+        assertThat(f1.format(hijri), is("1st Sunday in Ramadan"));
+
+        ChronoFormatter<HijriCalendar> f2 =
+            ChronoFormatter.ofPattern("F. EEEE 'im' MMMM", PatternType.CLDR, Locale.GERMAN, HijriCalendar.family());
+        assertThat(f2.format(hijri), is("1. Sonntag im Ramadan"));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void weekdayInMonthInvalid() {
+        HijriCalendar hijri =
+            HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 3);
+        hijri.with(HijriCalendar.WEEKDAY_IN_MONTH, 5);
+    }
+
 }

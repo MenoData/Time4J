@@ -88,6 +88,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -171,6 +172,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -330,6 +332,38 @@ public final class HijriCalendar
     public static final StdCalendarElement<Weekday, HijriCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<HijriCalendar>(HijriCalendar.class, getDefaultWeekmodel());
 
+    private static final WeekdayInMonthElement<HijriCalendar> WIM_ELEMENT =
+        new WeekdayInMonthElement<HijriCalendar>(HijriCalendar.class, DAY_OF_MONTH, DAY_OF_WEEK);
+
+    /**
+     * <p>Element with the ordinal day-of-week within given calendar month. </p>
+     *
+     * <p>Example of usage: </p>
+     *
+     * <pre>
+     *     HijriCalendar hijri =
+     *          HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 1); // Sunday
+     *     System.out.println(
+     *          hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.SATURDAY)));
+     *     // AH-1395-09-28[islamic-umalqura]
+     * </pre>
+     */
+    /*[deutsch]
+     * <p>Element mit dem x-ten Wochentag im Monat. </p>
+     *
+     * <p>Anwendungsbeispiel: </p>
+     *
+     * <pre>
+     *     HijriCalendar hijri =
+     *          HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 1); // Sonntag
+     *     System.out.println(
+     *          hijri.with(HijriCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.SATURDAY)));
+     *     // AH-1395-09-28[islamic-umalqura]
+     * </pre>
+     */
+    @FormattableElement(format = "F")
+    public static final OrdinalWeekdayElement<HijriCalendar> WEEKDAY_IN_MONTH = WIM_ELEMENT;
+
     /**
      * The name of Umm-al-qura-variant.
      *
@@ -411,6 +445,9 @@ public final class HijriCalendar
             .appendElement(
                 DAY_OF_WEEK,
                 new WeekdayRule())
+            .appendElement(
+                WIM_ELEMENT,
+                WeekdayInMonthElement.getRule(WIM_ELEMENT))
             .appendExtension(
                 new CommonElements.Weekengine(
                     HijriCalendar.class,
