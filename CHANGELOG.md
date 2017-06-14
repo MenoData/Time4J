@@ -1,6 +1,7 @@
 ## [v3.33] not yet released
 ### Added
 - Prevent escaping of Z-literal in format patterns [#658]
+- Weekday-in-month in non-iso-calendars [#653]
 - Alternative calculations for PersianCalendar [#634]
 - Calculation of astronomical seasons [#628]
 - Support for apparent solar time [#633]
