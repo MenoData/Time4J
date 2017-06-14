@@ -2,6 +2,7 @@
 ### Added
 - Prevent escaping of Z-literal in format patterns [#658]
 - Conversion methods for Weekday and Month [#657]
+- Weekday-in-month in non-iso-calendars [#653]
 - Alternative calculations for PersianCalendar [#634]
 - Calculation of astronomical seasons [#628]
 - Support for apparent solar time [#633]
