@@ -91,4 +91,15 @@ public class EthiopianMiscellaneousTest {
         assertThat(EthiopianCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
     }
 
+    @Test
+    public void weekdayInMonth() {
+        EthiopianCalendar cal = EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, EthiopianMonth.PAGUMEN, 6);
+        System.out.println(cal.getDayOfWeek());
+        assertThat(cal.getInt(EthiopianCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(cal.getMaximum(EthiopianCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(
+            cal.with(EthiopianCalendar.WEEKDAY_IN_MONTH.setTo(3, Weekday.MONDAY)),
+            is(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2008, 1, 10)));
+    }
+
 }

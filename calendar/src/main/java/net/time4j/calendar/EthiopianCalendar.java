@@ -88,6 +88,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -132,6 +133,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  *  <li>{@link #EVANGELIST}</li>
@@ -276,6 +278,18 @@ public final class EthiopianCalendar
     public static final StdCalendarElement<Weekday, EthiopianCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<EthiopianCalendar>(EthiopianCalendar.class, getDefaultWeekmodel());
 
+    private static final WeekdayInMonthElement<EthiopianCalendar> WIM_ELEMENT =
+        new WeekdayInMonthElement<EthiopianCalendar>(EthiopianCalendar.class, DAY_OF_MONTH, DAY_OF_WEEK);
+
+    /**
+     * <p>Element with the ordinal day-of-week within given calendar month. </p>
+     */
+    /*[deutsch]
+     * <p>Element mit dem x-ten Wochentag im Monat. </p>
+     */
+    @FormattableElement(format = "F")
+    public static final OrdinalWeekdayElement<EthiopianCalendar> WEEKDAY_IN_MONTH = WIM_ELEMENT;
+
     /**
      * <p>Represents the evangelist associated with a year of the Ethiopian leap year cycle. </p>
      *
@@ -360,6 +374,9 @@ public final class EthiopianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                WIM_ELEMENT,
+                WeekdayInMonthElement.getRule(WIM_ELEMENT))
             .appendElement(
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new RelatedGregorianYearRule<EthiopianCalendar>(CALSYS, DAY_OF_YEAR))

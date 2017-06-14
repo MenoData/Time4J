@@ -87,6 +87,7 @@ import java.util.Set;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -122,6 +123,7 @@ import java.util.Set;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -237,6 +239,18 @@ public final class ThaiSolarCalendar
     public static final StdCalendarElement<Weekday, ThaiSolarCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<ThaiSolarCalendar>(ThaiSolarCalendar.class, getDefaultWeekmodel());
 
+    private static final WeekdayInMonthElement<ThaiSolarCalendar> WIM_ELEMENT =
+        new WeekdayInMonthElement<ThaiSolarCalendar>(ThaiSolarCalendar.class, DAY_OF_MONTH, DAY_OF_WEEK);
+
+    /**
+     * <p>Element with the ordinal day-of-week within given calendar month. </p>
+     */
+    /*[deutsch]
+     * <p>Element mit dem x-ten Wochentag im Monat. </p>
+     */
+    @FormattableElement(format = "F")
+    public static final OrdinalWeekdayElement<ThaiSolarCalendar> WEEKDAY_IN_MONTH = WIM_ELEMENT;
+
     private static final Map<Object, ChronoElement<?>> CHILDREN;
     private static final EraYearMonthDaySystem<ThaiSolarCalendar> CALSYS;
     private static final TimeAxis<CalendarUnit, ThaiSolarCalendar> ENGINE;
@@ -282,6 +296,9 @@ public final class ThaiSolarCalendar
                 DAY_OF_WEEK,
                 FieldRule.of(DAY_OF_WEEK),
                 CalendarUnit.DAYS)
+            .appendElement(
+                WIM_ELEMENT,
+                WeekdayInMonthElement.getRule(WIM_ELEMENT))
             .appendExtension(
                 new CommonElements.Weekengine(
                     ThaiSolarCalendar.class,

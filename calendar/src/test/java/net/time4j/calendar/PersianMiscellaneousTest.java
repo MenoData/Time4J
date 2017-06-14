@@ -296,4 +296,14 @@ public class PersianMiscellaneousTest {
         assertThat(PersianCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SATURDAY));
     }
 
+    @Test
+    public void weekdayInMonth() {
+        PersianCalendar pcal = PersianCalendar.of(1403, 12, 30);
+        PersianCalendar.Date birashk = pcal.getDate(PersianAlgorithm.BIRASHK); // AP-1404-01-01[BIRASHK]
+        assertThat(pcal.getInt(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
+        assertThat(pcal.getMaximum(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
+        assertThat(birashk.getInt(PersianCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(birashk.getMaximum(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
+    }
+
 }

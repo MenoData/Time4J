@@ -92,6 +92,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -136,6 +137,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -252,6 +254,18 @@ public final class PersianCalendar
     public static final StdCalendarElement<Weekday, PersianCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<PersianCalendar>(PersianCalendar.class, getDefaultWeekmodel());
 
+    private static final WeekdayInMonthElement<PersianCalendar> WIM_ELEMENT =
+        new WeekdayInMonthElement<PersianCalendar>(PersianCalendar.class, DAY_OF_MONTH, DAY_OF_WEEK);
+
+    /**
+     * <p>Element with the ordinal day-of-week within given calendar month. </p>
+     */
+    /*[deutsch]
+     * <p>Element mit dem x-ten Wochentag im Monat. </p>
+     */
+    @FormattableElement(format = "F")
+    public static final OrdinalWeekdayElement<PersianCalendar> WEEKDAY_IN_MONTH = WIM_ELEMENT;
+
     private static final PersianAlgorithm DEFAULT_COMPUTATION = PersianAlgorithm.BORKOWSKI;
     private static final EraYearMonthDaySystem<PersianCalendar> CALSYS;
     private static final TimeAxis<PersianCalendar.Unit, PersianCalendar> ENGINE;
@@ -288,6 +302,9 @@ public final class PersianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                WIM_ELEMENT,
+                WeekdayInMonthElement.getRule(WIM_ELEMENT))
             .appendElement(
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new RelatedGregorianYearRule<PersianCalendar>(CALSYS, DAY_OF_YEAR))
@@ -1025,6 +1042,8 @@ public final class PersianCalendar
                     }
                 }
                 return element.getType().cast(Integer.valueOf(doy + this.delegate.pdom));
+            } else if (element == WEEKDAY_IN_MONTH) {
+                return element.getType().cast(Integer.valueOf(MathUtils.floorDivide(this.delegate.pdom - 1, 7) + 1));
             }
             return this.delegate.get(element);
         }
@@ -1045,6 +1064,8 @@ public final class PersianCalendar
                     }
                 }
                 return doy + this.delegate.pdom;
+            } else if (element == WEEKDAY_IN_MONTH) {
+                return MathUtils.floorDivide(this.delegate.pdom - 1, 7) + 1;
             }
             return this.delegate.getInt(element);
         }
@@ -1070,6 +1091,13 @@ public final class PersianCalendar
             } else if (element == DAY_OF_YEAR) {
                 int max = (this.algorithm.isLeapYear(this.delegate.pyear, this.offset) ? 366 : 365);
                 return element.getType().cast(Integer.valueOf(max));
+            } else if (element == WEEKDAY_IN_MONTH) {
+                int dom = this.delegate.pdom;
+                int max = this.getMaximum(DAY_OF_MONTH).intValue();
+                while (dom + 7 <= max) {
+                    dom += 7;
+                }
+                return element.getType().cast(MathUtils.floorDivide(dom - 1, 7) + 1);
             }
             return this.delegate.getMaximum(element);
         }
