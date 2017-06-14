@@ -84,6 +84,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -119,6 +120,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_WEEK}</li>
  *  <li>{@link #DAY_OF_MONTH}</li>
  *  <li>{@link #DAY_OF_YEAR}</li>
+ *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
@@ -258,6 +260,18 @@ public final class JulianCalendar
     public static final ChronoElement<Weekday> DAY_OF_WEEK =
         new StdWeekdayElement<>(JulianCalendar.class, getDefaultWeekmodel());
 
+    private static final WeekdayInMonthElement<JulianCalendar> WIM_ELEMENT =
+        new WeekdayInMonthElement<>(JulianCalendar.class, DAY_OF_MONTH, DAY_OF_WEEK);
+
+    /**
+     * <p>Element with the ordinal day-of-week within given calendar month. </p>
+     */
+    /*[deutsch]
+     * <p>Element mit dem x-ten Wochentag im Monat. </p>
+     */
+    @FormattableElement(format = "F")
+    public static final OrdinalWeekdayElement<JulianCalendar> WEEKDAY_IN_MONTH = WIM_ELEMENT;
+
     private static final EraYearMonthDaySystem<JulianCalendar> CALSYS;
     private static final TimeAxis<JulianCalendar.Unit, JulianCalendar> ENGINE;
 
@@ -296,6 +310,9 @@ public final class JulianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule(),
                 Unit.DAYS)
+            .appendElement(
+                WIM_ELEMENT,
+                WeekdayInMonthElement.getRule(WIM_ELEMENT))
             .appendElement(
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))

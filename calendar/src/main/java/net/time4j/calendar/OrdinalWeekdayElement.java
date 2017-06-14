@@ -80,7 +80,8 @@ public interface OrdinalWeekdayElement<T>
      * <p>Defines an operator which moves a date to the given ordinal weekday in month. </p>
      *
      * <p>If given ordinal number is {@code Integer.MAX_VALUE} then the last weekday in month
-     * will be determined. </p>
+     * will be determined. This operator behaves in a lenient way, any overflow of the ordinal
+     * number will be transferred to another month. </p>
      *
      * @param   ordinal     ordinal number
      * @param   dayOfWeek   last day of week in month
@@ -90,7 +91,8 @@ public interface OrdinalWeekdayElement<T>
      * <p>Definiert einen Versteller, der ein Datum auf den x-ten angegebenen Wochentag eines Monats setzt. </p>
      *
      * <p>Wenn die angegebene Ordnungsnummer {@code Integer.MAX_VALUE} ist, wird der letzte
-     * Wochentag des Monats bestimmt. </p>
+     * Wochentag des Monats bestimmt. Dieser Operator verh&auml;lt sich nachsichtig, d. h., jedweder
+     * &Uuml;berlauf der Ordnungsnummer wird auf einen anderen Monat &uuml;bertragen. </p>
      *
      * @param   ordinal     ordinal number
      * @param   dayOfWeek   last day of week in month

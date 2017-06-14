@@ -9,7 +9,6 @@ import net.time4j.calendar.astro.AstronomicalSeason;
 import net.time4j.calendar.astro.JulianDay;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
-import net.time4j.engine.EpochDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
@@ -319,6 +318,16 @@ public class PersianMiscellaneousTest {
     @Test
     public void defaultFirstDayOfWeek() {
         assertThat(PersianCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SATURDAY));
+    }
+
+    @Test
+    public void weekdayInMonth() {
+        PersianCalendar pcal = PersianCalendar.of(1403, 12, 30);
+        PersianCalendar.Date birashk = pcal.getDate(PersianAlgorithm.BIRASHK); // AP-1404-01-01[BIRASHK]
+        assertThat(pcal.getInt(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
+        assertThat(pcal.getMaximum(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
+        assertThat(birashk.getInt(PersianCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(birashk.getMaximum(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
     }
 
 }

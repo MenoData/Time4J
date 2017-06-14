@@ -403,4 +403,14 @@ public class JapaneseElementTest {
         assertThat(JapaneseCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
     }
 
+    @Test
+    public void weekdayInMonth() {
+        JapaneseCalendar jcal = PlainDate.of(1872, 12, 31).transform(JapaneseCalendar.axis()); // Meiji-5(1872)-12-02
+        assertThat(jcal.getInt(JapaneseCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(jcal.getMaximum(JapaneseCalendar.WEEKDAY_IN_MONTH), is(1));
+        assertThat(
+            jcal.with(JapaneseCalendar.WEEKDAY_IN_MONTH.setTo(2, Weekday.MONDAY)),
+            is(PlainDate.of(1873, 1, 6).transform(JapaneseCalendar.class)));
+    }
+
 }
