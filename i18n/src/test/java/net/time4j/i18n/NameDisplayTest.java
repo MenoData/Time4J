@@ -15,6 +15,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -148,6 +149,42 @@ public class NameDisplayTest {
     @Test
     public void getDisplayNameOfElement_SECOND() {
         assertThat(PlainTime.SECOND_OF_MINUTE.getDisplayName(Locale.ENGLISH), is("second"));
+    }
+
+    @Test
+    public void parseQuarterName() throws ParseException {
+        assertThat(
+            Quarter.parse(
+                "1. Quartal", Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
+            is(Quarter.Q1));
+        assertThat(
+            Quarter.parse(
+                "Q1", Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
+            is(Quarter.Q1));
+    }
+
+    @Test
+    public void parseWeekdayName() throws ParseException {
+        assertThat(
+            Weekday.parse(
+                "Montag", Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
+            is(Weekday.MONDAY));
+        assertThat(
+            Weekday.parse(
+                "Mo.", Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
+            is(Weekday.MONDAY));
+    }
+
+    @Test
+    public void parseMonthName() throws ParseException {
+        assertThat(
+            Month.parse(
+                "Januar", Locale.GERMAN, TextWidth.WIDE, OutputContext.FORMAT),
+            is(Month.JANUARY));
+        assertThat(
+            Month.parse(
+                "Jan", Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.STANDALONE),
+            is(Month.JANUARY));
     }
 
 }

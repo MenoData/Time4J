@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Quarter.java) is part of project Time4J.
  *
@@ -27,6 +27,8 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.Locale;
 
 
@@ -245,6 +247,48 @@ public enum Quarter
     ) {
 
         return CalendarText.getIsoInstance(locale).getQuarters(width, context).print(this);
+
+    }
+
+    /**
+     * <p>Tries to interprete given text as quarter of year. </p>
+     *
+     * @param   text    the text to be parsed
+     * @param   locale  language setting
+     * @param   width   expected text width
+     * @param   context expected output context
+     * @return  the parsed quarter of year if successful
+     * @throws  ParseException if parsing fails
+     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Versucht, den angegebenen Text als Quartal zu interpretieren. </p>
+     *
+     * @param   text    the text to be parsed
+     * @param   locale  language setting
+     * @param   width   expected text width
+     * @param   context expected output context
+     * @return  the parsed quarter if successful
+     * @throws  ParseException if parsing fails
+     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
+     * @since   3.33/4.28
+     */
+    public static Quarter parse(
+        CharSequence text,
+        Locale locale,
+        TextWidth width,
+        OutputContext context
+    ) throws ParseException {
+
+        ParsePosition pp = new ParsePosition(0);
+        Quarter q = CalendarText.getIsoInstance(locale).getQuarters(width, context).parse(text, pp, Quarter.class);
+
+        if (q == null) {
+            throw new ParseException("Cannot parse: " + text, pp.getErrorIndex());
+        } else {
+            return q;
+        }
 
     }
 
