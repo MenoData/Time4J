@@ -2,6 +2,7 @@
 ### Added
 - Prevent escaping of Z-literal in format patterns [#658]
 - Conversion methods for Weekday and Month [#657]
+- Direct parse-methods for Weekday, Quarter and Month [#656]
 - Weekday-in-month in non-iso-calendars [#653]
 - Alternative calculations for PersianCalendar [#634]
 - Calculation of astronomical seasons [#628]
