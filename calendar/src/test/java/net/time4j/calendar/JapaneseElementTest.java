@@ -409,8 +409,14 @@ public class JapaneseElementTest {
         assertThat(jcal.getInt(JapaneseCalendar.WEEKDAY_IN_MONTH), is(1));
         assertThat(jcal.getMaximum(JapaneseCalendar.WEEKDAY_IN_MONTH), is(1));
         assertThat(
+            jcal.with(JapaneseCalendar.WEEKDAY_IN_MONTH.setToFirst(Weekday.WEDNESDAY)),
+            is(PlainDate.of(1873, 1, 1).transform(JapaneseCalendar.class))); // no wednesday in current month
+        assertThat(
+            jcal.with(JapaneseCalendar.WEEKDAY_IN_MONTH.setToLast(Weekday.WEDNESDAY)),
+            is(PlainDate.of(1872, 12, 25).transform(JapaneseCalendar.class))); // new day never in next month
+        assertThat(
             jcal.with(JapaneseCalendar.WEEKDAY_IN_MONTH.setTo(2, Weekday.MONDAY)),
-            is(PlainDate.of(1873, 1, 6).transform(JapaneseCalendar.class)));
+            is(PlainDate.of(1873, 1, 6).transform(JapaneseCalendar.class))); // overflow transferred to next month
     }
 
 }
