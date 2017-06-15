@@ -51,28 +51,38 @@ public interface OrdinalWeekdayElement<T>
     /**
      * <p>Defines an operator which moves a date to the first given weekday in month. </p>
      *
+     * <p>Equivalent to {@link #setTo(int, Weekday) setTo(1, dayOfWeek)}. </p>
+     *
      * @param   dayOfWeek   first day of week in month
-     * @return  operator
+     * @return  lenient operator
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den ersten angegebenen Wochentag eines Monats setzt. </p>
      *
+     * <p>&Auml;quivalent zu {@link #setTo(int, Weekday) setTo(1, dayOfWeek)}. </p>
+     *
      * @param   dayOfWeek   first day of week in month
-     * @return  operator
+     * @return  lenient operator
      */
     ChronoOperator<T> setToFirst(Weekday dayOfWeek);
 
     /**
      * <p>Defines an operator which moves a date to the last given weekday in month. </p>
      *
+     * <p>Equivalent to {@link #setTo(int, Weekday) setTo(Integer.MAX_VALUE, dayOfWeek)}.
+     * The new day will never be in next month. </p>
+     *
      * @param   dayOfWeek   last day of week in month
-     * @return  operator
+     * @return  lenient operator
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den letzten angegebenen Wochentag eines Monats setzt. </p>
      *
+     * <p>&Auml;quivalent zu {@link #setTo(int, Weekday) setTo(Integer.MAX_VALUE, dayOfWeek)}.
+     * Der neue Tag wird niemals im n&auml;chsten Monat liegen. </p>
+     *
      * @param   dayOfWeek   last day of week in month
-     * @return  operator
+     * @return  lenient operator
      */
     ChronoOperator<T> setToLast(Weekday dayOfWeek);
 
@@ -81,22 +91,25 @@ public interface OrdinalWeekdayElement<T>
      *
      * <p>If given ordinal number is {@code Integer.MAX_VALUE} then the last weekday in month
      * will be determined. This operator behaves in a lenient way, any overflow of the ordinal
-     * number will be transferred to another month. </p>
+     * number will be transferred to another month. Note that this behaviour will also happen
+     * if the current month might be shorter than a full calendar week as exotic edge case. </p>
      *
      * @param   ordinal     ordinal number
      * @param   dayOfWeek   last day of week in month
-     * @return  operator
+     * @return  lenient operator
      */
     /*[deutsch]
      * <p>Definiert einen Versteller, der ein Datum auf den x-ten angegebenen Wochentag eines Monats setzt. </p>
      *
      * <p>Wenn die angegebene Ordnungsnummer {@code Integer.MAX_VALUE} ist, wird der letzte
      * Wochentag des Monats bestimmt. Dieser Operator verh&auml;lt sich nachsichtig, d. h., jedweder
-     * &Uuml;berlauf der Ordnungsnummer wird auf einen anderen Monat &uuml;bertragen. </p>
+     * &Uuml;berlauf der Ordnungsnummer wird auf einen anderen Monat &uuml;bertragen. Zu beachten,
+     * dieses Verhalten wird auch auftreten, wenn als exotischer Randfall der aktuelle Monat
+     * k&uuml;rzer als eine Kalenderwoche sein sollte. </p>
      *
      * @param   ordinal     ordinal number
      * @param   dayOfWeek   last day of week in month
-     * @return  operator
+     * @return  lenient operator
      */
     ChronoOperator<T> setTo(
         int ordinal,
