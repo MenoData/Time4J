@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayInMonthElement.java) is part of project Time4J.
  *
@@ -187,7 +187,7 @@ final class WeekdayInMonthElement
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final int ordinal;
+        private final long ordinal;
         private final Weekday dayOfWeek;
         private final ChronoOperator<PlainTimestamp> specialTS;
 
@@ -239,17 +239,15 @@ final class WeekdayInMonthElement
                 Weekday current = date.get(PlainDate.DAY_OF_WEEK);
                 int delta = this.dayOfWeek.getValue() - current.getValue();
                 int dom = date.getDayOfMonth() + delta;
-                int days =
-                    (this.ordinal - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7
-                    + delta;
+                long days;
                 if (this.ordinal == LAST) {
-                    int max =
-                        GregorianMath.getLengthOfMonth(
-                            date.getYear(),
-                            date.getMonth());
+                    days = (5L - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7 + delta;
+                    int max = GregorianMath.getLengthOfMonth(date.getYear(), date.getMonth());
                     if (date.getDayOfMonth() + days > max) {
                         days -= 7;
                     }
+                } else {
+                    days = (this.ordinal - (MathUtils.floorDivide(dom - 1, 7) + 1)) * 7 + delta;
                 }
                 date = date.plus(days, CalendarUnit.DAYS);
                 return entity.with(PlainDate.CALENDAR_DATE, date);
