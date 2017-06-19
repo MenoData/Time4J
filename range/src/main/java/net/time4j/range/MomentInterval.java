@@ -1195,25 +1195,6 @@ public final class MomentInterval
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
-     *  // Ausgabe:  Ende     * sind jedoch nicht erlaubt. Au&szlig;erdem darf eine der beiden
-     * Komponenten Start und Ende als P-String vorliegen. Wenn nicht, dann
-     * darf die Endkomponente auch in einer abgek&uuml;rzten Schreibweise
-     * angegeben werden, in der weniger pr&auml;zise Elemente wie das
-     * Kalenderjahr ausgelassen und von der Startkomponente &uuml;bernommen
-     * werden. In letzterem Fall ist auch der Offset der Endkomponente
-     * optional. Unendlichkeitssymbole werden verstanden, obwohl ISO-8601
-     * keine unendlichen Intervalle kennt. Beispiele f&uuml;r unterst&uuml;tzte
-     * Formate: </p>
-     *
-     * <pre>
-     *  System.out.println(
-     *      MomentInterval.parseISO(
-     *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z)
-     *
-     *  System.out.println(
-     *      MomentInterval.parseISO(
-     *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
      *  // Ausgabe: [2012-01-01T14:15:00Z/2012-08-11T15:59:00Z)
      *
      *  System.out.println(
