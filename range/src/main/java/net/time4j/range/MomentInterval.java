@@ -1142,7 +1142,7 @@ public final class MomentInterval
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/08-11T16:00+00:01&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2012-08-11T15:00:00Z)
+     *  // output: [2012-01-01T14:15:00Z/2012-08-11T15:59:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
