@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentInterval.java) is part of project Time4J.
  *
@@ -726,7 +726,7 @@ public final class MomentInterval
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
@@ -736,12 +736,12 @@ public final class MomentInterval
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/16:00&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/P2DT1H45M&quot;));
-     *  // output: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z]
+     *  // output: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z)
      * </pre>
      *
      * <p>This method dynamically creates an appropriate interval format.
@@ -773,7 +773,7 @@ public final class MomentInterval
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/2014-06-20T16:00Z&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2014-06-20T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
@@ -783,12 +783,12 @@ public final class MomentInterval
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/16:00&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-01T16:00:00Z)
      *
      *  System.out.println(
      *      MomentInterval.parseISO(
      *          &quot;2012-01-01T14:15Z/P2DT1H45M&quot;));
-     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z]
+     *  // Ausgabe: [2012-01-01T14:15:00Z/2012-01-03T16:00:00Z)
      * </pre>
      *
      * <p>Intern wird das notwendige Intervallformat dynamisch ermittelt. Ist
