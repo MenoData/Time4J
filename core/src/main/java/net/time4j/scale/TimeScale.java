@@ -151,8 +151,8 @@ public enum TimeScale {
      * atomic clock and presents a continuous scale relative to 1958-01-01. </p>
      *
      * <p>There is no second which is interpreted respective labelled as
-     * leapsecond. Hence this scale is decoupled from civil day and only
-     * usefule in a scientific context. As consequence the astronomic day has
+     * leap second. Hence this scale is decoupled from civil day and only
+     * useful in a scientific context. As consequence the astronomic day has
      * no meaning on this scale. </p>
      *
      * <p>Strictly spoken, the scale definition of TAI is a statistical
@@ -184,7 +184,7 @@ public enum TimeScale {
      *
      * <p>Es werden also keine Sekunden als Schaltsekunden interpretiert.
      * Somit ist diese Skala vom zivilen Alltag abgekoppelt und nur im
-     * Wissenschaftsbetrieb von Bedeutung. Konsequent hat der astronomische
+     * Wissenschaftsbetrieb von Bedeutung. Konsequenterweise hat der astronomische
      * Tag in dieser Skala keine Bedeutung. </p>
      *
      * <p>Streng genommen ist auch das Skalenma&szlig; von TAI nur eine
