@@ -99,6 +99,7 @@ public final class GenericTextProviderSPI
         types.add("buddhist");
         types.add("coptic");
         types.add("ethiopic");
+        types.add("extra/frenchrev");
         types.add("generic");
         types.add("indian");
         types.add("islamic");

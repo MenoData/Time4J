@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.calendar.astro.AstroTest;
 import net.time4j.calendar.astro.JulianDayTest;
+import net.time4j.calendar.frenchrev.FrenchRepublicanSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -24,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
         EthiopianOperatorTest.class,
         EthiopianTimeTest.class,
         EvangelistTest.class,
+        FrenchRepublicanSuite.class,
         HijriAlgoTest.class,
         HijriMiscellaneousTest.class,
         HijriOperatorTest.class,
