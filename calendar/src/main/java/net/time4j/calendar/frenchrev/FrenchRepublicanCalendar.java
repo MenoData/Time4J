@@ -21,20 +21,16 @@
 
 package net.time4j.calendar.frenchrev;
 
-import net.time4j.CalendarUnit;
 import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.PlainTimestamp;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.StdCalendarElement;
-import net.time4j.calendar.astro.AstronomicalSeason;
-import net.time4j.calendar.astro.SolarTime;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
@@ -52,7 +48,6 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
-import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.StartOfDay;
@@ -68,10 +63,8 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
-import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -178,7 +171,7 @@ public final class FrenchRepublicanCalendar
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int MAX_YEAR = 1202; // ~ 3000 - 1792 + 1
+    static final int MAX_YEAR = 1202; // ~ 3000 - 1792 + 1
 
     private static final int YEAR_INDEX = 0;
     private static final int DECADE_INDEX = 1;
@@ -379,7 +372,7 @@ public final class FrenchRepublicanCalendar
 
     private static final CalendarSystem<FrenchRepublicanCalendar> CALSYS;
     private static final TimeAxis<FrenchRepublicanCalendar.Unit, FrenchRepublicanCalendar> ENGINE;
-    private static final Algorithm DEFAULT_ALGORITHM = Algorithm.ASTRONOMICAL;
+    private static final FrenchRepublicanAlgorithm DEFAULT_ALGORITHM = FrenchRepublicanAlgorithm.EQUINOX;
 
     static {
         CALSYS = new Transformer();
@@ -457,7 +450,8 @@ public final class FrenchRepublicanCalendar
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private FrenchRepublicanCalendar(
+    // also called by FrenchRepublicanAlgorithm-enum
+    FrenchRepublicanCalendar(
         int fyear,
         int fdoy
     ) {
@@ -1206,93 +1200,6 @@ public final class FrenchRepublicanCalendar
             return start.until(end, this);
 
         }
-
-    }
-
-    /**
-     * Various calendar algorithm variants for the French revolutionary calendar.
-     */
-    /*[deutsch]
-     * Verschiedene Kalenderalgorithmen f&uuml;r den franz&ouml;sischen Revolutionskalender.
-     */
-    enum Algorithm {
-
-        //~ Statische Felder/Initialisierungen --------------------------------
-
-        /**
-         * The standard legal algorithm of the French revolutionary calendar.
-         */
-        /*[deutsch]
-         * Das gesetzliche Standardberechnungsverfahren f&uuml;r den franz&ouml;sischen Revolutionskalender.
-         */
-        ASTRONOMICAL() {
-            @Override
-            public boolean isLeapYear(int fyear) {
-                if (fyear < 1 || fyear > MAX_YEAR) {
-                    throw new IllegalArgumentException("Out of range: " + fyear);
-                }
-                long thisYear = autumnalEquinox(fyear).getDaysSinceEpochUTC();
-                long nextYear = autumnalEquinox(fyear + 1).getDaysSinceEpochUTC();
-                return ((nextYear - thisYear) == 366L);
-            }
-            @Override
-            FrenchRepublicanCalendar transform(long utcDays) {
-                if ((utcDays < -492997L) || (utcDays > 375548L)) {
-                    throw new IllegalArgumentException("Out of range: " + utcDays);
-                }
-                PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
-                int fyear = date.getYear() - 1791;
-                if (date.getMonth() < 9) {
-                    fyear--; // optimization
-                }
-                PlainDate equinox = autumnalEquinox(fyear);
-                long delta = CalendarUnit.DAYS.between(equinox, date);
-                while (delta < 0) {
-                    fyear--;
-                    equinox = autumnalEquinox(fyear);
-                    delta = CalendarUnit.DAYS.between(equinox, date);
-                }
-                int fdoy = (int) (delta + 1);
-                return new FrenchRepublicanCalendar(fyear, fdoy);
-            }
-            @Override
-            long transform(FrenchRepublicanCalendar cal) {
-                long newYear = autumnalEquinox(cal.getYear()).getDaysSinceEpochUTC();
-                return newYear + cal.getDayOfYear() - 1;
-            }
-            private PlainDate autumnalEquinox(int fyear) {
-                PlainTimestamp tsp =
-                    AstronomicalSeason.AUTUMNAL_EQUINOX
-                        .inYear(fyear + 1791)
-                        .get(SolarTime.apparentAt(PARIS_OBSERVATORY));
-                return tsp.getCalendarDate();
-            }
-        };
-
-        private static final ZonalOffset PARIS_OBSERVATORY =
-            ZonalOffset.atLongitude(OffsetSign.AHEAD_OF_UTC, 2, 20, 14.025); // Paris meridian (Wikipedia)
-
-        //~ Methoden ----------------------------------------------------------
-
-        /**
-         * <p>Determines if given republican year is a leap year or not. </p>
-         *
-         * @param   fyear   the year of French Republic in the French revolutionary calendar
-         * @return  {@code true} for leap years else {@code false}
-         */
-        /*[deutsch]
-         * <p>Bestimmt, ob das angegebene republikanische Jahr ein Schaltjahr ist. </p>
-         *
-         * @param   fyear   the year of French Republic in the French revolutionary calendar
-         * @return  {@code true} for leap years else {@code false}
-         */
-        public boolean isLeapYear(int fyear) {
-            throw new AbstractMethodError();
-        }
-
-        abstract FrenchRepublicanCalendar transform(long utcDays);
-
-        abstract long transform(FrenchRepublicanCalendar date);
 
     }
 
