@@ -112,7 +112,7 @@ public class FrenchRepublicanCalendarTest {
 
     @Test
     public void getDayOfMonth() {
-        if (this.frenchrev.isSansculottides()) {
+        if (this.frenchrev.hasSansculottides()) {
             try {
                 this.frenchrev.getDayOfMonth();
                 fail("Missing expected exception on sansculottides.");
@@ -130,7 +130,7 @@ public class FrenchRepublicanCalendarTest {
 
     @Test
     public void getDayOfDecade() {
-        if (this.frenchrev.isSansculottides()) {
+        if (this.frenchrev.hasSansculottides()) {
             try {
                 this.frenchrev.getDayOfDecade();
                 fail("Missing expected exception on sansculottides.");
@@ -162,7 +162,7 @@ public class FrenchRepublicanCalendarTest {
 
     @Test
     public void getDecade() {
-        if (this.frenchrev.isSansculottides()) {
+        if (this.frenchrev.hasSansculottides()) {
             try {
                 this.frenchrev.getDecade();
                 fail("Missing expected exception on sansculottides.");
@@ -180,7 +180,7 @@ public class FrenchRepublicanCalendarTest {
 
     @Test
     public void getMonth() {
-        if (this.frenchrev.isSansculottides()) {
+        if (this.frenchrev.hasSansculottides()) {
             try {
                 this.frenchrev.getMonth();
                 fail("Missing expected exception on sansculottides.");
@@ -236,6 +236,13 @@ public class FrenchRepublicanCalendarTest {
         assertThat(
             this.frenchrev.get(EpochDays.UNIX),
             is(this.epoch + 2 * 365));
+    }
+
+    @Test
+    public void hasMonth() {
+        assertThat(
+            this.frenchrev.hasMonth(),
+            is(!this.frenchrev.hasSansculottides()));
     }
 
 }

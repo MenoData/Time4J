@@ -218,7 +218,8 @@ public final class FrenchRepublicanCalendar
      * <p>However, it is always possible to query the date for the minimum or maximum complementary day
      * or to set the date to a complementary day even if the actual date is not a complementary day. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die Erg&auml;nzungstage des franz&ouml;sischen Revolutionskalenders. </p>
@@ -232,7 +233,8 @@ public final class FrenchRepublicanCalendar
      * Erg&auml;nzungstag zu fragen oder das aktuelle Datum auf einen Erg&auml;nzungstag zu setzen,
      * selbst wenn das Datum kein Erg&auml;nzungstag ist. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public static final ChronoElement<Sansculottides> SANSCULOTTIDES = SANSCULOTTIDES_ACCESS;
 
@@ -247,7 +249,8 @@ public final class FrenchRepublicanCalendar
      * <p>However, it is always possible to query the date for the minimum or maximum month
      * or to set the date to a month-related day even if the actual date is a complementary day. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Monat (Vend&eacute;miaire - Fructidor), wenn vorhanden. </p>
@@ -261,7 +264,8 @@ public final class FrenchRepublicanCalendar
      * Monat zu fragen oder das aktuelle Datum auf einen monatsbezogenen Tag zu setzen,
      * selbst wenn das Datum ein Erg&auml;nzungstag ist. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     @FormattableElement(format = "M")
     public static final StdCalendarElement<FrenchRepublicanMonth, FrenchRepublicanCalendar> MONTH_OF_YEAR =
@@ -279,7 +283,8 @@ public final class FrenchRepublicanCalendar
      * by raising an exception. Users have first to make sure that the date is not such a complementary
      * day. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die Dekade des Monats, wenn vorhanden. </p>
@@ -289,7 +294,8 @@ public final class FrenchRepublicanCalendar
      * mit einer Ausnahme quittiert. Anwender m&uuml;ssen zuerst sicherstellen, da&szlig; das Datum
      * kein solcher Erg&auml;nzungstag ist. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> DECADE_OF_MONTH =
         new StdIntegerDateElement<>("DECADE_OF_MONTH", FrenchRepublicanCalendar.class, 1, 3, '\u0000', null, null);
@@ -302,7 +308,8 @@ public final class FrenchRepublicanCalendar
      * by raising an exception. Users have first to make sure that the date is not such a complementary
      * day. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die Dekadentage des franz&ouml;sischen Revolutionskalenders. </p>
@@ -312,7 +319,8 @@ public final class FrenchRepublicanCalendar
      * mit einer Ausnahme quittiert. Anwender m&uuml;ssen zuerst sicherstellen, da&szlig; das Datum
      * kein solcher Erg&auml;nzungstag ist. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public static final ChronoElement<DayOfDecade> DAY_OF_DECADE = DAY_OF_DECADE_ACCESS;
 
@@ -324,7 +332,8 @@ public final class FrenchRepublicanCalendar
      * by raising an exception. Users have first to make sure that the date is not such a complementary
      * day. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Tag des Monats, wenn vorhanden. </p>
@@ -334,7 +343,8 @@ public final class FrenchRepublicanCalendar
      * mit einer Ausnahme quittiert. Anwender m&uuml;ssen zuerst sicherstellen, da&szlig; das Datum
      * kein solcher Erg&auml;nzungstag ist. </p>
      *
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     @FormattableElement(format = "d")
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> DAY_OF_MONTH =
@@ -619,7 +629,8 @@ public final class FrenchRepublicanCalendar
      * @return  month enum
      * @throws  ChronoException if this date is a complementary day
      * @see     #MONTH_OF_YEAR
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Liefert den republikanischen Monat, wenn vorhanden. </p>
@@ -627,7 +638,8 @@ public final class FrenchRepublicanCalendar
      * @return  month enum
      * @throws  ChronoException if this date is a complementary day
      * @see     #MONTH_OF_YEAR
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public FrenchRepublicanMonth getMonth() {
 
@@ -647,7 +659,8 @@ public final class FrenchRepublicanCalendar
      * @return  int (1, 2 or 3)
      * @throws  ChronoException if this date is a complementary day
      * @see     #DECADE_OF_MONTH
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Liefert die Dekade des aktuellen republikanischen Monats, wenn vorhanden. </p>
@@ -655,7 +668,8 @@ public final class FrenchRepublicanCalendar
      * @return  int (1, 2 or 3)
      * @throws  ChronoException if this date is a complementary day
      * @see     #DECADE_OF_MONTH
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public int getDecade() {
 
@@ -674,7 +688,8 @@ public final class FrenchRepublicanCalendar
      * @return  int (1-30)
      * @throws  ChronoException if this date is a complementary day
      * @see     #DAY_OF_MONTH
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Liefert den Tag des Monats, wenn vorhanden. </p>
@@ -682,7 +697,8 @@ public final class FrenchRepublicanCalendar
      * @return  int (1-30)
      * @throws  ChronoException if this date is a complementary day
      * @see     #DAY_OF_MONTH
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public int getDayOfMonth() {
 
@@ -701,7 +717,8 @@ public final class FrenchRepublicanCalendar
      * @return  enum
      * @throws  ChronoException if this date is a complementary day
      * @see     #DAY_OF_DECADE
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Liefert den Tag des Monats, wenn vorhanden (Zehn-Tage-Woche). </p>
@@ -709,11 +726,12 @@ public final class FrenchRepublicanCalendar
      * @return  enum
      * @throws  ChronoException if this date is a complementary day
      * @see     #DAY_OF_DECADE
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public DayOfDecade getDayOfDecade() {
 
-        if (this.isSansculottides()) {
+        if (this.hasSansculottides()) {
             throw new ChronoException("Day of decade does not exist on sansculottides: " + this.toString());
         }
 
@@ -759,14 +777,16 @@ public final class FrenchRepublicanCalendar
      *
      * @return  Sansculottides enum
      * @throws  ChronoException if this date is not a complementary day
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     /*[deutsch]
      * <p>Liefert den Erg&auml;nzungstag, wenn vorhanden. </p>
      *
      * @return  Sansculottides enum
      * @throws  ChronoException if this date is not a complementary day
-     * @see     #isSansculottides()
+     * @see     #hasSansculottides()
+     * @see     #hasMonth()
      */
     public Sansculottides getSansculottides() {
 
@@ -782,20 +802,66 @@ public final class FrenchRepublicanCalendar
     /**
      * <p>Is this date a complementary day? </p>
      *
+     * <p>A date in the French revolutionary calendar has either a month or is a complementary day. </p>
+     *
      * @return  boolean
+     * @see     #hasMonth()
      * @see     #MONTH_OF_YEAR
      * @see     #DAY_OF_MONTH
+     * @see     #DECADE_OF_MONTH
+     * @see     #DAY_OF_DECADE
+     * @see     #SANSCULOTTIDES
      */
     /*[deutsch]
      * <p>Liegt dieses Datum auf einem Erg&auml;nzungstag? </p>
      *
+     * <p>Ein Datum im franz&ouml;sischen Revolutionskalender hat entweder einen Monat
+     * oder ist ein Erg&auml;nzungstag. </p>
+     *
      * @return  boolean
+     * @see     #hasMonth()
      * @see     #MONTH_OF_YEAR
      * @see     #DAY_OF_MONTH
+     * @see     #DECADE_OF_MONTH
+     * @see     #DAY_OF_DECADE
+     * @see     #SANSCULOTTIDES
      */
-    public boolean isSansculottides() {
+    public boolean hasSansculottides() {
 
         return (this.fdoy > 360);
+
+    }
+
+    /**
+     * <p>Does this date contain a month? </p>
+     *
+     * <p>A date in the French revolutionary calendar has either a month or is a complementary day. </p>
+     *
+     * @return  boolean
+     * @see     #hasSansculottides()
+     * @see     #MONTH_OF_YEAR
+     * @see     #DAY_OF_MONTH
+     * @see     #DECADE_OF_MONTH
+     * @see     #DAY_OF_DECADE
+     * @see     #SANSCULOTTIDES
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Datum in einem Monat? </p>
+     *
+     * <p>Ein Datum im franz&ouml;sischen Revolutionskalender hat entweder einen Monat
+     * oder ist ein Erg&auml;nzungstag. </p>
+     *
+     * @return  boolean
+     * @see     #hasSansculottides()
+     * @see     #MONTH_OF_YEAR
+     * @see     #DAY_OF_MONTH
+     * @see     #DECADE_OF_MONTH
+     * @see     #DAY_OF_DECADE
+     * @see     #SANSCULOTTIDES
+     */
+    public boolean hasMonth() {
+
+        return (this.fdoy <= 360);
 
     }
 
@@ -965,9 +1031,9 @@ public final class FrenchRepublicanCalendar
             || element == DAY_OF_DECADE
             || element == DAY_OF_MONTH
         ) {
-            return !this.isSansculottides();
+            return !this.hasSansculottides();
         } else if (element == SANSCULOTTIDES) {
-            return this.isSansculottides();
+            return this.hasSansculottides();
         } else if (this.getRegisteredElements().contains(element)) {
             return true;
         }
@@ -1287,7 +1353,7 @@ public final class FrenchRepublicanCalendar
         @Override
         public boolean isValid(FrenchRepublicanCalendar context, int value) {
 
-            if ((this.index == DAY_OF_MONTH_INDEX || this.index == DECADE_INDEX) && context.isSansculottides()) {
+            if ((this.index == DAY_OF_MONTH_INDEX || this.index == DECADE_INDEX) && context.hasSansculottides()) {
                 return false;
             }
 
@@ -1300,9 +1366,9 @@ public final class FrenchRepublicanCalendar
         @Override
         public FrenchRepublicanCalendar withValue(FrenchRepublicanCalendar context, int value, boolean lenient) {
 
-            if ((this.index == DAY_OF_MONTH_INDEX) && context.isSansculottides()) {
+            if ((this.index == DAY_OF_MONTH_INDEX) && context.hasSansculottides()) {
                 throw new IllegalArgumentException("Day of month not defined on sansculottides: " + value);
-            } else if ((this.index == DECADE_INDEX) && context.isSansculottides()) {
+            } else if ((this.index == DECADE_INDEX) && context.hasSansculottides()) {
                 throw new IllegalArgumentException("Decade of month not defined on sansculottides: " + value);
             } else if (!this.isValid(context, value)) {
                 throw new IllegalArgumentException("Out of range: " + value);
@@ -1405,7 +1471,7 @@ public final class FrenchRepublicanCalendar
                     return 1;
                 case DECADE_INDEX:
                 case DAY_OF_MONTH_INDEX:
-                    if (context.isSansculottides()) {
+                    if (context.hasSansculottides()) {
                         throw new ChronoException(
                             "Complementary days (sansculottides) are not part of any month or decade: " + context);
                     } else {
@@ -1424,7 +1490,7 @@ public final class FrenchRepublicanCalendar
                     return MAX_YEAR;
                 case DECADE_INDEX:
                 case DAY_OF_MONTH_INDEX:
-                    if (context.isSansculottides()) {
+                    if (context.hasSansculottides()) {
                         throw new ChronoException(
                             "Complementary days (sansculottides) are not part of any month: " + context);
                     } else {
@@ -1485,7 +1551,7 @@ public final class FrenchRepublicanCalendar
 
             if (value == null) {
                 throw new IllegalArgumentException("Missing republican month.");
-            } else if (context.isSansculottides()) {
+            } else if (context.hasSansculottides()) {
                 return FrenchRepublicanCalendar.of(context.fyear, value, 30);
             } else {
                 return FrenchRepublicanCalendar.of(context.fyear, value, context.getDayOfMonth());
@@ -1598,7 +1664,7 @@ public final class FrenchRepublicanCalendar
         @Override
         public DayOfDecade getMinimum(FrenchRepublicanCalendar context) {
 
-            if (context.isSansculottides()) {
+            if (context.hasSansculottides()) {
                 throw new ChronoException("Cannot get minimum for day of decade on sansculottides: " + context);
             }
 
@@ -1609,7 +1675,7 @@ public final class FrenchRepublicanCalendar
         @Override
         public DayOfDecade getMaximum(FrenchRepublicanCalendar context) {
 
-            if (context.isSansculottides()) {
+            if (context.hasSansculottides()) {
                 throw new ChronoException("Cannot get maximum for day of decade on sansculottides: " + context);
             }
 
@@ -1623,7 +1689,7 @@ public final class FrenchRepublicanCalendar
             DayOfDecade value
         ) {
 
-            return (value != null) && !context.isSansculottides();
+            return (value != null) && !context.hasSansculottides();
 
         }
 
@@ -1636,7 +1702,7 @@ public final class FrenchRepublicanCalendar
 
             if (value == null) {
                 throw new IllegalArgumentException("Missing day of decade.");
-            } else if (context.isSansculottides()) {
+            } else if (context.hasSansculottides()) {
                 throw new IllegalArgumentException("Cannot set day of decade on sansculottides.");
             }
 
@@ -2124,7 +2190,7 @@ public final class FrenchRepublicanCalendar
                     long ym = MathUtils.safeAdd(ymValue(date), amount);
                     int year = MathUtils.safeCast(MathUtils.floorDivide(ym, 12));
                     int month = MathUtils.floorModulo(ym, 12) + 1;
-                    int dom = (date.isSansculottides() ? 30 : date.getDayOfMonth());
+                    int dom = (date.hasSansculottides() ? 30 : date.getDayOfMonth());
                     return FrenchRepublicanCalendar.of(year, month, dom);
                 case DECADES: // interprete sansculottides as extension of last decade of fructidor
                     long dec = MathUtils.safeAdd(decValue(date), amount);
@@ -2132,7 +2198,7 @@ public final class FrenchRepublicanCalendar
                     int rem = MathUtils.floorModulo(dec, 36);
                     int month2 = MathUtils.floorDivide(rem, 3) + 1;
                     int decOfMonth = MathUtils.floorModulo(rem, 3);
-                    int dod = (((date.isSansculottides() ? 30 : date.getDayOfMonth()) - 1) % 10) + 1;
+                    int dod = (((date.hasSansculottides() ? 30 : date.getDayOfMonth()) - 1) % 10) + 1;
                     int dom2 = decOfMonth * 10 + dod;
                     return FrenchRepublicanCalendar.of(year2, month2, dom2);
                 case WEEKS:
@@ -2161,8 +2227,8 @@ public final class FrenchRepublicanCalendar
                     return deltaY;
                 case MONTHS: // interprete sansculottides as extension of fructidor
                     long deltaM = ymValue(end) - ymValue(start);
-                    int sdom = (start.isSansculottides() ? (start.fdoy - 330) : start.getDayOfMonth());
-                    int edom = (end.isSansculottides() ? (end.fdoy - 330) : end.getDayOfMonth());
+                    int sdom = (start.hasSansculottides() ? (start.fdoy - 330) : start.getDayOfMonth());
+                    int edom = (end.hasSansculottides() ? (end.fdoy - 330) : end.getDayOfMonth());
                     if ((deltaM > 0) && (edom < sdom)) {
                         deltaM--;
                     } else if ((deltaM < 0) && (edom > sdom)) {
@@ -2171,8 +2237,8 @@ public final class FrenchRepublicanCalendar
                     return deltaM;
                 case DECADES: // interprete sansculottides as extension of last decade of fructidor
                     long deltaD = decValue(end) - decValue(start);
-                    int sdod = (start.isSansculottides() ? (start.fdoy - 350) : start.getDayOfDecade().getValue());
-                    int edod = (end.isSansculottides() ? (end.fdoy - 350) : end.getDayOfDecade().getValue());
+                    int sdod = (start.hasSansculottides() ? (start.fdoy - 350) : start.getDayOfDecade().getValue());
+                    int edod = (end.hasSansculottides() ? (end.fdoy - 350) : end.getDayOfDecade().getValue());
                     if ((deltaD > 0) && (edod < sdod)) {
                         deltaD--;
                     } else if ((deltaD < 0) && (edod > sdod)) {
@@ -2191,14 +2257,14 @@ public final class FrenchRepublicanCalendar
 
         private static int ymValue(FrenchRepublicanCalendar date) {
 
-            int m = (date.isSansculottides() ? 12 : date.getMonth().getValue());
+            int m = (date.hasSansculottides() ? 12 : date.getMonth().getValue());
             return date.fyear * 12 + m - 1;
 
         }
 
         private static int decValue(FrenchRepublicanCalendar date) {
 
-            int dec = (date.isSansculottides() ? 3 : date.getDecade());
+            int dec = (date.hasSansculottides() ? 3 : date.getDecade());
             return ymValue(date) * 3 + dec - 1;
 
         }
