@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
         FrenchRepublicanEraTest.class,
         FrenchRepublicanMonthTest.class,
         FrenchRepublicanUnitTest.class,
+        RommeTest.class,
         SansculottidesTest.class,
     }
 )

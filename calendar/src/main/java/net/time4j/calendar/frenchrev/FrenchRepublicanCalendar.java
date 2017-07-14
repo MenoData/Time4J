@@ -48,6 +48,7 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.StartOfDay;
@@ -171,7 +172,8 @@ public final class FrenchRepublicanCalendar
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    static final int MAX_YEAR = 1202; // ~ 3000 - 1792 + 1
+    // value chosen in order to make withEndOfFranciade() always working for equinox algorithm
+    static final int MAX_YEAR = 1202; // < 3000 - 1792 + 1
 
     private static final int YEAR_INDEX = 0;
     private static final int DECADE_INDEX = 1;
@@ -900,6 +902,33 @@ public final class FrenchRepublicanCalendar
     }
 
     /**
+     * <p>Obtains an alternative date view specific for given algorithm. </p>
+     *
+     * @param   algorithm   calendar computation
+     * @return  French republican date (possibly modified)
+     * @throws  IllegalArgumentException in case of date overflow
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Erh&auml;lt eine alternative Datumssicht spezifisch f&uuml;r den angegebenen Algorithmus. </p>
+     *
+     * @param   algorithm   calendar computation
+     * @return  French republican date (possibly modified)
+     * @throws  IllegalArgumentException in case of date overflow
+     * @since   3.33/4.28
+     */
+    public Date getDate(FrenchRepublicanAlgorithm algorithm) {
+
+        if (algorithm == DEFAULT_ALGORITHM) {
+            return new Date(this, DEFAULT_ALGORITHM);
+        }
+
+        long utcDays = DEFAULT_ALGORITHM.transform(this);
+        return new Date(algorithm.transform(utcDays), algorithm);
+
+    }
+
+    /**
      * <p>Creates a new local timestamp with this date and given wall time. </p>
      *
      * <p>If the time {@link PlainTime#midnightAtEndOfDay() T24:00} is used
@@ -1265,6 +1294,161 @@ public final class FrenchRepublicanCalendar
 
             return start.until(end, this);
 
+        }
+
+    }
+
+    /**
+     * <p>Static view of calendar date taking into account possibly different calendar algorithms. </p>
+     *
+     * <p>Note: Only elements registered in the French republican calendar chronology are supported. </p>
+     *
+     * @see     #getDate(FrenchRepublicanAlgorithm)
+     * @see     FrenchRepublicanAlgorithm#attribute()
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Statische Ansicht eines Kalenderdatums, das auf verschiedenen Kalenderalgorithmen basieren kann. </p>
+     *
+     * <p>Hinweis: Nur in der Chronologie des franz&ouml;sischen Revolutionskalenders registrierte Elemente
+     * werden unterst&uuml;tzt. </p>
+     *
+     * @see     #getDate(FrenchRepublicanAlgorithm)
+     * @see     FrenchRepublicanAlgorithm#attribute()
+     * @since   3.33/4.28
+     */
+    public static final class Date
+        implements ChronoDisplay {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final FrenchRepublicanCalendar delegate;
+        private final FrenchRepublicanAlgorithm algorithm;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Date(
+            FrenchRepublicanCalendar delegate,
+            FrenchRepublicanAlgorithm algorithm
+        ) {
+            super();
+
+            this.delegate = delegate;
+            this.algorithm = algorithm;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public boolean contains(ChronoElement<?> element) {
+            return ENGINE.isRegistered(element);
+        }
+
+        @Override
+        public <V> V get(ChronoElement<V> element) {
+            if (element == DAY_OF_WEEK) {
+                long utcDays = this.algorithm.transform(this.delegate);
+                return element.getType().cast(Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1));
+            } else if (element instanceof EpochDays) {
+                EpochDays ed = EpochDays.class.cast(element);
+                long utcDays = this.algorithm.transform(this.delegate);
+                return element.getType().cast(Long.valueOf(ed.transform(utcDays, EpochDays.UTC)));
+            } else if (ENGINE.isRegistered(element)) {
+                return this.delegate.get(element);
+            } else {
+                throw new ChronoException("French republican dates only support registered elements.");
+            }
+        }
+
+        @Override
+        public int getInt(ChronoElement<Integer> element) {
+            if (ENGINE.isRegistered(element)) {
+                return this.delegate.getInt(element);
+            } else {
+                return Integer.MIN_VALUE;
+            }
+        }
+
+        @Override
+        public <V> V getMinimum(ChronoElement<V> element) {
+            if (ENGINE.isRegistered(element)) {
+                return this.delegate.getMinimum(element);
+            } else {
+                throw new ChronoException("French republican dates only support registered elements.");
+            }
+        }
+
+        @Override
+        public <V> V getMaximum(ChronoElement<V> element) {
+            if (ENGINE.isRegistered(element)) {
+                return this.delegate.getMaximum(element);
+            } else {
+                throw new ChronoException("French republican dates only support registered elements.");
+            }
+        }
+
+        /**
+         * <p>This date has no timezone (offset). </p>
+         *
+         * @return  {@code false}
+         */
+        /*[deutsch]
+         * <p>Dieses Datum hat keine Zeitzone oder Verschiebung. </p>
+         *
+         * @return  {@code false}
+         */
+        @Override
+        public boolean hasTimezone() {
+            return false;
+        }
+
+        /**
+         * <p>Always throws an exception. </p>
+         *
+         * @return  (nothing)
+         * @throws  ChronoException (always)
+         */
+        /*[deutsch]
+         * <p>Wirft immer eine Ausnahme. </p>
+         *
+         * @return  (nothing)
+         * @throws  ChronoException (always)
+         */
+        @Override
+        public TZID getTimezone() {
+            throw new ChronoException("Timezone not available.");
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof Date) {
+                Date that = (Date) obj;
+                if (this.algorithm != that.algorithm) {
+                    return false;
+                } else {
+                    return this.delegate.equals(that.delegate);
+                }
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return 7 * this.delegate.hashCode() + 31 * this.algorithm.hashCode();
+        }
+
+        @Override
+        public String toString() {
+            StringBuilder sb = new StringBuilder();
+            sb.append(this.delegate);
+            sb.append('[');
+            sb.append(this.algorithm);
+            sb.append(']');
+            return sb.toString();
         }
 
     }
@@ -2098,6 +2282,8 @@ public final class FrenchRepublicanCalendar
             boolean preparsing
         ) {
 
+            FrenchRepublicanAlgorithm algorithm =
+                attributes.get(FrenchRepublicanAlgorithm.attribute(), DEFAULT_ALGORITHM);
             int year = entity.getInt(YEAR_OF_ERA);
 
             if (year == Integer.MIN_VALUE) {
@@ -2108,13 +2294,15 @@ public final class FrenchRepublicanCalendar
                 return null;
             }
 
+            FrenchRepublicanCalendar cal = null;
+
             if (entity.contains(MONTH_OF_YEAR)) {
                 int month = entity.get(MONTH_OF_YEAR).getValue();
                 int dom = entity.getInt(DAY_OF_MONTH);
 
                 if (dom != Integer.MIN_VALUE) {
                     if ((dom >= 1) && (dom <= 30)) {
-                        return FrenchRepublicanCalendar.of(year, month, dom);
+                        cal = FrenchRepublicanCalendar.of(year, month, dom);
                     } else {
                         entity.with(ValidationElement.ERROR_MESSAGE, "Invalid republican date.");
                     }
@@ -2122,29 +2310,40 @@ public final class FrenchRepublicanCalendar
             } else if (entity.contains(SANSCULOTTIDES)) {
                 Sansculottides s = entity.get(SANSCULOTTIDES);
                 int doy = s.getValue() + 360;
-                if ((doy == 6) && !FrenchRepublicanCalendar.isLeapYear(year)) {
+                if ((doy == 6) && !algorithm.isLeapYear(year)) {
                     entity.with(ValidationElement.ERROR_MESSAGE, "Republican date is no leap year.");
                 } else {
-                    return new FrenchRepublicanCalendar(year, doy);
+                    cal = new FrenchRepublicanCalendar(year, doy);
                 }
             } else {
                 int doy = entity.getInt(DAY_OF_YEAR);
                 if (doy != Integer.MIN_VALUE) {
-                    if ((doy >= 1) && (doy <= (DEFAULT_ALGORITHM.isLeapYear(year) ? 366 : 365))) {
-                        return new FrenchRepublicanCalendar(year, doy);
+                    if ((doy >= 1) && (doy <= (algorithm.isLeapYear(year) ? 366 : 365))) {
+                        cal = new FrenchRepublicanCalendar(year, doy);
                     }
                     entity.with(ValidationElement.ERROR_MESSAGE, "Invalid republican date.");
                 }
             }
 
-            return null;
+            if (algorithm != DEFAULT_ALGORITHM) {
+                cal = DEFAULT_ALGORITHM.transform(algorithm.transform(cal));
+            }
+
+            return cal;
 
         }
 
         @Override
         public ChronoDisplay preformat(FrenchRepublicanCalendar context, AttributeQuery attributes) {
 
-            return context;
+            FrenchRepublicanAlgorithm algorithm =
+                attributes.get(FrenchRepublicanAlgorithm.attribute(), DEFAULT_ALGORITHM);
+
+            if (algorithm == DEFAULT_ALGORITHM) {
+                return context;
+            }
+
+            return context.getDate(algorithm);
 
         }
 
