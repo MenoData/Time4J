@@ -8,6 +8,8 @@ import net.time4j.Weekday;
 import net.time4j.calendar.astro.AstronomicalSeason;
 import net.time4j.calendar.astro.JulianDay;
 import net.time4j.engine.CalendarDays;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
@@ -304,6 +306,16 @@ public class PersianMiscellaneousTest {
         assertThat(pcal.getMaximum(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
         assertThat(birashk.getInt(PersianCalendar.WEEKDAY_IN_MONTH), is(1));
         assertThat(birashk.getMaximum(PersianCalendar.WEEKDAY_IN_MONTH), is(5));
+    }
+
+    @Test(expected= ChronoException.class)
+    public void externalElementInDate() {
+        ChronoElement<Integer> element =
+            CommonElements.weekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel());
+        PersianCalendar pcal = PersianCalendar.of(1403, 1, 1);
+        assertThat(pcal.get(element), is(1));
+        PersianCalendar.Date date = pcal.getDate(PersianAlgorithm.BORKOWSKI);
+        date.get(element); // throws an exception because the element is not registered
     }
 
 }
