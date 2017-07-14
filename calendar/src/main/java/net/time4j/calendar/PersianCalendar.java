@@ -47,6 +47,7 @@ import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
@@ -575,7 +576,7 @@ public final class PersianCalendar
      * <p>Obtains an alternative date view specific for given algorithm. </p>
      *
      * @param   algorithm   calendar computation
-     * @return  Persian date
+     * @return  Persian date (possibly modified)
      * @throws  IllegalArgumentException in case of date overflow
      * @since   3.33/4.28
      */
@@ -583,7 +584,7 @@ public final class PersianCalendar
      * <p>Erh&auml;lt eine alternative Datumssicht spezifisch f&uuml;r den angegebenen Algorithmus. </p>
      *
      * @param   algorithm   calendar computation
-     * @return  Persian date
+     * @return  Persian date (possibly modified)
      * @throws  IllegalArgumentException in case of date overflow
      * @since   3.33/4.28
      */
@@ -604,7 +605,7 @@ public final class PersianCalendar
      * <p>Obtains an astronomical date view specific for given timezone offset. </p>
      *
      * @param   offset      timezone offset
-     * @return  Persian date based on astronomical calculations for given offset
+     * @return  Persian date based on astronomical calculations for given offset (possibly modified)
      * @throws  IllegalArgumentException in case of date overflow
      * @see     PersianAlgorithm#ASTRONOMICAL
      * @see     #getDate(PersianAlgorithm)
@@ -614,7 +615,7 @@ public final class PersianCalendar
      * <p>Erh&auml;lt eine astronomische Datumssicht spezifisch f&uuml;r die angegebene Zeitzonenverschiebung. </p>
      *
      * @param   offset      timezone offset
-     * @return  Persian date based on astronomical calculations for given offset
+     * @return  Persian date based on astronomical calculations for given offset (possibly modified)
      * @throws  IllegalArgumentException in case of date overflow
      * @see     PersianAlgorithm#ASTRONOMICAL
      * @see     #getDate(PersianAlgorithm)
@@ -968,6 +969,8 @@ public final class PersianCalendar
      *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_YEAR), is(366));
      * </pre>
      *
+     * <p>Note: Only elements registered in the Persian calendar chronology are supported. </p>
+     *
      * @see     #getDate(PersianAlgorithm)
      * @see     #getDate(ZonalOffset)
      * @see     PersianAlgorithm#attribute()
@@ -992,6 +995,8 @@ public final class PersianCalendar
      *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_MONTH), is(31));
      *      assertThat(birashk.getMaximum(PersianCalendar.DAY_OF_YEAR), is(366));
      * </pre>
+     *
+     * <p>Hinweis: Nur in der persischen Kalenderchronologie registrierte Elemente werden unterst&uuml;tzt. </p>
      *
      * @see     #getDate(PersianAlgorithm)
      * @see     #getDate(ZonalOffset)
@@ -1026,7 +1031,7 @@ public final class PersianCalendar
 
         @Override
         public boolean contains(ChronoElement<?> element) {
-            return this.delegate.contains(element);
+            return ENGINE.isRegistered(element);
         }
 
         @Override
@@ -1046,8 +1051,17 @@ public final class PersianCalendar
                 return element.getType().cast(Integer.valueOf(doy + this.delegate.pdom));
             } else if (element == WEEKDAY_IN_MONTH) {
                 return element.getType().cast(Integer.valueOf(Math.floorDiv(this.delegate.pdom - 1, 7) + 1));
+            } else if (element == CommonElements.RELATED_GREGORIAN_YEAR) {
+                return element.getType().cast(Integer.valueOf(this.delegate.getYear() + 621));
+            } else if (element instanceof EpochDays) {
+                EpochDays ed = EpochDays.class.cast(element);
+                long utcDays = this.algorithm.transform(this.delegate, this.offset);
+                return element.getType().cast(Long.valueOf(ed.transform(utcDays, EpochDays.UTC)));
+            } else if (ENGINE.isRegistered(element)) {
+                return this.delegate.get(element);
+            } else {
+                throw new ChronoException("Persian dates only support registered elements.");
             }
-            return this.delegate.get(element);
         }
 
         @Override
@@ -1068,13 +1082,22 @@ public final class PersianCalendar
                 return doy + this.delegate.pdom;
             } else if (element == WEEKDAY_IN_MONTH) {
                 return Math.floorDiv(this.delegate.pdom - 1, 7) + 1;
+            } else if (element == CommonElements.RELATED_GREGORIAN_YEAR) {
+                return (this.delegate.getYear() + 621);
+            } else if (ENGINE.isRegistered(element)) {
+                return this.delegate.getInt(element);
+            } else {
+                return Integer.MIN_VALUE;
             }
-            return this.delegate.getInt(element);
         }
 
         @Override
         public <V> V getMinimum(ChronoElement<V> element) {
-            return this.delegate.getMinimum(element);
+            if (ENGINE.isRegistered(element)) {
+                return this.delegate.getMinimum(element);
+            } else {
+                throw new ChronoException("Persian dates only support registered elements.");
+            }
         }
 
         @Override
@@ -1100,8 +1123,11 @@ public final class PersianCalendar
                     dom += 7;
                 }
                 return element.getType().cast(Math.floorDiv(dom - 1, 7) + 1);
+            } else if (ENGINE.isRegistered(element)) {
+                return this.delegate.getMaximum(element);
+            } else {
+                throw new ChronoException("Persian dates only support registered elements.");
             }
-            return this.delegate.getMaximum(element);
         }
 
         /**
