@@ -1,5 +1,6 @@
 package net.time4j.calendar.frenchrev;
 
+import net.time4j.PlainDate;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.expert.Iso8601Format;
 import org.junit.Test;
@@ -119,6 +120,19 @@ public class RommeTest {
         assertThat(
             FrenchRepublicanAlgorithm.ROMME.isLeapYear(this.year),
             is(this.leap));
+    }
+
+    @Test
+    public void getDate() {
+        FrenchRepublicanCalendar cal =
+            PlainDate.of(this.epoch, EpochDays.UTC).transform(FrenchRepublicanCalendar.axis());
+        FrenchRepublicanCalendar.Date dateE = cal.getDate(FrenchRepublicanAlgorithm.EQUINOX);
+        assertThat(dateE.get(FrenchRepublicanCalendar.YEAR_OF_ERA), is(cal.getYear()));
+        assertThat(dateE.get(FrenchRepublicanCalendar.DAY_OF_YEAR), is(cal.getDayOfYear()));
+
+        FrenchRepublicanCalendar.Date dateR = cal.getDate(FrenchRepublicanAlgorithm.ROMME);
+        assertThat(dateR.get(FrenchRepublicanCalendar.YEAR_OF_ERA), is(this.year));
+        assertThat(dateR.get(FrenchRepublicanCalendar.DAY_OF_YEAR), is(this.doy));
     }
 
 }

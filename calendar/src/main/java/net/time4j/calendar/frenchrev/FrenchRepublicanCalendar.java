@@ -1060,7 +1060,7 @@ public final class FrenchRepublicanCalendar
             || element == DAY_OF_DECADE
             || element == DAY_OF_MONTH
         ) {
-            return !this.hasSansculottides();
+            return this.hasMonth();
         } else if (element == SANSCULOTTIDES) {
             return this.hasSansculottides();
         } else if (this.getRegisteredElements().contains(element)) {
