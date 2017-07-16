@@ -8,11 +8,13 @@
 - Support for apparent solar time [#633]
 - Support for Julian Day Number [#527]
 - Implement timescales TT and UT1 [#93]
+- New dynamic pattern type [#659]
 
 ### Changed
 - Redefine value space and epoch of TAI [#652]
 
 ### Deprecated
+- Make PatternType-API fit for more calendars [#659]
 - Prepare StartOfDay-change for next major release [#655]
 
 ## [v3.32] published on 2017-04-28
