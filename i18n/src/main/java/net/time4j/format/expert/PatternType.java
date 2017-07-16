@@ -1666,7 +1666,7 @@ public enum PatternType
                 return cldr24(builder, locale, symbol, count);
             case NON_ISO_DATE:
                 if (isISO(chronology)) {
-                    throw new IllegalArgumentException("Choose CLDR or CLDR_24 for ISO-8601-chronology.");
+                    throw new IllegalArgumentException("Choose CLDR or CLDR_DATE for ISO-8601-chronology.");
                 }
                 return general(builder, chronology, symbol, count, locale);
             case CLDR_DATE:
