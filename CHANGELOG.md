@@ -14,6 +14,7 @@
 - Redefine value space and epoch of TAI [#652]
 
 ### Deprecated
+- Make PatternType-API fit for more calendars [#659]
 - Prepare StartOfDay-change for next major release [#655]
 
 ## [v4.27.2] published on 2017-04-29
