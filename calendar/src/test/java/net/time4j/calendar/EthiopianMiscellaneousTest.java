@@ -26,13 +26,13 @@ public class EthiopianMiscellaneousTest {
         Locale amharic = new Locale("am");
         ChronoFormatter<EthiopianCalendar> formatter =
             ChronoFormatter.setUp(EthiopianCalendar.class, amharic)
-                .addPattern("MMMM d ", PatternType.NON_ISO_DATE)
+                .addPattern("MMMM d ", PatternType.CLDR_DATE)
                 .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC)
                 .addInteger(EthiopianCalendar.YEAR_OF_ERA, 1, 9)
                 .endSection()
                 .addLiteral(" (")
                 .addText(EthiopianCalendar.EVANGELIST)
-                .addPattern(") G", PatternType.NON_ISO_DATE)
+                .addPattern(") G", PatternType.CLDR_DATE)
                 .build()
                 .with(Leniency.STRICT);
         String input = "ጥቅምት 11 ፲፱፻፺፯ (ማቴዎስ) ዓ/ም";
@@ -48,7 +48,7 @@ public class EthiopianMiscellaneousTest {
         // test of default number system for years
         ChronoFormatter<EthiopianCalendar> f2 =
             ChronoFormatter.setUp(EthiopianCalendar.class, amharic)
-                .addPattern("MMMM d yyyy G", PatternType.NON_ISO_DATE).build();
+                .addPattern("MMMM d yyyy G", PatternType.CLDR_DATE).build();
         assertThat(f2.parse("ጥቅምት 11 ፲፱፻፺፯ ዓ/ም"), is(ethio));
     }
 

@@ -67,7 +67,7 @@ public class HijriPatternTest {
         }
         this.formatter =
             ChronoFormatter.setUp(HijriCalendar.class, loc)
-                .addPattern(pattern, PatternType.NON_ISO_DATE).build()
+                .addPattern(pattern, PatternType.CLDR_DATE).build()
                 .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA);
         this.cldrFormatter =
             ChronoFormatter.setUp(HijriCalendar.class, loc)

@@ -256,7 +256,7 @@ public class HijriAlgoTest {
     public void formatExample() { // see issue #407
         ChronoFormatter<HijriCalendar> formatter2 =
             ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
-                .addPattern("EEE, d. MMMM yy", PatternType.NON_ISO_DATE).build()
+                .addPattern("EEE, d. MMMM yy", PatternType.CLDR_DATE).build()
                 .with(Attributes.PIVOT_YEAR, 1500);
         PlainDate today2 = PlainDate.of(735914, EpochDays.RATA_DIE);
         HijriCalendar h = today2.transform(HijriCalendar.class, "islamic-fatimida");

@@ -260,7 +260,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "MMMM/dd, G y",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.ENGLISH,
                 JapaneseCalendar.axis());
         JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 14);
@@ -272,7 +272,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "Gy年M月d日",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.JAPANESE,
                 JapaneseCalendar.axis());
 
@@ -292,7 +292,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "MMMM/dd, G y",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.ENGLISH,
                 JapaneseCalendar.axis());
         JapaneseCalendar expected = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 14);
@@ -304,7 +304,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "DDD, G y",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.ENGLISH,
                 JapaneseCalendar.axis());
         JapaneseCalendar expected = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 14);
@@ -316,7 +316,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "G-y-M-d",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.ENGLISH,
                 JapaneseCalendar.axis()
             ).with(EastAsianMonth.LEAP_MONTH_INDICATOR, 'L');
@@ -331,7 +331,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "Gy年M月d日",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.JAPANESE,
                 JapaneseCalendar.axis()
             ).with(Leniency.LAX);
@@ -379,7 +379,7 @@ public class JapaneseElementTest {
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern(
                 "Gy年M月d日",
-                PatternType.NON_ISO_DATE,
+                PatternType.CLDR_DATE,
                 Locale.JAPANESE,
                 JapaneseCalendar.axis()
             );
