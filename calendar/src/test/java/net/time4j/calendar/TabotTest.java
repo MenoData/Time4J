@@ -114,7 +114,7 @@ public class TabotTest {
     public void format() {
         ChronoFormatter<EthiopianCalendar> f =
             ChronoFormatter.setUp(EthiopianCalendar.axis(), new Locale("am"))
-                .addPattern("d MMMM y G", PatternType.NON_ISO_DATE)
+                .addPattern("d MMMM y G", PatternType.CLDR_DATE)
                 .addLiteral(" (")
                 .addText(EthiopianCalendar.TABOT)
                 .addLiteral(')')

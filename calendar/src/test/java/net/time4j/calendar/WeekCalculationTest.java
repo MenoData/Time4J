@@ -369,7 +369,7 @@ public class WeekCalculationTest {
     public void printWeekElementsThai() {
         ThaiSolarCalendar thai = PlainDate.of(1940, 12, 28).transform(ThaiSolarCalendar.class); // Saturday
         ChronoFormatter<ThaiSolarCalendar> cf =
-            ChronoFormatter.ofPattern("y w W ee c", PatternType.NON_ISO_DATE, Locale.ENGLISH, ThaiSolarCalendar.axis());
+            ChronoFormatter.ofPattern("y w W ee c", PatternType.CLDR_DATE, Locale.ENGLISH, ThaiSolarCalendar.axis());
         assertThat(cf.format(thai), is("2483 39 4 07 7"));
         ChronoFormatter<ThaiSolarCalendar> cf2 =
             ChronoFormatter.ofPattern("y ww W ee c", PatternType.CLDR, Locale.ENGLISH, ThaiSolarCalendar.axis());
@@ -381,7 +381,7 @@ public class WeekCalculationTest {
         ThaiSolarCalendar thai = PlainDate.of(1940, 12, 28).transform(ThaiSolarCalendar.class); // Saturday
         ChronoFormatter<ThaiSolarCalendar> cf =
             ChronoFormatter.ofPattern(
-                "G-yyyy-MM-dd w W ee c", PatternType.NON_ISO_DATE, Locale.ENGLISH, ThaiSolarCalendar.axis());
+                "G-yyyy-MM-dd w W ee c", PatternType.CLDR_DATE, Locale.ENGLISH, ThaiSolarCalendar.axis());
         assertThat(
             cf.with(Leniency.STRICT).parse("BE-2483-12-28 39 4 07 7"),
             is(thai));

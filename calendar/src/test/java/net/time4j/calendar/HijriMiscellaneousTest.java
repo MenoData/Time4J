@@ -36,7 +36,7 @@ public class HijriMiscellaneousTest {
     public void executeCodeDemo() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
             ChronoFormatter.ofPattern(
-                "EEE, d. MMMM yy", PatternType.NON_ISO_DATE, Locale.ENGLISH, HijriCalendar.family())
+                "EEE, d. MMMM yy", PatternType.CLDR_DATE, Locale.ENGLISH, HijriCalendar.family())
             .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
             .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
         HijriCalendar hijri = formatter.parse("Thu, 29. Ramadan 36");
@@ -48,7 +48,7 @@ public class HijriMiscellaneousTest {
     public void executeICU() throws ParseException {
         ChronoFormatter<HijriCalendar> formatter =
             ChronoFormatter.ofPattern(
-                "y-MM-dd", PatternType.NON_ISO_DATE, Locale.ENGLISH, HijriCalendar.family())
+                "y-MM-dd", PatternType.CLDR_DATE, Locale.ENGLISH, HijriCalendar.family())
             .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
         HijriCalendar hijri = formatter.parse("1-01-01");
         PlainDate date = hijri.transform(PlainDate.class);
