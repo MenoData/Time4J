@@ -26,6 +26,9 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.engine.BridgeChronology;
+import net.time4j.engine.CalendarVariant;
+import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.Chronology;
@@ -329,6 +332,10 @@ public enum PatternType
      * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour can be overridden
      * on builder-level. And the clock time (symbol &quot;h&quot;) will use the Ethiopian time starting
      * at 6 AM in the morning. </p>
+     *
+     * <p><strong>Warning: </strong> CLDR-like date patterns are only applicable when the calendar in question
+     * always contains a month for any date. This underlying assumption is not true for example for the
+     * French revolutionary calendar. </p>
      */
     /*[deutsch]
      * <p>Dieses Standardmuster ist auf viele Chronologien anwendbar und folgt der Norm
@@ -602,6 +609,10 @@ public enum PatternType
      * Standardverhalten kann auf <i>builder</i>-Ebene &uuml;berschrieben werden. Und die Uhrzeit
      * (Symbol &quot;h&quot;) wird die &auml;thiopische Variante mit 6 Uhr morgens als Tagesbeginn
      * nutzen. </p>
+     *
+     * <p><strong>Warnung: </strong> CLDR-basierte Datumsmuster sind nur anwendbar, wenn der fragliche
+     * Kalender immer zu irgeneinem beliebigen Datum einen Monat enth&auml;lt. Diese implizite Annahme
+     * ist zum Beispiel f&uuml;r den franz&ouml;sischen Revolutionskalender nicht immer gegeben. </p>
      */
     CLDR,
 
@@ -877,6 +888,236 @@ public enum PatternType
     CLDR_24,
 
     /**
+     * <p>A small subset of CLDR applicable on many calendar chronologies which have registered the
+     * associated elements with same symbols. </p>
+     *
+     * <p>If not explicitly stated otherwise the count of symbols always
+     * controls the minimum count of digits in case of a numerical element.
+     * Is an element shorter then the zero digit will be used for padding. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legend</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Description</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ERA</td>
+     *      <td>G</td>
+     *      <td>One to three symbols indicate an abbreviation, four symbols
+     *      indicate the long form and five symbols stand for a letter. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_ERA</td>
+     *      <td>y</td>
+     *      <td>The count of symbols normally controls the minimum count of
+     *      digits. If it is 2 however then the year will be printed with
+     *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>M</td>
+     *      <td>One or two symbols for the numerical form, three symbols
+     *      for the abbreviation, four for the full name and five for
+     *      a letter symbol (NARROW). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>L</td>
+     *      <td>Like M, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEK_OF_YEAR</td>
+     *      <td>w</td>
+     *      <td>One or two symbols for the country-dependent week of year. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEK_OF_MONTH</td>
+     *      <td>W</td>
+     *      <td>One symbol for the country-dependent week of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_MONTH</td>
+     *      <td>d</td>
+     *      <td>One or two symbols for the day of month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_YEAR</td>
+     *      <td>D</td>
+     *      <td>One, two or three symbols for the day of year. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_WEEK</td>
+     *      <td>E</td>
+     *      <td>One to three symbols for the abbreviation, four for the full
+     *      name, five for a letter symbol or six for the short form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEKDAY_IN_MONTH</td>
+     *      <td>F</td>
+     *      <td>One symbol for the weekday in month. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>e</td>
+     *      <td>Like E, but if there are only one or two symbols then the
+     *      formatter will choose the localized numerical form. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>c</td>
+     *      <td>Like e, but in the version {@link OutputContext#STANDALONE}.
+     *      In some languages (not english) the stand-alone-version requires
+     *      a special grammar. However, 2 symbols are not allowed. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
+     *      <td>The related gregorian year corresponds to the begin of the calendar year
+     *      in non-gregorian calender systems. For formatting or parsing, only the
+     *      ASCII-digits 0-9 will be used, even if other parts of the format use
+     *      alternative digits or other numeral systems. The count of symbols is
+     *      defined within the range 1-9. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     *
+     * <p>Special notes for the Ethiopian calendar: </p>
+     *
+     * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour
+     * can be overridden on builder-level using a sectional attribute for the number system. </p>
+     *
+     * <p><strong>Warning: </strong> CLDR-like date patterns are only applicable when the calendar in question
+     * always contains a month for any date. This underlying assumption is not true for example for the
+     * French revolutionary calendar. </p>
+     *
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Eine kleine Untermenge von CLDR, die auf viele Kalenderchronologien anwendbar ist, die die
+     * assoziierten Elemente mit gleichen Symbolen registriert haben. </p>
+     *
+     * <p>Wenn nicht explizit anders angegeben, steuert die Anzahl der Symbole
+     * immer die minimale Anzahl der zu formatierenden Stellen, ein numerisches
+     * Element vorausgesetzt. Ist also ein Element in der Darstellung
+     * k&uuml;rzer, dann wird mit der Null-Ziffer aufgef&uuml;llt. </p>
+     *
+     * <div style="margin-top:5px;">
+     * <table border="1">
+     *  <caption>Legende</caption>
+     *  <tr>
+     *      <th>Element</th>
+     *      <th>Symbol</th>
+     *      <th>Beschreibung</th>
+     *  </tr>
+     *  <tr>
+     *      <td>ERA</td>
+     *      <td>G</td>
+     *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
+     *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
+     *      Buchstabensymbol. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_ERA</td>
+     *      <td>y</td>
+     *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
+     *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
+     *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>M</td>
+     *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
+     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen
+     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>MONTH_OF_YEAR</td>
+     *      <td>L</td>
+     *      <td>Wie M, aber in der {@link OutputContext#STANDALONE
+     *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
+     *      erfordert die alleinstehende Variante eine besondere
+     *      Deklination. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEK_OF_YEAR</td>
+     *      <td>w</td>
+     *      <td>Ein oder zwei Symbole f&uuml;r die l&auml;nderabh&auml;ngige
+     *      Woche des Jahres. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEK_OF_MONTH</td>
+     *      <td>W</td>
+     *      <td>Ein Symbol f&uuml;r die l&auml;nderabh&auml;ngige
+     *      Woche des Monats. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_MONTH</td>
+     *      <td>d</td>
+     *      <td>Ein oder zwei Symbole f&uuml;r den Tag des Monats. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_YEAR</td>
+     *      <td>D</td>
+     *      <td>Ein, zwei oder drei Symbole f&uuml;r den Tag des Jahres. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>DAY_OF_WEEK</td>
+     *      <td>E</td>
+     *      <td>Ein bis drei Symbole f&uuml;r die Abk&uuml;rzung, vier
+     *      f&uuml;r den vollen Namen, f&uuml;nf f&uuml;r ein Buchstabensymbol
+     *      oder sechs f&uuml;r die Kurzform. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>WEEKDAY_IN_MONTH</td>
+     *      <td>F</td>
+     *      <td>Ein Symbol f&uuml;r den Wochentag im Monat. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>e</td>
+     *      <td>Wie E, aber wenn ein oder zwei Symbole angegeben sind, dann
+     *      wird die lokalisierte numerische Form gew&auml;hlt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>LOCAL_DAY_OF_WEEK</td>
+     *      <td>c</td>
+     *      <td>Wie e, aber in der {@link OutputContext#STANDALONE
+     *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
+     *      erfordert die alleinstehende Variante eine besondere
+     *      Deklination. Zu beachten: 2 Symbole sind nicht erlaubt. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>RELATED_GREGORIAN_YEAR</td>
+     *      <td>r</td>
+     *      <td>In nicht-gregorianischen Kalendersystemen entspricht es dem
+     *      ISO-Jahr des Beginns des jeweiligen Kalenderjahres. Zur Formatierung
+     *      werden immer die ASCII-Ziffern 0-9 verwendet, selbst wenn andere Teile
+     *      des Formats andere numerische Ziffern oder sogar andere Numeralsystem
+     *      verwenden. Die Anzahl der Symbole ist im Bereich 1-9 zu w&auml;hlen. </td>
+     *  </tr>
+     * </table>
+     * </div>
+     *
+     * <p>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </p>
+     *
+     * <p>Das &auml;thiopische Jahr wird per Standard in Amharic die &auml;thiopischen Numerale verwenden.
+     * Diese Vorgabe kann auf <i>builder</i>-Ebene mit einem sektionalen Attribut f&uuml;r das Zahlsystem
+     * &uuml;berschrieben werden. </p>
+     *
+     * <p><strong>Warnung: </strong> CLDR-basierte Datumsmuster sind nur anwendbar, wenn der fragliche
+     * Kalender immer zu irgeneinem beliebigen Datum einen Monat enth&auml;lt. Diese implizite Annahme
+     * ist zum Beispiel f&uuml;r den franz&ouml;sischen Revolutionskalender nicht immer gegeben. </p>
+     *
+     * @since   3.33/4.28
+     */
+    CLDR_DATE,
+
+    /**
      * <p>A small subset of CLDR applicable on any non-ISO-chronology which has registered the
      * associated elements with same symbols. </p>
      *
@@ -980,10 +1221,13 @@ public enum PatternType
      * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour
      * can be overridden on builder-level. </p>
      *
-     * @since   3.5/4.3
+     * @since       3.5/4.3
+     * @deprecated  Use {@link #CLDR_DATE} as replacement because the name of this pattern type can be
+     *              confusing considering the fact that not all calendars can be handled by this pattern type
+     *              (for example, the {@code FrenchRepublicanCalendar} is not suitable here)
      */
     /*[deutsch]
-     * <p>Eine kleine Untermenge von CLDR, die auf jede Nicht-ISO-Chronologie anwendbar ist, die die
+     * <p>Eine kleine Untermenge von CLDR, die auf jede Non-ISO-Chronologie anwendbar ist, die die
      * assoziierten Elemente mit gleichen Symbolen registriert hat. </p>
      *
      * <p>Wenn nicht explizit anders angegeben, steuert die Anzahl der Symbole
@@ -1093,9 +1337,48 @@ public enum PatternType
      * <p>Das &auml;thiopische Jahr wird per Standard in Amharic die &auml;thiopischen Numerale verwenden.
      * Diese Vorgabe kann auf <i>builder</i>-Ebene &uuml;berschrieben werden. </p>
      *
-     * @since   3.5/4.3
+     * @since       3.5/4.3
+     * @deprecated  Use {@link #CLDR_DATE} as replacement because the name of this pattern type can be
+     *              confusing considering the fact that not all calendars can be handled by this pattern type
+     *              (for example, the {@code FrenchRepublicanCalendar} is not suitable here)
      */
-    NON_ISO_DATE;
+    @Deprecated
+    NON_ISO_DATE,
+
+    /**
+     * <p>Resolves a pattern such that the chronology used in current context determines the meaning
+     * of any pattern symbols. </p>
+     *
+     * <p>In contrast to other pattern types like {@code CLDR}, the meaning of pattern symbols is not
+     * defined by any external standard. The elements associated with symbols are looked up among the registered
+     * elements of a chronology including those which can be found via any chronological extension. If the
+     * found element is a {@link TextElement text element} then it will be treated as such, and the count of
+     * symbols determines the text width (1 = NARROW, 2 = SHORT, 3 = ABBREVIATED, 4 = WIDE). Otherwise
+     * this pattern type tries to resolve the element in question as {@code ChronoElement<Integer>}, and
+     * the count of symbols will determine the min width of displayed/parsed digits and apply some padding
+     * if necessary. The maximum width is always 9, and no sign is used. </p>
+     *
+     * @see    ChronoElement#getSymbol()
+     * @since   3.33/4.20
+     */
+    /*[deutsch]
+     * <p>L&ouml;st ein Muster so auf, da&szlig; die im aktuellen Kontext benutzte Chronologie die
+     * Bedeutung von Mustersymbolen festlegt. </p>
+     *
+     * <p>Im Kontrast zu anderen Mustertypen wie {@code CLDR} ist die Bedeutung von Mustersymbolen nicht
+     * durch irgendeinen externen Standard festgelegt. Die mit den Symbolen verkn&uuml;pften Elemente
+     * werden unter den registrierten Elementen einer Chronologie gesucht, notfalls auch in den chronologischen
+     * Erweiterungen. Falls das gefundene Element ein {@link TextElement} ist, wird es als solches behandelt,
+     * und die Anzahl der Symbole bestimmt dann die Textbreite (1 = NARROW, 2 = SHORT, 3 = ABBREVIATED, 4 = WIDE).
+     * Sonst versucht dieser Mustertyp das fragliche Element als {@code ChronoElement<Integer>} aufzul&ouml;sen,
+     * und die Anzahl der Symbole wird die Mindestbreite der angezeigten/interpretierten Ziffern festlegen,
+     * unter Umst&auml;nden auch mit Auff&uuml;llen von F&uuml;llzeichen. Im numerischen Fall ist die maximale
+     * Breite 9, und ein Vorzeichen wird nie verwendet. </p>
+     *
+     * @see    ChronoElement#getSymbol()
+     * @since   3.33/4.20
+     */
+    DYNAMIC;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -1135,18 +1418,29 @@ public enum PatternType
         int count
     ) {
 
+        Chronology<?> chronology = getEffectiveChronology(builder);
+
         switch (this) {
             case CLDR:
                 return cldr(builder, locale, symbol, count);
             case SIMPLE_DATE_FORMAT:
-                return sdf(builder, locale, symbol, count);
+                return sdf(builder, chronology, locale, symbol, count);
             case CLDR_24:
                 return cldr24(builder, locale, symbol, count);
             case NON_ISO_DATE:
-                if (isISO(builder.getChronology())) {
+                if (isISO(chronology)) {
                     throw new IllegalArgumentException("Choose CLDR or CLDR_24 for ISO-8601-chronology.");
                 }
-                return general(builder, symbol, count, locale);
+                return general(builder, chronology, symbol, count, locale);
+            case CLDR_DATE:
+                Class<?> type = chronology.getChronoType();
+                if (Calendrical.class.isAssignableFrom(type) || CalendarVariant.class.isAssignableFrom(type)) {
+                    return general(builder, chronology, symbol, count, locale);
+                } else {
+                    throw new IllegalArgumentException("No calendar chronology.");
+                }
+            case DYNAMIC:
+                return dynamic(builder, symbol, count, locale);
             default:
                 throw new UnsupportedOperationException(this.name());
         }
@@ -1203,6 +1497,18 @@ public enum PatternType
 
     }
 
+    private static Chronology<?> getEffectiveChronology(ChronoFormatter.Builder<?> builder) {
+
+        Chronology<?> chronology = builder.getChronology();
+
+        while (chronology instanceof BridgeChronology) {
+            chronology = chronology.preparser();
+        }
+
+        return chronology;
+
+    }
+
     private Map<ChronoElement<?>, ChronoElement<?>> cldr(
         ChronoFormatter.Builder<?> builder,
         Locale locale,
@@ -1210,25 +1516,26 @@ public enum PatternType
         int count
     ) {
 
-        Chronology<?> chronology = builder.getChronology();
+        Chronology<?> chronology = getEffectiveChronology(builder);
 
         if (isGeneralSymbol(symbol) && !isISO(chronology)) {
-            return this.general(builder, symbol, count, locale);
+            return this.general(builder, chronology, symbol, count, locale);
         } else if ((symbol == 'h') && getCalendarType(chronology).equals("ethiopic")) {
-            ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
+            ChronoElement<Integer> ethioHour = findEthiopianHour(chronology);
             if (ethioHour == null) {
                 throw new IllegalArgumentException("Ethiopian time not available.");
             }
             addNumber(ethioHour, symbol, builder, count, false);
             return Collections.emptyMap();
         } else {
-            return this.cldrISO(builder, locale, symbol, count, false);
+            return this.cldrISO(builder, chronology, locale, symbol, count, false);
         }
 
     }
 
     private Map<ChronoElement<?>, ChronoElement<?>> cldrISO(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         Locale locale,
         char symbol,
         int count,
@@ -1376,7 +1683,7 @@ public enum PatternType
                     builder.addFixedNumerical(
                         Weekmodel.of(locale).localDayOfWeek(), count);
                 } else {
-                    cldrISO(builder, locale, 'E', count, sdf);
+                    cldrISO(builder, chronology, locale, 'E', count, sdf);
                 }
                 break;
             case 'c':
@@ -1391,7 +1698,7 @@ public enum PatternType
                         builder.addFixedNumerical(
                             Weekmodel.of(locale).localDayOfWeek(), 1);
                     } else {
-                        cldrISO(builder, locale, 'E', count, sdf);
+                        cldrISO(builder, chronology, locale, 'E', count, sdf);
                     }
                 } finally {
                     builder.endSection();
@@ -1402,9 +1709,9 @@ public enum PatternType
                 builder.startSection(Attributes.TEXT_WIDTH, width);
                 builder.addText(PlainTime.AM_PM_OF_DAY);
                 builder.endSection();
-                if (getCalendarType(builder.getChronology()).equals("ethiopic")) {
+                if (getCalendarType(chronology).equals("ethiopic")) {
                     // AM/PM-marker denotes western reference!
-                    ChronoElement<Integer> ethioHour = findEthiopianHour(builder.getChronology());
+                    ChronoElement<Integer> ethioHour = findEthiopianHour(chronology);
                     if (ethioHour == null) {
                         throw new IllegalArgumentException("Ethiopian time not available.");
                     }
@@ -1537,6 +1844,7 @@ public enum PatternType
 
     private Map<ChronoElement<?>, ChronoElement<?>> sdf(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         Locale locale,
         char symbol,
         int count
@@ -1577,9 +1885,9 @@ public enum PatternType
                     throw new IllegalArgumentException(
                         "Too many pattern letters (X): " + count);
                 }
-                return cldrISO(builder, locale, 'X', count, true);
+                return cldrISO(builder, chronology, locale, 'X', count, true);
             default:
-                return cldrISO(builder, locale, symbol, count, true);
+                return cldrISO(builder, chronology, locale, symbol, count, true);
         }
 
         return Collections.emptyMap();
@@ -1740,12 +2048,13 @@ public enum PatternType
 
     private Map<ChronoElement<?>, ChronoElement<?>> general(
         ChronoFormatter.Builder<?> builder,
+        Chronology<?> chronology,
         char symbol,
         int count,
         Locale locale
     ) {
 
-        Set<ChronoElement<?>> elements = getElements(builder, symbol, locale);
+        Set<ChronoElement<?>> elements = getElements(chronology, symbol, locale);
         String chronoType = builder.getChronology().getChronoType().getName();
         ChronoElement<?> element = find(elements, symbol, chronoType);
         TextElement<?> textElement;
@@ -1783,7 +2092,7 @@ public enum PatternType
                 break;
             case 'y':
                 boolean hasSpecialAttribute = false;
-                if (locale.getLanguage().equals("am") && getCalendarType(builder.getChronology()).equals("ethiopic")) {
+                if (locale.getLanguage().equals("am") && getCalendarType(chronology).equals("ethiopic")) {
                     hasSpecialAttribute = true;
                     builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ETHIOPIC);
                 }
@@ -1862,7 +2171,7 @@ public enum PatternType
                     ChronoElement<Weekday> wde = cast(element);
                     builder.addFixedNumerical(wde, count);
                 } else {
-                    general(builder, 'E', count, locale);
+                    general(builder, chronology, 'E', count, locale);
                 }
                 break;
             case 'c':
@@ -1877,7 +2186,7 @@ public enum PatternType
                         ChronoElement<Weekday> wde = cast(element);
                         builder.addFixedNumerical(wde, 1);
                     } else {
-                        general(builder, 'E', count, locale);
+                        general(builder, chronology, 'E', count, locale);
                     }
                 } finally {
                     builder.endSection();
@@ -1900,14 +2209,78 @@ public enum PatternType
 
     }
 
-    private static Set<ChronoElement<?>> getElements(
+    private Map<ChronoElement<?>, ChronoElement<?>> dynamic(
         ChronoFormatter.Builder<?> builder,
+        char symbol,
+        int count,
+        Locale locale
+    ) {
+
+        ChronoElement<?> found = null;
+        Chronology<?> chronology = getEffectiveChronology(builder);
+
+        for (ChronoElement<?> element : chronology.getRegisteredElements()) {
+            if (element.getSymbol() == symbol) {
+                found = element;
+                break;
+            }
+        }
+
+        if (found == null) {
+            for (ChronoExtension extension : chronology.getExtensions()) {
+                for (ChronoElement<?> element : extension.getElements(locale, Attributes.empty())) {
+                    if (element.getSymbol() == symbol) {
+                        found = element;
+                        break;
+                    }
+                }
+                if (found != null) {
+                    break;
+                }
+            }
+        }
+
+        if (found == null) {
+            throw new IllegalArgumentException("Cannot resolve symbol: " + symbol);
+        } else if (found instanceof TextElement) {
+            switch (count) {
+                case 1:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.NARROW);
+                    break;
+                case 2:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.SHORT);
+                    break;
+                case 3:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED);
+                    break;
+                case 4:
+                    builder.startSection(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+                    break;
+                default:
+                    throw new IllegalArgumentException("Illegal count of symbols: " + symbol);
+            }
+            TextElement<?> textElement = cast(found);
+            builder.addText(textElement);
+            builder.endSection();
+        } else if (found.getType() == Integer.class) {
+            ChronoElement<Integer> intElement = cast(found);
+            builder.addInteger(intElement, count, 9);
+        } else {
+            throw new IllegalArgumentException("Can only handle integer or text elements: " + found);
+        }
+
+        return Collections.emptyMap();
+
+    }
+
+    private static Set<ChronoElement<?>> getElements(
+        Chronology<?> chronology,
         char symbol,
         Locale locale
     ) {
 
         if ((symbol == 'w') || (symbol == 'W') || (symbol == 'e') || (symbol == 'c')) {
-            for (ChronoExtension extension : builder.getChronology().getExtensions()) {
+            for (ChronoExtension extension : chronology.getExtensions()) {
                 for (ChronoElement<?> element : extension.getElements(locale, Attributes.empty())) {
                     if (
                         ((symbol == 'e' || symbol == 'c') && element.name().equals("LOCAL_DAY_OF_WEEK"))
@@ -1922,7 +2295,7 @@ public enum PatternType
             }
             return Collections.emptySet();
         } else {
-            return builder.getChronology().getRegisteredElements();
+            return chronology.getRegisteredElements();
         }
 
     }
@@ -1936,13 +2309,13 @@ public enum PatternType
         char c = ((symbol == 'L') ? 'M' : ((symbol == 'c') ? 'e' : symbol));
 
         for (ChronoElement<?> element : elements) {
-            if (element.getSymbol() == c) {
+            if (element.isDateElement() && (element.getSymbol() == c)) {
                 return element;
             }
         }
 
         throw new IllegalArgumentException(
-            "Cannot find any chronological element for symbol " + symbol + " in \"" + chronoType + "\".");
+            "Cannot find any chronological date element for symbol " + symbol + " in \"" + chronoType + "\".");
 
     }
 

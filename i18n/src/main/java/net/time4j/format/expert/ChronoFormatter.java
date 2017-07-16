@@ -3101,6 +3101,7 @@ public final class ChronoFormatter<T>
         switch (type) {
             case CLDR:
             case CLDR_24:
+            case CLDR_DATE:
             case SIMPLE_DATE_FORMAT:
             case NON_ISO_DATE:
                 if (p.contains("h") || p.contains("K")) {
