@@ -2,18 +2,15 @@ package net.time4j.range;
 
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
-
-import java.time.Instant;
-import java.util.concurrent.TimeUnit;
-
 import net.time4j.SI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.not;
-import static org.hamcrest.CoreMatchers.nullValue;
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 
 
@@ -226,8 +223,7 @@ public class BasicMomentRangeTest {
         Moment end2 = Moment.axis().stepBackwards(end1);
         assertThat(
             MomentInterval.between(start1, end1)
-                .equals(
-                    MomentInterval.between(start2, end2)),
+                .equals(MomentInterval.between(start2, end2)),
             is(false));
         assertThat(
             MomentInterval.between(start1, end1)
@@ -250,9 +246,7 @@ public class BasicMomentRangeTest {
             not(MomentInterval.between(start2, end2).hashCode()));
         assertThat(
             MomentInterval.between(start1, end1).hashCode(),
-            not(
-                MomentInterval.between(start2, end2)
-                .withClosedEnd().hashCode()));
+            not(MomentInterval.between(start2, end2).withClosedEnd().hashCode()));
         assertThat(
             MomentInterval.between(start1, end1).hashCode(),
             is(MomentInterval.between(start1, end1).hashCode()));
