@@ -1040,6 +1040,55 @@ public final class MachineTime<U>
 
     }
 
+    /**
+     * <p>Converts this machine time to its JSR-310-equivalent. </p>
+     *
+     * @return  java.time.Duration
+     * @throws  IllegalStateException if this instance is not based on {@code java.util.concurrent.TimeUnit}
+     * @see     #from(java.time.Duration)
+     * @since   4.28
+     */
+    /*[deutsch]
+     * <p>Konvertiet diese Maschinenzeit zu ihrem JSR-310-&Auml;quivalent. </p>
+     *
+     * @return  java.time.Duration
+     * @throws  IllegalStateException if this instance is not based on {@code java.util.concurrent.TimeUnit}
+     * @see     #from(java.time.Duration)
+     * @since   4.28
+     */
+    public java.time.Duration toTemporalAmount() {
+
+        if (this.scale == TimeScale.POSIX) {
+            return java.time.Duration.ofSeconds(this.seconds, this.nanos);
+        } else {
+            throw new IllegalStateException(
+                "Can only convert based on &quot;java.util.concurrent.TimeUnit&quot;: " + this);
+        }
+
+    }
+
+    /**
+     * <p>Converts given JSR-310-duration to a machine time. </p>
+     *
+     * @param   threeten    duration defined in seconds and nanoseconds (JSR-310-API)
+     * @return  MachineTime
+     * @see     #toTemporalAmount()
+     * @since   4.28
+     */
+    /*[deutsch]
+     * <p>Konvertiert die angegebene JSR-310-Dauer zu einer Maschinenzeit. </p>
+     *
+     * @param   threeten    duration defined in seconds and nanoseconds (JSR-310-API)
+     * @return  MachineTime
+     * @see     #toTemporalAmount()
+     * @since   4.28
+     */
+    public static MachineTime<TimeUnit> from(java.time.Duration threeten) {
+
+        return MachineTime.ofPosixUnits(threeten.getSeconds(), threeten.getNano());
+
+    }
+
     private void createNumber(StringBuilder sb) {
 
         if (this.isNegative()) {

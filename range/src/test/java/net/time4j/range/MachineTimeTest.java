@@ -7,6 +7,7 @@ import net.time4j.scale.TimeScale;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
+import java.time.Duration;
 import java.util.concurrent.TimeUnit;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -544,6 +545,24 @@ public class MachineTimeTest {
         MachineTime<TimeUnit> mt2 = f.parse("-27:30:05");
         assertThat(mt1, is(MachineTime.of(99005, TimeUnit.SECONDS)));
         assertThat(mt2, is(MachineTime.of(-99005, TimeUnit.SECONDS)));
+    }
+
+    @Test
+    public void threetenConversion() {
+        MachineTime<TimeUnit> mt = MachineTime.ofPosixUnits(-2, -123456789);
+        Duration threeten = Duration.ofSeconds(-2, -123456789);
+        assertThat(mt.toTemporalAmount(), is(threeten));
+        assertThat(MachineTime.from(threeten), is(mt));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void threetenConversionSI() {
+        MachineTime.ofSISeconds(3.25).toTemporalAmount();
+    }
+
+    @Test(expected=NullPointerException.class)
+    public void threetenConversionNull() {
+        MachineTime.from(null);
     }
 
 }
