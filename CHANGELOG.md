@@ -1,6 +1,7 @@
 ## [v4.28] not yet released
 ### Added
 - Prevent escaping of Z-literal in format patterns [#658]
+- Easy conversion between MachineTime and JSR-310 [#660]
 - Conversion methods for Weekday and Month [#657]
 - Direct parse-methods for Weekday, Quarter and Month [#656]
 - Weekday-in-month in non-iso-calendars [#653]
