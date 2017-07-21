@@ -247,6 +247,7 @@ public final class ChronoFormatter<T>
 
     // serves for optimization
     private final boolean hasOptionals;
+    private final boolean hasOrMarkers;
     private final boolean needsHistorization;
     private final boolean needsExtensions;
     private final int countOfElements;
@@ -288,12 +289,16 @@ public final class ChronoFormatter<T>
 
         FractionProcessor fp = null;
         boolean ho = false;
+        boolean hm = false;
         boolean nh = false;
         boolean dp = false;
         int co = 0;
         boolean ix = true;
 
         for (FormatStep step : steps) {
+            if (step.isNewOrBlockStarted()) {
+                hm = true;
+            }
             if ((fp == null) && step.getProcessor() instanceof FractionProcessor) {
                 fp = FractionProcessor.class.cast(step.getProcessor());
             }
@@ -316,6 +321,7 @@ public final class ChronoFormatter<T>
 
         this.fracproc = fp;
         this.hasOptionals = ho;
+        this.hasOrMarkers = hm;
         this.needsHistorization = nh;
         this.countOfElements = co;
         this.indexable = ix;
@@ -378,6 +384,7 @@ public final class ChronoFormatter<T>
         this.defaults = Collections.unmodifiableMap(new NonAmbivalentMap(old.defaults));
         this.fracproc = old.fracproc;
         this.hasOptionals = old.hasOptionals;
+        this.hasOrMarkers = old.hasOrMarkers;
         this.needsHistorization = (old.needsHistorization || (history != null));
         this.needsExtensions = (old.needsExtensions || this.needsHistorization);
         this.countOfElements = old.countOfElements;
@@ -481,6 +488,7 @@ public final class ChronoFormatter<T>
         this.leniency = formatter.leniency;
         this.fracproc = formatter.fracproc;
         this.hasOptionals = formatter.hasOptionals;
+        this.hasOrMarkers = formatter.hasOrMarkers;
         this.needsHistorization = formatter.needsHistorization;
         this.needsExtensions = formatter.needsExtensions;
         this.countOfElements = formatter.countOfElements;
@@ -888,30 +896,142 @@ public final class ChronoFormatter<T>
             throw new NullPointerException("Missing text result buffer.");
         }
 
+        int index = 0;
+        int len = this.steps.size();
+
         Set<ElementPosition> positions = null;
         boolean quickPath = (attributes == this.globalAttributes);
 
         if (withPositions) {
-            positions = new LinkedHashSet<>(this.steps.size());
+            positions = new LinkedHashSet<>(len);
         }
 
-        try {
-            int index = 0;
-            int len = this.steps.size();
+        if (this.hasOrMarkers) {
+            Deque<StringBuilder> collectorStack = new LinkedList<>();
+            StringBuilder buf = new StringBuilder(len << 2);
+            collectorStack.push(buf);
+
+            Deque<Set<ElementPosition>> positionStack = null;
+            if (withPositions) {
+                positionStack = new LinkedList<>();
+                positionStack.push(positions);
+            }
+
+            int previous = 0;
+            int current = 0;
 
             while (index < len) {
                 FormatStep step = this.steps.get(index);
-                step.print(formattable, buffer, attributes, positions, quickPath);
+                current = step.getLevel();
+                int level = current;
 
-                if (step.isNewOrBlockStarted()) {
+                // Start einer optionalen Sektion: Stack erweitern
+                while (level > previous) {
+                    StringBuilder sb = new StringBuilder();
+                    sb.append(collectorStack.peek());
+                    collectorStack.push(sb);
+                    if (withPositions) {
+                        positions = new LinkedHashSet<>();
+                        positions.addAll(positionStack.peek());
+                        positionStack.push(positions);
+                    }
+                    level--;
+                }
+
+                // Ende einer optionalen Sektion: Werte im Stack sichern
+                while (level < previous) {
+                    buf = collectorStack.pop();
+                    collectorStack.pop();
+                    collectorStack.push(buf);
+                    if (withPositions) {
+                        positions = positionStack.pop();
+                        positionStack.pop();
+                        positionStack.push(positions);
+                    }
+                    level++;
+                }
+
+                buf = collectorStack.peek();
+                if (withPositions) {
+                    positions = positionStack.peek();
+                }
+
+                RuntimeException re = null;
+
+                try {
+                    step.print(formattable, buf, attributes, positions, quickPath);
+                } catch (ChronoException | IllegalArgumentException ex) {
+                    re = ex;
+                }
+
+                if (re != null) {
+                    // Fehlerfall: nächsten oder-Block suchen
+                    int section = step.getSection();
+                    int last = index;
+
+                    if (!step.isNewOrBlockStarted()) {
+                        for (int j = index + 1; j < len; j++) {
+                            FormatStep test = this.steps.get(j);
+                            if (test.isNewOrBlockStarted() && (test.getSection() == section)) {
+                                last = j;
+                                break;
+                            }
+                        }
+                    }
+
+                    if ((last > index) || step.isNewOrBlockStarted()) {
+                        // wenn gefunden, zum nächsten oder-Block springen
+                        collectorStack.pop();
+                        StringBuilder sb = new StringBuilder();
+                        if (!collectorStack.isEmpty()) {
+                            sb.append(collectorStack.peek());
+                        }
+                        collectorStack.push(sb);
+                        if (withPositions) {
+                            positionStack.pop();
+                            Set<ElementPosition> ep = new LinkedHashSet<>();
+                            if (!positionStack.isEmpty()) {
+                                ep.addAll(positionStack.peek());
+                            }
+                            positionStack.push(ep);
+                        }
+                        index = last;
+                    } else {
+                        throw new IllegalArgumentException("Not formattable: " + formattable, re);
+                    }
+                } else if (step.isNewOrBlockStarted()) {
                     index = step.skipTrailingOrBlocks();
                 }
 
+                // Schleifenzähler inkrementieren
+                previous = current;
                 index++;
             }
-        } catch (ChronoException ex) {
-            throw new IllegalArgumentException(
-                "Not formattable: " + formattable, ex);
+
+            // Verbleibende optionale Sektionen auflösen und Ergebnis schreiben
+            buf = collectorStack.peek();
+            collectorStack.clear();
+            buffer.append(buf);
+
+            if (withPositions) {
+                positions = positionStack.peek();
+                positionStack.clear();
+            }
+        } else {
+            try {
+                while (index < len) {
+                    FormatStep step = this.steps.get(index);
+                    step.print(formattable, buffer, attributes, positions, quickPath);
+
+                    if (step.isNewOrBlockStarted()) {
+                        index = step.skipTrailingOrBlocks();
+                    }
+
+                    index++;
+                }
+            } catch (ChronoException ex) {
+                throw new IllegalArgumentException("Not formattable: " + formattable, ex);
+            }
         }
 
         if (withPositions) {

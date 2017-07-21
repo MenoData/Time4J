@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CustomizedProcessor.java) is part of project Time4J.
  *
@@ -153,13 +153,13 @@ final class CustomizedProcessor<V>
                 positions.addAll(set);
             } else {
                 this.printer.print(value, collector, attributes, NO_RESULT);
-
-                positions.add(
-                    new ElementPosition(
-                        this.element,
-                        offset,
-                        offset + collector.length()));
             }
+
+            positions.add(
+                new ElementPosition(
+                    this.element,
+                    offset,
+                    offset + collector.length()));
         } else {
             this.printer.print(value, collector, attributes, NO_RESULT);
         }
