@@ -1953,7 +1953,6 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-
     /**
      * <p>Normalizes this duration by given normalizer. </p>
      *

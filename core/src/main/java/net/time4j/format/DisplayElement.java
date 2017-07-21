@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DisplayElement.java) is part of project Time4J.
  *
@@ -61,6 +61,7 @@ public abstract class DisplayElement<V extends Comparable<V>>
         map.put("YEAR_OF_DISPLAY", "L_year");
         map.put("MONTH_AS_NUMBER", "L_month");
         map.put("ISO_HOUR", "L_hour");
+        map.put("DAY_OF_MONTH", "L_day");
         OTHER_DISPLAY_KEYS = Collections.unmodifiableMap(map);
     }
 
