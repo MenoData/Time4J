@@ -25,6 +25,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.format.internal.DualFormatElement;
@@ -128,6 +129,7 @@ final class FormatStep {
      * @param   positions       positions of elements in text (optional)
      * @param   quickPath       hint for using quick path
      * @throws  IllegalArgumentException if the object is not formattable
+     * @throws  ChronoException if the object does not contain the element in question
      * @throws  IOException if writing into buffer fails
      * @since   3.15/4.12
      */
