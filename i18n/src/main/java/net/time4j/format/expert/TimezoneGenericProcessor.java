@@ -139,7 +139,7 @@ final class TimezoneGenericProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -159,8 +159,7 @@ final class TimezoneGenericProcessor
         }
 
         if (tzid instanceof ZonalOffset) { // TODO: fallback-Einstellung prüfen, wenn mehr Daten vorhanden sind
-            this.fallback.print(formattable, buffer, attributes, positions, quickPath);
-            return;
+            return this.fallback.print(formattable, buffer, attributes, positions, quickPath);
         }
 
         String name =
@@ -171,19 +170,17 @@ final class TimezoneGenericProcessor
                     : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
 
         if (name.equals(tzid.canonical())) { // name of given style not available => fallback
-            this.fallback.print(formattable, buffer, attributes, positions, quickPath);
-            return;
+            return this.fallback.print(formattable, buffer, attributes, positions, quickPath);
         }
 
         int start = -1;
-        int printed;
 
         if (buffer instanceof CharSequence) {
             start = ((CharSequence) buffer).length();
         }
 
         buffer.append(name);
-        printed = name.length();
+        int printed = name.length();
 
         if (
             (start != -1)
@@ -196,6 +193,8 @@ final class TimezoneGenericProcessor
                     start,
                     start + printed));
         }
+
+        return printed;
 
     }
 

@@ -100,7 +100,7 @@ final class TwoDigitYearProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -161,6 +161,8 @@ final class TwoDigitYearProcessor
         ) {
             positions.add(new ElementPosition(this.element, start, start + printed));
         }
+
+        return printed;
 
     }
 

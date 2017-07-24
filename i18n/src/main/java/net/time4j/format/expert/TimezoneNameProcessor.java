@@ -136,7 +136,7 @@ final class TimezoneNameProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -152,8 +152,7 @@ final class TimezoneNameProcessor
         TZID tzid = formattable.getTimezone();
 
         if (tzid instanceof ZonalOffset) {
-            this.fallback.print(formattable, buffer, attributes, positions, quickPath);
-            return;
+            return this.fallback.print(formattable, buffer, attributes, positions, quickPath);
         }
 
         String name;
@@ -194,6 +193,8 @@ final class TimezoneNameProcessor
                     start,
                     start + printed));
         }
+
+        return printed;
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OrdinalProcessor.java) is part of project Time4J.
  *
@@ -140,7 +140,7 @@ final class OrdinalProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -152,8 +152,7 @@ final class OrdinalProcessor
 
         if (value < 0) {
             if (value == Integer.MIN_VALUE) {
-                throw new IllegalArgumentException(
-                    "Format context \"" + formattable + "\" without element: " + this.element);
+                return -1;
             } else {
                 throw new IllegalArgumentException(
                     "Cannot format negative ordinal numbers: " + formattable);
@@ -200,6 +199,8 @@ final class OrdinalProcessor
             positions.add(
                 new ElementPosition(this.element, start, start + printed));
         }
+
+        return printed;
 
     }
 

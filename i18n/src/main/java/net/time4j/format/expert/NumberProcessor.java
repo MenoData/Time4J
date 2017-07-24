@@ -164,7 +164,7 @@ class NumberProcessor<V>
 
     @SuppressWarnings("unchecked")
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -193,8 +193,7 @@ class NumberProcessor<V>
             int v = formattable.getInt((ChronoElement<Integer>) this.element);
             if (v < 0) {
                 if (v == Integer.MIN_VALUE) {
-                    throw new IllegalArgumentException(
-                        "Format context \"" + formattable + "\" without element: " + this.element);
+                    return -1;
                 } else {
                     throw new IllegalArgumentException(
                         "Negative value not allowed according to sign policy.");
@@ -245,8 +244,7 @@ class NumberProcessor<V>
             if (type == Integer.class) {
                 int v = formattable.getInt((ChronoElement<Integer>) this.element);
                 if (v == Integer.MIN_VALUE) {
-                    throw new IllegalArgumentException(
-                        "Format context \"" + formattable + "\" without element: " + this.element);
+                    return -1;
                 }
                 negative = (v < 0);
                 x = Math.abs(v);
@@ -380,6 +378,8 @@ class NumberProcessor<V>
         ) {
             positions.add(new ElementPosition(this.element, start, start + printed));
         }
+
+        return printed;
 
     }
 

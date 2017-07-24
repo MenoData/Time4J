@@ -112,7 +112,7 @@ final class LocalizedGMTProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -267,6 +267,8 @@ final class LocalizedGMTProcessor
                     start,
                     start + printed));
         }
+
+        return printed;
 
     }
 

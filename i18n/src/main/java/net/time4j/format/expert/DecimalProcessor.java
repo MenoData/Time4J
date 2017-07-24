@@ -122,7 +122,7 @@ final class DecimalProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -216,6 +216,8 @@ final class DecimalProcessor
         ) {
             positions.add(new ElementPosition(this.element, start, start + printed));
         }
+
+        return printed;
 
     }
 

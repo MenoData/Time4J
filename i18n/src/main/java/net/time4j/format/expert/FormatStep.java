@@ -128,12 +128,13 @@ final class FormatStep {
      * @param   attributes      non-sectional control attributes
      * @param   positions       positions of elements in text (optional)
      * @param   quickPath       hint for using quick path
+     * @return  count of printed characters or {@code Integer.MAX_VALUE} if unknown or {@code -1} if not successful
      * @throws  IllegalArgumentException if the object is not formattable
      * @throws  ChronoException if the object does not contain the element in question
      * @throws  IOException if writing into buffer fails
      * @since   3.15/4.12
      */
-    void print(
+    int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -142,7 +143,7 @@ final class FormatStep {
     ) throws IOException {
 
         if (!this.isPrinting(formattable)) {
-            return;
+            return 0;
         }
 
         AttributeQuery aq = (quickPath ? this.fullAttrs : this.getQuery(attributes));
@@ -151,15 +152,13 @@ final class FormatStep {
             (this.padLeft == 0)
             && (this.padRight == 0)
         ) {
-            this.processor.print(
+            return this.processor.print(
                 formattable,
                 buffer,
                 aq,
                 positions,
                 quickPath
             );
-
-            return;
         }
 
         StringBuilder collector;
@@ -174,11 +173,12 @@ final class FormatStep {
             collector = new StringBuilder();
         }
 
-        if (
-            (buffer instanceof CharSequence)
-            && (positions != null)
-        ) {
-            offset = ((CharSequence) buffer).length();
+        if ((buffer instanceof CharSequence) && (positions != null)) {
+            offset = (
+                ((collector == buffer)
+                && ((this.processor instanceof CustomizedProcessor) || (this.processor instanceof StyleProcessor)))
+                    ? 0
+                    : ((CharSequence) buffer).length());
             posBuf = new LinkedHashSet<ElementPosition>();
         }
 
@@ -202,6 +202,8 @@ final class FormatStep {
                 throw new IllegalArgumentException(this.padExceeded());
             }
 
+            int leftPadding = 0;
+
             while (printed < this.padLeft) {
                 if (start == -1) {
                     buffer.append(padChar);
@@ -209,6 +211,7 @@ final class FormatStep {
                     collector.insert(start, padChar);
                 }
                 printed++;
+                leftPadding++;
             }
 
             if (start == -1) {
@@ -216,6 +219,7 @@ final class FormatStep {
             }
 
             if (offset != -1) {
+                offset += leftPadding;
                 for (ElementPosition ep : posBuf) {
                     positions.add(
                         new ElementPosition(
@@ -233,6 +237,7 @@ final class FormatStep {
                 while (len < this.padRight) {
                     buffer.append(padChar);
                     len++;
+                    printed++;
                 }
             }
         } else { // padRight > 0
@@ -259,6 +264,8 @@ final class FormatStep {
                 }
             }
         }
+
+        return printed;
 
     }
 

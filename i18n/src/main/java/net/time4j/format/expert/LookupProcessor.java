@@ -115,7 +115,7 @@ final class LookupProcessor<V>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -126,13 +126,13 @@ final class LookupProcessor<V>
         if (buffer instanceof CharSequence) {
             CharSequence cs = (CharSequence) buffer;
             int offset = cs.length();
-            this.print(formattable, buffer);
-
+            int printed = this.print(formattable, buffer);
             if (positions != null) {
                 positions.add(new ElementPosition(this.element, offset, cs.length()));
             }
+            return printed;
         } else {
-            this.print(formattable, buffer);
+            return this.print(formattable, buffer);
         }
 
     }
@@ -285,13 +285,15 @@ final class LookupProcessor<V>
 
     }
 
-    private void print(
+    private int print(
         ChronoDisplay formattable,
         Appendable buffer
     ) throws IOException {
 
         V value = formattable.get(this.element);
-        buffer.append(this.getString(value));
+        String text = this.getString(value);
+        buffer.append(text);
+        return text.length();
 
     }
 
