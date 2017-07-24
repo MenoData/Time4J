@@ -26,7 +26,6 @@ import net.time4j.PlainDate;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
-import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.format.OutputContext;
@@ -122,7 +121,7 @@ final class TextProcessor<V>
     }
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -130,21 +129,20 @@ final class TextProcessor<V>
         boolean quickPath
     ) throws IOException {
 
-        try {
-            if (buffer instanceof CharSequence) {
-                CharSequence cs = (CharSequence) buffer;
-                int offset = cs.length();
-                this.print(formattable, buffer, attributes, quickPath);
-
+        if (buffer instanceof CharSequence) {
+            CharSequence cs = (CharSequence) buffer;
+            int offset = cs.length();
+            if (this.print(formattable, buffer, attributes, quickPath)) {
                 if (positions != null) {
                     positions.add(new ElementPosition(this.element, offset, cs.length()));
                 }
-            } else {
-                this.print(formattable, buffer, attributes, quickPath);
+                return cs.length() - offset;
             }
-        } catch (ChronoException ce) {
-            throw new IllegalArgumentException(ce);
+        } else if (this.print(formattable, buffer, attributes, quickPath)) {
+            return Integer.MAX_VALUE;
         }
+
+        return -1;
 
     }
 
@@ -296,7 +294,7 @@ final class TextProcessor<V>
 
     }
 
-    private void print(
+    private boolean print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -305,8 +303,12 @@ final class TextProcessor<V>
 
         if ((this.gte != null) && quickPath) {
             this.gte.print(formattable, buffer, this.language, this.tw, this.oc);
-        } else {
+            return true;
+        } else if (formattable.contains(this.element)) {
             this.element.print(formattable, buffer, attributes);
+            return true;
+        } else {
+            return false;
         }
 
     }

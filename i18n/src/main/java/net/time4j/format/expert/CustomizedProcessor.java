@@ -114,7 +114,7 @@ final class CustomizedProcessor<V>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -130,7 +130,7 @@ final class CustomizedProcessor<V>
         if (this.passThroughZDT && (formattable instanceof ZonalDateTime) && (positions == null)) {
             ChronoFormatter<?> cf = (ChronoFormatter<?>) this.printer;
             cf.print(formattable, buffer, attributes, false);
-            return;
+            return Integer.MAX_VALUE; // unknown number of printed characters
         }
 
         V value = formattable.get(this.element);
@@ -165,6 +165,7 @@ final class CustomizedProcessor<V>
         }
 
         buffer.append(collector);
+        return collector.length();
 
     }
 

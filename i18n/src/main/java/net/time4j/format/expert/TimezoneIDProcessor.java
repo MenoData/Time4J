@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneIDProcessor.java) is part of project Time4J.
  *
@@ -50,7 +50,7 @@ enum TimezoneIDProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -85,6 +85,8 @@ enum TimezoneIDProcessor
                     start,
                     start + printed));
         }
+
+        return printed;
 
     }
 

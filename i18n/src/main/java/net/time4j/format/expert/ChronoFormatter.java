@@ -957,14 +957,15 @@ public final class ChronoFormatter<T>
                 }
 
                 RuntimeException re = null;
+                int printed = -1;
 
                 try {
-                    step.print(formattable, buf, attributes, positions, quickPath);
+                    printed = step.print(formattable, buf, attributes, positions, quickPath);
                 } catch (ChronoException | IllegalArgumentException ex) {
                     re = ex;
                 }
 
-                if (re != null) {
+                if (printed == -1) {
                     // Fehlerfall: nächsten oder-Block suchen
                     int section = step.getSection();
                     int last = index;
@@ -996,6 +997,8 @@ public final class ChronoFormatter<T>
                             positionStack.push(ep);
                         }
                         index = last;
+                    } else if (re == null) {
+                        throw new IllegalArgumentException("Not formattable: " + formattable);
                     } else {
                         throw new IllegalArgumentException("Not formattable: " + formattable, re);
                     }

@@ -18,7 +18,7 @@ import static org.junit.Assert.assertThat;
 public class OrFormatTest {
 
     @Test
-    public void format1() throws ParseException {
+    public void format1() {
         ChronoFormatter<PlainDate> f =
             ChronoFormatter.ofDatePattern(
                 "E, dd.MM.uuuu|E, MM/dd/uuuu|EEEE, d. MMMM uuuu", PatternType.CLDR, Locale.ENGLISH);
@@ -27,12 +27,26 @@ public class OrFormatTest {
     }
 
     @Test
-    public void format2() throws ParseException {
+    public void format2() {
         ChronoFormatter<PlainDate> f =
             ChronoFormatter.ofDatePattern(
                 "E, MM/dd/uuuu|E, dd.MM.uuuu|EEEE, d. MMMM uuuu", PatternType.CLDR, Locale.ENGLISH);
         PlainDate date = PlainDate.of(2015, 12, 31);
         assertThat(f.format(date), is("Thu, 12/31/2015"));
+    }
+
+    @Test
+    public void format3() {
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.ROOT)
+                .addFixedInteger(PlainDate.DAY_OF_YEAR, 2)
+                .or()
+                .addFixedInteger(PlainDate.DAY_OF_YEAR, 3)
+                .build();
+        PlainDate date1 = PlainDate.of(2015, 1, 1);
+        assertThat(f.format(date1), is("01"));
+        PlainDate date2 = PlainDate.of(2015, 12, 31);
+        assertThat(f.format(date2), is("365"));
     }
 
     @Test

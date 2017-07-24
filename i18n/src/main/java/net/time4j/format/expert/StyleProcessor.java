@@ -95,7 +95,7 @@ final class StyleProcessor<T>
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -109,6 +109,8 @@ final class StyleProcessor<T>
         if (positions != null) {
             positions.addAll(newPositions);
         }
+
+        return Integer.MAX_VALUE;
 
     }
 

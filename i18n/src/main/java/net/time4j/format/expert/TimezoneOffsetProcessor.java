@@ -149,7 +149,7 @@ final class TimezoneOffsetProcessor
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public void print(
+    public int print(
         ChronoDisplay formattable,
         Appendable buffer,
         AttributeQuery attributes,
@@ -272,6 +272,8 @@ final class TimezoneOffsetProcessor
                     start,
                     start + printed));
         }
+
+        return printed;
 
     }
 
