@@ -112,6 +112,69 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} are supported. </p>
  *
+ * <p><strong>Formatting and parsing:</strong> When using format patterns the
+ * {@link net.time4j.format.expert.PatternType#DYNAMIC dynamic pattern type}
+ * is strongly recommended instead of CLDR-like pattern types because this calendar
+ * is structurally different from month-based calendars. Following symbol-element
+ * table holds: </p>
+ *
+ * <div style="margin-top:5px;">
+ * <table border="1">
+ * <caption>Mapping of dynamic pattern symbols</caption>
+ * <tr>
+ *  <th>element</th><th>symbol</th><th>type</th>
+ * </tr>
+ * <tr>
+ *  <td>ERA</td><td>G</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>YEAR_OF_ERA</td><td>Y</td><td>number</td>
+ * </tr>
+ * <tr>
+ *  <td>MONTH_OF_YEAR</td><td>M</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>SANSCULOTTIDES</td><td>S</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>DAY_OF_MONTH</td><td>D</td><td>number</td>
+ * </tr>
+ * <tr>
+ *  <td>DAY_OF_DECADE</td><td>C</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>DAY_OF_WEEK</td><td>E</td><td>text</td>
+ * </tr>
+ * </table>
+ * </div>
+ *
+ * <p>Note: The standalone form of some enums like the republican month can be printed in a capitalized way
+ * if the formatter is first constructed on builder level by using a sectional attribute for the output context.
+ * Alternatively, users can simply modify the formatter by calling
+ * {@code f.with(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE)}. </p>
+ *
+ * <p>Furthermore: The abbreviated form of the republican month is usually numeric with two arabic digits. For
+ * more control about the numeric representation, the builder offers extra fine-tuned methods. </p>
+ *
+ * <p>It is strongly recommended to use the or-operator &quot;|&quot; in format patterns because not every date of
+ * this calendar has a month. Example: </p>
+ *
+ * <pre>
+ *    ChronoFormatter&lt;FrenchRepublicanCalendar&gt; f =
+ *      ChronoFormatter
+ *        .setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
+ *        .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
+ *        .addPattern(&quot;[D. MMMM|SSSS]&#39;, an &#39;Y&quot;, PatternType.DYNAMIC)
+ *        .endSection()
+ *        .build();
+ *
+ *    FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
+ *    System.out.println(f.format(cal)); // output =&gt; 1. vendémiaire, an 227
+ *
+ *    cal = cal.minus(CalendarDays.ONE);
+ *    System.out.println(f.format(cal)); // output =&gt; jour de la révolution, an 226
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @see     FrenchRepublicanEra
  * @see     FrenchRepublicanMonth
@@ -158,6 +221,69 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} unterst&uuml;tzt. </p>
  *
+ * <p><strong>Formatieren und Interpretation:</strong> Wenn Formatmuster verwendet werden,
+ * wird der {@link net.time4j.format.expert.PatternType#DYNAMIC dynamische Formatmustertyp}
+ * anstelle von CLDR-basierten Formatmustertypen empfohlen, weil dieser Kalender strukturell
+ * von monatsbasierten Kalendern verschieden ist. Folgende Symbol-Element-Tabelle gilt: </p>
+ *
+ * <div style="margin-top:5px;">
+ * <table border="1">
+ * <caption>Zuordnung von dynamischen Mustersymbolen</caption>
+ * <tr>
+ *  <th>element</th><th>symbol</th><th>type</th>
+ * </tr>
+ * <tr>
+ *  <td>ERA</td><td>G</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>YEAR_OF_ERA</td><td>Y</td><td>number</td>
+ * </tr>
+ * <tr>
+ *  <td>MONTH_OF_YEAR</td><td>M</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>SANSCULOTTIDES</td><td>S</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>DAY_OF_MONTH</td><td>D</td><td>number</td>
+ * </tr>
+ * <tr>
+ *  <td>DAY_OF_DECADE</td><td>C</td><td>text</td>
+ * </tr>
+ * <tr>
+ *  <td>DAY_OF_WEEK</td><td>E</td><td>text</td>
+ * </tr>
+ * </table>
+ * </div>
+ *
+ * <p>Hinweis: Die <i>standalone</i>-Form einiger Enums wie dem republikanischen Monat ist in einer
+ * kapitalisierten Weise erh&auml;ltlich, wenn der Formatierer zuerst mittels seines <i>builder</i>
+ * konstruiert und ein sektionales Attribut f&uuml;r den Ausgabekontext verwendet wird. Alternativ
+ * kann man am Formatierer {@code f.with(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE)} aufrufen. </p>
+ *
+ * <p>Au&szlig;erdem ist die abgek&uuml;rzte Schreibweise des republikanischen Monats gew&ouml;hnlich
+ * numerisch mit zwei arabischen Ziffern. Um mehr Kontrolle &uuml;ber die numerische Repr&auml;sentation
+ * zu bekommen, bietet der <i>builder</i> weitere feingranulare Methoden an. </p>
+ *
+ * <p>Weil nicht jedes Datum dieses Kalenders einen Monat hat, ist es angeraten, mit dem Oder-Operator
+ * &quot;|&quot; in der Formatierung zu arbeiten. Beispiel: </p>
+ *
+ * <pre>
+ *    ChronoFormatter&lt;FrenchRepublicanCalendar&gt; f =
+ *      ChronoFormatter
+ *        .setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
+ *        .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
+ *        .addPattern(&quot;[D. MMMM|SSSS]&#39;, an &#39;Y&quot;, PatternType.DYNAMIC)
+ *        .endSection()
+ *        .build();
+ *
+ *    FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
+ *    System.out.println(f.format(cal)); // Ausgabe =&gt; 1. vendémiaire, an 227
+ *
+ *    cal = cal.minus(CalendarDays.ONE);
+ *    System.out.println(f.format(cal)); // Ausgabe =&gt; jour de la révolution, an 226
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @see     FrenchRepublicanEra
  * @see     FrenchRepublicanMonth
@@ -196,14 +322,14 @@ public final class FrenchRepublicanCalendar
     /*[deutsch]
      * <p>Repr&auml;sentiert das republikanische Jahr gez&auml;hlt seit 1792-09-22 (im Bereich 1-1202). </p>
      */
-    @FormattableElement(format = "y")
+    @FormattableElement(format = "Y")
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> YEAR_OF_ERA =
         new StdIntegerDateElement<>(
             "YEAR_OF_ERA",
             FrenchRepublicanCalendar.class,
             1,
             MAX_YEAR,
-            'y',
+            'Y',
             null,
             null);
 
@@ -238,6 +364,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
+    @FormattableElement(format = "S")
     public static final ChronoElement<Sansculottides> SANSCULOTTIDES = SANSCULOTTIDES_ACCESS;
 
     /**
@@ -324,6 +451,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
+    @FormattableElement(format = "C")
     public static final ChronoElement<DayOfDecade> DAY_OF_DECADE = DAY_OF_DECADE_ACCESS;
 
     /**
@@ -348,9 +476,9 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
-    @FormattableElement(format = "d")
+    @FormattableElement(format = "D")
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> DAY_OF_MONTH =
-        new StdIntegerDateElement<>("DAY_OF_MONTH", FrenchRepublicanCalendar.class, 1, 30, 'd');
+        new StdIntegerDateElement<>("DAY_OF_MONTH", FrenchRepublicanCalendar.class, 1, 30, 'D');
 
     /**
      * <p>Represents the day of year. </p>
@@ -358,9 +486,8 @@ public final class FrenchRepublicanCalendar
     /*[deutsch]
      * <p>Repr&auml;sentiert den Tag des Jahres. </p>
      */
-    @FormattableElement(format = "D")
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> DAY_OF_YEAR =
-        new StdIntegerDateElement<>("DAY_OF_YEAR", FrenchRepublicanCalendar.class, 1, 365, 'D');
+        new StdIntegerDateElement<>("DAY_OF_YEAR", FrenchRepublicanCalendar.class, 1, 365, '\u0000');
 
     /**
      * <p>Represents the day of week where the week is seven days long. </p>
@@ -1839,6 +1966,13 @@ public final class FrenchRepublicanCalendar
         //~ Methoden ------------------------------------------------------
 
         @Override
+        public char getSymbol() {
+
+            return 'C';
+
+        }
+
+        @Override
         public DayOfDecade getValue(FrenchRepublicanCalendar context) {
 
             return context.getDayOfDecade(); // may throw an exception
@@ -2007,6 +2141,13 @@ public final class FrenchRepublicanCalendar
         }
 
         //~ Methoden ------------------------------------------------------
+
+        @Override
+        public char getSymbol() {
+
+            return 'S';
+
+        }
 
         @Override
         public Sansculottides getValue(FrenchRepublicanCalendar context) {

@@ -27,7 +27,7 @@ public class FrenchRepublicanElementTest {
             is(true));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_MONTH.getSymbol(),
-            is('d'));
+            is('D'));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_MONTH.isDateElement(),
             is(true));
@@ -119,7 +119,7 @@ public class FrenchRepublicanElementTest {
             is(true));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_DECADE.getSymbol(),
-            is('\u0000'));
+            is('C'));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_DECADE.isDateElement(),
             is(true));
@@ -276,7 +276,7 @@ public class FrenchRepublicanElementTest {
             is(true));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_YEAR.getSymbol(),
-            is('D'));
+            is('\u0000'));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_YEAR.isDateElement(),
             is(true));
@@ -598,7 +598,7 @@ public class FrenchRepublicanElementTest {
             is(true));
         assertThat(
             FrenchRepublicanCalendar.YEAR_OF_ERA.getSymbol(),
-            is('y'));
+            is('Y'));
         assertThat(
             FrenchRepublicanCalendar.YEAR_OF_ERA.isDateElement(),
             is(true));
@@ -685,7 +685,7 @@ public class FrenchRepublicanElementTest {
             is(true));
         assertThat(
             FrenchRepublicanCalendar.SANSCULOTTIDES.getSymbol(),
-            is('\u0000'));
+            is('S'));
         assertThat(
             FrenchRepublicanCalendar.SANSCULOTTIDES.isDateElement(),
             is(true));

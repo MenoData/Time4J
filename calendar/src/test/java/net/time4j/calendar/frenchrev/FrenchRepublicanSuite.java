@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         DayOfDecadeTest.class,
+        FormatTest.class,
         FrenchRepublicanCalendarTest.class,
         FrenchRepublicanElementTest.class,
         FrenchRepublicanEraTest.class,
