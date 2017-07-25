@@ -1,5 +1,6 @@
 ## [v3.33] not yet released
 ### Added
+- Support for or-logic during printing [#661]
 - Prevent escaping of Z-literal in format patterns [#658]
 - Direct parse-methods for Weekday, Quarter and Month [#656]
 - Weekday-in-month in non-iso-calendars [#653]
