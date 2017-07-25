@@ -1,5 +1,6 @@
 ## [v4.28] not yet released
 ### Added
+- Support for or-logic during printing [#661]
 - Prevent escaping of Z-literal in format patterns [#658]
 - Easy conversion between MachineTime and JSR-310 [#660]
 - Conversion methods for Weekday and Month [#657]
