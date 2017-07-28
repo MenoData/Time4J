@@ -184,12 +184,16 @@ public enum FrenchRepublicanAlgorithm {
      * <p>Format attribute which helps to resolve algorithmic differences between various French republican dates. </p>
      *
      * <p>Standard value is: {@link FrenchRepublicanAlgorithm#EQUINOX}. </p>
+     *
+     * @return  format attribute key
      */
     /*[deutsch]
      * <p>Formatattribut, das hilft, m&ouml;gliche algorithmische Differenzen von verschiedenen
      * Datumsangaben des franz&ouml;sischen Revolutionskalenders aufzul&ouml;sen. </p>
      *
      * <p>Standardwert ist: {@link FrenchRepublicanAlgorithm#EQUINOX}. </p>
+     *
+     * @return  format attribute key
      */
     public static AttributeKey<FrenchRepublicanAlgorithm> attribute() {
 

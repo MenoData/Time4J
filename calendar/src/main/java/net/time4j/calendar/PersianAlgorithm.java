@@ -470,6 +470,8 @@ public enum PersianAlgorithm {
      * <p>Standard value is: {@link PersianAlgorithm#BORKOWSKI}. It is also possible to use the
      * {@link #ASTRONOMICAL astronomical algorithm} in combination with an arbitrary timezone offset
      * by setting the format attribute {@link Attributes#TIMEZONE_ID} to any {@code ZonalOffset}. </p>
+     *
+     * @return  format attribute key
      */
     /*[deutsch]
      * <p>Formatattribut, das hilft, m&ouml;gliche algorithmische Differenzen von verschiedenen
@@ -492,6 +494,8 @@ public enum PersianAlgorithm {
      * {@link #ASTRONOMICAL astronomischen Algorithmus} in Verbindung mit einer beliebigen
      * Zeitzonenverschiebung zu nutzen, indem das Formatattribut {@link Attributes#TIMEZONE_ID}
      * auf irgendeinen {@code ZonalOffset} gesetzt wird. </p>
+     *
+     * @return  format attribute key
      */
     public static AttributeKey<PersianAlgorithm> attribute() {
 

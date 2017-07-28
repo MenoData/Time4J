@@ -182,7 +182,6 @@ import java.util.Locale;
  * @see     Sansculottides
  * @see     DayOfDecade
  * @since   3.33/4.28
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den in der franz&ouml;sischen Revolution von 1792 bis 1805 verwendeten Kalender. </p>
@@ -290,7 +289,6 @@ import java.util.Locale;
  * @see     Sansculottides
  * @see     DayOfDecade
  * @since   3.33/4.28
- * @doctags.concurrency {immutable}
  */
 @CalendarType("extra/frenchrev")
 public final class FrenchRepublicanCalendar
