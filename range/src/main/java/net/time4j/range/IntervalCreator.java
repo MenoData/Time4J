@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalCreator.java) is part of project Time4J.
  *
@@ -26,7 +26,7 @@ package net.time4j.range;
  * <p>Generische Intervallfabrik. </p>
  *
  * @author  Meno Hochschild
- * @see     3.25/4.21
+ * @since   3.25/4.21
  */
 interface IntervalCreator<T, I extends ChronoInterval<T>> {
 
