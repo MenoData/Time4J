@@ -1244,8 +1244,12 @@ public final class CalendarText {
                 || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
             ) {
                 return elementName.substring(0, 1);
-            } else if (elementName.equals("EVANGELIST")) { // special case
+            } else if (elementName.equals("EVANGELIST")) { // special case: Ethiopian calendar
                 return "EV";
+            } else if (elementName.equals("SANSCULOTTIDES")) { // special case: French revolutionary calendar
+                return "S";
+            } else if (elementName.equals("DAY_OF_DECADE")) { // special case: French revolutionary calendar
+                return "D";
             }
         }
 
