@@ -2825,7 +2825,7 @@ public final class ChronoFormatter<T>
      * <p>This example also demonstrates that the chronology will be inferred from the locale and not
      * from the object to be formatted. However, most applications should set the chronology explicitly
      * for performance and clarity. This method will not work for chronologies which require a pattern
-     * type deviating from CLDR, for example the Mayan calendar. </p>
+     * type deviating from CLDR, for example the Mayan calendar or the French revolutionary calendar. </p>
      *
      * @param   pattern     format pattern
      * @param   locale      format locale
@@ -2860,7 +2860,8 @@ public final class ChronoFormatter<T>
      * ermittelt wird, statt &uuml;ber das zu formatierende Objekt. Jedoch sollten die meisten
      * Anwendungen die Chronologie aus Gr&uuml;nden der Performance und Klarheit mit anderen Fabrikmethoden
      * explizit setzen. Diese Methode funktioniert nicht f&uuml;r Chronologien, die einen anderen
-     * Formatmustertyp als CLDR voraussetzen, zum Beispiel der Maya-Kalender. </p>
+     * Formatmustertyp als CLDR voraussetzen, zum Beispiel der Maya-Kalender oder der franz&ouml;sische
+     * Revolutionskalender. </p>
      *
      * @param   pattern     format pattern
      * @param   locale      format locale
@@ -2884,7 +2885,7 @@ public final class ChronoFormatter<T>
     }
 
     /**
-     * <p>Constructs a style-based formatter for general calendar chronologies. </p>
+     * <p>Constructs a style-based formatter for general calendar chronologies which are compatible to CLDR. </p>
      *
      * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
      * chronology if available. Otherwise ISO-8601 will be used. </p>
@@ -2898,7 +2899,8 @@ public final class ChronoFormatter<T>
      * @since   4.27
      */
     /*[deutsch]
-     * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
+     * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien,
+     * die zu CLDR kompatibel sind. </p>
      *
      * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
      * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet. </p>
