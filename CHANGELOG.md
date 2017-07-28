@@ -1,5 +1,6 @@
 ## [v3.33] not yet released
 ### Added
+- French Revolutionary Calendar [#615]
 - New formatter method 'getPattern()' [#662]
 - Support for or-logic during printing [#661]
 - Prevent escaping of Z-literal in format patterns [#658]
