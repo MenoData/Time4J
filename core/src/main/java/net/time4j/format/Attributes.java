@@ -647,6 +647,21 @@ public final class Attributes
     public static final AttributeKey<TimeScale> TIME_SCALE =
         PredefinedKey.valueOf("TIME_SCALE", TimeScale.class);
 
+    /**
+     * <p>Defines an attribute key which can show the global format pattern when the formatter
+     * was constructed by pattern. </p>
+     *
+     * @since       3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Definiert ein Formatattribut, das das bei der Konstruktion des Formatierers verwendete
+     * Formatmuster zeigen kann. </p>
+     *
+     * @since       3.33/4.28
+     */
+    public static final AttributeKey<String> FORMAT_PATTERN =
+        PredefinedKey.valueOf("FORMAT_PATTERN", String.class);
+
     private static final Attributes EMPTY = new Attributes.Builder().build();
 
     //~ Instanzvariablen --------------------------------------------------

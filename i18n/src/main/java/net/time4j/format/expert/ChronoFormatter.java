@@ -521,6 +521,32 @@ public final class ChronoFormatter<T>
     }
 
     /**
+     * <p>Returns the format pattern when this formatter was constructed by pattern. </p>
+     *
+     * <p>If no pattern was used then this method will only yield an empty string. This is
+     * also true if more than one pattern was used via the builder so that there is no longer
+     * a unique pattern. </p>
+     *
+     * @return  pattern string, maybe empty
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Ermittelt das bei der Konstruktion dieses Formatierers verwendete Formatmuster. </p>
+     *
+     * <p>Wurde kein Formatmuster verwendet, liefert diese Methode nur eine leere Zeichenkette.
+     * Das ist auch der Fall, wenn &uuml;ber den <i>Builder</i> mehr als ein Formatmuster verwendet wird
+     * und daher kein eindeutiges Formatmuster vorliegt. </p>
+     *
+     * @return  pattern string, maybe empty
+     * @since   3.33/4.28
+     */
+    public String getPattern() {
+
+        return this.globalAttributes.get(Attributes.FORMAT_PATTERN, "");
+
+    }
+
+    /**
      * <p>Returns the global format attributes which are active if they are not
      * overridden by sectional attributes. </p>
      *
@@ -3679,6 +3705,7 @@ public final class ChronoFormatter<T>
         private int sectionID;
         private int reservedIndex;
         private int leftPadWidth;
+        private String pattern;
         private DayPeriod dayPeriod;
         private Map<ChronoElement<?>, Object> defaultMap;
         private Chronology<?> deepestParser;
@@ -3715,6 +3742,7 @@ public final class ChronoFormatter<T>
             this.sectionID = 0;
             this.reservedIndex = -1;
             this.leftPadWidth = 0;
+            this.pattern = null;
             this.dayPeriod = null;
             this.defaultMap = new HashMap<ChronoElement<?>, Object>();
 
@@ -5108,6 +5136,8 @@ public final class ChronoFormatter<T>
                 }
             }
 
+            // ensure that pattern is only set if it is the only one
+            this.pattern = ((this.pattern == null) ? formatPattern : "");
             return this;
 
         }
@@ -6619,9 +6649,14 @@ public final class ChronoFormatter<T>
                     this.deepestParser
                 );
 
-            if (this.dayPeriod != null) {
+            if ((this.dayPeriod != null) || (this.pattern != null && !this.pattern.isEmpty())) {
                 AttributeSet as = formatter.globalAttributes;
-                as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
+                if ((this.pattern != null) && !this.pattern.isEmpty()) {
+                    as = as.withInternal(Attributes.FORMAT_PATTERN, this.pattern);
+                }
+                if (this.dayPeriod != null) {
+                    as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
+                }
                 formatter = new ChronoFormatter<T>(formatter, as);
             }
 
