@@ -290,7 +290,7 @@ public enum TimeScale {
      *
      * <p>UT is technically labelled as UT1 and often mixed up with UTC because leap seconds
      * are rare events and hardly noticed in civil life. The deviation of UT relative to TT
-     * is called &quot;delta-T&quot (difference TT - UT) and is regularly published by IERS.
+     * is called &quot;delta-T&quot; (difference TT - UT) and is regularly published by IERS.
      * Time4J uses polynomial expressions for the estimation of delta-T. These expressions
      * are based on the work of the Belgian astronomer Jean Meeus and allow the limited conversion
      * between UT and the other scales not bound to the rotation of the earth. </p>
