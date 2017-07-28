@@ -31,6 +31,7 @@ import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.StdCalendarElement;
+import net.time4j.calendar.service.DualYearOfEraElement;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
@@ -161,18 +162,17 @@ import java.util.Locale;
  *
  * <pre>
  *    ChronoFormatter&lt;FrenchRepublicanCalendar&gt; f =
- *      ChronoFormatter
- *        .setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
- *        .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
- *        .addPattern(&quot;[D. MMMM|SSSS]&#39;, an &#39;Y&quot;, PatternType.DYNAMIC)
- *        .endSection()
- *        .build();
+ *      ChronoFormatter.ofPattern(
+ *        &quot;[D. MMMM|SSSS]&#39;, an &#39;Y&quot;,
+ *        PatternType.DYNAMIC,
+ *        Locale.FRENCH,
+ *        FrenchRepublicanCalendar.axis());
  *
  *    FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
- *    System.out.println(f.format(cal)); // output =&gt; 1. vendémiaire, an 227
+ *    System.out.println(f.format(cal)); // output =&gt; 1. vendémiaire, an CCXXVII
  *
  *    cal = cal.minus(CalendarDays.ONE);
- *    System.out.println(f.format(cal)); // output =&gt; jour de la révolution, an 226
+ *    System.out.println(f.format(cal)); // output =&gt; jour de la révolution, an CCXXVI
  * </pre>
  *
  * @author  Meno Hochschild
@@ -270,18 +270,17 @@ import java.util.Locale;
  *
  * <pre>
  *    ChronoFormatter&lt;FrenchRepublicanCalendar&gt; f =
- *      ChronoFormatter
- *        .setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
- *        .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
- *        .addPattern(&quot;[D. MMMM|SSSS]&#39;, an &#39;Y&quot;, PatternType.DYNAMIC)
- *        .endSection()
- *        .build();
+ *      ChronoFormatter.ofPattern(
+ *        &quot;[D. MMMM|SSSS]&#39;, an &#39;Y&quot;,
+ *        PatternType.DYNAMIC,
+ *        Locale.FRENCH,
+ *        FrenchRepublicanCalendar.axis());
  *
  *    FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
- *    System.out.println(f.format(cal)); // Ausgabe =&gt; 1. vendémiaire, an 227
+ *    System.out.println(f.format(cal)); // Ausgabe =&gt; 1. vendémiaire, an CCXXVII
  *
  *    cal = cal.minus(CalendarDays.ONE);
- *    System.out.println(f.format(cal)); // Ausgabe =&gt; jour de la révolution, an 226
+ *    System.out.println(f.format(cal)); // Ausgabe =&gt; jour de la révolution, an CCXXVI
  * </pre>
  *
  * @author  Meno Hochschild
@@ -318,20 +317,18 @@ public final class FrenchRepublicanCalendar
 
     /**
      * <p>Represents the republican year since 1792-09-22 (in range 1-1202). </p>
+     *
+     * <p>The year is printed as roman number when using a pattern and the French language. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das republikanische Jahr gez&auml;hlt seit 1792-09-22 (im Bereich 1-1202). </p>
+     *
+     * <p>Das Jahr wird als r&ouml;mische Zahl formatiert, wenn ein Formatmuster und die franz&ouml;sische
+     * Sprache verwendet werden. </p>
      */
     @FormattableElement(format = "Y")
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> YEAR_OF_ERA =
-        new StdIntegerDateElement<>(
-            "YEAR_OF_ERA",
-            FrenchRepublicanCalendar.class,
-            1,
-            MAX_YEAR,
-            'Y',
-            null,
-            null);
+        new YearOfEraElement();
 
     private static final SansculottidesAccess SANSCULOTTIDES_ACCESS = new SansculottidesAccess();
     private static final DayOfDecadeAccess DAY_OF_DECADE_ACCESS = new DayOfDecadeAccess();
@@ -1625,6 +1622,40 @@ public final class FrenchRepublicanCalendar
 
     }
 
+    private static class YearOfEraElement
+        extends DualYearOfEraElement<FrenchRepublicanCalendar> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final long serialVersionUID = 7337125729623271040L;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private YearOfEraElement() {
+            super(FrenchRepublicanCalendar.class, 1, MAX_YEAR, 'Y');
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        protected NumberSystem getNumberSystem(AttributeQuery attributes) {
+
+            String pattern = attributes.get(Attributes.FORMAT_PATTERN, "");
+
+            if (
+                pattern.contains("Y")
+                && attributes.get(Attributes.LANGUAGE, Locale.ROOT).getLanguage().equals("fr")
+            ) {
+                return NumberSystem.ROMAN;
+            }
+
+            return attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ROMAN);
+
+        }
+
+    }
+
     private static class IntegerRule
         implements IntElementRule<FrenchRepublicanCalendar> {
 
@@ -1957,6 +1988,10 @@ public final class FrenchRepublicanCalendar
         extends BasicElement<DayOfDecade>
         implements TextElement<DayOfDecade>, ElementRule<FrenchRepublicanCalendar, DayOfDecade> {
 
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final long serialVersionUID = -8211850819064695450L;
+
         //~ Konstruktoren -------------------------------------------------
 
         DayOfDecadeAccess() {
@@ -2133,6 +2168,10 @@ public final class FrenchRepublicanCalendar
     private static class SansculottidesAccess
         extends BasicElement<Sansculottides>
         implements TextElement<Sansculottides>, ElementRule<FrenchRepublicanCalendar, Sansculottides> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final long serialVersionUID = -6615947737325572130L;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -2441,6 +2480,13 @@ public final class FrenchRepublicanCalendar
                 int month = entity.get(MONTH_OF_YEAR).getValue();
                 int dom = entity.getInt(DAY_OF_MONTH);
 
+                if ((dom == Integer.MIN_VALUE) && entity.contains(DAY_OF_DECADE)) {
+                    int decade = entity.getInt(DECADE_OF_MONTH);
+                    if (decade != Integer.MIN_VALUE) {
+                        dom = (decade - 1) * 10 + entity.get(DAY_OF_DECADE).getValue();
+                    }
+                }
+
                 if (dom != Integer.MIN_VALUE) {
                     if ((dom >= 1) && (dom <= 30)) {
                         cal = FrenchRepublicanCalendar.of(year, month, dom);
@@ -2466,7 +2512,7 @@ public final class FrenchRepublicanCalendar
                 }
             }
 
-            if (algorithm != DEFAULT_ALGORITHM) {
+            if ((cal != null) && (algorithm != DEFAULT_ALGORITHM)) {
                 cal = DEFAULT_ALGORITHM.transform(algorithm.transform(cal));
             }
 
@@ -2491,7 +2537,7 @@ public final class FrenchRepublicanCalendar
         @Override
         public int getDefaultPivotYear() {
 
-            return PlainDate.axis().getDefaultPivotYear() - 1792; // TODO: check impact on formatting
+            return PlainDate.axis().getDefaultPivotYear() - 1792; // not relevant for dynamic pattern type
 
         }
 

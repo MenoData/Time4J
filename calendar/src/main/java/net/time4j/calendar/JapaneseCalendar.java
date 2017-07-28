@@ -2567,8 +2567,6 @@ public final class JapaneseCalendar
 
     }
 
-
-
     private static class MonthPrimitiveElement
         implements TextElement<EastAsianMonth>, ElementRule<JapaneseCalendar, EastAsianMonth>, Serializable {
 

@@ -2,8 +2,6 @@ package net.time4j.calendar.frenchrev;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.CalendarDays;
-import net.time4j.format.Attributes;
-import net.time4j.format.NumberSystem;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -21,15 +19,47 @@ import static org.junit.Assert.assertThat;
 public class FormatTest {
 
     @Test
+    public void printWithStdArabicYear() {
+        ChronoFormatter<FrenchRepublicanCalendar> f =
+            ChronoFormatter.setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
+                .addPattern("D. MMMM', an '", PatternType.DYNAMIC)
+                .addFixedInteger(FrenchRepublicanCalendar.YEAR_OF_ERA, 5)
+                .or()
+                .addPattern("SSSS', an '", PatternType.DYNAMIC)
+                .addFixedInteger(FrenchRepublicanCalendar.YEAR_OF_ERA, 5)
+                .build();
+        FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
+        assertThat(
+            f.format(cal),
+            is("1. vendémiaire, an 00227"));
+    }
+
+    @Test
+    public void parseWithStdArabicYear() throws ParseException {
+        ChronoFormatter<FrenchRepublicanCalendar> f =
+            ChronoFormatter.setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
+                .addPattern("D. MMMM', an '", PatternType.DYNAMIC)
+                .addFixedInteger(FrenchRepublicanCalendar.YEAR_OF_ERA, 5)
+                .or()
+                .addPattern("SSSS', an '", PatternType.DYNAMIC)
+                .addFixedInteger(FrenchRepublicanCalendar.YEAR_OF_ERA, 5)
+                .build();
+        FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
+        assertThat(
+            f.parse("1. vendémiaire, an 00227"),
+            is(cal));
+    }
+
+    @Test
     public void printMonthOrSansculottidesOnGroundLevel() {
         ChronoFormatter<FrenchRepublicanCalendar> f = create("D MMMM' an 'Y|SSSS', an 'Y");
         FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
         assertThat(
             f.format(cal),
-            is("1 vendémiaire an 227"));
+            is("1 vendémiaire an CCXXVII"));
         assertThat(
             f.format(cal.minus(CalendarDays.ONE)),
-            is("jour de la révolution, an 226"));
+            is("jour de la révolution, an CCXXVI"));
     }
 
     @Test
@@ -38,10 +68,10 @@ public class FormatTest {
         FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
         assertThat(
             f.format(cal),
-            is("1 vendémiaire, an 227"));
+            is("1 vendémiaire, an CCXXVII"));
         assertThat(
             f.format(cal.minus(CalendarDays.ONE)),
-            is("jour de la révolution, an 226"));
+            is("jour de la révolution, an CCXXVI"));
     }
 
     @Test
@@ -49,10 +79,10 @@ public class FormatTest {
         ChronoFormatter<FrenchRepublicanCalendar> f = create("D MMMM' an 'Y|SSSS', an 'Y");
         FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
         assertThat(
-            f.parse("1 vendémiaire an 227"),
+            f.parse("1 vendémiaire an CCXXVII"),
             is(cal));
         assertThat(
-            f.parse("jour de la révolution, an 226"),
+            f.parse("jour de la révolution, an CCXXVI"),
             is(cal.minus(CalendarDays.ONE)));
     }
 
@@ -62,13 +92,13 @@ public class FormatTest {
         FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
         assertThat(
             f.format(cal),
-            is("0227-01-01"));
+            is("CCXXVII-01-01"));
         assertThat(
             f.with(FrenchRepublicanAlgorithm.attribute(), FrenchRepublicanAlgorithm.EQUINOX).format(cal),
-            is("0227-01-01"));
+            is("CCXXVII-01-01"));
         assertThat(
             f.with(FrenchRepublicanAlgorithm.attribute(), FrenchRepublicanAlgorithm.ROMME).format(cal),
-            is("0227-01-02"));
+            is("CCXXVII-01-02"));
     }
 
     @Test
@@ -76,23 +106,18 @@ public class FormatTest {
         ChronoFormatter<FrenchRepublicanCalendar> f = create("YYYY-MM-DD");
         FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
         assertThat(
-            f.parse("0227-01-01"),
+            f.parse("CCXXVII-01-01"),
             is(cal));
         assertThat(
-            f.with(FrenchRepublicanAlgorithm.attribute(), FrenchRepublicanAlgorithm.EQUINOX).parse("0227-01-01"),
+            f.with(FrenchRepublicanAlgorithm.attribute(), FrenchRepublicanAlgorithm.EQUINOX).parse("CCXXVII-01-01"),
             is(cal));
         assertThat(
-            f.with(FrenchRepublicanAlgorithm.attribute(), FrenchRepublicanAlgorithm.ROMME).parse("0227-01-02"),
+            f.with(FrenchRepublicanAlgorithm.attribute(), FrenchRepublicanAlgorithm.ROMME).parse("CCXXVII-01-02"),
             is(cal));
     }
 
     private static ChronoFormatter<FrenchRepublicanCalendar> create(String pattern) {
-        return ChronoFormatter
-                .setUp(FrenchRepublicanCalendar.axis(), Locale.FRENCH)
-                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC)
-                .addPattern(pattern, PatternType.DYNAMIC)
-                .endSection()
-                .build();
+        return ChronoFormatter.ofPattern(pattern, PatternType.DYNAMIC, Locale.FRENCH, FrenchRepublicanCalendar.axis());
     }
 
 }
