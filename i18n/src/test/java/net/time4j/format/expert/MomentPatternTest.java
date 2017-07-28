@@ -185,6 +185,7 @@ public class MomentPatternTest {
     private ChronoFormatter<Moment> formatter;
     private Moment value;
     private String text;
+    private String pattern;
 
     public MomentPatternTest(
         String pattern,
@@ -201,6 +202,7 @@ public class MomentPatternTest {
                 .withTimezone(Timezone.of(tzid).getID());
         this.value = Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse(value);
         this.text = text;
+        this.pattern = pattern;
     }
 
     @Test
@@ -215,6 +217,11 @@ public class MomentPatternTest {
         assertThat(
             this.formatter.parse(this.text),
             is(this.value));
+    }
+
+    @Test
+    public void pattern() {
+        assertThat(this.formatter.getPattern(), is(this.pattern));
     }
 
     private static Locale toLocale(String locale) {

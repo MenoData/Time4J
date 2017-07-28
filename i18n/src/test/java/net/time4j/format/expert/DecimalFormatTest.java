@@ -69,6 +69,9 @@ public class DecimalFormatTest {
         assertThat(
             mf.parse("2016123118.25-0500").toString(),
             is("2016-12-31T23:15:00Z"));
+        assertThat(
+            mf.getPattern(),
+            is(""));
     }
 
     @Test

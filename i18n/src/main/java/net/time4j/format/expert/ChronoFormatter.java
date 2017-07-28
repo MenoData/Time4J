@@ -557,6 +557,32 @@ public final class ChronoFormatter<T>
     }
 
     /**
+     * <p>Returns the format pattern when this formatter was constructed by pattern. </p>
+     *
+     * <p>If no pattern was used then this method will only yield an empty string. This is
+     * also true if more than one pattern was used via the builder so that there is no longer
+     * a unique pattern. </p>
+     *
+     * @return  pattern string, maybe empty
+     * @since   3.33/4.28
+     */
+    /*[deutsch]
+     * <p>Ermittelt das bei der Konstruktion dieses Formatierers verwendete Formatmuster. </p>
+     *
+     * <p>Wurde kein Formatmuster verwendet, liefert diese Methode nur eine leere Zeichenkette.
+     * Das ist auch der Fall, wenn &uuml;ber den <i>Builder</i> mehr als ein Formatmuster verwendet wird
+     * und daher kein eindeutiges Formatmuster vorliegt. </p>
+     *
+     * @return  pattern string, maybe empty
+     * @since   3.33/4.28
+     */
+    public String getPattern() {
+
+        return this.globalAttributes.get(Attributes.FORMAT_PATTERN, "");
+
+    }
+
+    /**
      * <p>Returns the global format attributes which are active if they are not
      * overridden by sectional attributes. </p>
      *
@@ -1417,7 +1443,7 @@ public final class ChronoFormatter<T>
         if (locale.equals(this.globalAttributes.getLocale())) {
             return this;
         } else if (this.chronology.getChronoType() == CalendarDate.class) {
-            String pattern = this.globalAttributes.get(Builder.FORMAT_PATTERN, "");
+            String pattern = this.getPattern();
             if (pattern.isEmpty()) {
                 FormatProcessor<?> processor = this.steps.get(0).getProcessor();
                 if (processor instanceof StyleProcessor) {
@@ -1430,7 +1456,7 @@ public final class ChronoFormatter<T>
                 return (ChronoFormatter<T>) ChronoFormatter.ofGenericCalendarPattern(pattern, locale);
             }
         } else if ((this.overrideHandler != null) && this.overrideHandler.isGeneric()) {
-            String pattern = this.globalAttributes.get(Builder.FORMAT_PATTERN, "");
+            String pattern = this.getPattern();
             if (!pattern.isEmpty()) {
                 return (ChronoFormatter<T>) ChronoFormatter.ofGenericMomentPattern(pattern, locale);
             }
@@ -4116,9 +4142,6 @@ public final class ChronoFormatter<T>
     public static final class Builder<T> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
-
-        private static final AttributeKey<String> FORMAT_PATTERN =
-            Attributes.createKey("FORMAT_PATTERN", String.class);
 
         private static final AttributeKey<DayPeriod> CUSTOM_DAY_PERIOD =
             Attributes.createKey("CUSTOM_DAY_PERIOD", DayPeriod.class);
@@ -7102,8 +7125,8 @@ public final class ChronoFormatter<T>
 
             if ((this.dayPeriod != null) || (this.pattern != null && !this.pattern.isEmpty())) {
                 AttributeSet as = formatter.globalAttributes;
-                if (this.pattern != null) {
-                    as = as.withInternal(FORMAT_PATTERN, this.pattern);
+                if ((this.pattern != null) && !this.pattern.isEmpty()) {
+                    as = as.withInternal(Attributes.FORMAT_PATTERN, this.pattern);
                 }
                 if (this.dayPeriod != null) {
                     as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
