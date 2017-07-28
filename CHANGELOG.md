@@ -1,4 +1,6 @@
-## [v3.33] not yet released
+## [v3.34] not yet released
+
+## [v3.33] published on 2017-07-28
 ### Added
 - French Revolutionary Calendar [#615]
 - New formatter method 'getPattern()' [#662]
