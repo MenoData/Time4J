@@ -23,11 +23,25 @@ package net.time4j.calendar.astro;
 
 import net.time4j.ClockUnit;
 import net.time4j.Moment;
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.base.ResourceLoader;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.TZID;
 import net.time4j.tz.ZonalOffset;
+
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.Serializable;
+import java.util.Locale;
+import java.util.Optional;
+import java.util.TimeZone;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -42,15 +56,361 @@ import net.time4j.tz.ZonalOffset;
  * @author  Meno Hochschild
  * @since   3.33/4.28
  */
-public class SolarTime {
+public final class SolarTime
+    implements Serializable {
+
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    private static final double STD_ZENITH = 90.0 + (50 / 60.0);
+    private static final EventCalculator DEFAULT_CALCULATOR;
+
+    static {
+        EventCalculator loaded = null;
+        for (EventCalculator calculator : ResourceLoader.getInstance().services(EventCalculator.class)) {
+            loaded = calculator;
+            break;
+        }
+        DEFAULT_CALCULATOR = ((loaded == null) ? StdCalculator.SIMPLE : loaded);
+    }
+
+    //~ Instanzvariablen --------------------------------------------------
+
+    /**
+     * @serial  the geographical latitude in degrees
+     * @since   3.34/4.29
+     */
+    private final double latitude;
+
+    /**
+     * @serial  the geographical longitude in degrees
+     * @since   3.34/4.29
+     */
+    private final double longitude;
+
+    /**
+     * @serial  the elevation or altitude in meters
+     * @since   3.34/4.29
+     */
+    private final double elevation;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    private SolarTime() {
-        // no instantiation
+    private SolarTime(
+        double latitude,
+        double longitude,
+        double elevation
+    ) {
+        super();
+
+        this.latitude = latitude;
+        this.longitude = longitude;
+        this.elevation = elevation;
+
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Obtains the solar time for given geographical location at sea level. </p>
+     *
+     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @return  instance of local solar time
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert die Sonnenzeit zur angegebenen geographischen Position auf Meeresh&ouml;he. </p>
+     *
+     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @return  instance of local solar time
+     * @since   3.34/4.29
+     */
+    public static SolarTime ofLocation(
+        double latitude,
+        double longitude
+    ) {
+
+        return ofLocation(latitude, longitude, 0);
+
+    }
+
+    /**
+     * <p>Obtains the solar time for given geographical location. </p>
+     *
+     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @param   elevation   elevation or altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @return  instance of local solar time
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert die Sonnenzeit zur angegebenen geographischen Position. </p>
+     *
+     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @param   elevation   elevation or altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @return  instance of local solar time
+     * @since   3.34/4.29
+     */
+    // private because elevation is not yet supported
+    private static SolarTime ofLocation(
+        double latitude,
+        double longitude,
+        double elevation
+    ) {
+
+        check(latitude, longitude, elevation);
+
+        return new SolarTime(latitude, longitude, elevation);
+
+    }
+
+    /**
+     * <p>Obtains the geographical latitude of this instance. </p>
+     *
+     * @return  latitude in degrees
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert den geographischen Breitengrad dieser Instanz. </p>
+     *
+     * @return  latitude in degrees
+     * @since   3.34/4.29
+     */
+    public double getLatitude() {
+
+        return this.latitude;
+
+    }
+
+    /**
+     * <p>Obtains the geographical longitude of this instance. </p>
+     *
+     * @return  longitude in degrees
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert den geographischen L&auml;ngengrad dieser Instanz. </p>
+     *
+     * @return  longitude in degrees
+     * @since   3.34/4.29
+     */
+    public double getLongitude() {
+
+        return this.longitude;
+
+    }
+
+    /**
+     * <p>Obtains the geographical elevation of this instance relative to sea level. </p>
+     *
+     * @return  elevation in meters
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert die geographische H&ouml;he dieser Instanz relativ zum Meeresspiegel. </p>
+     *
+     * @return  elevation in meters
+     * @since   3.34/4.29
+     */
+    // private because elevation is not yet supported
+    private double getElevation() {
+
+        return this.elevation;
+
+    }
+
+    /**
+     * <p>Calculates the moment of sunrise at the location of this instance. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     SolarTime hamburg = SolarTime.ofLocation(53.55, 10.0);
+     *     Optional&lt;Moment&gt; result = PlainDate.nowInSystemTime().get(hamburg.sunrise());
+     *     System.out.println(result.get().toZonalTimestamp(() -&gt; &quot;Europe/Berlin&quot;));
+     * </pre>
+     *
+     * <p>Note: The precision is generally constrained to minutes. </p>
+     *
+     * @return  sunrise function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet den Moment des Sonnenaufgangs an der Position dieser Instanz. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     SolarTime hamburg = SolarTime.ofLocation(53.55, 10.0);
+     *     Optional&lt;Moment&gt; result = PlainDate.nowInSystemTime().get(hamburg.sunrise());
+     *     System.out.println(result.get().toZonalTimestamp(() -&gt; &quot;Europe/Berlin&quot;));
+     * </pre>
+     *
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     *
+     * @return  sunrise function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Optional<Moment>> sunrise() {
+
+        double zenith = STD_ZENITH;
+
+        return date -> DEFAULT_CALCULATOR.sunrise(date, this.latitude, this.longitude, zenith);
+
+    }
+
+    /**
+     * <p>Calculates the local time of sunrise at the location of this instance in given timezone. </p>
+     *
+     * <p>Note: The precision is generally constrained to minutes. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  sunrise function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet die lokale Uhrzeit des Sonnenaufgangs an der Position dieser Instanz
+     * in der angegebenen Zeitzone. </p>
+     *
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  sunrise function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Optional<PlainTime>> sunrise(TZID tzid) {
+
+        double zenith = STD_ZENITH;
+
+        return date -> {
+            Optional<Moment> m = DEFAULT_CALCULATOR.sunrise(date, latitude, longitude, zenith);
+            if (m.isPresent()) {
+                return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
+            } else {
+                return Optional.empty();
+            }
+        };
+
+    }
+
+    /**
+     * <p>Calculates the moment of sunset at the location of this instance. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     SolarTime hamburg = SolarTime.ofLocation(53.55, 10.0);
+     *     Optional&lt;Moment&gt; result = PlainDate.nowInSystemTime().get(hamburg.sunset());
+     *     System.out.println(result.get().toZonalTimestamp(() -&gt; &quot;Europe/Berlin&quot;));
+     * </pre>
+     *
+     * <p>Note: The precision is generally constrained to minutes. </p>
+     *
+     * @return  sunset function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet den Moment des Sonnenuntergangs an der Position dieser Instanz. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     SolarTime hamburg = SolarTime.ofLocation(53.55, 10.0);
+     *     Optional&lt;Moment&gt; result = PlainDate.nowInSystemTime().get(hamburg.sunset());
+     *     System.out.println(result.get().toZonalTimestamp(() -&gt; &quot;Europe/Berlin&quot;));
+     * </pre>
+     *
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     *
+     * @return  sunset function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Optional<Moment>> sunset() {
+
+        double zenith = STD_ZENITH;
+
+        return date -> DEFAULT_CALCULATOR.sunset(date, this.latitude, this.longitude, zenith);
+
+    }
+
+    /**
+     * <p>Calculates the local time of sunset at the location of this instance in given timezone. </p>
+     *
+     * <p>Note: The precision is generally constrained to minutes. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  sunset function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet die lokale Uhrzeit des Sonnenuntergangs an der Position dieser Instanz
+     * in der angegebenen Zeitzone. </p>
+     *
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  sunset function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Optional<PlainTime>> sunset(TZID tzid) {
+
+        double zenith = STD_ZENITH;
+
+        return date -> {
+            Optional<Moment> m = DEFAULT_CALCULATOR.sunset(date, latitude, longitude, zenith);
+            if (m.isPresent()) {
+                return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
+            } else {
+                return Optional.empty();
+            }
+        };
+
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof SolarTime){
+            SolarTime that = (SolarTime) obj;
+            return (
+                (Double.compare(this.latitude, that.latitude) == 0)
+                    || (Double.compare(this.longitude, that.longitude) == 0)
+                    || (Double.compare(this.elevation, that.elevation) == 0));
+        } else {
+            return false;
+        }
+
+    }
+
+    @Override
+    public int hashCode() {
+
+        return (
+            7 * Double.hashCode(this.latitude)
+                + 31 * Double.hashCode(this.longitude)
+                + 37 * Double.hashCode(this.elevation)
+        );
+
+    }
+
+    @Override
+    public String toString() {
+
+        StringBuilder sb = new StringBuilder();
+        sb.append("SolarTime[");
+        sb.append("latitude=" + this.latitude);
+        sb.append(",longitude=" + this.longitude);
+        if (Double.compare(this.elevation, 0.0) != 0) {
+            sb.append(",elevation=" + this.elevation);
+        }
+        sb.append(']');
+        return sb.toString();
+
+    }
 
     /**
      * <p>Determines the apparent solar time of any moment at given local time zone offset. </p>
@@ -189,6 +549,346 @@ public class SolarTime {
                 TimeScale.POSIX);
         return ut.toZonalTimestamp(offset);
 
+    }
+
+    private static void check(
+        double latitude,
+        double longitude,
+        double elevation
+    ) {
+
+        if ((Double.compare(latitude, 90.0) > 0) || (Double.compare(latitude, -90.0) < 0)) {
+            throw new IllegalArgumentException("Degrees out of range -90.0 <= latitude <= +90.0: " + latitude);
+        } else if ((Double.compare(longitude, 180.0) >= 0) || (Double.compare(longitude, -180.0) < 0)) {
+            throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
+        } else if ((elevation < -1000) || (elevation > 9999)) {
+            throw new IllegalArgumentException("Meters out of range -1000 <= elevation < +10,000: " + elevation);
+        }
+
+    }
+
+    /**
+     * @serialData  Checks the sanity of the state.
+     * @param       in                          object input stream
+     * @throws      IOException                 in any case of I/O-errors
+     * @throws      IllegalArgumentException    in any case of inconsistent state
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        check(this.latitude, this.longitude, this.elevation);
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    /**
+     * <p>An SPI-interface representing a facade for the calculation engine regarding sunrise or sunset. </p>
+     *
+     * @since   3.34/4.29
+     * @doctags.spec    All implementations must have a public no-arg constructor.
+     */
+    /*[deutsch]
+     * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
+     * darstellt. </p>
+     *
+     * @since   3.34/4.29
+     * @doctags.spec    All implementations must have a public no-arg constructor.
+     */
+    public interface EventCalculator {
+
+        //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Obtains the name of the calculation method. </p>
+         *
+         * @return  String
+         */
+        /*[deutsch]
+         * <p>Liefert den Namen der Berechnungsmethode. </p>
+         *
+         * @return  String
+         */
+        String name();
+
+        /**
+         * <p>Calculates the moment of sunrise. </p>
+         *
+         * @param   date        the local calendar date
+         * @param   latitude    geographical latitude in degrees, positive for North, negative for South
+         * @param   longitude   geographical longitude in degrees, positive for East, negative for West
+         * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
+         * @return  moment of sunrise if it exists for given parameters else not present (polar day or night)
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        /*[deutsch]
+         * <p>Berechnet den Zeitpunkt des Sonnenaufgangs. </p>
+         *
+         * @param   date        the local calendar date
+         * @param   latitude    geographical latitude in degrees, positive for North, negative for South
+         * @param   longitude   geographical longitude in degrees, positive for East, negative for West
+         * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
+         * @return  moment of sunrise if it exists for given parameters else not present (polar day or night)
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        Optional<Moment> sunrise(
+            CalendarDate date,
+            double latitude,
+            double longitude,
+            double zenith
+        );
+
+        /**
+         * <p>Calculates the moment of sunset. </p>
+         *
+         * @param   date        the local calendar date
+         * @param   latitude    geographical latitude in degrees, positive for North, negative for South
+         * @param   longitude   geographical longitude in degrees, positive for East, negative for West
+         * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
+         * @return  moment of sunset if it exists for given parameters else not present (polar day or night)
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        /*[deutsch]
+         * <p>Berechnet den Zeitpunkt des Sonnenuntergangs. </p>
+         *
+         * @param   date        the local calendar date
+         * @param   latitude    geographical latitude in degrees, positive for North, negative for South
+         * @param   longitude   geographical longitude in degrees, positive for East, negative for West
+         * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
+         * @return  moment of sunset if it exists for given parameters else not present (polar day or night)
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        Optional<Moment> sunset(
+            CalendarDate date,
+            double latitude,
+            double longitude,
+            double zenith
+        );
+
+    }
+
+/*
+ * More links:
+ *
+ * http://www.nrel.gov/docs/fy08osti/34302.pdf
+ * https://github.com/KosherJava/zmanim/tree/master/src/net/sourceforge/zmanim/util
+ * http://www.kosherjava.com/zmanim/docs/api/
+ * http://www.jstott.me.uk/jsuntimes/doc-1.0/
+ *
+ * https://en.wikipedia.org/wiki/Twilight
+ * https://astronomy.stackexchange.com/questions/12824/how-long-does-a-sunrise-or-sunset-take
+ *
+ * http://midcdmz.nrel.gov/solpos/spa.html
+ * https://web.archive.org/web/20161202180207/http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+ * http://rredc.nrel.gov/solar/codesandalgorithms/solpos/
+ * https://www.esrl.noaa.gov/gmd/grad/solcalc/calcdetails.html
+ * http://www.sciencedirect.com/science/article/pii/S0038092X12000400?via%3Dihub
+ * https://github.com/KlausBrunner/solarpositioning
+ * https://github.com/mikereedell/sunrisesunsetlib-java/issues/33
+ */
+
+    private static enum StdCalculator
+        implements EventCalculator {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        /*
+            URL:
+              https://web.archive.org/web/20161202180207/http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+
+            Source:
+              Almanac for Computers, 1990
+              published by Nautical Almanac Office
+              United States Naval Observatory
+              Washington, DC 20392
+
+            Inputs:
+              day, month, year:      date of sunrise/sunset
+              latitude, longitude:   location for sunrise/sunset
+              zenith:                Sun's zenith for sunrise/sunset
+                offical      = 90 degrees 50'
+                civil        = 96 degrees
+                nautical     = 102 degrees
+                astronomical = 108 degrees
+
+            NOTE: longitude is positive for East and negative for West
+            NOTE: the algorithm assumes the use of a calculator with the
+            trig functions in "degree" (rather than "radian") mode. Most
+            programming languages assume radian arguments, requiring back
+            and forth convertions. The factor is 180/pi. So, for instance,
+            the equation RA = atan(0.91764 * tan(L)) would be coded as RA
+            = (180/pi)*atan(0.91764 * tan((pi/180)*L)) to give a degree
+            answer with a degree input for L.
+
+            1. first calculate the day of the year
+
+                N1 = floor(275 * month / 9)
+                N2 = floor((month + 9) / 12)
+                N3 = (1 + floor((year - 4 * floor(year / 4) + 2) / 3))
+                N = N1 - (N2 * N3) + day - 30
+
+            2. convert the longitude to hour value and calculate an approximate time
+
+                lngHour = longitude / 15
+
+                if rising time is desired:
+                    t = N + ((6 - lngHour) / 24)
+                if setting time is desired:
+                    t = N + ((18 - lngHour) / 24)
+
+            3. calculate the Sun's mean anomaly
+
+                M = (0.9856 * t) - 3.289
+
+            4. calculate the Sun's true longitude
+
+                L = M + (1.916 * sin(M)) + (0.020 * sin(2 * M)) + 282.634
+                NOTE: L potentially needs to be adjusted into the range [0,360) by adding/subtracting 360
+
+            5a. calculate the Sun's right ascension
+
+                RA = atan(0.91764 * tan(L))
+                NOTE: RA potentially needs to be adjusted into the range [0,360) by adding/subtracting 360
+
+            5b. right ascension value needs to be in the same quadrant as L
+
+                Lquadrant  = (floor( L/90)) * 90
+                RAquadrant = (floor(RA/90)) * 90
+                RA = RA + (Lquadrant - RAquadrant)
+
+            5c. right ascension value needs to be converted into hours
+
+                RA = RA / 15
+
+            6. calculate the Sun's declination
+
+                sinDec = 0.39782 * sin(L)
+                cosDec = cos(asin(sinDec))
+
+            7a. calculate the Sun's local hour angle
+
+                cosH = (cos(zenith) - (sinDec * sin(latitude))) / (cosDec * cos(latitude))
+
+                if (cosH >  1)
+                    the sun never rises on this location (on the specified date)
+                if (cosH < -1)
+                    the sun never sets on this location (on the specified date)
+
+            7b. finish calculating H and convert into hours
+
+                if rising time is desired:
+                    H = 360 - acos(cosH)
+                if setting time is desired:
+                    H = acos(cosH)
+
+                H = H / 15
+
+            8. calculate local mean time of rising/setting
+
+                T = H + RA - (0.06571 * t) - 6.622
+
+            9. adjust back to UTC
+
+                UT = T - lngHour
+                NOTE: UT potentially needs to be adjusted into the range [0,24) by adding/subtracting 24
+
+            10. convert UT value to local time zone of latitude/longitude
+
+                localT = UT + localOffset
+        */
+        SIMPLE {
+            @Override
+            public Optional<Moment> sunrise(CalendarDate date, double latitude, double longitude, double zenith) {
+                return event(date, latitude, longitude, zenith, true);
+            }
+            @Override
+            public Optional<Moment> sunset(CalendarDate date, double latitude, double longitude, double zenith) {
+                return event(date, latitude, longitude, zenith, false);
+            }
+            private Optional<Moment> event(
+                CalendarDate date,
+                double latitude,
+                double longitude,
+                double zenith,
+                boolean sunrise
+            ) {
+                PlainDate d;
+                if (date instanceof PlainDate) {
+                    d = (PlainDate) date;
+                } else {
+                    d = PlainDate.of(date.getDaysSinceEpochUTC(), EpochDays.UTC);
+                }
+                int doy = d.getDayOfYear();
+                double lngHour = longitude / 15;
+                double t = doy + (((sunrise ? 6 : 18) - lngHour) / 24);
+                double m = (0.9856 * t) - 3.289; // mean anomaly of sun in degrees
+                double L = // true longitude of sun in degrees
+                    m + (1.916 * Math.sin(Math.toRadians(m))) + (0.020 * Math.sin(2 * Math.toRadians(m))) + 282.634;
+                L = adjustRange(L);
+                double RA = // right ascension of sun in degrees
+                    Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
+                RA = adjustRange(RA);
+                double Lquadrant  = Math.floor(L / 90) * 90;
+                double RAquadrant = Math.floor(RA / 90) * 90;
+                RA = (RA + (Lquadrant - RAquadrant)) / 15; // RA in same quadrant as L
+                double sinDec = 0.39782 * Math.sin(Math.toRadians(L));
+                double cosDec = Math.cos(Math.asin(sinDec));
+                double latInRad = Math.toRadians(latitude);
+                double cosH = // local hour angle of sun
+                    (Math.cos(Math.toRadians(zenith)) - (sinDec * Math.sin(latInRad))) / (cosDec * Math.cos(latInRad));
+                if (Double.compare(cosH,  1.0) > 0) {
+                    // the sun never rises on this location (on the specified date)
+                    return Optional.empty();
+                } else if (Double.compare(cosH, -1.0) < 0) {
+                    // the sun never sets on this location (on the specified date)
+                    return Optional.empty();
+                }
+                double H = Math.toDegrees(Math.acos(cosH));
+                if (sunrise) {
+                    H = 360 - H;
+                }
+                H = H / 15;
+                double ut = H + RA - (0.06571 * t) - 6.622 - lngHour; // hour of mean solar time
+                if (Double.compare(0.0, ut) > 0) {
+                    ut += 24;
+                } else if (Double.compare(24.0, ut) <= 0) {
+                    ut -= 24;
+                }
+                int tod = (int) Math.floor(ut * 3600);
+                long secs = d.get(EpochDays.UTC) * 86400 + tod;
+                // we truncate/neglect the fractional seconds here (rounding)
+                Moment utc = Moment.of(secs, TimeScale.UT);
+                return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
+            }
+            private double adjustRange(double value) { // range [0.0, 360.0)
+                if (Double.compare(0.0, value) > 0) {
+                    value += 360;
+                } else if (Double.compare(value, 360.0) >= 0) {
+                    value -= 360;
+                }
+                return value;
+            }
+        }
+
+    }
+
+    public static void main(String... args) {
+        PlainDate date = PlainDate.nowInSystemTime();
+        String tzid = "Europe/Berlin";
+        double latitude = 53.0 + 33 / 60.0;
+        double longitude = 10.0;
+        SolarTime hamburg = SolarTime.ofLocation(latitude, longitude);
+        Optional<Moment> result = date.get(hamburg.sunset());
+        System.out.println("time4j => " + result.get().toZonalTimestamp(() -> tzid));
+
+        java.util.GregorianCalendar cal =
+            new java.util.GregorianCalendar(date.getYear(), date.getMonth() - 1, date.getDayOfMonth());
+        java.util.Date jud = net.time4j.calendar.astro.reedell.SunriseSunsetCalculator.getSunset(
+            latitude, longitude, TimeZone.getTimeZone(tzid), cal, STD_ZENITH - 90.0
+        ).getTime();
+        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
+        sdf.setTimeZone(TimeZone.getTimeZone(tzid));
+        System.out.println("reedell => " + sdf.format(jud));
     }
 
 }
