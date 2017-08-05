@@ -283,7 +283,7 @@ public final class ZonalOffset
      * and {@code Moment}. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
-     * @param   degrees     geographical length in degreed, defined in
+     * @param   degrees     geographical length in degrees, defined in
      *                      range {@code 0 <= degrees <= 180}
      * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
      * @param   arcSeconds  arc second part ({@code 0.0 <= arcSeconds < 60.0})
@@ -302,7 +302,7 @@ public final class ZonalOffset
      * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
-     * @param   degrees     geographical length in degreed, defined in
+     * @param   degrees     geographical length in degrees, defined in
      *                      range {@code 0 <= degrees <= 180}
      * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
      * @param   arcSeconds  arc second part ({@code 0.0 <= arcSeconds < 60.0})
