@@ -17,6 +17,7 @@ import org.junit.runners.Suite.SuiteClasses;
         FrenchRepublicanUnitTest.class,
         RommeTest.class,
         SansculottidesTest.class,
+        SerializationTest.class
     }
 )
 public class FrenchRepublicanSuite {
