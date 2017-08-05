@@ -1,4 +1,6 @@
 ## [v4.29] not yet released
+### Fixed
+- French revolutionary calendar not serializable [#664]
 
 ## [v4.28] published on 2017-07-28
 ### Added
