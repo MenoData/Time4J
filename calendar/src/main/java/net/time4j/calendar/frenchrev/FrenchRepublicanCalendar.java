@@ -579,7 +579,7 @@ public final class FrenchRepublicanCalendar
         ENGINE = builder.build();
     }
 
-    //private static final long serialVersionUID = 7482205842000661998L;
+    private static final long serialVersionUID = -6054794927532842783L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -1278,16 +1278,16 @@ public final class FrenchRepublicanCalendar
     }
 
     /**
-     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
+     * @serialData  Uses <a href="../../../../serialized-form.html#net.time4j.calendar.frenchrev/SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
-     *              the type-ID {@code 10}. Then the year is written as int, finally
+     *              the type-ID {@code 11}. Then the year is written as int, finally
      *              month and day-of-month as bytes.
      *
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
-        return null; // new SPX(this, SPX.INDIAN);
+        return new SPX(this, SPX.FRENCH_REV);
 
     }
 
