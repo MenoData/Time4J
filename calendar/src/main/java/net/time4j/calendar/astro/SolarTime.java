@@ -163,7 +163,9 @@ public class SolarTime {
     // Meeus (22.2), in degrees
     private static double obliquity(double jct) {
 
-        return 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+        double obliquity = 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+        double corr = 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct)); // Meeus (25.8)
+        return obliquity + corr;
 
     }
 

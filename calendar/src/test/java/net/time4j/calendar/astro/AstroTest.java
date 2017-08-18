@@ -224,7 +224,7 @@ public class AstroTest {
             is(1599));
         assertThat(
             equationOfTimeRounded(2017, 11, 25, 6, 26, 14, offset),
-            is(1295));
+            is(1294));
         assertThat(
             equationOfTimeRounded(2017, 12, 25, 6, 26, 14, offset),
             is(-19));
