@@ -1,4 +1,7 @@
 ## [v3.34] not yet released
+### Changed
+- Improve calculation of equation of time [#665]
+
 ### Fixed
 - French revolutionary calendar not serializable [#664]
 
