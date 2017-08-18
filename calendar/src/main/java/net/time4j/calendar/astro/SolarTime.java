@@ -38,9 +38,7 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Locale;
 import java.util.Optional;
-import java.util.TimeZone;
 import java.util.concurrent.TimeUnit;
 
 
@@ -70,7 +68,7 @@ public final class SolarTime
             loaded = calculator;
             break;
         }
-        DEFAULT_CALCULATOR = ((loaded == null) ? StdCalculator.SIMPLE : loaded);
+        DEFAULT_CALCULATOR = ((loaded == null) ? StdCalculator.WILLIAMS : loaded);
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -264,20 +262,24 @@ public final class SolarTime
     /**
      * <p>Calculates the local time of sunrise at the location of this instance in given timezone. </p>
      *
-     * <p>Note: The precision is generally constrained to minutes. </p>
+     * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
+     * that the calculated clock time is related to the previous day. </p>
      *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  sunrise function applicable on any calendar date
+     * @see     #sunrise()
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit des Sonnenaufgangs an der Position dieser Instanz
      * in der angegebenen Zeitzone. </p>
      *
-     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Es ist in seltenen F&auml;llen
+     * m&ouml;glich, da&szlig; die ermittelte Uhrzeit zum vorherigen Tag geh&ouml;rt. </p>
      *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  sunrise function applicable on any calendar date
+     * @see     #sunrise()
      * @since   3.34/4.29
      */
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunrise(TZID tzid) {
@@ -338,20 +340,24 @@ public final class SolarTime
     /**
      * <p>Calculates the local time of sunset at the location of this instance in given timezone. </p>
      *
-     * <p>Note: The precision is generally constrained to minutes. </p>
+     * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
+     * that the calculated clock time is related to the next day. </p>
      *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  sunset function applicable on any calendar date
+     * @see     #sunset()
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit des Sonnenuntergangs an der Position dieser Instanz
      * in der angegebenen Zeitzone. </p>
      *
-     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Es ist in seltenen F&auml;llen
+     * m&ouml;glich, da&szlig; die ermittelte Uhrzeit zum n&auml;chsten Tag geh&ouml;rt. </p>
      *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  sunset function applicable on any calendar date
+     * @see     #sunset()
      * @since   3.34/4.29
      */
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunset(TZID tzid) {
@@ -401,11 +407,13 @@ public final class SolarTime
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("SolarTime[");
-        sb.append("latitude=" + this.latitude);
-        sb.append(",longitude=" + this.longitude);
+        sb.append("SolarTime[latitude=");
+        sb.append(this.latitude);
+        sb.append(",longitude=");
+        sb.append(this.longitude);
         if (Double.compare(this.elevation, 0.0) != 0) {
-            sb.append(",elevation=" + this.elevation);
+            sb.append(",elevation=");
+            sb.append(this.elevation);
         }
         sb.append(']');
         return sb.toString();
@@ -469,6 +477,8 @@ public final class SolarTime
      *
      * <p>See also <a href="https://en.wikipedia.org/wiki/Equation_of_time">Wikipedia</a>. </p>
      *
+     * <p>Relation: mean-solar-time + equation-of-time = apparent-solar-time</p>
+     *
      * @param   moment  the moment when to determine the equation of time
      * @return  difference between apparent solar time and mean solar time in seconds
      * @throws  IllegalArgumentException if the moment is out of year range -2000/+3000
@@ -477,6 +487,8 @@ public final class SolarTime
      * <p>Bestimmt die Differenz zwischen wahrer und mittlerer Sonnenzeit zum angegebenen Zeitpunkt. </p>
      *
      * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Zeitgleichung">Wikipedia</a>. </p>
+     *
+     * <p>Relation: mittlere Sonnezeit + Zeitgleichung = wahre Sonnenzeit</p>
      *
      * @param   moment  the moment when to determine the equation of time
      * @return  difference between apparent solar time and mean solar time in seconds
@@ -515,7 +527,9 @@ public final class SolarTime
     // Meeus (22.2), in degrees
     private static double obliquity(double jct) {
 
-        return 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+        double obliquity = 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+        double corr = 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct)); // Meeus (25.8)
+        return obliquity + corr;
 
     }
 
@@ -674,6 +688,7 @@ public final class SolarTime
  * https://github.com/KosherJava/zmanim/tree/master/src/net/sourceforge/zmanim/util
  * http://www.kosherjava.com/zmanim/docs/api/
  * http://www.jstott.me.uk/jsuntimes/doc-1.0/
+ * https://github.com/caarmen/SunriseSunset
  *
  * https://en.wikipedia.org/wiki/Twilight
  * https://astronomy.stackexchange.com/questions/12824/how-long-does-a-sunrise-or-sunset-take
@@ -694,7 +709,7 @@ public final class SolarTime
 
         /*
             URL:
-              https://web.archive.org/web/20161202180207/http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+              http://www.edwilliams.org/sunrise_sunset_algorithm.htm
 
             Source:
               Almanac for Computers, 1990
@@ -796,7 +811,7 @@ public final class SolarTime
 
                 localT = UT + localOffset
         */
-        SIMPLE {
+        WILLIAMS {
             @Override
             public Optional<Moment> sunrise(CalendarDate date, double latitude, double longitude, double zenith) {
                 return event(date, latitude, longitude, zenith, true);
@@ -848,17 +863,19 @@ public final class SolarTime
                     H = 360 - H;
                 }
                 H = H / 15;
-                double ut = H + RA - (0.06571 * t) - 6.622 - lngHour; // hour of mean solar time
-                if (Double.compare(0.0, ut) > 0) {
-                    ut += 24;
-                } else if (Double.compare(24.0, ut) <= 0) {
-                    ut -= 24;
+                double lmt = H + RA - (0.06571 * t) - 6.622;
+                // deviation: (range adjustment applied on lmt, not ut)
+                if (Double.compare(0.0, lmt) > 0) {
+                    lmt += 24;
+                } else if (Double.compare(24.0, lmt) <= 0) {
+                    lmt -= 24;
                 }
+                double ut =  lmt - lngHour;
                 int tod = (int) Math.floor(ut * 3600);
                 long secs = d.get(EpochDays.UTC) * 86400 + tod;
-                // we truncate/neglect the fractional seconds here (rounding)
-                Moment utc = Moment.of(secs, TimeScale.UT);
-                return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
+                // we truncate/neglect the fractional seconds here and round to full minutes
+                Moment utc = Moment.of(Math.round(secs / 60.0) * 60, TimeScale.UT);
+                return Optional.of(utc.with(Moment.PRECISION, TimeUnit.MINUTES));
             }
             private double adjustRange(double value) { // range [0.0, 360.0)
                 if (Double.compare(0.0, value) > 0) {
@@ -870,25 +887,6 @@ public final class SolarTime
             }
         }
 
-    }
-
-    public static void main(String... args) {
-        PlainDate date = PlainDate.nowInSystemTime();
-        String tzid = "Europe/Berlin";
-        double latitude = 53.0 + 33 / 60.0;
-        double longitude = 10.0;
-        SolarTime hamburg = SolarTime.ofLocation(latitude, longitude);
-        Optional<Moment> result = date.get(hamburg.sunset());
-        System.out.println("time4j => " + result.get().toZonalTimestamp(() -> tzid));
-
-        java.util.GregorianCalendar cal =
-            new java.util.GregorianCalendar(date.getYear(), date.getMonth() - 1, date.getDayOfMonth());
-        java.util.Date jud = net.time4j.calendar.astro.reedell.SunriseSunsetCalculator.getSunset(
-            latitude, longitude, TimeZone.getTimeZone(tzid), cal, STD_ZENITH - 90.0
-        ).getTime();
-        java.text.SimpleDateFormat sdf = new java.text.SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss", Locale.ENGLISH);
-        sdf.setTimeZone(TimeZone.getTimeZone(tzid));
-        System.out.println("reedell => " + sdf.format(jud));
     }
 
 }
