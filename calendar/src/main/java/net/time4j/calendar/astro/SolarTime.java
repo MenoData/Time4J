@@ -38,6 +38,9 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
@@ -45,14 +48,42 @@ import java.util.concurrent.TimeUnit;
 /**
  * Contains various routines to determine solar time.
  *
+ * <p>Notice: Most chronological functions use the astronomical equation of time. Hence they are only applicable
+ * for years between -2000 and +3000 otherwise an {@code IllegalArgumentException} will be thrown. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.33/4.28
  */
 /*[deutsch]
  * Enth&auml;lt verschiedene Hilfsmittel zur Bestimmung der Sonnenzeit.
  *
+ * <p>Notiz: Die meisten chronologischen Funktionen verwenden die astronomische Zeitgleichung. Daher sind
+ * sie nur f&uuml;r Jahre zwischen -2000 und +3000 anwendbar, sonst wird gegebenenfalls eine
+ * {@code IllegalArgumentException} geworfen. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.33/4.28
+ */
+
+/*
+ * More links:
+ *
+ * http://www.nrel.gov/docs/fy08osti/34302.pdf
+ * https://github.com/KosherJava/zmanim/tree/master/src/net/sourceforge/zmanim/util
+ * http://www.kosherjava.com/zmanim/docs/api/
+ * http://www.jstott.me.uk/jsuntimes/doc-1.0/
+ * https://github.com/caarmen/SunriseSunset
+ *
+ * https://en.wikipedia.org/wiki/Twilight
+ * https://astronomy.stackexchange.com/questions/12824/how-long-does-a-sunrise-or-sunset-take
+ *
+ * http://midcdmz.nrel.gov/solpos/spa.html
+ * https://web.archive.org/web/20161202180207/http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
+ * http://rredc.nrel.gov/solar/codesandalgorithms/solpos/
+ * https://www.esrl.noaa.gov/gmd/grad/solcalc/calcdetails.html
+ * http://www.sciencedirect.com/science/article/pii/S0038092X12000400?via%3Dihub
+ * https://github.com/KlausBrunner/solarpositioning
+ * https://github.com/mikereedell/sunrisesunsetlib-java/issues/33
  */
 public final class SolarTime
     implements Serializable {
@@ -60,16 +91,23 @@ public final class SolarTime
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final double STD_ZENITH = 90.0 + (50 / 60.0);
-    private static final EventCalculator DEFAULT_CALCULATOR;
+    private static final Calculator DEFAULT_CALCULATOR;
+    private static final Map<String, Calculator> CALCULATORS;
 
     static {
-        EventCalculator loaded = null;
-        for (EventCalculator calculator : ResourceLoader.getInstance().services(EventCalculator.class)) {
+        Calculator loaded = null;
+        Map<String, Calculator> calculators = new HashMap<>();
+        for (Calculator calculator : ResourceLoader.getInstance().services(Calculator.class)) {
             loaded = calculator;
-            break;
+            calculators.put(calculator.name(), calculator);
         }
-        DEFAULT_CALCULATOR = ((loaded == null) ? StdCalculator.WILLIAMS : loaded);
+        calculators.put(Calculator.SIMPLE, StdCalculator.SIMPLE);
+        calculators.put(Calculator.NOAA, StdCalculator.NOAA);
+        CALCULATORS = Collections.unmodifiableMap(calculators);
+        DEFAULT_CALCULATOR = ((loaded == null) ? StdCalculator.NOAA : loaded);
     }
+
+    // TODO: serialversionUID
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -91,18 +129,26 @@ public final class SolarTime
      */
     private final double elevation;
 
+    /**
+     * @serial  name of the calculator for this instance
+     * @since   3.34/4.29
+     */
+    private final String calculator;
+
     //~ Konstruktoren -----------------------------------------------------
 
     private SolarTime(
         double latitude,
         double longitude,
-        double elevation
+        double elevation,
+        String calculator
     ) {
         super();
 
         this.latitude = latitude;
         this.longitude = longitude;
         this.elevation = elevation;
+        this.calculator = calculator;
 
     }
 
@@ -111,6 +157,9 @@ public final class SolarTime
     /**
      * <p>Obtains the solar time for given geographical location at sea level. </p>
      *
+     * <p>The default calculator is usually {@link Calculator#NOAA} unless another calculator was
+     * set up via the service loader mechnism. </p>
+     *
      * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
@@ -118,6 +167,9 @@ public final class SolarTime
      */
     /*[deutsch]
      * <p>Liefert die Sonnenzeit zur angegebenen geographischen Position auf Meeresh&ouml;he. </p>
+     *
+     * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn,
+     * eine andere Methode wurde &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
      * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
@@ -129,7 +181,7 @@ public final class SolarTime
         double longitude
     ) {
 
-        return ofLocation(latitude, longitude, 0);
+        return ofLocation(latitude, longitude, 0, DEFAULT_CALCULATOR.name());
 
     }
 
@@ -139,7 +191,10 @@ public final class SolarTime
      * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
      * @param   elevation   elevation or altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
+     * @see     Calculator#NOAA
+     * @see     Calculator#SIMPLE
      * @since   3.34/4.29
      */
     /*[deutsch]
@@ -148,19 +203,22 @@ public final class SolarTime
      * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
      * @param   elevation   elevation or altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
+     * @see     Calculator#NOAA
+     * @see     Calculator#SIMPLE
      * @since   3.34/4.29
      */
-    // private because elevation is not yet supported
-    private static SolarTime ofLocation(
+    public static SolarTime ofLocation(
         double latitude,
         double longitude,
-        double elevation
+        double elevation,
+        String calculator
     ) {
 
-        check(latitude, longitude, elevation);
+        check(latitude, longitude, elevation, calculator);
 
-        return new SolarTime(latitude, longitude, elevation);
+        return new SolarTime(latitude, longitude, elevation, calculator);
 
     }
 
@@ -212,10 +270,27 @@ public final class SolarTime
      * @return  elevation in meters
      * @since   3.34/4.29
      */
-    // private because elevation is not yet supported
-    private double getElevation() {
+    public double getElevation() {
 
         return this.elevation;
+
+    }
+
+    /**
+     * <p>Obtains the name of the underlying calculator. </p>
+     *
+     * @return  String
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert den Namen der zugrundeliegenden Berechnungsmethode. </p>
+     *
+     * @return  String
+     * @since   3.34/4.29
+     */
+    public Calculator getCalculator() {
+
+        return CALCULATORS.get(this.calculator);
 
     }
 
@@ -255,7 +330,7 @@ public final class SolarTime
 
         double zenith = STD_ZENITH;
 
-        return date -> DEFAULT_CALCULATOR.sunrise(date, this.latitude, this.longitude, zenith);
+        return date -> this.getCalculator().sunrise(date, this.latitude, this.longitude, zenith);
 
     }
 
@@ -287,7 +362,7 @@ public final class SolarTime
         double zenith = STD_ZENITH;
 
         return date -> {
-            Optional<Moment> m = DEFAULT_CALCULATOR.sunrise(date, latitude, longitude, zenith);
+            Optional<Moment> m = this.getCalculator().sunrise(date, latitude, longitude, zenith);
             if (m.isPresent()) {
                 return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
             } else {
@@ -333,7 +408,7 @@ public final class SolarTime
 
         double zenith = STD_ZENITH;
 
-        return date -> DEFAULT_CALCULATOR.sunset(date, this.latitude, this.longitude, zenith);
+        return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, zenith);
 
     }
 
@@ -365,12 +440,100 @@ public final class SolarTime
         double zenith = STD_ZENITH;
 
         return date -> {
-            Optional<Moment> m = DEFAULT_CALCULATOR.sunset(date, latitude, longitude, zenith);
+            Optional<Moment> m = this.getCalculator().sunset(date, latitude, longitude, zenith);
             if (m.isPresent()) {
                 return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
             } else {
                 return Optional.empty();
             }
+        };
+
+    }
+
+    /**
+     * <p>Calculates the moment of noon at the location of this instance (solar transit). </p>
+     *
+     * @return  noon function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet den Moment der h&ouml;chsten Position der Sonne an der Position dieser Instanz. </p>
+     *
+     * @return  noon function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Moment> noon() {
+
+        return date -> fromLocalEvent(date, 12, this.longitude, this.calculator);
+
+    }
+
+    /**
+     * <p>Calculates the local time of noon at the location of this instance in given timezone. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  noon function applicable on any calendar date
+     * @see     #noon()
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet die lokale Uhrzeit des Mittags an der Position dieser Instanz
+     * in der angegebenen Zeitzone. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  noon function applicable on any calendar date
+     * @see     #noon()
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, PlainTime> noon(TZID tzid) {
+
+        return date -> {
+            Moment m = fromLocalEvent(date, 12, this.longitude, this.calculator);
+            return m.toZonalTimestamp(tzid).getWallTime();
+        };
+
+    }
+
+    /**
+     * <p>Calculates the moment of midnight at the location of this instance (lowest position of sun). </p>
+     *
+     * @return  midnight function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet den Moment der niedrigsten Position der Sonne an der Position dieser Instanz. </p>
+     *
+     * @return  midnight function applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Moment> midnight() {
+
+        return date -> fromLocalEvent(date, 0, this.longitude, this.calculator);
+
+    }
+
+    /**
+     * <p>Calculates the local time of midnight at the location of this instance in given timezone. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  midnight function applicable on any calendar date
+     * @see     #midnight()
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet die lokale Uhrzeit von Mitternacht an der Position dieser Instanz
+     * in der angegebenen Zeitzone. </p>
+     *
+     * @param   tzid    the identifier of the timezone the local time of the result refers to
+     * @return  midnight function applicable on any calendar date
+     * @see     #midnight()
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, PlainTime> midnight(TZID tzid) {
+
+        return date -> {
+            Moment m = fromLocalEvent(date, 0, this.longitude, this.calculator);
+            return m.toZonalTimestamp(tzid).getWallTime();
         };
 
     }
@@ -383,9 +546,10 @@ public final class SolarTime
         } else if (obj instanceof SolarTime){
             SolarTime that = (SolarTime) obj;
             return (
-                (Double.compare(this.latitude, that.latitude) == 0)
-                    || (Double.compare(this.longitude, that.longitude) == 0)
-                    || (Double.compare(this.elevation, that.elevation) == 0));
+                this.calculator.equals(that.calculator)
+                    && (Double.compare(this.latitude, that.latitude) == 0)
+                    && (Double.compare(this.longitude, that.longitude) == 0)
+                    && (Double.compare(this.elevation, that.elevation) == 0));
         } else {
             return false;
         }
@@ -396,7 +560,8 @@ public final class SolarTime
     public int hashCode() {
 
         return (
-            7 * Double.hashCode(this.latitude)
+            this.calculator.hashCode()
+                + 7 * Double.hashCode(this.latitude)
                 + 31 * Double.hashCode(this.longitude)
                 + 37 * Double.hashCode(this.elevation)
         );
@@ -415,6 +580,10 @@ public final class SolarTime
             sb.append(",elevation=");
             sb.append(this.elevation);
         }
+        if (!this.calculator.equals(DEFAULT_CALCULATOR.name())) {
+            sb.append(",calculator=");
+            sb.append(this.calculator);
+        }
         sb.append(']');
         return sb.toString();
 
@@ -423,7 +592,8 @@ public final class SolarTime
     /**
      * <p>Determines the apparent solar time of any moment at given local time zone offset. </p>
      *
-     * <p>Based on the astronomical equation of time. </p>
+     * <p>Based on the astronomical equation of time. The default calculator is usually
+     * {@link Calculator#NOAA} unless another calculator was set up via the service loader mechnism. </p>
      *
      * @param   offset      the time zone offset which might depend on the geographical longitude
      * @return  function for getting the apparent solar time
@@ -433,7 +603,9 @@ public final class SolarTime
     /*[deutsch]
      * <p>Ermittelt die wahre Ortszeit zur angegebenen lokalen Zeitzonendifferenz. </p>
      *
-     * <p>Basiert auf der astronomischen Zeitgleichung. </p>
+     * <p>Basiert auf der astronomischen Zeitgleichung. Die Standardberechnungsmethode ist
+     * gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn, eine andere Methode wurde
+     * &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
      * @param   offset      the time zone offset which might depend on the geographical longitude
      * @return  function for getting the apparent solar time
@@ -445,6 +617,49 @@ public final class SolarTime
         return context -> {
             PlainTimestamp meanSolarTime = onAverage(context, offset);
             double eot = equationOfTime(context);
+            long secs = (long) Math.floor(eot);
+            int nanos = (int) ((eot - secs) * 1_000_000_000);
+            return meanSolarTime.plus(secs, ClockUnit.SECONDS).plus(nanos, ClockUnit.NANOS);
+        };
+
+    }
+
+    /**
+     * <p>Determines the apparent solar time of any moment at given local time zone offset. </p>
+     *
+     * <p>Based on the astronomical equation of time. </p>
+     *
+     * @param   offset      the time zone offset which might depend on the geographical longitude
+     * @param   calculator  name of solar time calculator
+     * @return  function for getting the apparent solar time
+     * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
+     * @see     #equationOfTime(Moment, String)
+     * @see     Calculator#NOAA
+     * @see     Calculator#SIMPLE
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Ermittelt die wahre Ortszeit zur angegebenen lokalen Zeitzonendifferenz. </p>
+     *
+     * <p>Basiert auf der astronomischen Zeitgleichung. </p>
+     *
+     * @param   offset      the time zone offset which might depend on the geographical longitude
+     * @param   calculator  name of solar time calculator
+     * @return  function for getting the apparent solar time
+     * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
+     * @see     #equationOfTime(Moment, String)
+     * @see     Calculator#NOAA
+     * @see     Calculator#SIMPLE
+     * @since   3.34/4.29
+     */
+    public static ChronoFunction<Moment, PlainTimestamp> apparentAt(
+        ZonalOffset offset,
+        String calculator
+    ) {
+
+        return context -> {
+            PlainTimestamp meanSolarTime = onAverage(context, offset);
+            double eot = equationOfTime(context, calculator);
             long secs = (long) Math.floor(eot);
             int nanos = (int) ((eot - secs) * 1_000_000_000);
             return meanSolarTime.plus(secs, ClockUnit.SECONDS).plus(nanos, ClockUnit.NANOS);
@@ -475,9 +690,11 @@ public final class SolarTime
     /**
      * <p>Determines the difference between apparent and mean solar time at given moment. </p>
      *
-     * <p>See also <a href="https://en.wikipedia.org/wiki/Equation_of_time">Wikipedia</a>. </p>
+     * <p>See also <a href="https://en.wikipedia.org/wiki/Equation_of_time">Wikipedia</a>.
+     * Relation: mean-solar-time + equation-of-time = apparent-solar-time</p>
      *
-     * <p>Relation: mean-solar-time + equation-of-time = apparent-solar-time</p>
+     * <p>The default calculator is usually {@link Calculator#NOAA} unless another calculator was
+     * set up via the service loader mechnism. </p>
      *
      * @param   moment  the moment when to determine the equation of time
      * @return  difference between apparent solar time and mean solar time in seconds
@@ -486,9 +703,11 @@ public final class SolarTime
     /*[deutsch]
      * <p>Bestimmt die Differenz zwischen wahrer und mittlerer Sonnenzeit zum angegebenen Zeitpunkt. </p>
      *
-     * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Zeitgleichung">Wikipedia</a>. </p>
+     * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Zeitgleichung">Wikipedia</a>.
+     * Relation: mittlere Sonnenzeit + Zeitgleichung = wahre Sonnenzeit</p>
      *
-     * <p>Relation: mittlere Sonnezeit + Zeitgleichung = wahre Sonnenzeit</p>
+     * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn,
+     * eine andere Methode wurde &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
      * @param   moment  the moment when to determine the equation of time
      * @return  difference between apparent solar time and mean solar time in seconds
@@ -497,60 +716,53 @@ public final class SolarTime
     public static double equationOfTime(Moment moment) {
 
         double jde = JulianDay.getValue(moment, TimeScale.TT);
-        return equationOfTime(jde);
+        return DEFAULT_CALCULATOR.equationOfTime(jde);
 
     }
 
-    // Meeus p.185 (lower accuracy model), returns units of second
-    // other source: http://adsabs.harvard.edu/full/1989MNRAS.238.1529H
-    private static double equationOfTime(double jde) {
+    /**
+     * <p>Determines the difference between apparent and mean solar time at given moment. </p>
+     *
+     * <p>See also <a href="https://en.wikipedia.org/wiki/Equation_of_time">Wikipedia</a>. </p>
+     *
+     * <p>Relation: mean-solar-time + equation-of-time = apparent-solar-time</p>
+     *
+     * @param   moment      the moment when to determine the equation of time
+     * @param   calculator  name of solar time calculator
+     * @return  difference between apparent solar time and mean solar time in seconds
+     * @throws  IllegalArgumentException if the moment is out of year range -2000/+3000 or if the calculator is unknown
+     * @see     Calculator#NOAA
+     * @see     Calculator#SIMPLE
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Differenz zwischen wahrer und mittlerer Sonnenzeit zum angegebenen Zeitpunkt. </p>
+     *
+     * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Zeitgleichung">Wikipedia</a>. </p>
+     *
+     * <p>Relation: mittlere Sonnenzeit + Zeitgleichung = wahre Sonnenzeit</p>
+     *
+     * @param   moment      the moment when to determine the equation of time
+     * @param   calculator  name of solar time calculator
+     * @return  difference between apparent solar time and mean solar time in seconds
+     * @throws  IllegalArgumentException if the moment is out of year range -2000/+3000 or if the calculator is unknown
+     * @see     Calculator#NOAA
+     * @see     Calculator#SIMPLE
+     * @since   3.34/4.29
+     */
+    public static double equationOfTime(
+        Moment moment,
+        String calculator
+    ) {
 
-        double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
-        double tanEpsilonHalf = Math.tan(Math.toRadians(obliquity(jct) / 2));
-        double y = tanEpsilonHalf * tanEpsilonHalf;
-        double l2Rad = Math.toRadians(2 * meanLongitude(jct));
-        double e = excentricity(jct);
-        double mRad = Math.toRadians(meanAnomaly(jct));
-        double sinM = Math.sin(mRad);
-
-        double eot =
-            y * Math.sin(l2Rad)
-            - 2 * e * sinM
-            + 4 * e * y * sinM * Math.cos(l2Rad)
-            - y * y * Math.sin(2 * l2Rad) / 2
-            - 5 * e * e * Math.sin(2 * mRad) / 4;
-
-        return Math.toDegrees(eot) * 240;
-
-    }
-
-    // Meeus (22.2), in degrees
-    private static double obliquity(double jct) {
-
-        double obliquity = 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
-        double corr = 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct)); // Meeus (25.8)
-        return obliquity + corr;
-
-    }
-
-    // Meeus (25.2), in degrees
-    private static double meanLongitude(double jct) {
-
-        return 280.46646 + (36000.76983 + 0.0003032 * jct) * jct;
-
-    }
-
-    // Meeus (25.3), in degrees
-    private static double meanAnomaly(double jct) {
-
-        return 357.52911 + (35999.05029 - 0.0001537 * jct) * jct;
-
-    }
-
-    // Meeus (25.4)
-    private static double excentricity(double jct) {
-
-        return 0.016708634 - (0.000042037 + 0.0000001267 * jct) * jct;
+        if (calculator == null) {
+            throw new NullPointerException("Missing calculator parameter.");
+        } else if (CALCULATORS.containsKey(calculator)) {
+            double jde = JulianDay.getValue(moment, TimeScale.TT);
+            return CALCULATORS.get(calculator).equationOfTime(jde);
+        } else {
+            throw new IllegalArgumentException("Unknown calculator: " + calculator);
+        }
 
     }
 
@@ -565,10 +777,37 @@ public final class SolarTime
 
     }
 
+    private static Moment fromLocalEvent(
+        CalendarDate date,
+        int hourOfEvent,
+        double longitude,
+        String calculator
+    ) {
+
+        // numerical approximation of equation-of-time in two steps
+        Calculator c = CALCULATORS.get(calculator);
+        double elapsed = date.getDaysSinceEpochUTC() * 86400 + hourOfEvent * 3600 - longitude * 240;
+        long secs = (long) Math.floor(elapsed);
+        int nanos = (int) ((elapsed - secs) * 1_000_000_000);
+        Moment m1 = Moment.of(secs, nanos, TimeScale.UT);
+        double eot = c.equationOfTime(JulianDay.getValue(m1, TimeScale.TT)); // first step
+
+        secs = (long) Math.floor(eot);
+        nanos = (int) ((eot - secs) * 1_000_000_000);
+        Moment m2 = m1.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS);
+        eot = c.equationOfTime(JulianDay.getValue(m2, TimeScale.TT)); // second step
+
+        secs = (long) Math.floor(eot);
+        nanos = (int) ((eot - secs) * 1_000_000_000);
+        return m1.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS);
+
+    }
+
     private static void check(
         double latitude,
         double longitude,
-        double elevation
+        double elevation,
+        String calculator
     ) {
 
         if ((Double.compare(latitude, 90.0) > 0) || (Double.compare(latitude, -90.0) < 0)) {
@@ -577,6 +816,10 @@ public final class SolarTime
             throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
         } else if ((elevation < -1000) || (elevation > 9999)) {
             throw new IllegalArgumentException("Meters out of range -1000 <= elevation < +10,000: " + elevation);
+        } else if (calculator == null) {
+            throw new NullPointerException("Missing calculator.");
+        } else if (!CALCULATORS.containsKey(calculator)) {
+            throw new IllegalArgumentException("Unknown calculator: " + calculator);
         }
 
     }
@@ -590,7 +833,7 @@ public final class SolarTime
     private void readObject(ObjectInputStream in)
         throws IOException {
 
-        check(this.latitude, this.longitude, this.elevation);
+        check(this.latitude, this.longitude, this.elevation, this.calculator);
 
     }
 
@@ -599,6 +842,7 @@ public final class SolarTime
     /**
      * <p>An SPI-interface representing a facade for the calculation engine regarding sunrise or sunset. </p>
      *
+     * @see     java.util.ServiceLoader
      * @since   3.34/4.29
      * @doctags.spec    All implementations must have a public no-arg constructor.
      */
@@ -606,10 +850,104 @@ public final class SolarTime
      * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
      * darstellt. </p>
      *
+     * @see     java.util.ServiceLoader
      * @since   3.34/4.29
      * @doctags.spec    All implementations must have a public no-arg constructor.
      */
-    public interface EventCalculator {
+    public interface Calculator {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        /**
+         * Follows closely the algorithms published by NOAA (National Oceanic and Atmospheric Administration).
+         *
+         * <p>The <a href="https://www.esrl.noaa.gov/gmd/grad/solcalc/">website</a> of NOAA also links
+         * to the calculation details. This is the default calculator with reasonably good precision.
+         * However, Time4J also applies a delta-T-correction while original NOAA does not do this adjustment. </p>
+         *
+         * <p>Although the precision is theoretically often better than one minute (for non-polar regions,
+         * beyond +/-72 degrees latitude rather in range of ten minutes), users should consider the fact
+         * that local topology or the actual weather conditions are not taken into account. Therefore
+         * truncating the results to minute precision should be considered. Example: </p>
+         *
+         * <pre>
+         *     PlainDate date = PlainDate.of(2009, 9, 6);
+         *     SolarTime atlanta = SolarTime.ofLocation(33.766667, -84.416667, 0, SolarTime.Calculator.NOAA);
+         *     TZID tzid = () -&gt; &quot;America/New_York&quot;;
+         *     assertThat(
+         *       date.get(atlanta.sunrise())
+         *         .get()
+         *         .toZonalTimestamp(tzid)
+         *         .with(PlainTime.PRECISION, ClockUnit.MINUTES),
+         *       is(PlainTimestamp.of(2009, 9, 6, 7, 15)));
+         * </pre>
+         */
+        /*[deutsch]
+         * Folgt nahe den Algorithmen, die von der NOAA (National Oceanic and Atmospheric Administration)
+         * ver&ouml;ffentlicht wurden.
+         *
+         * <p>Die <a href="https://www.esrl.noaa.gov/gmd/grad/solcalc/">Webseite</a> der NOAA verlinkt
+         * auch zu den Berechnungsdetails. Dies ist die Standardberechnungsmethode mit recht guter Genauigkeit.
+         * Allerdings wendet Time4J eine delta-T-Korrektur an, w&auml;hrend Original-NOAA diese Korrektur
+         * nicht anwendet. </p>
+         *
+         * <p>Obwohl die Genauigkeit theoretisch oft besser als eine Minute ist (f&uuml;r nicht-polare Breiten,
+         * jenseits von +/-72 Grad Breite jedoch eher im Bereich von 10 Minuten)), sollten Anwender auch die Tatsache
+         * in Betracht ziehen, da&szlig; die lokale Topologie oder die aktuellen Wetterbedingungen nicht
+         * ber&uuml;cksichtigt werden. Deshalb ist das Abschneiden der Sekundenteile in den Ergebnissen
+         * meistens angeraten. Beispiel: </p>
+         *
+         * <pre>
+         *     PlainDate date = PlainDate.of(2009, 9, 6);
+         *     SolarTime atlanta = SolarTime.ofLocation(33.766667, -84.416667, 0, SolarTime.Calculator.NOAA);
+         *     TZID tzid = () -&gt; &quot;America/New_York&quot;;
+         *     assertThat(
+         *       date.get(atlanta.sunrise())
+         *         .get()
+         *         .toZonalTimestamp(tzid)
+         *         .with(PlainTime.PRECISION, ClockUnit.MINUTES),
+         *       is(PlainTimestamp.of(2009, 9, 6, 7, 15)));
+         * </pre>
+         */
+        String NOAA = "NOAA";
+
+        /**
+         * Simple and relatively fast but rather imprecise calculator.
+         *
+         * <p>This calculator was once published in &quot;Almanac for Computers, 1990 by Nautical Almanac Office
+         * in United States Naval Observatory (USNO)&quot;. </p>
+         *
+         * <p>Ed Williams has used this book as the source for
+         * <a href="http://www.edwilliams.org/sunrise_sunset_algorithm.htm">his algorithmic proposal</a>. Mike
+         * Reedell has then used the proposal of Williams to realize his popular sunrise/sunset-library written
+         * in Java. Leaving aside general precision requirements, this method cannot be recommended for the
+         * polar regions. So the scope of this method is constrained to the latitudes in range
+         * {@code -65.0 <= latitude <= +65.0} otherwise the results are expected to be unusable. </p>
+         *
+         * <p>However, if users only use this method for actual years and non-polar regions, then
+         * the precision of sunrise or sunset events remain within two minutes (and the equation
+         * of time within one minute). </p>
+         */
+        /*[deutsch]
+         * Einfache und relativ schnelle aber eher ungenaue Berechnungsmethode.
+         *
+         * <p>Diese Berechnungsmethode wurde urspr&uuml;nglich im &quot;Almanac for Computers, 1990
+         * vom Nautical Almanac Office in United States Naval Observatory (USNO)&quot;
+         * ver&ouml;ffentlicht. </p>
+         *
+         * <p>Ed Williams hat dieses Buch als die Quelle
+         * <a href="http://www.edwilliams.org/sunrise_sunset_algorithm.htm">seines algorithmischen Vorschlags</a>
+         * verwendet. Mike Reedell hat schlie&szlig;lich den Vorschlag von Williams benutzt, um seine weit
+         * verbreitete sunrise/sunset-library in der Programmiersprache Java zu realisieren. Auch wenn allgemeine
+         * Genauigkeitsanforderungen beiseite gelassen werden, kann diese Methode nicht f&uuml;r die
+         * polaren Breiten empfohlen werden. Somit ist diese Methode auf geographische Breiten im Bereich
+         * {@code -65.0 <= latitude <= +65.0} beschr&auml;nkt, sonst sind die Ergebnisse unbrauchbar.  </p>
+         *
+         * <p>Allerdings verbleibt die Genauigkeit f&uuml;r Sonnenauf- oder Sonnenuntergang noch innerhalb
+         * von zwei Minuten (und f&uuml;r die Zeitgleichung innerhalb einer Minute), wenn Anwender diese
+         * Methode nur f&uuml;r aktuelle Jahre und die nicht-polaren Breiten benutzen. </p>
+         */
+        String SIMPLE = "SIMPLE";
 
         //~ Methoden ------------------------------------------------------
 
@@ -679,37 +1017,31 @@ public final class SolarTime
             double zenith
         );
 
+        /**
+         * <p>Calculates the difference between true and mean solar time. </p>
+         *
+         * @param   jde     julian day in ephemeris time
+         * @return  value in seconds
+         */
+        /*[deutsch]
+         * <p>Berechnet die Differenz zwischen wahrer und mittlerer Ortszeit. </p>
+         *
+         * @param   jde     julian day in ephemeris time
+         * @return  value in seconds
+         */
+        double equationOfTime(double jde);
+
     }
 
-/*
- * More links:
- *
- * http://www.nrel.gov/docs/fy08osti/34302.pdf
- * https://github.com/KosherJava/zmanim/tree/master/src/net/sourceforge/zmanim/util
- * http://www.kosherjava.com/zmanim/docs/api/
- * http://www.jstott.me.uk/jsuntimes/doc-1.0/
- * https://github.com/caarmen/SunriseSunset
- *
- * https://en.wikipedia.org/wiki/Twilight
- * https://astronomy.stackexchange.com/questions/12824/how-long-does-a-sunrise-or-sunset-take
- *
- * http://midcdmz.nrel.gov/solpos/spa.html
- * https://web.archive.org/web/20161202180207/http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
- * http://rredc.nrel.gov/solar/codesandalgorithms/solpos/
- * https://www.esrl.noaa.gov/gmd/grad/solcalc/calcdetails.html
- * http://www.sciencedirect.com/science/article/pii/S0038092X12000400?via%3Dihub
- * https://github.com/KlausBrunner/solarpositioning
- * https://github.com/mikereedell/sunrisesunsetlib-java/issues/33
- */
-
     private static enum StdCalculator
-        implements EventCalculator {
+        implements Calculator {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
         /*
             URL:
               http://www.edwilliams.org/sunrise_sunset_algorithm.htm
+              https://babel.hathitrust.org/cgi/pt?id=uiug.30112059294311;view=1up;seq=25
 
             Source:
               Almanac for Computers, 1990
@@ -805,13 +1137,13 @@ public final class SolarTime
             9. adjust back to UTC
 
                 UT = T - lngHour
-                NOTE: UT potentially needs to be adjusted into the range [0,24) by adding/subtracting 24
+                NOTE: T potentially needs to be adjusted into the range [0,24) by adding/subtracting 24
 
             10. convert UT value to local time zone of latitude/longitude
 
                 localT = UT + localOffset
         */
-        WILLIAMS {
+        SIMPLE {
             @Override
             public Optional<Moment> sunrise(CalendarDate date, double latitude, double longitude, double zenith) {
                 return event(date, latitude, longitude, zenith, true);
@@ -820,6 +1152,18 @@ public final class SolarTime
             public Optional<Moment> sunset(CalendarDate date, double latitude, double longitude, double zenith) {
                 return event(date, latitude, longitude, zenith, false);
             }
+            @Override
+            public double equationOfTime(double jde) {
+                // => page B8, formula 1 (precision about 0.8 minutes)
+                PlainTimestamp tsp = JulianDay.ofEphemerisTime(jde).toMoment().toZonalTimestamp(ZonalOffset.UTC);
+                double t =
+                    tsp.getCalendarDate().getDayOfYear()
+                    + tsp.getWallTime().get(PlainTime.SECOND_OF_DAY) / 86400.0;
+                return (
+                    -7.66 * Math.sin(Math.toRadians(0.9856 * t - 3.8))
+                    - 9.78 * Math.sin(Math.toRadians(1.9712 * t + 17.96))
+                ) * 60;
+            }
             private Optional<Moment> event(
                 CalendarDate date,
                 double latitude,
@@ -827,18 +1171,14 @@ public final class SolarTime
                 double zenith,
                 boolean sunrise
             ) {
-                PlainDate d;
-                if (date instanceof PlainDate) {
-                    d = (PlainDate) date;
-                } else {
-                    d = PlainDate.of(date.getDaysSinceEpochUTC(), EpochDays.UTC);
-                }
+                // => page B5/B6/B7
+                PlainDate d = toGregorian(date);
                 int doy = d.getDayOfYear();
                 double lngHour = longitude / 15;
                 double t = doy + (((sunrise ? 6 : 18) - lngHour) / 24);
-                double m = (0.9856 * t) - 3.289; // mean anomaly of sun in degrees
+                double M = (0.9856 * t) - 3.289; // mean anomaly of sun in degrees
                 double L = // true longitude of sun in degrees
-                    m + (1.916 * Math.sin(Math.toRadians(m))) + (0.020 * Math.sin(2 * Math.toRadians(m))) + 282.634;
+                    M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634;
                 L = adjustRange(L);
                 double RA = // right ascension of sun in degrees
                     Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
@@ -864,7 +1204,6 @@ public final class SolarTime
                 }
                 H = H / 15;
                 double lmt = H + RA - (0.06571 * t) - 6.622;
-                // deviation: (range adjustment applied on lmt, not ut)
                 if (Double.compare(0.0, lmt) > 0) {
                     lmt += 24;
                 } else if (Double.compare(24.0, lmt) <= 0) {
@@ -884,6 +1223,122 @@ public final class SolarTime
                     value -= 360;
                 }
                 return value;
+            }
+            private PlainDate toGregorian(CalendarDate date) {
+                if (date instanceof PlainDate) {
+                    return (PlainDate) date;
+                } else {
+                    return PlainDate.of(date.getDaysSinceEpochUTC(), EpochDays.UTC);
+                }
+            }
+        },
+
+        NOAA() {
+            @Override
+            public Optional<Moment> sunrise(CalendarDate date, double latitude, double longitude, double zenith) {
+                Moment m = fromLocalEvent(date, 12, longitude, this.name()); // noon
+                double jde = JulianDay.getValue(m, TimeScale.TT);
+                double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
+                double H = localHourAngle(jct, latitude, zenith);
+                if (Double.isNaN(H)) {
+                    return Optional.empty();
+                } else {
+                    long secs = (long) Math.floor(H);
+                    int nanos = (int) ((H - secs) * 1_000_000_000);
+                    return Optional.of(m.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS));
+                }
+            }
+            @Override
+            public Optional<Moment> sunset(CalendarDate date, double latitude, double longitude, double zenith) {
+                Moment m = fromLocalEvent(date, 12, longitude, this.name()); // noon
+                double jde = JulianDay.getValue(m, TimeScale.TT);
+                double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
+                double H = localHourAngle(jct, latitude, zenith);
+                if (Double.isNaN(H)) {
+                    return Optional.empty();
+                } else {
+                    long secs = (long) Math.floor(H);
+                    int nanos = (int) ((H - secs) * 1_000_000_000);
+                    return Optional.of(m.plus(secs, TimeUnit.SECONDS).plus(nanos, TimeUnit.NANOSECONDS));
+                }
+            }
+            // Meeus p.185 (lower accuracy model), returns units of second
+            // other source: http://adsabs.harvard.edu/full/1989MNRAS.238.1529H
+            @Override
+            public double equationOfTime(double jde) {
+                double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
+                double tanEpsilonHalf = Math.tan(Math.toRadians(obliquity(jct) / 2));
+                double y = tanEpsilonHalf * tanEpsilonHalf;
+                double l2Rad = Math.toRadians(2 * meanLongitude(jct));
+                double e = excentricity(jct);
+                double mRad = Math.toRadians(meanAnomaly(jct));
+                double sinM = Math.sin(mRad);
+                double eot =
+                    y * Math.sin(l2Rad)
+                        - 2 * e * sinM
+                        + 4 * e * y * sinM * Math.cos(l2Rad)
+                        - y * y * Math.sin(2 * l2Rad) / 2
+                        - 5 * e * e * Math.sin(2 * mRad) / 4;
+                return Math.toDegrees(eot) * 240;
+            }
+            // Meeus (22.2), in degrees
+            private double obliquity(double jct) {
+                double obliquity = 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+                double corr = 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct)); // Meeus (25.8)
+                return obliquity + corr;
+            }
+            // Meeus (25.2), in degrees
+            private double meanLongitude(double jct) {
+                return (280.46646 + (36000.76983 + 0.0003032 * jct) * jct) % 360;
+            }
+            // Meeus (25.3), in degrees
+            private double meanAnomaly(double jct) {
+                return 357.52911 + (35999.05029 - 0.0001537 * jct) * jct;
+            }
+            // Meeus (25.4), unit-less
+            private double excentricity(double jct) {
+                return 0.016708634 - (0.000042037 + 0.0000001267 * jct) * jct;
+            }
+            // W2-term in NOAA-Excel-sheet
+            private double localHourAngle(
+                double jct,
+                double latitude,
+                double zenith
+            ) {
+                double latInRad = Math.toRadians(latitude);
+                double decInRad = declination(jct);
+                double cosH =
+                    (Math.cos(Math.toRadians(zenith)) - (Math.sin(decInRad) * Math.sin(latInRad)))
+                        / (Math.cos(decInRad) * Math.cos(latInRad));
+                if (Double.compare(cosH,  1.0) > 0) {
+                    // the sun never rises on this location (on the specified date)
+                    return Double.NaN;
+                } else if (Double.compare(cosH, -1.0) < 0) {
+                    // the sun never sets on this location (on the specified date)
+                    return Double.NaN;
+                }
+                return Math.toDegrees(Math.acos(cosH)) * 240; // in decimal seconds
+            }
+            // T2-term in NOAA-Excel-sheet (in radians)
+            private double declination(double jct) {
+                return Math.asin(
+                    Math.sin(Math.toRadians(obliquity(jct))) * Math.sin(Math.toRadians(apparentLongitude(jct))));
+            }
+            // P2-term in NOAA-Excel-sheet
+            private double apparentLongitude(double jct) {
+                return meanLongitude(jct)
+                    + equationOfCenter(jct)
+                    - 0.00569
+                    - 0.00478 * Math.sin(Math.toRadians(125.04 - 1934.136 * jct));
+            }
+            // L2-term in NOAA-Excel-sheet
+            private double equationOfCenter(double jct) {
+                double j2 = Math.toRadians(meanAnomaly(jct));
+                return (
+                    Math.sin(j2) * (1.914602 - (0.004817 + 0.000014 * jct) * jct)
+                    + Math.sin(2 * j2) * (0.019993 - 0.000101 * jct)
+                    + Math.sin(3 * j2) * 0.000289
+                );
             }
         }
 
