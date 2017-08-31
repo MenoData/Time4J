@@ -21,6 +21,7 @@
 
 package net.time4j.calendar.astro;
 
+import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
@@ -28,6 +29,7 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.CalendarDate;
+import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
@@ -124,10 +126,10 @@ public final class SolarTime
     private final double longitude;
 
     /**
-     * @serial  the elevation or altitude in meters
+     * @serial  the geographical altitude in meters
      * @since   3.34/4.29
      */
-    private final double elevation;
+    private final double altitude;
 
     /**
      * @serial  name of the calculator for this instance
@@ -140,14 +142,14 @@ public final class SolarTime
     private SolarTime(
         double latitude,
         double longitude,
-        double elevation,
+        double altitude,
         String calculator
     ) {
         super();
 
         this.latitude = latitude;
         this.longitude = longitude;
-        this.elevation = elevation;
+        this.altitude = altitude;
         this.calculator = calculator;
 
     }
@@ -181,7 +183,7 @@ public final class SolarTime
         double longitude
     ) {
 
-        return ofLocation(latitude, longitude, 0, DEFAULT_CALCULATOR.name());
+        return ofLocation(latitude, longitude, 0.0, DEFAULT_CALCULATOR.name());
 
     }
 
@@ -190,7 +192,7 @@ public final class SolarTime
      *
      * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
-     * @param   elevation   elevation or altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
      * @see     Calculator#NOAA
@@ -202,7 +204,7 @@ public final class SolarTime
      *
      * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
-     * @param   elevation   elevation or altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
      * @see     Calculator#NOAA
@@ -212,13 +214,13 @@ public final class SolarTime
     public static SolarTime ofLocation(
         double latitude,
         double longitude,
-        double elevation,
+        double altitude,
         String calculator
     ) {
 
-        check(latitude, longitude, elevation, calculator);
+        check(latitude, longitude, altitude, calculator);
 
-        return new SolarTime(latitude, longitude, elevation, calculator);
+        return new SolarTime(latitude, longitude, altitude, calculator);
 
     }
 
@@ -259,20 +261,20 @@ public final class SolarTime
     }
 
     /**
-     * <p>Obtains the geographical elevation of this instance relative to sea level. </p>
+     * <p>Obtains the geographical altitude of this instance relative to sea level. </p>
      *
-     * @return  elevation in meters
+     * @return  altitude in meters
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Liefert die geographische H&ouml;he dieser Instanz relativ zum Meeresspiegel. </p>
      *
-     * @return  elevation in meters
+     * @return  altitude in meters
      * @since   3.34/4.29
      */
-    public double getElevation() {
+    public double getAltitude() {
 
-        return this.elevation;
+        return this.altitude;
 
     }
 
@@ -451,7 +453,63 @@ public final class SolarTime
     }
 
     /**
+     * <p>Queries a given calendar date for its associated sunshine data. </p>
+     *
+     * @param   tzid    the identifier of the timezone any local times of the result refer to
+     * @return  function for obtaining sunshine data
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Fragt zu einem gegebenen Kalenderdatum die damit verbundenen Sonnenscheindaten ab. </p>
+     *
+     * @param   tzid    the identifier of the timezone any local times of the result refer to
+     * @return  function for obtaining sunshine data
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Sunshine> sunshine(TZID tzid) {
+
+        return date -> {
+            PlainDate d = toGregorian(date);
+            Optional<Moment> start = this.getCalculator().sunrise(date, this.latitude, this.longitude, STD_ZENITH);
+            Optional<Moment> end = this.getCalculator().sunset(date, this.latitude, this.longitude, STD_ZENITH);
+            boolean absent = false;
+            if (!start.isPresent() && !end.isPresent()) {
+                double elevation = this.getHighestElevationOfSun(d);
+                if (Double.compare(elevation, 90 - STD_ZENITH) < 0) {
+                    absent = true;
+                }
+            }
+            return new Sunshine(d, start, end, tzid, absent);
+        };
+
+    }
+
+    /**
+     * <p>Determines if the sun is visible at all on a given calendar date. </p>
+     *
+     * @return  ChronoCondition
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob an einem gegebenen Kalenderdatum Polarnacht herrscht. </p>
+     *
+     * @return  ChronoCondition
+     * @since   3.34/4.29
+     */
+    public ChronoCondition<CalendarDate> polarNight() {
+
+        return date -> {
+            PlainDate d = toGregorian(date);
+            double elevation = this.getHighestElevationOfSun(d);
+            return (Double.compare(elevation, 90 - STD_ZENITH) < 0);
+        };
+
+    }
+
+    /**
      * <p>Calculates the moment of noon at the location of this instance (solar transit). </p>
+     *
+     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
      *
      * @return  noon function applicable on any calendar date
      * @since   3.34/4.29
@@ -459,36 +517,42 @@ public final class SolarTime
     /*[deutsch]
      * <p>Berechnet den Moment der h&ouml;chsten Position der Sonne an der Position dieser Instanz. </p>
      *
+     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
+     *
      * @return  noon function applicable on any calendar date
      * @since   3.34/4.29
      */
-    public ChronoFunction<CalendarDate, Moment> noon() {
+    public ChronoFunction<CalendarDate, Moment> transitAtNoon() {
 
-        return date -> fromLocalEvent(date, 12, this.longitude, this.calculator);
+        return date -> transitAtNoon(date, this.longitude, this.calculator);
 
     }
 
     /**
      * <p>Calculates the local time of noon at the location of this instance in given timezone. </p>
      *
+     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
+     *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  noon function applicable on any calendar date
-     * @see     #noon()
+     * @see     #transitAtNoon()
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit des Mittags an der Position dieser Instanz
      * in der angegebenen Zeitzone. </p>
      *
+     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
+     *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  noon function applicable on any calendar date
-     * @see     #noon()
+     * @see     #transitAtNoon()
      * @since   3.34/4.29
      */
-    public ChronoFunction<CalendarDate, PlainTime> noon(TZID tzid) {
+    public ChronoFunction<CalendarDate, PlainTime> transitAtNoon(TZID tzid) {
 
         return date -> {
-            Moment m = fromLocalEvent(date, 12, this.longitude, this.calculator);
+            Moment m = transitAtNoon(date, this.longitude, this.calculator);
             return m.toZonalTimestamp(tzid).getWallTime();
         };
 
@@ -497,42 +561,50 @@ public final class SolarTime
     /**
      * <p>Calculates the moment of midnight at the location of this instance (lowest position of sun). </p>
      *
+     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
+     *
      * @return  midnight function applicable on any calendar date
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Berechnet den Moment der niedrigsten Position der Sonne an der Position dieser Instanz. </p>
      *
+     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
+     *
      * @return  midnight function applicable on any calendar date
      * @since   3.34/4.29
      */
-    public ChronoFunction<CalendarDate, Moment> midnight() {
+    public ChronoFunction<CalendarDate, Moment> transitAtMidnight() {
 
-        return date -> fromLocalEvent(date, 0, this.longitude, this.calculator);
+        return date -> transitAtMidnight(date, this.longitude, this.calculator);
 
     }
 
     /**
      * <p>Calculates the local time of midnight at the location of this instance in given timezone. </p>
      *
+     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
+     *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  midnight function applicable on any calendar date
-     * @see     #midnight()
+     * @see     #transitAtMidnight()
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit von Mitternacht an der Position dieser Instanz
      * in der angegebenen Zeitzone. </p>
      *
+     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
+     *
      * @param   tzid    the identifier of the timezone the local time of the result refers to
      * @return  midnight function applicable on any calendar date
-     * @see     #midnight()
+     * @see     #transitAtMidnight()
      * @since   3.34/4.29
      */
-    public ChronoFunction<CalendarDate, PlainTime> midnight(TZID tzid) {
+    public ChronoFunction<CalendarDate, PlainTime> transitAtMidnight(TZID tzid) {
 
         return date -> {
-            Moment m = fromLocalEvent(date, 0, this.longitude, this.calculator);
+            Moment m = transitAtMidnight(date, this.longitude, this.calculator);
             return m.toZonalTimestamp(tzid).getWallTime();
         };
 
@@ -549,7 +621,7 @@ public final class SolarTime
                 this.calculator.equals(that.calculator)
                     && (Double.compare(this.latitude, that.latitude) == 0)
                     && (Double.compare(this.longitude, that.longitude) == 0)
-                    && (Double.compare(this.elevation, that.elevation) == 0));
+                    && (Double.compare(this.altitude, that.altitude) == 0));
         } else {
             return false;
         }
@@ -563,7 +635,7 @@ public final class SolarTime
             this.calculator.hashCode()
                 + 7 * Double.hashCode(this.latitude)
                 + 31 * Double.hashCode(this.longitude)
-                + 37 * Double.hashCode(this.elevation)
+                + 37 * Double.hashCode(this.altitude)
         );
 
     }
@@ -576,9 +648,9 @@ public final class SolarTime
         sb.append(this.latitude);
         sb.append(",longitude=");
         sb.append(this.longitude);
-        if (Double.compare(this.elevation, 0.0) != 0) {
-            sb.append(",elevation=");
-            sb.append(this.elevation);
+        if (Double.compare(this.altitude, 0.0) != 0) {
+            sb.append(",altitude=");
+            sb.append(this.altitude);
         }
         if (!this.calculator.equals(DEFAULT_CALCULATOR.name())) {
             sb.append(",calculator=");
@@ -766,6 +838,19 @@ public final class SolarTime
 
     }
 
+    // used in test classes
+    double getHighestElevationOfSun(PlainDate date) {
+
+        Moment noon = date.get(this.transitAtNoon());
+        double jde = JulianDay.getValue(noon, TimeScale.TT);
+        double decInRad = Math.toRadians(this.getCalculator().declination(jde));
+        double latInRad = Math.toRadians(this.latitude);
+        double sinElevation = // Extra term left out => Math.cos(Math.toRadians(trueNoon)) := 1.0 (per definition)
+            Math.sin(latInRad) * Math.sin(decInRad) + Math.cos(latInRad) * Math.cos(decInRad); // Meeus (13.6)
+        return Math.toDegrees(Math.asin(sinElevation));
+
+    }
+
     private static PlainTimestamp onAverage(Moment context, ZonalOffset offset) {
 
         Moment ut =
@@ -774,6 +859,28 @@ public final class SolarTime
                 context.getNanosecond(TimeScale.UT),
                 TimeScale.POSIX);
         return ut.toZonalTimestamp(offset);
+
+    }
+
+    private static Moment transitAtNoon(
+        CalendarDate date,
+        double longitude,
+        String calculator
+    ) {
+
+        Moment utc = fromLocalEvent(date, 12, longitude, calculator);
+        return utc.with(Moment.PRECISION, calculator.equals(Calculator.SIMPLE) ? TimeUnit.MINUTES : TimeUnit.SECONDS);
+
+    }
+
+    private static Moment transitAtMidnight(
+        CalendarDate date,
+        double longitude,
+        String calculator
+    ) {
+
+        Moment utc = fromLocalEvent(date, 0, longitude, calculator);
+        return utc.with(Moment.PRECISION, calculator.equals(Calculator.SIMPLE) ? TimeUnit.MINUTES : TimeUnit.SECONDS);
 
     }
 
@@ -800,6 +907,16 @@ public final class SolarTime
         secs = (long) Math.floor(eot);
         nanos = (int) ((eot - secs) * 1_000_000_000);
         return m1.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS);
+
+    }
+
+    private static PlainDate toGregorian(CalendarDate date) {
+
+        if (date instanceof PlainDate) {
+            return (PlainDate) date;
+        } else {
+            return PlainDate.of(date.getDaysSinceEpochUTC(), EpochDays.UTC);
+        }
 
     }
 
@@ -833,7 +950,7 @@ public final class SolarTime
     private void readObject(ObjectInputStream in)
         throws IOException {
 
-        check(this.latitude, this.longitude, this.elevation, this.calculator);
+        check(this.latitude, this.longitude, this.altitude, this.calculator);
 
     }
 
@@ -1031,6 +1148,293 @@ public final class SolarTime
          */
         double equationOfTime(double jde);
 
+        /**
+         * <p>Determines the declination of sun. </p>
+         *
+         * @param   jde     julian day in ephemeris time
+         * @return  declination of sun in degrees
+         */
+        /*[deutsch]
+         * <p>Bestimmt die Deklination der Sonne. </p>
+         *
+         * @param   jde     julian day in ephemeris time
+         * @return  declination of sun in degrees
+         */
+        double declination(double jde);
+
+    }
+
+    /**
+     * <p>Collects various data around sunrise and sunset. </p>
+     *
+     * @author  Meno Hochschild
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Sammelt verschiedene Daten um Sonnenauf- oder Sonnenuntergang herum. </p>
+     *
+     * @author  Meno Hochschild
+     * @since   3.34/4.29
+     */
+    public static class Sunshine {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final Moment startUTC;
+        private final Moment endUTC;
+        private final PlainTimestamp startLocal;
+        private final PlainTimestamp endLocal;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Sunshine(
+            PlainDate date,
+            Optional<Moment> start,
+            Optional<Moment> end,
+            TZID tzid,
+            boolean absent
+        ) {
+            super();
+
+            if (absent) { // polar night
+                this.startUTC = null;
+                this.endUTC = null;
+                this.startLocal = null;
+                this.endLocal = null;
+            } else if (start.isPresent()) {
+                this.startUTC = start.get();
+                this.startLocal = this.startUTC.toZonalTimestamp(tzid);
+                if (end.isPresent()) { // standard use-case
+                    this.endUTC = end.get();
+                    this.endLocal = this.endUTC.toZonalTimestamp(tzid);
+                } else {
+                    PlainDate next = date.plus(1, CalendarUnit.DAYS);
+                    this.endUTC = next.atFirstMoment(tzid);
+                    this.endLocal = next.atStartOfDay(tzid);
+                }
+            } else if (end.isPresent()) {
+                this.startUTC = date.atFirstMoment(tzid);
+                this.startLocal = date.atStartOfDay(tzid);
+                this.endUTC = end.get();
+                this.endLocal = this.endUTC.toZonalTimestamp(tzid);
+            } else { // midnight sun
+                this.startUTC = date.atFirstMoment(tzid);
+                this.startLocal = date.atStartOfDay(tzid);
+                PlainDate next = date.plus(1, CalendarUnit.DAYS);
+                this.endUTC = next.atFirstMoment(tzid);
+                this.endLocal = next.atStartOfDay(tzid);
+            }
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Obtains the moment of sunrise if it exists. </p>
+         *
+         * @return  moment of sunrise
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        /*[deutsch]
+         * <p>Liefert den Moment des Sonnenaufgangs wenn vorhanden. </p>
+         *
+         * @return  moment of sunrise
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        public Moment startUTC() {
+
+            return checkAndGet(this.startUTC);
+
+        }
+
+        /**
+         * <p>Obtains the moment of sunset if it exists. </p>
+         *
+         * @return  moment of sunset (exclusive)
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        /*[deutsch]
+         * <p>Liefert den Moment des Sonnenuntergangs wenn vorhanden. </p>
+         *
+         * @return  moment of sunset (exclusive)
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        public Moment endUTC() {
+
+            return checkAndGet(this.endUTC);
+
+        }
+
+        /**
+         * <p>Obtains the local timestamp of sunrise if it exists. </p>
+         *
+         * @return  local timestamp of sunrise
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        /*[deutsch]
+         * <p>Liefert die lokale Zeit des Sonnenaufgangs wenn vorhanden. </p>
+         *
+         * @return  local timestamp of sunrise
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        public PlainTimestamp startLocal() {
+
+            return checkAndGet(this.startLocal);
+
+        }
+
+        /**
+         * <p>Obtains the local timestamp of sunset if it exists. </p>
+         *
+         * @return  local timestamp of sunset (exclusive)
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        /*[deutsch]
+         * <p>Liefert die lokale Zeit des Sonnenuntergangs wenn vorhanden. </p>
+         *
+         * @return  local timestamp of sunset (exclusive)
+         * @throws  IllegalStateException in case of absent sunshine (polar night)
+         * @see     #isAbsent()
+         */
+        public PlainTimestamp endLocal() {
+
+            return checkAndGet(this.endLocal);
+
+        }
+
+        /**
+         * <p>Is there any sunshine at given moment? </p>
+         *
+         * @param   moment  the instant to be queried
+         * @return  boolean
+         */
+        /*[deutsch]
+         * <p>Scheint zum angegebenen Moment die Sonne? </p>
+         *
+         * @param   moment  the instant to be queried
+         * @return  boolean
+         */
+        public boolean isPresent(Moment moment) {
+
+            if (this.isAbsent()) {
+                return false;
+            }
+
+            return (!this.startUTC.isAfter(moment) && moment.isBefore(this.endUTC));
+
+        }
+
+        /**
+         * <p>Is there any sunshine at given local timestamp? </p>
+         *
+         * @param   tsp     the local timestamp to be queried
+         * @return  boolean
+         */
+        /*[deutsch]
+         * <p>Scheint zur angegebenen lokalen Zeit die Sonne? </p>
+         *
+         * @param   tsp     the local timestamp to be queried
+         * @return  boolean
+         */
+        public boolean isPresent(PlainTimestamp tsp) {
+
+            if (this.isAbsent()) {
+                return false;
+            }
+
+            return (!this.startLocal.isAfter(tsp) && tsp.isBefore(this.endLocal));
+
+        }
+
+        /**
+         * <p>Checks if any sunshine is unavailable (polar night). </p>
+         *
+         * @return  {@code true} if this instance corresponds to a polar night else {@code false}
+         */
+        /*[deutsch]
+         * <p>Pr&uuml;ft, ob gar kein Sonnenschein vorhanden ist (Polarnacht). </p>
+         *
+         * @return  {@code true} if this instance corresponds to a polar night else {@code false}
+         */
+        public boolean isAbsent() {
+
+            return (this.startUTC == null); // sufficient, see constructor
+
+        }
+
+        /**
+         * <p>Obtains the length of sunshine in seconds. </p>
+         *
+         * @return  physical length of sunshine in seconds (without leap seconds)
+         * @see     TimeUnit#SECONDS
+         */
+        /*[deutsch]
+         * <p>Liefert die Sonnenscheindauer in Sekunden. </p>
+         *
+         * @return  physical length of sunshine in seconds (without leap seconds)
+         * @see     TimeUnit#SECONDS
+         */
+        public int length() {
+
+            if (this.isAbsent()) {
+                return 0;
+            }
+
+            return (int) this.startUTC.until(this.endUTC, TimeUnit.SECONDS); // safe cast
+
+        }
+
+        /**
+         * <p>For debugging purposes. </p>
+         *
+         * @return  String
+         */
+        /*[deutsch]
+         * <p>F&uuml;r Debugging-Zwecke. </p>
+         *
+         * @return  String
+         */
+        @Override
+        public String toString() {
+
+            if (this.isAbsent()) {
+                return "Polar night";
+            }
+
+            StringBuilder sb = new StringBuilder(128);
+            sb.append("Sunshine[");
+            sb.append("utc=");
+            sb.append(this.startUTC);
+            sb.append('/');
+            sb.append(this.endUTC);
+            sb.append(",local=");
+            sb.append(this.startLocal);
+            sb.append('/');
+            sb.append(this.endLocal);
+            sb.append(",length=");
+            sb.append(this.length());
+            sb.append(']');
+            return sb.toString();
+
+        }
+
+        private static <T> T checkAndGet(T value) {
+
+            if (value == null) {
+                throw new IllegalStateException("Sunshine is absent (polar night).");
+            } else {
+                return value;
+            }
+
+        }
+
     }
 
     private static enum StdCalculator
@@ -1155,14 +1559,29 @@ public final class SolarTime
             @Override
             public double equationOfTime(double jde) {
                 // => page B8, formula 1 (precision about 0.8 minutes)
-                PlainTimestamp tsp = JulianDay.ofEphemerisTime(jde).toMoment().toZonalTimestamp(ZonalOffset.UTC);
-                double t =
-                    tsp.getCalendarDate().getDayOfYear()
-                    + tsp.getWallTime().get(PlainTime.SECOND_OF_DAY) / 86400.0;
+                double t = time0(jde);
                 return (
                     -7.66 * Math.sin(Math.toRadians(0.9856 * t - 3.8))
                     - 9.78 * Math.sin(Math.toRadians(1.9712 * t + 17.96))
                 ) * 60;
+            }
+            @Override
+            public double declination(double jde) {
+                double t0 = time0(jde);
+                double L = trueLongitudeOfSunInDegrees(t0);
+                double sinDec = 0.39782 * Math.sin(Math.toRadians(L));
+                return Math.toDegrees(Math.asin(sinDec));
+            }
+            private double time0(double jde) {
+                PlainTimestamp tsp = JulianDay.ofEphemerisTime(jde).toMoment().toZonalTimestamp(ZonalOffset.UTC);
+                return tsp.getCalendarDate().getDayOfYear() + tsp.getWallTime().get(PlainTime.SECOND_OF_DAY) / 86400.0;
+            }
+            private double trueLongitudeOfSunInDegrees(double t0) {
+                double M = // mean anomaly of sun in degrees
+                    (0.9856 * t0) - 3.289;
+                double L =
+                    M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634;
+                return adjustRange(L);
             }
             private Optional<Moment> event(
                 CalendarDate date,
@@ -1175,11 +1594,8 @@ public final class SolarTime
                 PlainDate d = toGregorian(date);
                 int doy = d.getDayOfYear();
                 double lngHour = longitude / 15;
-                double t = doy + (((sunrise ? 6 : 18) - lngHour) / 24);
-                double M = (0.9856 * t) - 3.289; // mean anomaly of sun in degrees
-                double L = // true longitude of sun in degrees
-                    M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634;
-                L = adjustRange(L);
+                double t0 = doy + (((sunrise ? 6 : 18) - lngHour) / 24);
+                double L = trueLongitudeOfSunInDegrees(t0);
                 double RA = // right ascension of sun in degrees
                     Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
                 RA = adjustRange(RA);
@@ -1191,7 +1607,7 @@ public final class SolarTime
                 double latInRad = Math.toRadians(latitude);
                 double cosH = // local hour angle of sun
                     (Math.cos(Math.toRadians(zenith)) - (sinDec * Math.sin(latInRad))) / (cosDec * Math.cos(latInRad));
-                if (Double.compare(cosH,  1.0) > 0) {
+                if (Double.compare(cosH, 1.0) > 0) {
                     // the sun never rises on this location (on the specified date)
                     return Optional.empty();
                 } else if (Double.compare(cosH, -1.0) < 0) {
@@ -1203,7 +1619,7 @@ public final class SolarTime
                     H = 360 - H;
                 }
                 H = H / 15;
-                double lmt = H + RA - (0.06571 * t) - 6.622;
+                double lmt = H + RA - (0.06571 * t0) - 6.622;
                 if (Double.compare(0.0, lmt) > 0) {
                     lmt += 24;
                 } else if (Double.compare(24.0, lmt) <= 0) {
@@ -1217,19 +1633,13 @@ public final class SolarTime
                 return Optional.of(utc.with(Moment.PRECISION, TimeUnit.MINUTES));
             }
             private double adjustRange(double value) { // range [0.0, 360.0)
-                if (Double.compare(0.0, value) > 0) {
+                while (Double.compare(0.0, value) > 0) {
                     value += 360;
-                } else if (Double.compare(value, 360.0) >= 0) {
+                }
+                while (Double.compare(value, 360.0) >= 0) {
                     value -= 360;
                 }
                 return value;
-            }
-            private PlainDate toGregorian(CalendarDate date) {
-                if (date instanceof PlainDate) {
-                    return (PlainDate) date;
-                } else {
-                    return PlainDate.of(date.getDaysSinceEpochUTC(), EpochDays.UTC);
-                }
             }
         },
 
@@ -1245,7 +1655,8 @@ public final class SolarTime
                 } else {
                     long secs = (long) Math.floor(H);
                     int nanos = (int) ((H - secs) * 1_000_000_000);
-                    return Optional.of(m.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS));
+                    Moment utc = m.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS);
+                    return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
                 }
             }
             @Override
@@ -1259,7 +1670,8 @@ public final class SolarTime
                 } else {
                     long secs = (long) Math.floor(H);
                     int nanos = (int) ((H - secs) * 1_000_000_000);
-                    return Optional.of(m.plus(secs, TimeUnit.SECONDS).plus(nanos, TimeUnit.NANOSECONDS));
+                    Moment utc = m.plus(secs, TimeUnit.SECONDS).plus(nanos, TimeUnit.NANOSECONDS);
+                    return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
                 }
             }
             // Meeus p.185 (lower accuracy model), returns units of second
@@ -1281,9 +1693,15 @@ public final class SolarTime
                         - 5 * e * e * Math.sin(2 * mRad) / 4;
                 return Math.toDegrees(eot) * 240;
             }
+            @Override
+            public double declination(double jde) {
+                double jct = (jde - 2451545.0) / 36525;
+                return Math.toDegrees(declinationRad(jct));
+            }
             // Meeus (22.2), in degrees
             private double obliquity(double jct) {
-                double obliquity = 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+                double obliquity =
+                    23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
                 double corr = 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct)); // Meeus (25.8)
                 return obliquity + corr;
             }
@@ -1306,7 +1724,7 @@ public final class SolarTime
                 double zenith
             ) {
                 double latInRad = Math.toRadians(latitude);
-                double decInRad = declination(jct);
+                double decInRad = declinationRad(jct);
                 double cosH =
                     (Math.cos(Math.toRadians(zenith)) - (Math.sin(decInRad) * Math.sin(latInRad)))
                         / (Math.cos(decInRad) * Math.cos(latInRad));
@@ -1320,7 +1738,7 @@ public final class SolarTime
                 return Math.toDegrees(Math.acos(cosH)) * 240; // in decimal seconds
             }
             // T2-term in NOAA-Excel-sheet (in radians)
-            private double declination(double jct) {
+            private double declinationRad(double jct) {
                 return Math.asin(
                     Math.sin(Math.toRadians(obliquity(jct))) * Math.sin(Math.toRadians(apparentLongitude(jct))));
             }
