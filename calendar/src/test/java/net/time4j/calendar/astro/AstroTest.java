@@ -512,6 +512,9 @@ public class AstroTest {
         assertThat(
             date.matches(suomi.polarNight()),
             is(true));
+        assertThat(
+            date.matches(suomi.midnightSun()),
+            is(false));
 
         // good agreement with NOAA
         date = PlainDate.of(2014, 1, 17);
@@ -585,6 +588,9 @@ public class AstroTest {
         assertThat(
             date.matches(suomi.polarNight()),
             is(false));
+        assertThat(
+            date.matches(suomi.midnightSun()),
+            is(true));
     }
 
     @Test
@@ -597,7 +603,7 @@ public class AstroTest {
             is(PlainTimestamp.of(2016, 11, 1, 11, 22)));
         assertThat(
             date.get(resolute.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2016, 11, 1, 14, 38))); // higher delta of 6 minutes compared with NOAA
+            is(PlainTimestamp.of(2016, 11, 1, 14, 38))); // higher delta of 5 minutes compared with NOAA
     }
 
     @Test
@@ -617,6 +623,32 @@ public class AstroTest {
         assertThat(
             date.get(resolute.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2016, 11, 1, 14, 43, 15)));
+    }
+
+    @Test
+    public void williamsSanFrancisco() {
+        PlainDate date = PlainDate.of(2016, 5, 3);
+        SolarTime sanFrancisco = SolarTime.ofLocation(37.739558, -122.479749, 0, SolarTime.Calculator.SIMPLE);
+        TZID tzid = () -> "America/Los_Angeles";
+        assertThat(
+            date.get(sanFrancisco.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2016, 5, 3, 6, 11)));
+        assertThat(
+            date.get(sanFrancisco.sunset()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2016, 5, 3, 20, 3)));
+    }
+
+    @Test
+    public void noaaSanFrancisco() {
+        PlainDate date = PlainDate.of(2016, 5, 3);
+        SolarTime sanFrancisco = SolarTime.ofLocation(37.739558, -122.479749, 0, SolarTime.Calculator.NOAA);
+        TZID tzid = () -> "America/Los_Angeles";
+        assertThat(
+            date.get(sanFrancisco.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2016, 5, 3, 6, 11, 17)));
+        assertThat(
+            date.get(sanFrancisco.sunset()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2016, 5, 3, 20, 2, 44)));
     }
 
     @Test

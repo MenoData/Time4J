@@ -470,8 +470,9 @@ public final class SolarTime
 
         return date -> {
             PlainDate d = toGregorian(date);
-            Optional<Moment> start = this.getCalculator().sunrise(date, this.latitude, this.longitude, STD_ZENITH);
-            Optional<Moment> end = this.getCalculator().sunset(date, this.latitude, this.longitude, STD_ZENITH);
+            Calculator c = this.getCalculator();
+            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, STD_ZENITH);
+            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, STD_ZENITH);
             boolean absent = false;
             if (!start.isPresent() && !end.isPresent()) {
                 double elevation = this.getHighestElevationOfSun(d);
@@ -485,7 +486,7 @@ public final class SolarTime
     }
 
     /**
-     * <p>Determines if the sun is visible at all on a given calendar date. </p>
+     * <p>Determines if the sun is invisible all day on a given calendar date. </p>
      *
      * @return  ChronoCondition
      * @since   3.34/4.29
@@ -502,6 +503,37 @@ public final class SolarTime
             PlainDate d = toGregorian(date);
             double elevation = this.getHighestElevationOfSun(d);
             return (Double.compare(elevation, 90 - STD_ZENITH) < 0);
+        };
+
+    }
+
+    /**
+     * <p>Determines if the sun is visible all day on a given calendar date. </p>
+     *
+     * @return  ChronoCondition
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob an einem gegebenen Kalenderdatum Mitternachtssonne herrscht. </p>
+     *
+     * @return  ChronoCondition
+     * @since   3.34/4.29
+     */
+    public ChronoCondition<CalendarDate> midnightSun() {
+
+        return date -> {
+            if (Double.compare(Math.abs(this.latitude), 66.0) < 0) {
+                return false;
+            }
+            PlainDate d = toGregorian(date);
+            Calculator c = this.getCalculator();
+            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, STD_ZENITH);
+            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, STD_ZENITH);
+            if (start.isPresent() || end.isPresent()) {
+                return false;
+            }
+            double elevation = this.getHighestElevationOfSun(d);
+            return (Double.compare(elevation, 90 - STD_ZENITH) > 0);
         };
 
     }
@@ -1607,11 +1639,8 @@ public final class SolarTime
                 double latInRad = Math.toRadians(latitude);
                 double cosH = // local hour angle of sun
                     (Math.cos(Math.toRadians(zenith)) - (sinDec * Math.sin(latInRad))) / (cosDec * Math.cos(latInRad));
-                if (Double.compare(cosH, 1.0) > 0) {
-                    // the sun never rises on this location (on the specified date)
-                    return Optional.empty();
-                } else if (Double.compare(cosH, -1.0) < 0) {
-                    // the sun never sets on this location (on the specified date)
+                if ((Double.compare(cosH, 1.0) > 0) || (Double.compare(cosH, -1.0) < 0)) {
+                    // the sun never rises or sets on this location (on the specified date)
                     return Optional.empty();
                 }
                 double H = Math.toDegrees(Math.acos(cosH));
@@ -1689,7 +1718,7 @@ public final class SolarTime
                 if (Double.isNaN(H)) {
                     return Optional.empty();
                 } else {
-                    H = localHourAngle(rise, jde + H / 86400, latitude, zenith); // corrected for time of day
+                    H = localHourAngle(rise, jde + H / 86400, latitude, zenith); // corrected for local time of day
                     if (Double.isNaN(H)) {
                         return Optional.empty();
                     } else {
@@ -1742,7 +1771,7 @@ public final class SolarTime
                 double cosH =
                     (Math.cos(Math.toRadians(zenith)) - (Math.sin(decInRad) * Math.sin(latInRad)))
                         / (Math.cos(decInRad) * Math.cos(latInRad));
-                if ((Double.compare(cosH,  1.0) > 0) || (Double.compare(cosH, -1.0) < 0)) {
+                if ((Double.compare(cosH, 1.0) > 0) || (Double.compare(cosH, -1.0) < 0)) {
                     // the sun never rises or sets on this location (on the specified date)
                     return Double.NaN;
                 }
