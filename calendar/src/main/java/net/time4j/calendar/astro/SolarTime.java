@@ -1646,33 +1646,11 @@ public final class SolarTime
         NOAA() {
             @Override
             public Optional<Moment> sunrise(CalendarDate date, double latitude, double longitude, double zenith) {
-                Moment m = fromLocalEvent(date, 12, longitude, this.name()); // noon
-                double jde = JulianDay.getValue(m, TimeScale.TT);
-                double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
-                double H = localHourAngle(jct, latitude, zenith);
-                if (Double.isNaN(H)) {
-                    return Optional.empty();
-                } else {
-                    long secs = (long) Math.floor(H);
-                    int nanos = (int) ((H - secs) * 1_000_000_000);
-                    Moment utc = m.minus(secs, TimeUnit.SECONDS).minus(nanos, TimeUnit.NANOSECONDS);
-                    return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
-                }
+                return this.event(true, date, latitude, longitude, zenith);
             }
             @Override
             public Optional<Moment> sunset(CalendarDate date, double latitude, double longitude, double zenith) {
-                Moment m = fromLocalEvent(date, 12, longitude, this.name()); // noon
-                double jde = JulianDay.getValue(m, TimeScale.TT);
-                double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
-                double H = localHourAngle(jct, latitude, zenith);
-                if (Double.isNaN(H)) {
-                    return Optional.empty();
-                } else {
-                    long secs = (long) Math.floor(H);
-                    int nanos = (int) ((H - secs) * 1_000_000_000);
-                    Moment utc = m.plus(secs, TimeUnit.SECONDS).plus(nanos, TimeUnit.NANOSECONDS);
-                    return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
-                }
+                return this.event(false, date, latitude, longitude, zenith);
             }
             // Meeus p.185 (lower accuracy model), returns units of second
             // other source: http://adsabs.harvard.edu/full/1989MNRAS.238.1529H
@@ -1697,6 +1675,42 @@ public final class SolarTime
             public double declination(double jde) {
                 double jct = (jde - 2451545.0) / 36525;
                 return Math.toDegrees(declinationRad(jct));
+            }
+            private Optional<Moment> event(
+                boolean rise,
+                CalendarDate date,
+                double latitude,
+                double longitude,
+                double zenith
+            ) {
+                Moment m = fromLocalEvent(date, 12, longitude, this.name()); // noon
+                double jde = JulianDay.getValue(m, TimeScale.TT);
+                double H = localHourAngle(rise, jde, latitude, zenith);
+                if (Double.isNaN(H)) {
+                    return Optional.empty();
+                } else {
+                    H = localHourAngle(rise, jde + H / 86400, latitude, zenith); // corrected for time of day
+                    if (Double.isNaN(H)) {
+                        return Optional.empty();
+                    } else {
+                        long secs = (long) Math.floor(H);
+                        int nanos = (int) ((H - secs) * 1_000_000_000);
+                        Moment utc = m.plus(secs, TimeUnit.SECONDS).plus(nanos, TimeUnit.NANOSECONDS);
+                        return Optional.of(utc.with(Moment.PRECISION, TimeUnit.SECONDS));
+                    }
+                }
+            }
+            private double localHourAngle(boolean rise, double jde, double latitude, double zenith) {
+                double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
+                double H = localHourAngle(jct, latitude, zenith);
+                if (Double.isNaN(H)) {
+                    return Double.NaN;
+                } else {
+                    if (rise) {
+                        H = -H;
+                    }
+                    return H;
+                }
             }
             // Meeus (22.2), in degrees
             private double obliquity(double jct) {
@@ -1728,11 +1742,8 @@ public final class SolarTime
                 double cosH =
                     (Math.cos(Math.toRadians(zenith)) - (Math.sin(decInRad) * Math.sin(latInRad)))
                         / (Math.cos(decInRad) * Math.cos(latInRad));
-                if (Double.compare(cosH,  1.0) > 0) {
-                    // the sun never rises on this location (on the specified date)
-                    return Double.NaN;
-                } else if (Double.compare(cosH, -1.0) < 0) {
-                    // the sun never sets on this location (on the specified date)
+                if ((Double.compare(cosH,  1.0) > 0) || (Double.compare(cosH, -1.0) < 0)) {
+                    // the sun never rises or sets on this location (on the specified date)
                     return Double.NaN;
                 }
                 return Math.toDegrees(Math.acos(cosH)) * 240; // in decimal seconds

@@ -306,7 +306,7 @@ public class AstroTest {
         TZID tzid = () -> "America/New_York";
         assertThat(
             date.get(ny.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(1990, 6, 25, 5, 26, 35)));
+            is(PlainTimestamp.of(1990, 6, 25, 5, 26, 32)));
         assertThat(
             date.get(ny.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(1990, 6, 25, 12, 59, 47)));
@@ -315,7 +315,7 @@ public class AstroTest {
             is(PlainTime.of(12, 59, 47)));
         assertThat(
             date.get(ny.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(1990, 6, 25, 20, 32, 59)));
+            is(PlainTimestamp.of(1990, 6, 25, 20, 32, 56)));
         assertThat(
             ny.getCalculator().name(),
             is(SolarTime.Calculator.NOAA));
@@ -341,10 +341,10 @@ public class AstroTest {
         TZID tzid = () -> "Atlantic/Reykjavik";
         assertThat(
             date.get(reykjavik.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 6, 21, 2, 55, 7)));
+            is(PlainTimestamp.of(2014, 6, 21, 2, 55, 8)));
         assertThat(
             date.get(reykjavik.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 6, 22, 0, 3, 53))); // next day is correct!!!
+            is(PlainTimestamp.of(2014, 6, 22, 0, 3, 52))); // next day is correct!!!
     }
 
     @Test
@@ -373,7 +373,7 @@ public class AstroTest {
             is(PlainTime.of(1, 15, 19)));
         assertThat(
             date.get(germany.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 6, 21, 4, 59, 26)));
+            is(PlainTimestamp.of(2014, 6, 21, 4, 59, 27)));
         assertThat(
             date.get(germany.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 13, 15, 26)));
@@ -405,10 +405,10 @@ public class AstroTest {
         TZID tzid = () -> "Europe/London";
         assertThat(
             date.get(wales.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2015, 8, 12, 5, 49, 9)));
+            is(PlainTimestamp.of(2015, 8, 12, 5, 48, 33)));
         assertThat(
             date.get(wales.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2015, 8, 12, 20, 49, 40)));
+            is(PlainTimestamp.of(2015, 8, 12, 20, 49, 4)));
     }
 
     @Test
@@ -431,10 +431,10 @@ public class AstroTest {
         TZID tzid = () -> "America/New_York";
         assertThat(
             date.get(atlanta.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2009, 9, 6, 7, 15, 12)));
+            is(PlainTimestamp.of(2009, 9, 6, 7, 14, 56)));
         assertThat(
             date.get(atlanta.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2009, 9, 6, 19, 56, 35)));
+            is(PlainTimestamp.of(2009, 9, 6, 19, 56, 19)));
     }
 
     @Test
@@ -479,23 +479,23 @@ public class AstroTest {
             date.get(suomi.sunset()).isPresent(),
             is(false)); // polar night
 
-        // Original NOAA says: still polar night (probably rounding error due to fractional longitude)
+        // Original NOAA says: still polar night (probably rounding error due to fractional longitude/zenith)
         date = date.plus(1, CalendarUnit.DAYS);
         assertThat(
             date.get(suomi.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 1, 16, 12, 6, 46)));
+            is(PlainTimestamp.of(2014, 1, 16, 12, 7, 9)));
         assertThat(
             date.get(suomi.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 1, 16, 12, 36, 40)));
+            is(PlainTimestamp.of(2014, 1, 16, 12, 37, 3)));
 
         // good agreement with original NOAA
         date = date.plus(1, CalendarUnit.DAYS);
         assertThat(
             date.get(suomi.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 1, 17, 11, 45, 30)));
+            is(PlainTimestamp.of(2014, 1, 17, 11, 45, 53)));
         assertThat(
             date.get(suomi.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2014, 1, 17, 12, 58, 37)));
+            is(PlainTimestamp.of(2014, 1, 17, 12, 59, 0)));
     }
 
     @Test
@@ -513,33 +513,33 @@ public class AstroTest {
             date.matches(suomi.polarNight()),
             is(true));
 
-        // good agreement with original NOAA
+        // good agreement with NOAA
         date = PlainDate.of(2014, 1, 17);
         assertThat(
             date.get(suomi.sunrise()).get().toZonalTimestamp(eest),
-            is(PlainTimestamp.of(2014, 1, 17, 11, 51, 34)));
+            is(PlainTimestamp.of(2014, 1, 17, 11, 51, 58)));
         assertThat(
             date.get(suomi.sunset()).get().toZonalTimestamp(eest),
-            is(PlainTimestamp.of(2014, 1, 17, 12, 44, 32)));
+            is(PlainTimestamp.of(2014, 1, 17, 12, 44, 56)));
 
-        // good agreement with original NOAA
+        // good agreement with NOAA
         date = PlainDate.of(2014, 1, 18);
         assertThat(
             date.get(suomi.sunrise()).get().toZonalTimestamp(eest),
-            is(PlainTimestamp.of(2014, 1, 18, 11, 35, 17)));
+            is(PlainTimestamp.of(2014, 1, 18, 11, 35, 41)));
         assertThat(
             date.get(suomi.sunset()).get().toZonalTimestamp(eest),
-            is(PlainTimestamp.of(2014, 1, 18, 13, 1, 29)));
+            is(PlainTimestamp.of(2014, 1, 18, 13, 1, 53)));
 
-        // good agreement with original NOAA spreadsheet (but NOAA web calculator deviates by about 9 minutes)
+        // good agreement with NOAA
         ZonalOffset eedt = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 3, 0);
         date = PlainDate.of(2014, 5, 15);
         assertThat(
             date.get(suomi.sunrise()).get().toZonalTimestamp(eedt),
-            is(PlainTimestamp.of(2014, 5, 15, 1, 43, 40)));
+            is(PlainTimestamp.of(2014, 5, 15, 1, 51, 3)));
         assertThat(
             date.get(suomi.sunset()).get().toZonalTimestamp(eedt),
-            is(PlainTimestamp.of(2014, 5, 16, 0, 25, 2)));
+            is(PlainTimestamp.of(2014, 5, 16, 0, 34, 4)));
         SolarTime.Sunshine sunshine = date.get(suomi.sunshine(eedt));
         assertThat(
             sunshine.startUTC(),
@@ -555,7 +555,7 @@ public class AstroTest {
             is(date.get(suomi.sunset()).get().toZonalTimestamp(eedt)));
         assertThat(
             sunshine.length(),
-            is(81682));
+            is(81781));
         assertThat(
             sunshine.isAbsent(),
             is(false));
@@ -566,13 +566,14 @@ public class AstroTest {
             sunshine.isPresent(date.get(suomi.sunset()).get().toZonalTimestamp(eedt)),
             is(false));
 
+        // good agreement with NOAA
         date = PlainDate.of(2014, 5, 16);
         assertThat(
             date.get(suomi.sunrise()).get().toZonalTimestamp(eedt),
-            is(PlainTimestamp.of(2014, 5, 16, 1, 19, 20))); // NOAA-spreadsheet: T01:21:15
+            is(PlainTimestamp.of(2014, 5, 16, 1, 33, 48)));
         assertThat(
-            date.get(suomi.sunset()).get().toZonalTimestamp(eedt),
-            is(PlainTimestamp.of(2014, 5, 17, 0, 49, 24)));
+            date.get(suomi.sunset()).isPresent(),
+            is(false));
 
         date = PlainDate.of(2014, 5, 17);
         assertThat(
@@ -606,7 +607,7 @@ public class AstroTest {
         TZID tzid = () -> "America/Resolute";
         assertThat(
             date.get(resolute.sunrise()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2016, 11, 1, 11, 21, 38)));
+            is(PlainTimestamp.of(2016, 11, 1, 11, 20, 49)));
         assertThat(
             date.get(resolute.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2016, 11, 1, 13, 2, 51)));
@@ -615,7 +616,7 @@ public class AstroTest {
             is(PlainTime.of(13, 2, 51)));
         assertThat(
             date.get(resolute.sunset()).get().toZonalTimestamp(tzid),
-            is(PlainTimestamp.of(2016, 11, 1, 14, 44, 3)));
+            is(PlainTimestamp.of(2016, 11, 1, 14, 43, 15)));
     }
 
     @Test
