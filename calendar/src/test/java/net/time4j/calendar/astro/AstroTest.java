@@ -290,7 +290,7 @@ public class AstroTest {
             is(-74.3));
         assertThat(
             ny.getAltitude(),
-            is(0.0));
+            is(0));
         assertThat(
             date.get(ny.sunrise(tzid)).get(),
             is(PlainTime.of(5, 26)));
@@ -657,6 +657,40 @@ public class AstroTest {
         assertThat(
             Math.floor(st.getHighestElevationOfSun(PlainDate.of(2010, 6, 21)) * 100) / 100,
             is(73.43)); // from NOAA-spreadsheet
+    }
+
+    @Test
+    public void kilimanjaro() {
+        PlainDate date = PlainDate.of(2017, 12, 22);
+        TZID tzid = () -> "Africa/Dar_es_Salaam"; // Tanzania: UTC+03:00
+        // high altitude => earlier sunrise and later sunset
+        SolarTime kibo5895 = SolarTime.ofLocation(-3.066667, 37.359167, 5895, SolarTime.Calculator.NOAA);
+        assertThat(
+            date.get(kibo5895.sunrise(tzid)).get(),
+            is(PlainTime.of(6, 9, 28)));
+        assertThat(
+            date.get(kibo5895.sunset(tzid)).get(),
+            is(PlainTime.of(18, 48, 55)));
+        assertThat(
+            kibo5895.getAltitude(),
+            is(5895));
+        assertThat(
+            date.get(kibo5895.sunshine(tzid)).length(),
+            is(12 * 3600 + 39 * 60 + 27));
+        // good agreement with NOAA
+        SolarTime kiboSeaLevel = SolarTime.ofLocation(-3.066667, 37.359167, 0, SolarTime.Calculator.NOAA);
+        assertThat(
+            date.get(kiboSeaLevel.sunrise(tzid)).get(),
+            is(PlainTime.of(6, 20, 13)));
+        assertThat(
+            date.get(kiboSeaLevel.sunset(tzid)).get(),
+            is(PlainTime.of(18, 38, 9)));
+        assertThat(
+            kiboSeaLevel.getAltitude(),
+            is(0));
+        assertThat(
+            date.get(kiboSeaLevel.sunshine(tzid)).length(),
+            is(12 * 3600 + 17 * 60 + 56));
     }
 
 }

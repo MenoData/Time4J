@@ -92,6 +92,8 @@ public final class SolarTime
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final double EQUATORIAL_RADIUS = 6378137.0;
+    private static final double POLAR_RADIUS = 6356752.3;
     private static final double STD_ZENITH = 90.0 + (50 / 60.0);
     private static final Calculator DEFAULT_CALCULATOR;
     private static final Map<String, Calculator> CALCULATORS;
@@ -129,7 +131,7 @@ public final class SolarTime
      * @serial  the geographical altitude in meters
      * @since   3.34/4.29
      */
-    private final double altitude;
+    private final int altitude;
 
     /**
      * @serial  name of the calculator for this instance
@@ -142,7 +144,7 @@ public final class SolarTime
     private SolarTime(
         double latitude,
         double longitude,
-        double altitude,
+        int altitude,
         String calculator
     ) {
         super();
@@ -183,7 +185,7 @@ public final class SolarTime
         double longitude
     ) {
 
-        return ofLocation(latitude, longitude, 0.0, DEFAULT_CALCULATOR.name());
+        return ofLocation(latitude, longitude, 0, DEFAULT_CALCULATOR.name());
 
     }
 
@@ -214,7 +216,7 @@ public final class SolarTime
     public static SolarTime ofLocation(
         double latitude,
         double longitude,
-        double altitude,
+        int altitude,
         String calculator
     ) {
 
@@ -272,7 +274,7 @@ public final class SolarTime
      * @return  altitude in meters
      * @since   3.34/4.29
      */
-    public double getAltitude() {
+    public int getAltitude() {
 
         return this.altitude;
 
@@ -330,9 +332,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Optional<Moment>> sunrise() {
 
-        double zenith = STD_ZENITH;
-
-        return date -> this.getCalculator().sunrise(date, this.latitude, this.longitude, zenith);
+        return date -> this.getCalculator().sunrise(date, this.latitude, this.longitude, this.zenithAngle());
 
     }
 
@@ -361,10 +361,8 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunrise(TZID tzid) {
 
-        double zenith = STD_ZENITH;
-
         return date -> {
-            Optional<Moment> m = this.getCalculator().sunrise(date, latitude, longitude, zenith);
+            Optional<Moment> m = this.getCalculator().sunrise(date, latitude, longitude, this.zenithAngle());
             if (m.isPresent()) {
                 return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
             } else {
@@ -408,9 +406,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Optional<Moment>> sunset() {
 
-        double zenith = STD_ZENITH;
-
-        return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, zenith);
+        return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, this.zenithAngle());
 
     }
 
@@ -439,10 +435,8 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunset(TZID tzid) {
 
-        double zenith = STD_ZENITH;
-
         return date -> {
-            Optional<Moment> m = this.getCalculator().sunset(date, latitude, longitude, zenith);
+            Optional<Moment> m = this.getCalculator().sunset(date, latitude, longitude, this.zenithAngle());
             if (m.isPresent()) {
                 return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
             } else {
@@ -471,12 +465,13 @@ public final class SolarTime
         return date -> {
             PlainDate d = toGregorian(date);
             Calculator c = this.getCalculator();
-            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, STD_ZENITH);
-            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, STD_ZENITH);
+            double zenith = this.zenithAngle();
+            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, zenith);
+            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, zenith);
             boolean absent = false;
             if (!start.isPresent() && !end.isPresent()) {
                 double elevation = this.getHighestElevationOfSun(d);
-                if (Double.compare(elevation, 90 - STD_ZENITH) < 0) {
+                if (Double.compare(elevation, 90 - zenith) < 0) {
                     absent = true;
                 }
             }
@@ -500,9 +495,19 @@ public final class SolarTime
     public ChronoCondition<CalendarDate> polarNight() {
 
         return date -> {
+            if (Double.compare(Math.abs(this.latitude), 66.0) < 0) {
+                return false;
+            }
             PlainDate d = toGregorian(date);
+            Calculator c = this.getCalculator();
+            double zenith = this.zenithAngle();
+            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, zenith);
+            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, zenith);
+            if (start.isPresent() || end.isPresent()) {
+                return false;
+            }
             double elevation = this.getHighestElevationOfSun(d);
-            return (Double.compare(elevation, 90 - STD_ZENITH) < 0);
+            return (Double.compare(elevation, 90 - zenith) < 0);
         };
 
     }
@@ -527,13 +532,14 @@ public final class SolarTime
             }
             PlainDate d = toGregorian(date);
             Calculator c = this.getCalculator();
-            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, STD_ZENITH);
-            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, STD_ZENITH);
+            double zenith = this.zenithAngle();
+            Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, zenith);
+            Optional<Moment> end = c.sunset(date, this.latitude, this.longitude, zenith);
             if (start.isPresent() || end.isPresent()) {
                 return false;
             }
             double elevation = this.getHighestElevationOfSun(d);
-            return (Double.compare(elevation, 90 - STD_ZENITH) > 0);
+            return (Double.compare(elevation, 90 - zenith) > 0);
         };
 
     }
@@ -653,7 +659,7 @@ public final class SolarTime
                 this.calculator.equals(that.calculator)
                     && (Double.compare(this.latitude, that.latitude) == 0)
                     && (Double.compare(this.longitude, that.longitude) == 0)
-                    && (Double.compare(this.altitude, that.altitude) == 0));
+                    && (this.altitude == that.altitude));
         } else {
             return false;
         }
@@ -667,7 +673,7 @@ public final class SolarTime
             this.calculator.hashCode()
                 + 7 * Double.hashCode(this.latitude)
                 + 31 * Double.hashCode(this.longitude)
-                + 37 * Double.hashCode(this.altitude)
+                + 37 * this.altitude
         );
 
     }
@@ -680,7 +686,7 @@ public final class SolarTime
         sb.append(this.latitude);
         sb.append(",longitude=");
         sb.append(this.longitude);
-        if (Double.compare(this.altitude, 0.0) != 0) {
+        if (this.altitude != 0) {
             sb.append(",altitude=");
             sb.append(this.altitude);
         }
@@ -949,6 +955,34 @@ public final class SolarTime
         } else {
             return PlainDate.of(date.getDaysSinceEpochUTC(), EpochDays.UTC);
         }
+
+    }
+
+    private double earthRadius() {
+
+        // curvature radius of earth rotation ellipsoid in the prime vertical (east-west), see also:
+        // https://en.wikipedia.org/wiki/Earth_radius#Radii_of_curvature
+        double lat = Math.toRadians(this.latitude);
+        double r1 = EQUATORIAL_RADIUS * Math.cos(lat);
+        double r2 = POLAR_RADIUS * Math.sin(lat);
+        return EQUATORIAL_RADIUS * EQUATORIAL_RADIUS / Math.sqrt(r1 * r1 + r2 * r2);
+
+    }
+
+    private double sunAngleOfAltitude() {
+
+        if (this.altitude == 0) {
+            return 0.0;
+        }
+
+        double r = this.earthRadius();
+        return Math.toDegrees(Math.acos(r / (r + this.altitude)));
+
+    }
+
+    private double zenithAngle() {
+
+        return STD_ZENITH + this.sunAngleOfAltitude();
 
     }
 
