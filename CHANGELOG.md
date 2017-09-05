@@ -1,4 +1,7 @@
 ## [v3.34] not yet released
+### Added
+- Twilight definition [#667]
+
 ### Changed
 - Improve calculation of equation of time [#665]
 
