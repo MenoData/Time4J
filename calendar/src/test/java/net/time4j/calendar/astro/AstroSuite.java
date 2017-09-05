@@ -20,7 +20,8 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         AstroTest.class,
         JulianDayTest.class,
-        SunSydneyTest.class
+        SunSydneyTest.class,
+        TwilightTest.class
     }
 )
 public class AstroSuite {
