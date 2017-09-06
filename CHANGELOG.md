@@ -1,5 +1,6 @@
 ## [v3.34] not yet released
 ### Added
+- Support for sunrise / sunset - calculations [#663]
 - Twilight definition [#667]
 
 ### Changed
