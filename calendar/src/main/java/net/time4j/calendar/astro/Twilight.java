@@ -56,7 +56,7 @@ public enum Twilight {
 	 * normalerweise sprechen Fotografen von der blauen Stunden, wenn die Sonne zwischen 4 und 8 Grad
 	 * unter dem Horizont steht. Siehe auch <a href="https://en.wikipedia.org/wiki/Blue_hour">Wikipedia</a>. </p>
 	 */
-	BLUE_HOUR(-4.0),
+	BLUE_HOUR(4.0),
 
 	/**
 	 * <p>Marks the time when the sun is 6 degrees below the horizon. </p>
@@ -64,7 +64,7 @@ public enum Twilight {
 	/*[deutsch]
 	 * <p>Markiert die Zeit, wenn die Sonne 6 Grad unter dem Horizont ist. </p>
 	 */
-	CIVIL(-6.0),
+	CIVIL(6.0),
 
 	/**
 	 * <p>Marks the time when the sun is 12 degrees below the horizon. </p>
@@ -72,7 +72,7 @@ public enum Twilight {
 	/*[deutsch]
 	 * <p>Markiert die Zeit, wenn die Sonne 12 Grad unter dem Horizont ist. </p>
 	 */
-	NAUTICAL(-12.0),
+	NAUTICAL(12.0),
 
 	/**
 	 * <p>Marks the time when the sun is 18 degrees below the horizon. </p>
@@ -84,7 +84,7 @@ public enum Twilight {
 	 *
 	 * <p>Steht die Sonne noch tiefer, spricht man von tiefer Nacht. </p>
 	 */
-	ASTRONOMICAL(-18.0);
+	ASTRONOMICAL(18.0);
 
 	//~ Instanzvariablen --------------------------------------------------
 
@@ -108,7 +108,7 @@ public enum Twilight {
 	 *
 	 * @return	angle in degrees
 	 */
-	public double getAngle() {
+	double getAngle() {
 
 		return this.angle;
 

@@ -94,7 +94,7 @@ public final class SolarTime
 
     private static final double EQUATORIAL_RADIUS = 6378137.0;
     private static final double POLAR_RADIUS = 6356752.3;
-    private static final double STD_ZENITH = 90.0 + (50 / 60.0);
+    private static final double STD_ZENITH = 90.0 + (50.0 / 60.0);
     private static final Calculator DEFAULT_CALCULATOR;
     private static final Map<String, Calculator> CALCULATORS;
 
@@ -337,6 +337,31 @@ public final class SolarTime
     }
 
     /**
+     * <p>Calculates the time of given twilight at sunrise and the location of this instance. </p>
+     *
+     * <p>Note: The precision is generally constrained to minutes. </p>
+     *
+     * @param   twilight    relevant definition of twilight
+     * @return  twilight function at sunrise applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet die Zeit der angegebenen D&auml;mmerung zum Sonnenaufgang an der Position dieser Instanz. </p>
+     *
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     *
+     * @param   twilight    relevant definition of twilight
+     * @return  twilight function at sunrise applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Optional<Moment>> sunrise(Twilight twilight) {
+
+        double effAngle = 90.0 + this.sunAngleOfAltitude() + twilight.getAngle();
+        return date -> this.getCalculator().sunrise(date, this.latitude, this.longitude, effAngle);
+
+    }
+
+    /**
      * <p>Calculates the local time of sunrise at the location of this instance in given timezone. </p>
      *
      * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
@@ -407,6 +432,31 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Optional<Moment>> sunset() {
 
         return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, this.zenithAngle());
+
+    }
+
+    /**
+     * <p>Calculates the time of given twilight at sunset and the location of this instance. </p>
+     *
+     * <p>Note: The precision is generally constrained to minutes. </p>
+     *
+     * @param   twilight    relevant definition of twilight
+     * @return  twilight function at sunset applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Berechnet die Zeit der angegebenen D&auml;mmerung zum Sonnenuntergang an der Position dieser Instanz. </p>
+     *
+     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
+     *
+     * @param   twilight    relevant definition of twilight
+     * @return  twilight function at sunset applicable on any calendar date
+     * @since   3.34/4.29
+     */
+    public ChronoFunction<CalendarDate, Optional<Moment>> sunset(Twilight twilight) {
+
+        double effAngle = 90.0 + this.sunAngleOfAltitude() + twilight.getAngle();
+        return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, effAngle);
 
     }
 
