@@ -111,7 +111,7 @@ public final class SolarTime
         DEFAULT_CALCULATOR = ((loaded == null) ? StdCalculator.NOAA : loaded);
     }
 
-    // TODO: serialversionUID
+    private static final long serialVersionUID = -4816619838743247977L;
 
     //~ Instanzvariablen --------------------------------------------------
 
