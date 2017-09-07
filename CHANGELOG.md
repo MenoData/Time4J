@@ -2,11 +2,13 @@
 ### Added
 - Support for sunrise / sunset - calculations [#663]
 - Twilight definition [#667]
+- Sunset as start-of-day (for islamic calendar etc) [#668]
 
 ### Changed
 - Improve calculation of equation of time [#665]
 
 ### Fixed
+- Conversion of Duration to Java-8 broken if fractional seconds occur [#669]
 - French revolutionary calendar not serializable [#664]
 
 ## [v4.28] published on 2017-07-28
