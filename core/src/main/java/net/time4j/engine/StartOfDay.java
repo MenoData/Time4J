@@ -21,7 +21,10 @@
 
 package net.time4j.engine;
 
+import net.time4j.base.MathUtils;
+import net.time4j.base.UnixTime;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 
 
 /**
@@ -86,7 +89,7 @@ public abstract class StartOfDay {
     //~ Methoden ------------------------------------------------------
 
     /**
-     * <p>Liefert the start of given calendar day relative to midnight in fixed seconds. </p>
+     * <p>Obtains the start of a calendar day relative to midnight in fixed seconds. </p>
      *
      * <p>A negative deviation is explicitly allowed and refers to the previous calendar day. </p>
      *
@@ -116,6 +119,66 @@ public abstract class StartOfDay {
         }
 
         return new FixedStartOfDay(deviation);
+
+    }
+
+    /**
+     * <p>Obtains the start of a calendar day as determined by given date function. </p>
+     *
+     * <p>If the given function cannot determine a moment for a calendar day then
+     * an exception will be thrown. This method is most suitable for calendars whose
+     * days start on astronomical events like sunset. Example: </p>
+     *
+     * <pre>
+     *     HijriCalendar hijri = HijriCalendar.ofUmalqura(1436, 10, 2);
+     *     SolarTime mekkaTime = SolarTime.ofLocation(21.4225, 39.826111);
+     *     ZonalOffset saudiArabia = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+     *     StartOfDay startOfDay = StartOfDay.definedBy(mekkaTime.sunset());
+     *
+     *     // short after sunset (2015-07-17T19:05:40)
+     *     System.out.println(
+     *         hijri.atTime(19, 6).at(saudiArabia, startOfDay)); // 2015-07-17T19:06+03:00
+     *
+     *     // short before sunset (2015-07-17T19:05:40)
+     *     System.out.println(
+     *         hijri.minus(CalendarDays.ONE).atTime(19, 5).at(saudiArabia, startOfDay)); // 2015-07-17T19:05+03:00
+     * </pre>
+     *
+     * @param   <T> generic type parameter indicating the time of the event
+     * @param   event   function which yields the relevant moment for a given calendar day
+     * @return  start of day
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Liefert den Start eines Kalendertags, wie von der angegebenen Datumsfunktion bestimmt. </p>
+     *
+     * <p>Wenn die angegebene Funktion keinen Moment f&uuml;r ein Kalenderdatum ermitteln kann,
+     * wird eine Ausnahme geworfen. Diese Methode ist am besten f&uuml;r Kalender geeignet,
+     * deren Tage zu astronomischen Ereignissen wie einem Sonnenuntergang beginnen. Beispiel: </p>
+     *
+     * <pre>
+     *     HijriCalendar hijri = HijriCalendar.ofUmalqura(1436, 10, 2);
+     *     SolarTime mekkaTime = SolarTime.ofLocation(21.4225, 39.826111);
+     *     ZonalOffset saudiArabia = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+     *     StartOfDay startOfDay = StartOfDay.definedBy(mekkaTime.sunset());
+     *
+     *     // short after sunset (2015-07-17T19:05:40)
+     *     System.out.println(
+     *         hijri.atTime(19, 6).at(saudiArabia, startOfDay)); // 2015-07-17T19:06+03:00
+     *
+     *     // short before sunset (2015-07-17T19:05:40)
+     *     System.out.println(
+     *         hijri.minus(CalendarDays.ONE).atTime(19, 5).at(saudiArabia, startOfDay)); // 2015-07-17T19:05+03:00
+     * </pre>
+     *
+     * @param   <T> generic type parameter indicating the time of the event
+     * @param   event   function which yields the relevant moment for a given calendar day
+     * @return  start of day
+     * @since   3.34/4.29
+     */
+    public static <T extends UnixTime> StartOfDay definedBy(ChronoFunction<CalendarDate, T> event) {
+
+        return new FunctionalStartOfDay<T>(event);
 
     }
 
@@ -168,7 +231,7 @@ public abstract class StartOfDay {
         @Override
         public int getDeviation(
             Calendrical<?, ?> calendarDay,
-            TZID timezone
+            TZID tzid
         ) {
 
             return this.deviation;
@@ -200,6 +263,49 @@ public abstract class StartOfDay {
         public String toString() {
 
             return "FixedStartOfDay[" + this.deviation + "]";
+
+        }
+
+    }
+
+    private static class FunctionalStartOfDay<T extends UnixTime>
+        extends StartOfDay {
+
+        //~ Instanzvariablen ------------------------------------------
+
+        private final ChronoFunction<CalendarDate, T> event;
+
+        //~ Konstruktoren ---------------------------------------------
+
+        private FunctionalStartOfDay(ChronoFunction<CalendarDate, T> event) {
+            super();
+
+            if (event == null) {
+                throw new NullPointerException("Missing event function.");
+            }
+
+            this.event = event;
+
+        }
+
+        //~ Methoden --------------------------------------------------
+
+        @Override
+        public int getDeviation(
+            Calendrical<?, ?> calendarDay,
+            TZID tzid
+        ) {
+
+            T ut = this.event.apply(calendarDay);
+
+            if (ut != null) {
+                long local = ut.getPosixTime() - 2 * 365 * 86400 + Timezone.of(tzid).getOffset(ut).getIntegralAmount();
+                long midnight = calendarDay.getDaysSinceEpochUTC() * 86400;
+                int timeOfDay = MathUtils.safeCast(local - midnight);
+                return ((timeOfDay >= 43200) ? (timeOfDay - 86400) : timeOfDay);
+            } else {
+                throw new ChronoException("Cannot determine start of day: No event.");
+            }
 
         }
 
