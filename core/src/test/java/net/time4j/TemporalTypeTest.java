@@ -229,6 +229,10 @@ public class TemporalTypeTest {
             TemporalType.THREETEN_DURATION.from(Duration.of(-1, ClockUnit.NANOS)),
             is(java.time.Duration.ofSeconds(-1).plusNanos(999_999_999))
         );
+        assertThat(
+            TemporalType.THREETEN_DURATION.from(Duration.of(5, ClockUnit.SECONDS).plus(234500, ClockUnit.MICROS)),
+            is(java.time.Duration.ofSeconds(5).plusNanos(234_500_000))
+        );
     }
 
     @Test

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalType.java) is part of project Time4J.
  *
@@ -731,7 +731,6 @@ public abstract class TemporalType<S, T>
             java.time.Duration threetenDuration = java.time.Duration.ZERO;
 
             for (ClockUnit unit : ClockUnit.values()) {
-                long amount = time4j.getPartialAmount(unit);
                 TemporalUnit threetenUnit;
 
                 switch (unit) {
@@ -745,11 +744,8 @@ public abstract class TemporalType<S, T>
                         threetenUnit = ChronoUnit.SECONDS;
                         break;
                     case MILLIS:
-                        threetenUnit = ChronoUnit.MILLIS;
-                        break;
                     case MICROS:
-                        threetenUnit = ChronoUnit.MICROS;
-                        break;
+                        continue;
                     case NANOS:
                         threetenUnit = ChronoUnit.NANOS;
                         break;
@@ -758,6 +754,7 @@ public abstract class TemporalType<S, T>
 
                 }
 
+                long amount = time4j.getPartialAmount(unit);
                 threetenDuration = threetenDuration.plus(amount, threetenUnit);
             }
 
