@@ -66,27 +66,6 @@ import java.util.concurrent.TimeUnit;
  * @author  Meno Hochschild
  * @since   3.33/4.28
  */
-
-/*
- * More links:
- *
- * http://www.nrel.gov/docs/fy08osti/34302.pdf
- * https://github.com/KosherJava/zmanim/tree/master/src/net/sourceforge/zmanim/util
- * http://www.kosherjava.com/zmanim/docs/api/
- * http://www.jstott.me.uk/jsuntimes/doc-1.0/
- * https://github.com/caarmen/SunriseSunset
- *
- * https://en.wikipedia.org/wiki/Twilight
- * https://astronomy.stackexchange.com/questions/12824/how-long-does-a-sunrise-or-sunset-take
- *
- * http://midcdmz.nrel.gov/solpos/spa.html
- * https://web.archive.org/web/20161202180207/http://williams.best.vwh.net/sunrise_sunset_algorithm.htm
- * http://rredc.nrel.gov/solar/codesandalgorithms/solpos/
- * https://www.esrl.noaa.gov/gmd/grad/solcalc/calcdetails.html
- * http://www.sciencedirect.com/science/article/pii/S0038092X12000400?via%3Dihub
- * https://github.com/KlausBrunner/solarpositioning
- * https://github.com/mikereedell/sunrisesunsetlib-java/issues/33
- */
 public final class SolarTime
     implements Serializable {
 
