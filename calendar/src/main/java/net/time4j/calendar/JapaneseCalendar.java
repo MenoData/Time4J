@@ -661,11 +661,11 @@ public final class JapaneseCalendar
     /**
      * <p>Creates a modern Japanese calendar for all dates since Meiji 6 (gregorian calendar rules). </p>
      *
-     * <p>Equivalent to
+     * <p>Leaving the gregorian condition aside, equivalent to
      * {@code JapaneseCalendar.of(nengo, yearOfNengo, EastAsianMonth.valueOf(month), dayOfMonth, Leniency.SMART)}. </p>
      *
-     * @param   nengo           Japanese era
-     * @param   yearOfNengo     year of nengo starting with number 1
+     * @param   nengo           Japanese era (Meiji or later)
+     * @param   yearOfNengo     year of nengo starting with number 1 (if Meiji then starting with 6)
      * @param   month           gregorian month (1-12)
      * @param   dayOfMonth      day of month {@code >= 1}
      * @return  new instance of {@code JapaneseCalendar}
@@ -676,11 +676,11 @@ public final class JapaneseCalendar
      * <p>Erzeugt einen modernen japanischen Kalender f&uuml;r jedes Datum seit Meiji 6
      * (gregorianische Kalenderregeln). </p>
      *
-     * <p>&Auml;quivalent zu
+     * <p>Die gregorianische Bedingung au&szlig;er Acht lassend, &auml;quivalent zu
      * {@code JapaneseCalendar.of(nengo, yearOfNengo, EastAsianMonth.valueOf(month), dayOfMonth, Leniency.SMART)}. </p>
      *
-     * @param   nengo           Japanese era
-     * @param   yearOfNengo     year of nengo starting with number 1
+     * @param   nengo           Japanese era (Meiji or later)
+     * @param   yearOfNengo     year of nengo starting with number 1 (if Meiji then starting with 6)
      * @param   month           gregorian month (1-12)
      * @param   dayOfMonth      day of month {@code >= 1}
      * @return  new instance of {@code JapaneseCalendar}
