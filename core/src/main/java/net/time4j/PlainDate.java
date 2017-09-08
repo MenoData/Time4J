@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainDate.java) is part of project Time4J.
  *
@@ -1328,6 +1328,40 @@ public final class PlainDate
     }
 
     /**
+     * <p>Queries if given parameter values form a well defined calendar date. </p>
+     *
+     * <p>This method only checks the range limits, not if the date is historically correct. </p>
+     *
+     * @param   year        the proleptic year to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(int, int, int)
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
+     *
+     * <p>Hier werden nur die Bereichsgrenzen &uuml;berpr&uuml;ft, nicht die historische Sinnhaftigkeit. </p>
+     *
+     * @param   year        the proleptic year to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(int, int, int)
+     * @since   3.34/4.29
+     */
+    public static boolean isValid(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+
+        return GregorianMath.isValid(year, month, dayOfMonth);
+
+    }
+
+    /**
      * <p>Adds given amount in units to this date and yields the result of addition. </p>
      *
      * <p>Covers the most important units and is overloaded for performance reasons. </p>
@@ -2423,6 +2457,7 @@ public final class PlainDate
         }
 
         @Override
+        @Deprecated
         public PlainDate createFrom(
             TemporalAccessor threeten,
             AttributeQuery attributes
