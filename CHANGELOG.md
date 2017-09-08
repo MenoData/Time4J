@@ -1,6 +1,7 @@
 ## [v4.29] not yet released
 ### Added
 - Support for sunrise / sunset - calculations [#663]
+- Static validation methods for calendars [#666]
 - Twilight definition [#667]
 - Sunset as start-of-day (for islamic calendar etc) [#668]
 
