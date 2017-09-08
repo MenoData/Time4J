@@ -730,6 +730,39 @@ public final class EthiopianCalendar
     }
 
     /**
+     * <p>Queries if given parameter values form a well defined calendar date. </p>
+     *
+     * @param   era         the era to be checked
+     * @param   yearOfEra   the year of era to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(EthiopianEra, int, int, int)
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
+     *
+     * @param   era         the era to be checked
+     * @param   yearOfEra   the year of era to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(EthiopianEra, int, int, int)
+     * @since   3.34/4.29
+     */
+    public static boolean isValid(
+        EthiopianEra era,
+        int yearOfEra,
+        int month,
+        int dayOfMonth
+    ) {
+
+        return CALSYS.isValid(era, yearOfEra, month, dayOfMonth);
+
+    }
+
+    /**
      * <p>Creates a new local timestamp with this date and given Ethiopian time. </p>
      *
      * <p>Note: The Ethiopian time will be automatically converted to ISO. </p>

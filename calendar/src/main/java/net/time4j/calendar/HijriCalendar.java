@@ -935,6 +935,40 @@ public final class HijriCalendar
     }
 
     /**
+     * <p>Queries if given parameter values form a well defined calendar date. </p>
+     *
+     * @param   variant     the variant of the underlying calendar system
+     * @param   yearOfEra   the year of era to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(String, int, int, int)
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
+     *
+     * @param   variant     the variant of the underlying calendar system
+     * @param   yearOfEra   the year of era to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(String, int, int, int)
+     * @since   3.34/4.29
+     */
+    public static boolean isValid(
+        String variant,
+        int yearOfEra,
+        int month,
+        int dayOfMonth
+    ) {
+
+        EraYearMonthDaySystem<HijriCalendar> calsys = CALSYS.get(variant);
+        return ((calsys != null) && calsys.isValid(HijriEra.ANNO_HEGIRAE, yearOfEra, month, dayOfMonth));
+
+    }
+
+    /**
      * <p>Convenient short form for {@code with(YEAR_OF_ERA.incremented())}. </p>
      *
      * @return  copy of this instance at next year

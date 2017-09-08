@@ -1028,6 +1028,39 @@ public final class FrenchRepublicanCalendar
     }
 
     /**
+     * <p>Queries if given parameter values form a well defined calendar date. </p>
+     *
+     * @param   year        the year of era to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(int, int, int)
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
+     *
+     * @param   year        the year of era to be checked
+     * @param   month       the month to be checked
+     * @param   dayOfMonth  the day of month to be checked
+     * @return  {@code true} if valid else  {@code false}
+     * @see     #of(int, int, int)
+     * @since   3.34/4.29
+     */
+    public static boolean isValid(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+
+        return (
+            (year >= 1) && (year <= MAX_YEAR)
+            && (month >= 1) && (month <= 12)
+            && (dayOfMonth >= 1) && (dayOfMonth <= 30));
+
+    }
+
+    /**
      * <p>Obtains an alternative date view specific for given algorithm. </p>
      *
      * @param   algorithm   calendar computation
