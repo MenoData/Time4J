@@ -4,6 +4,7 @@
 - Static validation methods for calendars [#666]
 - Twilight definition [#667]
 - Sunset as start-of-day (for islamic calendar etc) [#668]
+- Simplified version of JulianDay [#670]
 
 ### Changed
 - Improve calculation of equation of time [#665]
