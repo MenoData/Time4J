@@ -42,6 +42,20 @@ public class JulianDayTest {
         assertThat(expected.toMoment(), is(j1970));
     }
 
+    @Test
+    public void simplifiedTime() {
+        Moment j2000 = PlainTimestamp.of(2000, 1, 1, 12, 0).atUTC();
+        Moment j1969 = PlainTimestamp.of(1969, 1, 1, 12, 0).atUTC();
+        long delta = j1969.until(j2000, TimeUnit.DAYS);
+        assertThat(j1969.toString(TimeScale.POSIX), is("POSIX-1969-01-01T12Z"));
+        JulianDay expected = JulianDay.ofSimplifiedTime(2451545.0 - delta);
+        assertThat(JulianDay.ofSimplifiedTime(j1969), is(expected));
+        assertThat(expected.getMJD(), is(40587.5 - 365));
+        assertThat(expected.getScale(), is(TimeScale.POSIX));
+        assertThat(expected.toMoment(), is(j1969));
+        assertThat(expected.plusDays(delta).toMoment(), is(j2000));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void ephemerisTimeBelowMin() {
         Moment min = Moment.axis().getMinimum();
@@ -80,6 +94,20 @@ public class JulianDayTest {
         assertThat(
             JulianDay.ofMeanSolarTime(JulianDay.MAX).toMoment().toString(TimeScale.UT),
             is("UT-3000-12-31T12Z"));
+    }
+
+    @Test
+    public void simplifiedTimeMin() {
+        assertThat(
+            JulianDay.ofSimplifiedTime(JulianDay.MIN).toMoment().toString(TimeScale.POSIX),
+            is("POSIX--2000-01-01T12Z"));
+    }
+
+    @Test
+    public void simplifiedTimeMax() {
+        assertThat(
+            JulianDay.ofSimplifiedTime(JulianDay.MAX).toMoment().toString(TimeScale.POSIX),
+            is("POSIX-3000-12-31T12Z"));
     }
 
     @Test

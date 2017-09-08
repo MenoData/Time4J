@@ -71,6 +71,7 @@ public final class JulianDay
 
     private static final int MRD = 1000000000;
     private static final int DAY_IN_SECONDS = 86400;
+    private static final long OFFSET_1970 = (2451545 - (2000 - 1970) * 365 - 8) * 86400L + 43200;
     private static final long OFFSET_1972 = (2451545 - (2000 - 1972) * 365 - 8) * 86400L + 43200;
 
     /**
@@ -229,6 +230,58 @@ public final class JulianDay
     public static JulianDay ofMeanSolarTime(Moment moment) {
 
         return new JulianDay(getValue(moment, TimeScale.UT), TimeScale.UT);
+
+    }
+
+    /**
+     * <p>Creates a Julian day on the time scale {@link TimeScale#POSIX}. </p>
+     *
+     * <p>This conversion does not involve a delta-T-correction. </p>
+     *
+     * @param   value   floating decimal value in range {@code 990575.0 - 2817152.0}
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if given value is not a finite number or out of range
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen julianischen Tag auf der Zeitskala {@link TimeScale#POSIX}. </p>
+     *
+     * <p>Die Umrechnung erfordert keine delta-T-Korrektur. </p>
+     *
+     * @param   value   floating decimal value in range {@code 990575.0 - 2817152.0}
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if given value is not a finite number or out of range
+     * @since   3.34/4.29
+     */
+    public static JulianDay ofSimplifiedTime(double value) {
+
+        return new JulianDay(value, TimeScale.POSIX);
+
+    }
+
+    /**
+     * <p>Creates a Julian day on the time scale {@link TimeScale#POSIX}. </p>
+     *
+     * <p>This conversion does not involve a delta-T-correction. </p>
+     *
+     * @param   moment      corresponding moment
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen julianischen Tag auf der Zeitskala {@link TimeScale#POSIX}. </p>
+     *
+     * <p>Die Umrechnung erfordert keine delta-T-Korrektur. </p>
+     *
+     * @param   moment      corresponding moment
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+     * @since   3.34/4.29
+     */
+    public static JulianDay ofSimplifiedTime(Moment moment) {
+
+        return new JulianDay(getValue(moment, TimeScale.POSIX), TimeScale.POSIX);
 
     }
 
@@ -406,7 +459,7 @@ public final class JulianDay
         double secs = this.value * DAY_IN_SECONDS;
         long elapsed = (long) secs;
         int nano = (int) ((secs - Math.floor(secs)) * MRD);
-        return Moment.of(MathUtils.safeSubtract(elapsed, OFFSET_1972), nano, this.scale);
+        return Moment.of(MathUtils.safeSubtract(elapsed, jdOffset(this.scale)), nano, this.scale);
 
     }
 
@@ -416,21 +469,24 @@ public final class JulianDay
         TimeScale scale
     ) {
 
-        long jdOffset;
+        long elapsedTime = moment.getElapsedTime(scale) + jdOffset(scale);
+        int nano = moment.getNanosecond(scale);
+        double secs = elapsedTime + nano / (MRD * 1.0);
+        return secs / DAY_IN_SECONDS;
+
+    }
+
+    private static long jdOffset(TimeScale scale) {
 
         switch (scale) {
             case UT:
             case TT:
-                jdOffset = OFFSET_1972;
-                break;
+                return OFFSET_1972;
+            case POSIX:
+                return OFFSET_1970;
             default:
                 throw new UnsupportedOperationException(scale.name());
         }
-
-        long elapsedTime = moment.getElapsedTime(scale) + jdOffset;
-        int nano = moment.getNanosecond(scale);
-        double secs = elapsedTime + nano / (MRD * 1.0);
-        return secs / DAY_IN_SECONDS;
 
     }
 
@@ -446,6 +502,7 @@ public final class JulianDay
         switch (scale) {
             case UT:
             case TT:
+            case POSIX:
                 if (Double.compare(MIN, value) > 0 || Double.compare(value, MAX) > 0) {
                     throw new IllegalArgumentException("Out of range: " + value);
                 }
