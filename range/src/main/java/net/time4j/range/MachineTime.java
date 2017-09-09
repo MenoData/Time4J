@@ -773,6 +773,12 @@ public final class MachineTime<U>
 
         if (factor == 1) {
             return this;
+        } else if (factor == 0) {
+            if (this.scale == POSIX) {
+                return cast(POSIX_ZERO);
+            } else {
+                return cast(UTC_ZERO);
+            }
         }
 
         BigDecimal value =
@@ -786,6 +792,51 @@ public final class MachineTime<U>
         }
 
         return cast(mt);
+
+    }
+
+    /**
+     * <p>Multiplies this duration with given decimal factor. </p>
+     *
+     * <p>If more rounding control is needed then users might consider the alternatives
+     * {@link #multipliedBy(long)} and {@link #dividedBy(long, RoundingMode)}. </p>
+     *
+     * @param   factor  multiplicand
+     * @return  changed copy of this duration
+     * @throws  IllegalArgumentException if given factor is not a finite number
+     */
+    /*[deutsch]
+     * <p>Multipliziert diese Dauer mit dem angegebenen Dezimalfaktor. </p>
+     *
+     * <p>Wenn mehr Kontrolle &uuml;ber das Rundungsverfahren gebraucht wird, gibt es die
+     * Alternativen {@link #multipliedBy(long)} und {@link #dividedBy(long, RoundingMode)}. </p>
+     *
+     * @param   factor  multiplicand
+     * @return  changed copy of this duration
+     * @throws  IllegalArgumentException if given factor is not a finite number
+     */
+    public MachineTime<U> multipliedBy(double factor) {
+
+        if (factor == 1.0) {
+            return this;
+        } else if (factor == 0.0) {
+            if (this.scale == POSIX) {
+                return cast(POSIX_ZERO);
+            } else {
+                return cast(UTC_ZERO);
+            }
+        } else if (Double.isInfinite(factor) || Double.isNaN(factor)) {
+            throw new IllegalArgumentException("Not finite: " + factor);
+        } else {
+            double len = this.toBigDecimal().doubleValue() * factor;
+            MachineTime<?> mt;
+            if (this.scale == POSIX) {
+                mt = MachineTime.ofPosixSeconds(len);
+            } else {
+                mt = MachineTime.ofSISeconds(len);
+            }
+            return cast(mt);
+        }
 
     }
 
