@@ -288,9 +288,30 @@ public class BasicMomentRangeTest {
     }
 
     @Test
-    public void surroundingInterval() {
+    public void surroundingIntervalSI() {
         Moment moment = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
-        MachineTime<SI> duration = MachineTime.ofSIUnits(3600, 0);
+        MachineTime<SI> duration = MachineTime.ofSIUnits(5400, 0);
+
+        MomentInterval centered = MomentInterval.surrounding(moment, duration, MomentInterval.CENTERED);
+        Moment startCentered = PlainTimestamp.of(2017, 9, 9, 9, 15).atUTC();
+        Moment endCentered = PlainTimestamp.of(2017, 9, 9, 10, 45).atUTC();
+        assertThat(centered, is(MomentInterval.between(startCentered, endCentered)));
+
+        MomentInterval left = MomentInterval.surrounding(moment, duration, MomentInterval.LEFT_ALIGNED);
+        Moment startLeft = PlainTimestamp.of(2017, 9, 9, 8, 30).atUTC();
+        Moment endLeft = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
+        assertThat(left, is(MomentInterval.between(startLeft, endLeft)));
+
+        MomentInterval right = MomentInterval.surrounding(moment, duration, MomentInterval.RIGHT_ALIGNED);
+        Moment startRight = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
+        Moment endRight = PlainTimestamp.of(2017, 9, 9, 11, 30).atUTC();
+        assertThat(right, is(MomentInterval.between(startRight, endRight)));
+    }
+
+    @Test
+    public void surroundingIntervalPOSIX() {
+        Moment moment = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
+        MachineTime<TimeUnit> duration = MachineTime.ofPosixUnits(3600, 0);
 
         MomentInterval centered = MomentInterval.surrounding(moment, duration, MomentInterval.CENTERED);
         Moment startCentered = PlainTimestamp.of(2017, 9, 9, 9, 30).atUTC();

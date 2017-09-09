@@ -39,6 +39,7 @@ import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.Iso8601Format;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.SignPolicy;
+import net.time4j.scale.TimeScale;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
@@ -274,18 +275,16 @@ public final class MomentInterval
      */
     public static MomentInterval surrounding(
         Moment moment,
-        MachineTime<SI> duration,
+        MachineTime<?> duration,
         double alignment
     ) {
 
-        if (alignment == 1.0) { // avoid possible rounding errors
-            return MomentInterval.between(moment.minus(duration), moment);
-        } else if ((Double.compare(alignment, 0.0) < 0) || (Double.compare(alignment, 1.0) > 0)) {
+        if ((Double.compare(alignment, 0.0) < 0) || (Double.compare(alignment, 1.0) > 0)) {
             throw new IllegalArgumentException("Out of range: " + alignment);
         }
 
-        Moment start = moment.minus(duration.multipliedBy(alignment));
-        return MomentInterval.between(start, start.plus(duration));
+        Moment start = subtract(moment, duration.multipliedBy(alignment));
+        return MomentInterval.between(start, (alignment == 1.0) ? moment : add(start, duration));
 
     }
 
@@ -1064,6 +1063,38 @@ public final class MomentInterval
         }
 
         return false;
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Moment add(
+        Moment moment,
+        MachineTime<?> duration
+    ) {
+
+        if (duration.getScale() == TimeScale.UTC) {
+            MachineTime<SI> mt = (MachineTime<SI>) duration;
+            return moment.plus(mt);
+        } else {
+            MachineTime<TimeUnit> mt = (MachineTime<TimeUnit>) duration;
+            return moment.plus(mt);
+        }
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static Moment subtract(
+        Moment moment,
+        MachineTime<?> duration
+    ) {
+
+        if (duration.getScale() == TimeScale.UTC) {
+            MachineTime<SI> mt = (MachineTime<SI>) duration;
+            return moment.minus(mt);
+        } else {
+            MachineTime<TimeUnit> mt = (MachineTime<TimeUnit>) duration;
+            return moment.minus(mt);
+        }
 
     }
 
