@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockInterval.java) is part of project Time4J.
  *
@@ -273,6 +273,30 @@ public final class ClockInterval
     public static ClockInterval until(LocalTime end) {
 
         return ClockInterval.until(PlainTime.from(end));
+
+    }
+
+    /**
+     * <p>Converts an arbitrary clock interval to an interval of this type. </p>
+     *
+     * @param   interval    any kind of clock interval
+     * @return  ClockInterval
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Konvertiert ein beliebiges Intervall zu einem Intervall dieses Typs. </p>
+     *
+     * @param   interval    any kind of clock interval
+     * @return  ClockInterval
+     * @since   3.34/4.29
+     */
+    public static ClockInterval from(ChronoInterval<PlainTime> interval) {
+
+        if (interval instanceof ClockInterval) {
+            return ClockInterval.class.cast(interval);
+        } else {
+            return new ClockInterval(interval.getStart(), interval.getEnd());
+        }
 
     }
 
