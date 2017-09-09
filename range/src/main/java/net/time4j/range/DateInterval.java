@@ -225,7 +225,7 @@ public final class DateInterval
      * @since   3.28/4.24
      */
     /*[deutsch]
-     * <p>Konvertiet ein beliebiges Datumsintervall zu einem Intervall dieses Typs. </p>
+     * <p>Konvertiert ein beliebiges Datumsintervall zu einem Intervall dieses Typs. </p>
      *
      * @param   interval    any kind of date interval
      * @return  DateInterval
@@ -238,6 +238,7 @@ public final class DateInterval
         } else {
             return new DateInterval(interval.getStart(), interval.getEnd());
         }
+
     }
 
     /**

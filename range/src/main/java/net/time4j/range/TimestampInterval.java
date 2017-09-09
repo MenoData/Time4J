@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimestampInterval.java) is part of project Time4J.
  *
@@ -190,6 +190,30 @@ public final class TimestampInterval
 
         Boundary<PlainTimestamp> past = Boundary.infinitePast();
         return new TimestampInterval(past, Boundary.of(OPEN, end));
+
+    }
+
+    /**
+     * <p>Converts an arbitrary timestamp interval to an interval of this type. </p>
+     *
+     * @param   interval    any kind of timestamp interval
+     * @return  TimestampInterval
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Konvertiert ein beliebiges Intervall zu einem Intervall dieses Typs. </p>
+     *
+     * @param   interval    any kind of timestamp interval
+     * @return  TimestampInterval
+     * @since   3.34/4.29
+     */
+    public static TimestampInterval from(ChronoInterval<PlainTimestamp> interval) {
+
+        if (interval instanceof TimestampInterval) {
+            return TimestampInterval.class.cast(interval);
+        } else {
+            return new TimestampInterval(interval.getStart(), interval.getEnd());
+        }
 
     }
 

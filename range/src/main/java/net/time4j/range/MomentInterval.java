@@ -195,6 +195,30 @@ public final class MomentInterval
     }
 
     /**
+     * <p>Converts an arbitrary moment interval to an interval of this type. </p>
+     *
+     * @param   interval    any kind of moment interval
+     * @return  MomentInterval
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Konvertiert ein beliebiges Intervall zu einem Intervall dieses Typs. </p>
+     *
+     * @param   interval    any kind of moment interval
+     * @return  MomentInterval
+     * @since   3.34/4.29
+     */
+    public static MomentInterval from(ChronoInterval<Moment> interval) {
+
+        if (interval instanceof MomentInterval) {
+            return MomentInterval.class.cast(interval);
+        } else {
+            return new MomentInterval(interval.getStart(), interval.getEnd());
+        }
+
+    }
+
+    /**
      * <p>Converts this instance to a local timestamp interval in the system
      * timezone. </p>
      *
