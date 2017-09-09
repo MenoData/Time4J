@@ -302,7 +302,7 @@ public final class JulianDay
     }
 
     /**
-     * <p>Obtains the value of this Julian day as <em>odified Julian Date</em>
+     * <p>Obtains the value of this Julian day as <em>Modified Julian Date</em>
      * starting at midnight. </p>
      *
      * @return  double
