@@ -6,6 +6,7 @@
 - Sunset as start-of-day (for islamic calendar etc) [#668]
 - Simplified version of JulianDay [#670]
 - Easy conversions from general intervals to ISO-intervals [#671]
+- Intervals surrounding any moment [#672]
 
 ### Changed
 - Improve calculation of equation of time [#665]
