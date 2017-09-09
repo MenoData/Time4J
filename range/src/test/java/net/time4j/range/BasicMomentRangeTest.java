@@ -308,4 +308,25 @@ public class BasicMomentRangeTest {
             is(expected));
     }
 
+    @Test
+    public void surroundingInterval() {
+        Moment moment = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
+        MachineTime<SI> duration = MachineTime.ofSIUnits(3600, 0);
+
+        MomentInterval centered = MomentInterval.surrounding(moment, duration, MomentInterval.CENTERED);
+        Moment startCentered = PlainTimestamp.of(2017, 9, 9, 9, 30).atUTC();
+        Moment endCentered = PlainTimestamp.of(2017, 9, 9, 10, 30).atUTC();
+        assertThat(centered, is(MomentInterval.between(startCentered, endCentered)));
+
+        MomentInterval left = MomentInterval.surrounding(moment, duration, MomentInterval.LEFT_ALIGNED);
+        Moment startLeft = PlainTimestamp.of(2017, 9, 9, 9, 0).atUTC();
+        Moment endLeft = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
+        assertThat(left, is(MomentInterval.between(startLeft, endLeft)));
+
+        MomentInterval right = MomentInterval.surrounding(moment, duration, MomentInterval.RIGHT_ALIGNED);
+        Moment startRight = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC();
+        Moment endRight = PlainTimestamp.of(2017, 9, 9, 11, 0).atUTC();
+        assertThat(right, is(MomentInterval.between(startRight, endRight)));
+    }
+
 }

@@ -3,15 +3,15 @@ package net.time4j.range;
 import net.time4j.Moment;
 import net.time4j.SI;
 import net.time4j.scale.TimeScale;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.Duration;
 import java.util.concurrent.TimeUnit;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -385,10 +385,27 @@ public class MachineTimeTest {
     }
 
     @Test
-    public void multipliedBy() {
+    public void multipliedByLong() {
         assertThat(
             MachineTime.ofSIUnits(2, 500000000).multipliedBy(3),
             is(MachineTime.ofSIUnits(7, 500000000)));
+    }
+
+    @Test
+    public void multipliedByDouble() {
+        assertThat(
+            MachineTime.ofSIUnits(2, 500000000).multipliedBy(0.5),
+            is(MachineTime.ofSIUnits(1, 250000000)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void multipliedByInfinite() {
+        MachineTime.ofSIUnits(2, 500000000).multipliedBy(Double.POSITIVE_INFINITY);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void multipliedByNaN() {
+        MachineTime.ofSIUnits(2, 500000000).multipliedBy(Double.NaN);
     }
 
     @Test

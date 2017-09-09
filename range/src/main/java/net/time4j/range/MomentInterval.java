@@ -87,6 +87,42 @@ public final class MomentInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /**
+     * Determines the alignment of surrounding intervals.
+     *
+     * @see     #surrounding(Moment, MachineTime, double)
+     */
+    /*[deutsch]
+     * Legt die Ausrichtung von Umgebungsintervallen fest.
+     *
+     * @see     #surrounding(Moment, MachineTime, double)
+     */
+    public static double LEFT_ALIGNED = 1.0;
+
+    /**
+     * Determines the alignment of surrounding intervals.
+     *
+     * @see     #surrounding(Moment, MachineTime, double)
+     */
+    /*[deutsch]
+     * Legt die Ausrichtung von Umgebungsintervallen fest.
+     *
+     * @see     #surrounding(Moment, MachineTime, double)
+     */
+    public static double CENTERED = 0.5;
+
+    /**
+     * Determines the alignment of surrounding intervals.
+     *
+     * @see     #surrounding(Moment, MachineTime, double)
+     */
+    /*[deutsch]
+     * Legt die Ausrichtung von Umgebungsintervallen fest.
+     *
+     * @see     #surrounding(Moment, MachineTime, double)
+     */
+    public static double RIGHT_ALIGNED = 0.0;
+
     private static final long serialVersionUID = -5403584519478162113L;
 
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
@@ -273,6 +309,65 @@ public final class MomentInterval
     public static MomentInterval until(Instant end) {
 
         return MomentInterval.until(Moment.from(end));
+
+    }
+
+    /**
+     * <p>Creates an interval surrounding given moment. </p>
+     *
+     * <p><strong>Alignment: </strong></p>
+     * <ul>
+     *     <li>If the alignment is {@code 0.0} then the new interval will start at given moment.</li>
+     *     <li>If the alignment is {@code 0.5} then the new interval will be centered around given moment.</li>
+     *     <li>If the alignment is {@code 1.0} then the new interval will end at given moment.</li>
+     * </ul>
+     *
+     * @param   moment      embedded moment at focus of alignment
+     * @param   duration    machine time duration
+     * @param   alignment   determines how to align the interval around moment (in range {@code 0.0 <= x <= 1.0})
+     * @return  new moment interval
+     * @throws  IllegalArgumentException if the duration is negative or the alignment is not finite or out of range
+     * @throws  UnsupportedOperationException if any given or calculated moment is before 1972
+     * @see     #LEFT_ALIGNED
+     * @see     #CENTERED
+     * @see     #RIGHT_ALIGNED
+     * @since   3.34/4.29
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Intervall, das den angegebenen Zeitpunkt umgibt. </p>
+     *
+     * <p><strong>Ausrichtung: </strong></p>
+     * <ul>
+     *     <li>Wenn die Ausrichtung {@code 0.0} ist, beginnt das neue Interval mit dem angegebenen Moment.</li>
+     *     <li>Wenn die Ausrichtung {@code 0.5} ist, ist das neue Interval um den angegebenen Moment zentriert.</li>
+     *     <li>Wenn die Ausrichtung {@code 1.0} ist, endet das neue Interval mit dem angegebenen Moment.</li>
+     * </ul>
+     *
+     * @param   moment      embedded moment at focus of alignment
+     * @param   duration    machine time duration
+     * @param   alignment   determines how to align the interval around moment (in range {@code 0.0 <= x <= 1.0})
+     * @return  new moment interval
+     * @throws  IllegalArgumentException if the duration is negative or the alignment is not finite or out of range
+     * @throws  UnsupportedOperationException if any given or calculated moment is before 1972
+     * @see     #LEFT_ALIGNED
+     * @see     #CENTERED
+     * @see     #RIGHT_ALIGNED
+     * @since   3.34/4.29
+     */
+    public static MomentInterval surrounding(
+        Moment moment,
+        MachineTime<SI> duration,
+        double alignment
+    ) {
+
+        if (alignment == 1.0) { // avoid possible rounding errors
+            return MomentInterval.between(moment.minus(duration), moment);
+        } else if ((Double.compare(alignment, 0.0) < 0) || (Double.compare(alignment, 1.0) > 0)) {
+            throw new IllegalArgumentException("Out of range: " + alignment);
+        }
+
+        Moment start = moment.minus(duration.multipliedBy(alignment));
+        return MomentInterval.between(start, start.plus(duration));
 
     }
 
