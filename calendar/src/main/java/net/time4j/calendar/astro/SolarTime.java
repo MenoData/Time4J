@@ -1128,17 +1128,20 @@ public final class SolarTime
     /**
      * <p>An SPI-interface representing a facade for the calculation engine regarding sunrise or sunset. </p>
      *
+     * <p><strong>Implementation note: </strong> All implementations must have a public no-arg constructor. </p>
+     *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     /*[deutsch]
      * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
      * darstellt. </p>
      *
+     * <p><strong>Implementierungshinweis: </strong> Alle Implementierungen m&uuml;ssen einen
+     * &ouml;ffentlichen Konstruktor ohne Argumente haben. </p>
+     *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     public interface Calculator {
 
