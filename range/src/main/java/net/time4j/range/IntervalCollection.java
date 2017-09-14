@@ -46,7 +46,8 @@ import java.util.NoSuchElementException;
  * <p>Any instance can first be achieved by calling one of the static
  * {@code onXYZAxis()}-methods and then be filled with any count of
  * typed intervals via {@code plus(...)}-methods. All intervals are
- * stored with closed start if they have finite start. </p>
+ * stored with closed start if they have finite start. Empty intervals
+ * are never stored. </p>
  *
  * @param   <T> generic type characterizing the associated time axis
  * @author  Meno Hochschild
@@ -67,7 +68,8 @@ import java.util.NoSuchElementException;
  * wie {@code onXYZAxis()} erhalten und dann mit einer beliebigen Zahl
  * von typisierten Intervallen gef&uuml;llt werden - via {@code plus(...)}
  * -Methoden. Alle Intervalle werden so gespeichert, da&szlig; sie den
- * Start inklusive haben, wenn dieser endlich ist. </p>
+ * Start inklusive haben, wenn dieser endlich ist. Leere Intervalle werden
+ * nie gespeichert. </p>
  *
  * @param   <T> generic type characterizing the associated time axis
  * @author  Meno Hochschild
@@ -635,6 +637,10 @@ public abstract class IntervalCollection<T>
      */
     public IntervalCollection<T> plus(ChronoInterval<T> interval) {
 
+        if (interval.isEmpty()) {
+            return this;
+        }
+
         List<ChronoInterval<T>> windows = new ArrayList<>(this.intervals);
         windows.add(this.adjust(interval));
         Collections.sort(windows, this.getComparator());
@@ -707,7 +713,9 @@ public abstract class IntervalCollection<T>
         List<ChronoInterval<T>> windows = new ArrayList<>(this.intervals);
 
         for (ChronoInterval<T> i : intervals) {
-            windows.add(this.adjust(i));
+            if (!i.isEmpty()) {
+                windows.add(this.adjust(i));
+            }
         }
 
         Collections.sort(windows, this.getComparator());
@@ -767,10 +775,7 @@ public abstract class IntervalCollection<T>
      */
     public IntervalCollection<T> minus(ChronoInterval<T> interval) {
 
-        if (
-            this.isEmpty()
-            || interval.isEmpty()
-        ) {
+        if (this.isEmpty() || interval.isEmpty()) {
             return this;
         }
 
@@ -885,7 +890,9 @@ public abstract class IntervalCollection<T>
         List<ChronoInterval<T>> list = new ArrayList<>();
 
         for (ChronoInterval<T> i : intervals) {
-            list.add(this.adjust(i));
+            if (!i.isEmpty()) {
+                list.add(this.adjust(i));
+            }
         }
 
         Collections.sort(list, this.getComparator());
@@ -985,6 +992,11 @@ public abstract class IntervalCollection<T>
      * @since   2.1
      */
     public IntervalCollection<T> withComplement(ChronoInterval<T> timeWindow) {
+
+        if (timeWindow.isEmpty()) {
+            List<ChronoInterval<T>> zero = Collections.emptyList();
+            return this.create(zero);
+        }
 
         ChronoInterval<T> window = this.adjust(timeWindow);
         IntervalCollection<T> coll = this.withFilter(window);
@@ -1639,6 +1651,11 @@ public abstract class IntervalCollection<T>
     }
 
     private IntervalCollection<T> withFilter(ChronoInterval<T> window) {
+
+        if (window.isEmpty()) {
+            List<ChronoInterval<T>> zero = Collections.emptyList();
+            return this.create(zero);
+        }
 
         Boundary<T> lower = window.getStart();
         Boundary<T> upper = window.getEnd();
