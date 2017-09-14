@@ -414,6 +414,32 @@ public abstract class IntervalCollection<T>
     }
 
     /**
+     * <p>Queries if given interval is stored in this collection. </p>
+     *
+     * @param   interval    the interval to be checked
+     * @return  boolean
+     * @since   4.30
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob das angegebene Intervall in dieser Menge gespeichert ist. </p>
+     *
+     * @param   interval    the interval to be checked
+     * @return  boolean
+     * @since   4.30
+     */
+    public boolean contains(ChronoInterval<T> interval) {
+
+        for (ChronoInterval<T> i : this.intervals) {
+            if (i.equals(interval)) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    /**
      * <p>Returns the overall minimum of this interval collection. </p>
      *
      * <p>The minimum is always inclusive, if finite. </p>
