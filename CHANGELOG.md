@@ -1,4 +1,6 @@
 ## [v4.30] not yet released
+### Fixed
+- Conversion of Time4J-Duration to temporal amount sometimes broken [#680]
 
 ## [v4.29] published on 2017-09-10
 ### Added
