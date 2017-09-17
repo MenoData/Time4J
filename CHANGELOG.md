@@ -1,4 +1,7 @@
 ## [v3.35] not yet released
+### Changed
+- Clarify meaning of IntervalCollection [#677]
+- Empty intervals should not be added to interval collection [#678]
 
 ## [v3.34] published on 2017-09-10
 ### Added
