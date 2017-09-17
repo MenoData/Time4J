@@ -1,4 +1,8 @@
 ## [v4.30] not yet released
+### Changed
+- Clarify meaning of IntervalCollection [#677]
+- Empty intervals should not be added to interval collection [#678]
+
 ### Fixed
 - Conversion of Time4J-Duration to temporal amount sometimes broken [#680]
 
