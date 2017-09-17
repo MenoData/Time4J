@@ -176,9 +176,10 @@ final class JSR310DurationAdapter
         m = Math.addExact(m, Math.multiplyExact(duration.getPartialAmount(CalendarUnit.QUARTERS), 3L));
         m = Math.addExact(m, duration.getPartialAmount(CalendarUnit.MONTHS));
 
-        long s = Math.multiplyExact(duration.getPartialAmount(CalendarUnit.WEEKS), 7 * 86400L);
-        s = Math.addExact(s, Math.multiplyExact(duration.getPartialAmount(CalendarUnit.DAYS), 86400L));
-        s = Math.addExact(s, Math.multiplyExact(duration.getPartialAmount(ClockUnit.HOURS), 3600L));
+        long d = Math.multiplyExact(duration.getPartialAmount(CalendarUnit.WEEKS), 7L);
+        d = Math.addExact(d, duration.getPartialAmount(CalendarUnit.DAYS));
+
+        long s = Math.multiplyExact(duration.getPartialAmount(ClockUnit.HOURS), 3600L);
         s = Math.addExact(s, Math.multiplyExact(duration.getPartialAmount(ClockUnit.MINUTES), 60L));
         s = Math.addExact(s, duration.getPartialAmount(ClockUnit.SECONDS));
 
@@ -190,6 +191,9 @@ final class JSR310DurationAdapter
             }
             if (s > 0) {
                 temporal = temporal.minus(s, ChronoUnit.SECONDS);
+            }
+            if (d > 0) {
+                temporal = temporal.minus(d, ChronoUnit.DAYS);
             }
             if (m > 0) {
                 temporal = temporal.minus(m, ChronoUnit.MONTHS);
@@ -203,6 +207,9 @@ final class JSR310DurationAdapter
             }
             if (m > 0) {
                 temporal = temporal.plus(m, ChronoUnit.MONTHS);
+            }
+            if (d > 0) {
+                temporal = temporal.plus(d, ChronoUnit.DAYS);
             }
             if (s > 0) {
                 temporal = temporal.plus(s, ChronoUnit.SECONDS);

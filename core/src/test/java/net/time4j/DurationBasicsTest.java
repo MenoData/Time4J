@@ -4,8 +4,12 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
 import net.time4j.engine.TimeSpan.Item;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.LocalDate;
 import java.time.LocalDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
@@ -13,20 +17,9 @@ import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MICROS;
-import static net.time4j.ClockUnit.MILLIS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
-import static net.time4j.ClockUnit.SECONDS;
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
@@ -1452,7 +1445,7 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void toTemporalAmount() {
+    public void toTemporalAmountGeneral() {
         TemporalAmount ta1 =
             Duration.ofPositive().years(1).months(2).days(5).hours(10).millis(450).build().toTemporalAmount();
         assertThat(
@@ -1478,6 +1471,18 @@ public class DurationBasicsTest {
         expectedList.add(ChronoUnit.HOURS);
         expectedList.add(ChronoUnit.NANOS);
         assertThat(ta1.getUnits(), is(expectedList));
+    }
+
+    @Test
+    public void toTemporalAmountCalendrical() throws ParseException {
+        Duration<CalendarUnit> d = Duration.parseCalendarPeriod("P8W");
+        LocalDate ld = LocalDate.of(2017, 9, 17);
+        assertThat(
+            PlainDate.from(ld).plus(d),
+            is(PlainDate.of(2017, 11, 12)));
+        assertThat(
+            ld.plus(d.toTemporalAmount()),
+            is(PlainDate.of(2017, 11, 12).toTemporalAccessor()));
     }
 
 }
