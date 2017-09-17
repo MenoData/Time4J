@@ -5,6 +5,10 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.scale.TimeScale;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
 import java.util.ArrayList;
@@ -12,11 +16,6 @@ import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-
-import net.time4j.scale.TimeScale;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static net.time4j.ClockUnit.NANOS;
 import static org.hamcrest.CoreMatchers.is;
@@ -480,9 +479,9 @@ public class IntervalCollectionTest {
     public void timeWindowIfEnclosing() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2013-06-30/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
-            .plus(DateInterval.parseISO("2012-09-01/2014-09-30"));
+                .plus(DateInterval.parseISO("2013-06-30/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
+                .plus(DateInterval.parseISO("2012-09-01/2014-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2012-06-30/2014-12-31");
         assertThat(coll.withTimeWindow(window), is(coll));
@@ -492,16 +491,16 @@ public class IntervalCollectionTest {
     public void timeWindowIfOverlap1() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
-            .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
+                .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2012-06-30/2014-12-31");
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2012-06-30/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
-            .plus(DateInterval.parseISO("2012-09-01/2014-12-31"));
+                .plus(DateInterval.parseISO("2012-06-30/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-07-31"))
+                .plus(DateInterval.parseISO("2012-09-01/2014-12-31"));
         assertThat(coll.withTimeWindow(window), is(expected));
     }
 
@@ -509,16 +508,16 @@ public class IntervalCollectionTest {
     public void timeWindowIfOverlap2() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2015-01-01"))
-            .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2015-01-01"))
+                .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2012-06-30/2014-12-31");
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2012-06-30/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-12-31"))
-            .plus(DateInterval.parseISO("2012-09-01/2014-12-31"));
+                .plus(DateInterval.parseISO("2012-06-30/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-12-31"))
+                .plus(DateInterval.parseISO("2012-09-01/2014-12-31"));
         assertThat(coll.withTimeWindow(window), is(expected));
     }
 
@@ -526,14 +525,14 @@ public class IntervalCollectionTest {
     public void complementIfOverlap1() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2015-01-01"))
-            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2015-01-01"))
+                .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2012-06-30/2014-12-31");
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"));
+                .plus(DateInterval.parseISO("2014-01-01/2014-06-29"));
         assertThat(coll.withComplement(window), is(expected));
     }
 
@@ -541,15 +540,15 @@ public class IntervalCollectionTest {
     public void complementIfOverlap2() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
-            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+                .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2012-06-30/2014-12-31");
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
-            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"));
+                .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+                .plus(DateInterval.parseISO("2014-08-02/2014-08-31"));
         assertThat(coll.withComplement(window), is(expected));
     }
 
@@ -557,9 +556,9 @@ public class IntervalCollectionTest {
     public void complementIfOverlap3() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
-            .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+                .plus(DateInterval.parseISO("2012-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2012-06-30/2014-12-31");
         IntervalCollection<PlainDate> expected =
@@ -571,17 +570,17 @@ public class IntervalCollectionTest {
     public void complementIfBigWindow() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
-            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+                .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.parseISO("2010-06-30/2015-12-31");
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
-            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
-            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
-            .plus(DateInterval.parseISO("2015-10-01/2015-12-31"));
+                .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
+                .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+                .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
+                .plus(DateInterval.parseISO("2015-10-01/2015-12-31"));
         assertThat(coll.withComplement(window), is(expected));
     }
 
@@ -589,17 +588,17 @@ public class IntervalCollectionTest {
     public void complementIfPastWindow() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
-            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+                .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.until(PlainDate.of(2015, 12, 31));
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.until(PlainDate.of(2010, 12, 31)))
-            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
-            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
-            .plus(DateInterval.parseISO("2015-10-01/2015-12-31"));
+                .plus(DateInterval.until(PlainDate.of(2010, 12, 31)))
+                .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+                .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
+                .plus(DateInterval.parseISO("2015-10-01/2015-12-31"));
         assertThat(coll.withComplement(window), is(expected));
     }
 
@@ -607,17 +606,17 @@ public class IntervalCollectionTest {
     public void complementIfFutureWindow() throws ParseException {
         IntervalCollection<PlainDate> coll =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
-            .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
-            .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
+                .plus(DateInterval.parseISO("2011-01-01/2013-12-31"))
+                .plus(DateInterval.parseISO("2014-06-30/2014-08-01"))
+                .plus(DateInterval.parseISO("2014-09-01/2015-09-30"));
         ChronoInterval<PlainDate> window =
             DateInterval.since(PlainDate.of(2010, 6, 30));
         IntervalCollection<PlainDate> expected =
             IntervalCollection.onDateAxis()
-            .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
-            .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
-            .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
-            .plus(DateInterval.since(PlainDate.of(2015, 10, 1)));
+                .plus(DateInterval.parseISO("2010-06-30/2010-12-31"))
+                .plus(DateInterval.parseISO("2014-01-01/2014-06-29"))
+                .plus(DateInterval.parseISO("2014-08-02/2014-08-31"))
+                .plus(DateInterval.since(PlainDate.of(2015, 10, 1)));
         assertThat(coll.withComplement(window), is(expected));
     }
 
@@ -663,29 +662,29 @@ public class IntervalCollectionTest {
             windows.minus(i4),
             is(
                 IntervalCollection.onDateAxis()
-                .plus(
-                    DateInterval.between(
-                        PlainDate.of(2014, 2, 28),
-                        PlainDate.of(2014, 4, 8)))
-                .plus(i3)));
+                    .plus(
+                        DateInterval.between(
+                            PlainDate.of(2014, 2, 28),
+                            PlainDate.of(2014, 4, 8)))
+                    .plus(i3)));
         assertThat(
             windows.minus(i5),
             is(
                 IntervalCollection.onDateAxis()
-                .plus(
-                    DateInterval.between(
-                        PlainDate.of(2014, 2, 28),
-                        PlainDate.of(2014, 4, 20)))
-                .plus(
-                    DateInterval.between(
-                        PlainDate.of(2014, 4, 10),
-                        PlainDate.of(2014, 4, 20)))
-                .plus(DateInterval.atomic(PlainDate.of(2014, 5, 31)))
-                .plus(
-                    DateInterval.between(
-                        PlainDate.of(2014, 5, 31),
-                        PlainDate.of(2014, 6, 1)))
-                .plus(i3)));
+                    .plus(
+                        DateInterval.between(
+                            PlainDate.of(2014, 2, 28),
+                            PlainDate.of(2014, 4, 20)))
+                    .plus(
+                        DateInterval.between(
+                            PlainDate.of(2014, 4, 10),
+                            PlainDate.of(2014, 4, 20)))
+                    .plus(DateInterval.atomic(PlainDate.of(2014, 5, 31)))
+                    .plus(
+                        DateInterval.between(
+                            PlainDate.of(2014, 5, 31),
+                            PlainDate.of(2014, 6, 1)))
+                    .plus(i3)));
     }
 
     @Test
@@ -787,7 +786,7 @@ public class IntervalCollectionTest {
         windows = windows.plus(i1).plus(i2).plus(i3);
 
         DateInterval empty =
-            DateInterval.atomic(PlainDate.of(2012, 4, 9)).withOpenEnd();
+            DateInterval.atomic(PlainDate.of(2014, 5, 9)).withOpenEnd();
 
         assertThat(
             windows.minus(empty),
@@ -907,13 +906,14 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2014, 4, 30),
                 PlainDate.of(2014, 6, 1));
-        ChronoInterval<PlainDate> range =
+        DateInterval range =
             DateInterval.between(
                 PlainDate.of(2014, 2, 28),
                 PlainDate.of(2014, 6, 1));
         IntervalCollection<PlainDate> coll = IntervalCollection.onDateAxis().plus(i1).plus(i2);
+        ChronoInterval<PlainDate> expected = range;
 
-        assertThat(coll.getRange(), is(range));
+        assertThat(coll.getRange(), is(expected));
     }
 
     @Test
@@ -923,11 +923,12 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2014, 4, 30),
                 PlainDate.of(2014, 6, 1));
-        ChronoInterval<PlainDate> range =
+        DateInterval range =
             DateInterval.until(PlainDate.of(2014, 6, 1));
         IntervalCollection<PlainDate> coll = IntervalCollection.onDateAxis().plus(i1).plus(i2);
+        ChronoInterval<PlainDate> expected = range;
 
-        assertThat(coll.getRange(), is(range));
+        assertThat(coll.getRange(), is(expected));
     }
 
     @Test
@@ -949,11 +950,12 @@ public class IntervalCollectionTest {
             TimestampInterval.between(
                 PlainTimestamp.of(2014, 4, 30, 0, 0),
                 PlainTimestamp.of(2014, 6, 1, 2, 30));
-        ChronoInterval<PlainTimestamp> range =
+        TimestampInterval range =
             TimestampInterval.until(PlainTimestamp.of(2014, 6, 1, 2, 30));
         IntervalCollection<PlainTimestamp> coll = IntervalCollection.onTimestampAxis().plus(i1).plus(i2);
+        ChronoInterval<PlainTimestamp> expected = range;
 
-        assertThat(coll.getRange(), is(range));
+        assertThat(coll.getRange(), is(expected));
         assertThat(coll.getRange().getEnd().isOpen(), is(true));
     }
 
@@ -971,17 +973,15 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2014, 4, 15),
                 PlainDate.of(2014, 6, 1));
-        DateInterval intersection1 = i2;
         DateInterval intersection2 =
             DateInterval.between(
                 PlainDate.of(2014, 4, 15),
                 PlainDate.of(2014, 5, 31));
         IntervalCollection<PlainDate> a = IntervalCollection.onDateAxis().plus(i1);
         IntervalCollection<PlainDate> b = IntervalCollection.onDateAxis().plus(i2).plus(i3);
-        Object ic1 = a.intersect(b);
-        Object ic2 = IntervalCollection.onDateAxis().plus(intersection1).plus(intersection2);
+        IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(i2).plus(intersection2);
 
-        assertThat(ic1, is(ic2));
+        assertThat(a.intersect(b), is(c));
     }
 
     @Test
@@ -1039,7 +1039,8 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2014, 2, 28),
                 PlainDate.of(2014, 3, 31));
-        ChronoInterval<PlainDate> second = i2;
+        ChronoInterval<PlainDate> second =
+            i2;
         ChronoInterval<PlainDate> third =
             DateInterval.between(
                 PlainDate.of(2014, 4, 6),
@@ -1086,7 +1087,8 @@ public class IntervalCollectionTest {
             ClockInterval.between(
                 PlainTime.of(9, 28),
                 PlainTime.of(10, 1));
-        ChronoInterval<PlainTime> second = i2;
+        ChronoInterval<PlainTime> second =
+            i2;
         ChronoInterval<PlainTime> third =
             ClockInterval.between(
                 PlainTime.of(11, 5),
@@ -1099,7 +1101,8 @@ public class IntervalCollectionTest {
             ClockInterval.between(
                 PlainTime.of(20, 31),
                 PlainTime.of(20, 31, 1));
-        ChronoInterval<PlainTime> sixth = i4;
+        ChronoInterval<PlainTime> sixth =
+            i4;
 
         assertThat(splits.size(), is(6));
         assertThat(splits.get(0), is(first));
@@ -1139,7 +1142,8 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2016, 4, 1),
                 PlainDate.of(2016, 7, 31));
-        ChronoInterval<PlainDate> expected4 = i1;
+        ChronoInterval<PlainDate> expected4 =
+            i1;
 
         assertThat(splits.size(), is(5));
         assertThat(splits.get(0), is(expected0));
@@ -1150,7 +1154,7 @@ public class IntervalCollectionTest {
     }
 
     @Test
-    public void splittedTimeFuture() {
+    public void splittedTime24() {
         ClockInterval i1 =
             ClockInterval.since(PlainTime.of(13, 0));
         ChronoInterval<PlainTime> i2 =
@@ -1164,7 +1168,6 @@ public class IntervalCollectionTest {
 
         List<ChronoInterval<PlainTime>> splits =
             windows.withSplits().getIntervals();
-        ChronoInterval<PlainTime> expected1 = i2;
         ChronoInterval<PlainTime> expected2 =
             ClockInterval.between(
                 PlainTime.of(13),
@@ -1175,7 +1178,7 @@ public class IntervalCollectionTest {
                 PlainTime.of(24));
 
         assertThat(splits.size(), is(3));
-        assertThat(splits.get(0), is(expected1));
+        assertThat(splits.get(0), is(i2));
         assertThat(splits.get(1), is(expected2));
         assertThat(splits.get(2), is(expected3));
     }
@@ -1252,7 +1255,7 @@ public class IntervalCollectionTest {
         SimpleInterval<Date> i2 =
             SimpleInterval.between(new Date(0L), new Date(7L));
         SimpleInterval<Date> i3 =
-            SimpleInterval.between(new Date(1L), new Date(1L));
+            SimpleInterval.between(new Date(8L), new Date(9L));
         IntervalCollection<Date> icoll = IntervalCollection.onTraditionalTimeLine().plus(i3).plus(i2).plus(i1);
         List<ChronoInterval<Date>> expected1 = new ArrayList<ChronoInterval<Date>>();
         expected1.add(i1);
@@ -1261,12 +1264,29 @@ public class IntervalCollectionTest {
         assertThat(icoll.getIntervals(), is(expected1));
         assertThat(icoll.getSize(), is(3));
         assertThat(icoll.withIntersection().isEmpty(), is(true));
-        ChronoInterval<Date> expected2 = SimpleInterval.between(new Date(0L), new Date(7L));
+        ChronoInterval<Date> expected2 = SimpleInterval.between(new Date(0L), new Date(9L));
         assertThat(icoll.getRange(), is(expected2));
         List<ChronoInterval<Date>> expected3 = new ArrayList<ChronoInterval<Date>>();
         expected3.add(i2);
+        expected3.add(i3);
         assertThat(icoll.withBlocks().getIntervals(), is(expected3));
-        assertThat(icoll.withGaps().getIntervals().isEmpty(), is(true));
+        ChronoInterval<Date> expected4 = SimpleInterval.between(new Date(7L), new Date(8L));
+        assertThat(icoll.withGaps().getIntervals().get(0), is(expected4));
+    }
+
+    @Test
+    public void plusEmptyInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        DateInterval empty = DateInterval.atomic(PlainDate.of(2012, 5, 10)).withOpenEnd();
+        IntervalCollection<PlainDate> icoll = IntervalCollection.onDateAxis().plus(Arrays.asList(i1, i2, empty));
+        assertThat(icoll.size(), is(2));
     }
 
 }
