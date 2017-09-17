@@ -787,7 +787,7 @@ public class IntervalCollectionTest {
         windows = windows.plus(i1).plus(i2).plus(i3);
 
         DateInterval empty =
-            DateInterval.atomic(PlainDate.of(2012, 4, 9)).withOpenEnd();
+            DateInterval.atomic(PlainDate.of(2014, 5, 9)).withOpenEnd();
 
         assertThat(
             windows.minus(empty),
@@ -1251,14 +1251,14 @@ public class IntervalCollectionTest {
         SimpleInterval<Date> i2 =
             SimpleInterval.between(new Date(0L), new Date(7L));
         SimpleInterval<Date> i3 =
-            SimpleInterval.between(new Date(1L), new Date(1L));
+            SimpleInterval.between(new Date(8L), new Date(9L));
         IntervalCollection<Date> icoll = IntervalCollection.onTraditionalTimeLine().plus(i3).plus(i2).plus(i1);
         assertThat(icoll.getIntervals(), is(Arrays.asList(i1, i2, i3)));
         assertThat(icoll.getSize(), is(3));
         assertThat(icoll.withIntersection().isEmpty(), is(true));
-        assertThat(icoll.getRange(), is(SimpleInterval.between(new Date(0L), new Date(7L))));
-        assertThat(icoll.withBlocks().getIntervals(), is(Arrays.asList(i2)));
-        assertThat(icoll.withGaps().getIntervals().isEmpty(), is(true));
+        assertThat(icoll.getRange(), is(SimpleInterval.between(new Date(0L), new Date(9L))));
+        assertThat(icoll.withBlocks().getIntervals(), is(Arrays.asList(i2, i3)));
+        assertThat(icoll.withGaps().getIntervals().get(0), is(SimpleInterval.between(new Date(7L), new Date(8L))));
     }
 
     @Test
@@ -1275,6 +1275,21 @@ public class IntervalCollectionTest {
         assertThat(icoll.getRange(), is(SimpleInterval.since(Instant.EPOCH)));
         assertThat(icoll.withBlocks().getIntervals(), is(Arrays.asList(i1, i2)));
         assertThat(icoll.withGaps().getIntervals(), is(Arrays.asList(SimpleInterval.between(now, now.plusSeconds(1)))));
+    }
+
+    @Test
+    public void plusEmptyInterval() {
+        DateInterval i1 =
+            DateInterval.between(
+                PlainDate.of(2014, 2, 28),
+                PlainDate.of(2014, 5, 31));
+        DateInterval i2 =
+            DateInterval.between(
+                PlainDate.of(2014, 4, 30),
+                PlainDate.of(2014, 6, 1));
+        DateInterval empty = DateInterval.atomic(PlainDate.of(2012, 5, 10)).withOpenEnd();
+        IntervalCollection<PlainDate> icoll = IntervalCollection.onDateAxis().plus(Arrays.asList(i1, i2, empty));
+        assertThat(icoll.size(), is(2));
     }
 
 }
