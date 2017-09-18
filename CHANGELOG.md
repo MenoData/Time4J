@@ -3,6 +3,9 @@
 - Clarify meaning of IntervalCollection [#677]
 - Empty intervals should not be added to interval collection [#678]
 
+### Fixed
+- Duration parser tolerates trailing chars [#682]
+
 ## [v3.34] published on 2017-09-10
 ### Added
 - Support for sunrise / sunset - calculations [#663]
