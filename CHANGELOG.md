@@ -1,5 +1,10 @@
 ## [v4.30] not yet released
+### Changed
+- Clarify meaning of IntervalCollection [#677]
+- Empty intervals should not be added to interval collection [#678]
+
 ### Fixed
+- Duration parser tolerates trailing chars [#682]
 - Conversion of Time4J-Duration to temporal amount sometimes broken [#680]
 
 ## [v4.29] published on 2017-09-10

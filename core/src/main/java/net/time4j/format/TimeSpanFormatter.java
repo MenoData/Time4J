@@ -292,7 +292,7 @@ public abstract class TimeSpanFormatter<U, S extends TimeSpan<U>> {
      *
      * @param   text	custom textual representation to be parsed
      * @return  parsed duration
-     * @throws ParseException (for example in case of mixed signs)
+     * @throws	ParseException (for example in case of mixed signs or if trailing unparsed characters exist)
      * @see     #parse(CharSequence, int)
      */
     /*[deutsch]
@@ -300,7 +300,7 @@ public abstract class TimeSpanFormatter<U, S extends TimeSpan<U>> {
      *
      * @param   text	custom textual representation to be parsed
      * @return  parsed duration
-     * @throws	ParseException (for example in case of mixed signs)
+     * @throws	ParseException (for example in case of mixed signs or if trailing unparsed characters exist)
      * @see     #parse(CharSequence, int)
      */
     public S parse(CharSequence text) throws ParseException {
@@ -316,7 +316,7 @@ public abstract class TimeSpanFormatter<U, S extends TimeSpan<U>> {
      * @param   text	custom textual representation to be parsed
      * @param   offset  start position for the parser
      * @return  parsed duration
-     * @throws	ParseException (for example in case of mixed signs)
+     * @throws	ParseException (for example in case of mixed signs or if trailing unparsed characters exist)
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text entsprechend dem
@@ -325,7 +325,7 @@ public abstract class TimeSpanFormatter<U, S extends TimeSpan<U>> {
      * @param   text	custom textual representation to be parsed
      * @param   offset  start position for the parser
      * @return  parsed duration
-     * @throws	ParseException (for example in case of mixed signs)
+     * @throws	ParseException (for example in case of mixed signs or if trailing unparsed characters exist)
      */
     public S parse(
         CharSequence text,
@@ -361,6 +361,17 @@ public abstract class TimeSpanFormatter<U, S extends TimeSpan<U>> {
             } else {
                 pos = reply;
             }
+        }
+
+        int len = text.length();
+
+        if (pos < len) {
+            throw new ParseException(
+                "Unparsed trailing characters found: \""
+                    + text.subSequence(pos, len)
+                    + "\" in \""
+                    + text,
+                pos);
         }
 
         Long sign = unitsToValues.remove(SIGN_KEY);

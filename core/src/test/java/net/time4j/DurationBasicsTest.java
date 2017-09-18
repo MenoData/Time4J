@@ -974,6 +974,16 @@ public class DurationBasicsTest {
         }
     }
 
+    @Test(expected=ParseException.class)
+    public void parseAlternativeInvalid_3_PYYYY_MM_DD_TRAILING() throws Exception {
+        try {
+            Duration.parsePeriod("P0001-01-02T5H10M"); // alternative date part, but standard time part
+        } catch (ParseException pe) {
+            assertThat(pe.getErrorOffset(), is(13));
+            throw pe;
+        }
+    }
+
     @Test
     public void parseAlternativePYYYY_MM_DDTHH() throws Exception {
         assertThat(
