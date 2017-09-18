@@ -82,9 +82,9 @@ import java.util.NoSuchElementException;
  * @see     MomentInterval#comparator()
  */
 public abstract class IntervalCollection<T>
-    // TODO: activate in next major release
+    // TODO: activate in next major release (and remove explicit Iterable-reference)
     // extends AbstractCollection<ChronoInterval<T>>
-    implements Serializable {
+    implements Iterable<ChronoInterval<T>>, Serializable {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -279,15 +279,15 @@ public abstract class IntervalCollection<T>
      * <p>Obtains an interval iterator. </p>
      *
      * @return  Iterator
-     * @since   4.30
+     * @since   3.35/4.30
      */
     /*[deutsch]
      * <p>Liefert einen Intervall-Iterator. </p>
      *
      * @return  Iterator
-     * @since   4.30
+     * @since   3.35/4.30
      */
-//    @Override (TODO: activate annotation as soon as the super class is AbstractCollection)
+    @Override
     public Iterator<ChronoInterval<T>> iterator() {
 
         return this.intervals.iterator();
@@ -298,13 +298,13 @@ public abstract class IntervalCollection<T>
      * <p>Obtains the count of stored intervals. </p>
      *
      * @return  int
-     * @since   4.30
+     * @since   3.35/4.30
      */
     /*[deutsch]
      * <p>Liefert die Anzahl der gespeicherten Intervalle. </p>
      *
      * @return  int
-     * @since   4.30
+     * @since   3.35/4.30
      */
 //    @Override (TODO: activate annotation as soon as the super class is AbstractCollection)
     public int size() {
@@ -392,14 +392,14 @@ public abstract class IntervalCollection<T>
      *
      * @param   temporal    time point to be queried
      * @return  {@code true} if given time point belongs to any interval of this collection else {@code false}
-     * @since   4.30
+     * @since   3.35/4.30
      */
     /*[deutsch]
      * <p>Fragt ab, ob irgendein Intervall dieser Menge den angegebenen Zeitpunkt enth&auml;lt. </p>
      *
      * @param   temporal    time point to be queried
      * @return  {@code true} if given time point belongs to any interval of this collection else {@code false}
-     * @since   4.30
+     * @since   3.35/4.30
      */
     public boolean encloses(T temporal) {
 
@@ -420,14 +420,14 @@ public abstract class IntervalCollection<T>
      *
      * @param   interval    the interval to be checked
      * @return  boolean
-     * @since   4.30
+     * @since   3.35/4.30
      */
     /*[deutsch]
      * <p>Ermittelt, ob das angegebene Intervall in dieser Menge gespeichert ist. </p>
      *
      * @param   interval    the interval to be checked
      * @return  boolean
-     * @since   4.30
+     * @since   3.35/4.30
      */
     public boolean contains(ChronoInterval<T> interval) {
 
@@ -616,6 +616,8 @@ public abstract class IntervalCollection<T>
     /**
      * <p>Adds the given interval to this interval collection. </p>
      *
+     * <p>An empty interval will be ignored. </p>
+     *
      * @param   interval    the new interval to be added
      * @return  new IntervalCollection-instance containing a sum of
      *          the own intervals and the given one while this instance
@@ -626,6 +628,8 @@ public abstract class IntervalCollection<T>
      */
     /*[deutsch]
      * <p>F&uuml;gt das angegebene Intervall hinzu. </p>
+     *
+     * <p>Ein leeres Intervall wird ignoriert. </p>
      *
      * @param   interval    the new interval to be added
      * @return  new IntervalCollection-instance containing a sum of
@@ -687,22 +691,26 @@ public abstract class IntervalCollection<T>
     /**
      * <p>Adds the given intervals to this interval collection. </p>
      *
-     * @param   intervals       the new intervals to be added
-     * @return  new IntervalCollection-instance containing a sum of
-     *          the own intervals and the given one while this instance remains unaffected
-     * @throws  IllegalArgumentException if given list contains a finite
-     *          interval with open start which cannot be adjusted to one with closed start
-     * @since   4.30
-     */
-    /*[deutsch]
-     * <p>F&uuml;gt die angegebenen Intervalle hinzu. </p>
+     * <p>Empty intervals will be ignored. </p>
      *
      * @param   intervals       the new intervals to be added
      * @return  new IntervalCollection-instance containing a sum of
      *          the own intervals and the given one while this instance remains unaffected
      * @throws  IllegalArgumentException if given list contains a finite
      *          interval with open start which cannot be adjusted to one with closed start
-     * @since   4.30
+     * @since   3.35/4.30
+     */
+    /*[deutsch]
+     * <p>F&uuml;gt die angegebenen Intervalle hinzu. </p>
+     *
+     * <p>Leere Intervalle werden ignoriert. </p>
+     *
+     * @param   intervals       the new intervals to be added
+     * @return  new IntervalCollection-instance containing a sum of
+     *          the own intervals and the given one while this instance remains unaffected
+     * @throws  IllegalArgumentException if given list contains a finite
+     *          interval with open start which cannot be adjusted to one with closed start
+     * @since   3.35/4.30
      */
     public IntervalCollection<T> plus(Collection<? extends ChronoInterval<T>> intervals) {
 
@@ -752,8 +760,7 @@ public abstract class IntervalCollection<T>
     }
 
     /**
-     * <p>Subtracts all timepoints of given interval from this interval
-     * collection. </p>
+     * <p>Subtracts all timepoints of given interval from this interval collection. </p>
      *
      * @param   interval    other interval to be subtracted from this
      * @return  new interval collection containing all timepoints of
@@ -866,7 +873,7 @@ public abstract class IntervalCollection<T>
      * @throws  IllegalArgumentException if given list contains a finite
      *          interval with open start which cannot be adjusted to one
      *          with closed start
-     * @since   4.30
+     * @since   3.35/4.30
      */
     /*[deutsch]
      * <p>Subtrahiert alle in den angegebenen Zeitintervallen enthaltenen
@@ -878,7 +885,7 @@ public abstract class IntervalCollection<T>
      * @throws  IllegalArgumentException if given list contains a finite
      *          interval with open start which cannot be adjusted to one
      *          with closed start
-     * @since   4.30
+     * @since   3.35/4.30
      */
     public IntervalCollection<T> minus(Collection<? extends ChronoInterval<T>> intervals) {
 

@@ -14,6 +14,7 @@ import java.text.ParseException;
 import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -346,10 +347,9 @@ public class IntervalCollectionTest {
 
         List<ChronoInterval<PlainDate>> blocks =
             windows.withBlocks().getIntervals();
-        ChronoInterval<PlainDate> expected = i1;
 
         assertThat(blocks.size(), is(1));
-        assertThat(blocks.get(0), is(expected));
+        assertThat(blocks.get(0), is(i1));
     }
 
     @Test
@@ -361,10 +361,9 @@ public class IntervalCollectionTest {
 
         List<ChronoInterval<PlainDate>> blocks =
             windows.withBlocks().getIntervals();
-        ChronoInterval<PlainDate> expected = interval;
 
         assertThat(blocks.size(), is(1));
-        assertThat(blocks.get(0), is(expected));
+        assertThat(blocks.get(0), is(interval));
     }
 
     @Test
@@ -444,10 +443,9 @@ public class IntervalCollectionTest {
 
         List<ChronoInterval<PlainDate>> overlap =
             windows.withIntersection().getIntervals();
-        ChronoInterval<PlainDate> expected = i2;
 
         assertThat(overlap.size(), is(1));
-        assertThat(overlap.get(0), is(expected));
+        assertThat(overlap.get(0), is(i2));
     }
 
     @Test
@@ -971,14 +969,13 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2014, 4, 15),
                 PlainDate.of(2014, 6, 1));
-        DateInterval intersection1 = i2;
         DateInterval intersection2 =
             DateInterval.between(
                 PlainDate.of(2014, 4, 15),
                 PlainDate.of(2014, 5, 31));
         IntervalCollection<PlainDate> a = IntervalCollection.onDateAxis().plus(i1);
         IntervalCollection<PlainDate> b = IntervalCollection.onDateAxis().plus(i2).plus(i3);
-        IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(intersection1).plus(intersection2);
+        IntervalCollection<PlainDate> c = IntervalCollection.onDateAxis().plus(i2).plus(intersection2);
 
         assertThat(a.intersect(b), is(c));
     }
@@ -1038,7 +1035,6 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2014, 2, 28),
                 PlainDate.of(2014, 3, 31));
-        ChronoInterval<PlainDate> second = i2;
         ChronoInterval<PlainDate> third =
             DateInterval.between(
                 PlainDate.of(2014, 4, 6),
@@ -1048,15 +1044,14 @@ public class IntervalCollectionTest {
                 PlainDate.of(2014, 4, 10),
                 PlainDate.of(2014, 5, 31));
         ChronoInterval<PlainDate> fifth = DateInterval.atomic(PlainDate.of(2014, 6, 1));
-        ChronoInterval<PlainDate> sixth = i4;
 
         assertThat(splits.size(), is(6));
         assertThat(splits.get(0), is(first));
-        assertThat(splits.get(1), is(second));
+        assertThat(splits.get(1), is(i2));
         assertThat(splits.get(2), is(third));
         assertThat(splits.get(3), is(fourth));
         assertThat(splits.get(4), is(fifth));
-        assertThat(splits.get(5), is(sixth));
+        assertThat(splits.get(5), is(i4));
     }
 
     @Test
@@ -1085,7 +1080,6 @@ public class IntervalCollectionTest {
             ClockInterval.between(
                 PlainTime.of(9, 28),
                 PlainTime.of(10, 1));
-        ChronoInterval<PlainTime> second = i2;
         ChronoInterval<PlainTime> third =
             ClockInterval.between(
                 PlainTime.of(11, 5),
@@ -1098,15 +1092,14 @@ public class IntervalCollectionTest {
             ClockInterval.between(
                 PlainTime.of(20, 31),
                 PlainTime.of(20, 31, 1));
-        ChronoInterval<PlainTime> sixth = i4;
 
         assertThat(splits.size(), is(6));
         assertThat(splits.get(0), is(first));
-        assertThat(splits.get(1), is(second));
+        assertThat(splits.get(1), is(i2));
         assertThat(splits.get(2), is(third));
         assertThat(splits.get(3), is(fourth));
         assertThat(splits.get(4), is(fifth));
-        assertThat(splits.get(5), is(sixth));
+        assertThat(splits.get(5), is(i4));
     }
 
     @Test
@@ -1138,14 +1131,13 @@ public class IntervalCollectionTest {
             DateInterval.between(
                 PlainDate.of(2016, 4, 1),
                 PlainDate.of(2016, 7, 31));
-        ChronoInterval<PlainDate> expected4 = i1;
 
         assertThat(splits.size(), is(5));
         assertThat(splits.get(0), is(expected0));
         assertThat(splits.get(1), is(expected1));
         assertThat(splits.get(2), is(expected2));
         assertThat(splits.get(3), is(expected3));
-        assertThat(splits.get(4), is(expected4));
+        assertThat(splits.get(4), is(i1));
     }
 
     @Test
@@ -1163,7 +1155,6 @@ public class IntervalCollectionTest {
 
         List<ChronoInterval<PlainTime>> splits =
             windows.withSplits().getIntervals();
-        ChronoInterval<PlainTime> expected1 = i2;
         ChronoInterval<PlainTime> expected2 =
             ClockInterval.between(
                 PlainTime.of(13),
@@ -1174,7 +1165,7 @@ public class IntervalCollectionTest {
                 PlainTime.of(24));
 
         assertThat(splits.size(), is(3));
-        assertThat(splits.get(0), is(expected1));
+        assertThat(splits.get(0), is(i2));
         assertThat(splits.get(1), is(expected2));
         assertThat(splits.get(2), is(expected3));
     }
@@ -1187,10 +1178,9 @@ public class IntervalCollectionTest {
 
         List<ChronoInterval<PlainDate>> splits =
             windows.withSplits().getIntervals();
-        ChronoInterval<PlainDate> expected = interval;
 
         assertThat(splits.size(), is(1));
-        assertThat(splits.get(0), is(expected));
+        assertThat(splits.get(0), is(interval));
     }
 
     @Test
@@ -1274,7 +1264,9 @@ public class IntervalCollectionTest {
         assertThat(icoll.withIntersection().isEmpty(), is(true));
         assertThat(icoll.getRange(), is(SimpleInterval.since(Instant.EPOCH)));
         assertThat(icoll.withBlocks().getIntervals(), is(Arrays.asList(i1, i2)));
-        assertThat(icoll.withGaps().getIntervals(), is(Arrays.asList(SimpleInterval.between(now, now.plusSeconds(1)))));
+        assertThat(
+            icoll.withGaps().getIntervals(),
+            is(Collections.singletonList(SimpleInterval.between(now, now.plusSeconds(1)))));
     }
 
     @Test
