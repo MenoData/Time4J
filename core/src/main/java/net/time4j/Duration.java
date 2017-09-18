@@ -3307,7 +3307,7 @@ public final class Duration<U extends IsoUnit>
                             "Unexpected date component found: " + period,
                             index);
                     } else {
-                        alternative = parse(period, index, sep, CALENDAR_TYPE, items);
+                        alternative = parse(period.substring(0, sep), index, sep, CALENDAR_TYPE, items);
                     }
                 }
                 if (alternative) {
