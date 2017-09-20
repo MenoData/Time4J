@@ -7,6 +7,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static net.time4j.CalendarUnit.DAYS;
+import static net.time4j.CalendarUnit.WEEKS;
 import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.YEARS;
 import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
@@ -17,6 +18,16 @@ import static org.junit.Assert.assertThat;
 @RunWith(JUnit4.class)
 public class SpecialUnitTest {
 
+    @Test(expected=UnsupportedOperationException.class)
+    public void atEndOfMonthDayBased() {
+        DAYS.atEndOfMonth();
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void atEndOfMonthWeekBased() {
+        WEEKS.atEndOfMonth();
+    }
+
     @Test
     public void atEndOfMonth() {
         assertThat(
@@ -26,27 +37,40 @@ public class SpecialUnitTest {
             PlainDate.of(2011, 7, 1).plus(7, MONTHS.atEndOfMonth()),
             is(PlainDate.of(2012, 2, 29)));
         assertThat(
-            PlainDate.of(2011, 6, 30).plus(7, DAYS.atEndOfMonth()),
-            is(PlainDate.of(2011, 7, 31)));
+            PlainDate.of(2011, 7, 1).minus(1, MONTHS.atEndOfMonth()),
+            is(PlainDate.of(2011, 6, 30)));
+        assertThat(
+            PlainDate.of(2011, 7, 1).until(PlainDate.of(2011, 6, 30), MONTHS.atEndOfMonth()),
+            is(-1L));
+        assertThat(
+            PlainDate.of(2011, 6, 30).until(PlainDate.of(2011, 7, 30), MONTHS.atEndOfMonth()),
+            is(0L));
+        assertThat(
+            PlainDate.of(2011, 6, 30).until(PlainDate.of(2011, 7, 31), MONTHS.atEndOfMonth()),
+            is(1L));
     }
 
     @Test
     public void atEndOfMonthAsDuration() {
         assertThat(
-            PlainDate.of(2011, 2, 28)
-                .plus(Duration.of(1, YEARS.atEndOfMonth())),
+            PlainDate.of(2011, 2, 28).plus(Duration.of(1, YEARS.atEndOfMonth())),
             is(PlainDate.of(2012, 2, 29)));
         assertThat(
-            PlainDate.of(2011, 7, 1)
-                .plus(Duration.of(7, MONTHS.atEndOfMonth())),
+            PlainDate.of(2011, 7, 1).plus(Duration.of(7, MONTHS.atEndOfMonth())),
             is(PlainDate.of(2012, 2, 29)));
         assertThat(
-            PlainDate.of(2011, 6, 30)
-                .plus(Duration.of(7, DAYS.atEndOfMonth())),
-            is(PlainDate.of(2011, 7, 31)));
-        assertThat(
-            PlainDate.of(2015, 1, 30).plus(1, MONTHS.atEndOfMonth()),
-            is(PlainDate.of(2015, 2, 28)));
+            PlainDate.of(2015, 2, 27).minus(Duration.of(1, MONTHS.atEndOfMonth())),
+            is(PlainDate.of(2015, 1, 31)));
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void keepingEndOfMonthDayBased() {
+        DAYS.keepingEndOfMonth();
+    }
+
+    @Test(expected=UnsupportedOperationException.class)
+    public void keepingEndOfMonthWeekBased() {
+        WEEKS.keepingEndOfMonth();
     }
 
     @Test
@@ -60,6 +84,51 @@ public class SpecialUnitTest {
         assertThat(
             PlainDate.of(2015, 1, 31).plus(1, MONTHS.keepingEndOfMonth()),
             is(PlainDate.of(2015, 2, 28)));
+        assertThat(
+            PlainDate.of(2015, 1, 30).plus(1, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 2, 28)));
+        assertThat(
+            PlainDate.of(2015, 2, 27).minus(1, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 1, 27)));
+        assertThat(
+            PlainDate.of(2015, 2, 28).minus(1, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 1, 31)));
+        assertThat(
+            PlainDate.of(2015, 3, 31).minus(1, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 2, 28)));
+        assertThat(
+            PlainDate.of(2015, 3, 30).minus(1, MONTHS.keepingEndOfMonth()),
+            is(PlainDate.of(2015, 2, 28)));
+        assertThat(
+            PlainDate.of(2015, 3, 10).until(PlainDate.of(2015, 2, 9), MONTHS.keepingEndOfMonth()),
+            is(-1L));
+        assertThat(
+            PlainDate.of(2015, 2, 9).until(PlainDate.of(2015, 3, 10), MONTHS.keepingEndOfMonth()),
+            is(1L));
+        assertThat(
+            PlainDate.of(2015, 3, 10).until(PlainDate.of(2015, 2, 10), MONTHS.keepingEndOfMonth()),
+            is(-1L));
+        assertThat(
+            PlainDate.of(2015, 2, 10).until(PlainDate.of(2015, 3, 10), MONTHS.keepingEndOfMonth()),
+            is(1L));
+        assertThat(
+            PlainDate.of(2015, 3, 10).until(PlainDate.of(2015, 2, 11), MONTHS.keepingEndOfMonth()),
+            is(0L));
+        assertThat(
+            PlainDate.of(2015, 2, 11).until(PlainDate.of(2015, 3, 10), MONTHS.keepingEndOfMonth()),
+            is(0L));
+        assertThat(
+            PlainDate.of(2015, 3, 30).until(PlainDate.of(2015, 2, 28), MONTHS.keepingEndOfMonth()),
+            is(-1L));
+        assertThat(
+            PlainDate.of(2015, 2, 28).until(PlainDate.of(2015, 3, 30), MONTHS.keepingEndOfMonth()),
+            is(0L));
+        assertThat(
+            PlainDate.of(2015, 3, 31).until(PlainDate.of(2015, 2, 28), MONTHS.keepingEndOfMonth()),
+            is(-1L));
+        assertThat(
+            PlainDate.of(2015, 2, 28).until(PlainDate.of(2015, 3, 31), MONTHS.keepingEndOfMonth()),
+            is(1L));
     }
 
     @Test(expected=ChronoException.class)

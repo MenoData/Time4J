@@ -867,12 +867,12 @@ public class DurationBasicsTest {
 
     @Test(expected=ChronoException.class)
     public void testToStringISOSpecialUnit() {
-        Duration.of(3, DAYS.atEndOfMonth()).toStringISO();
+        Duration.of(3, MONTHS.atEndOfMonth()).toStringISO();
     }
 
     @Test(expected=ChronoException.class)
     public void testToStringXMLSpecialUnit() {
-        Duration.of(3, DAYS.atEndOfMonth()).toStringXML();
+        Duration.of(3, MONTHS.atEndOfMonth()).toStringXML();
     }
 
     @Test

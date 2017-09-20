@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarUnit.java) is part of project Time4J.
  *
@@ -24,6 +24,9 @@ package net.time4j;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
+
+import static net.time4j.OverflowUnit.POLICY_END_OF_MONTH;
+import static net.time4j.OverflowUnit.POLICY_KEEPING_LAST_DATE;
 
 
 /**
@@ -248,8 +251,7 @@ public enum CalendarUnit
      * <p>Note: The metric for calculation of temporal distances remains
      * unaffected. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour if month-based, but still the same metric
      */
     /*[deutsch]
      * <p>Definiert eine Variante dieser Zeiteinheit, in der bei Additionen
@@ -267,15 +269,14 @@ public enum CalendarUnit
      * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
      * unver&auml;ndert erhalten. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour if month-based, but still the same metric
      */
     public IsoDateUnit nextValidDate() {
 
         switch (this) {
             case WEEKS:
             case DAYS:
-                return this;
+                return this; // optimization
             default:
                 return this.nvd;
         }
@@ -298,8 +299,7 @@ public enum CalendarUnit
      * <p>Note: The metric for calculation of temporal distances remains
      * unaffected. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour if month-based, but still the same metric
      */
     /*[deutsch]
      * <p>Definiert eine Variante dieser Zeiteinheit, in der bei Additionen
@@ -317,15 +317,14 @@ public enum CalendarUnit
      * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
      * unver&auml;ndert erhalten. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour if month-based, but still the same metric
      */
     public IsoDateUnit withCarryOver() {
 
         switch (this) {
             case WEEKS:
             case DAYS:
-                return this;
+                return this; // optimization
             default:
                 return this.co;
         }
@@ -348,8 +347,7 @@ public enum CalendarUnit
      * <p>Note: The metric for calculation of temporal distances remains
      * unaffected. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour if month-based, but still the same metric
      */
     /*[deutsch]
      * <p>Definiert eine Variante dieser Zeiteinheit, in der bei Additionen
@@ -367,15 +365,14 @@ public enum CalendarUnit
      * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
      * unver&auml;ndert erhalten. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour if month-based, but still the same metric
      */
     public IsoDateUnit unlessInvalid() {
 
         switch (this) {
             case WEEKS:
             case DAYS:
-                return this;
+                return this; // optimization
             default:
                 return this.ui;
         }
@@ -398,13 +395,16 @@ public enum CalendarUnit
      *  // Ausgabe: 2013-04-30
      * </pre>
      *
-     * <p>Note: The metric for calculation of temporal distances remains
-     * unaffected. An alternative which only jumps to the end of month
+     * <p>Note: The metric for calculation of temporal distances has been changed
+     * since v3.35/4.30: The day-of-month-criterion will no longer be directly applied
+     * but the intermediate result will be adjusted after having done an addition step. </p>
+     *
+     * <p>An alternative which only jumps to the end of month
      * if the original date is the last day of month can be achieved
      * by {@link #keepingEndOfMonth()}. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour and modified metric (if month-based)
+     * @throws  UnsupportedOperationException if this unit is day- or week-related
      */
     /*[deutsch]
      * <p>Definiert eine Variante dieser Zeiteinheit, in der bei Additionen
@@ -422,23 +422,32 @@ public enum CalendarUnit
      *  // Ausgabe: 2013-04-30
      * </pre>
      *
-     * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
-     * unver&auml;ndert erhalten. Eine Alternative, die nur dann zum Ende
-     * des Monats springt, wenn das aktuelle Datum der letzte Tag des Monats
-     * ist, ist mittels {@link #keepingEndOfMonth()} erh&auml;ltlich. </p>
+     * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden wurde seit v3.35/4.30
+     * ver&auml;ndert: Es wird nicht mehr direkt der Tag des Monats f&uuml;r die Anpassung
+     * der Berechnung herangezogen, sondern per direkter Addition das Zwischenergebnis
+     * angepasst. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * <p>Eine Alternative, die nur dann zum Ende des Monats springt, wenn das aktuelle Datum
+     * der letzte Tag des Monats ist, ist mittels {@link #keepingEndOfMonth()} erh&auml;ltlich. </p>
+     *
+     * @return  calendar unit with modified addition behaviour and modified metric (if month-based)
+     * @throws  UnsupportedOperationException if this unit is day- or week-related
      */
     public IsoDateUnit atEndOfMonth() {
 
-        return this.eof;
+        switch (this) {
+            case WEEKS:
+            case DAYS:
+                throw new UnsupportedOperationException("Original unit is not month-based: " + this.name());
+            default:
+                return this.eof;
+        }
 
     }
 
     /**
-     * <p>Defines a variation of this unit which always sets the resulting
-     * date in additions and subtractions to the end of month if the original
+     * <p>Defines a variation of this unit which sets the resulting date
+     * in additions and subtractions to the end of month if and only if the original
      * date is the last day of month. </p>
      *
      * <p>Example for months: </p>
@@ -452,17 +461,20 @@ public enum CalendarUnit
      *  // Ausgabe: 2013-04-30
      * </pre>
      *
-     * <p>Note: The metric for calculation of temporal distances remains
-     * unaffected. An alternative which unconditionally jumps to the end
+     * <p>Note: The metric for calculation of temporal distances has been changed
+     * since v3.35/4.30: The day-of-month-criterion will no longer be directly applied
+     * but the intermediate result will be adjusted after having done an addition step. </p>
+     *
+     * <p>An alternative which unconditionally jumps to the end
      * of month can be achieved by {@link #atEndOfMonth()}. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour and modified metric if month-based
+     * @throws  UnsupportedOperationException if this unit is day- or week-related
      * @since   2.3
      */
     /*[deutsch]
      * <p>Definiert eine Variante dieser Zeiteinheit, in der bei Additionen
-     * und Subtraktionen grunds&auml;tzlich der letzte Tag des Monats gesetzt
+     * und Subtraktionen der letzte Tag des Monats genau dann gesetzt
      * wird, wenn das Ausgangsdatum bereits der letzte Tag des Monats ist. </p>
      *
      * <p>Beispiel f&uuml;r Monate: </p>
@@ -476,18 +488,27 @@ public enum CalendarUnit
      *  // Ausgabe: 2013-04-30
      * </pre>
      *
-     * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden bleibt
-     * unver&auml;ndert erhalten. Eine Alternative, die bedingungslos zum
-     * Ende des Monats springt, ist mittels {@link #atEndOfMonth()}
+     * <p>Notiz: Die Metrik zur Berechnung von Zeitabst&auml;nden wurde seit v3.35/4.30
+     * ver&auml;ndert: Es wird nicht mehr direkt der Tag des Monats f&uuml;r die Anpassung
+     * der Berechnung herangezogen, sondern per direkter Addition das Zwischenergebnis
+     * angepasst. </p>
+     *
+     * <p>Eine Alternative, die bedingungslos zum Ende des Monats springt, ist mittels {@link #atEndOfMonth()}
      * erh&auml;ltlich. </p>
      *
-     * @return  calendar unit with modified addition behaviour, but still
-     *          the same metric
+     * @return  calendar unit with modified addition behaviour and modified metric if month-based
+     * @throws  UnsupportedOperationException if this unit is day- or week-related
      * @since   2.3
      */
     public IsoDateUnit keepingEndOfMonth() {
 
-        return this.kld;
+        switch (this) {
+            case WEEKS:
+            case DAYS:
+                throw new UnsupportedOperationException("Original unit is not month-based: " + this.name());
+            default:
+                return this.kld;
+        }
 
     }
 
@@ -602,22 +623,22 @@ public enum CalendarUnit
 
             switch (this.unit) {
                 case MILLENNIA:
-                    amount = monthDelta(d1, d2) / 12000;
+                    amount = this.monthDelta(d1, d2) / 12000;
                     break;
                 case CENTURIES:
-                    amount = monthDelta(d1, d2) / 1200;
+                    amount = this.monthDelta(d1, d2) / 1200;
                     break;
                 case DECADES:
-                    amount = monthDelta(d1, d2) / 120;
+                    amount = this.monthDelta(d1, d2) / 120;
                     break;
                 case YEARS:
-                    amount = monthDelta(d1, d2) / 12;
+                    amount = this.monthDelta(d1, d2) / 12;
                     break;
                 case QUARTERS:
-                    amount = monthDelta(d1, d2) / 3;
+                    amount = this.monthDelta(d1, d2) / 3;
                     break;
                 case MONTHS:
-                    amount = monthDelta(d1, d2);
+                    amount = this.monthDelta(d1, d2);
                     break;
                 case WEEKS:
                     amount = dayDelta(d1, d2) / 7;
@@ -659,26 +680,28 @@ public enum CalendarUnit
 
         }
 
-        private static long monthDelta(
+        private long monthDelta(
             PlainDate start,
             PlainDate end
         ) {
 
-            long result = (end.getEpochMonths() - start.getEpochMonths());
+            long amount = (end.getEpochMonths() - start.getEpochMonths());
 
-            if (
-                (result > 0)
-                && (end.getDayOfMonth() < start.getDayOfMonth())
-            ) {
-                result--;
-            } else if (
-                (result < 0)
-                && (end.getDayOfMonth() > start.getDayOfMonth())
-            ) {
-                result++;
+            if ((this.policy == POLICY_KEEPING_LAST_DATE) || (this.policy == POLICY_END_OF_MONTH)) {
+                if ((amount > 0) && PlainDate.doAdd(this.unit, start, amount, this.policy).isAfter(end)) {
+                    amount--;
+                } else if ((amount < 0) && PlainDate.doAdd(this.unit, start, amount, this.policy).isBefore(end)) {
+                    amount++;
+                }
+            } else {
+                if ((amount > 0) && (end.getDayOfMonth() < start.getDayOfMonth())) {
+                    amount--;
+                } else if ((amount < 0) && (end.getDayOfMonth() > start.getDayOfMonth())) {
+                    amount++;
+                }
             }
 
-            return result;
+            return amount;
 
         }
 
