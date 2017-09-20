@@ -1,5 +1,6 @@
 ## [v4.30] not yet released
 ### Changed
+- Changes to CalendarUnit.keepingEndOfMonth() and atEndOfMonth() [#679]
 - Clarify meaning of IntervalCollection [#677]
 - Empty intervals should not be added to interval collection [#678]
 
