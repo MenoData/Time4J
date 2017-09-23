@@ -56,14 +56,14 @@ final class TimezoneGenericProcessor
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<NameStyle, ConcurrentMap<Locale, TZNames>> CACHE_ZONENAMES =
-        new EnumMap<NameStyle, ConcurrentMap<Locale, TZNames>>(NameStyle.class);
+    private static final Map<NameStyle, ConcurrentMap<Locale, ZoneLabels>> CACHE_ZONENAMES =
+        new EnumMap<NameStyle, ConcurrentMap<Locale, ZoneLabels>>(NameStyle.class);
     private static final int MAX = 25; // maximum size of cache
     private static final String DEFAULT_PROVIDER = "DEFAULT";
 
     static {
         for (NameStyle style : NameStyle.values()) {
-            CACHE_ZONENAMES.put(style, new ConcurrentHashMap<Locale, TZNames>());
+            CACHE_ZONENAMES.put(style, new ConcurrentHashMap<Locale, ZoneLabels>());
         }
     }
 
@@ -76,6 +76,7 @@ final class TimezoneGenericProcessor
     // quick path optimization
     private final Leniency lenientMode;
     private final Locale locale;
+    private final int protectedLength;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -93,6 +94,7 @@ final class TimezoneGenericProcessor
 
         this.lenientMode = Leniency.SMART;
         this.locale = Locale.ROOT;
+        this.protectedLength = 0;
 
     }
 
@@ -114,6 +116,7 @@ final class TimezoneGenericProcessor
 
         this.lenientMode = Leniency.SMART;
         this.locale = Locale.ROOT;
+        this.protectedLength = 0;
 
     }
 
@@ -122,7 +125,8 @@ final class TimezoneGenericProcessor
         FormatProcessor<TZID> fallback,
         Set<TZID> preferredZones,
         Leniency lenientMode,
-        Locale locale
+        Locale locale,
+        int protectedLength
     ) {
         super();
 
@@ -133,6 +137,7 @@ final class TimezoneGenericProcessor
         // quick path members
         this.lenientMode = lenientMode;
         this.locale = locale;
+        this.protectedLength = protectedLength;
 
     }
 
@@ -207,38 +212,22 @@ final class TimezoneGenericProcessor
         boolean quickPath
     ) {
 
-        int len = text.length();
         int start = status.getPosition();
-        int pos = start;
+        int len = text.length();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
-        if (pos >= len) {
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
+        if (start >= len) {
             status.setError(start, "Missing timezone name in style " + this.style + ".");
             return;
         }
 
         Locale lang = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
         Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
-
-        // evaluation of relevant part of input which might contain the generic timezone name
-        StringBuilder name = new StringBuilder();
-
-        while (pos < len) {
-            char c = text.charAt(pos);
-
-            if (
-                Character.isLetter(c) // tz names must start with a letter
-                || (!this.style.isAbbreviation() && (pos > start) && !Character.isDigit(c))
-            ) {
-                // long tz names can contain almost every char - with the exception of digits
-                name.append(c);
-                pos++;
-            } else {
-                break;
-            }
-        }
-
-        String key = name.toString().trim();
-        pos = start + key.length();
+        String key = text.subSequence(start, Math.min(start + 3, len)).toString();
 
         // fallback-case (fixed offset)
         if (key.startsWith("GMT") || key.startsWith("UT")) {
@@ -247,15 +236,14 @@ final class TimezoneGenericProcessor
         }
 
         // Zeitzonennamen im Cache suchen und ggf. Cache füllen
-        ConcurrentMap<Locale, TZNames> cache = CACHE_ZONENAMES.get(this.style);
-        TZNames tzNames = cache.get(lang);
+        ConcurrentMap<Locale, ZoneLabels> cache = CACHE_ZONENAMES.get(this.style);
+        ZoneLabels tzNames = cache.get(lang);
 
         if (tzNames == null) {
-            Map<String, List<TZID>> genericNames = this.getTimezoneNameMap(lang);
-            tzNames = new TZNames(genericNames);
+            tzNames = this.createZoneNames(lang);
 
             if (cache.size() < MAX) {
-                TZNames tmp = cache.putIfAbsent(lang, tzNames);
+                ZoneLabels tmp = cache.putIfAbsent(lang, tzNames);
 
                 if (tmp != null) {
                     tzNames = tmp;
@@ -265,8 +253,8 @@ final class TimezoneGenericProcessor
 
         // Zeitzonen-IDs bestimmen
         int[] lenbuf = new int[1];
-        lenbuf[0] = pos;
-        List<TZID> genericZones = readZones(tzNames, key, lenbuf);
+        lenbuf[0] = start;
+        List<TZID> genericZones = readZoneNames(tzNames, text.subSequence(0, len), lenbuf);
         int sum = genericZones.size();
 
         if (sum == 0) {
@@ -320,24 +308,7 @@ final class TimezoneGenericProcessor
             return;
         }
 
-        // remove alternative provider zones if default provider zone exists
-        if (sum > 1) {
-            List<TZID> filtered = null;
-            for (TZID id : genericZones) {
-                if (id.canonical().indexOf('~') == -1) {
-                    if (filtered == null) {
-                        filtered = new ArrayList<TZID>();
-                    }
-                    filtered.add(id);
-                }
-            }
-            if (filtered != null) {
-                genericZones = filtered;
-                sum = genericZones.size();
-            }
-        }
-
-        // final step: determining the result
+        // final step
         if ((sum == 1) || leniency.isLax()) {
             parsedResult.put(TimezoneElement.TIMEZONE_ID, genericZones.get(0));
             status.setPosition(lenbuf[0]);
@@ -383,7 +354,8 @@ final class TimezoneGenericProcessor
             this.fallback,
             this.preferredZones,
             attributes.get(Attributes.LENIENCY, Leniency.SMART),
-            attributes.get(Attributes.LANGUAGE, Locale.ROOT)
+            attributes.get(Attributes.LANGUAGE, Locale.ROOT),
+            attributes.get(Attributes.PROTECTED_CHARACTERS, 0)
         );
 
     }
@@ -428,10 +400,9 @@ final class TimezoneGenericProcessor
 
     }
 
-    private Map<String, List<TZID>> getTimezoneNameMap(Locale locale) {
+    private ZoneLabels createZoneNames(Locale locale) {
 
-        List<TZID> zones;
-        Map<String, List<TZID>> map = new HashMap<String, List<TZID>>();
+        ZoneLabels.Node node = null;
 
         for (TZID tzid : Timezone.getAvailableIDs()) {
             String tzName = Timezone.getDisplayName(tzid, this.style, locale);
@@ -440,40 +411,28 @@ final class TimezoneGenericProcessor
                 continue; // registrierte NameProvider haben nichts gefunden!
             }
 
-            zones = map.get(tzName);
-
-            if (zones == null) {
-                zones = new ArrayList<TZID>();
-                map.put(tzName, zones);
-            }
-
-            zones.add(tzid);
+            node = ZoneLabels.insert(node, tzName, tzid);
         }
 
-        return Collections.unmodifiableMap(map);
+        return new ZoneLabels(node);
 
     }
 
-    private static List<TZID> readZones(
-        TZNames tzNames,
-        String key,
+    private static List<TZID> readZoneNames(
+        final ZoneLabels tzNames,
+        CharSequence text,
         int[] lenbuf
     ) {
-        
-        List<TZID> zones = tzNames.search(key);
 
-        if (zones.isEmpty()) {
-            int last = key.length() - 1;
-            if (!Character.isLetter(key.charAt(last))) { // maybe interpunctuation char?
-                zones = tzNames.search(key.substring(0, last));
-                if (!zones.isEmpty()) {
-                    lenbuf[0]--;
-                }
-            }
+        String prefix = tzNames.longestPrefixOf(text, lenbuf[0]);
+        List<TZID> zones = tzNames.find(prefix);
+
+        if (!zones.isEmpty()) {
+            lenbuf[0] += prefix.length();
         }
-        
+
         return zones;
-        
+
     }
 
     private static List<TZID> excludeWinZones(List<TZID> zones) {
@@ -579,38 +538,6 @@ final class TimezoneGenericProcessor
         }
 
         return sb.append('}').toString();
-
-    }
-
-    //~ Innere Klassen ----------------------------------------------------
-
-    private static class TZNames {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final Map<String, List<TZID>> names;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        TZNames(Map<String, List<TZID>> names) {
-            super();
-
-            this.names = names;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        // quick search via hash-access
-        List<TZID> search(String key) {
-
-            if (this.names.containsKey(key)) {
-                return this.names.get(key);
-            }
-
-            return Collections.emptyList();
-
-        }
 
     }
 

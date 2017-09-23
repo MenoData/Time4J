@@ -4,7 +4,9 @@ import net.time4j.Moment;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.FlagElement;
 import net.time4j.engine.ValidationElement;
+import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.NameStyle;
@@ -23,11 +25,21 @@ import static org.junit.Assert.assertThat;
 public class ZoneNameResourceTest {
 
     @Test
-    public void noValidationError() {
+    public void noValidationError1() {
         ChronoFormatter<?> cf = ChronoFormatter.ofMomentPattern("z", PatternType.CLDR, Locale.GERMANY, EUROPE.PARIS);
         ChronoEntity<?> raw = cf.parseRaw("MESZ");
-        System.out.println("raw-data=" + raw);
         assertThat(raw.contains(ValidationElement.ERROR_MESSAGE), is(false));
+        assertThat(raw.getTimezone().canonical(), is("Europe/Paris"));
+        assertThat(raw.get(FlagElement.DAYLIGHT_SAVING), is(Boolean.TRUE));
+    }
+
+    @Test
+    public void noValidationError2() {
+        ChronoFormatter<?> cf = ChronoFormatter.ofMomentPattern("z", PatternType.CLDR, Locale.GERMANY, EUROPE.PARIS);
+        ChronoEntity<?> raw = cf.parseRaw("MEZ");
+        assertThat(raw.contains(ValidationElement.ERROR_MESSAGE), is(false));
+        assertThat(raw.getTimezone().canonical(), is("Europe/Paris"));
+        assertThat(raw.get(FlagElement.DAYLIGHT_SAVING), is(Boolean.FALSE));
     }
 
     @Test
@@ -161,6 +173,43 @@ public class ZoneNameResourceTest {
                 .addPattern("MMM dd HH:mm:ss z yyyy", PatternType.CLDR)
                 .build();
         f.withTimezone(EUROPE.DUBLIN).parse(input);
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseISTWithTrailingCharsTooShort() throws ParseException {
+        ChronoFormatter<Moment> f =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss ", PatternType.CLDR)
+                .startSection(Attributes.PROTECTED_CHARACTERS, 7)
+                .addShortTimezoneName(Collections.<TZID>singleton(ASIA.KOLKATA))
+                .endSection()
+                .addPattern("'X' yyyy", PatternType.CLDR)
+                .build();
+        f.parse("Dec 31 07:30:00 ISTX 2016");
+    }
+
+    @Test
+    public void parseISTWithTrailingCharsPrefixMatch() throws ParseException {
+        ChronoFormatter<Moment> f1 =
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss ", PatternType.CLDR)
+                .startSection(Attributes.PROTECTED_CHARACTERS, 6)
+                .addShortTimezoneName(Collections.<TZID>singleton(ASIA.KOLKATA))
+                .endSection()
+                .addPattern("'X' yyyy", PatternType.CLDR)
+                .build();
+        ChronoFormatter<Moment> f2 = // relies on prefix matching only
+            ChronoFormatter.setUp(Moment.axis(), Locale.ENGLISH)
+                .addPattern("MMM dd HH:mm:ss ", PatternType.CLDR)
+                .addShortTimezoneName(Collections.<TZID>singleton(ASIA.KOLKATA))
+                .addPattern("'X' yyyy", PatternType.CLDR)
+                .build();
+        assertThat(
+            f1.parse("Dec 31 07:30:00 ISTX 2016"),
+            is(PlainTimestamp.of(2016, 12, 31, 2, 0).atUTC()));
+        assertThat(
+            f2.parse("Dec 31 07:30:00 ISTX 2016"),
+            is(PlainTimestamp.of(2016, 12, 31, 2, 0).atUTC()));
     }
 
 }
