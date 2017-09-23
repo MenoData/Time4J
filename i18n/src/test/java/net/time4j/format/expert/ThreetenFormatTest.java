@@ -195,14 +195,14 @@ public class ThreetenFormatTest {
         TemporalAccessor ta = dtf.parse("24:00");
         ChronoFormatter<PlainTime> formatter =
             ChronoFormatter.setUp(PlainTime.class, Locale.ROOT)
-                .addFixedInteger(PlainTime.ISO_HOUR, 2)
+                .addFixedInteger(PlainTime.HOUR_FROM_0_TO_24, 2)
                 .addPattern(":mm", PatternType.CLDR)
                 .build();
         StringBuilder buffer = new StringBuilder();
         Set<ElementPosition> positions = formatter.printThreeten(ta, buffer);
         assertThat(buffer.toString(), is("24:00"));
         assertThat(positions.size(), is(2));
-        assertThat(positions.stream().findFirst().get().getElement(), is(PlainTime.ISO_HOUR));
+        assertThat(positions.stream().findFirst().get().getElement(), is(PlainTime.HOUR_FROM_0_TO_24));
     }
 
     @Test

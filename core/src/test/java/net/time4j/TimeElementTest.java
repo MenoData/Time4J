@@ -48,8 +48,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourName() {
-        assertThat(ISO_HOUR.name(), is("ISO_HOUR"));
+    public void hour0To24Name() {
+        assertThat(HOUR_FROM_0_TO_24.name(), is("HOUR_FROM_0_TO_24"));
     }
 
     @Test
@@ -138,8 +138,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourIsLenient() {
-        assertThat(ISO_HOUR.isLenient(), is(false));
+    public void hour0To24IsLenient() {
+        assertThat(HOUR_FROM_0_TO_24.isLenient(), is(false));
     }
 
     @Test
@@ -228,8 +228,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourIsDateElement() {
-        assertThat(ISO_HOUR.isDateElement(), is(false));
+    public void hour0To24IsDateElement() {
+        assertThat(HOUR_FROM_0_TO_24.isDateElement(), is(false));
     }
 
     @Test
@@ -318,8 +318,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourIsTimeElement() {
-        assertThat(ISO_HOUR.isTimeElement(), is(true));
+    public void hour0To24IsTimeElement() {
+        assertThat(HOUR_FROM_0_TO_24.isTimeElement(), is(true));
     }
 
     @Test
@@ -410,8 +410,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourGetSymbol() {
-        assertThat(ISO_HOUR.getSymbol(), is('H'));
+    public void hour0To24GetSymbol() {
+        assertThat(HOUR_FROM_0_TO_24.getSymbol(), is('H'));
     }
 
     @Test
@@ -502,8 +502,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourGetDefaultMinimum() {
-        assertThat(ISO_HOUR.getDefaultMinimum(), is(0));
+    public void hour0To24GetDefaultMinimum() {
+        assertThat(HOUR_FROM_0_TO_24.getDefaultMinimum(), is(0));
     }
 
     @Test
@@ -594,8 +594,8 @@ public class TimeElementTest {
     }
 
     @Test
-    public void isoHourGetDefaultMaximum() {
-        assertThat(ISO_HOUR.getDefaultMaximum(), is(23));
+    public void hour0To24GetDefaultMaximum() {
+        assertThat(HOUR_FROM_0_TO_24.getDefaultMaximum(), is(23));
     }
 
     @Test

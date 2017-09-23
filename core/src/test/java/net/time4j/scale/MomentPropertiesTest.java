@@ -263,30 +263,30 @@ public class MomentPropertiesTest {
     }
 
     @Test
-    public void containsIsoHour() {
-        assertThat(this.utc.contains(ISO_HOUR), is(false));
+    public void containsHour0To24() {
+        assertThat(this.utc.contains(HOUR_FROM_0_TO_24), is(false));
     }
 
     @Test
-    public void getIsoHour() {
-        assertThat(this.utc.get(ISO_HOUR.atUTC()), is(23));
+    public void getHour0To24() {
+        assertThat(this.utc.get(HOUR_FROM_0_TO_24.atUTC()), is(23));
     }
 
     @Test
-    public void withIsoHour() {
+    public void withHour0To24() {
         assertThat(
-            this.utc.with(ISO_HOUR.newValue(23).atUTC()),
+            this.utc.with(HOUR_FROM_0_TO_24.newValue(23).atUTC()),
             is(this.utc));
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withIsoHourNull() {
-        this.utc.with(ISO_HOUR.newValue(null).atUTC());
+    public void withHour0To24Null() {
+        this.utc.with(HOUR_FROM_0_TO_24.newValue(null).atUTC());
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withIsoHour24() {
-        this.utc.with(ISO_HOUR.newValue(24).atUTC());
+    public void withHour0To2424() {
+        this.utc.with(HOUR_FROM_0_TO_24.newValue(24).atUTC());
     }
 
     @Test

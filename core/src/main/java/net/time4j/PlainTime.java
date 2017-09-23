@@ -91,7 +91,7 @@ import java.util.Set;
  *  <li>{@link #CLOCK_HOUR_OF_DAY}</li>
  *  <li>{@link #DIGITAL_HOUR_OF_AMPM}</li>
  *  <li>{@link #DIGITAL_HOUR_OF_DAY}</li>
- *  <li>{@link #ISO_HOUR}</li>
+ *  <li>{@link #HOUR_FROM_0_TO_24}</li>
  *  <li>{@link #MINUTE_OF_HOUR}</li>
  *  <li>{@link #MINUTE_OF_DAY}</li>
  *  <li>{@link #SECOND_OF_MINUTE}</li>
@@ -129,7 +129,7 @@ import java.util.Set;
  *  <li>{@link #CLOCK_HOUR_OF_DAY}</li>
  *  <li>{@link #DIGITAL_HOUR_OF_AMPM}</li>
  *  <li>{@link #DIGITAL_HOUR_OF_DAY}</li>
- *  <li>{@link #ISO_HOUR}</li>
+ *  <li>{@link #HOUR_FROM_0_TO_24}</li>
  *  <li>{@link #MINUTE_OF_HOUR}</li>
  *  <li>{@link #MINUTE_OF_DAY}</li>
  *  <li>{@link #SECOND_OF_MINUTE}</li>
@@ -322,8 +322,8 @@ public final class PlainTime
      * does not make any difference between start and end of day. This is a
      * limitation which preserves the compatibility with CLDR and the class
      * {@code java.text.SimpleDateFormat}. In order to support the full
-     * hour range users can use the element {@link #ISO_HOUR}. In detail
-     * the mapping to ISO-hours looks like following: </p>
+     * hour range users can use the element {@link #HOUR_FROM_0_TO_24}. In detail
+     * the mapping to full hours in range 0-24 looks like following: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -333,7 +333,7 @@ public final class PlainTime
      *  <td>12</td><td>1</td><td>...</td><td>11</td><td>12</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Full-range hour</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -347,7 +347,7 @@ public final class PlainTime
      * also keinen Unterschied zwischen Anfang und Ende eines Tages. Das ist
      * eine Einschr&auml;nkung, die die Kompatibilit&auml;t mit CLDR und
      * {@code java.text.SimpleDateFormat} wahrt. Um den vollen Stundenbereich
-     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #ISO_HOUR} verwendet
+     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #HOUR_FROM_0_TO_24} verwendet
      * werden. Im Detail sieht die Stundenzuordnung so aus: </p>
      *
      * <div style="margin-top:5px;">
@@ -358,7 +358,7 @@ public final class PlainTime
      *  <td>12</td><td>1</td><td>...</td><td>11</td><td>12</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Stunde 0-24</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -377,8 +377,8 @@ public final class PlainTime
      * does not make any difference between start and end of day. This is a
      * limitation which preserves the compatibility with CLDR and the class
      * {@code java.text.SimpleDateFormat}. In order to support the full
-     * hour range users can use the element {@link #ISO_HOUR}. In detail
-     * the mapping to ISO-hours looks like following: </p>
+     * hour range users can use the element {@link #HOUR_FROM_0_TO_24}. In detail
+     * the mapping to full hours in range 0-24 looks like following: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -388,7 +388,7 @@ public final class PlainTime
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>24</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Full-range hour</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -401,7 +401,7 @@ public final class PlainTime
      * also keinen Unterschied zwischen Anfang und Ende eines Tages. Das ist
      * eine Einschr&auml;nkung, die die Kompatibilit&auml;t mit CLDR und
      * {@code java.text.SimpleDateFormat} wahrt. Um den vollen Stundenbereich
-     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #ISO_HOUR} verwendet
+     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #HOUR_FROM_0_TO_24} verwendet
      * werden. Im Detail sieht die Stundenzuordnung so aus: </p>
      *
      * <div style="margin-top:5px;">
@@ -412,7 +412,7 @@ public final class PlainTime
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>24</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Stunde 0-24</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -431,8 +431,8 @@ public final class PlainTime
      * does not make any difference between start and end of day. This is a
      * limitation which preserves the compatibility with CLDR and the class
      * {@code java.text.SimpleDateFormat}. In order to support the full
-     * hour range users can use the element {@link #ISO_HOUR}. In detail
-     * the mapping to ISO-hours looks like following: </p>
+     * hour range users can use the element {@link #HOUR_FROM_0_TO_24}. In detail
+     * the mapping to full hours in range 0-24 looks like following: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -442,7 +442,7 @@ public final class PlainTime
      *  <td>0</td><td>1</td><td>...</td><td>11</td><td>0</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Full-range hour</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -455,7 +455,7 @@ public final class PlainTime
      * also keinen Unterschied zwischen Anfang und Ende eines Tages. Das ist
      * eine Einschr&auml;nkung, die die Kompatibilit&auml;t mit CLDR und
      * {@code java.text.SimpleDateFormat} wahrt. Um den vollen Stundenbereich
-     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #ISO_HOUR} verwendet
+     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #HOUR_FROM_0_TO_24} verwendet
      * werden. Im Detail sieht die Stundenzuordnung so aus: </p>
      *
      * <div style="margin-top:5px;">
@@ -466,7 +466,7 @@ public final class PlainTime
      *  <td>0</td><td>1</td><td>...</td><td>11</td><td>0</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Stunde 0-24</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -489,8 +489,8 @@ public final class PlainTime
      * does not make any difference between start and end of day. This is a
      * limitation which preserves the compatibility with CLDR and the class
      * {@code java.text.SimpleDateFormat}. In order to support the full
-     * hour range users can use the element {@link #ISO_HOUR}. In detail
-     * the mapping to ISO-hours looks like following: </p>
+     * hour range users can use the element {@link #HOUR_FROM_0_TO_24}. In detail
+     * the mapping to full hours in range 0-24 looks like following: </p>
      *
      * <div style="margin-top:5px;">
      * <table border="1">
@@ -500,7 +500,7 @@ public final class PlainTime
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>0</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Full-range hour</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -513,7 +513,7 @@ public final class PlainTime
      * also keinen Unterschied zwischen Anfang und Ende eines Tages. Das ist
      * eine Einschr&auml;nkung, die die Kompatibilit&auml;t mit CLDR und
      * {@code java.text.SimpleDateFormat} wahrt. Um den vollen Stundenbereich
-     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #ISO_HOUR} verwendet
+     * zu unterst&uuml;tzen, sollte m&ouml;glichst {@link #HOUR_FROM_0_TO_24} verwendet
      * werden. Im Detail sieht die Stundenzuordnung so aus: </p>
      *
      * <div style="margin-top:5px;">
@@ -524,7 +524,7 @@ public final class PlainTime
      *  <td>12</td><td>13</td><td>...</td><td>23</td><td>0</td>
      * </tr>
      * <tr>
-     *  <td>ISO-8601-Wert</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
+     *  <td>Stunde 0-24</td><td>T0</td><td>T1</td><td>...</td><td>T11</td>
      *  <td>T12</td><td>T13</td><td>...</td><td>T23</td><td>T24</td>
      * </tr>
      * </table>
@@ -541,32 +541,47 @@ public final class PlainTime
             'H');
 
     /**
-     * <p>Element with the ISO-8601-hour of day in the value range
-     * {@code 0-24}. </p>
+     * <p>Element with the full hour of day in the value range {@code 0-24}. </p>
      *
      * <p>Given a context of {@code PlainTime} with full hours, the maximum
      * is {@code 24} and stands for the time 24:00 (midnight at end of day),
      * else the maximum is {@code 23} in every different context. </p>
      *
      * @see     #getHour()
+     * @since   v3.35/4.30
      */
     /*[deutsch]
-     * <p>Element mit der ISO-8601-Stunde im Bereich {@code 0-24}. </p>
+     * <p>Element mit der vollen Stunde im Bereich {@code 0-24}. </p>
      *
      * <p>Im Kontext von {@code PlainTime} mit vollen Stunden ist das Maximum
-     * {@code 24} und steht f&uuml;r die Uhrzeit T24:00, ansonsten ist das
-     * Maximum in jedem anderen Kontext {@code 23}. </p>
+     * {@code 24} und steht f&uuml;r die Uhrzeit T24:00 (Mitternacht am Ende des Tages),
+     * ansonsten ist das Maximum in jedem anderen Kontext {@code 23}. </p>
      *
      * @see     #getHour()
+     * @since   v3.35/4.30
      */
     @FormattableElement(format = "H")
-    public static final ProportionalElement<Integer, PlainTime> ISO_HOUR =
+    public static final ProportionalElement<Integer, PlainTime> HOUR_FROM_0_TO_24 =
         IntegerTimeElement.createTimeElement(
-            "ISO_HOUR",
+            "HOUR_FROM_0_TO_24",
             IntegerTimeElement.ISO_HOUR,
             0,
             23,
             'H');
+
+    /**
+     * <p>Synonym for {@code HOUR_FROM_0_TO_24}. </p>
+     *
+     * @deprecated  Use {@link #HOUR_FROM_0_TO_24} instead, will be removed in next major release
+     */
+    /*[deutsch]
+     * <p>Synonym f&uuml;r {@code HOUR_FROM_0_TO_24}. </p>
+     *
+     * @deprecated  Use {@link #HOUR_FROM_0_TO_24} instead, will be removed in next major release
+     */
+    @FormattableElement(format = "H")
+    @Deprecated
+    public static final ProportionalElement<Integer, PlainTime> ISO_HOUR = HOUR_FROM_0_TO_24;
 
     /**
      * <p>Element with the minute of hour in the value range {@code 0-59}. </p>
@@ -914,7 +929,7 @@ public final class PlainTime
         fill(constants, CLOCK_HOUR_OF_DAY);
         fill(constants, DIGITAL_HOUR_OF_AMPM);
         fill(constants, DIGITAL_HOUR_OF_DAY);
-        fill(constants, ISO_HOUR);
+        fill(constants, HOUR_FROM_0_TO_24);
         fill(constants, MINUTE_OF_HOUR);
         fill(constants, MINUTE_OF_DAY);
         fill(constants, SECOND_OF_MINUTE);
@@ -971,8 +986,8 @@ public final class PlainTime
                 new IntegerElementRule(DIGITAL_HOUR_OF_DAY, 0, 23),
                 ClockUnit.HOURS)
             .appendElement(
-                ISO_HOUR,
-                new IntegerElementRule(ISO_HOUR, 0, 24),
+                HOUR_FROM_0_TO_24,
+                new IntegerElementRule(HOUR_FROM_0_TO_24, 0, 24),
                 ClockUnit.HOURS)
             .appendElement(
                 MINUTE_OF_HOUR,
@@ -1937,7 +1952,7 @@ public final class PlainTime
 
         return (
             ((element == MILLI_OF_DAY) && ((this.nano % MIO) != 0))
-            || ((element == ISO_HOUR) && !this.isFullHour())
+            || ((element == HOUR_FROM_0_TO_24) && !this.isFullHour())
             || ((element == MINUTE_OF_DAY) && !this.isFullMinute())
             || ((element == SECOND_OF_DAY) && (this.nano != 0))
             || ((element == MICRO_OF_DAY) && ((this.nano % KILO) != 0))
@@ -2786,7 +2801,7 @@ public final class PlainTime
         ) {
 
             if (
-                (this.element == ISO_HOUR)
+                (this.element == HOUR_FROM_0_TO_24)
                 || (this.element == DIGITAL_HOUR_OF_DAY)
                 || (this.element == DIGITAL_HOUR_OF_AMPM)
             ) {
@@ -3484,7 +3499,7 @@ public final class PlainTime
                 return PlainTime.of(entity.get(DECIMAL_HOUR));
             }
 
-            int hour = entity.getInt(ISO_HOUR);
+            int hour = entity.getInt(HOUR_FROM_0_TO_24);
 
             if (hour == Integer.MIN_VALUE) {
                 hour = readHour(entity);
@@ -3495,7 +3510,7 @@ public final class PlainTime
                     flagValidationError(
                         entity,
                         "Time 24:00 not allowed, "
-                            + "use lax mode or element ISO_HOUR instead.");
+                            + "use lax mode or element HOUR_FROM_0_TO_24 instead.");
                     return null;
                 }
             }

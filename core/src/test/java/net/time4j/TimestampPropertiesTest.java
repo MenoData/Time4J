@@ -621,72 +621,72 @@ public class TimestampPropertiesTest {
     }
 
     @Test
-    public void containsIsoHour() {
+    public void containsHour0To24() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
-        assertThat(anyTS.contains(ISO_HOUR), is(true));
+        assertThat(anyTS.contains(HOUR_FROM_0_TO_24), is(true));
     }
 
     @Test
-    public void getIsoHour() {
+    public void getHour0To24() {
         assertThat(
-            PlainTimestamp.of(2014, 4, 21, 13, 45).get(ISO_HOUR),
+            PlainTimestamp.of(2014, 4, 21, 13, 45).get(HOUR_FROM_0_TO_24),
             is(13));
     }
 
     @Test
-    public void getBaseUnitIsoHour() {
+    public void getBaseUnitHour0To24() {
         IsoUnit unit = ClockUnit.HOURS;
         assertThat(
-            PlainTimestamp.axis().getBaseUnit(ISO_HOUR),
+            PlainTimestamp.axis().getBaseUnit(HOUR_FROM_0_TO_24),
             is(unit));
     }
 
     @Test
-    public void getMinimumIsoHour() {
+    public void getMinimumHour0To24() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 12, 15);
-        assertThat(anyTS.getMinimum(ISO_HOUR), is(0));
+        assertThat(anyTS.getMinimum(HOUR_FROM_0_TO_24), is(0));
     }
 
     @Test
-    public void getMaximumIsoHour() {
+    public void getMaximumHour0To24() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
-        assertThat(anyTS.getMaximum(ISO_HOUR), is(23));
+        assertThat(anyTS.getMaximum(HOUR_FROM_0_TO_24), is(23));
     }
 
     @Test
-    public void isValidIsoHour() {
+    public void isValidHour0To24() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
-        assertThat(anyTS.isValid(ISO_HOUR, 23), is(true));
+        assertThat(anyTS.isValid(HOUR_FROM_0_TO_24, 23), is(true));
     }
 
     @Test
-    public void isValidIsoHourNull() {
+    public void isValidHour0To24Null() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 9, 15);
-        assertThat(anyTS.isValid(ISO_HOUR, null), is(false));
+        assertThat(anyTS.isValid(HOUR_FROM_0_TO_24, null), is(false));
     }
 
     @Test
-    public void isValidIsoHour24() {
+    public void isValidHour0To2424() {
         PlainTimestamp anyTS = PlainTimestamp.of(2014, 4, 21, 0, 0);
-        assertThat(anyTS.isValid(ISO_HOUR, 24), is(false));
+        assertThat(anyTS.isValid(HOUR_FROM_0_TO_24, 24), is(false));
     }
 
     @Test
-    public void withIsoHour() {
+    public void withHour0To24() {
         assertThat(
             PlainTimestamp.of(2014, 4, 21, 9, 15)
-                .with(ISO_HOUR, 23),
+                .with(HOUR_FROM_0_TO_24, 23),
             is(PlainTimestamp.of(2014, 4, 21, 23, 15)));
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withIsoHourNull() {
-        PlainTimestamp.of(2014, 4, 21, 9, 15).with(ISO_HOUR, null);
+    public void withHour0To24Null() {
+        PlainTimestamp.of(2014, 4, 21, 9, 15).with(HOUR_FROM_0_TO_24, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void withIsoHour24() {
-        PlainTimestamp.of(2014, 4, 21, 0, 0).with(ISO_HOUR, 24);
+    public void withHour0To2424() {
+        PlainTimestamp.of(2014, 4, 21, 0, 0).with(HOUR_FROM_0_TO_24, 24);
     }
 
     @Test

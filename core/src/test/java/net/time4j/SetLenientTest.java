@@ -122,9 +122,9 @@ public class SetLenientTest {
     }
 
     @Test
-    public void isoHourLenient() {
+    public void hour0To24Lenient() {
         assertThat(
-           PlainTime.of(6, 12, 30).with(ISO_HOUR.setLenient(25)),
+           PlainTime.of(6, 12, 30).with(HOUR_FROM_0_TO_24.setLenient(25)),
            is(PlainTime.of(1, 12, 30)));
     }
 
@@ -177,10 +177,10 @@ public class SetLenientTest {
     }
 
     @Test
-    public void isoHourLenientOnTimestamp() {
+    public void hour0To24LenientOnTimestamp() {
         assertThat(
            PlainTimestamp.of(2014, 5, 9, 1, 12, 30)
-                .with(ISO_HOUR.setLenient(48)),
+                .with(HOUR_FROM_0_TO_24.setLenient(48)),
            is(PlainTimestamp.of(2014, 5, 11, 0, 12, 30)));
     }
 

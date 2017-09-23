@@ -138,7 +138,7 @@ public class NameDisplayTest {
         assertThat(PlainTime.DIGITAL_HOUR_OF_DAY.getDisplayName(Locale.GERMAN), is("Stunde"));
         assertThat(PlainTime.CLOCK_HOUR_OF_AMPM.getDisplayName(Locale.GERMAN), is("Stunde"));
         assertThat(PlainTime.DIGITAL_HOUR_OF_AMPM.getDisplayName(Locale.GERMAN), is("Stunde"));
-        assertThat(PlainTime.ISO_HOUR.getDisplayName(Locale.GERMAN), is("Stunde"));
+        assertThat(PlainTime.HOUR_FROM_0_TO_24.getDisplayName(Locale.GERMAN), is("Stunde"));
     }
 
     @Test
