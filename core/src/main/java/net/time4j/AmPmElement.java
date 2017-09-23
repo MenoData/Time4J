@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AmPmElement.java) is part of project Time4J.
  *
@@ -175,7 +175,13 @@ enum AmPmElement
         AttributeQuery attributes
     ) {
 
-        return this.accessor(attributes).parse(text, status, this.getType(), attributes);
+        Meridiem m = parseAmPm(text, status);
+
+        if (m == null) {
+            m = this.accessor(attributes).parse(text, status, this.getType(), attributes);
+        }
+
+        return m;
 
     }
 
@@ -202,7 +208,13 @@ enum AmPmElement
         Leniency leniency
     ) {
 
-        return this.accessor(language, tw, oc).parse(text, status, this.getType(), leniency);
+        Meridiem m = parseAmPm(text, status);
+
+        if (m == null) {
+            m = this.accessor(language, tw, oc).parse(text, status, this.getType(), leniency);
+        }
+
+        return m;
 
     }
 
@@ -222,6 +234,31 @@ enum AmPmElement
     ) {
 
         return CalendarText.getIsoInstance(language).getMeridiems(textWidth, outputContext);
+
+    }
+
+    static Meridiem parseAmPm(
+        CharSequence text,
+        ParsePosition pp
+    ) {
+
+        int offset = pp.getIndex();
+
+        if (text.length() >= offset + 2) {
+            char c2 = text.charAt(offset + 1);
+            if (c2 == 'M' || c2 == 'm') {
+                char c1 = text.charAt(offset);
+                if (c1 == 'A' || c1 == 'a') {
+                    pp.setIndex(offset + 2);
+                    return Meridiem.AM;
+                } else if (c1 == 'P' || c1 == 'p') {
+                    pp.setIndex(offset + 2);
+                    return Meridiem.PM;
+                }
+            }
+        }
+
+        return null;
 
     }
 

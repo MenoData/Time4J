@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Meridiem.java) is part of project Time4J.
  *
@@ -24,8 +24,11 @@ package net.time4j;
 import net.time4j.base.WallTime;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.format.CalendarText;
+import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.Locale;
 
 
@@ -102,20 +105,123 @@ public enum Meridiem
     }
 
     /**
-     * <p>Gets a descriptive text in given language. </p>
+     * <p>Equivalent to the expression
+     * {@code getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT)}. </p>
      *
      * @param   locale  language of text to be printed
      * @return  localized text in given language
      */
     /*[deutsch]
-     * <p>Gibt eine Textdarstellung in der angegebenen Sprache aus. </p>
+     * <p>Entspricht dem Ausdruck
+     * {@code getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT)}. </p>
      *
      * @param   locale  language of text to be printed
      * @return  localized text in given language
      */
     public String getDisplayName(Locale locale) {
 
-        return CalendarText.getIsoInstance(locale).getMeridiems(TextWidth.WIDE).print(this);
+        return this.getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT);
+
+    }
+
+    /**
+     * <p>Gets the description text dependent on the locale and style
+     * parameters. </p>
+     *
+     * <p>The second argument controls the width of description while the
+     * third argument is only relevant for languages which make a difference
+     * between stand-alone forms and embedded text forms (does not matter in
+     * English). </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @param   context     output context
+     * @return  descriptive text for given locale and style (never {@code null})
+     * @since   3.35/4.30
+     */
+    /*[deutsch]
+     * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
+     *
+     * <p>&Uuml;ber das zweite Argument kann gesteuert werden, ob eine kurze
+     * oder eine lange Form des Beschreibungstexts ausgegeben werden soll. Das
+     * ist besonders sinnvoll in Benutzeroberfl&auml;chen, wo zwischen der
+     * Beschriftung und der detaillierten Erl&auml;uterung einer graphischen
+     * Komponente unterschieden wird. Das dritte Argument ist in Sprachen von
+     * Belang, die verschiedene grammatikalische Formen f&uuml;r die Ausgabe
+     * als alleinstehend oder eingebettet in formatierten Text kennen. </p>
+     *
+     * @param   locale      language setting
+     * @param   width       text width
+     * @param   context     output context
+     * @return  descriptive text for given locale and style (never {@code null})
+     * @since   3.35/4.30
+     */
+    public String getDisplayName(
+        Locale locale,
+        TextWidth width,
+        OutputContext context
+    ) {
+
+        return CalendarText.getIsoInstance(locale).getMeridiems(width, context).print(this);
+
+    }
+
+    /**
+     * <p>Tries to interprete given text as AM/PM. </p>
+     *
+     * <p>The strings &quot;am&quot;, &quot;AM&quot;, &quot;pm&quot;, &quot;PM&quot; are always understood. </p>
+     *
+     * @param   text    the text to be parsed
+     * @param   locale  language setting
+     * @param   width   expected text width
+     * @param   context expected output context
+     * @return  the parsed meridiem if successful
+     * @throws ParseException if parsing fails
+     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
+     * @since   3.35/4.30
+     */
+    /*[deutsch]
+     * <p>Versucht, den angegebenen Text als AM/PM zu interpretieren. </p>
+     *
+     * <p>Die Ausdr&uuml;cke &quot;am&quot;, &quot;AM&quot;, &quot;pm&quot;, &quot;PM&quot;
+     * werden immer verstanden. </p>
+     *
+     * @param   text    the text to be parsed
+     * @param   locale  language setting
+     * @param   width   expected text width
+     * @param   context expected output context
+     * @return  the parsed meridiem if successful
+     * @throws  ParseException if parsing fails
+     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
+     * @since   3.35/4.30
+     */
+    public static Meridiem parse(
+        CharSequence text,
+        Locale locale,
+        TextWidth width,
+        OutputContext context
+    ) throws ParseException {
+
+        if (text.length() == 2) {
+            char c2 = text.charAt(1);
+            if (c2 == 'M' || c2 == 'm') {
+                char c1 = text.charAt(0);
+                if (c1 == 'A' || c1 == 'a') {
+                    return Meridiem.AM;
+                } else if (c1 == 'P' || c1 == 'p') {
+                    return Meridiem.PM;
+                }
+            }
+        }
+
+        ParsePosition pp = new ParsePosition(0);
+        Meridiem m = CalendarText.getIsoInstance(locale).getMeridiems(width, context).parse(text, pp, Meridiem.class);
+
+        if (m == null) {
+            throw new ParseException("Cannot parse: " + text, pp.getErrorIndex());
+        } else {
+            return m;
+        }
 
     }
 

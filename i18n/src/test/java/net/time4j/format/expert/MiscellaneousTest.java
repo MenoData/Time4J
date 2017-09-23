@@ -54,6 +54,17 @@ import static org.junit.Assert.fail;
 public class MiscellaneousTest {
 
     @Test
+    public void parseMeridiem() throws ParseException {
+        ChronoFormatter<PlainTime> f = ChronoFormatter.ofTimePattern("hh:mm a", PatternType.CLDR, new Locale("es"));
+        assertThat(f.parse("04:30 am"), is(PlainTime.of(4, 30)));
+        assertThat(f.parse("04:30 pm"), is(PlainTime.of(16, 30)));
+        assertThat(f.parse("04:30 AM"), is(PlainTime.of(4, 30)));
+        assertThat(f.parse("04:30 PM"), is(PlainTime.of(16, 30)));
+        assertThat(f.parse("04:30 a. m."), is(PlainTime.of(4, 30)));
+        assertThat(f.parse("04:30 p. m."), is(PlainTime.of(16, 30)));
+    }
+
+    @Test
     public void divisionByTen() {
         for (int i = 0; i < 100; i++) {
             int expected = i / 10;
@@ -118,7 +129,7 @@ public class MiscellaneousTest {
     @Test(expected=IllegalArgumentException.class)
     public void printWithGenericPattern() {
         ChronoFormatter<PlainDate> formatter =
-            ChronoFormatter.ofDatePattern("EEEE, yyyy-MM-dd", PatternType.NON_ISO_DATE, Locale.GERMAN);
+            ChronoFormatter.ofDatePattern("EEEE, yyyy-MM-dd", PatternType.CLDR_DATE, Locale.GERMAN);
         formatter.format(PlainDate.of(2015, 7, 17));
     }
 
