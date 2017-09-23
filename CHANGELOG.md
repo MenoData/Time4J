@@ -12,6 +12,9 @@
 - Zone name parsing should use string-prefix-matching [#686]
 - Duration parser tolerates trailing chars [#682]
 
+### Deprecated
+- Rename PlainTime.ISO_HOUR to HOUR_FROM_0_TO_24 [#685]
+
 ## [v3.34] published on 2017-09-10
 ### Added
 - Support for sunrise / sunset - calculations [#663]
