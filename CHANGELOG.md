@@ -3,6 +3,7 @@
 - Unit simulating Joda-behaviour for month-based durations [#687]
 
 ### Changed
+- Parsing of "AM" or "PM" for all locales [#684]
 - Changes to CalendarUnit.keepingEndOfMonth() and atEndOfMonth() [#679]
 - Clarify meaning of IntervalCollection [#677]
 - Empty intervals should not be added to interval collection [#678]
