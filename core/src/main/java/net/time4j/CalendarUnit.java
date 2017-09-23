@@ -26,6 +26,7 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 
 import static net.time4j.OverflowUnit.POLICY_END_OF_MONTH;
+import static net.time4j.OverflowUnit.POLICY_JODA_METRIC;
 import static net.time4j.OverflowUnit.POLICY_KEEPING_LAST_DATE;
 
 
@@ -188,6 +189,8 @@ public enum CalendarUnit
         new OverflowUnit(this, OverflowUnit.POLICY_NEXT_VALID_DATE);
     private final IsoDateUnit co =
         new OverflowUnit(this, OverflowUnit.POLICY_CARRY_OVER);
+    private final IsoDateUnit joda =
+        new OverflowUnit(this, OverflowUnit.POLICY_JODA_METRIC);
 
     //~ Methoden ----------------------------------------------------------
 
@@ -513,6 +516,66 @@ public enum CalendarUnit
     }
 
     /**
+     * <p>Defines a variation of this unit which simulates the behaviour of Joda-Time. </p>
+     *
+     * <p>Example for years: </p>
+     *
+     * <pre>
+     *  PlainDate birthDate = PlainDate.of(1996, 2, 29);
+     *  PlainDate currentDate = PlainDate.of(2014, 2, 28);
+     *  IsoDateUnit jodaUnit = YEARS.withJodaMetric();
+     *  Duration&lt;IsoDateUnit&gt; d = Duration.in(jodaUnit).between(birthDate, currentDate);
+     *  System.out.println(d); // Output: P18{Y-JODA_METRIC}
+     *
+     *  assertThat(d.getPartialAmount(jodaUnit), is(18L));
+     *  assertThat(birthDate.plus(18, jodaUnit), is(currentDate));
+     *
+     *  assertThat(birthDate.until(currentDate, jodaUnit), is(18L)); // Joda-metric
+     *  assertThat(birthDate.until(currentDate, CalendarUnit.YEARS), is(17L)); // standard metric
+     * </pre>
+     *
+     * <p>Note: Users should not use this unit for age calculations. </p>
+     *
+     * @return  calendar unit with default addition behaviour but modified metric if month-based
+     * @since   3.35/4.30
+     */
+    /*[deutsch]
+     * <p>Definiert eine Variante dieser Zeiteinheit, die das Verhalten von Joda-Time simuliert. </p>
+     *
+     * <p>Beispiel f&uuml;r Jahre: </p>
+     *
+     * <pre>
+     *  PlainDate birthDate = PlainDate.of(1996, 2, 29);
+     *  PlainDate currentDate = PlainDate.of(2014, 2, 28);
+     *  IsoDateUnit jodaUnit = YEARS.withJodaMetric();
+     *  Duration&lt;IsoDateUnit&gt; d = Duration.in(jodaUnit).between(birthDate, currentDate);
+     *  System.out.println(d); // Output: P18{Y-JODA_METRIC}
+     *
+     *  assertThat(d.getPartialAmount(jodaUnit), is(18L));
+     *  assertThat(birthDate.plus(18, jodaUnit), is(currentDate));
+     *
+     *  assertThat(birthDate.until(currentDate, jodaUnit), is(18L)); // Joda-metric
+     *  assertThat(birthDate.until(currentDate, CalendarUnit.YEARS), is(17L)); // standard metric
+     * </pre>
+     *
+     * <p>Hinweis: Anwender sollten diese Einheit nicht f&uuml;r Altersberechnungen verwenden. </p>
+     *
+     * @return  calendar unit with default addition behaviour but modified metric if month-based
+     * @since   3.35/4.30
+     */
+    public IsoDateUnit withJodaMetric() {
+
+        switch (this) {
+            case WEEKS:
+            case DAYS:
+                return this;
+            default:
+                return this.joda;
+        }
+
+    }
+
+    /**
      * <p>Defines a special calendar unit for week-based years which are
      * not bound to the calendar year but to the week cycle of a year
      * preserving the day of week and (if possible) the week of year. </p>
@@ -687,10 +750,15 @@ public enum CalendarUnit
 
             long amount = (end.getEpochMonths() - start.getEpochMonths());
 
-            if ((this.policy == POLICY_KEEPING_LAST_DATE) || (this.policy == POLICY_END_OF_MONTH)) {
-                if ((amount > 0) && PlainDate.doAdd(this.unit, start, amount, this.policy).isAfter(end)) {
+            if (
+                (this.policy == POLICY_KEEPING_LAST_DATE)
+                || (this.policy == POLICY_END_OF_MONTH)
+                || (this.policy == POLICY_JODA_METRIC)
+            ) {
+                CalendarUnit u = CalendarUnit.MONTHS;
+                if ((amount > 0) && PlainDate.doAdd(u, start, amount, this.policy).isAfter(end)) {
                     amount--;
-                } else if ((amount < 0) && PlainDate.doAdd(this.unit, start, amount, this.policy).isBefore(end)) {
+                } else if ((amount < 0) && PlainDate.doAdd(u, start, amount, this.policy).isBefore(end)) {
                     amount++;
                 }
             } else {

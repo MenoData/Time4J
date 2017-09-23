@@ -205,4 +205,18 @@ public class SpecialUnitTest {
             is(PlainDate.of(2014, 3, 1)));
     }
 
+    @Test
+    public void jodaMetric() {
+        PlainDate birthDate = PlainDate.of(1996, 2, 29);
+        PlainDate currentDate = PlainDate.of(2014, 2, 28);
+        IsoDateUnit jodaUnit = YEARS.withJodaMetric();
+        Duration<IsoDateUnit> d = Duration.in(jodaUnit).between(birthDate, currentDate);
+        System.out.println(d); // Output: P18{Y-JODA_METRIC}
+        assertThat(d.getPartialAmount(jodaUnit), is(18L));
+        assertThat(birthDate.plus(18, jodaUnit), is(currentDate));
+        assertThat(birthDate.until(currentDate, jodaUnit), is(18L));
+        assertThat(birthDate.until(currentDate, CalendarUnit.YEARS), is(17L));
+        assertThat(CalendarUnit.YEARS.between(birthDate, currentDate), is(17L));
+    }
+
 }
