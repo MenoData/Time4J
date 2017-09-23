@@ -1,4 +1,7 @@
 ## [v4.30] not yet released
+### Added
+- Unit simulating Joda-behaviour for month-based durations [#687]
+
 ### Changed
 - Changes to CalendarUnit.keepingEndOfMonth() and atEndOfMonth() [#679]
 - Clarify meaning of IntervalCollection [#677]
