@@ -71,6 +71,7 @@ final class TimezoneNameProcessor
     // quick path optimization
     private final Leniency lenientMode;
     private final Locale locale;
+    private final int protectedLength;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -88,6 +89,7 @@ final class TimezoneNameProcessor
 
         this.lenientMode = Leniency.SMART;
         this.locale = Locale.ROOT;
+        this.protectedLength = 0;
 
     }
 
@@ -109,6 +111,7 @@ final class TimezoneNameProcessor
 
         this.lenientMode = Leniency.SMART;
         this.locale = Locale.ROOT;
+        this.protectedLength = 0;
 
     }
 
@@ -117,7 +120,8 @@ final class TimezoneNameProcessor
         FormatProcessor<TZID> fallback,
         Set<TZID> preferredZones,
         Leniency lenientMode,
-        Locale locale
+        Locale locale,
+        int protectedLength
     ) {
         super();
 
@@ -128,6 +132,7 @@ final class TimezoneNameProcessor
         // quick path members
         this.lenientMode = lenientMode;
         this.locale = locale;
+        this.protectedLength = protectedLength;
 
     }
 
@@ -205,38 +210,22 @@ final class TimezoneNameProcessor
         boolean quickPath
     ) {
 
-        int len = text.length();
         int start = status.getPosition();
-        int pos = start;
+        int len = text.length();
+        int protectedChars = (quickPath ? this.protectedLength : attributes.get(Attributes.PROTECTED_CHARACTERS, 0));
 
-        if (pos >= len) {
+        if (protectedChars > 0) {
+            len -= protectedChars;
+        }
+
+        if (start >= len) {
             status.setError(start, "Missing timezone name.");
             return;
         }
 
         Locale lang = (quickPath ? this.locale : attributes.get(Attributes.LANGUAGE, Locale.ROOT));
         Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
-
-        // evaluation of relevant part of input which might contain the timezone name
-        StringBuilder name = new StringBuilder();
-
-        while (pos < len) {
-            char c = text.charAt(pos);
-
-            if (
-                Character.isLetter(c) // tz names must start with a letter
-                || (!this.abbreviated && (pos > start) && !Character.isDigit(c))
-            ) {
-                // long tz names can contain almost every char - with the exception of digits
-                name.append(c);
-                pos++;
-            } else {
-                break;
-            }
-        }
-
-        String key = name.toString().trim();
-        pos = start + key.length();
+        String key = this.extractRelevantKey(text, start, len);
 
         // fallback-case (fixed offset)
         if (key.startsWith("GMT") || key.startsWith("UT")) {
@@ -245,18 +234,12 @@ final class TimezoneNameProcessor
         }
 
         // Zeitzonennamen im Cache suchen und ggf. Cache füllen
-        ConcurrentMap<Locale, TZNames> cache = (
-            this.abbreviated
-            ? CACHE_ABBREVIATIONS
-            : CACHE_ZONENAMES);
-
+        ConcurrentMap<Locale, TZNames> cache = (this.abbreviated ? CACHE_ABBREVIATIONS : CACHE_ZONENAMES);
         TZNames tzNames = cache.get(lang);
 
         if (tzNames == null) {
-            Map<String, List<TZID>> stdNames =
-                this.getTimezoneNameMap(lang, false);
-            Map<String, List<TZID>> dstNames =
-                this.getTimezoneNameMap(lang, true);
+            ZoneLabels stdNames = this.createZoneNames(lang, false);
+            ZoneLabels dstNames = this.createZoneNames(lang, true);
             tzNames = new TZNames(stdNames, dstNames);
 
             if (cache.size() < MAX) {
@@ -268,27 +251,29 @@ final class TimezoneNameProcessor
             }
         }
 
-        // Zeitzonen-IDs bestimmen
+        // prefix-matching of tz names
+        List<TZID> stdZones = new ArrayList<>();
+        List<TZID> dstZones = new ArrayList<>();
         int[] lenbuf = new int[2];
-        lenbuf[0] = pos;
-        lenbuf[1] = pos;
-        List<TZID> stdZones = readZones(tzNames, key, false, lenbuf);
-        List<TZID> dstZones = readZones(tzNames, key, true, lenbuf);
+        tzNames.search(text.subSequence(0, len), start, stdZones, dstZones, lenbuf);
+
         int sum = stdZones.size() + dstZones.size();
 
         if (sum == 0) {
             status.setError(
                 start,
-                "Unknown timezone name: " + key);
+                "\"" + key + "\" does not match any known timezone name.");
             return;
         }
 
+        // exclude win-zones if needed
         if ((sum > 1) && !leniency.isStrict()) {
             stdZones = excludeWinZones(stdZones);
             dstZones = excludeWinZones(dstZones);
             sum = stdZones.size() + dstZones.size();
         }
 
+        // match against preferred zones
         List<TZID> stdZonesOriginal = stdZones;
         List<TZID> dstZonesOriginal = dstZones;
 
@@ -308,8 +293,7 @@ final class TimezoneNameProcessor
                     for (TZID tzid : dstZones) {
                         if (tzid.canonical().equals(pref.canonical())) {
                             stdZones = Collections.emptyList();
-                            dstZones = new ArrayList<>();
-                            dstZones.add(tzid);
+                            dstZones = Collections.singletonList(tzid);
                             resolved = true;
                             break;
                         }
@@ -327,7 +311,8 @@ final class TimezoneNameProcessor
         }
 
         sum = stdZones.size() + dstZones.size();
-        
+
+        // abort if no match against preferred zones
         if (sum == 0) {
             List<String> candidates = new ArrayList<>();
             for (TZID tzid : stdZonesOriginal) {
@@ -346,60 +331,36 @@ final class TimezoneNameProcessor
             return;
         }
 
+        // merge the zone-lists
+        boolean daylightSaving = false;
         List<TZID> zones;
-        int index;
 
         if (stdZones.size() > 0) {
             zones = stdZones;
-            index = 0;
             if (
                 (sum == 2)
-                && (dstZones.size() > 0)
-                && (stdZones.get(0).canonical().equals(dstZones.get(0).canonical()))
+                && (dstZones.size() == 1)
+                && (stdZones.get(0).canonical().equals(dstZones.get(0).canonical())) // special case
             ) {
-                dstZones.remove(0);
-                sum--;
+                // ignore dstZones (sum == 1)
             } else if (!dstZones.isEmpty()) {
                 zones = new ArrayList<>(zones);
                 zones.addAll(dstZones); // for better error message if not unique
             }
         } else {
             zones = dstZones;
-            index = 1;
+            daylightSaving = true;
         }
 
-        // remove alternative provider zones if default provider zone exists
-        if (sum > 1) {
-            List<TZID> filtered = null;
-            for (TZID id : zones) {
-                if (id.canonical().indexOf('~') == -1) {
-                    if (filtered == null) {
-                        filtered = new ArrayList<>();
-                    }
-                    filtered.add(id);
-                }
-            }
-            if (filtered != null) {
-                zones = filtered;
-                sum = zones.size();
-            }
-        }
-
-        // final step: determining the result
-        if (
-            (sum == 1)
-            || leniency.isLax()
-        ) {
+        // final step
+        if ((zones.size() == 1) || leniency.isLax()) {
             parsedResult.put(TimezoneElement.TIMEZONE_ID, zones.get(0));
-            status.setPosition(lenbuf[index]);
-            if (tzNames.isDaylightSensitive()) {
-                parsedResult.put(FlagElement.DAYLIGHT_SAVING, Boolean.valueOf(index == 1));
-            }
+            parsedResult.put(FlagElement.DAYLIGHT_SAVING, Boolean.valueOf(daylightSaving));
+            status.setPosition(lenbuf[daylightSaving ? 1 : 0]);
         } else {
             status.setError(
                 start,
-                "Time zone name is not unique: \"" + key + "\" in "
-                + toString(zones));
+                "Time zone name is not unique: \"" + key + "\" in " + toString(zones));
         }
 
     }
@@ -437,7 +398,8 @@ final class TimezoneNameProcessor
             this.fallback,
             this.preferredZones,
             attributes.get(Attributes.LENIENCY, Leniency.SMART),
-            attributes.get(Attributes.LANGUAGE, Locale.ROOT)
+            attributes.get(Attributes.LANGUAGE, Locale.ROOT),
+            attributes.get(Attributes.PROTECTED_CHARACTERS, 0)
         );
 
     }
@@ -482,61 +444,55 @@ final class TimezoneNameProcessor
 
     }
 
-    private Map<String, List<TZID>> getTimezoneNameMap(
+    private String extractRelevantKey(
+        CharSequence text,
+        int offset,
+        int len
+    ) {
+
+        // evaluation of relevant part of input which might contain the timezone name
+        StringBuilder name = new StringBuilder();
+        int pos = offset;
+
+        while (pos < len) {
+            char c = text.charAt(pos);
+
+            if (
+                Character.isLetter(c) // tz names must start with a letter
+                || (!this.abbreviated && (pos > offset) && !Character.isDigit(c))
+            ) {
+                // long tz names can contain almost every char - with the exception of digits
+                name.append(c);
+                pos++;
+            } else {
+                break;
+            }
+        }
+
+        return name.toString().trim();
+
+    }
+
+    private ZoneLabels createZoneNames(
         Locale locale,
         boolean daylightSaving
     ) {
 
-        List<TZID> zones;
-        Map<String, List<TZID>> map = new HashMap<>();
+        ZoneLabels.Node node = null;
+        NameStyle style = this.getStyle(daylightSaving);
 
         for (TZID tzid : Timezone.getAvailableIDs()) {
-            String tzName =
-                Timezone.getDisplayName(
-                    tzid,
-                    this.getStyle(daylightSaving),
-                    locale);
+            String tzName = Timezone.getDisplayName(tzid, style, locale);
 
             if (tzName.equals(tzid.canonical())) {
                 continue; // registrierte NameProvider haben nichts gefunden!
             }
 
-            zones = map.get(tzName);
-
-            if (zones == null) {
-                zones = new ArrayList<>();
-                map.put(tzName, zones);
-            }
-
-            zones.add(tzid);
+            node = ZoneLabels.insert(node, tzName, tzid);
         }
 
-        return Collections.unmodifiableMap(map);
+        return new ZoneLabels(node);
 
-    }
-
-    private static List<TZID> readZones(
-        TZNames tzNames,
-        String key,
-        boolean daylightSaving,
-        int[] lenbuf
-    ) {
-        
-        List<TZID> zones = tzNames.search(key, daylightSaving);
-
-        if (zones.isEmpty()) {
-            int last = key.length() - 1;
-            if (!Character.isLetter(key.charAt(last))) { // maybe interpunctuation char?
-                zones = tzNames.search(key.substring(0, last), daylightSaving);
-                if (!zones.isEmpty()) {
-                    int index = (daylightSaving ? 1 : 0);
-                    lenbuf[index]--;
-                }
-            }
-        }
-        
-        return zones;
-        
     }
 
     private static List<TZID> excludeWinZones(List<TZID> zones) {
@@ -667,49 +623,48 @@ final class TimezoneNameProcessor
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final boolean dstSensitive;
-        private final Map<String, List<TZID>> stdNames;
-        private final Map<String, List<TZID>> dstNames;
+        private final ZoneLabels stdNames;
+        private final ZoneLabels dstNames;
 
         //~ Konstruktoren -------------------------------------------------
 
         TZNames(
-            Map<String, List<TZID>> stdNames,
-            Map<String, List<TZID>> dstNames
+            ZoneLabels stdNames,
+            ZoneLabels dstNames
         ) {
             super();
 
             this.stdNames = stdNames;
             this.dstNames = dstNames;
 
-            this.dstSensitive = !stdNames.keySet().equals(dstNames.keySet());
-
         }
 
         //~ Methoden ------------------------------------------------------
 
-        boolean isDaylightSensitive() {
-
-            return this.dstSensitive;
-
-        }
-
-        // quick search via hash-access
-        List<TZID> search(
-            String key,
-            boolean daylightSaving
+        void search(
+            CharSequence text,
+            int offset,
+            List<TZID> stdZones,
+            List<TZID> dstZones,
+            int[] lenbuf
         ) {
 
-            Map<String, List<TZID>> names = (
-                daylightSaving
-                ? this.dstNames
-                : this.stdNames);
+            String stdKey = this.stdNames.longestPrefixOf(text, offset);
+            int stdLen = stdKey.length();
+            lenbuf[0] = offset + stdLen;
 
-            if (names.containsKey(key)) {
-                return names.get(key);
+            String dstKey = this.dstNames.longestPrefixOf(text, offset);
+            int dstLen = dstKey.length();
+            lenbuf[1] = offset + dstLen;
+
+            if (dstLen > stdLen) {
+                dstZones.addAll(this.dstNames.find(dstKey));
+            } else if (dstLen < stdLen) {
+                stdZones.addAll(this.stdNames.find(stdKey));
+            } else if (stdLen > 0) {
+                stdZones.addAll(this.stdNames.find(stdKey));
+                dstZones.addAll(this.dstNames.find(dstKey));
             }
-
-            return Collections.emptyList();
 
         }
 
