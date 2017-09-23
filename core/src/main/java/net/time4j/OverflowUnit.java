@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OverflowUnit.java) is part of project Time4J.
  *
@@ -73,6 +73,13 @@ final class OverflowUnit
      * @since   2.3
      */
     static final int POLICY_KEEPING_LAST_DATE = 5;
+
+    /**
+     * Same algorithm in addition and subtraction but with a different metric.
+     *
+     * @since   3.35/4.30
+     */
+    static final int POLICY_JODA_METRIC = 6;
 
     private static final long serialVersionUID = 1988843503875912054L;
 
@@ -209,6 +216,9 @@ final class OverflowUnit
                 break;
             case POLICY_KEEPING_LAST_DATE:
                 sb.append("KEEPING_LAST_DATE");
+                break;
+            case POLICY_JODA_METRIC:
+                sb.append("JODA_METRIC");
                 break;
             default:
                 sb.append("PREVIOUS_VALID_DATE");
