@@ -13,6 +13,9 @@
 - Duration parser tolerates trailing chars [#682]
 - Conversion of Time4J-Duration to temporal amount sometimes broken [#680]
 
+### Deprecated
+- Rename PlainTime.ISO_HOUR to HOUR_FROM_0_TO_24 [#685]
+
 ## [v4.29] published on 2017-09-10
 ### Added
 - Support for sunrise / sunset - calculations [#663]
