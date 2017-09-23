@@ -5,6 +5,7 @@
 - Empty intervals should not be added to interval collection [#678]
 
 ### Fixed
+- Zone name parsing should use string-prefix-matching [#686]
 - Duration parser tolerates trailing chars [#682]
 - Conversion of Time4J-Duration to temporal amount sometimes broken [#680]
 
