@@ -835,7 +835,7 @@ public class MiscellaneousTest {
                     embedded)
                 .build()
                 .withDefault(PlainDate.YEAR, 2016)
-                .withDefault(PlainTime.ISO_HOUR, 0);
+                .withDefault(PlainTime.HOUR_FROM_0_TO_24, 0);
         PlainTimestamp tsp = f.parse("02-29");
         assertThat(tsp, is(PlainTimestamp.of(2016, 2, 29, 0, 0)));
     }

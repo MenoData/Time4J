@@ -3343,7 +3343,7 @@ public final class ChronoFormatter<T>
                 (result instanceof PlainTimestamp)
                 && (PlainTimestamp.class.cast(result).getHour() == 0)
                 && (
-                    (parsed.getInt(PlainTime.ISO_HOUR) == 24)
+                    (parsed.getInt(PlainTime.HOUR_FROM_0_TO_24) == 24)
                     || (parsed.contains(PlainTime.COMPONENT) && (parsed.get(PlainTime.COMPONENT).getHour() == 24))
                 )
             ) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPeriod.java) is part of project Time4J.
  *
@@ -626,7 +626,7 @@ public final class DayPeriod {
         ) {
             if (
                 entity.contains(PlainTime.COMPONENT)
-                || entity.contains(PlainTime.ISO_HOUR)
+                || entity.contains(PlainTime.HOUR_FROM_0_TO_24)
                 || entity.contains(PlainTime.DIGITAL_HOUR_OF_DAY)
                 || entity.contains(PlainTime.CLOCK_HOUR_OF_DAY)
             ) {

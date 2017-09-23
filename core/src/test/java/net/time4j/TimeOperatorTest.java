@@ -407,147 +407,147 @@ public class TimeOperatorTest {
     }
 
     @Test
-    public void isoHourMinimized() {
+    public void hour0To24Minimized() {
         assertThat(
-            PlainTime.of(19, 45, 30).with(ISO_HOUR.minimized()),
+            PlainTime.of(19, 45, 30).with(HOUR_FROM_0_TO_24.minimized()),
             is(PlainTime.of(0, 45, 30)));
     }
 
     @Test
-    public void isoHourMinimizedOnTimestamp() {
+    public void hour0To24MinimizedOnTimestamp() {
         assertThat(
             PlainTimestamp.of(2014, 5, 7, 19, 45, 30)
-                .with(ISO_HOUR.minimized()),
+                .with(HOUR_FROM_0_TO_24.minimized()),
             is(PlainTimestamp.of(2014, 5, 7, 0, 45, 30)));
     }
 
     @Test
-    public void isoHourMinimizedIfFullHour() {
+    public void hour0To24MinimizedIfFullHour() {
         assertThat(
-            PlainTime.of(13).with(ISO_HOUR.minimized()),
+            PlainTime.of(13).with(HOUR_FROM_0_TO_24.minimized()),
             is(PlainTime.of(0)));
         assertThat(
-            PlainTime.of(24).with(ISO_HOUR.minimized()),
+            PlainTime.of(24).with(HOUR_FROM_0_TO_24.minimized()),
             is(PlainTime.of(0)));
     }
 
     @Test
-    public void isoHourMaximized() {
+    public void hour0To24Maximized() {
         assertThat(
-            PlainTime.of(19, 45, 30).with(ISO_HOUR.maximized()),
+            PlainTime.of(19, 45, 30).with(HOUR_FROM_0_TO_24.maximized()),
             is(PlainTime.of(23, 45, 30)));
     }
 
     @Test
-    public void isoHourMaximizedOnTimestamp() {
+    public void hour0To24MaximizedOnTimestamp() {
         assertThat(
             PlainTimestamp.of(2014, 5, 7, 19, 0)
-                .with(ISO_HOUR.maximized()),
+                .with(HOUR_FROM_0_TO_24.maximized()),
             is(PlainTimestamp.of(2014, 5, 7, 23, 0)));
     }
 
     @Test
-    public void isoHourMaximizedIfFullHour() {
+    public void hour0To24MaximizedIfFullHour() {
         assertThat(
-            PlainTime.of(0).with(ISO_HOUR.maximized()),
+            PlainTime.of(0).with(HOUR_FROM_0_TO_24.maximized()),
             is(PlainTime.of(24)));
         assertThat(
-            PlainTime.of(10).with(ISO_HOUR.maximized()),
+            PlainTime.of(10).with(HOUR_FROM_0_TO_24.maximized()),
             is(PlainTime.of(24)));
         assertThat(
-            PlainTime.of(24).with(ISO_HOUR.maximized()),
+            PlainTime.of(24).with(HOUR_FROM_0_TO_24.maximized()),
             is(PlainTime.of(24)));
     }
 
     @Test
-    public void isoHourDecremented() {
+    public void hour0To24Decremented() {
         assertThat(
-            PlainTime.of(19, 45, 30).with(ISO_HOUR.decremented()),
+            PlainTime.of(19, 45, 30).with(HOUR_FROM_0_TO_24.decremented()),
             is(PlainTime.of(18, 45, 30)));
     }
 
     @Test
-    public void isoHourDecrementedOnTimestamp() {
+    public void hour0To24DecrementedOnTimestamp() {
         assertThat(
             PlainTimestamp.of(2014, 5, 7, 0, 45, 30)
-                .with(ISO_HOUR.decremented()),
+                .with(HOUR_FROM_0_TO_24.decremented()),
             is(PlainTimestamp.of(2014, 5, 6, 23, 45, 30)));
     }
 
     @Test
-    public void isoHourDecrementedIfFullHour() {
+    public void hour0To24DecrementedIfFullHour() {
         assertThat(
-            PlainTime.of(0).with(ISO_HOUR.decremented()),
+            PlainTime.of(0).with(HOUR_FROM_0_TO_24.decremented()),
             is(PlainTime.of(23)));
         assertThat(
-            PlainTime.of(1).with(ISO_HOUR.decremented()),
+            PlainTime.of(1).with(HOUR_FROM_0_TO_24.decremented()),
             is(PlainTime.of(0)));
         assertThat(
-            PlainTime.of(24).with(ISO_HOUR.decremented()),
+            PlainTime.of(24).with(HOUR_FROM_0_TO_24.decremented()),
             is(PlainTime.of(23)));
     }
 
     @Test
-    public void isoHourIncremented() {
+    public void hour0To24Incremented() {
         assertThat(
-            PlainTime.of(19, 45, 30).with(ISO_HOUR.incremented()),
+            PlainTime.of(19, 45, 30).with(HOUR_FROM_0_TO_24.incremented()),
             is(PlainTime.of(20, 45, 30)));
     }
 
     @Test
-    public void isoHourIncrementedOnTimestamp() {
+    public void hour0To24IncrementedOnTimestamp() {
         assertThat(
             PlainTimestamp.of(2014, 5, 7, 23, 45, 30)
-                .with(ISO_HOUR.incremented()),
+                .with(HOUR_FROM_0_TO_24.incremented()),
             is(PlainTimestamp.of(2014, 5, 8, 0, 45, 30)));
     }
 
     @Test
-    public void isoHourIncrementedIfFullHour() {
+    public void hour0To24IncrementedIfFullHour() {
         assertThat(
-            PlainTime.of(23).with(ISO_HOUR.incremented()),
+            PlainTime.of(23).with(HOUR_FROM_0_TO_24.incremented()),
             is(PlainTime.of(24)));
         assertThat(
-            PlainTime.of(24).with(ISO_HOUR.incremented()),
+            PlainTime.of(24).with(HOUR_FROM_0_TO_24.incremented()),
             is(PlainTime.of(1)));
         assertThat(
-            PlainTime.of(0).with(ISO_HOUR.incremented()),
+            PlainTime.of(0).with(HOUR_FROM_0_TO_24.incremented()),
             is(PlainTime.of(1)));
     }
 
     @Test
-    public void isoHourAtFloor() {
+    public void hour0To24AtFloor() {
         assertThat(
             PlainTime.of(19, 45, 30, 123456789)
-                .with(ISO_HOUR.atFloor()),
+                .with(HOUR_FROM_0_TO_24.atFloor()),
             is(PlainTime.of(19)));
     }
 
     @Test
-    public void isoHourAtFloorIfFullHour() {
+    public void hour0To24AtFloorIfFullHour() {
         assertThat(
-            PlainTime.of(19).with(ISO_HOUR.atFloor()),
+            PlainTime.of(19).with(HOUR_FROM_0_TO_24.atFloor()),
             is(PlainTime.of(19)));
         assertThat(
-            PlainTime.of(24).with(ISO_HOUR.atFloor()),
+            PlainTime.of(24).with(HOUR_FROM_0_TO_24.atFloor()),
             is(PlainTime.of(24)));
     }
 
     @Test
-    public void isoHourAtCeiling() {
+    public void hour0To24AtCeiling() {
         assertThat(
             PlainTime.of(19, 45, 30, 123456789)
-                .with(ISO_HOUR.atCeiling()),
+                .with(HOUR_FROM_0_TO_24.atCeiling()),
             is(PlainTime.of(19, 59, 59, 999999999)));
     }
 
     @Test
-    public void isoHourAtCeilingIfFullHour() {
+    public void hour0To24AtCeilingIfFullHour() {
         assertThat(
-            PlainTime.of(19).with(ISO_HOUR.atCeiling()),
+            PlainTime.of(19).with(HOUR_FROM_0_TO_24.atCeiling()),
             is(PlainTime.of(19, 59, 59, 999999999)));
         assertThat(
-            PlainTime.of(24).with(ISO_HOUR.atCeiling()),
+            PlainTime.of(24).with(HOUR_FROM_0_TO_24.atCeiling()),
             is(PlainTime.of(24)));
     }
 

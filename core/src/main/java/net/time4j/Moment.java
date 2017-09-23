@@ -413,7 +413,7 @@ public final class Moment
 
     static {
         Set<ChronoElement<?>> high = new HashSet<ChronoElement<?>>();
-        high.add(ISO_HOUR);
+        high.add(HOUR_FROM_0_TO_24);
         high.add(DIGITAL_HOUR_OF_DAY);
         high.add(DIGITAL_HOUR_OF_AMPM);
         high.add(CLOCK_HOUR_OF_DAY);

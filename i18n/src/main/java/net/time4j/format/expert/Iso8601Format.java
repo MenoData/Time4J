@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Iso8601Format.java) is part of project Time4J.
  *
@@ -692,7 +692,7 @@ LOOP:
 
         builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
         builder.startSection(Attributes.ZERO_DIGIT, '0');
-        builder.addFixedInteger(ISO_HOUR, 2);
+        builder.addFixedInteger(HOUR_FROM_0_TO_24, 2);
         builder.startOptionalSection();
 
         if (extended) {

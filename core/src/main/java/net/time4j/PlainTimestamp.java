@@ -105,7 +105,7 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
  *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
  *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
- *  <li>{@link PlainTime#ISO_HOUR}</li>
+ *  <li>{@link PlainTime#HOUR_FROM_0_TO_24}</li>
  *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
  *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
  *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
@@ -154,7 +154,7 @@ import static net.time4j.PlainTime.*;
  *  <li>{@link PlainTime#CLOCK_HOUR_OF_DAY}</li>
  *  <li>{@link PlainTime#DIGITAL_HOUR_OF_AMPM}</li>
  *  <li>{@link PlainTime#DIGITAL_HOUR_OF_DAY}</li>
- *  <li>{@link PlainTime#ISO_HOUR}</li>
+ *  <li>{@link PlainTime#HOUR_FROM_0_TO_24}</li>
  *  <li>{@link PlainTime#MINUTE_OF_HOUR}</li>
  *  <li>{@link PlainTime#MINUTE_OF_DAY}</li>
  *  <li>{@link PlainTime#SECOND_OF_MINUTE}</li>
@@ -218,7 +218,7 @@ public final class PlainTimestamp
         children.put(CLOCK_HOUR_OF_DAY, MINUTE_OF_HOUR);
         children.put(DIGITAL_HOUR_OF_AMPM, MINUTE_OF_HOUR);
         children.put(DIGITAL_HOUR_OF_DAY, MINUTE_OF_HOUR);
-        children.put(ISO_HOUR, MINUTE_OF_HOUR);
+        children.put(HOUR_FROM_0_TO_24, MINUTE_OF_HOUR);
         children.put(MINUTE_OF_HOUR, SECOND_OF_MINUTE);
         children.put(MINUTE_OF_DAY, SECOND_OF_MINUTE);
         children.put(SECOND_OF_MINUTE, NANO_OF_SECOND);
@@ -300,8 +300,8 @@ public final class PlainTimestamp
                     FieldRule.of(DIGITAL_HOUR_OF_DAY),
                     HOURS)
                 .appendElement(
-                    ISO_HOUR,
-                    FieldRule.of(ISO_HOUR),
+                    HOUR_FROM_0_TO_24,
+                    FieldRule.of(HOUR_FROM_0_TO_24),
                     HOURS)
                 .appendElement(
                     MINUTE_OF_HOUR,

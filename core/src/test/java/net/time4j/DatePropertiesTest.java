@@ -1309,37 +1309,37 @@ public class DatePropertiesTest {
     }
 
     @Test
-    public void containsIsoHour() {
+    public void containsHour0To24() {
         assertThat(
-            PlainDate.of(2014, 4, 21).contains(ISO_HOUR),
+            PlainDate.of(2014, 4, 21).contains(HOUR_FROM_0_TO_24),
             is(false));
     }
 
     @Test(expected=ChronoException.class)
-    public void getIsoHour() {
-        PlainDate.of(2014, 4, 21).get(ISO_HOUR);
+    public void getHour0To24() {
+        PlainDate.of(2014, 4, 21).get(HOUR_FROM_0_TO_24);
     }
 
     @Test(expected=ChronoException.class)
-    public void getMinimumIsoHour() {
-        PlainDate.of(2014, 4, 21).getMinimum(ISO_HOUR);
+    public void getMinimumHour0To24() {
+        PlainDate.of(2014, 4, 21).getMinimum(HOUR_FROM_0_TO_24);
     }
 
     @Test(expected=ChronoException.class)
-    public void getMaximumIsoHour() {
-        PlainDate.of(2014, 4, 21).getMaximum(ISO_HOUR);
+    public void getMaximumHour0To24() {
+        PlainDate.of(2014, 4, 21).getMaximum(HOUR_FROM_0_TO_24);
     }
 
     @Test
-    public void isValidIsoHour() {
+    public void isValidHour0To24() {
         assertThat(
-            PlainDate.of(2014, 4, 21).isValid(ISO_HOUR, 1),
+            PlainDate.of(2014, 4, 21).isValid(HOUR_FROM_0_TO_24, 1),
             is(false));
     }
 
     @Test(expected=ChronoException.class)
-    public void withIsoHour() {
-        PlainDate.of(2014, 4, 21).with(ISO_HOUR, 1);
+    public void withHour0To24() {
+        PlainDate.of(2014, 4, 21).with(HOUR_FROM_0_TO_24, 1);
     }
 
     @Test

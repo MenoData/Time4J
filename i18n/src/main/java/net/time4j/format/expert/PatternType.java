@@ -851,9 +851,9 @@ public enum PatternType
      *      <th>Description</th>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainTime#ISO_HOUR}</td>
+     *      <td>{@link PlainTime#HOUR_FROM_0_TO_24}</td>
      *      <td>H</td>
-     *      <td>Hour of day as defined in ISO-8601 - in range 0-24 (the value 24 is only permitted if
+     *      <td>Hour of day - in full range 0-24 (the value 24 is only permitted if
      *      all other time parts are zero). </td>
      *  </tr>
      * </table>
@@ -862,7 +862,7 @@ public enum PatternType
      * @since   3.4/4.3
      */
     /*[deutsch]
-     * <p>CLDR-Variante, die das Symbol &quot;H&quot; als ISO-8601-Stunde im Bereich 0-24 interpretiert. </p>
+     * <p>CLDR-Variante, die das Symbol &quot;H&quot; als volle Stunde im Bereich 0-24 interpretiert. </p>
      *
      * <p>Unterschiede zu {@link #CLDR}: </p>
      *
@@ -875,9 +875,9 @@ public enum PatternType
      *      <th>Beschreibung</th>
      *  </tr>
      *  <tr>
-     *      <td>{@link PlainTime#ISO_HOUR}</td>
+     *      <td>{@link PlainTime#HOUR_FROM_0_TO_24}</td>
      *      <td>H</td>
-     *      <td>Stunde des ISO-8601-Formats im Bereich 0-24 (der Wert 24 ist nur dann erlaubt,
+     *      <td>Volle Stunde im Bereich 0-24 (der Wert 24 ist nur dann erlaubt,
      *      wenn alle anderen Uhrzeitanteile {@code 0} sind). </td>
      *  </tr>
      * </table>
@@ -1902,7 +1902,7 @@ public enum PatternType
     ) {
 
         if (symbol == 'H') {
-            addNumber(PlainTime.ISO_HOUR, symbol, builder, count, false);
+            addNumber(PlainTime.HOUR_FROM_0_TO_24, symbol, builder, count, false);
             return Collections.emptyMap();
         }
 
