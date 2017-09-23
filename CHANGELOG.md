@@ -5,6 +5,7 @@
 - Empty intervals should not be added to interval collection [#678]
 
 ### Fixed
+- Zone name parsing should use string-prefix-matching [#686]
 - Duration parser tolerates trailing chars [#682]
 
 ## [v3.34] published on 2017-09-10
