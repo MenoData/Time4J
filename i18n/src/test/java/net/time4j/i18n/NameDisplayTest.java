@@ -187,4 +187,32 @@ public class NameDisplayTest {
             is(Month.JANUARY));
     }
 
+    @Test
+    public void parseMeridiemName() throws ParseException {
+        assertThat(
+            Meridiem.parse(
+                "a. m.", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.AM));
+        assertThat(
+            Meridiem.parse(
+                "p. m.", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.PM));
+        assertThat(
+            Meridiem.parse(
+                "am", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.AM));
+        assertThat(
+            Meridiem.parse(
+                "AM", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.AM));
+        assertThat(
+            Meridiem.parse(
+                "pm", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.PM));
+        assertThat(
+            Meridiem.parse(
+                "PM", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.PM));
+    }
+
 }
