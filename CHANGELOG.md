@@ -1,5 +1,8 @@
-## [v3.35] not yet released
+## [v3.36] not yet released
+
+## [v3.35] published on 2017-09-25
 ### Added
+- New hemisphere-related methods in astronomical classes [#688]
 - Unit simulating Joda-behaviour for month-based durations [#687]
 
 ### Changed
