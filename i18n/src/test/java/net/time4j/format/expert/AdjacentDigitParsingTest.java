@@ -63,7 +63,7 @@ public class AdjacentDigitParsingTest {
                 .addInteger(PlainDate.YEAR, 4, 9)
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
-                .addFixedInteger(PlainTime.ISO_HOUR, 2)
+                .addFixedInteger(PlainTime.HOUR_FROM_0_TO_24, 2)
                 .addFraction(PlainTime.NANO_OF_SECOND, 3, 6, false)
                 .build();
         formatter.parse("20000229174521123456");
@@ -77,7 +77,7 @@ public class AdjacentDigitParsingTest {
                 .addInteger(PlainDate.YEAR, 4, 9)
                 .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
-                .addFixedInteger(PlainTime.ISO_HOUR, 2)
+                .addFixedInteger(PlainTime.HOUR_FROM_0_TO_24, 2)
                 .addFraction(PlainTime.NANO_OF_SECOND, 6, 6, false)
                 .build();
         assertThat(
@@ -209,7 +209,7 @@ public class AdjacentDigitParsingTest {
         ChronoFormatter<PlainTime> formatter =
             ChronoFormatter
                 .setUp(PlainTime.class, Locale.ROOT)
-                .addInteger(PlainTime.ISO_HOUR, 1, 2)
+                .addInteger(PlainTime.HOUR_FROM_0_TO_24, 1, 2)
                 .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
                 .build();
         assertThat(

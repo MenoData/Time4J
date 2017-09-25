@@ -171,7 +171,7 @@ public class DecimalFormatTest {
         ChronoFormatter<PlainTime> formatter =
             ChronoFormatter
                 .setUp(PlainTime.class, Locale.ROOT)
-                .addInteger(PlainTime.ISO_HOUR, 1, 2)
+                .addInteger(PlainTime.HOUR_FROM_0_TO_24, 1, 2)
                 .addFixedDecimal(PlainTime.DECIMAL_MINUTE, 3, 1)
                 .build();
         assertThat(

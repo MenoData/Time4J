@@ -1,11 +1,23 @@
-## [v4.30] not yet released
+## [v4.31] not yet released
+
+## [v4.30] published on 2017-09-25
+### Added
+- New hemisphere-related methods in astronomical classes [#688]
+- Unit simulating Joda-behaviour for month-based durations [#687]
+
 ### Changed
+- Parsing of "AM" or "PM" for all locales [#684]
+- Changes to CalendarUnit.keepingEndOfMonth() and atEndOfMonth() [#679]
 - Clarify meaning of IntervalCollection [#677]
 - Empty intervals should not be added to interval collection [#678]
 
 ### Fixed
+- Zone name parsing should use string-prefix-matching [#686]
 - Duration parser tolerates trailing chars [#682]
 - Conversion of Time4J-Duration to temporal amount sometimes broken [#680]
+
+### Deprecated
+- Rename PlainTime.ISO_HOUR to HOUR_FROM_0_TO_24 [#685]
 
 ## [v4.29] published on 2017-09-10
 ### Added

@@ -138,7 +138,7 @@ public class NameDisplayTest {
         assertThat(PlainTime.DIGITAL_HOUR_OF_DAY.getDisplayName(Locale.GERMAN), is("Stunde"));
         assertThat(PlainTime.CLOCK_HOUR_OF_AMPM.getDisplayName(Locale.GERMAN), is("Stunde"));
         assertThat(PlainTime.DIGITAL_HOUR_OF_AMPM.getDisplayName(Locale.GERMAN), is("Stunde"));
-        assertThat(PlainTime.ISO_HOUR.getDisplayName(Locale.GERMAN), is("Stunde"));
+        assertThat(PlainTime.HOUR_FROM_0_TO_24.getDisplayName(Locale.GERMAN), is("Stunde"));
     }
 
     @Test
@@ -185,6 +185,34 @@ public class NameDisplayTest {
             Month.parse(
                 "Jan", Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.STANDALONE),
             is(Month.JANUARY));
+    }
+
+    @Test
+    public void parseMeridiemName() throws ParseException {
+        assertThat(
+            Meridiem.parse(
+                "a. m.", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.AM));
+        assertThat(
+            Meridiem.parse(
+                "p. m.", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.PM));
+        assertThat(
+            Meridiem.parse(
+                "am", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.AM));
+        assertThat(
+            Meridiem.parse(
+                "AM", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.AM));
+        assertThat(
+            Meridiem.parse(
+                "pm", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.PM));
+        assertThat(
+            Meridiem.parse(
+                "PM", new Locale("es"), TextWidth.WIDE, OutputContext.FORMAT),
+            is(Meridiem.PM));
     }
 
 }

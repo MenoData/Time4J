@@ -1855,16 +1855,7 @@ public final class PlainDate
                     MathUtils.safeMultiply(amount, 7),
                     policy);
             case DAYS:
-                PlainDate date = addDays(context, amount);
-                if (policy == OverflowUnit.POLICY_END_OF_MONTH) {
-                    return PlainDate.of(
-                        date.year,
-                        date.month,
-                        GregorianMath.getLengthOfMonth(date.year, date.month)
-                    );
-                } else {
-                    return date;
-                }
+                return addDays(context, amount);
             default:
                 throw new UnsupportedOperationException(unit.name());
         }
@@ -2077,6 +2068,7 @@ public final class PlainDate
                 case OverflowUnit.POLICY_PREVIOUS_VALID_DATE:
                 case OverflowUnit.POLICY_END_OF_MONTH:
                 case OverflowUnit.POLICY_KEEPING_LAST_DATE:
+                case OverflowUnit.POLICY_JODA_METRIC:
                     dom = max;
                     break;
                 case OverflowUnit.POLICY_NEXT_VALID_DATE:

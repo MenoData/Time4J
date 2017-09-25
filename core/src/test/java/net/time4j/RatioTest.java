@@ -129,18 +129,18 @@ public class RatioTest {
     }
 
     @Test
-    public void isoHourRatio() {
+    public void hour0To24Ratio() {
         assertThat(
-           PlainTime.midnightAtStartOfDay().get(ISO_HOUR.ratio()),
+           PlainTime.midnightAtStartOfDay().get(HOUR_FROM_0_TO_24.ratio()),
            is(BigDecimal.ZERO));
         assertThat(
-           PlainTime.of(6).get(ISO_HOUR.ratio()),
+           PlainTime.of(6).get(HOUR_FROM_0_TO_24.ratio()),
            is(new BigDecimal("0.25")));
         assertThat(
-           PlainTime.of(6, 12, 30).get(ISO_HOUR.ratio()),
+           PlainTime.of(6, 12, 30).get(HOUR_FROM_0_TO_24.ratio()),
            is(new BigDecimal("0.25")));
         assertThat(
-           PlainTime.midnightAtEndOfDay().get(ISO_HOUR.ratio()),
+           PlainTime.midnightAtEndOfDay().get(HOUR_FROM_0_TO_24.ratio()),
            is(BigDecimal.ONE));
     }
 
