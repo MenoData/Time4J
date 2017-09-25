@@ -177,6 +177,41 @@ public class AstroTest {
     }
 
     @Test
+    public void onNorthernHemisphere() {
+        for (AstronomicalSeason season : AstronomicalSeason.values()) {
+            assertThat(season.onNorthernHemisphere(), is(season));
+        }
+    }
+
+    @Test
+    public void onSouthernHemisphere() {
+        assertThat(VERNAL_EQUINOX.onSouthernHemisphere(), is(AUTUMNAL_EQUINOX));
+        assertThat(SUMMER_SOLSTICE.onSouthernHemisphere(), is(WINTER_SOLSTICE));
+        assertThat(AUTUMNAL_EQUINOX.onSouthernHemisphere(), is(VERNAL_EQUINOX));
+        assertThat(WINTER_SOLSTICE.onSouthernHemisphere(), is(SUMMER_SOLSTICE));
+    }
+
+    @Test
+    public void solarTimeBuilder() {
+        assertThat( // Hamburg
+            SolarTime.ofLocation().northernLatitude(53, 0, 0).easternLongitude(10, 0, 0).build(),
+            is(SolarTime.ofLocation(53, 10)));
+        assertThat( // Kilimanjaro
+            SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build(),
+            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, SolarTime.Calculator.NOAA)));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void solarTimeBuilderEx1() {
+        SolarTime.ofLocation().northernLatitude(90, 0, 0.001).easternLongitude(10, 0, 0).build();
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void solarTimeBuilderEx2() {
+        SolarTime.ofLocation().northernLatitude(40, 0, 0).westernLongitude(180, 0, 0.001).build();
+    }
+
+    @Test
     public void solarTimeTeheran() {
         ZonalOffset teheran = ZonalOffset.atLongitude(OffsetSign.AHEAD_OF_UTC, 52, 30, 0.0); // +03:30
         Moment spring2024 = AstronomicalSeason.VERNAL_EQUINOX.inYear(2024);

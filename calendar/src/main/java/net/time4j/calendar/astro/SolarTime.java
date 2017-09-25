@@ -138,14 +138,42 @@ public final class SolarTime
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Obtains a builder for creating a new instance of local solar time. </p>
+     *
+     * <p>This method is the recommended approach if any given geographical position is described
+     * in degrees including arc minutes and arc seconds in order to avoid manual conversions to
+     * decimal degrees. </p>
+     *
+     * @return  builder for creating a new instance of local solar time
+     * @since   3.35/4.30
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Builder} zur Erzeugung einer neuen Instanz einer lokalen Sonnenzeit. </p>
+     *
+     * <p>Diese Methode ist der empfohlene Ansatz, wenn irgendeine geographische Positionsangabe
+     * in Grad mit Bogenminuten und Bogensekunden vorliegt, um manuelle Umrechnungen in Dezimalangaben
+     * zu vermeiden. </p>
+     *
+     * @return  builder for creating a new instance of local solar time
+     * @since   3.35/4.30
+     */
+    public static SolarTime.Builder ofLocation() {
+
+        return new Builder();
+
+    }
+
+    /**
      * <p>Obtains the solar time for given geographical location at sea level. </p>
      *
      * <p>The default calculator is usually {@link Calculator#NOAA} unless another calculator was
      * set up via the service loader mechnism. </p>
      *
-     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
-     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
+     * @see     #ofLocation()
+     * @see     #ofLocation(double, double, int, String)
      * @since   3.34/4.29
      */
     /*[deutsch]
@@ -154,9 +182,11 @@ public final class SolarTime
      * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn,
      * eine andere Methode wurde &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
-     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
-     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
+     * @see     #ofLocation()
+     * @see     #ofLocation(double, double, int, String)
      * @since   3.34/4.29
      */
     public static SolarTime ofLocation(
@@ -171,11 +201,12 @@ public final class SolarTime
     /**
      * <p>Obtains the solar time for given geographical location. </p>
      *
-     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
-     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
+     * @see     #ofLocation()
      * @see     Calculator#NOAA
      * @see     Calculator#SIMPLE
      * @since   3.34/4.29
@@ -183,11 +214,12 @@ public final class SolarTime
     /*[deutsch]
      * <p>Liefert die Sonnenzeit zur angegebenen geographischen Position. </p>
      *
-     * @param   latitude    geographical latitude in degrees ({@code -90.0 <= x <= +90.0})
-     * @param   longitude   geographical longitude in degrees ({@code -180.0 <= x < 180.0})
+     * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
+     * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
+     * @see     #ofLocation()
      * @see     Calculator#NOAA
      * @see     Calculator#SIMPLE
      * @since   3.34/4.29
@@ -200,7 +232,6 @@ public final class SolarTime
     ) {
 
         check(latitude, longitude, altitude, calculator);
-
         return new SolarTime(latitude, longitude, altitude, calculator);
 
     }
@@ -208,13 +239,13 @@ public final class SolarTime
     /**
      * <p>Obtains the geographical latitude of this instance. </p>
      *
-     * @return  latitude in degrees
+     * @return  latitude in decimal degrees
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Liefert den geographischen Breitengrad dieser Instanz. </p>
      *
-     * @return  latitude in degrees
+     * @return  latitude in decimal degrees
      * @since   3.34/4.29
      */
     public double getLatitude() {
@@ -226,13 +257,13 @@ public final class SolarTime
     /**
      * <p>Obtains the geographical longitude of this instance. </p>
      *
-     * @return  longitude in degrees
+     * @return  longitude in decimal degrees
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Liefert den geographischen L&auml;ngengrad dieser Instanz. </p>
      *
-     * @return  longitude in degrees
+     * @return  longitude in decimal degrees
      * @since   3.34/4.29
      */
     public double getLongitude() {
@@ -979,7 +1010,7 @@ public final class SolarTime
 
     }
 
-    // used in test classes
+    // used in test classes, too
     double getHighestElevationOfSun(PlainDate date) {
 
         Moment noon = date.get(this.transitAtNoon());
@@ -1092,18 +1123,22 @@ public final class SolarTime
     private static void check(
         double latitude,
         double longitude,
-        double elevation,
+        int altitude,
         String calculator
     ) {
 
-        if ((Double.compare(latitude, 90.0) > 0) || (Double.compare(latitude, -90.0) < 0)) {
+        if (Double.isNaN(latitude) || Double.isInfinite(latitude)) {
+            throw new IllegalArgumentException("Latitude must be a finite value: " + latitude);
+        } else if (Double.isNaN(longitude) || Double.isInfinite(longitude)) {
+            throw new IllegalArgumentException("Longitude must be a finite value: " + longitude);
+        } else if ((Double.compare(latitude, 90.0) > 0) || (Double.compare(latitude, -90.0) < 0)) {
             throw new IllegalArgumentException("Degrees out of range -90.0 <= latitude <= +90.0: " + latitude);
         } else if ((Double.compare(longitude, 180.0) >= 0) || (Double.compare(longitude, -180.0) < 0)) {
             throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
-        } else if ((elevation < -1000) || (elevation > 9999)) {
-            throw new IllegalArgumentException("Meters out of range -1000 <= elevation < +10,000: " + elevation);
-        } else if (calculator == null) {
-            throw new NullPointerException("Missing calculator.");
+        } else if ((altitude < -1000) || (altitude > 9999)) {
+            throw new IllegalArgumentException("Meters out of range -1000 <= altitude < +10,000: " + altitude);
+        } else if (calculator.isEmpty()) {
+            throw new IllegalArgumentException("Missing calculator.");
         } else if (!CALCULATORS.containsKey(calculator)) {
             throw new IllegalArgumentException("Unknown calculator: " + calculator);
         }
@@ -1124,6 +1159,252 @@ public final class SolarTime
     }
 
     //~ Innere Klassen ----------------------------------------------------
+
+    /**
+     * <p>Helper class to construct a new instance of {@code SolarTime}. </p>
+     *
+     * @author  Meno Hochschild
+     * @since   3.35/4.30
+     */
+    /*[deutsch]
+     * <p>Hilfsklasse f&uuml;r die Erzeugung einer neuen Instanz von {@code SolarTime}. </p>
+     *
+     * @author  Meno Hochschild
+     * @since   3.35/4.30
+     */
+    public static class Builder {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private double latitude = Double.NaN;
+        private double longitude = Double.NaN;
+        private int altitude = 0;
+        private String calculator = DEFAULT_CALCULATOR.name();
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private Builder() {
+            super();
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        /**
+         * <p>Sets the northern latitude in degrees, arc minutes and arc seconds. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x <= 90}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        /*[deutsch]
+         * <p>Setzt die n&ouml;rdliche geographische Breite in Grad, Bogenminuten und Bogensekunden. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x <= 90}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        public Builder northernLatitude(
+            int degrees,
+            int minutes,
+            double seconds
+        ) {
+
+            check(degrees, minutes, seconds, 90);
+            this.latitude = degrees + minutes / 60.0 + seconds / 3600.0;
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the southern latitude in degrees, arc minutes and arc seconds. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x <= 90}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        /*[deutsch]
+         * <p>Setzt die s&uuml;dliche geographische Breite in Grad, Bogenminuten und Bogensekunden. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x <= 90}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        public Builder southernLatitude(
+            int degrees,
+            int minutes,
+            double seconds
+        ) {
+
+            check(degrees, minutes, seconds, 90);
+            this.latitude = -1 * (degrees + minutes / 60.0 + seconds / 3600.0);
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the eastern longitude in degrees, arc minutes and arc seconds. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x < 180}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        /*[deutsch]
+         * <p>Setzt die &ouml;stliche geographische L&auml;nge in Grad, Bogenminuten und Bogensekunden. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x < 180}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        public Builder easternLongitude(
+            int degrees,
+            int minutes,
+            double seconds
+        ) {
+
+            check(degrees, minutes, seconds, 179);
+            this.longitude = degrees + minutes / 60.0 + seconds / 3600.0;
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the western longitude in degrees, arc minutes and arc seconds. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x <= 180}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        /*[deutsch]
+         * <p>Setzt die westliche geographische L&auml;nge in Grad, Bogenminuten und Bogensekunden. </p>
+         *
+         * @param   degrees     degrees in range {@code 0 <= x <= 180}
+         * @param   minutes     arc minutes in range {@code 0 <= x < 60}
+         * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any parameter is out of range
+         */
+        public Builder westernLongitude(
+            int degrees,
+            int minutes,
+            double seconds
+        ) {
+
+            check(degrees, minutes, seconds, 180);
+            this.longitude = -1 * (degrees + minutes / 60.0 + seconds / 3600.0);
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the altitude in meters. </p>
+         *
+         * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
+         * <p>Setzt die H&ouml;he in Metern. </p>
+         *
+         * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+         * @return  this instance for method chaining
+         */
+        public Builder atAltitude(int altitude) {
+
+            if ((altitude < -1000) || (altitude > 9999)) {
+                throw new IllegalArgumentException("Meters out of range -1000 <= altitude < +10,000: " + altitude);
+            }
+
+            this.altitude = altitude;
+            return this;
+
+        }
+
+        /**
+         * <p>Sets the reference to the solar time calculator to be used. </p>
+         *
+         * @param   calculator  name of solar time calculator
+         * @return  this instance for method chaining
+         */
+        /*[deutsch]
+         * <p>Setzt die Referenz auf das zugrundeliegende Berechnungsverfahren. </p>
+         *
+         * @param   calculator  name of solar time calculator
+         * @return  this instance for method chaining
+         */
+        public Builder usingCalculator(String calculator) {
+
+            if (calculator.isEmpty()) {
+                throw new IllegalArgumentException("Missing calculator.");
+            }
+
+            this.calculator = calculator;
+            return this;
+
+        }
+
+        /**
+         * <p>Finishes the build-process. </p>
+         *
+         * @return  new configured instance of {@code SolarTime}
+         * @throws  IllegalStateException if either latitude or longitude have not yet been set
+         */
+        /*[deutsch]
+         * <p>Schlie&szlig;t den Erzeugungs- und Konfigurationsprozess ab. </p>
+         *
+         * @return  new configured instance of {@code SolarTime}
+         * @throws  IllegalStateException if either latitude or longitude have not yet been set
+         */
+        public SolarTime build() {
+
+            if (Double.isNaN(this.latitude)) {
+                throw new IllegalStateException("Latitude was not yet set.");
+            } else if (Double.isNaN(this.longitude)) {
+                throw new IllegalStateException("Longitude was not yet set.");
+            }
+
+            return new SolarTime(this.latitude, this.longitude, this.altitude, this.calculator);
+
+        }
+
+        private static void check(
+            int degrees,
+            int minutes,
+            double seconds,
+            int max
+        ) {
+
+            if (
+                degrees < 0
+                || degrees > max
+                || ((degrees == max) && (max != 179) && (minutes > 0 || Double.compare(seconds, 0.0) > 0))
+            ) {
+                double v = degrees + minutes / 60.0 + seconds / 3600.0;
+                throw new IllegalArgumentException("Degrees out of range: " + degrees + " (decimal=" + v + ")");
+            } else if (minutes < 0 || minutes >= 60) {
+                throw new IllegalArgumentException("Arc minutes out of range: " + minutes);
+            } else if (Double.isNaN(seconds) || Double.isInfinite(seconds)) {
+                throw new IllegalArgumentException("Arc seconds must be finite.");
+            } else if (Double.compare(seconds, 0.0) < 0 || Double.compare(seconds, 60.0) >= 0) {
+                throw new IllegalArgumentException("Arc seconds out of range: " + seconds);
+            }
+
+        }
+
+    }
 
     /**
      * <p>An SPI-interface representing a facade for the calculation engine regarding sunrise or sunset. </p>

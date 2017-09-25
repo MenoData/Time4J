@@ -29,11 +29,17 @@ import net.time4j.scale.TimeScale;
 /**
  * <p>The four astronomical seasons (Spring, Summer, Autumn and Winter). </p>
  *
+ * <p>If there is no context information then Time4J will assume that any season is related
+ * to the northern hemisphere. </p>
+ *
  * @author 	Meno Hochschild
  * @since 	3.33/4.28
  */
 /*[deutsch]
  * <p>Die vier astronomischen Jahreszeiten (Fr&uuml;hling, Sommer, Herbst und Winter). </p>
+ *
+ * <p>Falls keine Kontextinformation verf&uuml;gbar ist, wird Time4J annehmen, da&szlig;
+ * eine gegebene Jahreszeit sich auf die Nordhalbkugel der Erde bezieht. </p>
  *
  * @author 	Meno Hochschild
  * @since 	3.33/4.28
@@ -145,6 +151,57 @@ public enum AstronomicalSeason {
 	public JulianDay julianDay(int year) {
 
 		return JulianDay.ofEphemerisTime(this.jdEphemerisDays(year));
+
+	}
+
+	/**
+	 * <p>Interpretes this season as related to the northern hemisphere and returns
+	 * this instance unchanged. </p>
+	 *
+	 * <p>This method does not change anything but serves for better documentation
+	 * and more clarity about the meaning of this season. </p>
+	 *
+	 * @return	this instance (identity operation)
+	 * @see 	#onSouthernHemisphere()
+	 * @since 	3.35/4.30
+	 */
+	/*[deutsch]
+	 * <p>Interpretiert diese Jahreszeit als auf die Nordhalbkugel der Erde bezogen
+	 * und gibt diese Instanz unver&auml;ndert zur&uuml;ck. </p>
+	 *
+	 * <p>Diese Methode &auml;ndert nichts und ist nur zur besseren Dokumentation
+	 * und gr&ouml;&szlig;eren Klarheit &uuml;ber die Bedeutung dieser Jahreszeit
+	 * gedacht. </p>
+	 *
+	 * @return	this instance (identity operation)
+	 * @see 	#onSouthernHemisphere()
+	 * @since 	3.35/4.30
+	 */
+	public AstronomicalSeason onNorthernHemisphere() {
+
+		return this;
+
+	}
+
+	/**
+	 * <p>Interpretes this season as related to the southern hemisphere and returns
+	 * the corresponding northern equivalent. </p>
+	 *
+	 * @return	northern equivalent of this season
+	 * @see 	#onNorthernHemisphere()
+	 * @since 	3.35/4.30
+	 */
+	/*[deutsch]
+	 * <p>Interpretiert diese Jahreszeit als auf die S&uuml;dhalbkugel der Erde bezogen
+	 * und gibt die entsprechende Jahreszeit der Nordhalbkugel zur&uuml;ck. </p>
+	 *
+	 * @return	northern equivalent of this season
+	 * @see 	#onNorthernHemisphere()
+	 * @since 	3.35/4.30
+	 */
+	public AstronomicalSeason onSouthernHemisphere() {
+
+		return AstronomicalSeason.values()[(this.ordinal() + 2) % 4];
 
 	}
 
