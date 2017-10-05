@@ -703,16 +703,16 @@ public class AstroTest {
         SolarTime kibo5895 = SolarTime.ofLocation(-3.066667, 37.359167, 5895, SolarTime.Calculator.NOAA);
         assertThat(
             date.get(kibo5895.sunrise(tzid)),
-            is(PlainTime.of(6, 9, 28)));
+            is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level
         assertThat(
             date.get(kibo5895.sunset(tzid)),
-            is(PlainTime.of(18, 48, 55)));
+            is(PlainTime.of(18, 47, 48))); // 18:48:55 with same atmospheric refraction as on sea level
         assertThat(
             kibo5895.getAltitude(),
             is(5895));
         assertThat(
             date.get(kibo5895.sunshine(tzid)).length(),
-            is(12 * 3600 + 39 * 60 + 27));
+            is(12 * 3600 + 37 * 60 + 14));
         // good agreement with NOAA
         SolarTime kiboSeaLevel = SolarTime.ofLocation(-3.066667, 37.359167, 0, SolarTime.Calculator.NOAA);
         assertThat(

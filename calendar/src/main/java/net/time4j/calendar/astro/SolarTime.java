@@ -53,6 +53,24 @@ import java.util.concurrent.TimeUnit;
  * <p>Notice: Most chronological functions use the astronomical equation of time. Hence they are only applicable
  * for years between -2000 and +3000 otherwise an {@code IllegalArgumentException} will be thrown. </p>
  *
+ * <p>Example for sunrise and sunset on the top of Africas highest mountain Kilimanjaro: </p>
+ *
+ * <pre>
+ *     PlainDate date = PlainDate.of(2017, 12, 22);
+ *     TZID tzid = Timezone.of(&quot;Africa/Dar_es_Salaam&quot;).getID(); // Tanzania: UTC+03:00
+ *
+ *     // high altitude => earlier sunrise and later sunset
+ *     SolarTime kibo5895 =
+ *       SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
+ *
+ *     assertThat(
+ *       date.get(kibo5895.sunrise(tzid)),
+ *       is(PlainTime.of(6, 10, 34)));
+ *     assertThat(
+ *       date.get(kibo5895.sunset(tzid)),
+ *       is(PlainTime.of(18, 47, 48)));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.33/4.28
  */
@@ -62,6 +80,24 @@ import java.util.concurrent.TimeUnit;
  * <p>Notiz: Die meisten chronologischen Funktionen verwenden die astronomische Zeitgleichung. Daher sind
  * sie nur f&uuml;r Jahre zwischen -2000 und +3000 anwendbar, sonst wird gegebenenfalls eine
  * {@code IllegalArgumentException} geworfen. </p>
+ *
+ * <p>Beispielrechnung f&uuml;r den Sonnenaufgang und -untergang auf Afrikas h&ouml;chstem Berg Kilimanjaro: </p>
+ *
+ * <pre>
+ *     PlainDate date = PlainDate.of(2017, 12, 22);
+ *     TZID tzid = Timezone.of(&quot;Africa/Dar_es_Salaam&quot;).getID(); // Tansania: UTC+03:00
+ *
+ *     // gro&szlig;e H&ouml;he => fr&uuml;herer Sonnenaufgang und sp&auml;terer Sonnenuntergang
+ *     SolarTime kibo5895 =
+ *       SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
+ *
+ *     assertThat(
+ *       date.get(kibo5895.sunrise(tzid)),
+ *       is(PlainTime.of(6, 10, 34)));
+ *     assertThat(
+ *       date.get(kibo5895.sunset(tzid)),
+ *       is(PlainTime.of(18, 47, 48)));
+ * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.33/4.28
@@ -73,7 +109,10 @@ public final class SolarTime
 
     private static final double EQUATORIAL_RADIUS = 6378137.0;
     private static final double POLAR_RADIUS = 6356752.3;
-    private static final double STD_ZENITH = 90.0 + (50.0 / 60.0);
+    private static final double SUN_RADIUS = 16.0;
+    private static final double STD_REFRACTION = 34.0;
+    private static final double STD_ZENITH = 90.0 + (SUN_RADIUS + STD_REFRACTION) / 60.0;
+    private static final double BENNETT_TERM = 1 / Math.tan(Math.toRadians(7.31 / 4.4)); // Meeus (16.3)
     private static final Calculator DEFAULT_CALCULATOR;
     private static final Map<String, Calculator> CALCULATORS;
 
@@ -203,7 +242,7 @@ public final class SolarTime
      *
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
-     * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
      * @see     #ofLocation()
@@ -216,7 +255,7 @@ public final class SolarTime
      *
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
-     * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+     * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
      * @see     #ofLocation()
@@ -357,7 +396,8 @@ public final class SolarTime
      * <p>Calculates the time of given twilight at sunrise and the location of this instance. </p>
      *
      * <p>Note: The precision is generally constrained to minutes. If there is no sunrise then
-     * the function will just yield {@code null}. </p>
+     * the function will just yield {@code null}. And the atmospheric refraction
+     * is here not taken into account. </p>
      *
      * @param   twilight    relevant definition of twilight
      * @return  twilight function at sunrise applicable on any calendar date
@@ -367,7 +407,8 @@ public final class SolarTime
      * <p>Berechnet die Zeit der angegebenen D&auml;mmerung zum Sonnenaufgang an der Position dieser Instanz. </p>
      *
      * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Gibt es keinen Sonnenaufgang,
-     * wird die Funktion lediglich {@code null} liefern. </p>
+     * wird die Funktion lediglich {@code null} liefern. Die atmosp&auml;rische Lichtbeugung wird
+     * hier nicht ber&uuml;cksichtigt. </p>
      *
      * @param   twilight    relevant definition of twilight
      * @return  twilight function at sunrise applicable on any calendar date
@@ -375,7 +416,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Moment> sunrise(Twilight twilight) {
 
-        final double effAngle = 90.0 + this.sunAngleOfAltitude() + twilight.getAngle();
+        final double effAngle = 90.0 + this.geodeticAngle() + twilight.getAngle();
         return new ChronoFunction<CalendarDate, Moment>() {
             @Override
             public Moment apply(CalendarDate date) {
@@ -475,7 +516,8 @@ public final class SolarTime
      * <p>Calculates the time of given twilight at sunset and the location of this instance. </p>
      *
      * <p>Note: The precision is generally constrained to minutes. If there is no sunset then
-     * the function will just yield {@code null}. </p>
+     * the function will just yield {@code null}. And the atmospheric refraction
+     * is here not taken into account. </p>
      *
      * @param   twilight    relevant definition of twilight
      * @return  twilight function at sunset applicable on any calendar date
@@ -485,7 +527,8 @@ public final class SolarTime
      * <p>Berechnet die Zeit der angegebenen D&auml;mmerung zum Sonnenuntergang an der Position dieser Instanz. </p>
      *
      * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Gibt es keinen Sonnenuntergang,
-     * wird die Funktion lediglich {@code null} liefern. </p>
+     * wird die Funktion lediglich {@code null} liefern. Die atmosp&auml;rische Lichtbeugung wird
+     * hier nicht ber&uuml;cksichtigt. </p>
      *
      * @param   twilight    relevant definition of twilight
      * @return  twilight function at sunset applicable on any calendar date
@@ -493,7 +536,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Moment> sunset(Twilight twilight) {
 
-        final double effAngle = 90.0 + this.sunAngleOfAltitude() + twilight.getAngle();
+        final double effAngle = 90.0 + this.geodeticAngle() + twilight.getAngle();
         return new ChronoFunction<CalendarDate, Moment>() {
             @Override
             public Moment apply(CalendarDate date) {
@@ -1103,7 +1146,7 @@ public final class SolarTime
 
     }
 
-    private double sunAngleOfAltitude() {
+    private double geodeticAngle() {
 
         if (this.altitude == 0) {
             return 0.0;
@@ -1116,7 +1159,24 @@ public final class SolarTime
 
     private double zenithAngle() {
 
-        return STD_ZENITH + this.sunAngleOfAltitude();
+        if (this.altitude == 0) {
+            return STD_ZENITH;
+        }
+
+        // approximation assuming standard atmosphere below tropopause
+        // https://de.wikipedia.org/wiki/Normatmosph%C3%A4re
+        // https://de.wikipedia.org/wiki/Barometrische_H%C3%B6henformel#Atmosph.C3.A4re_mit_linearem_Temperaturverlauf
+        double temperature = 1 - ((0.0065 * this.altitude) / 288.15);
+        double pressure = Math.pow(temperature, 5.255);
+
+        // we neglect that the bennett term is rather for T=10K and p = 1010hPa
+        double refraction = BENNETT_TERM * (pressure / temperature); // Meeus p.107
+        return 90 + ((SUN_RADIUS + refraction) / 60.0) + this.geodeticAngle();
+
+        // Dershowitz/Reingold say: 90 + 50 / 60.0 + geodeticAngle() + 19 * Math.sqrt(altitude) / 3600.0
+        // => but the last term using the square root of altitude is probably a misinterpretation
+        // of the source given in chapter 9 of "Explanatory Supplement to the Astronomical Almanach 1992"
+        // => the refraction should not increase but decrease with altitude because the pressure is more important
 
     }
 
@@ -1135,8 +1195,8 @@ public final class SolarTime
             throw new IllegalArgumentException("Degrees out of range -90.0 <= latitude <= +90.0: " + latitude);
         } else if ((Double.compare(longitude, 180.0) >= 0) || (Double.compare(longitude, -180.0) < 0)) {
             throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
-        } else if ((altitude < -1000) || (altitude > 9999)) {
-            throw new IllegalArgumentException("Meters out of range -1000 <= altitude < +10,000: " + altitude);
+        } else if ((altitude < 0) || (altitude >= 11000)) {
+            throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
         } else if (calculator.isEmpty()) {
             throw new IllegalArgumentException("Missing calculator.");
         } else if (!CALCULATORS.containsKey(calculator)) {
@@ -1313,19 +1373,19 @@ public final class SolarTime
         /**
          * <p>Sets the altitude in meters. </p>
          *
-         * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+         * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
          */
         /*[deutsch]
          * <p>Setzt die H&ouml;he in Metern. </p>
          *
-         * @param   altitude    geographical altitude relative to sea level in meters ({@code -1,000 <= x < 10,0000})
+         * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
          */
         public Builder atAltitude(int altitude) {
 
-            if ((altitude < -1000) || (altitude > 9999)) {
-                throw new IllegalArgumentException("Meters out of range -1000 <= altitude < +10,000: " + altitude);
+            if ((altitude < 0) || (altitude >= 11000)) {
+                throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
             }
 
             this.altitude = altitude;
