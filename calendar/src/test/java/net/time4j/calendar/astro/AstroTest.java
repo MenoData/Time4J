@@ -9,6 +9,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDays;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -697,21 +698,21 @@ public class AstroTest {
     @Test
     public void kilimanjaro() {
         PlainDate date = PlainDate.of(2017, 12, 22);
-        TZID tzid = () -> "Africa/Dar_es_Salaam"; // Tanzania: UTC+03:00
+        TZID tzid = Timezone.of("Africa/Dar_es_Salaam").getID(); // Tanzania: UTC+03:00
         // high altitude => earlier sunrise and later sunset
         SolarTime kibo5895 = SolarTime.ofLocation(-3.066667, 37.359167, 5895, SolarTime.Calculator.NOAA);
         assertThat(
             date.get(kibo5895.sunrise(tzid)).get(),
-            is(PlainTime.of(6, 9, 28)));
+            is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level
         assertThat(
             date.get(kibo5895.sunset(tzid)).get(),
-            is(PlainTime.of(18, 48, 55)));
+            is(PlainTime.of(18, 47, 48))); // 18:48:55 with same atmospheric refraction as on sea level
         assertThat(
             kibo5895.getAltitude(),
             is(5895));
         assertThat(
             date.get(kibo5895.sunshine(tzid)).length(),
-            is(12 * 3600 + 39 * 60 + 27));
+            is(12 * 3600 + 37 * 60 + 14));
         // good agreement with NOAA
         SolarTime kiboSeaLevel = SolarTime.ofLocation(-3.066667, 37.359167, 0, SolarTime.Calculator.NOAA);
         assertThat(
