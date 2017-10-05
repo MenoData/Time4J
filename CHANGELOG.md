@@ -1,4 +1,8 @@
 ## [v3.36] not yet released
+### Changed
+- German names of French Republican calendar months [#692]
+- Prevent calling some SolarTime.Builder-methods twice [#691]
+- Refine altitude-dependent calculation of solar time [#689]
 
 ## [v3.35] published on 2017-09-25
 ### Added
