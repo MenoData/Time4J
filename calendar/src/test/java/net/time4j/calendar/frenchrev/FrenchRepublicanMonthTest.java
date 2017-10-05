@@ -99,7 +99,7 @@ public class FrenchRepublicanMonthTest {
     }
 
     @Test
-    public void monthNames() {
+    public void monthNamesFR() {
         assertThat(
             FrenchRepublicanMonth.VENDEMIAIRE.getDisplayName(Locale.FRENCH),
             is("vendémiaire"));
@@ -136,6 +136,46 @@ public class FrenchRepublicanMonthTest {
         assertThat(
             FrenchRepublicanMonth.FRUCTIDOR.getDisplayName(Locale.FRENCH),
             is("fructidor"));
+    }
+
+    @Test
+    public void monthNamesDE() {
+        assertThat(
+            FrenchRepublicanMonth.VENDEMIAIRE.getDisplayName(Locale.GERMAN),
+            is("Weinlesemonat"));
+        assertThat(
+            FrenchRepublicanMonth.BRUMAIRE.getDisplayName(Locale.GERMAN),
+            is("Nebelmonat"));
+        assertThat(
+            FrenchRepublicanMonth.FRIMAIRE.getDisplayName(Locale.GERMAN),
+            is("Reifmonat"));
+        assertThat(
+            FrenchRepublicanMonth.NIVOSE.getDisplayName(Locale.GERMAN),
+            is("Schneemonat"));
+        assertThat(
+            FrenchRepublicanMonth.PLUVIOSE.getDisplayName(Locale.GERMAN),
+            is("Regenmonat"));
+        assertThat(
+            FrenchRepublicanMonth.VENTOSE.getDisplayName(Locale.GERMAN),
+            is("Windmonat"));
+        assertThat(
+            FrenchRepublicanMonth.GERMINAL.getDisplayName(Locale.GERMAN),
+            is("Keimmonat"));
+        assertThat(
+            FrenchRepublicanMonth.FLOREAL.getDisplayName(Locale.GERMAN),
+            is("Blütenmonat"));
+        assertThat(
+            FrenchRepublicanMonth.PRAIRIAL.getDisplayName(Locale.GERMAN),
+            is("Wiesenmonat"));
+        assertThat(
+            FrenchRepublicanMonth.MESSIDOR.getDisplayName(Locale.GERMAN),
+            is("Erntemonat"));
+        assertThat(
+            FrenchRepublicanMonth.THERMIDOR.getDisplayName(Locale.GERMAN),
+            is("Hitzemonat"));
+        assertThat(
+            FrenchRepublicanMonth.FRUCTIDOR.getDisplayName(Locale.GERMAN),
+            is("Fruchtmonat"));
     }
 
     @Test
