@@ -9,7 +9,6 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDays;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -701,7 +700,12 @@ public class AstroTest {
         TZID tzid = () -> "Africa/Dar_es_Salaam"; // Tanzania: UTC+03:00
         // high altitude => earlier sunrise and later sunset
         SolarTime kibo5895 =
-            SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
+            SolarTime.ofLocation()
+                .southernLatitude(3, 4, 0)
+                .easternLongitude(37, 21, 33)
+                .atAltitude(5895)
+                .usingCalculator(SolarTime.Calculator.NOAA)
+                .build();
         assertThat(
             date.get(kibo5895.sunrise(tzid)).get(),
             is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level
@@ -728,6 +732,16 @@ public class AstroTest {
         assertThat(
             date.get(kiboSeaLevel.sunshine(tzid)).length(),
             is(12 * 3600 + 17 * 60 + 56));
+    }
+
+    @Test(expected=IllegalStateException.class)
+    public void latitudeOrLongitudeTwice() {
+        SolarTime.ofLocation()
+            .northernLatitude(53, 0, 0)
+            .southernLatitude(15, 0, 0)
+            .westernLongitude(10, 0, 0)
+            .easternLongitude(72, 0, 0)
+            .build();
     }
 
 }

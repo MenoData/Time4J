@@ -1184,6 +1184,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the latitude has already been set
+         * @see     #southernLatitude(int, int, double)
          */
         /*[deutsch]
          * <p>Setzt die n&ouml;rdliche geographische Breite in Grad, Bogenminuten und Bogensekunden. </p>
@@ -1193,6 +1195,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the latitude has already been set
+         * @see     #southernLatitude(int, int, double)
          */
         public Builder northernLatitude(
             int degrees,
@@ -1201,8 +1205,13 @@ public final class SolarTime
         ) {
 
             check(degrees, minutes, seconds, 90);
-            this.latitude = degrees + minutes / 60.0 + seconds / 3600.0;
-            return this;
+
+            if (Double.isNaN(this.latitude)) {
+                this.latitude = degrees + minutes / 60.0 + seconds / 3600.0;
+                return this;
+            } else {
+                throw new IllegalStateException("Latitude has already been set.");
+            }
 
         }
 
@@ -1214,6 +1223,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the latitude has already been set
+         * @see     #northernLatitude(int, int, double)
          */
         /*[deutsch]
          * <p>Setzt die s&uuml;dliche geographische Breite in Grad, Bogenminuten und Bogensekunden. </p>
@@ -1223,6 +1234,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the latitude has already been set
+         * @see     #northernLatitude(int, int, double)
          */
         public Builder southernLatitude(
             int degrees,
@@ -1231,8 +1244,13 @@ public final class SolarTime
         ) {
 
             check(degrees, minutes, seconds, 90);
-            this.latitude = -1 * (degrees + minutes / 60.0 + seconds / 3600.0);
-            return this;
+
+            if (Double.isNaN(this.latitude)) {
+                this.latitude = -1 * (degrees + minutes / 60.0 + seconds / 3600.0);
+                return this;
+            } else {
+                throw new IllegalStateException("Latitude has already been set.");
+            }
 
         }
 
@@ -1244,6 +1262,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the longitude has already been set
+         * @see     #westernLongitude(int, int, double)
          */
         /*[deutsch]
          * <p>Setzt die &ouml;stliche geographische L&auml;nge in Grad, Bogenminuten und Bogensekunden. </p>
@@ -1253,6 +1273,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the longitude has already been set
+         * @see     #westernLongitude(int, int, double)
          */
         public Builder easternLongitude(
             int degrees,
@@ -1261,8 +1283,13 @@ public final class SolarTime
         ) {
 
             check(degrees, minutes, seconds, 179);
-            this.longitude = degrees + minutes / 60.0 + seconds / 3600.0;
-            return this;
+
+            if (Double.isNaN(this.longitude)) {
+                this.longitude = degrees + minutes / 60.0 + seconds / 3600.0;
+                return this;
+            } else {
+                throw new IllegalStateException("Longitude has already been set.");
+            }
 
         }
 
@@ -1274,6 +1301,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the longitude has already been set
+         * @see     #easternLongitude(int, int, double)
          */
         /*[deutsch]
          * <p>Setzt die westliche geographische L&auml;nge in Grad, Bogenminuten und Bogensekunden. </p>
@@ -1283,6 +1312,8 @@ public final class SolarTime
          * @param   seconds     arc seconds in range {@code 0.0 <= x < 60.0}
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any parameter is out of range
+         * @throws  IllegalStateException if the longitude has already been set
+         * @see     #easternLongitude(int, int, double)
          */
         public Builder westernLongitude(
             int degrees,
@@ -1291,8 +1322,13 @@ public final class SolarTime
         ) {
 
             check(degrees, minutes, seconds, 180);
-            this.longitude = -1 * (degrees + minutes / 60.0 + seconds / 3600.0);
-            return this;
+
+            if (Double.isNaN(this.longitude)) {
+                this.longitude = -1 * (degrees + minutes / 60.0 + seconds / 3600.0);
+                return this;
+            } else {
+                throw new IllegalStateException("Longitude has already been set.");
+            }
 
         }
 
