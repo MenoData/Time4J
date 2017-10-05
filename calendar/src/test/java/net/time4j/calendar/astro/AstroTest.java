@@ -698,9 +698,10 @@ public class AstroTest {
     @Test
     public void kilimanjaro() {
         PlainDate date = PlainDate.of(2017, 12, 22);
-        TZID tzid = Timezone.of("Africa/Dar_es_Salaam").getID(); // Tanzania: UTC+03:00
+        TZID tzid = () -> "Africa/Dar_es_Salaam"; // Tanzania: UTC+03:00
         // high altitude => earlier sunrise and later sunset
-        SolarTime kibo5895 = SolarTime.ofLocation(-3.066667, 37.359167, 5895, SolarTime.Calculator.NOAA);
+        SolarTime kibo5895 =
+            SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
         assertThat(
             date.get(kibo5895.sunrise(tzid)).get(),
             is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level

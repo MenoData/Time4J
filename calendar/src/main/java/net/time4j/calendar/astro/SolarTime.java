@@ -57,7 +57,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <pre>
  *     PlainDate date = PlainDate.of(2017, 12, 22);
- *     TZID tzid = Timezone.of(&quot;Africa/Dar_es_Salaam&quot;).getID(); // Tanzania: UTC+03:00
+ *     TZID tzid = () -> &quot;Africa/Dar_es_Salaam&quot;; // Tanzania: UTC+03:00
  *
  *     // high altitude => earlier sunrise and later sunset
  *     SolarTime kibo5895 =
@@ -85,7 +85,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <pre>
  *     PlainDate date = PlainDate.of(2017, 12, 22);
- *     TZID tzid = Timezone.of(&quot;Africa/Dar_es_Salaam&quot;).getID(); // Tansania: UTC+03:00
+ *     TZID tzid = () -> &quot;Africa/Dar_es_Salaam&quot;; // Tanzania: UTC+03:00
  *
  *     // gro&szlig;e H&ouml;he => fr&uuml;herer Sonnenaufgang und sp&auml;terer Sonnenuntergang
  *     SolarTime kibo5895 =
