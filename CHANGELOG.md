@@ -1,4 +1,7 @@
 ## [v3.36] not yet released
+### Added
+- Julian centuries with J2000-epoch [#693]
+
 ### Changed
 - German names of French Republican calendar months [#692]
 - Prevent calling some SolarTime.Builder-methods twice [#691]
