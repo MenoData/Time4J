@@ -744,4 +744,18 @@ public class AstroTest {
             .build();
     }
 
+    @Test
+    public void newMoon() {
+        assertThat(
+            MoonPhase.NEW_MOON.atLunation(-283),
+            is(PlainTimestamp.of(1977, 2, 18, 3, 36, 53).atUTC()));
+    }
+
+    @Test
+    public void lastQuarter() {
+        assertThat(
+            MoonPhase.LAST_QUARTER.atLunation(544),
+            is(PlainTimestamp.of(2044, 1, 21, 23, 47, 7).atUTC()));
+    }
+
 }
