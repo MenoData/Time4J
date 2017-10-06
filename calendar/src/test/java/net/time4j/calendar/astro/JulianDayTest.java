@@ -25,6 +25,7 @@ public class JulianDayTest {
         JulianDay expected = JulianDay.ofEphemerisTime(2451545.0);
         assertThat(JulianDay.ofEphemerisTime(j2000), is(expected));
         assertThat(expected.getMJD(), is(51544.5));
+        assertThat(expected.getCentury(), is(0.0));
         assertThat(expected.getScale(), is(TimeScale.TT));
         assertThat(expected.toMoment(), is(j2000));
     }

@@ -322,6 +322,24 @@ public final class JulianDay
     }
 
     /**
+     * <p>Obtains the value of this Julian day as <em>Julian century relative to the year 2000</em>. </p>
+     *
+     * @return  Julian century in J2000-frame
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Liefert den Wert dieses julianischen Tags als <em>Julianisches Jahrhundert relativ zum Jahr 2000</em>. </p>
+     *
+     * @return  Julian century in J2000-frame
+     * @since   3.36/4.31
+     */
+    public double getCentury() {
+
+        return (this.value - 2451545.0) / 36525;
+
+    }
+
+    /**
      * <p>Obtains the underlying time scale. </p>
      *
      * @return  TimeScale
