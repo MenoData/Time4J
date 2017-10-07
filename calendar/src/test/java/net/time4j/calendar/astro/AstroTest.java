@@ -748,14 +748,14 @@ public class AstroTest {
     public void newMoon() {
         assertThat(
             MoonPhase.NEW_MOON.atLunation(-283),
-            is(PlainTimestamp.of(1977, 2, 18, 3, 36, 53).atUTC()));
+            is(PlainTimestamp.of(1977, 2, 18, 3, 36, 53).atUTC())); // Meeus (example 49.a)
     }
 
     @Test
     public void lastQuarter() {
         assertThat(
             MoonPhase.LAST_QUARTER.atLunation(544),
-            is(PlainTimestamp.of(2044, 1, 21, 23, 47, 7).atUTC()));
+            is(PlainTimestamp.of(2044, 1, 21, 23, 47, 7).atUTC())); // Meeus (example 49.b)
     }
 
 }
