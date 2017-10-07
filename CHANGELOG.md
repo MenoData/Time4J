@@ -1,5 +1,6 @@
 ## [v4.31] not yet released
 ### Added
+- Moon phases [#676]
 - Julian centuries with J2000-epoch [#693]
 
 ### Changed
