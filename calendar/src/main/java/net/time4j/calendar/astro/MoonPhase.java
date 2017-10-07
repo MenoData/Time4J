@@ -22,6 +22,8 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
+import net.time4j.PlainTimestamp;
+import net.time4j.base.MathUtils;
 
 import java.util.concurrent.TimeUnit;
 
@@ -75,6 +77,7 @@ public enum MoonPhase {
 	LAST_QUARTER(270);
 
 	private static final double MEAN_SYNODIC_MONTH = 29.530588861;
+	private static final Moment ZERO_REF = PlainTimestamp.of(2000, 1, 6, 18, 13, 42).atUTC(); // NEW_MOON.atLunation(0)
 
 	private static final int[] W_NEW_FULL = {
 		0, 1, 0, 0, 1, 1, 2, 0, 0, 1, 0, 1, 1, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
@@ -130,6 +133,88 @@ public enum MoonPhase {
 	//~ Methoden ----------------------------------------------------------
 
 	/**
+	 * <p>Obtains the first moon phase which is after given moment. </p>
+	 *
+	 * @param 	moment	the moment to be compared with
+	 * @return	first time of this phase after given moment
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 */
+	/*[deutsch]
+	 * <p>Liefert die erste Mondphase, die nach dem angegebenen Zeitpunkt liegt. </p>
+	 *
+	 * @param 	moment	the moment to be compared with
+	 * @return	first time of this phase after given moment
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 */
+	public Moment after(Moment moment) {
+
+		int estimation = this.getEstimatedLunations(moment);
+		Moment m = this.atLunation(estimation);
+		int n = estimation;
+
+		while (!m.isAfter(moment)) {
+			n++;
+			m = this.atLunation(n);
+		}
+
+		if (n <= estimation) {
+			while (true) {
+				n--;
+				Moment test = this.atLunation(n);
+				if (test.isAfter(moment)) {
+					m = test;
+				} else {
+					break;
+				}
+			}
+		}
+
+		return m;
+
+	}
+
+	/**
+	 * <p>Obtains the last moon phase which is still before given moment. </p>
+	 *
+	 * @param 	moment	the moment to be compared with
+	 * @return	last time of this phase before given moment
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 */
+	/*[deutsch]
+	 * <p>Liefert die letzte Mondphase, die vor dem angegebenen Zeitpunkt liegt. </p>
+	 *
+	 * @param 	moment	the moment to be compared with
+	 * @return	last time of this phase before given moment
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 */
+	public Moment before(Moment moment) {
+
+		int estimation = this.getEstimatedLunations(moment);
+		Moment m = this.atLunation(estimation);
+		int n = estimation;
+
+		while (!m.isBefore(moment)) {
+			n--;
+			m = this.atLunation(n);
+		}
+
+		if (n >= estimation) {
+			while (true) {
+				n++;
+				Moment test = this.atLunation(n);
+				if (test.isBefore(moment)) {
+					m = test;
+				} else {
+					break;
+				}
+			}
+		}
+
+		return m;
+
+	}
+
+	/**
 	 * <p>Obtains the time of n-th lunation based on this type of phase. </p>
 	 *
 	 * <p>The parameter value {@code n = 0} will determine the first phase after the calendar date 2000-01-01.
@@ -138,6 +223,7 @@ public enum MoonPhase {
 	 *
 	 * @param 	n	count of lunations (distance between two consecutive moon phases of same type)
 	 * @return	moment of this phase after given lunations
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
 	 */
 	/*[deutsch]
 	 * <p>Liefert den Zeitpunkt der n-ten Lunation basierend auf diesem Phasentyp. </p>
@@ -148,6 +234,7 @@ public enum MoonPhase {
 	 *
 	 * @param 	n	count of lunations (distance between two consecutive moon phases of same type)
 	 * @return	moment of this phase after given lunations
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
 	 */
 	public Moment atLunation(int n) {
 
@@ -223,6 +310,13 @@ public enum MoonPhase {
 		}
 
 		return JulianDay.ofEphemerisTime(jde).toMoment().with(Moment.PRECISION, TimeUnit.SECONDS);
+
+	}
+
+	private int getEstimatedLunations(Moment moment) {
+
+		return MathUtils.safeCast(
+			Math.round(ZERO_REF.until(moment, TimeUnit.DAYS) / MEAN_SYNODIC_MONTH - this.phase / 360.0));
 
 	}
 
