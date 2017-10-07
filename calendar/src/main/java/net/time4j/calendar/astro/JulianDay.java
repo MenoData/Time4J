@@ -75,18 +75,18 @@ public final class JulianDay
     private static final long OFFSET_1972 = (2451545 - (2000 - 1972) * 365 - 8) * 86400L + 43200;
 
     /**
-     * The minimum value.
+     * The minimum value which corresponds roughly to the year {@code -2000}.
      */
     /*[deutsch]
-     * Der Minimumwert.
+     * Der Minimumwert, der ungef&auml;hr dem Jahr {@code -2000} entspricht.
      */
     public static final double MIN = 990575.0;
 
     /**
-     * The maximum value.
+     * The maximum value which corresponds roughly to the year {@code +3000}.
      */
     /*[deutsch]
-     * Der Maximumwert.
+     * Der Maximumwert, der ungef&auml;hr dem Jahr {@code +3000} entspricht.
      */
     public static final double MAX = 2817152.0;
 
