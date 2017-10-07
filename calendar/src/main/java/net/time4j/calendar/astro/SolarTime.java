@@ -71,6 +71,14 @@ import java.util.concurrent.TimeUnit;
  *       is(PlainTime.of(18, 47, 48)));
  * </pre>
  *
+ * <p><strong>About limitations of accuracy:</strong></p>
+ *
+ * <p>Time4J only models a spherical geometry but not local topology with mountains which can break the
+ * horizon line. Furthermore, special weather conditions which can have a bigger impact on atmospheric
+ * refraction are not calculatable. The concrete calculator in use is also a limiting factor for accuracy.
+ * Users should therefore not expect more than minute precision. This can be even worse for polar regions
+ * because the sun crosses then the horizon under a very shallow angle. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.33/4.28
  */
@@ -98,6 +106,15 @@ import java.util.concurrent.TimeUnit;
  *       date.get(kibo5895.sunset(tzid)),
  *       is(PlainTime.of(18, 47, 48)));
  * </pre>
+ *
+ * <p><strong>&Uuml;ber die Grenzen der Genauigkeit:</strong></p>
+ *
+ * <p>Time4J modelliert nur eine sp&auml;rische Geometrie, aber nicht eine lokale Topologie mit Bergen,
+ * die die Horizontlinie unterbrechen k&ouml;nnen. Au&szlig;erdem sind besondere Wetterbedingungen mit
+ * ihrem Einflu&szlig; auf die atmosph&auml;rische Lichtbeugung nicht berechenbar. Das konkret verwendete
+ * Berechnungsverfahren ist ebenfalls ein begrenzender Faktor f&uuml;r die erreichbare Genauigkeit.
+ * Anwender sollten daher nicht mehr als Minutengenauigkeit erwarten. In Polargebieten ist sie sogar
+ * schlechter, weil die Sonne dann nur unter einem sehr flachen Winkel den Horizont quert. </p>
  *
  * @author  Meno Hochschild
  * @since   3.33/4.28
@@ -208,10 +225,13 @@ public final class SolarTime
      * <p>The default calculator is usually {@link Calculator#NOAA} unless another calculator was
      * set up via the service loader mechnism. </p>
      *
+     * <p>This method handles the geographical location in decimal degrees only. If these data are given
+     * in degrees, arc minutes and arc seconds then users should apply the {@link #ofLocation() builder}
+     * approach instead. </p>
+     *
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
-     * @see     #ofLocation()
      * @see     #ofLocation(double, double, int, String)
      * @since   3.34/4.29
      */
@@ -221,10 +241,13 @@ public final class SolarTime
      * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn,
      * eine andere Methode wurde &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
+     * <p>Diese Methode nimmt geographische Angaben nur in Dezimalgrad entgegen. Wenn diese Daten aber
+     * in Grad, Bogenminuten und Bogensekunden vorliegen, sollten Anwender den {@link #ofLocation() Builder-Ansatz}
+     * bevorzugen. </p>
+     *
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
-     * @see     #ofLocation()
      * @see     #ofLocation(double, double, int, String)
      * @since   3.34/4.29
      */
@@ -240,12 +263,15 @@ public final class SolarTime
     /**
      * <p>Obtains the solar time for given geographical location. </p>
      *
+     * <p>This method handles the geographical location in decimal degrees only. If these data are given
+     * in degrees, arc minutes and arc seconds then users should apply the {@link #ofLocation() builder}
+     * approach instead. </p>
+     *
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
-     * @see     #ofLocation()
      * @see     Calculator#NOAA
      * @see     Calculator#SIMPLE
      * @since   3.34/4.29
@@ -253,12 +279,15 @@ public final class SolarTime
     /*[deutsch]
      * <p>Liefert die Sonnenzeit zur angegebenen geographischen Position. </p>
      *
+     * <p>Diese Methode nimmt geographische Angaben nur in Dezimalgrad entgegen. Wenn diese Daten aber
+     * in Grad, Bogenminuten und Bogensekunden vorliegen, sollten Anwender den {@link #ofLocation() Builder-Ansatz}
+     * bevorzugen. </p>
+     *
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
-     * @see     #ofLocation()
      * @see     Calculator#NOAA
      * @see     Calculator#SIMPLE
      * @since   3.34/4.29
@@ -1409,11 +1438,22 @@ public final class SolarTime
         /**
          * <p>Sets the altitude in meters. </p>
          *
+         * <p>The altitude is used to model a geodetic correction as well as a refraction correction based
+         * on the simple assumption of a standard atmosphere. Users should keep in mind that the local
+         * topology with mountains breaking the horizon line and special weather conditions cannot be taken
+         * into account. </p>
+         *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
          */
         /*[deutsch]
          * <p>Setzt die H&ouml;he in Metern. </p>
+         *
+         * <p>Die H&ouml;henangabe dient der Modellierung einer geod&auml;tischen Korrektur und auch einer
+         * Korrektur der atmosph&auml;rischen Lichtbeugung basierend auf der einfachen Annahme einer
+         * Standardatmosph&auml;re. Anwender m&uuml;ssen im Auge behalten, da&szlig; die lokale Topologie
+         * mit Bergen, die die Horizontlinie unterbrechen und spezielle Wetterbedingungen nicht berechenbar
+         * sind. </p>
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
