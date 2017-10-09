@@ -1,9 +1,11 @@
 ## [v3.36] not yet released
 ### Added
 - Moon phases [#676]
+- Generic calendar intervals [#675]
 - Julian centuries with J2000-epoch [#693]
 
 ### Changed
+- TimeLine-enhancement [#675]
 - German names of French Republican calendar months [#692]
 - Prevent calling some SolarTime.Builder-methods twice [#691]
 - Refine altitude-dependent calculation of solar time [#689]
