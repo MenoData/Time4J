@@ -455,4 +455,10 @@ public class BasicTimestampRangeTest {
         interval.stream(Duration.of(1, ClockUnit.NANOS));
     }
 
+    @Test
+    public void always() {
+        assertThat(TimestampInterval.ALWAYS.getStart().isInfinite(), is(true));
+        assertThat(TimestampInterval.ALWAYS.getEnd().isInfinite(), is(true));
+    }
+
 }

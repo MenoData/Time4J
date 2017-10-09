@@ -92,10 +92,14 @@ public final class DateInterval
 
     /**
      * Constant for a date interval from infinite past to infinite future.
+     *
+     * @since   3.31/4.26
      */
     /*[deutsch]
      * Konstante f&uuml;r ein Datumsintervall, das von der unbegrenzten Vergangenheit
      * bis in die unbegrenzte Zukunft reicht.
+     *
+     * @since   3.31/4.26
      */
     public static final DateInterval ALWAYS =
         DateIntervalFactory.INSTANCE.between(Boundary.infinitePast(), Boundary.infiniteFuture());
