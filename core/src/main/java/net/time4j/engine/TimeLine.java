@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeLine.java) is part of project Time4J.
  *
@@ -127,6 +127,26 @@ public interface TimeLine<T>
     default T getMaximum() {
 
         throw new UnsupportedOperationException("Not implemented."); // TODO: v5.0 => keine default-Methode
+
+    }
+
+    /**
+     * Determines if this timeline is calendrical or not.
+     *
+     * @return  boolean
+     * @see     CalendarDate
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * Ermittelt, ob diese Zeitachse kalendarisch ist oder nicht.
+     *
+     * @return  boolean
+     * @see     CalendarDate
+     * @since   3.36/4.31
+     */
+    default boolean isCalendrical() {
+
+        return (this.getMaximum() instanceof CalendarDate);
 
     }
 

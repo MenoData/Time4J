@@ -3391,6 +3391,13 @@ public final class Moment
         }
 
         @Override
+        public boolean isCalendrical() {
+
+            return false;
+
+        }
+
+        @Override
         public Moment getMinimum() {
 
             return MIN;
