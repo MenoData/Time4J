@@ -64,7 +64,7 @@ public final class ClockInterval
     private static final long serialVersionUID = -6020908050362634577L;
 
     private static final Comparator<ChronoInterval<PlainTime>> COMPARATOR =
-        new IntervalComparator<PlainTime>(false, PlainTime.axis());
+        new IntervalComparator<PlainTime>(PlainTime.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 

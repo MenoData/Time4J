@@ -117,7 +117,7 @@ public final class MomentInterval
     private static final long serialVersionUID = -5403584519478162113L;
 
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
-        new IntervalComparator<Moment>(false, Moment.axis());
+        new IntervalComparator<Moment>(Moment.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 

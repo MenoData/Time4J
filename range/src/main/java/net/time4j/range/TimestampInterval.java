@@ -79,7 +79,7 @@ public final class TimestampInterval
     private static final long serialVersionUID = -3965530927182499606L;
 
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
-        new IntervalComparator<PlainTimestamp>(false, PlainTimestamp.axis());
+        new IntervalComparator<PlainTimestamp>(PlainTimestamp.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 

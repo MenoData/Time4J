@@ -87,7 +87,7 @@ public final class DateInterval
     private static final long serialVersionUID = 8074261825266036014L;
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
-        new IntervalComparator<PlainDate>(true, PlainDate.axis());
+        new IntervalComparator<PlainDate>(PlainDate.axis());
 
     //~ Konstruktoren -----------------------------------------------------
 

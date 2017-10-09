@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SimpleInterval.java) is part of project Time4J.
  *
@@ -22,9 +22,14 @@
 package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarFamily;
+import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoFunction;
+import net.time4j.engine.Chronology;
+import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeLine;
+import net.time4j.engine.TimePoint;
 import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
@@ -44,14 +49,14 @@ import java.util.Locale;
  * <p>Represents an interval with following simplified features: </p>
  *
  * <ul>
- *     <li>Always half-open with inclusive start and exclusive end. </li>
- *     <li>Supports infinite boundaries (the only exception to half-open-state). </li>
+ *     <li>If calendrical, then always closed else half-open with inclusive start and exclusive end. </li>
+ *     <li>Supports infinite boundaries (exception to half-open-state or closed-state). </li>
  *     <li>Can be adapted to any foreign type as long as a timeline can be implemented. </li>
  *     <li>Can be used in conjunction with {@code IntervalCollection} and {@code IntervalTree}. </li>
  * </ul>
  *
- * <p>This class is mainly intended to adapt foreign types like {@code java.util.Date}.
- * It is less suitable for calendrical types. </p>
+ * <p>This class is mainly intended to adapt foreign types like {@code java.util.Date} but also for calendar
+ * intervals which are not based on ISO-8601. </p>
  *
  * @param   <T> generic type of timepoints on the underlying timeline
  * @author  Meno Hochschild
@@ -63,14 +68,14 @@ import java.util.Locale;
  * <p>Repr&auml;sentiert ein Intervall mit folgenden vereinfachten Eigenschaften: </p>
  *
  * <ul>
- *     <li>Immer halb-offen mit dem Start inklusive und dem Ende exklusive. </li>
- *     <li>Unterst&uuml;tzt unendliche Grenzen (die einzige Ausnahme vom halb-offenen Zustand). </li>
+ *     <li>Wenn kalendarisch, immer geschlossen, sonst halb-offen mit dem Start inklusive und dem Ende exklusive. </li>
+ *     <li>Unterst&uuml;tzt unendliche Grenzen (Ausnahme vom halb-offenen oder geschlossenen Zustand). </li>
  *     <li>Kann an irgendeinen Fremdtyp angepasst werden, solange ein Zeitstrahl passend konstruiert wird. </li>
  *     <li>Kann in Verbindung mit {@code IntervalCollection} und {@code IntervalTree} genutzt werden. </li>
  * </ul>
  *
- * <p>Diese Klasse dient haupts&auml;chlich zur Verwendung mit Fremdtypen wie {@code java.util.Date}.
- * Sie ist f&uuml;r rein kalendarische Typen weniger geeignet. </p>
+ * <p>Diese Klasse dient haupts&auml;chlich zur Verwendung mit Fremdtypen wie {@code java.util.Date}
+ * oder {@code java.time.Instant}, aber auch f&uuml;r Kalenderintervalle, die nicht auf ISO-8601 beruhen. </p>
  *
  * @param   <T> generic type of timepoints on the underlying timeline
  * @author  Meno Hochschild
@@ -128,7 +133,10 @@ public final class SimpleInterval<T>
         }
 
         this.start = ((start == null) ? Boundary.<T>infinitePast() : Boundary.ofClosed(start));
-        this.end = ((end == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(end));
+        this.end = (
+            (end == null)
+                ? Boundary.<T>infiniteFuture()
+                : (timeLine.isCalendrical() ? Boundary.ofClosed(end) : Boundary.ofOpen(end)));
         this.timeLine = timeLine;
 
     }
@@ -233,6 +241,7 @@ public final class SimpleInterval<T>
      * @param   <T> generic type of timepoints on the underlying timeline
      * @param   timeLine    the timeline definition
      * @return  new interval factory
+     * @see     #on(TimeAxis)
      */
     /*[deutsch]
      * <p>Definiert einen Zeitstrahl, auf dem neue generische Intervalle erzeugt werden k&ouml;nnen. </p>
@@ -243,10 +252,110 @@ public final class SimpleInterval<T>
      * @param   <T> generic type of timepoints on the underlying timeline
      * @param   timeLine    the timeline definition
      * @return  new interval factory
+     * @see     #on(TimeAxis)
      */
     public static <T> Factory<T> onTimeLine(TimeLine<T> timeLine) {
 
         return new Factory<T>(timeLine);
+
+    }
+
+    /**
+     * <p>Defines a timeline on which new generic intervals can be created. </p>
+     *
+     * <p>Note that calendar intervals are usually closed. Example: </p>
+     *
+     * <pre>
+     *         PersianCalendar start = PersianCalendar.of(1392, PersianMonth.ESFAND, 27);
+     *         PersianCalendar end = PersianCalendar.of(1393, PersianMonth.FARVARDIN, 6);
+     *
+     *         SimpleInterval&lt;PersianCalendar&gt; i1 =
+     *           SimpleInterval.on(PersianCalendar.axis()).between(start, end);
+     *         SimpleInterval&lt;PersianCalendar&gt; i2 =
+     *           SimpleInterval.on(PersianCalendar.axis()).between(
+     *             end.minus(CalendarDays.ONE),
+     *             end.plus(CalendarDays.ONE));
+     *
+     *         System.out.println(
+     *           interval.findIntersection(
+     *             SimpleInterval.on(PersianCalendar.axis()).between(
+     *               end.minus(CalendarDays.ONE), end.plus(CalendarDays.ONE))).get());
+     *         // [AP-1393-01-05/AP-1393-01-06]
+     * </pre>
+     *
+     * @param   <U> generic type of time units
+     * @param   <T> generic type of time context compatible to {@link TimePoint}
+     * @param   axis    the underlying time axis
+     * @return  new interval factory
+     * @see     #on(CalendarFamily, String)
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Definiert einen Zeitstrahl, auf dem neue generische Intervalle erzeugt werden k&ouml;nnen. </p>
+     *
+     * <p>Hinweis: Kalenderintervalle sind normal geschlossen. Beispiel: </p>
+     *
+     * <pre>
+     *         PersianCalendar start = PersianCalendar.of(1392, PersianMonth.ESFAND, 27);
+     *         PersianCalendar end = PersianCalendar.of(1393, PersianMonth.FARVARDIN, 6);
+     *
+     *         SimpleInterval&lt;PersianCalendar&gt; i1 =
+     *           SimpleInterval.on(PersianCalendar.axis()).between(start, end);
+     *         SimpleInterval&lt;PersianCalendar&gt; i2 =
+     *           SimpleInterval.on(PersianCalendar.axis()).between(
+     *             end.minus(CalendarDays.ONE),
+     *             end.plus(CalendarDays.ONE));
+     *
+     *         System.out.println(
+     *           interval.findIntersection(
+     *             SimpleInterval.on(PersianCalendar.axis()).between(
+     *               end.minus(CalendarDays.ONE), end.plus(CalendarDays.ONE))).get());
+     *         // [AP-1393-01-05/AP-1393-01-06]
+     * </pre>
+     *
+     * @param   <U> generic type of time units
+     * @param   <T> generic type of time context compatible to {@link TimePoint}
+     * @param   axis    the underlying time axis
+     * @return  new interval factory
+     * @see     #on(CalendarFamily, String)
+     * @since   3.36/4.31
+     */
+    public static <U, T extends TimePoint<U, T>> Factory<T> on(TimeAxis<U, T> axis) {
+
+        return new Factory<T>(SerializableTimeLine.wrap(axis));
+
+    }
+
+    /**
+     * <p>Defines a timeline on which new generic calendar intervals can be created. </p>
+     *
+     * <p>Note that calendar intervals are usually closed. </p>
+     *
+     * @param   <D> generic type of timepoints on the underlying timeline
+     * @param   family  calendar family
+     * @param   variant calendar variant
+     * @return  new interval factory
+     * @see     #on(TimeAxis)
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Definiert einen Zeitstrahl, auf dem neue generische Kalenderintervalle erzeugt werden k&ouml;nnen. </p>
+     *
+     * <p>Hinweis: Kalenderintervalle sind normal geschlossen. </p>
+     *
+     * @param   <D> generic type of timepoints on the underlying timeline
+     * @param   family  calendar family
+     * @param   variant calendar variant
+     * @return  new interval factory
+     * @see     #on(TimeAxis)
+     * @since   3.36/4.31
+     */
+    public static <D extends CalendarVariant<D>> Factory<D> on(
+        CalendarFamily<D> family,
+        String variant
+    ) {
+
+        return new Factory<D>(family.getTimeLine(variant));
 
     }
 
@@ -278,7 +387,7 @@ public final class SimpleInterval<T>
             return false;
         }
 
-        return (this.timeLine.compare(this.start.getTemporal(), this.end.getTemporal()) == 0);
+        return (this.end.isOpen() && (this.timeLine.compare(this.start.getTemporal(), this.end.getTemporal()) == 0));
 
     }
 
@@ -292,7 +401,8 @@ public final class SimpleInterval<T>
         }
 
         if (!this.end.isInfinite()) {
-            return (this.timeLine.compare(this.end.getTemporal(), temporal) > 0);
+            int comp = this.timeLine.compare(this.end.getTemporal(), temporal);
+            return (this.end.isClosed() ? (comp >= 0) : (comp > 0));
         }
 
         return true;
@@ -325,11 +435,22 @@ public final class SimpleInterval<T>
 
         T endB = other.getEnd().getTemporal();
 
-        if (
-            other.getEnd().isOpen()
-            && (this.timeLine.compare(startB, endB) == 0)
-        ) {
-            if ((endA == null) || (this.timeLine.compare(startB, endA) >= 0)) {
+        if (other.getEnd().isOpen() && (this.timeLine.compare(startB, endB) == 0)) {
+            if (this.end.isOpen()) {
+                endA = this.timeLine.stepBackwards(endA);
+            }
+            if ((endA == null) || (this.timeLine.compare(startB, endA) > 0)) {
+                return false;
+            }
+        } else if (this.timeLine.isCalendrical()) {
+            if (other.getEnd().isOpen()) {
+                endB = this.timeLine.stepBackwards(endB);
+            }
+            if (
+                (endA == null)
+                || (endB == null) // dann startB = infinite_past
+                || this.timeLine.compare(endA, endB) < 0
+            ) {
                 return false;
             }
         } else {
@@ -375,7 +496,11 @@ public final class SimpleInterval<T>
             return false;
         }
 
-        return (this.timeLine.compare(this.end.getTemporal(), temporal) <= 0);
+        if (this.end.isOpen()) {
+            return (this.timeLine.compare(this.end.getTemporal(), temporal) <= 0);
+        } else {
+            return (this.timeLine.compare(this.end.getTemporal(), temporal) < 0);
+        }
 
     }
 
@@ -395,8 +520,10 @@ public final class SimpleInterval<T>
 
         if (startB == null) { // exotic case: start in infinite future
             return true;
-        } else {
+        } else if (this.end.isOpen()) {
             return (this.timeLine.compare(endA, startB) <= 0);
+        } else {
+            return (this.timeLine.compare(endA, startB) < 0);
         }
 
     }
@@ -418,6 +545,9 @@ public final class SimpleInterval<T>
         T endA = this.end.getTemporal();
         T endB = other.getEnd().getTemporal();
 
+        if ((endA != null) && this.end.isClosed()) {
+            endA = this.timeLine.stepForward(endA);
+        }
         if ((endB != null) && other.getEnd().isClosed()) {
             endB = this.timeLine.stepForward(endB);
         }
@@ -495,15 +625,28 @@ public final class SimpleInterval<T>
         } else {
             T t1 = this.end.getTemporal();
             T t2 = other.getEnd().getTemporal();
-            if (other.getEnd().isClosed()) {
-                t2 = this.timeLine.stepForward(t2);
-            }
-            if (t1 == null) {
-                e = ((t2 == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(t2));
-            } else if (t2 == null) {
-                e = ((t1 == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(t1));
+            if (this.timeLine.isCalendrical()) {
+                if (this.end.isOpen()) {
+                    t1 = this.timeLine.stepBackwards(t1);
+                }
+                if (other.getEnd().isOpen()) {
+                    t2 = this.timeLine.stepBackwards(t2);
+                }
+                e = ((this.timeLine.compare(t1, t2) < 0) ? Boundary.ofClosed(t1) : Boundary.ofClosed(t2));
             } else {
-                e = ((this.timeLine.compare(t1, t2) < 0) ? Boundary.ofOpen(t1) : Boundary.ofOpen(t2));
+                if (this.end.isClosed()) {
+                    t1 = this.timeLine.stepForward(t1);
+                }
+                if (other.getEnd().isClosed()) {
+                    t2 = this.timeLine.stepForward(t2);
+                }
+                if (t1 == null) {
+                    e = ((t2 == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(t2));
+                } else if (t2 == null) {
+                    e = ((t1 == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(t1));
+                } else {
+                    e = ((this.timeLine.compare(t1, t2) < 0) ? Boundary.ofOpen(t1) : Boundary.ofOpen(t2));
+                }
             }
         }
 
@@ -648,7 +791,11 @@ public final class SimpleInterval<T>
             sb.append("+\u221E)");
         } else {
             sb.append(this.end.getTemporal());
-            sb.append(')');
+            if (this.end.isClosed()) {
+                sb.append(']');
+            } else {
+                sb.append(')');
+            }
         }
         return sb.toString();
 
@@ -899,12 +1046,85 @@ public final class SimpleInterval<T>
         }
 
         @Override
+        public boolean isCalendrical() {
+            return false;
+        }
+
+        @Override
         public int compare(Date o1, Date o2) {
             return o1.compareTo(o2);
         }
 
         private Object readResolve() throws ObjectStreamException {
             return OLD_DATE_FACTORY.getTimeLine();
+        }
+
+    }
+
+    private static class SerializableTimeLine<T extends TimePoint<?, T>>
+        implements TimeLine<T>, Serializable {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private transient final TimeAxis<?, T> axis;
+        private final Class<T> chronoType;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private SerializableTimeLine(TimeAxis<?, T> axis) {
+            super();
+
+            this.axis = axis;
+            this.chronoType = axis.getChronoType();
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        static <T extends TimePoint<?, T>> TimeLine<T> wrap(TimeAxis<?, T> axis) {
+            return new SerializableTimeLine<T>(axis);
+        }
+
+        @Override
+        public T stepForward(T timepoint) {
+            return this.axis.stepForward(timepoint);
+        }
+
+        @Override
+        public T stepBackwards(T timepoint) {
+            return this.axis.stepBackwards(timepoint);
+        }
+
+        @Override
+        public boolean isCalendrical() {
+            return this.axis.isCalendrical();
+        }
+
+        @Override
+        public int compare(T o1, T o2) {
+            return this.axis.compare(o1, o2);
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof SerializableTimeLine) {
+                SerializableTimeLine<?> that = (SerializableTimeLine<?>) obj;
+                return this.chronoType == that.chronoType;
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return this.chronoType.hashCode();
+        }
+
+        @SuppressWarnings("unchecked")
+        private Object readResolve() throws ObjectStreamException {
+            Chronology<?> c = Chronology.lookup(this.chronoType);
+            return wrap(TimeAxis.class.cast(c));
         }
 
     }
