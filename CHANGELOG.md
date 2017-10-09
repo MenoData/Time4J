@@ -1,6 +1,7 @@
 ## [v3.36] not yet released
 ### Added
 - Moon phases [#676]
+- Extended support for always-intervals [#695]
 - Generic calendar intervals [#675]
 - Julian centuries with J2000-epoch [#693]
 
