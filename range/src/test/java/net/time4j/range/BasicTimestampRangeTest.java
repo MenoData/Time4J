@@ -224,7 +224,7 @@ public class BasicTimestampRangeTest {
             TimestampInterval.between(start1, end1).hashCode(),
             not(
                 TimestampInterval.between(start2, end2)
-                .withClosedEnd().hashCode()));
+                    .withClosedEnd().hashCode()));
         assertThat(
             TimestampInterval.between(start1, end1).hashCode(),
             is(TimestampInterval.between(start1, end1).hashCode()));
@@ -298,6 +298,12 @@ public class BasicTimestampRangeTest {
         assertThat(
             interval.move(12, ClockUnit.HOURS),
             is(expected));
+    }
+
+    @Test
+    public void always() {
+        assertThat(TimestampInterval.ALWAYS.getStart().isInfinite(), is(true));
+        assertThat(TimestampInterval.ALWAYS.getEnd().isInfinite(), is(true));
     }
 
 }

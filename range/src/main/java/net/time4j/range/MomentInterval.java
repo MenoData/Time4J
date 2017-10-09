@@ -79,6 +79,20 @@ public final class MomentInterval
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
+     * Constant for a moment interval from infinite past to infinite future.
+     *
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * Konstante f&uuml;r ein Momentintervall, das von der unbegrenzten Vergangenheit
+     * bis in die unbegrenzte Zukunft reicht.
+     *
+     * @since   3.36/4.31
+     */
+    public static final MomentInterval ALWAYS =
+        MomentIntervalFactory.INSTANCE.between(Boundary.<Moment>infinitePast(), Boundary.<Moment>infiniteFuture());
+
+    /**
      * Determines the alignment of surrounding intervals.
      *
      * @see     #surrounding(Moment, MachineTime, double)

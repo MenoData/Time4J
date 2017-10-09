@@ -76,6 +76,22 @@ public final class TimestampInterval
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /**
+     * Constant for a timestamp interval from infinite past to infinite future.
+     *
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * Konstante f&uuml;r ein Zeitstempelintervall, das von der unbegrenzten Vergangenheit
+     * bis in die unbegrenzte Zukunft reicht.
+     *
+     * @since   3.36/4.31
+     */
+    public static final TimestampInterval ALWAYS =
+        TimestampIntervalFactory.INSTANCE.between(
+            Boundary.<PlainTimestamp>infinitePast(),
+            Boundary.<PlainTimestamp>infiniteFuture());
+
     private static final long serialVersionUID = -3965530927182499606L;
 
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =

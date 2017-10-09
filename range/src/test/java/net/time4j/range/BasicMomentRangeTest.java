@@ -329,4 +329,10 @@ public class BasicMomentRangeTest {
         assertThat(right, is(MomentInterval.between(startRight, endRight)));
     }
 
+    @Test
+    public void always() {
+        assertThat(MomentInterval.ALWAYS.getStart().isInfinite(), is(true));
+        assertThat(MomentInterval.ALWAYS.getEnd().isInfinite(), is(true));
+    }
+
 }
