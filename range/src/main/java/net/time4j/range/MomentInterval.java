@@ -374,7 +374,7 @@ public final class MomentInterval
      * <p>Creates an interval surrounding given instant. </p>
      *
      * <p>Equivalent to {@link #surrounding(Moment, MachineTime, double)
-     * surrounding(Moment.from(instant), duration, alignment)}. </p>
+     * surrounding(Moment.from(instant), MachineTime.from(duration), alignment)}. </p>
      *
      * @param   instant     embedded instant at focus of alignment
      * @param   duration    machine time duration
@@ -384,13 +384,13 @@ public final class MomentInterval
      * @see     #LEFT_ALIGNED
      * @see     #CENTERED
      * @see     #RIGHT_ALIGNED
-     * @since   3.34/4.29
+     * @since   4.31
      */
     /*[deutsch]
      * <p>Erzeugt ein Intervall, das den angegebenen Zeitpunkt umgibt. </p>
      *
      * <p>&Auml;quivalent zu {@link #surrounding(Moment, MachineTime, double)
-     * surrounding(Moment.from(instant), duration, alignment)}. </p>
+     * surrounding(Moment.from(instant), MachineTime.from(duration), alignment)}. </p>
      *
      * @param   instant     embedded instant at focus of alignment
      * @param   duration    machine time duration
@@ -400,8 +400,43 @@ public final class MomentInterval
      * @see     #LEFT_ALIGNED
      * @see     #CENTERED
      * @see     #RIGHT_ALIGNED
-     * @since   3.34/4.29
+     * @since   4.31
      */
+    public static MomentInterval surrounding(
+        Instant instant,
+        java.time.Duration duration,
+        double alignment
+    ) {
+
+        return MomentInterval.surrounding(Moment.from(instant), MachineTime.from(duration), alignment);
+
+    }
+
+    /**
+     * <p>Creates an interval surrounding given instant. </p>
+     *
+     * @param   instant     embedded instant at focus of alignment
+     * @param   duration    machine time duration
+     * @param   alignment   determines how to align the interval around instant (in range {@code 0.0 <= x <= 1.0})
+     * @return  new moment interval
+     * @throws  IllegalArgumentException if the duration is negative or the alignment is not finite or out of range
+     * @deprecated  Use {@link #surrounding(Moment, MachineTime, double)}
+     *              or {@link #surrounding(Instant, java.time.Duration, double)}
+     * @since   4.29
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Intervall, das den angegebenen Zeitpunkt umgibt. </p>
+     *
+     * @param   instant     embedded instant at focus of alignment
+     * @param   duration    machine time duration
+     * @param   alignment   determines how to align the interval around instant (in range {@code 0.0 <= x <= 1.0})
+     * @return  new moment interval
+     * @throws  IllegalArgumentException if the duration is negative or the alignment is not finite or out of range
+     * @deprecated  Use {@link #surrounding(Moment, MachineTime, double)}
+     *              or {@link #surrounding(Instant, java.time.Duration, double)}
+     * @since   4.29
+     */
+    @Deprecated
     public static MomentInterval surrounding(
         Instant instant,
         MachineTime<TimeUnit> duration,

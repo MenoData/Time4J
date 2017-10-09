@@ -332,7 +332,7 @@ public class BasicMomentRangeTest {
     @Test
     public void surroundingIntervalPOSIX() {
         Instant instant = PlainTimestamp.of(2017, 9, 9, 10, 0).atUTC().toTemporalAccessor();
-        MachineTime<TimeUnit> duration = MachineTime.ofPosixUnits(3600, 0);
+        java.time.Duration duration = java.time.Duration.ofSeconds(3600);
 
         MomentInterval centered = MomentInterval.surrounding(instant, duration, MomentInterval.CENTERED);
         Moment startCentered = PlainTimestamp.of(2017, 9, 9, 9, 30).atUTC();
