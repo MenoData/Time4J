@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -524,7 +524,7 @@ final class SPX
             intervals.add(new SimpleInterval(s, e, timeLine));
         }
 
-        Collections.sort(intervals, new IntervalComparator(false, timeLine));
+        Collections.sort(intervals, new IntervalComparator(timeLine));
         return new GenericWindows(timeLine, intervals);
 
     }

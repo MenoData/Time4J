@@ -103,7 +103,7 @@ public final class DateInterval
     private static final long serialVersionUID = 8074261825266036014L;
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
-        new IntervalComparator<>(true, PlainDate.axis());
+        new IntervalComparator<>(PlainDate.axis());
     private static final ChronoPrinter<PlainDate> REDUCED_DD =
         ChronoFormatter.ofDatePattern("dd", PatternType.CLDR, Locale.ROOT);
     private static final ChronoPrinter<PlainDate> REDUCED_MMDD =

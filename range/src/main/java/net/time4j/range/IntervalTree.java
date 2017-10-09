@@ -253,8 +253,10 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
      *
      * @param   <I> the type of intervals stored in the tree
      * @param   timeLine    the underlying timeline
-     * @param   intervals   collection of moment intervals
+     * @param   intervals   collection of intervals
      * @return  new interval tree
+     * @see     net.time4j.engine.TimeAxis
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
      * @throws  ArithmeticException if the count of intervals overflows an int
      */
     /*[deutsch]
@@ -262,8 +264,10 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
      *
      * @param   <I> the type of intervals stored in the tree
      * @param   timeLine    the underlying timeline
-     * @param   intervals   collection of moment intervals
+     * @param   intervals   collection of intervals
      * @return  new interval tree
+     * @see     net.time4j.engine.TimeAxis
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
      * @throws  ArithmeticException if the count of intervals overflows an int
      */
     public static <T, I extends ChronoInterval<T>> IntervalTree<T, I> onTimeLine(
