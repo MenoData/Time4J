@@ -3333,6 +3333,13 @@ public final class Moment
         }
 
         @Override
+        public boolean isCalendrical() {
+
+            return false;
+
+        }
+
+        @Override
         public int compare(Moment m1, Moment m2) {
 
             return m1.compareTo(m2);

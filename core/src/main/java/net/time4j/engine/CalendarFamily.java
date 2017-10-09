@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarFamily.java) is part of project Time4J.
  *
@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import java.io.ObjectStreamException;
+import java.io.Serializable;
 import java.util.List;
 import java.util.Map;
 
@@ -95,6 +97,26 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
         } else {
             return result;
         }
+
+    }
+
+    /**
+     * <p>Obtains an object which is useful for generic interval support. </p>
+     *
+     * @param   variant     name of calendar variant
+     * @return  serializable timeline which is variant-specific
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Liefert ein Objekt, das f&uuml;r die allgemeine Intervallunterst&uuml;tzung n&uuml;tzlich ist. </p>
+     *
+     * @param   variant     name of calendar variant
+     * @return  serializable timeline which is variant-specific
+     * @since   3.36/4.31
+     */
+    public TimeLine<T> getTimeLine(String variant) {
+
+        return new CalendarTimeLine<T>(this, variant);
 
     }
 
@@ -236,6 +258,93 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
             Chronology.register(engine);
             return engine;
 
+        }
+
+    }
+
+    private static class CalendarTimeLine<D extends CalendarVariant<D>>
+        implements TimeLine<D>, Serializable {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private transient final CalendarSystem<D> calsys;
+
+        // only for deserialization
+        private final Class<D> chronoType;
+        private final String variant;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private CalendarTimeLine(
+            Chronology<D> chronology,
+            String variant
+        ) {
+            super();
+
+            this.calsys = chronology.getCalendarSystem(variant);
+            this.chronoType = chronology.getChronoType();
+            this.variant = variant;
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public D stepForward(D timepoint) {
+            if (timepoint.getDaysSinceEpochUTC() == this.calsys.getMaximumSinceUTC()) {
+                return null;
+            }
+            return timepoint.plus(CalendarDays.ONE);
+        }
+
+        @Override
+        public D stepBackwards(D timepoint) {
+            if (timepoint.getDaysSinceEpochUTC() == this.calsys.getMinimumSinceUTC()) {
+                return null;
+            }
+            return timepoint.minus(CalendarDays.ONE);
+        }
+
+        @Override
+        public boolean isCalendrical() {
+            return true;
+        }
+
+        @Override
+        public int compare(D o1, D o2) {
+            // pure time comparison, we don't take into account the variant in context of timeline
+            long t1 = o1.getDaysSinceEpochUTC();
+            long t2 = o2.getDaysSinceEpochUTC();
+
+            if (t1 < t2) {
+                return - 1;
+            } else if (t1 > t2) {
+                return 1;
+            } else {
+                return 0;
+            }
+        }
+
+        @Override
+        public boolean equals(Object obj) {
+            if (this == obj) {
+                return true;
+            } else if (obj instanceof CalendarTimeLine) {
+                CalendarTimeLine<?> that = (CalendarTimeLine<?>) obj;
+                return this.chronoType == that.chronoType && this.variant.equals(that.variant);
+            } else {
+                return false;
+            }
+        }
+
+        @Override
+        public int hashCode() {
+            return this.chronoType.hashCode() + 31 * this.variant.hashCode();
+        }
+
+        // reconstruct the calendar system in deserialization
+        private Object readResolve() throws ObjectStreamException {
+            Chronology<D> chronology = Chronology.lookup(this.chronoType);
+            return new CalendarTimeLine<D>(chronology, this.variant);
         }
 
     }
