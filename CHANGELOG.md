@@ -11,6 +11,9 @@
 - Prevent calling some SolarTime.Builder-methods twice [#691]
 - Refine altitude-dependent calculation of solar time [#689]
 
+### Fixed
+- ChronoHistory.month()-annotation is incomplete [#696]
+
 ## [v3.35] published on 2017-09-25
 ### Added
 - New hemisphere-related methods in astronomical classes [#688]
