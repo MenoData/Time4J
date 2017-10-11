@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoHistory.java) is part of project Time4J.
  *
@@ -1465,7 +1465,7 @@ public final class ChronoHistory
      * @see     PlainDate
      * @see     net.time4j.PlainTimestamp
      */
-    @FormattableElement(format = "M")
+    @FormattableElement(format = "M", standalone = "L")
     public TextElement<Integer> month() {
 
         return this.monthElement;
