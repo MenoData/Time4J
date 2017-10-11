@@ -11,6 +11,9 @@
 - Prevent calling some SolarTime.Builder-methods twice [#691]
 - Refine altitude-dependent calculation of solar time [#689]
 
+### Fixed
+- ChronoHistory.month()-annotation is incomplete [#696]
+
 ### Deprecated
 - Make surrounding()-method in MomentInterval consistently using APIs [#694]
 
