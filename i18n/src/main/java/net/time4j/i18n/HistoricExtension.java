@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricExtension.java) is part of project Time4J.
  *
@@ -124,6 +124,11 @@ public class HistoricExtension
             return ChronoHistory.PROLEPTIC_JULIAN;
         } else if (attributes.contains(HistoricAttribute.CALENDAR_HISTORY)) {
             return attributes.get(HistoricAttribute.CALENDAR_HISTORY);
+        } else if (
+            attributes.get(Attributes.CALENDAR_TYPE, CalendarText.ISO_CALENDAR_TYPE).equals("historic")
+            && attributes.contains(Attributes.CALENDAR_VARIANT)
+        ) {
+            return ChronoHistory.from(attributes.get(Attributes.CALENDAR_VARIANT));
         } else {
             return ChronoHistory.of(locale);
         }
