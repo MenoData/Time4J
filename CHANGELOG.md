@@ -1,6 +1,7 @@
 ## [v4.31] not yet released
 ### Added
 - Moon phases [#676]
+- Static factory ChronoHistory.from(variantString) [#697]
 - Extended support for always-intervals [#695]
 - Generic calendar intervals [#675]
 - TimeLine-enhancement [#675]
