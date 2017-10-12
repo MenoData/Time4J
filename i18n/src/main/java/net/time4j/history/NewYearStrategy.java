@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NewYearStrategy.java) is part of project Time4J.
  *
@@ -179,7 +179,7 @@ public final class NewYearStrategy {
 
         StringBuilder sb = new StringBuilder();
         if (this.strategies.isEmpty()) {
-            sb.append("[new-year-rule=");
+            sb.append('[');
             sb.append(this.lastRule);
             if (this.lastAnnoDomini != Integer.MAX_VALUE) {
                 sb.append("->");

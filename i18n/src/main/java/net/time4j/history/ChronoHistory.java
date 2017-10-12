@@ -31,12 +31,14 @@ import net.time4j.engine.FormattableElement;
 import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
+import net.time4j.format.expert.Iso8601Format;
 import net.time4j.history.internal.HistoricVariant;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -827,15 +829,157 @@ public final class ChronoHistory
     }
 
     /**
+     * <p>Reconstructs the calendar history from given variant description. </p>
+     *
+     * @param   variant     description as defined in {@link #getVariant()}
+     * @return  ChronoHistory
+     * @throws  IllegalArgumentException if the variant cannot be interpreted as calendar history
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Rekonstruiert die Kalenderhistorie von der angegebenen Beschreibung. </p>
+     *
+     * @param   variant     description as defined in {@link #getVariant()}
+     * @return  ChronoHistory
+     * @throws  IllegalArgumentException if the variant cannot be interpreted as calendar history
+     * @since   3.36/4.31
+     */
+    public static ChronoHistory from(String variant) {
+
+        String[] parts = variant.split(":");
+
+        if (parts.length == 0) {
+            throw new IllegalArgumentException("Invalid variant description.");
+        }
+
+        HistoricVariant hv = HistoricVariant.valueOf(parts[0]);
+        ChronoHistory history;
+        int startIndex = 2;
+
+        switch (hv) {
+            case PROLEPTIC_GREGORIAN:
+                return ChronoHistory.PROLEPTIC_GREGORIAN;
+            case PROLEPTIC_JULIAN:
+                return ChronoHistory.PROLEPTIC_JULIAN;
+            case PROLEPTIC_BYZANTINE:
+                return ChronoHistory.PROLEPTIC_BYZANTINE;
+            case SWEDEN:
+                history = ChronoHistory.ofSweden();
+                startIndex = 1;
+                break;
+            case INTRODUCTION_ON_1582_10_15:
+                if (!getGregorianCutOverDate(parts, variant).equals(PlainDate.of(1582, 10, 15))) {
+                    throw new IllegalArgumentException("Inconsistent cutover date: " + variant);
+                }
+                history = ChronoHistory.ofFirstGregorianReform();
+                break;
+            case SINGLE_CUTOVER_DATE:
+                PlainDate cutover = getGregorianCutOverDate(parts, variant);
+                history = ChronoHistory.ofGregorianReform(cutover);
+                break;
+            default:
+                throw new UnsupportedOperationException(hv.name());
+        }
+
+        String[] a = parts[startIndex].split("=");
+
+        if (a[0].equals("ancient-julian-leap-years")) {
+            String ajly = a[1].substring(1, a[1].length() - 1);
+            if (!ajly.isEmpty()) {
+                String[] nums = ajly.split(",");
+                int[] bcYears = new int[nums.length];
+                for (int i = 0; i < nums.length; i++) {
+                    bcYears[i] = 1 - Integer.parseInt(nums[i]);
+                }
+                history = history.with(AncientJulianLeapYears.of(bcYears));
+            }
+        }
+
+        String[] b = parts[startIndex + 1].split("=");
+
+        if (b[0].equals("new-year-strategy")) {
+            String desc = b[1].substring(1, b[1].length() - 1);
+            String[] rules = desc.split(",");
+            NewYearStrategy nys = null;
+            for (int i = 0; i < rules.length; i++) {
+                String[] rule = rules[i].split("->");
+                NewYearRule nyr = NewYearRule.valueOf(rule[0]);
+                int annoDomini = (rule.length == 2 ? Integer.parseInt(rule[1]) : Integer.MAX_VALUE);
+                if (nys == null) {
+                    if ((nyr == NewYearRule.BEGIN_OF_JANUARY) && (annoDomini == 567)) {
+                        continue;
+                    }
+                    nys = nyr.until(annoDomini);
+                } else {
+                    nys = nys.and(nyr.until(annoDomini));
+                }
+            }
+            history = history.with(nys);
+        }
+
+        String[] c = parts[startIndex + 2].split("=");
+
+        if (c[0].equals("era-preference")) {
+            String desc = c[1].substring(1, c[1].length() - 1);
+            if (!desc.equals("default")) {
+                String[] prefs = desc.split(",");
+                try {
+                    HistoricEra era = HistoricEra.valueOf(prefs[0].substring(5));
+                    PlainDate start = Iso8601Format.parseDate(prefs[1].substring(7));
+                    PlainDate end = Iso8601Format.parseDate(prefs[2].substring(5));
+                    switch (era) {
+                        case HISPANIC:
+                            history = history.with(EraPreference.hispanicBetween(start, end));
+                            break;
+                        case BYZANTINE:
+                            history = history.with(EraPreference.byzantineBetween(start, end));
+                            break;
+                        case AB_URBE_CONDITA:
+                            history = history.with(EraPreference.abUrbeConditaBetween(start, end));
+                            break;
+                        default:
+                            throw new IllegalArgumentException("BC/AD not allowed as era preference: " + variant);
+                    }
+                } catch (ParseException pe) {
+                    throw new IllegalArgumentException("Invalid date syntax: " + variant);
+                }
+            }
+        }
+
+        return history;
+
+    }
+
+    private static PlainDate getGregorianCutOverDate(String[] parts, String variant) {
+
+        String[] c = parts[1].split("=");
+
+        if (c.length != 2) {
+            throw new IllegalArgumentException("Invalid syntax in variant description: " + variant);
+        } else if (c[0].equals("cutover")) {
+            try {
+                return Iso8601Format.EXTENDED_DATE.parse(c[1]);
+            } catch (ParseException e) {
+                // abort in next code line
+            }
+        }
+
+        throw new IllegalArgumentException("Invalid cutover definition: " + variant);
+
+    }
+
+    /**
      * <p>Yields the variant of a historic calendar. </p>
      *
      * @return  text describing the internal state
+     * @see     #from(String)
      * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Liefert die Variante eines historischen Kalenders. </p>
      *
      * @return  text describing the internal state
+     * @see     #from(String)
      * @since   3.11/4.8
      */
     @Override
