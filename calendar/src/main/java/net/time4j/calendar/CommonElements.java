@@ -199,7 +199,7 @@ public class CommonElements {
      * unter Benutzung des angegebenen Wochenmodells. </p>
      *
      * <p>Die angegebene Chronologie mu&szlig; eine 7-Tage-Woche mit Elementen namens &quot;DAY_OF_WEEK&quot;
-     * und &quot;DAY_OF_YEAR&quot; unterst&uuml;tzen, sonst wird eine Ausnahme geworfen. </p>
+     * und &quot;DAY_OF_MONTH&quot; unterst&uuml;tzen, sonst wird eine Ausnahme geworfen. </p>
      *
      * @param   <T> chronological type
      * @param   chronology  the calendar chronology

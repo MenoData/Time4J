@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BasicElement.java) is part of project Time4J.
  *
@@ -441,7 +441,7 @@ public abstract class BasicElement<V extends Comparable<V>>
      * <p>Wird von {@code equals(Object)} aufgerufen. </p>
      *
      * <p>Subklassen sollten diese Methode &uuml;berschreiben, wenn anderer Zustandsattribute als nur
-     * der Elementname ber&uuml;cksichtigt werdne m&uuml;ssen. Der Parameter kann sicher zu einem
+     * der Elementname ber&uuml;cksichtigt werden m&uuml;ssen. Der Parameter kann sicher zu einem
      * Typ dieser Klasse umgewandelt werden. </p>
      *
      * @param   obj     other element to be compared with
