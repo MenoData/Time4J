@@ -60,7 +60,7 @@ public abstract class DisplayElement<V extends Comparable<V>>
         Map<String, String> map = new HashMap<String, String>();
         map.put("YEAR_OF_DISPLAY", "L_year");
         map.put("MONTH_AS_NUMBER", "L_month");
-        map.put("ISO_HOUR", "L_hour");
+        map.put("HOUR_FROM_0_TO_24", "L_hour");
         map.put("DAY_OF_MONTH", "L_day");
         OTHER_DISPLAY_KEYS = Collections.unmodifiableMap(map);
     }
