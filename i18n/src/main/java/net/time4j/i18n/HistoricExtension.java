@@ -77,7 +77,44 @@ public class HistoricExtension
         AttributeQuery attributes
     ) {
 
-        ChronoHistory history = getHistory(locale, attributes);
+        return this.resolve(entity, getHistory(locale, attributes), attributes);
+
+    }
+
+    /**
+     * <p>Also used by {@code HistoricCalendar}. </p>
+     *
+     * @param   entity  any kind of map from chronological elements to
+     *                  their values (note that the main use case of parsed
+     *                  data has no chronology and allows the virtual value
+     *                  {@code null} to be set as indication for removing
+     *                  associated element)
+     * @param   history         calendar history
+     * @param   attributes      global configuration attributes of parser
+     * @return  eventually changed entity
+     * @throws  IllegalArgumentException if resolving fails due to inconsistencies
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Auch von {@code HistoricCalendar} gebraucht. </p>
+     *
+     * @param   entity  any kind of map from chronological elements to
+     *                  their values (note that the main use case of parsed
+     *                  data has no chronology and allows the virtual value
+     *                  {@code null} to be set as indication for removing
+     *                  associated element)
+     * @param   history         calendar history
+     * @param   attributes      global configuration attributes of parser
+     * @return  eventually changed entity
+     * @throws  IllegalArgumentException if resolving fails due to inconsistencies
+     * @since   3.36/4.31
+     */
+    public ChronoEntity<?> resolve(
+        ChronoEntity<?> entity,
+        ChronoHistory history,
+        AttributeQuery attributes
+    ) {
+
         HistoricEra era = null;
 
         if (entity.contains(history.era())) {
@@ -87,12 +124,12 @@ public class HistoricExtension
         }
 
         if ((era != null) && entity.contains(history.yearOfEra())) {
-            int yearOfEra = entity.get(history.yearOfEra());
+            int yearOfEra = entity.getInt(history.yearOfEra());
 
             if (entity.contains(history.month()) && entity.contains(history.dayOfMonth())) {
                 YearDefinition yd = attributes.get(ChronoHistory.YEAR_DEFINITION, DUAL_DATING);
-                int month = entity.get(history.month());
-                int dayOfMonth = entity.get(history.dayOfMonth());
+                int month = entity.getInt(history.month());
+                int dayOfMonth = entity.getInt(history.dayOfMonth());
                 HistoricDate hd = HistoricDate.of(era, yearOfEra, month, dayOfMonth, yd, history.getNewYearStrategy());
                 PlainDate date = history.convert(hd);
                 entity.with(history.era(), null);
@@ -101,7 +138,7 @@ public class HistoricExtension
                 entity.with(history.dayOfMonth(), null);
                 return entity.with(PlainDate.COMPONENT, date);
             } else if (entity.contains(history.dayOfYear())) {
-                int doy = entity.get(history.dayOfYear());
+                int doy = entity.getInt(history.dayOfYear());
                 if (entity.contains(StdHistoricalElement.YEAR_OF_DISPLAY)) {
                     yearOfEra = entity.getInt(StdHistoricalElement.YEAR_OF_DISPLAY);
                 }
