@@ -24,6 +24,7 @@ package net.time4j.calendar;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.base.MathUtils;
+import net.time4j.engine.EpochDays;
 import net.time4j.history.HistoricEra;
 
 import java.io.Externalizable;
@@ -75,6 +76,9 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int INDIAN = 10;
+
+    /** Serialisierungstyp. */
+    static final int HISTORIC = 11;
 
     private static final long serialVersionUID = 1L;
 
@@ -172,6 +176,9 @@ final class SPX
             case INDIAN:
                 this.writeIndian(out);
                 break;
+            case HISTORIC:
+                this.writeHistoric(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -228,6 +235,9 @@ final class SPX
                 break;
             case INDIAN:
                 this.obj = this.readIndian(in);
+                break;
+            case HISTORIC:
+                this.obj = this.readHistoric(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -448,6 +458,26 @@ final class SPX
         int month = in.readByte();
         int dom = in.readByte();
         return IndianCalendar.of(year, month, dom);
+
+    }
+
+    private void writeHistoric(ObjectOutput out)
+        throws IOException {
+
+        HistoricCalendar cal = (HistoricCalendar) this.obj;
+        out.writeUTF(cal.getHistory().getVariant());
+        out.writeLong(cal.get(PlainDate.COMPONENT).getDaysSinceEpochUTC());
+
+    }
+
+    private HistoricCalendar readHistoric(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        String variant = in.readUTF();
+        long utcDays = in.readLong();
+
+        PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
+        return date.transform(HistoricCalendar.class, variant);
 
     }
 

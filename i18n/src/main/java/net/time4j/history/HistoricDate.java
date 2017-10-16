@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricDate.java) is part of project Time4J.
  *
@@ -130,7 +130,7 @@ public final class HistoricDate
      * defined range of the class {@code PlainDate}. </p>
      *
      * @param   era             historic era
-     * @param   yearOfEra       year of related era ({@code >= 1}) starting on January the first
+     * @param   yearOfEra       year of era which will be interpreted according to given year definition ({@code >= 1})
      * @param   month           historic month (1-12)
      * @param   dom             historic day of month (1-31)
      * @param   yearDefinition  defines a strategy how to interprete year of era
@@ -150,7 +150,7 @@ public final class HistoricDate
      * Definitionsbereichs der Klasse {@code PlainDate} liegen. </p>
      *
      * @param   era             historic era
-     * @param   yearOfEra       year of related era ({@code >= 1}) starting on January the first
+     * @param   yearOfEra       year of era which will be interpreted according to given year definition ({@code >= 1})
      * @param   month           historic month (1-12)
      * @param   dom             historic day of month (1-31)
      * @param   yearDefinition  defines a strategy how to interprete year of era

@@ -1480,7 +1480,15 @@ public final class ChronoFormatter<T>
             throw new NullPointerException("Missing calendar history.");
         }
 
-        AttributeSet as = this.globalAttributes.withInternal(HistoricAttribute.CALENDAR_HISTORY, history);
+        Attributes attrs =
+            new Attributes.Builder()
+                .setAll(this.globalAttributes.getAttributes())
+                .setCalendarVariant(history.getVariant())
+                .build();
+        AttributeSet as =
+            this.globalAttributes
+                .withInternal(HistoricAttribute.CALENDAR_HISTORY, history)
+                .withAttributes(attrs);
         return new ChronoFormatter<T>(this, as, history);
 
     }

@@ -1639,7 +1639,7 @@ public final class ChronoHistory
      * @see     net.time4j.PlainTimestamp
      */
     @FormattableElement(format = "d")
-    public TextElement<Integer> dayOfMonth() {
+    public ChronoElement<Integer> dayOfMonth() {
 
         return this.dayOfMonthElement;
 
@@ -1671,7 +1671,7 @@ public final class ChronoHistory
      * @see     net.time4j.PlainTimestamp
      */
     @FormattableElement(format = "D")
-    public TextElement<Integer> dayOfYear() {
+    public ChronoElement<Integer> dayOfYear() {
 
         return this.dayOfYearElement;
 
