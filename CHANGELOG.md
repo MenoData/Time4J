@@ -14,6 +14,7 @@
 - Refine altitude-dependent calculation of solar time [#689]
 
 ### Fixed
+- Unicode-ca-support not available for HijriCalendar [#700]
 - ChronoHistory.month()-annotation is incomplete [#696]
 
 ### Deprecated
