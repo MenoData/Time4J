@@ -75,14 +75,15 @@ import java.util.Locale;
 /**
  * <p>Represents the calendar used in Ethiopia. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is built on the base of the <a href="CopticCalendar.html">Coptic calendar</a>
  * but uses two different eras. Another difference to Coptic calendar is the day starting
  * in the morning at 06:00 (usual approximation for sunrise). For more details see
  * <a href="http://ayannanahmias.com/the-nahmias-cipher-report/2011/06/15/ethiopian-calendar/">Intro
  * to the Ethiopic Calendar</a>. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -98,7 +99,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <h4>Example of usage</h4>
  *
  * <pre>
  *     // printing to English
@@ -125,6 +126,19 @@ import java.util.Locale;
  *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+ *      ChronoFormatter&lt;Moment&gt; f =
+ *          ChronoFormatter.ofGenericMomentPattern(&quot;G, yyyy-MM-dd hh:mm a XXX&quot;, Locale.ENGLISH)
+ *              .withTimezone(offset)
+ *              .with(Locale.forLanguageTag(&quot;en-US-u-ca-ethiopic&quot;));
+ *      assertThat(
+ *          f.parse(&quot;Amete Mihret, 2008-03-09 09:45 pm +03:00&quot;),
+ *          is(PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset)));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @see     EthiopianEra
  * @see     EthiopianMonth
@@ -136,13 +150,15 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der in &Auml;thiopien als offizieller Kalender verwendet wird. </p>
  *
+ * <h4>Einleitung</h4>
+ *
  * <p>Er ist im wesentlichen wie der <a href="CopticCalendar.html">koptische Kalender</a> aufgebaut, verwendet
  * aber zwei andere &Auml;ras. Eine weitere Differenz zum koptischen Kalender ist, da&szlig; der Kalendertag
  * am Morgen um 06:00 beginnt (typische N&auml;herung f&uuml;r den Sonnenaufgang). Mehr Details siehe
  * <a href="http://ayannanahmias.com/the-nahmias-cipher-report/2011/06/15/ethiopian-calendar/">Intro
  * to the Ethiopic Calendar</a>. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -158,7 +174,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiele: </p>
+ * <h4>Anwendungsbeispiele</h4>
  *
  * <pre>
  *     // Englische Textausgabe
@@ -183,6 +199,19 @@ import java.util.Locale;
  *     String input = &quot;&#4901;&#4677;&#4637;&#4725; 11 &#4978;&#4977;&#4987;&#4986;&#4975; (&#4635;&#4724;&#4814;&#4661;) &#4819;/&#4637;&quot;;
  *     EthiopianCalendar ethio = formatter.parse(input);
  *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
+ * </pre>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
+ *      ChronoFormatter&lt;Moment&gt; f =
+ *          ChronoFormatter.ofGenericMomentPattern(&quot;G, yyyy-MM-dd hh:mm a XXX&quot;, Locale.ENGLISH)
+ *              .withTimezone(offset)
+ *              .with(Locale.forLanguageTag(&quot;en-US-u-ca-ethiopic&quot;));
+ *      assertThat(
+ *          f.parse(&quot;Amete Mihret, 2008-03-09 09:45 pm +03:00&quot;),
+ *          is(PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset)));
  * </pre>
  *
  * @author  Meno Hochschild

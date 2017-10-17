@@ -29,6 +29,7 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.calendar.astro.SolarTime;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
@@ -40,6 +41,7 @@ import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.DisplayStyle;
@@ -71,6 +73,8 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * <p>Represents the Hijri calendar used in many islamic countries. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is a lunar calendar which exists in several variants and is mainly for religious purposes.
  * The variant used in Saudi-Arabia is named &quot;islamic-umalqura&quot; and is based on data partially
  * observed by sighting the new moon, partially by astronomical calculations/predictions. Note that the
@@ -84,8 +88,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * data-subdirectory of resource class path (where hyphens are replaced by underscores). Format details see
  * the file &quot;islamic_umalqura.data&quot;. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -99,7 +102,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Examples of usage: </p>
+ * <h4>Formatting and simple transformations</h4>
  *
  * <pre>
  *     // parse a Hijri-string and convert to a gregorian date
@@ -108,20 +111,31 @@ import java.util.concurrent.ConcurrentHashMap;
  *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
  *       .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
+ *
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);
  *     PlainDate date = hijri.transform(PlainDate.class);
  *     System.out.println(date); // 2015-07-16
  *
- *     // determine actual Hijri date (two methods)
+ *     // determine actual Hijri date
  *     HijriCalendar today = // conversion valid at noon (not in the evening when next islamic day starts)
  *       SystemClock.inLocalView().today().transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA);
- *     HijriCalendar todayExact = // taking into account the specific start of day for Hijri calendar
+ * </pre>
+ *
+ * <h4>Exact handling of start of islamic day in the evening</h4>
+ *
+ * <pre>
+ *     SolarTime meccaTime = SolarTime.ofLocation(21.4225, 39.826111);
+ *     StartOfDay startOfDay = StartOfDay.definedBy(meccaTime.sunset());
+ *
+ *     HijriCalendar todayExact =
  *       SystemClock.inLocalView().now(
  *         HijriCalendar.family(),
  *         HijriCalendar.VARIANT_UMALQURA,
- *         StartOfDay.EVENING // simple approximation =&gt; 18:00
+ *         startOfDay
  *       ).toDate();
  * </pre>
+ *
+ * <h4>How to determine the valid calendar range</h4>
  *
  * <p>Note that the supported range of this class is limited compared with the gregorian counter-example. Users
  * can apply following code to determine the exact variant-dependent range: </p>
@@ -141,6 +155,15 @@ import java.util.concurrent.ConcurrentHashMap;
  *     PlainDate maxGregorian = PlainDate.of(max, EpochDays.UTC); // 2077-11-16
  * </pre>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *     Locale locale = Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;);
+ *     ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *     String today = f.format(SystemClock.inLocalView().today()); // conversion valid at noon
+ *     // output in arabic language using the calendar of Saudi-Arabia
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @see     HijriEra
  * @see     HijriMonth
@@ -149,12 +172,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     net.time4j.format.NumberSystem#ARABIC
  * @see     net.time4j.format.NumberSystem#ARABIC_INDIC
  * @see     net.time4j.format.NumberSystem#ARABIC_INDIC_EXT
+ * @see     StartOfDay#definedBy(ChronoFunction)
+ * @see     SolarTime#sunset()
  * @since   3.5/4.3
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Hijri-Kalender, der in vielen islamischen L&auml;ndern vorwiegend f&uuml;r
  * religi&ouml;se Zwecke benutzt wird. </p>
+ *
+ * <h4>Einleitung</h4>
  *
  * <p>Es handelt sich um einen lunaren Kalender, der in verschiedenen Varianten existiert. Die Variante
  * in Saudi-Arabien hei&szlig;t &quot;islamic-umalqura&quot; und basiert teilweise auf Daten gewonnen
@@ -170,7 +197,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * liegt (wobei Bindestriche durch Unterstriche ersetzt werden). Formatdetails siehe die vorhandene Datei
  * &quot;islamic_umalqura.data&quot;. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -184,7 +211,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiele: </p>
+ * <h4>Anwendungsbeispiele</h4>
  *
  * <pre>
  *     // Hijri-Text interpretieren und in ein gregorianisches Datum umwandeln
@@ -193,20 +220,31 @@ import java.util.concurrent.ConcurrentHashMap;
  *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
  *       .with(Attributes.PIVOT_YEAR, 1500); // abgebildet auf den Bereich 1400-1499
+ *
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);
  *     PlainDate date = hijri.transform(PlainDate.class);
  *     System.out.println(date); // 2015-07-16
  *
- *     // aktuelles Hijri-Datum bestimmen (zwei Methoden)
+ *     // aktuelles Hijri-Datum bestimmen
  *     HijriCalendar today = // Konversion mittags g&uuml;ltig (nicht abends, wenn der n&auml;chste Tag beginnt)
  *       SystemClock.inLocalView().today().transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA);
- *     HijriCalendar todayExact = // ber&uuml;cksichtigt den spezifischen Start des islamischen Tags
+ * </pre>
+ *
+ * <h4>Exakte Behandlung des Beginns des islamischen Tags am Abend</h4>
+ *
+ * <pre>
+ *     SolarTime meccaTime = SolarTime.ofLocation(21.4225, 39.826111);
+ *     StartOfDay startOfDay = StartOfDay.definedBy(meccaTime.sunset());
+ *
+ *     HijriCalendar todayExact =
  *       SystemClock.inLocalView().now(
  *         HijriCalendar.family(),
  *         HijriCalendar.VARIANT_UMALQURA,
- *         StartOfDay.EVENING // einfache N&auml;herung =&gt; 18:00
+ *         startOfDay
  *       ).toDate();
  * </pre>
+ *
+ * <h4>Ermittlung des g&uuml;ltigen Wertbereichs</h4>
  *
  * <p>Hinweis: Der unterst&uuml;tze variantenabh&auml;ngige Wertbereich dieser Klasse ist verglichen mit
  * dem gregorianischen Standardfall begrenzt. Anwender k&ouml;nnen folgenden Code nutzen, um den genauen
@@ -227,6 +265,15 @@ import java.util.concurrent.ConcurrentHashMap;
  *     PlainDate maxGregorian = PlainDate.of(max, EpochDays.UTC); // 2077-11-16
  * </pre>
  *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *     Locale locale = Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;);
+ *     ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *     String today = f.format(SystemClock.inLocalView().today()); // conversion valid at noon
+ *     // output in arabic language using the calendar of Saudi-Arabia
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @see     HijriEra
  * @see     HijriMonth
@@ -235,6 +282,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     net.time4j.format.NumberSystem#ARABIC
  * @see     net.time4j.format.NumberSystem#ARABIC_INDIC
  * @see     net.time4j.format.NumberSystem#ARABIC_INDIC_EXT
+ * @see     StartOfDay#definedBy(ChronoFunction)
+ * @see     SolarTime#sunset()
  * @since   3.5/4.3
  * @doctags.concurrency {immutable}
  */
