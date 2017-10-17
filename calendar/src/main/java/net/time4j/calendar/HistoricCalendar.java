@@ -91,7 +91,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * <p>Represents the historic christian calendar used in most European countries. </p>
  *
- * <p>Following elements which are declared as constants are registered by this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class: </h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -106,7 +106,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example: </p>
+ * <h4>Formatting example:</h4>
  *
  * <pre>
  *      ChronoHistory history = ChronoHistory.of(Locale.UK);
@@ -118,6 +118,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *      assertThat(f.parse(text), is(cal));
  * </pre>
  *
+ * <h4>Transformation from ISO-8601:</h4>
+ *
  * <p>Any gregorian date (ISO-8601) can be transformed to {@code HistoricCalendar} this simple way: </p>
  *
  * <pre>
@@ -125,6 +127,20 @@ import java.util.concurrent.ConcurrentHashMap;
  *     HistoricCalendar cal = PlainDate.of(1582, 10, 5).transform(HistoricCalendar.family(), history)
  *     System.out.println(cal); // AD-1582-09-25[...], ten days were cut off by pope Gregor
  * </pre>
+ *
+ * <h4>Support for unicode ca-extensions:</h4>
+ *
+ * <pre>
+ *     Locale locale = Locale.forLanguageTag(&quot;de-DE-PREUSSEN-u-ca-historic&quot;);
+ *     ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *     assertThat(
+ *          f.format(PlainDate.of(1610, 9, 1)),
+ *          is(&quot;Mittwoch, 22. August 1610 n. Chr.&quot;));
+ * </pre>
+ *
+ * <p>The key word is &quot;historic&quot;. The ca-extension finally evaluates
+ * {@link ChronoHistory#of(Locale)} for automatical conversions to
+ * {@code HistoricCalendar} before formatting (as shown above). </p>
  *
  * @author  Meno Hochschild
  * @since   3.36/4.31
@@ -134,7 +150,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Repr&auml;sentiert den historischen christlichen Kalender, der in vielen europ&auml;ischen L&auml;ndern
  * benutzt wurde. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente: </h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -149,7 +165,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Beispiel: </p>
+ * <h4>Formatierungsbeispiel:</h4>
  *
  * <pre>
  *      ChronoHistory history = ChronoHistory.of(Locale.UK);
@@ -161,6 +177,8 @@ import java.util.concurrent.ConcurrentHashMap;
  *      assertThat(f.parse(text), is(cal));
  * </pre>
  *
+ * <h4>Transformation von ISO-8601:</h4>
+ *
  * <p>Jedes gregorianische Datum (ISO-8601) kann zu einem {@code HistoricCalendar} auf folgende einfache
  * Art und Weise transformiert werden: </p>
  *
@@ -169,6 +187,22 @@ import java.util.concurrent.ConcurrentHashMap;
  *     HistoricCalendar cal = PlainDate.of(1582, 10, 5).transform(HistoricCalendar.family(), history)
  *     System.out.println(cal); // AD-1582-09-25[...], ten days were cut off by pope Gregor
  * </pre>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen:</h4>
+ *
+ * <pre>
+ *     Locale locale = Locale.forLanguageTag(&quot;de-DE-PREUSSEN-u-ca-historic&quot;);
+ *     ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *     assertThat(
+ *          f.format(PlainDate.of(1610, 9, 1)),
+ *          is(&quot;Mittwoch, 22. August 1610 n. Chr.&quot;));
+ * </pre>
+ * <p> </p>
+ *
+ *
+ * <p>Das Schl&uuml;sselwort ist &quot;historic&quot;. Die ca-Erweiterung wertet schlie&szlig;lich
+ * {@link ChronoHistory#of(Locale)} f&uuml;r automatische Umwandlungen zu {@code HistoricCalendar}
+ * aus, bevor das Datum formatiert wird (wie oben gezeigt). </p>
  *
  * @author  Meno Hochschild
  * @since   3.36/4.31

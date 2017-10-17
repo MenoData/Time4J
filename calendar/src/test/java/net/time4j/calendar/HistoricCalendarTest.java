@@ -4,6 +4,7 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -350,6 +351,15 @@ public class HistoricCalendarTest {
         assertThat(cal.getInt(HistoricCalendar.RELATED_STANDARD_YEAR), is(7207));
         assertThat(cal.getMonth(), is(Month.DECEMBER));
         assertThat(cal.getDayOfMonth(), is(22));
+    }
+
+    @Test
+    public void caSupport() throws ParseException {
+        Locale locale = Locale.forLanguageTag("de-DE-PREUSSEN-u-ca-historic");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(1610, 9, 1)),
+            is("Mittwoch, 22. August 1610 n. Chr."));
     }
 
 }
