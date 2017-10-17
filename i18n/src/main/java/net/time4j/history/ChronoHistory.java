@@ -846,7 +846,11 @@ public final class ChronoHistory
      */
     public static ChronoHistory from(String variant) {
 
-        String[] parts = variant.split(":");
+        if (!variant.startsWith("historic-")) {
+            throw new IllegalArgumentException("Variant does not start with \"historic-\": " + variant);
+        }
+
+        String[] parts = variant.substring(9).split(":");
 
         if (parts.length == 0) {
             throw new IllegalArgumentException("Invalid variant description.");
@@ -986,6 +990,7 @@ public final class ChronoHistory
     public String getVariant() {
 
         StringBuilder sb = new StringBuilder(64);
+        sb.append("historic-");
         sb.append(this.variant.name());
 
         switch (this.variant){
