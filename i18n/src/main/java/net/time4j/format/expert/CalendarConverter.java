@@ -103,14 +103,11 @@ final class CalendarConverter<T extends ChronoEntity<T> & CalendarDate>
             Optional<Chronology<? extends CalendarDate>> c = provider.findChronology(name);
 
             if (c.isPresent()) {
-                int index = name.indexOf('-');
                 String calendarVariant = "";
-                if (index == -1) {
-                    if (name.equals("historic")) {
-                        calendarVariant = ChronoHistory.of(locale).getVariant();
-                    }
-                } else {
-                    calendarVariant = name.substring(index + 1);
+                if (name.equals("historic")) {
+                    calendarVariant = ChronoHistory.of(locale).getVariant();
+                } else if (name.indexOf('-') > 0) {
+                    calendarVariant = name;
                 }
                 return adapt(c.get(), calendarVariant);
             }
