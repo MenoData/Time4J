@@ -77,11 +77,8 @@ import java.util.Set;
  * <p>The Thai solar calendar calendar used in Thailand uses as only difference to western gregorian
  * calendar a different year numbering with the Buddhist era mainly. </p>
  *
- * <p>This class supports the calendar reform of 1940/41 after that the begin of year moved from 1st of April
- * to 1st of January. See also: <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a>. </p>
- *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by
+ * this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -95,6 +92,11 @@ import java.util.Set;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
+ * <h4>Anomaly in year 1940</h4>
+ *
+ * <p>This class supports the calendar reform of 1940/41 after that the begin of year moved from 1st of April
+ * to 1st of January. See also: <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a>. </p>
+ *
  * <p>The date arithmetic uses the ISO-compatible class {@code CalendarUnit} and always delegate to
  * the ISO-equivalent {@code PlainDate} due to the fact that this calendar has always been a derivate
  * of the western gregorian calendar (years are intended as approximate solar years). However, if
@@ -105,6 +107,16 @@ import java.util.Set;
  * corresponds to the addition of apparently three buddhist years in this edge case. If translated to
  * its ISO-equivalent the reason is clear: [1940-02-01] + 2 years = [1942-02-01]. </p>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-buddhist&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, October 1, 2560 BE&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.19/4.15
  * @doctags.concurrency {immutable}
@@ -114,11 +126,7 @@ import java.util.Set;
  * zum gregorianischen Kalender eine andere Jahresz&auml;hlung, indem als Ausgangspunkt gew&ouml;hnlich
  * die buddhistische &Auml;ra benutzt wird. </p>
  *
- * <p>Diese Klasse unterst&uuml;tzt die Kalenderreform von 1940/41, als der Beginn des Jahres vom ersten
- * April auf den ersten Januar vorverlegt wurde. Siehe auch:
- * <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a>. </p>
- *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -132,6 +140,12 @@ import java.util.Set;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
+ * <h4>Anomalie im Jahr 1940</h4>
+ *
+ * <p>Diese Klasse unterst&uuml;tzt die Kalenderreform von 1940/41, als der Beginn des Jahres vom ersten
+ * April auf den ersten Januar vorverlegt wurde. Siehe auch:
+ * <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a>. </p>
+ *
  * <p>Die Datumsarithmetik benutzt die ISO-kompatible Klasse {@code CalendarUnit} und delegiert immer an
  * das ISO-Gegenst&uuml;ck {@code PlainDate}, weil dieser Kalender nur eine Abwandlung des westlichen
  * gregorianischen Kalenders darstellt und Jahre als gen&auml;herte Sonnenjahre versteht. Wenn allerdings
@@ -143,6 +157,16 @@ import java.util.Set;
  * (Sonnen-)Jahren entspricht in diesem Einzelfall der Addition von scheinbar drei
  * buddhistischen Jahren. Wenn die Datumsangaben zu ISO &uuml;bersetzt werden, ist der
  * Grund sofort klar: [1940-02-01] + 2 years = [1942-02-01] </p>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-buddhist&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, October 1, 2560 BE&quot;));
+ * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.19/4.15
