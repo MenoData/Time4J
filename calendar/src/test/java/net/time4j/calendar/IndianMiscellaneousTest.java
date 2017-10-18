@@ -4,6 +4,7 @@ import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -87,6 +88,15 @@ public class IndianMiscellaneousTest {
     @Test
     public void defaultFirstDayOfWeek() {
         assertThat(IndianCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void caSupport() throws ParseException {
+        Locale locale = Locale.forLanguageTag("en-u-ca-indian");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2017, 10, 1)),
+            is("Sunday, Asvina 9, 1939 Saka"));
     }
 
 }
