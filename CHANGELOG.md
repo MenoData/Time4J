@@ -7,6 +7,7 @@
 - Generic calendar intervals [#675]
 - TimeLine-enhancement [#675]
 - Julian centuries with J2000-epoch [#693]
+- Document which unicode-ca-extensions are supported [#699]
 
 ### Changed
 - German names of French Republican calendar months [#692]
