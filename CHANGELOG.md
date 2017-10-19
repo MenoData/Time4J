@@ -2,6 +2,7 @@
 ### Added
 - Moon phases [#676]
 - Historic calendar [#698]
+- New SolarTime.Calculator based on Dershowitz/Reingold [#701]
 - Static factory ChronoHistory.from(variantString) [#697]
 - Extended support for always-intervals [#695]
 - Generic calendar intervals [#675]
