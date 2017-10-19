@@ -2,6 +2,7 @@
 ### Added
 - Moon phases [#676]
 - Historic calendar [#698]
+- New SolarTime.Calculator based on Dershowitz/Reingold [#701]
 - Static factory ChronoHistory.from(variantString) [#697]
 - Extended support for always-intervals [#695]
 - Generic calendar intervals [#675]
@@ -19,6 +20,7 @@
 - ChronoHistory.month()-annotation is incomplete [#696]
 
 ### Deprecated
+- Constants in SolarTime.Calculator marked for removal [#701]
 - Make surrounding()-method in MomentInterval consistently using APIs [#694]
 
 ## [v4.30] published on 2017-09-25
