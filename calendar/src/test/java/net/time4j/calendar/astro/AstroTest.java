@@ -198,7 +198,7 @@ public class AstroTest {
             is(SolarTime.ofLocation(53, 10)));
         assertThat( // Kilimanjaro
             SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build(),
-            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, SolarTime.Calculator.NOAA)));
+            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, StdSolarCalculator.TIME4J)));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -218,8 +218,8 @@ public class AstroTest {
         Moment spring2025 = AstronomicalSeason.VERNAL_EQUINOX.inYear(2025);
         PlainTimestamp tsp2024 = spring2024.get(SolarTime.apparentAt(teheran));
         PlainTimestamp tsp2025 = spring2025.get(SolarTime.apparentAt(teheran));
-        PlainTimestamp tsp2024NOAA = spring2024.get(SolarTime.apparentAt(teheran, SolarTime.Calculator.NOAA));
-        PlainTimestamp tsp2025NOAA = spring2025.get(SolarTime.apparentAt(teheran, SolarTime.Calculator.NOAA));
+        PlainTimestamp tsp2024NOAA = spring2024.get(SolarTime.apparentAt(teheran, "NOAA"));
+        PlainTimestamp tsp2025NOAA = spring2025.get(SolarTime.apparentAt(teheran, "NOAA"));
         assertThat(tsp2024, is(tsp2024NOAA));
         assertThat(tsp2025, is(tsp2025NOAA));
         System.out.println("apparent solar time of Teheran: " + spring2024.get(SolarTime.apparentAt(teheran)));
@@ -291,7 +291,7 @@ public class AstroTest {
 
     @Test
     public void stdCalculators() {
-        String[] names = {SolarTime.Calculator.NOAA, SolarTime.Calculator.SIMPLE};
+        String[] names = {"NOAA", "SIMPLE", "CC", "TIME4J"};
         for (String name : names) {
             assertThat(name, is(SolarTime.ofLocation(0, 0, 0, name).getCalculator().name()));
         }
@@ -300,14 +300,14 @@ public class AstroTest {
     @Test
     public void ofLocation() {
         SolarTime ny1 = SolarTime.ofLocation(40.9, -74.3);
-        SolarTime ny2 = SolarTime.ofLocation(40.9, -74.3, 0, SolarTime.Calculator.NOAA);
+        SolarTime ny2 = SolarTime.ofLocation(40.9, -74.3, 0, "TIME4J");
         assertThat(ny1, is(ny2)); // we assume no service loader in the background here
     }
 
     @Test
     public void williamsNewYork() { // see: http://www.edwilliams.org/sunrise_sunset_example.htm
         PlainDate date = PlainDate.of(1990, 6, 25);
-        SolarTime ny = SolarTime.ofLocation(40.9, -74.3, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime ny = SolarTime.ofLocation(40.9, -74.3, 0, "SIMPLE");
         TZID tzid = () -> "America/New_York";
         assertThat(
             date.get(ny.sunrise()).get().toZonalTimestamp(tzid),
@@ -317,7 +317,7 @@ public class AstroTest {
             is(PlainTimestamp.of(1990, 6, 25, 20, 33)));
         assertThat(
             ny.getCalculator().name(),
-            is(SolarTime.Calculator.SIMPLE));
+            is("SIMPLE"));
         assertThat(
             ny.getLatitude(),
             is(40.9));
@@ -338,7 +338,7 @@ public class AstroTest {
     @Test
     public void nooaNewYork() {
         PlainDate date = PlainDate.of(1990, 6, 25);
-        SolarTime ny = SolarTime.ofLocation(40.9, -74.3, 0, SolarTime.Calculator.NOAA);
+        SolarTime ny = SolarTime.ofLocation(40.9, -74.3, 0, "NOAA");
         TZID tzid = () -> "America/New_York";
         assertThat(
             date.get(ny.sunrise()).get().toZonalTimestamp(tzid),
@@ -354,13 +354,13 @@ public class AstroTest {
             is(PlainTimestamp.of(1990, 6, 25, 20, 32, 56)));
         assertThat(
             ny.getCalculator().name(),
-            is(SolarTime.Calculator.NOAA));
+            is("NOAA"));
     }
 
     @Test
     public void williamsReykjavik() {
         PlainDate date = PlainDate.of(2014, 6, 21);
-        SolarTime reykjavik = SolarTime.ofLocation(64.15, -21.93, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime reykjavik = SolarTime.ofLocation(64.15, -21.93, 0, "SIMPLE");
         TZID tzid = () -> "Atlantic/Reykjavik";
         assertThat(
             date.get(reykjavik.sunrise()).get().toZonalTimestamp(tzid),
@@ -373,7 +373,7 @@ public class AstroTest {
     @Test
     public void noaaReykjavik() {
         PlainDate date = PlainDate.of(2014, 6, 21);
-        SolarTime reykjavik = SolarTime.ofLocation(64.15, -21.93, 0, SolarTime.Calculator.NOAA);
+        SolarTime reykjavik = SolarTime.ofLocation(64.15, -21.93, 0, "NOAA");
         TZID tzid = () -> "Atlantic/Reykjavik";
         assertThat(
             date.get(reykjavik.sunrise()).get().toZonalTimestamp(tzid),
@@ -386,7 +386,7 @@ public class AstroTest {
     @Test
     public void williamsGermany() {
         PlainDate date = PlainDate.of(2014, 6, 21);
-        SolarTime germany = SolarTime.ofLocation(50.93311, 11.58336, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime germany = SolarTime.ofLocation(50.93311, 11.58336, 0, "SIMPLE");
         TZID tzid = () -> "Europe/Berlin";
         assertThat(
             date.get(germany.sunrise()).get().toZonalTimestamp(tzid),
@@ -399,7 +399,7 @@ public class AstroTest {
     @Test
     public void noaaGermany() {
         PlainDate date = PlainDate.of(2014, 6, 21);
-        SolarTime germany = SolarTime.ofLocation(50.93311, 11.58336, 0, SolarTime.Calculator.NOAA);
+        SolarTime germany = SolarTime.ofLocation(50.93311, 11.58336, 0, "NOAA");
         TZID tzid = () -> "Europe/Berlin";
         assertThat(
             date.get(germany.transitAtMidnight()).toZonalTimestamp(tzid),
@@ -424,7 +424,7 @@ public class AstroTest {
     @Test
     public void williamsWales() {
         PlainDate date = PlainDate.of(2015, 8, 12);
-        SolarTime wales = SolarTime.ofLocation(53.284355, -3.581405, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime wales = SolarTime.ofLocation(53.284355, -3.581405, 0, "SIMPLE");
         TZID tzid = () -> "Europe/London";
         assertThat(
             date.get(wales.sunrise()).get().toZonalTimestamp(tzid),
@@ -437,7 +437,7 @@ public class AstroTest {
     @Test
     public void noaaWales() {
         PlainDate date = PlainDate.of(2015, 8, 12);
-        SolarTime wales = SolarTime.ofLocation(53.284355, -3.581405, 0, SolarTime.Calculator.NOAA);
+        SolarTime wales = SolarTime.ofLocation(53.284355, -3.581405, 0, "NOAA");
         TZID tzid = () -> "Europe/London";
         assertThat(
             date.get(wales.sunrise()).get().toZonalTimestamp(tzid),
@@ -450,7 +450,7 @@ public class AstroTest {
     @Test
     public void williamsAtlanta() {
         PlainDate date = PlainDate.of(2009, 9, 6);
-        SolarTime atlanta = SolarTime.ofLocation(33.766667, -84.416667, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime atlanta = SolarTime.ofLocation(33.766667, -84.416667, 0, "SIMPLE");
         TZID tzid = () -> "America/New_York";
         assertThat(
             date.get(atlanta.sunrise()).get().toZonalTimestamp(tzid),
@@ -463,7 +463,7 @@ public class AstroTest {
     @Test
     public void noaaAtlanta() {
         PlainDate date = PlainDate.of(2009, 9, 6);
-        SolarTime atlanta = SolarTime.ofLocation(33.766667, -84.416667, 0, SolarTime.Calculator.NOAA);
+        SolarTime atlanta = SolarTime.ofLocation(33.766667, -84.416667, 0, "NOAA");
         TZID tzid = () -> "America/New_York";
         assertThat(
             date.get(atlanta.sunrise()).get().toZonalTimestamp(tzid),
@@ -476,7 +476,7 @@ public class AstroTest {
     @Test
     public void williamsLapland() {
         PlainDate date = PlainDate.of(2014, 1, 15);
-        SolarTime suomi = SolarTime.ofLocation(69.8888, 27, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime suomi = SolarTime.ofLocation(69.8888, 27, 0, "SIMPLE");
         TZID tzid = () -> "Europe/Helsinki";
         assertThat(
             date.get(suomi.sunrise()).isPresent(),
@@ -506,7 +506,7 @@ public class AstroTest {
     @Test
     public void noaaLapland1() {
         PlainDate date = PlainDate.of(2014, 1, 15);
-        SolarTime suomi = SolarTime.ofLocation(69.8888, 27, 0, SolarTime.Calculator.NOAA);
+        SolarTime suomi = SolarTime.ofLocation(69.8888, 27, 0, "NOAA");
         TZID tzid = () -> "Europe/Helsinki";
         assertThat(
             date.get(suomi.sunrise()).isPresent(),
@@ -537,7 +537,7 @@ public class AstroTest {
     @Test
     public void noaaLapland2() {
         PlainDate date = PlainDate.of(2014, 1, 16);
-        SolarTime suomi = SolarTime.ofLocation(70, 28, 0, SolarTime.Calculator.NOAA);
+        SolarTime suomi = SolarTime.ofLocation(70, 28, 0, "NOAA");
         TZID eest = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 2, 0);
         assertThat(
             date.get(suomi.sunrise()).isPresent(),
@@ -632,7 +632,7 @@ public class AstroTest {
     @Test
     public void williamsResolute() {
         PlainDate date = PlainDate.of(2016, 11, 1);
-        SolarTime resolute = SolarTime.ofLocation(74.6973, -94.8297, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime resolute = SolarTime.ofLocation(74.6973, -94.8297, 0, "SIMPLE");
         TZID tzid = () -> "America/Resolute";
         assertThat(
             date.get(resolute.sunrise()).get().toZonalTimestamp(tzid),
@@ -645,7 +645,7 @@ public class AstroTest {
     @Test
     public void noaaResolute() {
         PlainDate date = PlainDate.of(2016, 11, 1);
-        SolarTime resolute = SolarTime.ofLocation(74.6973, -94.8297, 0, SolarTime.Calculator.NOAA);
+        SolarTime resolute = SolarTime.ofLocation(74.6973, -94.8297, 0, "NOAA");
         TZID tzid = () -> "America/Resolute";
         assertThat(
             date.get(resolute.sunrise()).get().toZonalTimestamp(tzid),
@@ -664,7 +664,7 @@ public class AstroTest {
     @Test
     public void williamsSanFrancisco() {
         PlainDate date = PlainDate.of(2016, 5, 3);
-        SolarTime sanFrancisco = SolarTime.ofLocation(37.739558, -122.479749, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime sanFrancisco = SolarTime.ofLocation(37.739558, -122.479749, 0, "SIMPLE");
         TZID tzid = () -> "America/Los_Angeles";
         assertThat(
             date.get(sanFrancisco.sunrise()).get().toZonalTimestamp(tzid),
@@ -677,7 +677,7 @@ public class AstroTest {
     @Test
     public void noaaSanFrancisco() {
         PlainDate date = PlainDate.of(2016, 5, 3);
-        SolarTime sanFrancisco = SolarTime.ofLocation(37.739558, -122.479749, 0, SolarTime.Calculator.NOAA);
+        SolarTime sanFrancisco = SolarTime.ofLocation(37.739558, -122.479749, 0, "NOAA");
         TZID tzid = () -> "America/Los_Angeles";
         assertThat(
             date.get(sanFrancisco.sunrise()).get().toZonalTimestamp(tzid),
@@ -689,10 +689,58 @@ public class AstroTest {
 
     @Test
     public void maxElevation() {
-        SolarTime st = SolarTime.ofLocation(40, -105, 0, SolarTime.Calculator.NOAA);
+        SolarTime st = SolarTime.ofLocation(40, -105, 0, "NOAA");
         assertThat(
             Math.floor(st.getHighestElevationOfSun(PlainDate.of(2010, 6, 21)) * 100) / 100,
             is(73.43)); // from NOAA-spreadsheet
+    }
+
+    @Test
+    public void sydneyWilliams() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.SIMPLE);
+        PlainDate date = PlainDate.of(2017, 1, 1);
+        Moment sunrise = date.get(sydney.sunrise()).get(); // 2016-12-31T18:48:00Z
+        Moment expected = date.at(PlainTime.of(5, 48)).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 11));
+        assertThat(
+            sunrise.toString(),
+            Math.abs(expected.until(sunrise, TimeUnit.MINUTES)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
+    @Test
+    public void sydneyNOAA() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.NOAA);
+        PlainDate date = PlainDate.of(2017, 1, 1);
+        Moment sunrise = date.get(sydney.sunrise()).get(); // 2016-12-31T18:47:53Z
+        Moment expected = date.at(PlainTime.of(5, 48)).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 11));
+        assertThat(
+            sunrise.toString(),
+            Math.abs(expected.until(sunrise, TimeUnit.MINUTES)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
+    @Test
+    public void sydneyCC() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.CC);
+        PlainDate date = PlainDate.of(2017, 1, 1);
+        Moment sunrise = date.get(sydney.sunrise()).get(); // 2016-12-31T18:47:45Z
+        Moment expected = date.at(PlainTime.of(5, 48)).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 11));
+        assertThat(
+            sunrise.toString(),
+            Math.abs(expected.until(sunrise, TimeUnit.MINUTES)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
+    @Test
+    public void sydneyTime4J() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.TIME4J);
+        PlainDate date = PlainDate.of(2017, 1, 1);
+        Moment sunrise = date.get(sydney.sunrise()).get(); // 2016-12-31T18:47:53Z
+        Moment expected = date.at(PlainTime.of(5, 48)).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 11));
+        assertThat(
+            sunrise.toString(),
+            Math.abs(expected.until(sunrise, TimeUnit.MINUTES)) == 0, // exact agreement in minute precision
+            is(true));
     }
 
     @Test
@@ -705,7 +753,7 @@ public class AstroTest {
                 .southernLatitude(3, 4, 0)
                 .easternLongitude(37, 21, 33)
                 .atAltitude(5895)
-                .usingCalculator(SolarTime.Calculator.NOAA)
+                .usingCalculator(StdSolarCalculator.TIME4J)
                 .build();
         assertThat(
             date.get(kibo5895.sunrise(tzid)).get(),
@@ -720,7 +768,13 @@ public class AstroTest {
             date.get(kibo5895.sunshine(tzid)).length(),
             is(12 * 3600 + 37 * 60 + 14));
         // good agreement with NOAA
-        SolarTime kiboSeaLevel = SolarTime.ofLocation(-3.066667, 37.359167, 0, SolarTime.Calculator.NOAA);
+        SolarTime kiboSeaLevel =
+            SolarTime.ofLocation()
+                .southernLatitude(3, 4, 0)
+                .easternLongitude(37, 21, 33)
+                .atAltitude(0)
+                .usingCalculator("NOAA")
+                .build();
         assertThat(
             date.get(kiboSeaLevel.sunrise(tzid)).get(),
             is(PlainTime.of(6, 20, 13)));

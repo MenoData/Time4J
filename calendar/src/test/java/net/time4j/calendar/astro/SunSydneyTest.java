@@ -508,4 +508,52 @@ public class SunSydneyTest {
             is(true));
     }
 
+    @Test
+    public void ccSunrise() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.CC);
+        PlainDate date = PlainDate.of(2017, this.doy);
+        PlainTime sunrise = date.get(sydney.sunrise(() -> "Australia/Sydney")).get();
+        PlainTime expected = PlainTime.of(this.hourSunrise, this.minuteSunrise);
+        assertThat(
+            sunrise.toString(),
+            Math.abs(ClockUnit.MINUTES.between(expected, sunrise)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
+    @Test
+    public void ccSunset() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.CC);
+        PlainDate date = PlainDate.of(2017, this.doy);
+        PlainTime sunset = date.get(sydney.sunset(() -> "Australia/Sydney")).get();
+        PlainTime expected = PlainTime.of(this.hourSunset, this.minuteSunset);
+        assertThat(
+            sunset.toString(),
+            Math.abs(ClockUnit.MINUTES.between(expected, sunset)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
+    @Test
+    public void time4jSunrise() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.TIME4J);
+        PlainDate date = PlainDate.of(2017, this.doy);
+        PlainTime sunrise = date.get(sydney.sunrise(() -> "Australia/Sydney")).get();
+        PlainTime expected = PlainTime.of(this.hourSunrise, this.minuteSunrise);
+        assertThat(
+            sunrise.toString(),
+            Math.abs(ClockUnit.MINUTES.between(expected, sunrise)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
+    @Test
+    public void time4jSunset() {
+        SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.TIME4J);
+        PlainDate date = PlainDate.of(2017, this.doy);
+        PlainTime sunset = date.get(sydney.sunset(() -> "Australia/Sydney")).get();
+        PlainTime expected = PlainTime.of(this.hourSunset, this.minuteSunset);
+        assertThat(
+            sunset.toString(),
+            Math.abs(ClockUnit.MINUTES.between(expected, sunset)) == 0, // exact agreement in minute precision
+            is(true));
+    }
+
 }
