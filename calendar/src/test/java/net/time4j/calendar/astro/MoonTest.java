@@ -2,8 +2,9 @@ package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.engine.EpochDays;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -106,8 +107,12 @@ public class MoonTest {
 
     @Test
     public void illuminationOfMoon() {
-        long d = PlainDate.of(1992, 4, 12).get(EpochDays.JULIAN_DAY_NUMBER);
-        Moment m = JulianDay.ofEphemerisTime(d - 0.5).toMoment();
+        Moment m =
+            JulianDay.ofEphemerisTime(
+                PlainDate.of(1992, 4, 12),
+                PlainTime.midnightAtStartOfDay(),
+                ZonalOffset.UTC
+            ).toMoment();
         assertThat(
             MoonPhase.getIllumination(m),
             is(0.68)); // Meeus (example 48.a)

@@ -22,8 +22,12 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
+import net.time4j.PlainTime;
 import net.time4j.base.MathUtils;
+import net.time4j.engine.CalendarDate;
+import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -182,6 +186,47 @@ public final class JulianDay
     }
 
     /**
+     * <p>Creates a Julian day on the time scale {@link TimeScale#TT},
+     * sometimes also called <em>Julian Ephemeris Day</em>. </p>
+     *
+     * <p>This kind of Julian day represents the actual astronomical standard. The time
+     * TT-2000-01-01T12:00Z corresponds to JD(TT)2451545.0 </p>
+     *
+     * @param   date        calendar date
+     * @param   time        local time
+     * @param   offset      timezone offset
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen julianischen Tag auf der Zeitskala {@link TimeScale#TT},
+     * manchmal auch <em>Julian Ephemeris Day</em> genannt. </p>
+     *
+     * <p>Diese Art des julianischen Tages repr&auml;sentiert den aktuellen astronomischen Standard.
+     * Die Zeit TT-2000-01-01T12:00Z entspricht JD(TT)2451545.0 </p>
+     *
+     * @param   date        calendar date
+     * @param   time        local time
+     * @param   offset      timezone offset
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+     * @since   3.36/4.31
+     */
+    public static JulianDay ofEphemerisTime(
+        CalendarDate date,
+        PlainTime time,
+        ZonalOffset offset
+    ) {
+
+        long d = EpochDays.JULIAN_DAY_NUMBER.transform(date.getDaysSinceEpochUTC(), EpochDays.UTC);
+        double tod = time.get(PlainTime.NANO_OF_DAY) / (86400.0 * 1000000000L);
+        double jde = d - 0.5 + tod - offset.getIntegralAmount() / 86400.0;
+        return new JulianDay(jde, TimeScale.TT);
+
+    }
+
+    /**
      * <p>Creates a Julian day on the time scale {@link TimeScale#UT},
      * hence related to the mean solar time. </p>
      *
@@ -333,7 +378,7 @@ public final class JulianDay
      * @return  Julian century in J2000-frame
      * @since   3.36/4.31
      */
-    public double getCentury() {
+    public double getCenturyJ2000() {
 
         return (this.value - 2451545.0) / 36525;
 
