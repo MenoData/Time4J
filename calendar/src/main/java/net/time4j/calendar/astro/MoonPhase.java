@@ -331,7 +331,7 @@ public enum MoonPhase {
 	 */
 	public static double getIllumination(Moment moment) {
 
-		double jct = JulianDay.ofEphemerisTime(moment).getCentury();
+		double jct = JulianDay.ofEphemerisTime(moment).getCenturyJ2000();
 
 		// Meeus (47.2)
 		double meanElongation =

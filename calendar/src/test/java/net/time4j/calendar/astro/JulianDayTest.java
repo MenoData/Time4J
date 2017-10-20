@@ -2,8 +2,13 @@ package net.time4j.calendar.astro;
 
 import net.time4j.ClockUnit;
 import net.time4j.Moment;
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.OffsetSign;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -18,16 +23,27 @@ import static org.junit.Assert.assertThat;
 public class JulianDayTest {
 
     @Test
-    public void ephemerisTime() {
+    public void ephemerisTime1() {
         Moment j2000 = // TT = UTC + 42.184
             PlainTimestamp.of(2000, 1, 1, 11, 58, 56).minus(184, ClockUnit.MILLIS).atUTC();
         assertThat(j2000.toString(TimeScale.TT), is("TT-2000-01-01T12Z"));
         JulianDay expected = JulianDay.ofEphemerisTime(2451545.0);
         assertThat(JulianDay.ofEphemerisTime(j2000), is(expected));
         assertThat(expected.getMJD(), is(51544.5));
-        assertThat(expected.getCentury(), is(0.0));
+        assertThat(expected.getCenturyJ2000(), is(0.0));
         assertThat(expected.getScale(), is(TimeScale.TT));
         assertThat(expected.toMoment(), is(j2000));
+    }
+
+    @Test
+    public void ephemerisTime2() {
+        PlainDate date = PlainDate.of(1992, 4, 12);
+        PlainTime time = PlainTime.of(2);
+        ZonalOffset utc = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2);
+        JulianDay jdEphemeris = JulianDay.ofEphemerisTime(date, time, utc);
+        assertThat(
+            jdEphemeris,
+            is(JulianDay.ofEphemerisTime(date.get(EpochDays.JULIAN_DAY_NUMBER) - 0.5)));
     }
 
     @Test
