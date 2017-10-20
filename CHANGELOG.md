@@ -1,4 +1,6 @@
-## [v4.31] not yet released
+## [v4.32] not yet released
+
+## [v4.31] published on 2017-10-20
 ### Added
 - Moon phases [#676]
 - Illumination of moon [#702]
