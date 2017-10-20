@@ -313,6 +313,57 @@ public enum MoonPhase {
 
 	}
 
+	/**
+	 * <p>Determines the degree of illumination of the moon at given moment. </p>
+	 *
+	 * <p>The accuracy is limited to percent values (two digits after decimal point). </p>
+	 *
+	 * @param 	moment	universal time
+	 * @return	degree of illumination in range {@code 0.00 <= i <= 1.00}
+	 */
+	/*[deutsch]
+	 * <p>Ermittelt den Beleuchtungsgrad des Mondes zur angegebenen Zeit. </p>
+	 *
+	 * <p>Die Genauigkeit ist auf Prozentwerte beschr&auml;nkt (zwei Nachkommastellen). </p>
+	 *
+	 * @param 	moment	universal time
+	 * @return	degree of illumination in range {@code 0.00 <= i <= 1.00}
+	 */
+	public static double getIllumination(Moment moment) {
+
+		double jct = JulianDay.ofEphemerisTime(moment).getCentury();
+
+		// Meeus (47.2)
+		double meanElongation =
+			297.8501921 + (445267.1114034 + (-0.0018819 + (1.0 / 545868 + (1.0 / 113065000) * jct) * jct) * jct) * jct;
+
+		// Meeus (47.3)
+		double meanAnomalySun =
+			357.5291092 + (35999.0502909 + (-0.0001536 + (1.0 / 24490000) * jct) * jct) * jct;
+
+		// Meeus (47.4)
+		double meanAnomalyMoon =
+			134.9633964 + (477198.8675055 + (0.0087414 + ((1.0 / 69699) + (1.0 / 14712000) * jct) * jct) * jct) * jct;
+
+		double i = // phase angle of moon for a geocentric observer, Meeus (48.4)
+			180 - meanElongation
+				- 6.289 * sin(meanAnomalyMoon)
+				+ 2.1 * sin(meanAnomalySun)
+				- 1.274 * sin(2 * meanElongation - meanAnomalyMoon)
+				- 0.658 * sin(2 * meanElongation)
+				- 0.214 * sin(2 * meanAnomalyMoon)
+				- 0.11 * sin(meanElongation);
+
+		double k = (cos(i) + 1) / 2; // Meeus (48.1)
+
+		if (k >= 0.995) {
+			return 1.0;
+		} else {
+			return Math.floor(k * 100) / 100; // rounding
+		}
+
+	}
+
 	private int getEstimatedLunations(Moment moment) {
 
 		return MathUtils.safeCast(

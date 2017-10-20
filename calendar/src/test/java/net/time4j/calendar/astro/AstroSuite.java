@@ -10,6 +10,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         AstroTest.class,
         JulianDayTest.class,
+        MoonTest.class,
         SunSydneyTest.class,
         TwilightTest.class
     }
