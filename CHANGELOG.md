@@ -1,6 +1,7 @@
 ## [v4.31] not yet released
 ### Added
 - Moon phases [#676]
+- Illumination of moon [#702]
 - Historic calendar [#698]
 - New SolarTime.Calculator based on Dershowitz/Reingold [#701]
 - Static factory ChronoHistory.from(variantString) [#697]
