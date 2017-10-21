@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdEnumDateElement.java) is part of project Time4J.
  *
@@ -220,10 +220,27 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     }
 
     /**
+     * <p>Obtains the effective calendar type. </p>
+     *
+     * @param   attributes  format attributes
+     * @return  effective calendar type
+     */
+    protected String getCalendarType(AttributeQuery attributes) {
+
+        if (this.isMonthElement() || this.isEraElement()) {
+            return attributes.get(Attributes.CALENDAR_TYPE, this.defaultCalendarType);
+        } else if (this.isWeekdayElement()) {
+            return CalendarText.ISO_CALENDAR_TYPE;
+        } else {
+            return this.defaultCalendarType;
+        }
+
+    }
+
+    /**
      * <p>Does given element value represent a leap form? </p>
      *
-     * <p>Example: If given value is the hebrew month ADAR-I or ADAR-II
-     * then this method must return {@code true}. </p>
+     * <p>Example: If given value is the hebrew leap month ADAR-I then this method must return {@code true}. </p>
      *
      * @param   value   element value
      * @return  {@code false} by default
@@ -301,30 +318,20 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
 
         Locale lang = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
         TextWidth textWidth = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
-
-        CalendarText cnames;
+        CalendarText cnames = CalendarText.getInstance(this.getCalendarType(attributes), lang);
 
         if (this.isMonthElement()) {
-            cnames =
-                CalendarText.getInstance(
-                    attributes.get(Attributes.CALENDAR_TYPE, this.defaultCalendarType),
-                    lang);
             if (leap) {
                 return cnames.getLeapMonths(textWidth, outputContext);
             } else {
                 return cnames.getStdMonths(textWidth, outputContext);
             }
         } else if (this.isWeekdayElement()) {
-            cnames = CalendarText.getIsoInstance(lang);
             return cnames.getWeekdays(textWidth, outputContext);
         } else if (this.isEraElement()) {
-            cnames =
-                CalendarText.getInstance(
-                    attributes.get(Attributes.CALENDAR_TYPE, this.defaultCalendarType),
-                    lang);
             return cnames.getEras(textWidth);
         } else {
-            return CalendarText.getInstance(this.defaultCalendarType, lang).getTextForms(this.name(), this.type);
+            return cnames.getTextForms(this.name(), this.type);
         }
 
     }

@@ -1,6 +1,7 @@
 package net.time4j.calendar;
 
 import net.time4j.calendar.astro.JulianDay;
+import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -11,6 +12,7 @@ import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -74,6 +76,11 @@ public class SerializationTest {
     @Test
     public void serializeJulianDay() throws IOException, ClassNotFoundException {
         roundtrip(JulianDay.ofEphemerisTime(2451545.0));
+    }
+
+    @Test
+    public void serializeHistoric() throws IOException, ClassNotFoundException {
+        roundtrip(HistoricCalendar.of(ChronoHistory.of(Locale.UK), HistoricEra.AD, 1603, 3, 24));
     }
 
     private static int roundtrip(Object obj)

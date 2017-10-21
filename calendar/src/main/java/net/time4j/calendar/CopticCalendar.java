@@ -73,6 +73,8 @@ import java.util.Locale;
 /**
  * <p>Represents the calendar used by the Coptic church in Egypt. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is a solar calendar which defines years consisting of 13 months. The first 12 months are always 30 days long.
  * The last month has 5 or 6 days depending if a Coptic year is a leap year or not. The leap year rule is the same
  * as defined in Julian Calendar, namely every fourth year. Years are counted since the era of martyrs where
@@ -83,8 +85,7 @@ import java.util.Locale;
  * calendar (the historic ancestor of the Coptic calendar) started the day at sunrise. We assume
  * here an adaptation of the Coptic calendar to the habits of Islamic calendar in Egypt. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -98,7 +99,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <h4>Example of usage</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
@@ -109,12 +110,24 @@ import java.util.Locale;
  *     System.out.println(formatter.format(copticDate));
  * </pre>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, Tout 21, 1734 A.M.&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.11/4.8
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der von der koptischen Kirche in &Auml;gypten verwendet wird. </p>
+ *
+ * <h4>Einleitung</h4>
  *
  * <p>Es handelt sich um einen Sonnenkalender, dessen Jahre aus 13 Monaten bestehen. Die ersten 12 Monate
  * sind immer 30 Tage lang, w&auml;hrend der letzte Monat 5 oder 6 Tage lang ist, je nachdem ob ein Schaltjahr
@@ -127,7 +140,7 @@ import java.util.Locale;
  * eine Anpassung des koptischen Kalenders an die Gewohnheiten des islamischen Kalenders in &Auml;gypten
  * angenommen. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -141,7 +154,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
@@ -150,6 +163,16 @@ import java.util.Locale;
  *     PlainDate today = SystemClock.inLocalView().today();
  *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // Konversion zu 12 Uhr mittags
  *     System.out.println(formatter.format(copticDate));
+ * </pre>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, Tout 21, 1734 A.M.&quot;));
  * </pre>
  *
  * @author  Meno Hochschild

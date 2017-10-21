@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericWindows.java) is part of project Time4J.
  *
@@ -72,8 +72,14 @@ final class GenericWindows<T>
 
         if (start.isInfinite()) {
             T e = end.getTemporal();
-            if ((e != null) && end.isClosed()) {
-                e = this.timeLine.stepForward(e);
+            if (e != null) {
+                if (this.timeLine.isCalendrical()) {
+                    if (end.isOpen()) {
+                        e = this.timeLine.stepBackwards(e);
+                    }
+                } else if (end.isClosed()) {
+                    e = this.timeLine.stepForward(e);
+                }
             }
             if (e == null) {
                 return new SimpleInterval<>(start, Boundary.infiniteFuture(), this.timeLine);
@@ -92,7 +98,11 @@ final class GenericWindows<T>
                 s = this.timeLine.stepForward(s);
             }
             T e = end.getTemporal();
-            if (end.isClosed()) {
+            if (this.timeLine.isCalendrical()) {
+                if (end.isOpen()) {
+                    e = this.timeLine.stepBackwards(e);
+                }
+            } else if (end.isClosed()) {
                 e = this.timeLine.stepForward(e);
             }
             return factory.between(s, e);
@@ -103,7 +113,7 @@ final class GenericWindows<T>
     @Override
     Comparator<ChronoInterval<T>> getComparator() {
 
-        return new IntervalComparator<>(false, this.timeLine);
+        return new IntervalComparator<>(this.timeLine);
 
     }
 

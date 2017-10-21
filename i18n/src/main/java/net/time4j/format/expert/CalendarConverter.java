@@ -30,6 +30,7 @@ import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.Converter;
+import net.time4j.history.ChronoHistory;
 
 import java.util.Locale;
 import java.util.Optional;
@@ -102,8 +103,12 @@ final class CalendarConverter<T extends ChronoEntity<T> & CalendarDate>
             Optional<Chronology<? extends CalendarDate>> c = provider.findChronology(name);
 
             if (c.isPresent()) {
-                int index = name.indexOf('-');
-                String calendarVariant = ((index == -1) ? "" : name.substring(index + 1));
+                String calendarVariant = "";
+                if (name.equals("historic")) {
+                    calendarVariant = ChronoHistory.of(locale).getVariant();
+                } else if (name.indexOf('-') > 0) {
+                    calendarVariant = name;
+                }
                 return adapt(c.get(), calendarVariant);
             }
         }

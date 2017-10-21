@@ -93,6 +93,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
 /**
  * <p>Represents the Japanese calendar from 701 AD (julian) until now. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is a mixed calendar, lunisolar before Meiji 6 (= 1873-01-01) and then gregorian. A special era system
  * is used to count years where a Japanese era is also called {@code Nengo}. The first year of an era or nengo
  * always has the number 1. Before Meiji, nengos were announced at any irregular time, often even more than
@@ -115,8 +117,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * <p>Note: The lunisolar calendar part does not use astronomical calculations but depends on the original
  * chronological tables from Paul Y. Tsuchihashi for the purpose of greatest historical accuracy. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -132,7 +133,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <h4>Example of usage</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;JapaneseCalendar&gt; formatter =
@@ -158,6 +159,16 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * Another special feature: Two-digit-years using a pivot year are effectively switched off even if the pattern
  * &quot;yy&quot; is used (but users should avoid this pattern and prefer &quot;y&quot;). </p>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-japanese&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, October 1, 29 Heisei&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @see     Nengo
  * @see     EastAsianMonth
@@ -167,6 +178,8 @@ import static net.time4j.calendar.Nengo.Selector.*;
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den japanischen Kalender von 701 AD (julianisch) bis heute. </p>
+ *
+ * <h4>Einleitung</h4>
  *
  * <p>Es ist ein gemischter Kalender, lunisolar vor Meiji 6 (= 1873-01-01) und dann gregorianisch. Eine
  * besondere Jahresz&auml;hlung wird bis heute verwendet, indem die Jahre mit einer dazugeh&ouml;rigen
@@ -192,7 +205,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * <p>Hinweis: Der lunisolare Kalenderteil verwendet keine astronomischen Berechnungen, sondern die Originaldaten
  * von Paul Y. Tsuchihashi, um eine gr&ouml;&szlig;tm&ouml;gliche historische Detailtreue zu erzielen. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -208,7 +221,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;JapaneseCalendar&gt; formatter =
@@ -234,6 +247,16 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * &quot;元&quot; (gannen). Eine andere Spezialit&auml;t: Zweistellige Jahresangaben mit Kippjahr sind
  * de facto ausgeschaltet, sogar dann, wenn das Formatmuster &quot;yy&quot; verwendet wird (aber Anwender
  * sollten trotzdem das Muster &quot;y&quot; bevorzugen). </p>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-japanese&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, October 1, 29 Heisei&quot;));
+ * </pre>
  *
  * @author  Meno Hochschild
  * @see     Nengo

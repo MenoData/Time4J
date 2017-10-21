@@ -18,6 +18,7 @@ import org.junit.runners.Suite.SuiteClasses;
         RangeTest.class,
         ScaligerTest.class,
         SerializationTest.class,
+        VariantTest.class,
         YearDefinitionTest.class
     }
 )

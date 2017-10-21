@@ -45,7 +45,7 @@ public class TwilightTest {
     @Test
     public void hamburgWilliams() {
         PlainDate date = PlainDate.of(2017, 9, 6);
-        SolarTime hamburg = SolarTime.ofLocation(53 + 33.0 / 60.0, 10.0, 0, SolarTime.Calculator.SIMPLE);
+        SolarTime hamburg = SolarTime.ofLocation(53 + 33.0 / 60.0, 10.0, 0, StdSolarCalculator.SIMPLE);
         TZID tzid = () -> "Europe/Berlin";
         assertThat(
             date.get(hamburg.sunrise(Twilight.ASTRONOMICAL)).get().toZonalTimestamp(tzid).toTime(),
@@ -70,7 +70,7 @@ public class TwilightTest {
     @Test
     public void hamburgNOAA() {
         PlainDate date = PlainDate.of(2017, 9, 6);
-        SolarTime hamburg = SolarTime.ofLocation(53 + 33.0 / 60.0, 10.0, 0, SolarTime.Calculator.NOAA);
+        SolarTime hamburg = SolarTime.ofLocation(53 + 33.0 / 60.0, 10.0, 0, StdSolarCalculator.NOAA);
         TZID tzid = () -> "Europe/Berlin";
         assertThat(
             date.get(hamburg.sunrise(Twilight.ASTRONOMICAL)).get().toZonalTimestamp(tzid).toTime(),

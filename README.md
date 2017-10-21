@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2017-09-25, the version v4.30 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
+On 2017-10-20, the version v4.31 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
 
 - **time4j-olson** contains predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
 - **time4j-tzdata** is the timezone repository of Time4J based on the IANA-TZDB
@@ -138,6 +138,7 @@ Support for alternative calendars:
 - Ethiopian (including support for Ethiopian time)
 - French revolutionary
 - Hijri (Islamic) with a lot of customizable variants
+- Historic christian (includes british, byzantine, swedish etc.)
 - Indian national (Saka)
 - Japanese (including lunisolar part since AD 701)
 - Julian

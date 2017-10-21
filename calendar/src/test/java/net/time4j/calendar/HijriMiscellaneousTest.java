@@ -1,8 +1,10 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.calendar.service.GenericDatePatterns;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.VariantSource;
@@ -278,6 +280,14 @@ public class HijriMiscellaneousTest {
         HijriCalendar hijri =
             HijriCalendar.of(HijriCalendar.VARIANT_UMALQURA, 1395, HijriMonth.RAMADAN, 3);
         hijri.with(HijriCalendar.WEEKDAY_IN_MONTH, 5);
+    }
+
+    @Test
+    public void caSupport() {
+        Locale locale = Locale.forLanguageTag("en-SA-u-ca-islamic-umalqura");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        String today = f.format(SystemClock.inLocalView().today());
+        System.out.println(today);
     }
 
 }

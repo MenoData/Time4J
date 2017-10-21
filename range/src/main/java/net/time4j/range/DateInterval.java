@@ -92,10 +92,14 @@ public final class DateInterval
 
     /**
      * Constant for a date interval from infinite past to infinite future.
+     *
+     * @since   3.31/4.26
      */
     /*[deutsch]
      * Konstante f&uuml;r ein Datumsintervall, das von der unbegrenzten Vergangenheit
      * bis in die unbegrenzte Zukunft reicht.
+     *
+     * @since   3.31/4.26
      */
     public static final DateInterval ALWAYS =
         DateIntervalFactory.INSTANCE.between(Boundary.infinitePast(), Boundary.infiniteFuture());
@@ -103,7 +107,7 @@ public final class DateInterval
     private static final long serialVersionUID = 8074261825266036014L;
 
     private static final Comparator<ChronoInterval<PlainDate>> COMPARATOR =
-        new IntervalComparator<>(true, PlainDate.axis());
+        new IntervalComparator<>(PlainDate.axis());
     private static final ChronoPrinter<PlainDate> REDUCED_DD =
         ChronoFormatter.ofDatePattern("dd", PatternType.CLDR, Locale.ROOT);
     private static final ChronoPrinter<PlainDate> REDUCED_MMDD =

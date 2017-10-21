@@ -228,12 +228,16 @@ public abstract class IntervalCollection<T>
      * <p>Yields an empty instance for intervals on given timeline. </p>
      *
      * @return  empty generic {@code IntervalCollection}
+     * @see     net.time4j.engine.TimeAxis
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
      * @since   3.25/4.21
      */
     /*[deutsch]
      * <p>Liefert eine leere Instanz f&uuml;r Intervalle auf dem angegebenen Zeitstrahl. </p>
      *
      * @return  empty generic {@code IntervalCollection}
+     * @see     net.time4j.engine.TimeAxis
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
      * @since   3.25/4.21
      */
     @SuppressWarnings("unchecked")
@@ -1633,7 +1637,7 @@ public abstract class IntervalCollection<T>
      */
     boolean isCalendrical() {
 
-        return false;
+        return this.getTimeLine().isCalendrical();
 
     }
 

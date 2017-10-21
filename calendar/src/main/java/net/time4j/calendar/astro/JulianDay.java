@@ -22,7 +22,11 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
+import net.time4j.PlainTime;
+import net.time4j.engine.CalendarDate;
+import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.ObjectInputStream;
@@ -74,18 +78,18 @@ public final class JulianDay
     private static final long OFFSET_1972 = (2451545 - (2000 - 1972) * 365 - 8) * 86400L + 43200;
 
     /**
-     * The minimum value.
+     * The minimum value which corresponds roughly to the year {@code -2000}.
      */
     /*[deutsch]
-     * Der Minimumwert.
+     * Der Minimumwert, der ungef&auml;hr dem Jahr {@code -2000} entspricht.
      */
     public static final double MIN = 990575.0;
 
     /**
-     * The maximum value.
+     * The maximum value which corresponds roughly to the year {@code +3000}.
      */
     /*[deutsch]
-     * Der Maximumwert.
+     * Der Maximumwert, der ungef&auml;hr dem Jahr {@code +3000} entspricht.
      */
     public static final double MAX = 2817152.0;
 
@@ -177,6 +181,47 @@ public final class JulianDay
     public static JulianDay ofEphemerisTime(Moment moment) {
 
         return new JulianDay(getValue(moment, TimeScale.TT), TimeScale.TT);
+
+    }
+
+    /**
+     * <p>Creates a Julian day on the time scale {@link TimeScale#TT},
+     * sometimes also called <em>Julian Ephemeris Day</em>. </p>
+     *
+     * <p>This kind of Julian day represents the actual astronomical standard. The time
+     * TT-2000-01-01T12:00Z corresponds to JD(TT)2451545.0 </p>
+     *
+     * @param   date        calendar date
+     * @param   time        local time
+     * @param   offset      timezone offset
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen julianischen Tag auf der Zeitskala {@link TimeScale#TT},
+     * manchmal auch <em>Julian Ephemeris Day</em> genannt. </p>
+     *
+     * <p>Diese Art des julianischen Tages repr&auml;sentiert den aktuellen astronomischen Standard.
+     * Die Zeit TT-2000-01-01T12:00Z entspricht JD(TT)2451545.0 </p>
+     *
+     * @param   date        calendar date
+     * @param   time        local time
+     * @param   offset      timezone offset
+     * @return  JulianDay
+     * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+     * @since   3.36/4.31
+     */
+    public static JulianDay ofEphemerisTime(
+        CalendarDate date,
+        PlainTime time,
+        ZonalOffset offset
+    ) {
+
+        long d = EpochDays.JULIAN_DAY_NUMBER.transform(date.getDaysSinceEpochUTC(), EpochDays.UTC);
+        double tod = time.get(PlainTime.NANO_OF_DAY) / (86400.0 * 1000000000L);
+        double jde = d - 0.5 + tod - offset.getIntegralAmount() / 86400.0;
+        return new JulianDay(jde, TimeScale.TT);
 
     }
 
@@ -317,6 +362,24 @@ public final class JulianDay
     public double getMJD() {
 
         return this.value - 2400000.5;
+
+    }
+
+    /**
+     * <p>Obtains the value of this Julian day as <em>Julian century relative to the year 2000</em>. </p>
+     *
+     * @return  Julian century in J2000-frame
+     * @since   3.36/4.31
+     */
+    /*[deutsch]
+     * <p>Liefert den Wert dieses julianischen Tags als <em>Julianisches Jahrhundert relativ zum Jahr 2000</em>. </p>
+     *
+     * @return  Julian century in J2000-frame
+     * @since   3.36/4.31
+     */
+    public double getCenturyJ2000() {
+
+        return (this.value - 2451545.0) / 36525;
 
     }
 

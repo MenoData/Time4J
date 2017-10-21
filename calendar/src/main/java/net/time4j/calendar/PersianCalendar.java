@@ -72,6 +72,8 @@ import java.util.Locale;
 /**
  * <p>Represents the Solar Hijri calendar which is officially used in Iran and Afghanistan. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is a solar calendar which is in close agreement with the astronomical seasons. The vernal equinox
  * serves as the first day of the Persian year (Farvardin 1st). If it is observed before noon at local time
  * in Teheran then the associated day is the first day of the year else the next day. More details about the
@@ -86,8 +88,7 @@ import java.util.Locale;
  * However, dates calculated in far future beyond 2123 can still be wrong due to the uncertainty of astronomical
  * term delta-T and should be considered as approximation. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -101,7 +102,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <h4>Example of usage</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
@@ -112,12 +113,25 @@ import java.util.Locale;
  *     System.out.println(formatter.format(jalali));
  * </pre>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; formatter = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.MEDIUM, loc);
+ *      PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
+ *      PlainDate gregorian = jalali.transform(PlainDate.class);
+ *      assertThat(formatter.format(jalali), is(&quot;10.01.1393 AP&quot;));
+ *      assertThat(formatter.format(gregorian), is(&quot;10.01.1393 AP&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.9/4.6
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den persischen Kalender, der offiziell in Iran und Afghanistan benutzt wird. </p>
+ *
+ * <h4>Einleitung</h4>
  *
  * <p>Es handelt sich um einen solaren Kalender, der in enger &Uuml;bereinstimmung mit den astronomischen
  * Saisons existiert. Als Startpunkt dient die astronomische Fr&uuml;hlingstagundnachtgleiche. Wird sie vor
@@ -134,7 +148,7 @@ import java.util.Locale;
  * astronomische Term delta-T sich nicht beliebig genau in die Zukunft prognostizieren l&auml;sst. Solche Datumswerte
  * weit in der Zukunft sind daher als N&auml;herung anzusehen. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -148,7 +162,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
@@ -157,6 +171,17 @@ import java.util.Locale;
  *     PlainDate today = SystemClock.inLocalView().today();
  *     PersianCalendar jalali = today.transform(PersianCalendar.class);
  *     System.out.println(formatter.format(jalali));
+ * </pre>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; formatter = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.MEDIUM, loc);
+ *      PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
+ *      PlainDate gregorian = jalali.transform(PlainDate.class);
+ *      assertThat(formatter.format(jalali), is(&quot;10.01.1393 AP&quot;));
+ *      assertThat(formatter.format(gregorian), is(&quot;10.01.1393 AP&quot;));
  * </pre>
  *
  * @author  Meno Hochschild

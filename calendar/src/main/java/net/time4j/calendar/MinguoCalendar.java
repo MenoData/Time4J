@@ -83,8 +83,7 @@ import java.util.Set;
  *
  * <p>See also: <a href="https://en.wikipedia.org/wiki/Minguo_calendar">Wikipedia</a>. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -98,6 +97,16 @@ import java.util.Set;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-roc&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, October 1, 106 Minguo&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.13/4.10
  * @doctags.concurrency {immutable}
@@ -109,7 +118,7 @@ import java.util.Set;
  *
  * <p>Siehe auch: <a href="https://en.wikipedia.org/wiki/Minguo_calendar">Wikipedia</a>. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -122,6 +131,16 @@ import java.util.Set;
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-roc&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, October 1, 106 Minguo&quot;));
+ * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10

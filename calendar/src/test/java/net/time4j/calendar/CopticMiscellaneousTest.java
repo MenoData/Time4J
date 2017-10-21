@@ -1,10 +1,17 @@
 package net.time4j.calendar;
 
+import net.time4j.PlainDate;
 import net.time4j.Weekday;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
+import net.time4j.format.DisplayMode;
+import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -56,6 +63,15 @@ public class CopticMiscellaneousTest {
     @Test
     public void defaultFirstDayOfWeek() {
         assertThat(CopticCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SATURDAY));
+    }
+
+    @Test
+    public void caSupport() throws ParseException {
+        Locale locale = Locale.forLanguageTag("en-u-ca-coptic");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2017, 10, 1)),
+            is("Sunday, Tout 21, 1734 A.M."));
     }
 
 }

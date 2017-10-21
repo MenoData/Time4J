@@ -3,6 +3,7 @@ package net.time4j.history;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -413,6 +414,26 @@ public class HistoryTest {
                 .build();
         assertThat(formatter.format(PlainDate.of(2000, 12, 31)), is("20th century"));
         assertThat(formatter.format(PlainDate.of(2001, 1, 1)), is("21st century"));
+    }
+
+    @Test
+    public void printGermanWithEmbeddedMonth() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("MMM", PatternType.CLDR, Locale.GERMANY)
+                .with(ChronoHistory.ofFirstGregorianReform());
+        assertThat(
+            formatter.format(PlainDate.of(1582, 10, 1)),
+            is("Sep."));
+    }
+
+    @Test
+    public void printGermanWithStandaloneMonth() {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.ofDatePattern("LLL", PatternType.CLDR, Locale.GERMANY)
+                .with(ChronoHistory.ofFirstGregorianReform());
+        assertThat(
+            formatter.format(PlainDate.of(1582, 10, 1)),
+            is("Sep"));
     }
 
 }

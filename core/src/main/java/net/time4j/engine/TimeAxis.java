@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -38,7 +38,7 @@ import java.util.Set;
  * time points belonging to this time axis respective chronology. </p>
  *
  * @param   <U> generic type of time units
- * @param   <T> generic type of time context compatible to {@link TimePoint})
+ * @param   <T> generic type of time context compatible to {@link TimePoint}
  * @author  Meno Hochschild
  */
 /*[deutsch]
@@ -47,7 +47,7 @@ import java.util.Set;
  * beliebigen Zeitpunkten der Chronologie definiert wird. </p>
  *
  * @param   <U> generic type of time units
- * @param   <T> generic type of time context compatible to {@link TimePoint})
+ * @param   <T> generic type of time context compatible to {@link TimePoint}
  * @author  Meno Hochschild
  */
 public final class TimeAxis<U, T extends TimePoint<U, T>>
@@ -463,6 +463,13 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     public T getMaximum() {
 
         return this.max;
+
+    }
+
+    @Override
+    public boolean isCalendrical() {
+
+        return (this.calendarSystem != null);
 
     }
 

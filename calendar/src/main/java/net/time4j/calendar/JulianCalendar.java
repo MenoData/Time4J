@@ -73,12 +73,13 @@ import java.util.Locale;
 /**
  * <p>Represents the proleptic Julian calendar. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is de facto the ancestor of modern gregorian calendar but does not reflect any historic anomalies
  * and applies its leap year rules even backwards into the far past. The main difference to gregorian
  * calendar is the leap year rule which considers every year as leap year whose number is divisible by four. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -93,7 +94,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <h4>Example of usage</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;JulianCalendar&gt; formatter =
@@ -104,17 +105,29 @@ import java.util.Locale;
  *     System.out.println(formatter.format(julianDate));
  * </pre>
  *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-julian&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, September 18, 2017 AD&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.15/4.12
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den proleptischen julianischen Kalender. </p>
  *
+ * <h4>Einleitung</h4>
+ *
  * <p>De facto handelt es sich um den Vorg&auml;nger des modernen gregorianischen Kalenders.
  * Jedoch werden historische Anomalien nicht erfasst. Die Schaltjahresregel, die jedes durch
  * vier teilbare Jahr als Schaltjahr ansieht, wird sogar bis in die ferne Vergangenheit angewandt. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -129,7 +142,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;JulianCalendar&gt; formatter =
@@ -138,6 +151,16 @@ import java.util.Locale;
  *     PlainDate today = SystemClock.inLocalView().today();
  *     JulianCalendar julianDate = today.transform(JulianCalendar.class);
  *     System.out.println(formatter.format(julianDate));
+ * </pre>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-julian&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, September 18, 2017 AD&quot;));
  * </pre>
  *
  * @author  Meno Hochschild

@@ -1,4 +1,30 @@
-## [v4.31] not yet released
+## [v4.32] not yet released
+
+## [v4.31] published on 2017-10-20
+### Added
+- Moon phases [#676]
+- Illumination of moon [#702]
+- Historic calendar [#698]
+- New SolarTime.Calculator based on Dershowitz/Reingold [#701]
+- Static factory ChronoHistory.from(variantString) [#697]
+- Extended support for always-intervals [#695]
+- Generic calendar intervals [#675]
+- TimeLine-enhancement [#675]
+- Julian centuries with J2000-epoch [#693]
+- Document which unicode-ca-extensions are supported [#699]
+
+### Changed
+- German names of French Republican calendar months [#692]
+- Prevent calling some SolarTime.Builder-methods twice [#691]
+- Refine altitude-dependent calculation of solar time [#689]
+
+### Fixed
+- Unicode-ca-support not available for HijriCalendar [#700]
+- ChronoHistory.month()-annotation is incomplete [#696]
+
+### Deprecated
+- Constants in SolarTime.Calculator marked for removal [#701]
+- Make surrounding()-method in MomentInterval consistently using APIs [#694]
 
 ## [v4.30] published on 2017-09-25
 ### Added

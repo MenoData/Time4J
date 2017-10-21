@@ -2,10 +2,17 @@ package net.time4j.calendar;
 
 import net.time4j.CalendarUnit;
 import net.time4j.Month;
+import net.time4j.PlainDate;
 import net.time4j.Weekday;
+import net.time4j.engine.CalendarDate;
+import net.time4j.format.DisplayMode;
+import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -167,6 +174,15 @@ public class MinguoMiscellaneousTest {
     @Test
     public void defaultFirstDayOfWeek() {
         assertThat(MinguoCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void caSupport() throws ParseException {
+        Locale locale = Locale.forLanguageTag("en-u-ca-roc");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2017, 10, 1)),
+            is("Sunday, October 1, 106 Minguo"));
     }
 
 }

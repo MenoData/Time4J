@@ -72,6 +72,8 @@ import java.util.Locale;
 /**
  * <p>Represents the national calendar of India. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>It is a reform calendar synchronized with the gregorian calendar and was introduced in year 1957 as an attempt
  * to unify the various local calendars used in India. A special leap year rule was introduced as follows:
  * <i>First add to the year of Saka era the number 78, then determine if the sum is a gregorian leap year.</i>
@@ -80,8 +82,7 @@ import java.util.Locale;
  * the gregorian calendar. The calendar day starts at midnight, like in gregorian calendar but in contrast
  * to the old Hinduist tradition. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -95,7 +96,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <p>Example of usage: </p>
+ * <h4>Example of usage</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;IndianCalendar&gt; formatter =
@@ -104,6 +105,16 @@ import java.util.Locale;
  *     PlainDate today = SystemClock.inLocalView().today();
  *     IndianCalendar indianDate = today.transform(IndianCalendar.class);
  *     System.out.println(formatter.format(indianDate));
+ * </pre>
+ *
+ * <h4>Support for unicode ca-extensions</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-indian&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, Asvina 9, 1939 Saka&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -119,6 +130,8 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den indischen Nationalkalender. </p>
  *
+ * <h4>Einleitung</h4>
+ *
  * <p>Es handelt sich um einen Reformkalender, der mit dem gregorianischen Kalender synchronisiert ist und
  * im Jahre 1957 als Versuch eingef&uuml;hrt wurde, die verschiedenen lokalen Kalender in Indien zu
  * vereinen. Eine spezielle Schaltjahresregel wurde wie folgt eingef&uuml;hrt: <i>Zuerst addiere zum
@@ -128,7 +141,7 @@ import java.util.Locale;
  * meisten Inder bevorzugen den gregorianischen Kalender. Die Kalendertage beginnen um Mitternacht,
  * wie im gregorianischen Kalender, aber im Gegensatz zur alten hinduistischen Tradition. </p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -142,7 +155,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <p>Anwendungsbeispiel: </p>
+ * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
  *     ChronoFormatter&lt;IndianCalendar&gt; formatter =
@@ -151,6 +164,16 @@ import java.util.Locale;
  *     PlainDate today = SystemClock.inLocalView().today();
  *     IndianCalendar indianDate = today.transform(IndianCalendar.class);
  *     System.out.println(formatter.format(indianDate));
+ * </pre>
+ *
+ * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ *
+ * <pre>
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-indian&quot;);
+ *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+ *      assertThat(
+ *          f.format(PlainDate.of(2017, 10, 1)),
+ *          is(&quot;Sunday, Asvina 9, 1939 Saka&quot;));
  * </pre>
  *
  * @author  Meno Hochschild

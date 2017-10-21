@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalComparator.java) is part of project Time4J.
  *
@@ -42,13 +42,10 @@ final class IntervalComparator<T>
 
     //~ Konstruktoren -----------------------------------------------------
 
-    IntervalComparator(
-        boolean calendrical,
-        TimeLine<T> axis
-    ) {
+    IntervalComparator(TimeLine<T> axis) {
         super();
 
-        this.calendrical = calendrical;
+        this.calendrical = axis.isCalendrical();
         this.axis = axis;
 
     }
