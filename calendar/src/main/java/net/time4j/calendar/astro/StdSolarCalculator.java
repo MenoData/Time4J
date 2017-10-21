@@ -39,7 +39,7 @@ import java.util.concurrent.TimeUnit;
  *
  * @since   3.36/4.31
  */
-/**
+/*[deutsch]
  * <p>Aufz&auml;hlung einiger Standardberechnungsverfahren f&uuml;r die Sonnenzeit. </p>
  *
  * @since   3.36/4.31
