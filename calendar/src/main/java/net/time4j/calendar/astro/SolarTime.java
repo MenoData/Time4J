@@ -55,9 +55,9 @@ import java.util.concurrent.TimeUnit;
  *
  * <pre>
  *     PlainDate date = PlainDate.of(2017, 12, 22);
- *     TZID tzid = () -> &quot;Africa/Dar_es_Salaam&quot;; // Tanzania: UTC+03:00
+ *     TZID tzid = Timezone.of(&quot;Africa/Dar_es_Salaam&quot;).getID(); // Tanzania: UTC+03:00
  *
- *     // high altitude => earlier sunrise and later sunset
+ *     // high altitude implies earlier sunrise and later sunset
  *     SolarTime kibo5895 =
  *       SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
  *
@@ -91,9 +91,9 @@ import java.util.concurrent.TimeUnit;
  *
  * <pre>
  *     PlainDate date = PlainDate.of(2017, 12, 22);
- *     TZID tzid = () -> &quot;Africa/Dar_es_Salaam&quot;; // Tanzania: UTC+03:00
+ *     TZID tzid = Timezone.of(&quot;Africa/Dar_es_Salaam&quot;).getID(); // Tanzania: UTC+03:00
  *
- *     // gro&szlig;e H&ouml;he => fr&uuml;herer Sonnenaufgang und sp&auml;terer Sonnenuntergang
+ *     // gro&szlig;e H&ouml;he verursacht fr&uuml;heren Sonnenaufgang und sp&auml;teren Sonnenuntergang
  *     SolarTime kibo5895 =
  *       SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
  *
@@ -1575,7 +1575,6 @@ public final class SolarTime
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     /*[deutsch]
      * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
@@ -1583,7 +1582,6 @@ public final class SolarTime
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     public interface Calculator {
 

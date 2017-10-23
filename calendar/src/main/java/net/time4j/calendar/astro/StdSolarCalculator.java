@@ -309,7 +309,7 @@ public enum StdSolarCalculator
     /**
      * Follows closely the algorithms published by NOAA (National Oceanic and Atmospheric Administration).
      *
-     * <h4>Introduction</h4>
+     * <p><strong>Introduction</strong></p>
      *
      * <p>The <a href="https://www.esrl.noaa.gov/gmd/grad/solcalc/">website</a> of NOAA also links
      * to the calculation details. This is a calculator with reasonably good precision. But the altitude
@@ -320,7 +320,7 @@ public enum StdSolarCalculator
      * that local topology or the actual weather conditions are not taken into account. Therefore
      * truncating the results to minute precision should be considered. </p>
      *
-     * <h4>Example</h4>
+     * <p><strong>Example</strong></p>
      *
      * <pre>
      *     PlainDate date = PlainDate.of(2009, 9, 6);
@@ -338,7 +338,7 @@ public enum StdSolarCalculator
      * Folgt nahe den Algorithmen, die von der NOAA (National Oceanic and Atmospheric Administration)
      * ver&ouml;ffentlicht wurden.
      *
-     * <h4>Einleitung</h4>
+     * <p><strong>Einleitung</strong></p>
      *
      * <p>Die <a href="https://www.esrl.noaa.gov/gmd/grad/solcalc/">Webseite</a> der NOAA verlinkt
      * auch zu den Berechnungsdetails. Dieses Verfahren bietet eine recht gute Genauigkeit. Die H&ouml;he
@@ -350,7 +350,7 @@ public enum StdSolarCalculator
      * ber&uuml;cksichtigt werden. Deshalb ist das Abschneiden der Sekundenteile in den Ergebnissen
      * meistens angeraten. </p>
      *
-     * <h4>Beispiel</h4>
+     * <p><strong>Beispiel</strong></p>
      *
      * <pre>
      *     PlainDate date = PlainDate.of(2009, 9, 6);
@@ -678,7 +678,7 @@ public enum StdSolarCalculator
      * Based mainly on the astronomical calculations published by Jean Meeus in his book
      * &quot;Astronomical Algorithms&quot; (second edition).
      *
-     * <h4>Introduction</h4>
+     * <p><strong>Introduction</strong></p>
      *
      * <p>This calculation is the <strong>default</strong> method because it offers high precision
      * with the general limitation that the local topology or special weather conditions cannot be
@@ -687,7 +687,7 @@ public enum StdSolarCalculator
      * <p>The altitude of the observer is taken into account using a spheroid (WGS84)
      * and the assumption of a standard atmosphere (for the refraction). </p>
      *
-     * <h4>Supported features</h4>
+     * <p><strong>Supported features</strong></p>
      *
      * <ul>
      *     <li>declination</li>
@@ -698,7 +698,7 @@ public enum StdSolarCalculator
      * Basiert meist auf den astronomischen Berechnungen von Jean Meeus, die er im Buch
      * &quot;Astronomical Algorithms&quot; (zweite Auflage) ver&ouml;ffentlicht hat.
      *
-     * <h4>Einleitung</h4>
+     * <p><strong>Einleitung</strong></p>
      *
      * <p>Dieses Verfahren ist der <strong>Standard</strong>, weil es hohe Genauigkeit bietet, aber mit der
      * allgemeinen Einschr&auml;nkung, da&szlig; die lokale Topologie oder besondere Wetterbedingungen
@@ -708,7 +708,7 @@ public enum StdSolarCalculator
      * als geod&auml;tischen Modell und der Annahme einer Standardatmosph&auml;re (f&uuml;r
      * die Refraktion) ber&uuml;cksichtigt. </p>
      *
-     * <h4>Unterst&uuml;tzte Merkmale</h4>
+     * <p><strong>Unterst&uuml;tzte Merkmale</strong></p>
      *
      * <ul>
      *     <li>declination</li>
