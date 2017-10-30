@@ -1,4 +1,6 @@
 ## [v4.32] not yet released
+### Added
+-  More flexible numberings of enums in formatting [#706]
 
 ## [v4.31] published on 2017-10-20
 ### Added
