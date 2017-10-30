@@ -150,7 +150,7 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     }
 
     @Override
-    public int parseToInt(
+    public int printToInt(
         V value,
         ChronoDisplay context,
         AttributeQuery attributes

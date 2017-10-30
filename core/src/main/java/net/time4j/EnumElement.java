@@ -184,7 +184,7 @@ final class EnumElement<V extends Enum<V>>
     }
 
     @Override
-    public int parseToInt(
+    public int printToInt(
         V value,
         ChronoDisplay context,
         AttributeQuery attributes

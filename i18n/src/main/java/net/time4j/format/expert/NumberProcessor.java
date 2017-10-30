@@ -265,7 +265,7 @@ class NumberProcessor<V>
                 int v = Integer.MIN_VALUE;
                 if (this.element instanceof NumericalElement) {
                     V value = formattable.get(this.element);
-                    v = ((NumericalElement<V>) this.element).parseToInt(value, formattable, attributes);
+                    v = ((NumericalElement<V>) this.element).printToInt(value, formattable, attributes);
                     negative = (v < 0);
                 }
                 if (v == Integer.MIN_VALUE) {

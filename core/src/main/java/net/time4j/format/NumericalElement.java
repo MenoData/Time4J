@@ -53,7 +53,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Translates given element value to a numerical integer. </p>
      *
      * <p>Will be called by the default methods {@link #parseFromInt(ChronoEntity, int)}
-     * or {@link #parseToInt(Object, ChronoDisplay, AttributeQuery)}. The integer {@code Integer.MIN_VALUE}
+     * or {@link #printToInt(Object, ChronoDisplay, AttributeQuery)}. The integer {@code Integer.MIN_VALUE}
      * must be avoided in this conversion. </p>
      *
      * @param   value       value to be converted to int
@@ -63,7 +63,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Ermittelt eine numerische Darstellung des angegebenen Werts. </p>
      *
      * <p>Wird von den Standardimplementierungen der Methoden {@link #parseFromInt(ChronoEntity, int)}
-     * oder {@link #parseToInt(Object, ChronoDisplay, AttributeQuery)} aufgerufen. Der Integerwert
+     * oder {@link #printToInt(Object, ChronoDisplay, AttributeQuery)} aufgerufen. Der Integerwert
      * {@code Integer.MIN_VALUE} mu&szlig; vermieden werden. </p>
      *
      * @param   value       value to be converted to int
@@ -95,7 +95,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * @return  Integer-representation of given value
      * @since   3.37/4.32
      */
-    int parseToInt(
+    int printToInt(
         V value,
         ChronoDisplay context,
         AttributeQuery attributes
