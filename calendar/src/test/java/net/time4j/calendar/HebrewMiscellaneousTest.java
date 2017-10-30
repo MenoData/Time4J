@@ -6,6 +6,7 @@ import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
@@ -95,6 +96,52 @@ public class HebrewMiscellaneousTest {
                 break;
             }
         }
+    }
+
+    @Test
+    public void defaultOrderFormatter() throws ParseException {
+        ChronoFormatter<HebrewCalendar> f =
+            ChronoFormatter.ofPattern("yyyy-MM-dd", PatternType.CLDR_DATE, Locale.UK, HebrewCalendar.axis());
+        HebrewCalendar date = HebrewCalendar.ofCivil(5778, 12, 11);
+        assertThat(date.getMonth(), is(HebrewMonth.ELUL));
+        assertThat(f.format(date), is("5778-12-11"));
+        assertThat(f.parse("5778-12-11"), is(date));
+    }
+
+    @Test
+    public void enumOrderFormatter() throws ParseException {
+        ChronoFormatter<HebrewCalendar> f =
+            ChronoFormatter
+                .ofPattern("yyyy-MM-dd", PatternType.CLDR_DATE, Locale.UK, HebrewCalendar.axis())
+                .with(HebrewMonth.order(), HebrewMonth.Order.ENUM);
+        HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.ELUL, 11);
+        assertThat(date.getMonth(), is(HebrewMonth.ELUL));
+        assertThat(f.format(date), is("5778-13-11"));
+        assertThat(f.parse("5778-13-11"), is(date));
+    }
+
+    @Test
+    public void civilOrderFormatter() throws ParseException {
+        ChronoFormatter<HebrewCalendar> f =
+            ChronoFormatter
+                .ofPattern("yyyy-MM-dd", PatternType.CLDR_DATE, Locale.UK, HebrewCalendar.axis())
+                .with(HebrewMonth.order(), HebrewMonth.Order.CIVIL);
+        HebrewCalendar date = HebrewCalendar.ofCivil(5778, 12, 11);
+        assertThat(date.getMonth(), is(HebrewMonth.ELUL));
+        assertThat(f.format(date), is("5778-12-11"));
+        assertThat(f.parse("5778-12-11"), is(date));
+    }
+
+    @Test
+    public void biblicalOrderFormatter() throws ParseException {
+        ChronoFormatter<HebrewCalendar> f =
+            ChronoFormatter
+                .ofPattern("yyyy-MM-dd", PatternType.CLDR_DATE, Locale.UK, HebrewCalendar.axis())
+                .with(HebrewMonth.order(), HebrewMonth.Order.BIBILICAL);
+        HebrewCalendar date = HebrewCalendar.ofBiblical(5778, 6, 11);
+        assertThat(date.getMonth(), is(HebrewMonth.ELUL));
+        assertThat(f.format(date), is("5778-06-11"));
+        assertThat(f.parse("5778-06-11"), is(date));
     }
 
     @Test
