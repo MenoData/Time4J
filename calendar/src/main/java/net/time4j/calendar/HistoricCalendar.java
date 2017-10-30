@@ -1682,7 +1682,7 @@ public final class HistoricCalendar
         }
 
         @Override
-        public int parseToInt(
+        public int printToInt(
             HistoricEra value,
             ChronoDisplay context,
             AttributeQuery attributes
@@ -1889,21 +1889,6 @@ public final class HistoricCalendar
             ChronoHistory history = getHistory(attributes);
             DualFormatElement element = DualFormatElement.class.cast(history.yearOfEra());
             return element.parse(text, status, attributes, parsedResult);
-
-        }
-
-        @Override
-        public int numerical(Integer value) {
-
-            return value.intValue();
-
-        }
-
-        @Override
-        public boolean parseFromInt(ChronoEntity<?> entity, int value) {
-
-            entity.with(this, Integer.valueOf(value));
-            return true;
 
         }
 

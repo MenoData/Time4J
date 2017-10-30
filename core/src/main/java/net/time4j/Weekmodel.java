@@ -952,9 +952,7 @@ public final class Weekmodel
 
     private class DayOfWeekElement
         extends AbstractDateElement<Weekday>
-        implements NavigableElement<Weekday>,
-                   NumericalElement<Weekday>,
-                   TextElement<Weekday> {
+        implements NavigableElement<Weekday>, NumericalElement<Weekday>, TextElement<Weekday> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -1281,8 +1279,7 @@ public final class Weekmodel
     }
 
     private class CalendarWeekElement
-        extends AbstractDateElement<Integer>
-        implements NumericalElement<Integer> {
+        extends AbstractDateElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -1328,13 +1325,6 @@ public final class Weekmodel
         public Class<Integer> getType() {
 
             return Integer.class;
-
-        }
-
-        @Override
-        public int numerical(Integer value) {
-
-            return value.intValue();
 
         }
 

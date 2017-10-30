@@ -28,7 +28,6 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.NumberSystem;
-import net.time4j.format.NumericalElement;
 import net.time4j.format.TextElement;
 
 import java.io.IOException;
@@ -42,8 +41,7 @@ import java.text.ParsePosition;
  * @since   3.32/4.27
  */
 public interface DualFormatElement // ehemals: net.time4j.history.internal.HistorizedElement
-    extends NumericalElement<Integer>, TextElement<Integer> {
-    // TODO: remove inheritance from NumericalElement in next major release
+    extends TextElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

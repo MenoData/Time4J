@@ -217,7 +217,7 @@ public final class HebrewCalendar
                 return HebrewCalendar.isLeapYear(context.getInt(YEAR_OF_ERA));
             }
             @Override
-            public int parseToInt(
+            public int printToInt(
                 HebrewMonth value,
                 ChronoDisplay context,
                 AttributeQuery attributes

@@ -133,7 +133,7 @@ final class HistoricEraElement
     }
 
     @Override
-    public int parseToInt(
+    public int printToInt(
         HistoricEra value,
         ChronoDisplay context,
         AttributeQuery attributes
