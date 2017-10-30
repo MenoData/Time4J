@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EnumElement.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
+import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
@@ -180,6 +181,21 @@ final class EnumElement<V extends Enum<V>>
     public int numerical(V value) {
 
         return value.ordinal() + 1;
+
+    }
+
+    @Override // for performance reasons
+    public boolean parseFromInt(
+        ChronoEntity<?> entity,
+        int value
+    ) {
+
+        try {
+            entity.with(this, this.type.getEnumConstants()[value - 1]);
+            return true;
+        } catch (RuntimeException re) {
+            return false;
+        }
 
     }
 

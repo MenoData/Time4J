@@ -298,6 +298,32 @@ final class HistoricIntegerElement
     }
 
     @Override
+    public int numerical(Integer value) {
+
+        return value.intValue();
+
+    }
+
+    @Override
+    public int parseToInt(
+        Integer value,
+        ChronoDisplay context,
+        AttributeQuery attributes
+    ) {
+
+        return value.intValue();
+
+    }
+
+    @Override
+    public boolean parseFromInt(ChronoEntity<?> entity, int value) {
+
+        entity.with(this, Integer.valueOf(value));
+        return true;
+
+    }
+
+    @Override
     protected <T extends ChronoEntity<T>> ElementRule<T, Integer> derive(Chronology<T> chronology) {
 
         if (chronology.isRegistered(PlainDate.COMPONENT)) {

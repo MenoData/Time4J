@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdIntegerDateElement.java) is part of project Time4J.
  *
@@ -23,7 +23,6 @@ package net.time4j.calendar.service;
 
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.format.NumericalElement;
 
 
 /**
@@ -39,8 +38,7 @@ import net.time4j.format.NumericalElement;
  * @since   3.5/4.3
  */
 public class StdIntegerDateElement<T extends ChronoEntity<T>>
-    extends StdDateElement<Integer, T>
-    implements NumericalElement<Integer> {
+    extends StdDateElement<Integer, T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -109,13 +107,6 @@ public class StdIntegerDateElement<T extends ChronoEntity<T>>
     public Integer getDefaultMaximum() {
 
         return Integer.valueOf(this.max);
-
-    }
-
-    @Override
-    public int numerical(Integer value) {
-
-        return value.intValue();
 
     }
 
