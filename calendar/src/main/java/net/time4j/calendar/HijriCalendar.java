@@ -2083,7 +2083,7 @@ public final class HijriCalendar
         @Override
         public int getDefaultPivotYear() {
 
-            return HijriCalendar.nowInSystemTime(HijriAlgorithm.WEST_ISLAMIC_CIVIL,StartOfDay.MIDNIGHT).getYear() + 20;
+            return HijriCalendar.nowInSystemTime(HijriAlgorithm.WEST_ISLAMIC_CIVIL, StartOfDay.MIDNIGHT).getYear() + 20;
 
         }
 

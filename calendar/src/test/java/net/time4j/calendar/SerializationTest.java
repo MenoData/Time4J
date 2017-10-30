@@ -83,6 +83,11 @@ public class SerializationTest {
         roundtrip(HistoricCalendar.of(ChronoHistory.of(Locale.UK), HistoricEra.AD, 1603, 3, 24));
     }
 
+    @Test
+    public void serializeHebrew() throws IOException, ClassNotFoundException {
+        roundtrip(HebrewCalendar.of(5779, HebrewMonth.ADAR_I, 1));
+    }
+
     private static int roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

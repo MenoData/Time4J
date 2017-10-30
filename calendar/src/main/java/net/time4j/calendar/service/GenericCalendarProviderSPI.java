@@ -23,6 +23,7 @@ package net.time4j.calendar.service;
 
 import net.time4j.calendar.CopticCalendar;
 import net.time4j.calendar.EthiopianCalendar;
+import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
 import net.time4j.calendar.HistoricCalendar;
 import net.time4j.calendar.IndianCalendar;
@@ -61,6 +62,8 @@ public class GenericCalendarProviderSPI
             case "ethioaa":
             case "ethiopic-amete-alem":
                 return Optional.of(EthiopianCalendar.axis());
+            case "hebrew":
+                return Optional.of(HebrewCalendar.axis());
             case "historic":
                 return Optional.of(HistoricCalendar.family());
             case "indian":

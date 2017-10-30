@@ -180,7 +180,7 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
 
         V value = context.get(this);
         OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-        buffer.append(this.accessor(attributes, oc, isLeapMonth(value)).print(value));
+        buffer.append(this.accessor(attributes, oc, hasLeapMonth(context)).print(value));
 
     }
 
@@ -238,15 +238,15 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
     }
 
     /**
-     * <p>Does given element value represent a leap form? </p>
+     * <p>Does given context have a leap month? </p>
      *
-     * <p>Example: If given value is the hebrew leap month ADAR-I then this method must return {@code true}. </p>
+     * <p>Example: If given context has a leap month ADAR-I then this method must return {@code true}. </p>
      *
-     * @param   value   element value
+     * @param   context     time context with the value of this element
      * @return  {@code false} by default
-     * @since   3.5/4.3
+     * @since   3.37/4.32
      */
-    protected boolean isLeapMonth(V value) {
+    protected boolean hasLeapMonth(ChronoDisplay context) {
 
         return false;
 
