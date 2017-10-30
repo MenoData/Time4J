@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdHistoricalElement.java) is part of project Time4J.
  *
@@ -23,7 +23,6 @@ package net.time4j.history.internal;
 
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.DisplayElement;
-import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
 
@@ -35,8 +34,7 @@ import java.io.ObjectStreamException;
  * @since   3.16/4.13
  */
 public class StdHistoricalElement
-    extends DisplayElement<Integer>
-    implements NumericalElement<Integer> {
+    extends DisplayElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -119,13 +117,6 @@ public class StdHistoricalElement
     public boolean isTimeElement() {
 
         return false;
-
-    }
-
-    @Override
-    public int numerical(Integer value) {
-
-        return value.intValue();
 
     }
 

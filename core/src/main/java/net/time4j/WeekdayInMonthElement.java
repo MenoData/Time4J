@@ -26,7 +26,6 @@ import net.time4j.base.MathUtils;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
 
@@ -43,7 +42,7 @@ import java.io.ObjectStreamException;
  */
 final class WeekdayInMonthElement
     extends AbstractDateElement<Integer>
-    implements OrdinalWeekdayElement, NumericalElement<Integer> {
+    implements OrdinalWeekdayElement {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -75,13 +74,6 @@ final class WeekdayInMonthElement
     public char getSymbol() {
 
         return 'F';
-
-    }
-
-    @Override
-    public int numerical(Integer value) {
-
-        return value.intValue();
 
     }
 

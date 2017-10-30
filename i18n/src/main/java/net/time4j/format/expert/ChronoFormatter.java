@@ -4119,8 +4119,7 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     NumericalElement#numerical(java.lang.Object)
-         *          NumericalElement.numerical(V)
+         * @see     NumericalElement#numerical(java.lang.Object) NumericalElement.numerical(V)
          * @see     SignPolicy#SHOW_NEVER
          */
         /*[deutsch]
@@ -4154,8 +4153,7 @@ public final class ChronoFormatter<T>
          * @throws  IllegalStateException if a numerical element is added
          *          multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     NumericalElement#numerical(java.lang.Object)
-         *          NumericalElement.numerical(V)
+         * @see     NumericalElement#numerical(java.lang.Object) NumericalElement.numerical(V)
          * @see     SignPolicy#SHOW_NEVER
          */
         public <V extends Enum<V>> Builder<T> addNumerical(

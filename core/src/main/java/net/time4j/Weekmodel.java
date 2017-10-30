@@ -994,6 +994,31 @@ public final class Weekmodel
         }
 
         @Override
+        public int parseToInt(
+            Weekday value,
+            ChronoDisplay context,
+            AttributeQuery attributes
+        ) {
+
+            return this.numerical(value);
+
+        }
+
+        @Override
+        public boolean parseFromInt(ChronoEntity<?> entity, int value) {
+
+            for (Weekday weekday : Weekday.values()) {
+                if (weekday.getValue(Weekmodel.this) == value) {
+                    entity.with(this, weekday);
+                    return true;
+                }
+            }
+
+            return false;
+
+        }
+
+        @Override
         public int compare(
             ChronoDisplay o1,
             ChronoDisplay o2
@@ -1338,6 +1363,25 @@ public final class Weekmodel
         public int numerical(Integer value) {
 
             return value.intValue();
+
+        }
+
+        @Override
+        public int parseToInt(
+            Integer value,
+            ChronoDisplay context,
+            AttributeQuery attributes
+        ) {
+
+            return value.intValue();
+
+        }
+
+        @Override
+        public boolean parseFromInt(ChronoEntity<?> entity, int value) {
+
+            entity.with(this, Integer.valueOf(value));
+            return true;
 
         }
 

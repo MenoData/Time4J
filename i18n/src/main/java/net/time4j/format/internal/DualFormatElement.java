@@ -43,6 +43,7 @@ import java.text.ParsePosition;
  */
 public interface DualFormatElement // ehemals: net.time4j.history.internal.HistorizedElement
     extends NumericalElement<Integer>, TextElement<Integer> {
+    // TODO: remove inheritance from NumericalElement in next major release
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

@@ -133,6 +133,32 @@ final class HistoricEraElement
     }
 
     @Override
+    public int parseToInt(
+        HistoricEra value,
+        ChronoDisplay context,
+        AttributeQuery attributes
+    ) {
+
+        return value.ordinal();
+
+    }
+
+    @Override
+    public boolean parseFromInt(
+        ChronoEntity<?> entity,
+        int value
+    ) {
+
+        try {
+            entity.with(this, HistoricEra.class.getEnumConstants()[value]);
+            return true;
+        } catch (RuntimeException re) {
+            return false;
+        }
+
+    }
+
+    @Override
     public void print(
         ChronoDisplay context,
         Appendable buffer,

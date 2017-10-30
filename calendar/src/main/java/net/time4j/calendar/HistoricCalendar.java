@@ -1653,6 +1653,32 @@ public final class HistoricCalendar
 
         }
 
+        @Override
+        public int parseToInt(
+            HistoricEra value,
+            ChronoDisplay context,
+            AttributeQuery attributes
+        ) {
+
+            return value.ordinal();
+
+        }
+
+        @Override
+        public boolean parseFromInt(
+            ChronoEntity<?> entity,
+            int value
+        ) {
+
+            try {
+                entity.with(this, HistoricEra.values()[value]);
+                return true;
+            } catch (RuntimeException re) {
+                return false;
+            }
+
+        }
+
         private Object readResolve() throws ObjectStreamException {
 
             return ERA;
@@ -1841,6 +1867,25 @@ public final class HistoricCalendar
         public int numerical(Integer value) {
 
             return value.intValue();
+
+        }
+
+        @Override
+        public int parseToInt(
+            Integer value,
+            ChronoDisplay context,
+            AttributeQuery attributes
+        ) {
+
+            return this.numerical(value);
+
+        }
+
+        @Override
+        public boolean parseFromInt(ChronoEntity<?> entity, int value) {
+
+            entity.with(this, Integer.valueOf(value));
+            return true;
 
         }
 

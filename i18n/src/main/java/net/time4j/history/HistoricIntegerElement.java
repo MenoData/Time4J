@@ -541,6 +541,32 @@ final class HistoricIntegerElement
 
     }
 
+    @Override
+    public int numerical(Integer value) {
+
+        return value.intValue();
+
+    }
+
+    @Override
+    public int parseToInt(
+        Integer value,
+        ChronoDisplay context,
+        AttributeQuery attributes
+    ) {
+
+        return value.intValue();
+
+    }
+
+    @Override
+    public boolean parseFromInt(ChronoEntity<?> entity, int value) {
+
+        entity.with(this, Integer.valueOf(value));
+        return true;
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class Rule<C extends ChronoEntity<C>>

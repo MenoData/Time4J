@@ -262,22 +262,11 @@ class NumberProcessor<V>
                 count = digits.length();
                 defaultZeroChar = '0';
             } else if (Enum.class.isAssignableFrom(type)) {
-                V value = formattable.get(this.element);
-                int v = -1;
+                int v = Integer.MIN_VALUE;
                 if (this.element instanceof NumericalElement) {
-                    v = ((NumericalElement<V>) this.element).numerical(value);
+                    V value = formattable.get(this.element);
+                    v = ((NumericalElement<V>) this.element).parseToInt(value, formattable, attributes);
                     negative = (v < 0);
-                } else {
-                    for (Object e : type.getEnumConstants()) {
-                        if (e.equals(value)) {
-                            v = Enum.class.cast(e).ordinal();
-                            break;
-                        }
-                    }
-                    if (v == -1) {
-                        throw new AssertionError(
-                            "Enum broken: " + value + " / " + type.getName());
-                    }
                 }
                 if (v == Integer.MIN_VALUE) {
                     throw new IllegalArgumentException("Cannot print: " + this.element);
@@ -632,52 +621,31 @@ class NumberProcessor<V>
             }
         }
 
-        Object value = null;
         Class<V> type = this.element.getType();
 
         if (type == Integer.class) {
             parsedResult.put(this.element, (int) total);
-            status.setPosition(pos);
-            return;
         } else if (type == Long.class) {
-            value = Long.valueOf(total);
+            Object value = Long.valueOf(total);
+            parsedResult.put(this.element, value);
         } else if (this.element == PlainDate.MONTH_OF_YEAR) {
             parsedResult.put(PlainDate.MONTH_AS_NUMBER, (int) total);
-            status.setPosition(pos);
-            return;
         } else if (Enum.class.isAssignableFrom(type)) {
-            if (this.element instanceof NumericalElement) { // Normalfall
+            boolean ok = false;
+            if (this.element instanceof NumericalElement) {
                 NumericalElement<V> ne = (NumericalElement<V>) this.element;
-                for (Object e : type.getEnumConstants()) {
-                    if (ne.numerical(type.cast(e)) == total) {
-                        value = e;
-                        break;
-                    }
-                }
-            } else {
-                for (Object e : type.getEnumConstants()) { // Ausweichoption
-                    if (Enum.class.cast(e).ordinal() == total) {
-                        value = e;
-                        break;
-                    }
-                }
+                ok = ne.parseFromInt(parsedResult, (int) (total));
             }
-
-            if (value == null) {
+            if (!ok) {
                 status.setError(
                     ((sign == '-') || (sign == '+') ? start - 1 : start),
-                    "["
-                        + this.element.name()
-                        + "] No enum found for value: "
-                        + total);
+                    "[" + this.element.name() + "] No enum found for value: " + total);
                 return;
             }
         } else {
-            throw new IllegalArgumentException(
-                "Not parseable: " + this.element);
+            throw new IllegalArgumentException("Not parseable: " + this.element);
         }
 
-        parsedResult.put(this.element, value);
         status.setPosition(pos);
 
     }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntegerTimeElement.java) is part of project Time4J.
  *
@@ -24,7 +24,6 @@ package net.time4j;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.format.NumericalElement;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
@@ -38,7 +37,7 @@ import java.math.BigDecimal;
  */
 final class IntegerTimeElement
     extends AbstractTimeElement<Integer>
-    implements ProportionalElement<Integer, PlainTime>, NumericalElement<Integer> {
+    implements ProportionalElement<Integer, PlainTime> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -153,13 +152,6 @@ final class IntegerTimeElement
     public boolean isTimeElement() {
 
         return true;
-
-    }
-
-    @Override
-    public int numerical(Integer value) {
-
-        return value.intValue();
 
     }
 

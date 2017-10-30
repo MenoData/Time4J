@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LongElement.java) is part of project Time4J.
  *
@@ -25,7 +25,6 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.format.NumericalElement;
 
 import java.io.InvalidObjectException;
 import java.io.ObjectStreamException;
@@ -39,8 +38,7 @@ import java.math.BigDecimal;
  */
 final class LongElement
     extends AbstractTimeElement<Long>
-    implements ProportionalElement<Long, PlainTime>,
-               NumericalElement<Long> {
+    implements ProportionalElement<Long, PlainTime> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -111,19 +109,6 @@ final class LongElement
     public boolean isTimeElement() {
 
         return true;
-
-    }
-
-    @Override
-    public int numerical(Long value) {
-
-        long v = value.longValue();
-
-        if (v >= Integer.MIN_VALUE && v <= Integer.MAX_VALUE) {
-            return value.intValue();
-        } else {
-            throw new ArithmeticException("Numerical overflow: " + value);
-        }
 
     }
 
