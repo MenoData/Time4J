@@ -101,6 +101,7 @@ public final class GenericTextProviderSPI
         types.add("ethiopic");
         types.add("extra/frenchrev");
         types.add("generic");
+        types.add("hebrew");
         types.add("indian");
         types.add("islamic");
         types.add("japanese");
@@ -170,7 +171,7 @@ public final class GenericTextProviderSPI
         }
 
         String key = getKey(rb, "MONTH_OF_YEAR");
-        String[] names = lookupBundle(rb, countOfMonths(calendarType), key, tw, oc, leapForm, 1);
+        String[] names = lookupBundle(rb, calendarType, countOfMonths(calendarType), key, tw, oc, leapForm, 1);
 
         // fallback rules as found in CLDR-root-properties via alias paths
         if (names == null) {
@@ -244,7 +245,8 @@ public final class GenericTextProviderSPI
         }
 
         String key = getKey(rb, "ERA");
-        String[] names = lookupBundle(rb, countOfEras(calendarType), key, tw, OutputContext.FORMAT, false, 0);
+        String[] names =
+            lookupBundle(rb, calendarType, countOfEras(calendarType), key, tw, OutputContext.FORMAT, false, 0);
 
         if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
             names = eras(calendarType, locale, TextWidth.ABBREVIATED);
@@ -321,6 +323,7 @@ public final class GenericTextProviderSPI
 
     private static String[] lookupBundle(
         ResourceBundle rb,
+        String calendarType,
         int len,
         String elementName,
         TextWidth tw,
@@ -361,6 +364,10 @@ public final class GenericTextProviderSPI
             b.append(')');
             b.append('_');
             b.append(i + baseIndex);
+            if ((i == 6) && leapForm && elementName.equals("M") && calendarType.equals("hebrew")) {
+                // special case for ADAR-II
+                b.append('L');
+            }
             String key = b.toString();
 
             if (rb.containsKey(key)) {
@@ -400,13 +407,15 @@ public final class GenericTextProviderSPI
 
     private static int countOfMonths(String ct) {
 
-        return ((ct.equals("coptic") || ct.equals("ethiopic") || ct.equals("generic")) ? 13 : 12);
+        return (
+            (ct.equals("coptic") || ct.equals("ethiopic") || ct.equals("generic") || ct.equals("hebrew")) ? 13 : 12);
 
     }
 
     private static int countOfEras(String ct) {
 
-        return ((ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc") || ct.equals("buddhist")) ? 2 : 1);
+        return (
+            (ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc") || ct.equals("buddhist")) ? 2 : 1);
 
     }
 
