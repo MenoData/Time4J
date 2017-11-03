@@ -742,6 +742,30 @@ public final class HebrewCalendar
     }
 
     /**
+     * <p>Is the year of this date <em>Rosh Chodesh</em>? </p>
+     *
+     * <p>This term describes the head of the month where the day-of-month is 1 unless it is the month
+     * Tishri. If the previous month has 30 days then the 30th of the previous month is also associated
+     * with the <em>Rosh Chodesh</em>. Note that Tishri 1 is <em>Rosh Hashana</em>. </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Datum in einem Sabbatjahr wie in der Bibel beschrieben? </p>
+     *
+     * <p>Dieser Begriff beschreibt den Monatsanfang (Tag 1), es sei denn, es handelt sich um den
+     * Monat Tishri. Wenn der vorherige Monat 30 Tage hat, ist dessen letzter Tag ebenfalls dem
+     * <em>Rosh Chodesh</em> zuzurechnen. Zu beachten: Der Tishri 1 ist <em>Rosh Hashana</em>. </p>
+     *
+     * @return  boolean
+     */
+    public boolean isRoshChodesh() {
+
+        return (((this.dom == 1) && (this.month != HebrewMonth.TISHRI)) || (this.dom == 30));
+
+    }
+
+    /**
      * <p>Queries if given parameter values form a well defined calendar date. </p>
      *
      * @param   yearOfEra   the year of era to be checked
@@ -918,7 +942,7 @@ public final class HebrewCalendar
 
     }
 
-    private static int lengthOfMonth(
+    static int lengthOfMonth(
         int year,
         HebrewMonth month
     ) {

@@ -40,6 +40,14 @@ public class HebrewMiscellaneousTest {
     }
 
     @Test
+    public void isRoshChodesh() {
+        HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.TISHRI, 1);
+        assertThat(date.isRoshChodesh(), is(false));
+        assertThat(date.with(HebrewCalendar.DAY_OF_MONTH, 30).isRoshChodesh(), is(true));
+        assertThat(date.with(HebrewCalendar.MONTH_OF_YEAR, HebrewMonth.HESHVAN).isRoshChodesh(), is(true));
+    }
+
+    @Test
     public void hebrewCalendarProperties() {
         HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.TISHRI, 11);
         assertThat(
