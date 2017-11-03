@@ -25,6 +25,7 @@ import org.junit.runners.Suite.SuiteClasses;
         EthiopianTimeTest.class,
         EvangelistTest.class,
         FrenchRepublicanSuite.class,
+        HebrewAnniversaryTest.class,
         HebrewCalendarTest.class,
         HebrewMiscellaneousTest.class,
         HebrewMonthTest.class,

@@ -42,6 +42,14 @@ public class HebrewMiscellaneousTest {
     }
 
     @Test
+    public void isRoshChodesh() {
+        HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.TISHRI, 1);
+        assertThat(date.isRoshChodesh(), is(false));
+        assertThat(date.with(HebrewCalendar.DAY_OF_MONTH, 30).isRoshChodesh(), is(true));
+        assertThat(date.with(HebrewCalendar.MONTH_OF_YEAR, HebrewMonth.HESHVAN).isRoshChodesh(), is(true));
+    }
+
+    @Test
     public void hebrewCalendarProperties() {
         HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.TISHRI, 11);
         assertThat(
@@ -87,7 +95,7 @@ public class HebrewMiscellaneousTest {
     }
 
     @Test
-    public void longYear() {
+    public void longHeshvanShortKislev() {
         for (int y = 1; y <= 9999; y++) {
             HebrewCalendar h1 = HebrewCalendar.of(y, HebrewMonth.HESHVAN, 1);
             HebrewCalendar h2 = HebrewCalendar.of(y, HebrewMonth.KISLEV, 1);
