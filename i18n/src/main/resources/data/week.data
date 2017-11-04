@@ -1,14 +1,14 @@
 # -----------------------------------------------------------------------------------------
-# Version like in CLDR-v30 (only deviations from standard are explicitly written)
+# Version like in CLDR-v32 (only deviations from standard are explicitly written)
 # Implicit standards are (country=001): minDays=1, first=Monday, start=Saturday, end=Sunday
 # Format:
 # minDays-4={ISO-3166-2-codes}
 # {'first'|'start'|'end'}-{'mon'|'tue'|'wed'|'thu'|'fri'|'sat'|'sun'}={ISO-3166-2-codes}
 # -----------------------------------------------------------------------------------------
-minDays-4=AD AN AT AX BE BG CH CZ DE DK EE ES FI FJ FO FR GB GF GG GI GP GR HU IE IM IS IT JE LI LT LU MC MQ NL NO PL PT RE SE SJ SK SM VA
+minDays-4=AD AN AT AX BE BG CH CZ DE DK EE ES FI FJ FO FR GB GF GG GI GP GR HU IE IM IS IT JE LI LT LU MC MQ NL NO PL PT RE RU SE SJ SK SM VA
 first-fri=BD MV
 first-sat=AE AF BH DJ DZ EG IQ IR JO KW LY MA OM QA SD SY
-first-sun=AG AR AS AU BR BS BT BW BZ CA CN CO DM DO ET GT GU HK HN ID IE IL IN JM JP KE KH KR LA MH MM MO MT MX MZ NI NP NZ PA PE PH PK PR PY SA SG SV TH TN TT TW UM US VE VI WS YE ZA ZW
+first-sun=AG AR AS AU BR BS BT BW BZ CA CN CO DM DO ET GT GU HK HN ID IE IL IN JM JP KE KH KR LA MH MM MO MT MX MZ NI NP PA PE PH PK PR PY SA SG SV TH TN TT TW UM US VE VI WS YE ZA ZW
 start-thu=AF
 start-fri=AE BH DZ EG IL IQ IR JO KW LY MA OM QA SA SD SY TN YE
 start-sun=IN
