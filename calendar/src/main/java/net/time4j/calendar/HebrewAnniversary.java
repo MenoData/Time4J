@@ -69,7 +69,8 @@ public enum HebrewAnniversary {
      *          is(HebrewCalendar.of(5789, HebrewMonth.NISAN, 1)));
      * </pre>
      *
-     * <p>Note: The predefined function {@link #barMitzvah()} is simpler to use for this purpose. </p>
+     * <p>Note: The predefined method {@link HebrewCalendar#barMitzvah()} is simpler to use
+     * for this special purpose. </p>
      */
     /*[deutsch]
      * Markiert den j&auml;hrlichen Geburtstag.
@@ -85,8 +86,8 @@ public enum HebrewAnniversary {
      *          is(HebrewCalendar.of(5789, HebrewMonth.NISAN, 1)));
      * </pre>
      *
-     * <p>Hinweis: Die vordefinierte Funktion {@link #barMitzvah()} ist einfacher f&uuml;r diesen Zweck
-     * zu nutzen. </p>
+     * <p>Hinweis: Die vordefinierte Methode {@link HebrewCalendar#barMitzvah()} ist f&uuml;r diesen
+     * speziellen Zweck einfacher zu nutzen. </p>
      */
     BIRTHDAY() {
         @Override
@@ -157,51 +158,6 @@ public enum HebrewAnniversary {
     };
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Interpretes the input date as birth date of a boy and determines the 13th birthday. </p>
-     *
-     * @return  date of <em>bar mitzvah</em>
-     */
-    /*[deutsch]
-     * <p>Interpretiert das Eingabedatum als Geburtsdatum eines Jungen und bestimmt den dreizehnten Geburtstag. </p>
-     *
-     * @return  date of <em>bar mitzvah</em>
-     */
-    public static ChronoFunction<CalendarDate, HebrewCalendar> barMitzvah() {
-
-        return new ChronoFunction<CalendarDate, HebrewCalendar>() {
-            @Override
-            public HebrewCalendar apply(CalendarDate birth) {
-                HebrewCalendar date = convert(birth);
-                return date.get(HebrewAnniversary.BIRTHDAY.inHebrewYear(date.getYear() + 13));
-            }
-        };
-
-    }
-
-    /**
-     * <p>Interpretes the input date as birth date of a girl and determines the 12th birthday. </p>
-     *
-     * @return  date of <em>bat mitzvah</em>
-     */
-    /*[deutsch]
-     * <p>Interpretiert das Eingabedatum als Geburtsdatum eines M&auml;dchens
-     * und bestimmt den zw&ouml;lften Geburtstag. </p>
-     *
-     * @return  date of <em>bat mitzvah</em>
-     */
-    public static ChronoFunction<CalendarDate, HebrewCalendar> batMitzvah() {
-
-        return new ChronoFunction<CalendarDate, HebrewCalendar>() {
-            @Override
-            public HebrewCalendar apply(CalendarDate birth) {
-                HebrewCalendar date = convert(birth);
-                return date.get(HebrewAnniversary.BIRTHDAY.inHebrewYear(date.getYear() + 12));
-            }
-        };
-
-    }
 
     /**
      * <p>Determines the input calendar date as original event date and determines the anniversary day of this event

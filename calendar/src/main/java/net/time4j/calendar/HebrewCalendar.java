@@ -746,7 +746,7 @@ public final class HebrewCalendar
      *
      * <p>This term describes the head of the month where the day-of-month is 1 unless it is the month
      * Tishri. If the previous month has 30 days then the 30th of the previous month is also associated
-     * with the <em>Rosh Chodesh</em>. Note that Tishri 1 is <em>Rosh Hashana</em>. </p>
+     * with the <em>Rosh Chodesh</em>. Note that Tishri 1 is <em>Rosh Hashana</em> (head of the year). </p>
      *
      * @return  boolean
      */
@@ -755,7 +755,8 @@ public final class HebrewCalendar
      *
      * <p>Dieser Begriff beschreibt den Monatsanfang (Tag 1), es sei denn, es handelt sich um den
      * Monat Tishri. Wenn der vorherige Monat 30 Tage hat, ist dessen letzter Tag ebenfalls dem
-     * <em>Rosh Chodesh</em> zuzurechnen. Zu beachten: Der Tishri 1 ist <em>Rosh Hashana</em>. </p>
+     * <em>Rosh Chodesh</em> zuzurechnen. Zu beachten: Der Tishri 1 ist <em>Rosh Hashana</em>
+     * (Jahresanfang). </p>
      *
      * @return  boolean
      */
@@ -790,6 +791,39 @@ public final class HebrewCalendar
     ) {
 
         return CALSYS.isValid(HebrewEra.ANNO_MUNDI, yearOfEra, month.getValue(), dayOfMonth);
+
+    }
+
+    /**
+     * <p>Interpretes this date as birth date of a boy and determines the 13th birthday. </p>
+     *
+     * @return  date of <em>bar mitzvah</em>
+     */
+    /*[deutsch]
+     * <p>Interpretiert dieses Datum als Geburtsdatum eines Jungen und bestimmt den dreizehnten Geburtstag. </p>
+     *
+     * @return  date of <em>bar mitzvah</em>
+     */
+    public HebrewCalendar barMitzvah() {
+
+        return this.get(HebrewAnniversary.BIRTHDAY.inHebrewYear(this.year + 13));
+
+    }
+
+    /**
+     * <p>Interpretes this date as birth date of a girl and determines the 12th birthday. </p>
+     *
+     * @return  date of <em>bat mitzvah</em>
+     */
+    /*[deutsch]
+     * <p>Interpretiert dieses Datum als Geburtsdatum eines M&auml;dchens
+     * und bestimmt den zw&ouml;lften Geburtstag. </p>
+     *
+     * @return  date of <em>bat mitzvah</em>
+     */
+    public HebrewCalendar batMitzvah() {
+
+        return this.get(HebrewAnniversary.BIRTHDAY.inHebrewYear(this.year + 12));
 
     }
 

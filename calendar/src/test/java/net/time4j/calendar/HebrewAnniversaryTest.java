@@ -19,7 +19,7 @@ public class HebrewAnniversaryTest {
     public void barMitzvah() {
         HebrewCalendar birth = HebrewCalendar.of(5776, HebrewMonth.ADAR_I, 30);
         assertThat(
-            birth.get(HebrewAnniversary.barMitzvah()),
+            birth.barMitzvah(),
             is(HebrewCalendar.of(5789, HebrewMonth.NISAN, 1)));
     }
 
@@ -27,7 +27,7 @@ public class HebrewAnniversaryTest {
     public void batMitzvah() {
         HebrewCalendar birth = HebrewCalendar.of(5776, HebrewMonth.ADAR_II, 29);
         assertThat(
-            birth.get(HebrewAnniversary.batMitzvah()),
+            birth.batMitzvah(),
             is(HebrewCalendar.of(5788, HebrewMonth.ADAR_II, 29)));
     }
 
@@ -170,7 +170,7 @@ public class HebrewAnniversaryTest {
             birth.transform(PlainDate.class),
             is(PlainDate.of(2017, 1, 2)));
         assertThat(
-            birth.get(HebrewAnniversary.barMitzvah()),
+            birth.barMitzvah(),
             is(barMitzvah));
         assertThat(
             birth.get(HebrewAnniversary.BIRTHDAY.inGregorianYear(2029)),
