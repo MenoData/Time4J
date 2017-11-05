@@ -129,7 +129,7 @@ public class EraNameTest {
             is("Rattanakosin Sok"));
         assertThat(
             ThaiSolarEra.BUDDHIST.getDisplayName(Locale.FRANCE, TextWidth.WIDE),
-            is("ère bouddhiste"));
+            is("ère bouddhique"));
     }
 
     @Test

@@ -27,7 +27,7 @@ public class HijriMiscellaneousTest {
     @Test
     public void genericIslamicPattern() {
         String pattern = GenericDatePatterns.get("islamic", DisplayMode.FULL, new Locale("ar"));
-        assertThat(pattern, is("EEEE، d MMMM، y G"));
+        assertThat(pattern, is("EEEE، d MMMM y G"));
         pattern = GenericDatePatterns.get("islamic", DisplayMode.FULL, Locale.GERMANY);
         assertThat(pattern, is("EEEE, d. MMMM y G"));
     }
