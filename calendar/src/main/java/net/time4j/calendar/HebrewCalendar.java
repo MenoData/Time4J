@@ -798,11 +798,13 @@ public final class HebrewCalendar
      * <p>Interpretes this date as birth date of a boy and determines the 13th birthday. </p>
      *
      * @return  date of <em>bar mitzvah</em>
+     * @see     HebrewAnniversary#BIRTHDAY
      */
     /*[deutsch]
      * <p>Interpretiert dieses Datum als Geburtsdatum eines Jungen und bestimmt den dreizehnten Geburtstag. </p>
      *
      * @return  date of <em>bar mitzvah</em>
+     * @see     HebrewAnniversary#BIRTHDAY
      */
     public HebrewCalendar barMitzvah() {
 
@@ -814,12 +816,14 @@ public final class HebrewCalendar
      * <p>Interpretes this date as birth date of a girl and determines the 12th birthday. </p>
      *
      * @return  date of <em>bat mitzvah</em>
+     * @see     HebrewAnniversary#BIRTHDAY
      */
     /*[deutsch]
      * <p>Interpretiert dieses Datum als Geburtsdatum eines M&auml;dchens
      * und bestimmt den zw&ouml;lften Geburtstag. </p>
      *
      * @return  date of <em>bat mitzvah</em>
+     * @see     HebrewAnniversary#BIRTHDAY
      */
     public HebrewCalendar batMitzvah() {
 
