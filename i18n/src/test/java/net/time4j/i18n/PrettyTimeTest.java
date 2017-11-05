@@ -302,7 +302,7 @@ public class PrettyTimeTest {
     public void print0DaysLatvian() {
         assertThat(
             PrettyTime.of(new Locale("lv")).print(0, DAYS, TextWidth.WIDE),
-            is("0 dienas"));
+            is("0 dienu"));
     }
 
     @Test
