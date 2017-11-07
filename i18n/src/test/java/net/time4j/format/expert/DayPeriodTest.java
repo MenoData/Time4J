@@ -77,7 +77,7 @@ public class DayPeriodTest {
         assertThat(
             PlainTime.of(17, 59).get(
                 DayPeriod.of(Locale.GERMAN).fixed(TextWidth.ABBREVIATED, OutputContext.FORMAT)),
-            is("nachm."));
+            is("PM"));
         assertThat(
             PlainTime.of(17, 59).get(
                 DayPeriod.of(Locale.ENGLISH).approximate()),
@@ -480,7 +480,7 @@ public class DayPeriodTest {
                 .with(Leniency.STRICT)
                 .with(Attributes.ZERO_DIGIT, '0');
         assertThat(
-            f.parse("3:45 عصر"), // afternoon1
+            f.parse("3:45 بعدازظهر"), // afternoon1 (was ambivalent before CLDR-v32, now the  literal has changed)
             is(PlainTime.of(15, 45)));
         assertThat(
             f.parse("6:45 عصر"), // evening1
@@ -529,9 +529,12 @@ public class DayPeriodTest {
     }
 
     private static boolean isCheckWanted(Locale locale) {
+/*
         String lang = locale.getLanguage();
         // require manual check
-        return !(lang.equals("fa") || lang.equals("gl") || lang.equals("hu") || lang.equals("zu"));
+        return !(lang.equals("fr") || lang.equals("ms")); // fr + ms corrected for wrong CLDR-v32-data
+*/
+        return true;
     }
 
 }
