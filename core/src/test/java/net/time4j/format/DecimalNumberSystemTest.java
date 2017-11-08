@@ -59,6 +59,16 @@ public class DecimalNumberSystemTest {
             is('\u17E0'));
     }
 
+    @Test
+    public void orya() {
+        assertThat(
+            NumberSystem.ORYA.getDigits(),
+            is("୦୧୨୩୪୫୬୭୮୯"));
+        assertThat(
+            NumberSystem.ORYA.isDecimal(),
+            is(true));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void negativeNumberToNumeral() {
         NumberSystem.ARABIC_INDIC.toNumeral(-1234567890);

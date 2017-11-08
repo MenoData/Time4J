@@ -594,6 +594,31 @@ public enum NumberSystem {
     },
 
     /**
+     * The Orya digits used in parts of India.
+     *
+     * <p>Note: Must not be negative. </p>
+     *
+     * @since   3.37/4.32
+     */
+    /*[deutsch]
+     * Die Orya-Ziffern (in Teilen von Indien verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. </p>
+     *
+     * @since   3.37/4.32
+     */
+    ORYA() {
+        @Override
+        public String getDigits() {
+            return "\u0B66\u0B67\u0B68\u0B69\u0B6A\u0B6B\u0B6C\u0B6D\u0B6E\u0B6F";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
      * Roman numerals in range 1-3999.
      *
      * <p>If the leniency is strict then parsing of Roman numerals will only follow modern usage.
