@@ -1,6 +1,8 @@
 ## [v3.37] not yet released
 ### Added
--  More flexible numberings of enums in formatting [#706]
+- Add Odia (Oriya) language [#709]
+- More flexible numberings of enums in formatting [#706]
+- Update to CLDR v32 [#690]
 
 ## [v3.36] published on 2017-10-20
 ### Added
