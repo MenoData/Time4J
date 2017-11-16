@@ -1,5 +1,6 @@
 ## [v3.37] not yet released
 ### Added
+- Constants of solar time for Jerusalem and Mecca [#711]
 - Add Odia (Oriya) language [#709]
 - More flexible numberings of enums in formatting [#706]
 - Update to CLDR v32 [#690]
