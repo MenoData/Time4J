@@ -1059,7 +1059,7 @@ public final class HebrewCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.HEBREW);
+        return new SPX(this, SPX.HEBREW_DATE);
 
     }
 
