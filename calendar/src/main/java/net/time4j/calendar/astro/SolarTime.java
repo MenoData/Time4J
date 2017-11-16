@@ -144,6 +144,11 @@ public final class SolarTime
         DEFAULT_CALCULATOR = ((loaded == null) ? StdSolarCalculator.TIME4J : loaded);
     }
 
+    private static final SolarTime JERUSALEM = // temple area
+        SolarTime.ofLocation().easternLongitude(35, 14, 5).northernLatitude(31, 46, 44).atAltitude(721).build();
+    private static final SolarTime MECCA =
+        SolarTime.ofLocation().easternLongitude(39, 49, 34.06).northernLatitude(21, 25, 21.22).atAltitude(298).build();
+
     private static final long serialVersionUID = -4816619838743247977L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -339,6 +344,54 @@ public final class SolarTime
         CALCULATORS.putIfAbsent(name, calculator);
         check(latitude, longitude, altitude, name);
         return new SolarTime(latitude, longitude, altitude, name);
+
+    }
+
+    /**
+     * <p>Obtains an instance of solar time for the temple area in Jerusalem which has a prominent meaning
+     * in Hebrew calendar and time. </p>
+     *
+     * @return  SolarTime
+     * @since   3.37/4.32
+     */
+    /*[deutsch]
+     * <p>Liefert eine Instanz der Sonnenzeit f&uuml;r das Tempelgebiet in Jerusalem, das eine besondere
+     * Bedeutung im hebr&auml;ischen Kalender hat. </p>
+     *
+     * @return  SolarTime
+     * @since   3.37/4.32
+     */
+    public static SolarTime ofJerusalem() {
+
+        return JERUSALEM;
+
+    }
+
+    /**
+     * <p>Obtains an instance of solar time for the Kaaba in Mecca which has a prominent meaning
+     * in islamic calendar. </p>
+     *
+     * <p>The start of day in Mecca can be obtained by the expression
+     * {@code StartOfDay.definedBy(SolarTime.ofMecca().sunset())}. </p>
+     *
+     * @return  SolarTime
+     * @see     net.time4j.engine.StartOfDay#definedBy(ChronoFunction)
+     * @since   3.37/4.32
+     */
+    /*[deutsch]
+     * <p>Liefert eine Instanz der Sonnenzeit f&uuml;r die Kaaba in Mekka, die eine besondere
+     * Bedeutung im islamischen Kalender hat. </p>
+     *
+     * <p>Der Beginn des islamischen Tages in Mekka kann mittels des Ausdrucks
+     * {@code StartOfDay.definedBy(SolarTime.ofMecca().sunset())} bestimmt werden. </p>
+     *
+     * @return  SolarTime
+     * @see     net.time4j.engine.StartOfDay#definedBy(ChronoFunction)
+     * @since   3.37/4.32
+     */
+    public static SolarTime ofMecca() {
+
+        return MECCA;
 
     }
 

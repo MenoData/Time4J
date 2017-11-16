@@ -22,7 +22,6 @@
 package net.time4j.calendar;
 
 import net.time4j.Meridiem;
-import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.base.MathUtils;
@@ -1636,7 +1635,7 @@ public final class EthiopianTime
 
         @Override
         public int getDefaultPivotYear() {
-            return PlainDate.axis().getDefaultPivotYear() - 8;
+            return Integer.MIN_VALUE;
         }
 
     }
