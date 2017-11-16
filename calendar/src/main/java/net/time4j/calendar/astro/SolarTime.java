@@ -145,10 +145,10 @@ public final class SolarTime
         DEFAULT_CALCULATOR = ((loaded == null) ? StdSolarCalculator.TIME4J : loaded);
     }
 
-    private static final SolarTime JERUSALEM =
+    private static final SolarTime JERUSALEM = // temple area
         SolarTime.ofLocation().easternLongitude(35, 14, 5).northernLatitude(31, 46, 44).atAltitude(721).build();
     private static final SolarTime MECCA =
-        SolarTime.ofLocation().easternLongitude(39, 49, 34.06).northernLatitude(21, 25, 21.22).atAltitude(300).build();
+        SolarTime.ofLocation().easternLongitude(39, 49, 34.06).northernLatitude(21, 25, 21.22).atAltitude(298).build();
 
     private static final long serialVersionUID = -4816619838743247977L;
 
