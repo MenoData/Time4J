@@ -1440,7 +1440,6 @@ public final class EthiopianTime
         }
     }
 
-
     private static class IntegerElementRule
         implements ElementRule<EthiopianTime, Integer> {
 
@@ -1626,7 +1625,7 @@ public final class EthiopianTime
 
         @Override
         public int getDefaultPivotYear() {
-            return PlainDate.axis().getDefaultPivotYear() - 8;
+            return Integer.MIN_VALUE;
         }
 
     }
