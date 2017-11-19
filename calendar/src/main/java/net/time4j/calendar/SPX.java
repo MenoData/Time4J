@@ -523,8 +523,7 @@ final class SPX
         throws IOException {
 
         HebrewTime time = (HebrewTime) this.obj;
-        out.writeBoolean(time.isDay());
-        out.writeByte(time.getHour());
+        out.writeByte(time.getDigitalHour());
         out.writeShort(time.getPart());
 
     }
@@ -532,15 +531,10 @@ final class SPX
     private HebrewTime readHebrewTime(ObjectInput in)
         throws IOException, ClassNotFoundException {
 
-        boolean day = in.readBoolean();
-        int hour = in.readByte();
+        int hour23 = in.readByte();
         int part = in.readShort();
 
-        if (day) {
-            return HebrewTime.ofDay(hour, part);
-        } else {
-            return HebrewTime.ofNight(hour, part);
-        }
+        return HebrewTime.ofDigital(hour23, part);
 
     }
 

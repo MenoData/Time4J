@@ -71,6 +71,23 @@ public class HebrewMiscellaneousTest {
     }
 
     @Test
+    public void hebrewTimeProperties() {
+        HebrewTime time = HebrewTime.ofDay(5, 123);
+        assertThat(
+            time.get(HebrewTime.CLOCK_CYCLE),
+            is(HebrewTime.ClockCycle.DAY));
+        assertThat(
+            time.getInt(HebrewTime.CLOCK_HOUR),
+            is(5));
+        assertThat(
+            time.getInt(HebrewTime.DIGITAL_HOUR),
+            is(17));
+        assertThat(
+            time.getInt(HebrewTime.PART_OF_HOUR),
+            is(123));
+    }
+
+    @Test
     public void hebrewUnits() {
         HebrewCalendar start = HebrewCalendar.of(5778, HebrewMonth.HESHVAN, 6);
         HebrewCalendar end = HebrewCalendar.of(5778, HebrewMonth.ELUL, 6);

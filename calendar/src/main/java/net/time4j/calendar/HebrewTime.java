@@ -83,8 +83,9 @@ import java.util.concurrent.TimeUnit;
  * <p>Following elements which are declared as constants are registered by this class: </p>
  *
  * <ul>
- *  <li>{@link #CYCLE}</li>
- *  <li>{@link #HOUR_OF_CYCLE}</li>
+ *  <li>{@link #CLOCK_CYCLE}</li>
+ *  <li>{@link #CLOCK_HOUR}</li>
+ *  <li>{@link #DIGITAL_HOUR}</li>
  *  <li>{@link #PART_OF_HOUR}</li>
  * </ul>
  *
@@ -107,8 +108,9 @@ import java.util.concurrent.TimeUnit;
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
- *  <li>{@link #CYCLE}</li>
- *  <li>{@link #HOUR_OF_CYCLE}</li>
+ *  <li>{@link #CLOCK_CYCLE}</li>
+ *  <li>{@link #CLOCK_HOUR}</li>
+ *  <li>{@link #DIGITAL_HOUR}</li>
  *  <li>{@link #PART_OF_HOUR}</li>
  * </ul>
  *
@@ -124,8 +126,10 @@ public final class HebrewTime
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final int PARTS_IN_HOUR = 1080;
-    private static final int HOUR_INDEX = 0;
-    private static final int PART_INDEX = 1;
+
+    private static final int HOUR12_INDEX = 0;
+    private static final int HOUR23_INDEX = 1;
+    private static final int PART_INDEX = 2;
 
     /**
      * Marks the period between either sunset and sunrise (NIGHT) or sunrise and sunset (DAY).
@@ -134,32 +138,49 @@ public final class HebrewTime
      * Markiert die Period zwischen entweder Sonnenuntergang und Sonneaufgang (NIGHT = Nacht) oder
      * Sonnenaufgang und Sonnenuntergang (DAY = Tag).
      */
-    @FormattableElement(format = "C")
-    public static final ChronoElement<Cycle> CYCLE =
-        new StdEnumDateElement<>("CYCLE", HebrewTime.class, Cycle.class, 'C');
+    @FormattableElement(format = "c")
+    public static final ChronoElement<ClockCycle> CLOCK_CYCLE =
+        new StdEnumDateElement<>("CLOCK_CYCLE", HebrewTime.class, ClockCycle.class, 'c');
 
     /**
-     * The Hebrew hour with the value range 1-12 which is coupled to the sun cycle.
+     * The Hebrew hour with the biblical value range 1-12 which is coupled to the sun cycle.
      */
     /*[deutsch]
-     * Die hebr&auml;ische Stunde mit dem Wertebereich 1-12, die mit dem Sonnenzyklus verkn&uuml;pft ist.
+     * Die hebr&auml;ische Stunde mit dem biblischen Wertebereich 1-12, die mit dem Sonnenzyklus verkn&uuml;pft ist.
      */
-    @FormattableElement(format = "H")
-    public static final StdCalendarElement<Integer, HebrewTime> HOUR_OF_CYCLE =
+    @FormattableElement(format = "h")
+    public static final StdCalendarElement<Integer, HebrewTime> CLOCK_HOUR =
         new StdIntegerDateElement<>(
-            "HOUR_OF_CYCLE",
+            "CLOCK_HOUR",
             HebrewTime.class,
             1,
             12,
+            'h',
+            new UnitOperator(Unit.HOURS, true),
+            new UnitOperator(Unit.HOURS, false));
+
+    /**
+     * The Hebrew hour with the digital value range 0-23 which is coupled to the sun cycle.
+     */
+    /*[deutsch]
+     * Die hebr&auml;ische Stunde mit dem digitalen Wertebereich 0-23, die mit dem Sonnenzyklus verkn&uuml;pft ist.
+     */
+    @FormattableElement(format = "H")
+    public static final StdCalendarElement<Integer, HebrewTime> DIGITAL_HOUR =
+        new StdIntegerDateElement<>(
+            "DIGITAL_HOUR",
+            HebrewTime.class,
+            0,
+            23,
             'H',
             new UnitOperator(Unit.HOURS, true),
             new UnitOperator(Unit.HOURS, false));
 
     /**
-     * Marks the part of hour (<em>helek</em>) with the value range 0-1179.
+     * Marks the part of hour (<em>helek</em>) with the value range 0-1079.
      */
     /*[deutsch]
-     * Markiert den Teil einer Stunde (<em>helek</em>) mit dem Wertebereich 0-1179.
+     * Markiert den Teil einer Stunde (<em>helek</em>) mit dem Wertebereich 0-1079.
      */
     @FormattableElement(format = "P")
     public static final StdCalendarElement<Integer, HebrewTime> PART_OF_HOUR =
@@ -177,8 +198,8 @@ public final class HebrewTime
     private static final TimeAxis<Unit, HebrewTime> ENGINE;
 
     static {
-        MIN = new HebrewTime(Cycle.NIGHT, 1, 0);
-        MAX = new HebrewTime(Cycle.DAY, 12, PARTS_IN_HOUR - 1);
+        MIN = new HebrewTime(0, 0);
+        MAX = new HebrewTime(23, PARTS_IN_HOUR - 1);
 
         TimeAxis.Builder<Unit, HebrewTime> builder =
             TimeAxis.Builder.setUp(
@@ -188,11 +209,15 @@ public final class HebrewTime
                 HebrewTime.MIN,
                 HebrewTime.MAX)
             .appendElement(
-                CYCLE,
+                CLOCK_CYCLE,
                 new CycleRule())
             .appendElement(
-                HOUR_OF_CYCLE,
-                new IntegerElementRule(HOUR_INDEX),
+                CLOCK_HOUR,
+                new IntegerElementRule(HOUR12_INDEX),
+                Unit.HOURS)
+            .appendElement(
+                DIGITAL_HOUR,
+                new IntegerElementRule(HOUR23_INDEX),
                 Unit.HOURS)
             .appendElement(
                 PART_OF_HOUR,
@@ -206,21 +231,21 @@ public final class HebrewTime
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private transient final int hour24;
+    private transient final int hour23;
     private transient final int part;
 
     //~ Konstruktoren -----------------------------------------------------
 
     private HebrewTime(
-        Cycle cycle,
-        int hour,
+        ClockCycle cycle,
+        int hour12,
         int part
     ) {
         super();
 
-        if (hour < 1 || hour > 12) {
+        if (hour12 < 1 || hour12 > 12) {
             throw new IllegalArgumentException(
-                "HOUR_OF_CYCLE out of range: " + hour);
+                "CLOCK_HOUR out of range: " + hour12);
         }
 
         if (part < 0 || part >= PARTS_IN_HOUR) {
@@ -228,7 +253,19 @@ public final class HebrewTime
                 "PART_OF_HOUR out of range: " + part);
         }
 
-        this.hour24 = (cycle.equals(Cycle.NIGHT) ? hour : hour + 12) - 1; // NPE-check
+        int h = ((hour12 == 12) ? 0 : hour12);
+        this.hour23 = (cycle.equals(ClockCycle.NIGHT) ? h : h + 12); // NPE-check
+        this.part = part;
+
+    }
+
+    private HebrewTime(
+        int hour23,
+        int part
+    ) {
+        super();
+
+        this.hour23 = hour23;
         this.part = part;
 
     }
@@ -236,50 +273,83 @@ public final class HebrewTime
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Obtains an instance of Hebrew time between two sunsets. </p>
+     *
+     * @param   hour23  hebrew hour in the digital range 0-23
+     * @param   part    the part of hour (<em>helek</em>) in range 0-1079
+     * @return  Hebrew time
+     */
+    /*[deutsch]
+     * <p>Liefert eine Instanz der hebr&auml;ischen Uhrzeit zwischen zwei Sonnenunterg&auml;ngen. </p>
+     *
+     * @param   hour23  hebrew hour in the digital range 0-23
+     * @param   part    the part of hour (<em>helek</em>) in range 0-1079
+     * @return  Hebrew time
+     */
+    public static HebrewTime ofDigital(
+        int hour23,
+        int part
+    ) {
+
+        if (hour23 < 0 || hour23 > 23) {
+            throw new IllegalArgumentException(
+                "DIGITAL_HOUR out of range: " + hour23);
+        }
+
+        if (part < 0 || part >= PARTS_IN_HOUR) {
+            throw new IllegalArgumentException(
+                "PART_OF_HOUR out of range: " + part);
+        }
+
+        return new HebrewTime(hour23, part);
+
+    }
+
+    /**
      * <p>Obtains an instance of Hebrew time between sunset and sunrise (night). </p>
      *
-     * @param   hour    hebrew hour in range 1-12 during night
-     * @param   part    the part of hour (<em>helek</em>)
+     * @param   hour12  hebrew hour in the biblical range 1-12 during night
+     * @param   part    the part of hour (<em>helek</em>) in range 0-1079
      * @return  Hebrew time
      */
     /*[deutsch]
      * <p>Liefert eine Instanz der hebr&auml;ischen Uhrzeit zwischen Sonnenuntergang und
      * Sonnenaufgang (nachts). </p>
      *
-     * @param   hour    hebrew hour in range 1-12 during night
-     * @param   part    the part of hour (<em>helek</em>)
+     * @param   hour12  hebrew hour in the biblical range 1-12 during night
+     * @param   part    the part of hour (<em>helek</em>) in range 0-1079
      * @return  Hebrew time
      */
     public static HebrewTime ofNight(
-        int hour,
+        int hour12,
         int part
     ) {
 
-        return new HebrewTime(Cycle.NIGHT, hour, part);
+        return new HebrewTime(ClockCycle.NIGHT, hour12, part);
 
     }
 
     /**
      * <p>Obtains an instance of Hebrew time between sunrise and sunset (day). </p>
      *
-     * @param   hour    hebrew hour in range 1-12 during day
-     * @param   part    the part of hour (<em>helek</em>)
+     * @param   hour12  hebrew hour in the biblical range 1-12 during day
+     * @param   part    the part of hour (<em>helek</em>) in range 0-1079
      * @return  Hebrew time
      */
     /*[deutsch]
      * <p>Liefert eine Instanz der hebr&auml;ischen Uhrzeit zwischen Sonnenaufgang und
      * Sonnenuntergang (tags&uuml;ber). </p>
      *
-     * @param   hour    hebrew hour in range 1-12 during day
-     * @param   part    the part of hour (<em>helek</em>)
+     * @param   hour12  hebrew hour in the biblical range 1-12 during day
+     * @param   part    the part of hour (<em>helek</em>) in range 0-1079
      * @return  Hebrew time
      */
     public static HebrewTime ofDay(
-        int hour,
+        int hour12,
         int part
     ) {
 
-        return new HebrewTime(Cycle.DAY, hour, part);
+        return new HebrewTime(ClockCycle.DAY, hour12, part);
 
     }
 
@@ -371,7 +441,7 @@ public final class HebrewTime
 
             if (sunset.isPresent()) {
                 Optional<Moment> sunrise;
-                Cycle cycle = null;
+                ClockCycle cycle = null;
                 Moment t1 = null;
                 Moment t2 = null;
                 if (moment.isBefore(sunset.get())) {
@@ -380,12 +450,12 @@ public final class HebrewTime
                         if (moment.isBefore(sunrise.get())) {
                             sunset = tsp.toDate().minus(1, CalendarUnit.DAYS).get(geoLocation.sunset());
                             if (sunset.isPresent()) {
-                                cycle = Cycle.NIGHT;
+                                cycle = ClockCycle.NIGHT;
                                 t1 = sunset.get();
                                 t2 = sunrise.get();
                             }
                         } else {
-                            cycle = Cycle.DAY;
+                            cycle = ClockCycle.DAY;
                             t1 = sunrise.get();
                             t2 = sunset.get();
                         }
@@ -393,19 +463,24 @@ public final class HebrewTime
                 } else {
                     sunrise = tsp.toDate().plus(1, CalendarUnit.DAYS).get(geoLocation.sunrise());
                     if (sunrise.isPresent()) {
-                        cycle = Cycle.NIGHT;
+                        cycle = ClockCycle.NIGHT;
                         t1 = sunset.get();
                         t2 = sunrise.get();
                     }
                 }
                 if (cycle != null && t1 != null && t2 != null) {
-                    long seconds = t1.until(t2, TimeUnit.SECONDS);
-                    if (t1.getNanosecond() > t2.getNanosecond()) {
-                        seconds--;
-                    }
-                    int hourOfCycle = (int) MathUtils.floorDivide(seconds, 12 * 3600);
-                    int partOfHour = MathUtils.floorModulo(seconds, 12 * 3600) * 3 / 10;
-                    return Optional.of(new HebrewTime(cycle, hourOfCycle, partOfHour));
+                    long halfDay =
+                        t1.until(t2, TimeUnit.SECONDS) * 1_000_000_000L
+                            + t2.getNanosecond()
+                            - t1.getNanosecond();
+                    long delta =
+                        t1.until(moment, TimeUnit.SECONDS) * 1_000_000_000L
+                            + moment.getNanosecond()
+                            - t1.getNanosecond();
+                    double halakim = (12.0 * PARTS_IN_HOUR * delta) / halfDay;
+                    int hourOfCycle = (int) Math.floor(halakim / PARTS_IN_HOUR);
+                    int partOfHour = (int) Math.floor(halakim - hourOfCycle * PARTS_IN_HOUR);
+                    return Optional.of(new HebrewTime(cycle, ((hourOfCycle == 0) ? 12 : hourOfCycle), partOfHour));
                 }
             }
 
@@ -441,18 +516,13 @@ public final class HebrewTime
 
         return (moment) -> {
             PlainTime time = moment.toZonalTimestamp(tzid).getWallTime();
-            int hour24 = (time.getHour() + 6) % 24;
-            Cycle cycle = ((hour24 < 12) ? Cycle.NIGHT : Cycle.DAY);
-            int hourOfCycle = hour24;
-            if (hour24 >= 12) {
-                hourOfCycle -= 12;
-            }
+            int hour23 = (time.getHour() + 6) % 24;
             int partOfHour =
                 time.get(PlainTime.DECIMAL_HOUR)
                     .subtract(new BigDecimal(time.getHour()))
                     .multiply(new BigDecimal(PARTS_IN_HOUR))
                     .intValue();
-            return new HebrewTime(cycle, hourOfCycle, partOfHour);
+            return new HebrewTime(hour23, partOfHour);
         };
 
     }
@@ -469,7 +539,7 @@ public final class HebrewTime
      */
     public boolean isNight() {
 
-        return (this.hour24 < 12);
+        return (this.hour23 < 12);
 
     }
 
@@ -485,30 +555,34 @@ public final class HebrewTime
      */
     public boolean isDay() {
 
-        return (this.hour24 >= 12);
+        return (this.hour23 >= 12);
 
     }
 
     /**
-     * <p>Yields the Hebrew hour in range 1-12. </p>
+     * <p>Yields the Hebrew hour in the biblical range 1-12. </p>
      *
      * @return  hour in range 1-12
      * @see     #isNight()
      * @see     #isDay()
      */
     /*[deutsch]
-     * <p>Liefert die hebr&auml;ische Stunde im Bereich 1-12. </p>
+     * <p>Liefert die hebr&auml;ische Stunde im biblischen Bereich 1-12. </p>
      *
      * @return  hour in range 1-12
      * @see     #isNight()
      * @see     #isDay()
      */
-    public int getHour() {
+    public int getClockHour() {
 
-        int h = this.hour24 + 1;
+        int h = this.hour23;
 
         if (this.isDay()) {
             h -= 12;
+        }
+
+        if (h == 0) {
+            return 12;
         }
 
         return h;
@@ -516,14 +590,30 @@ public final class HebrewTime
     }
 
     /**
+     * <p>Yields the Hebrew hour in the digital value range 0-23. </p>
+     *
+     * @return  hour in range 0-23
+     */
+    /*[deutsch]
+     * <p>Liefert die hebr&auml;ische Stunde im digitalen Wertebereich 0-23. </p>
+     *
+     * @return  hour in range 0-23
+     */
+    public int getDigitalHour() {
+
+        return this.hour23;
+
+    }
+
+    /**
      * <p>Yields the part of hour (<em>helek</em>). </p>
      *
-     * @return  int in range 0-1179
+     * @return  int in range 0-1079
      */
     /*[deutsch]
      * <p>Liefert den Teil (<em>helek</em>) innerhalb der aktuellen Stunde. </p>
      *
-     * @return  int in range 0-1179
+     * @return  int in range 0-1079
      */
     public int getPart() {
 
@@ -584,9 +674,7 @@ public final class HebrewTime
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("Hebrew-");
-        sb.append(this.isDay() ? "day-" : "night-");
-        sb.append(this.getHour());
+        sb.append(this.hour23);
         sb.append('H');
         sb.append(this.part);
         sb.append('P');
@@ -676,7 +764,7 @@ public final class HebrewTime
         Timezone tz
     ) {
 
-        int h = (this.hour24 + 18) % 24;
+        int h = (this.hour23 + 18) % 24;
         BigDecimal p = new BigDecimal(this.part);
         BigDecimal t = p.divide(new BigDecimal(PARTS_IN_HOUR), RoundingMode.FLOOR).add(new BigDecimal(h));
         PlainTime iso = PlainTime.of(18).with(PlainTime.DECIMAL_HOUR, t);
@@ -718,7 +806,7 @@ public final class HebrewTime
 
     private int getTimeOfDay() {
 
-        return (this.part + this.hour24 * PARTS_IN_HOUR);
+        return (this.part + this.hour23 * PARTS_IN_HOUR);
 
     }
 
@@ -774,7 +862,7 @@ public final class HebrewTime
      *
      * @since   3.37/4.32
      */
-    public static enum Cycle {
+    public static enum ClockCycle {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -878,26 +966,20 @@ public final class HebrewTime
 
             switch (this.unit) {
                 case HOURS:
-                    h = MathUtils.floorModulo(MathUtils.safeAdd(context.hour24, amount), 24);
+                    h = MathUtils.floorModulo(MathUtils.safeAdd(context.hour23, amount), 24);
                     p = context.part;
                     break;
                 case HALAKIM:
                     long sum = MathUtils.safeAdd(context.part, amount);
                     p = MathUtils.floorModulo(sum, PARTS_IN_HOUR);
                     long overflow = MathUtils.floorDivide(sum, PARTS_IN_HOUR);
-                    h = MathUtils.floorModulo(MathUtils.safeAdd(context.hour24, overflow), 24);
+                    h = MathUtils.floorModulo(MathUtils.safeAdd(context.hour23, overflow), 24);
                     break;
                 default:
                     throw new UnsupportedOperationException(this.unit.name());
             }
 
-            Cycle cycle = ((h < 12) ? Cycle.NIGHT : Cycle.DAY);
-            if (h >= 12) {
-                h -= 12;
-            }
-            h += 1;
-
-            return new HebrewTime(cycle, h, p);
+            return new HebrewTime(h, p);
 
         }
 
@@ -955,53 +1037,53 @@ public final class HebrewTime
     }
 
     private static class CycleRule
-        implements ElementRule<HebrewTime, Cycle> {
+        implements ElementRule<HebrewTime, ClockCycle> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Cycle getValue(HebrewTime context) {
-            return ((context.hour24 < 12) ? Cycle.NIGHT : Cycle.DAY);
+        public ClockCycle getValue(HebrewTime context) {
+            return ((context.hour23 < 12) ? ClockCycle.NIGHT : ClockCycle.DAY);
         }
 
         @Override
         public HebrewTime withValue(
             HebrewTime context,
-            Cycle value,
+            ClockCycle value,
             boolean lenient
         ) {
             if (value == null) {
                 throw new IllegalArgumentException("Missing Hebrew cycle.");
             }
-            return new HebrewTime(value, context.getHour(), context.getPart());
+            return new HebrewTime(value, context.getClockHour(), context.getPart());
         }
 
         @Override
         public boolean isValid(
             HebrewTime context,
-            Cycle value
+            ClockCycle value
         ) {
             return (value != null);
         }
 
         @Override
-        public Cycle getMinimum(HebrewTime context) {
-            return Cycle.NIGHT;
+        public ClockCycle getMinimum(HebrewTime context) {
+            return ClockCycle.NIGHT;
         }
 
         @Override
-        public Cycle getMaximum(HebrewTime context) {
-            return Cycle.DAY;
+        public ClockCycle getMaximum(HebrewTime context) {
+            return ClockCycle.DAY;
         }
 
         @Override
         public ChronoElement<?> getChildAtFloor(HebrewTime context) {
-            return HOUR_OF_CYCLE;
+            return CLOCK_HOUR;
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(HebrewTime context) {
-            return HOUR_OF_CYCLE;
+            return CLOCK_HOUR;
         }
 
     }
@@ -1027,8 +1109,10 @@ public final class HebrewTime
         @Override
         public Integer getValue(HebrewTime context) {
             switch (this.index) {
-                case HOUR_INDEX:
-                    return context.getHour();
+                case HOUR12_INDEX:
+                    return context.getClockHour();
+                case HOUR23_INDEX:
+                    return context.hour23;
                 case PART_INDEX:
                     return context.part;
                 default:
@@ -1039,8 +1123,9 @@ public final class HebrewTime
         @Override
         public Integer getMinimum(HebrewTime context) {
             switch (this.index) {
-                case HOUR_INDEX:
+                case HOUR12_INDEX:
                     return Integer.valueOf(1);
+                case HOUR23_INDEX:
                 case PART_INDEX:
                     return Integer.valueOf(0);
                 default:
@@ -1051,8 +1136,10 @@ public final class HebrewTime
         @Override
         public Integer getMaximum(HebrewTime context) {
             switch (this.index) {
-                case HOUR_INDEX:
+                case HOUR12_INDEX:
                     return Integer.valueOf(12);
+                case HOUR23_INDEX:
+                    return Integer.valueOf(23);
                 case PART_INDEX:
                     return Integer.valueOf(PARTS_IN_HOUR - 1);
                 default:
@@ -1088,21 +1175,25 @@ public final class HebrewTime
             int v = value.intValue();
 
             switch (this.index) {
-                case HOUR_INDEX:
+                case HOUR12_INDEX:
                     if (lenient) {
-                        return context.plus(MathUtils.safeSubtract(v, context.getHour()), Unit.HOURS);
+                        return context.plus(MathUtils.safeSubtract(v, context.getClockHour()), Unit.HOURS);
                     } else if (context.isDay()) {
                         return HebrewTime.ofDay(v, context.part);
                     } else {
                         return HebrewTime.ofNight(v, context.part);
                     }
+                case HOUR23_INDEX:
+                    if (lenient) {
+                        return context.plus(MathUtils.safeSubtract(v, context.hour23), Unit.HOURS);
+                    } else {
+                        return HebrewTime.ofDigital(v, context.part);
+                    }
                 case PART_INDEX:
                     if (lenient) {
                         return context.plus(MathUtils.safeSubtract(v, context.part), Unit.HALAKIM);
-                    } else if (context.isDay()) {
-                        return HebrewTime.ofDay(context.getHour(), v);
                     } else {
-                        return HebrewTime.ofNight(context.getHour(), v);
+                        return HebrewTime.ofDigital(context.hour23, v);
                     }
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
@@ -1111,12 +1202,12 @@ public final class HebrewTime
 
         @Override
         public ChronoElement<?> getChildAtFloor(HebrewTime context) {
-            return ((this.index == HOUR_INDEX) ? PART_OF_HOUR : null);
+            return (((this.index == HOUR12_INDEX) || (this.index == HOUR23_INDEX)) ? PART_OF_HOUR : null);
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(HebrewTime context) {
-            return ((this.index == HOUR_INDEX) ? PART_OF_HOUR : null);
+            return this.getChildAtFloor(context);
         }
 
     }
@@ -1162,22 +1253,29 @@ public final class HebrewTime
             boolean lenient,
             boolean preparsing
         ) {
-            if (entity.contains(CYCLE) && entity.contains(HOUR_OF_CYCLE)) {
-                Cycle cycle = entity.get(CYCLE);
-                int hour = entity.getInt(HOUR_OF_CYCLE);
-                if (hour < 1 || hour > 12) {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "HOUR_OF_CYCLE out of range: " + hour);
+            int part = 0; // optional
+            if (entity.contains(PART_OF_HOUR)) {
+                part = entity.getInt(PART_OF_HOUR);
+                if (part < 0 || part >= PARTS_IN_HOUR) {
+                    entity.with(ValidationElement.ERROR_MESSAGE, "PART_OF_HOUR out of range: " + part);
                     return null;
                 }
-                int part = 0; // optional
-                if (entity.contains(PART_OF_HOUR)) {
-                    part = entity.getInt(PART_OF_HOUR);
-                    if (part < 0 || part >= PARTS_IN_HOUR) {
-                        entity.with(ValidationElement.ERROR_MESSAGE, "PART_OF_HOUR out of range: " + part);
-                        return null;
-                    }
+            }
+            if (entity.contains(CLOCK_CYCLE) && entity.contains(CLOCK_HOUR)) {
+                ClockCycle cycle = entity.get(CLOCK_CYCLE);
+                int hour12 = entity.getInt(CLOCK_HOUR);
+                if (hour12 < 1 || hour12 > 12) {
+                    entity.with(ValidationElement.ERROR_MESSAGE, "CLOCK_HOUR out of range: " + hour12);
+                    return null;
                 }
-                return new HebrewTime(cycle, hour, part);
+                return new HebrewTime(cycle, hour12, part);
+            } else if (entity.contains(DIGITAL_HOUR)) {
+                int hour23 = entity.getInt(DIGITAL_HOUR);
+                if (hour23 < 0 || hour23 > 23) {
+                    entity.with(ValidationElement.ERROR_MESSAGE, "DIGITAL_HOUR out of range: " + hour23);
+                    return null;
+                }
+                return new HebrewTime(hour23, part);
             } else {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing cycle or hour of cycle.");
                 return null;
