@@ -2885,7 +2885,7 @@ public final class PlainTime
                 case IntegerTimeElement.DIGITAL_HOUR_OF_AMPM:
                     return (context.hour % 12);
                 case IntegerTimeElement.DIGITAL_HOUR_OF_DAY:
-                    return context.hour % 24;
+                    return ((context.hour == 24) ? 0 : context.hour);
                 case IntegerTimeElement.ISO_HOUR:
                     return context.hour;
                 case IntegerTimeElement.MINUTE_OF_HOUR:
