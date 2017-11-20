@@ -1,5 +1,8 @@
 ## [v3.37] not yet released
 ### Added
+- Hebrew calendar [#528]
+- Hebrew time [#708]
+- Hebrew birthdays and yahrzeit [#707]
 - Constants of solar time for Jerusalem and Mecca [#711]
 - Add Odia (Oriya) language [#709]
 - More flexible numberings of enums in formatting [#706]
