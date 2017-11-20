@@ -1,7 +1,10 @@
 package net.time4j.calendar;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
+import net.time4j.calendar.astro.SolarTime;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.format.DisplayMode;
@@ -10,6 +13,7 @@ import net.time4j.format.expert.PatternType;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
+import net.time4j.tz.Timezone;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -85,6 +89,46 @@ public class HebrewMiscellaneousTest {
         assertThat(
             time.getInt(HebrewTime.PART_OF_HOUR),
             is(123));
+    }
+
+    @Test
+    public void onDateInJerusalem() {
+        HebrewTime time = HebrewTime.ofDay(12, 540);
+        assertThat(
+            time.on(HebrewCalendar.of(5778, HebrewMonth.NISAN, 1), SolarTime.ofJerusalem()).get(),
+            is(PlainTimestamp.of(2018, 3, 17, 4, 13, 25).atUTC())); // sunrise at 2018-03-17T03:43:02Z
+        time = HebrewTime.ofNight(12, 540);
+        assertThat(
+            time.on(HebrewCalendar.of(5778, HebrewMonth.NISAN, 1), SolarTime.ofJerusalem()).get(),
+            is(PlainTimestamp.of(2018, 3, 16, 16, 21, 14).atUTC())); // short after sunset
+    }
+
+    @Test
+    public void onDateInTimezone() {
+        HebrewTime time = HebrewTime.ofDay(12, 540);
+        Timezone tz = Timezone.of("Asia/Jerusalem");
+        assertThat(
+            time.on(HebrewCalendar.of(5778, HebrewMonth.NISAN, 1), tz),
+            is(PlainTimestamp.of(2018, 3, 17, 6, 30).in(tz)));
+    }
+
+    @Test
+    public void atJerusalem() {
+        assertThat(
+            PlainTimestamp.of(2018, 3, 17, 4, 13, 25).atUTC().get(HebrewTime.at(SolarTime.ofJerusalem())).get(),
+            is(HebrewTime.ofDay(12, 539))); // small rounding error (normally 540P)
+        assertThat(
+            PlainTimestamp.of(2018, 3, 16, 16, 21, 14).atUTC().get(HebrewTime.at(SolarTime.ofJerusalem())).get(),
+            is(HebrewTime.ofNight(12, 539))); // small rounding error (normally 540P)
+    }
+
+    @Test
+    public void atTimezone() {
+        Timezone tz = Timezone.of("Asia/Jerusalem");
+        Moment moment = PlainTimestamp.of(2018, 3, 17, 6, 30).in(tz);
+        assertThat(
+            moment.get(HebrewTime.at(tz.getID())),
+            is(HebrewTime.ofDay(12, 540)));
     }
 
     @Test
@@ -176,6 +220,23 @@ public class HebrewMiscellaneousTest {
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, 11 Tishri 5778"));
+    }
+
+    @Test
+    public void dateFormat() {
+        HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.ADAR_II, 29);
+        ChronoFormatter<HebrewCalendar> f =
+            ChronoFormatter.ofPattern("MMMM, dd (yyyy)", PatternType.CLDR_DATE, Locale.US, HebrewCalendar.axis());
+        assertThat(f.format(date), is("Adar, 29 (5778)"));
+        assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is("Adar II, 29 (5779)"));
+    }
+
+    @Test
+    public void timeFormat() {
+        HebrewTime htime = HebrewTime.ofNight(12, 540);
+        ChronoFormatter<HebrewTime> f =
+            ChronoFormatter.ofPattern("H'H' P'P'", PatternType.DYNAMIC, Locale.ROOT, HebrewTime.axis());
+        assertThat(f.format(htime), is("0H 540P"));
     }
 
 }

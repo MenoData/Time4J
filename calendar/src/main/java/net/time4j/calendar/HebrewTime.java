@@ -72,6 +72,8 @@ import java.util.concurrent.TimeUnit;
  * <p>Represents the 12-hour-time used in Jewish calendar starting in the evening
  * at either sunset or simplified at 6 PM as zero point. </p>
  *
+ * <h4>Introduction</h4>
+ *
  * <p>The calendar day is divided into day and night, or more precisely into two periods from sunset
  * to sunrise and then to next sunset. Each period is again divided into 12 timely hours which have
  * no fixed length due to seasonal changes. And each such hour is divided into 1080 parts
@@ -80,7 +82,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <p style="text-align:center;"><img src="doc-files/hebrewclock.png" alt="Hebrew clock"></p>
  *
- * <p>Following elements which are declared as constants are registered by this class: </p>
+ * <h4>Following elements which are declared as constants are registered by this class: </h4>
  *
  * <ul>
  *  <li>{@link #CLOCK_CYCLE}</li>
@@ -89,13 +91,29 @@ import java.util.concurrent.TimeUnit;
  *  <li>{@link #PART_OF_HOUR}</li>
  * </ul>
  *
+ * <h4>Formatting example</h4>
+ *
+ * <p>A suitable formatter can be constructed by help of dynamic format patterns, but not by the
+ * standard format pattern CLDR: </p>
+ *
+ * <pre>
+ *     HebrewTime htime = HebrewTime.ofNight(12, 540);
+ *     ChronoFormatter&lt;HebrewTime&gt; f =
+ *          ChronoFormatter.ofPattern(&quot;H'H' P'P'&quot;, PatternType.DYNAMIC, Locale.ROOT, HebrewTime.axis());
+ *     assertThat(f.format(htime), is(&quot;0H 540P&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
+ * @see     HebrewCalendar
+ * @see     net.time4j.format.expert.PatternType#DYNAMIC
  * @since   3.37/4.32
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die 12-Stunden-Uhr, die im j&uuml;dischen Kalender verwendet wird
  * und abends zum Sonnenuntergang oder im vereinfachten Zeitma&szlig; um 18 Uhr startet. </p>
+ *
+ * <h4>Einleitung</h4>
  *
  * <p>Der Kalendertag wird in zwei Perioden Tag und Nacht unterteilt. Diese Perioden wiederum
  * werden in 12 Stunden mit variabler L&auml;nge unterteilt. Deren L&auml;nge h&auml;ngt vom
@@ -105,7 +123,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <p style="text-align:center;"><img src="doc-files/hebrewclock.png" alt="Hebr&auml;ische Uhrk"></p>
  *
- * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
+ * <h4>Registriert sind folgende als Konstanten deklarierte Elemente: </h4>
  *
  * <ul>
  *  <li>{@link #CLOCK_CYCLE}</li>
@@ -114,7 +132,21 @@ import java.util.concurrent.TimeUnit;
  *  <li>{@link #PART_OF_HOUR}</li>
  * </ul>
  *
+ * <h4>Formatierungsbeispiel</h4>
+ *
+ * <p>Ein geeigneter Formatierer kann mit Hilfe von dynamischen Formatmustern
+ * (aber nicht mit dem Standardformatmuster CLDR) konstruiert werden: </p>
+ *
+ * <pre>
+ *     HebrewTime htime = HebrewTime.ofNight(12, 540);
+ *     ChronoFormatter&lt;HebrewTime&gt; f =
+ *          ChronoFormatter.ofPattern(&quot;H'H' P'P'&quot;, PatternType.DYNAMIC, Locale.ROOT, HebrewTime.axis());
+ *     assertThat(f.format(htime), is(&quot;0H 540P&quot;));
+ * </pre>
+ *
  * @author  Meno Hochschild
+ * @see     HebrewCalendar
+ * @see     net.time4j.format.expert.PatternType#DYNAMIC
  * @since   3.37/4.32
  * @doctags.concurrency {immutable}
  */
@@ -227,7 +259,7 @@ public final class HebrewTime
         ENGINE = builder.build();
     }
 
-    //private static final long serialVersionUID = 3576122091324773241L;
+    private static final long serialVersionUID = -6206874394178665128L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -434,6 +466,7 @@ public final class HebrewTime
      * @see     #on(HebrewCalendar, SolarTime)
      */
     public static ChronoFunction<Moment, Optional<HebrewTime>> at(SolarTime geoLocation) {
+
         return (moment) -> {
             ZonalOffset offset = ZonalOffset.atLongitude(new BigDecimal(geoLocation.getLongitude()));
             PlainTimestamp tsp = moment.toZonalTimestamp(offset); // local mean time
@@ -685,6 +718,8 @@ public final class HebrewTime
     /**
      * <p>Obtains the moment at this Hebrew time on given date at the given geographical position. </p>
      *
+     * <p>Note: The practical precision of this method is constrained to minutes. </p>
+     *
      * @param   date            the Hebrew date to be combined with this time
      * @param   geoLocation     the geographical position as basis of the solar time
      * @return  Moment (optional)
@@ -694,6 +729,8 @@ public final class HebrewTime
     /*[deutsch]
      * <p>Ermittelt den Moment, zu dem diese hebr&auml;ische Uhrzeit am angegebenen Datum und an der
      * geographischen Position geh&ouml;rt. </p>
+     *
+     * <p>Hinweis: Die praktische Genauigkeit dieser Methode ist auf Minuten begrenzt. </p>
      *
      * @param   date            the Hebrew date to be combined with this time
      * @param   geoLocation     the geographical position as basis of the solar time
@@ -707,13 +744,16 @@ public final class HebrewTime
     ) {
 
         PlainDate iso = date.transform(PlainDate.axis());
+        HebrewTime htime;
         Optional<Moment> t1;
         Optional<Moment> t2;
 
         if (this.isNight()) {
+            htime = this;
             t1 = geoLocation.sunset().apply(iso.minus(CalendarDays.ONE));
             t2 = geoLocation.sunrise().apply(iso);
         } else {
+            htime = this.minus(12, Unit.HOURS);
             t1 = geoLocation.sunrise().apply(iso);
             t2 = geoLocation.sunset().apply(iso);
         }
@@ -725,7 +765,7 @@ public final class HebrewTime
             }
             Moment m =
                 t1.get().plus(
-                    (long) Math.floor(this.getTimeOfDay() * delta / (PARTS_IN_HOUR * 12.0)),
+                    (long) Math.floor(htime.getTimeOfDay() * delta / (PARTS_IN_HOUR * 12.0)),
                     TimeUnit.SECONDS);
             return Optional.of(m);
         } else {
@@ -738,7 +778,9 @@ public final class HebrewTime
      * <p>Obtains the moment at this simplified Hebrew time on given date using a fixed 24-hour-scale. </p>
      *
      * <p>The simplified Hebrew time always starts on 6 pm in the evening. A more exact conversion
-     * can be obtained by {@link #on(HebrewCalendar, SolarTime)}. </p>
+     * can be obtained by {@link #on(HebrewCalendar, SolarTime)}. Attention: This method might have
+     * very small rounding errors in nanosecond range because <i>halakim</i> cannot always be converted
+     * to seconds in an exact way. </p>
      *
      * @param   date    the Hebrew date to be combined with this time
      * @param   tz      timezone
@@ -751,7 +793,9 @@ public final class HebrewTime
      * auf einer festen 24-Stunden-Zeitskala geh&ouml;rt. </p>
      *
      * <p>Die vereinfachte hebr&auml;ische Uhrzeit beginnt immer um 6 Uhr abends. Eine genauere Umwandlung
-     * ist mittels {@link #on(HebrewCalendar, SolarTime)} verf&uuml;gbar. </p>
+     * ist mittels {@link #on(HebrewCalendar, SolarTime)} verf&uuml;gbar. Achtung: Diese Methode kann
+     * sehr kleine Rundungsfehler im Nanosekundenbereich haben, weil sich <i>halakim</i> nicht immer exakt
+     * in Sekundenbruchteile umrechnen lassen. </p>
      *
      * @param   date    the Hebrew date to be combined with this time
      * @param   tz      timezone
@@ -766,7 +810,10 @@ public final class HebrewTime
 
         int h = (this.hour23 + 18) % 24;
         BigDecimal p = new BigDecimal(this.part);
-        BigDecimal t = p.divide(new BigDecimal(PARTS_IN_HOUR), RoundingMode.FLOOR).add(new BigDecimal(h));
+        BigDecimal t =
+            p.setScale(15, RoundingMode.UNNECESSARY)
+                .divide(new BigDecimal(PARTS_IN_HOUR), RoundingMode.FLOOR)
+                .add(new BigDecimal(h));
         PlainTime iso = PlainTime.of(18).with(PlainTime.DECIMAL_HOUR, t);
         return date.at(iso).in(tz, StartOfDay.EVENING);
 
