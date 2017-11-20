@@ -108,7 +108,6 @@ import java.util.concurrent.TimeUnit;
  * @see     HebrewCalendar
  * @see     net.time4j.format.expert.PatternType#DYNAMIC
  * @since   3.37/4.32
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die 12-Stunden-Uhr, die im j&uuml;dischen Kalender verwendet wird
@@ -149,7 +148,6 @@ import java.util.concurrent.TimeUnit;
  * @see     HebrewCalendar
  * @see     net.time4j.format.expert.PatternType#DYNAMIC
  * @since   3.37/4.32
- * @doctags.concurrency {immutable}
  */
 @CalendarType("hebrew")
 public final class HebrewTime
