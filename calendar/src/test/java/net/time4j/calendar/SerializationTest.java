@@ -42,12 +42,8 @@ public class SerializationTest {
     }
 
     @Test
-    public void serializeEthiopianDate() throws IOException, ClassNotFoundException {
+    public void serializeEthiopian() throws IOException, ClassNotFoundException {
         roundtrip(EthiopianCalendar.of(EthiopianEra.AMETE_MIHRET, 2007, 13, 6));
-    }
-
-    @Test
-    public void serializeEthiopianTime() throws IOException, ClassNotFoundException {
         roundtrip(EthiopianTime.ofDay(4, 45, 23));
     }
 
@@ -86,6 +82,7 @@ public class SerializationTest {
     @Test
     public void serializeHebrew() throws IOException, ClassNotFoundException {
         roundtrip(HebrewCalendar.of(5779, HebrewMonth.ADAR_I, 1));
+        roundtrip(HebrewTime.ofDay(12, 540));
     }
 
     private static int roundtrip(Object obj)

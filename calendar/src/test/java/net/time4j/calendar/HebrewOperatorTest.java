@@ -124,4 +124,98 @@ public class HebrewOperatorTest {
             is(HebrewCalendar.of(5778, HebrewMonth.KISLEV, 30)));
     }
 
+    @Test
+    public void nextHour() {
+        assertThat(
+            HebrewTime.ofNight(11, 0).with(HebrewTime.CLOCK_HOUR.incremented()),
+            is(HebrewTime.ofDay(12, 0)));
+        assertThat(
+            HebrewTime.ofNight(12, 0).with(HebrewTime.CLOCK_HOUR.incremented()),
+            is(HebrewTime.ofNight(1, 0)));
+        assertThat(
+            HebrewTime.ofDay(11, 0).with(HebrewTime.DIGITAL_HOUR.incremented()),
+            is(HebrewTime.ofNight(12, 0)));
+    }
+
+    @Test
+    public void previousHour() {
+        assertThat(
+            HebrewTime.ofDay(12, 0).with(HebrewTime.CLOCK_HOUR.decremented()),
+            is(HebrewTime.ofNight(11, 0)));
+        assertThat(
+            HebrewTime.ofNight(1, 0).with(HebrewTime.CLOCK_HOUR.decremented()),
+            is(HebrewTime.ofNight(12, 0)));
+        assertThat(
+            HebrewTime.ofNight(12, 0).with(HebrewTime.DIGITAL_HOUR.decremented()),
+            is(HebrewTime.ofDay(11, 0)));
+    }
+
+    @Test
+    public void nextPart() {
+        assertThat(
+            HebrewTime.ofNight(11, 1079).with(HebrewTime.PART_OF_HOUR.incremented()),
+            is(HebrewTime.ofDay(12, 0)));
+    }
+
+    @Test
+    public void previousPart() {
+        assertThat(
+            HebrewTime.ofDay(12, 0).with(HebrewTime.PART_OF_HOUR.decremented()),
+            is(HebrewTime.ofNight(11, 1079)));
+    }
+
+    @Test
+    public void minHour() {
+        assertThat(
+            HebrewTime.ofDay(11, 0).with(HebrewTime.CLOCK_HOUR.minimized()),
+            is(HebrewTime.ofDay(1, 0)));
+        assertThat(
+            HebrewTime.ofDay(11, 0).with(HebrewTime.DIGITAL_HOUR.minimized()),
+            is(HebrewTime.ofNight(12, 0)));
+    }
+
+    @Test
+    public void maxHour() {
+        assertThat(
+            HebrewTime.ofNight(5, 0).with(HebrewTime.CLOCK_HOUR.maximized()),
+            is(HebrewTime.ofNight(12, 0)));
+        assertThat(
+            HebrewTime.ofNight(5, 0).with(HebrewTime.DIGITAL_HOUR.maximized()),
+            is(HebrewTime.ofDay(11, 0)));
+    }
+
+    @Test
+    public void minPart() {
+        assertThat(
+            HebrewTime.ofDay(12, 1000).with(HebrewTime.PART_OF_HOUR.minimized()),
+            is(HebrewTime.ofDay(12, 0)));
+    }
+
+    @Test
+    public void maxPart() {
+        assertThat(
+            HebrewTime.ofDay(12, 1000).with(HebrewTime.PART_OF_HOUR.maximized()),
+            is(HebrewTime.ofDay(12, 1079)));
+    }
+
+    @Test
+    public void hourAtFloor() {
+        assertThat(
+            HebrewTime.ofDay(4, 1000).with(HebrewTime.CLOCK_HOUR.atFloor()),
+            is(HebrewTime.ofDay(4, 0)));
+        assertThat(
+            HebrewTime.ofDay(4, 1000).with(HebrewTime.DIGITAL_HOUR.atFloor()),
+            is(HebrewTime.ofDay(4, 0)));
+    }
+
+    @Test
+    public void hourAtCeiling() {
+        assertThat(
+            HebrewTime.ofDay(4, 0).with(HebrewTime.CLOCK_HOUR.atCeiling()),
+            is(HebrewTime.ofDay(4, 1079)));
+        assertThat(
+            HebrewTime.ofDay(4, 0).with(HebrewTime.DIGITAL_HOUR.atCeiling()),
+            is(HebrewTime.ofDay(4, 1079)));
+    }
+
 }
