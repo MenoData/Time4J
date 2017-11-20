@@ -149,8 +149,8 @@ public enum HebrewAnniversary {
                     } else if ((m.getBiblicalValue(false) == 12) && (d == 30) && !HebrewCalendar.isLeapYear(hyear)) {
                         return HebrewCalendar.of(hyear, SHEVAT, 30);
                     } else {
-                        return HebrewCalendar.ofBiblical(
-                            hyear, m.getBiblicalValue(false), 1).plus(CalendarDays.of(d - 1));
+                        return HebrewCalendar.ofBiblical(hyear, m.getBiblicalValue(false), 1)
+                            .plus(CalendarDays.of(d - 1));
                     }
                 }
             };

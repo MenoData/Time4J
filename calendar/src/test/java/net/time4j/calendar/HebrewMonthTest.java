@@ -190,4 +190,26 @@ public class HebrewMonthTest {
             is("Adar II"));
     }
 
+    @Test
+    public void isValid() {
+        assertThat(
+            HebrewCalendar.of(5778, HebrewMonth.NISAN, 30).isValid(HebrewCalendar.MONTH_OF_YEAR, HebrewMonth.ADAR_I),
+            is(false));
+        assertThat(
+            HebrewCalendar.of(5779, HebrewMonth.NISAN, 30).isValid(HebrewCalendar.MONTH_OF_YEAR, HebrewMonth.ADAR_I),
+            is(true));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withAdarIWhenNormalYear() {
+        HebrewCalendar.of(5778, HebrewMonth.NISAN, 30).with(HebrewCalendar.MONTH_OF_YEAR, HebrewMonth.ADAR_I);
+    }
+
+    @Test
+    public void withAdarIWhenLeapYear() {
+        assertThat(
+            HebrewCalendar.of(5779, HebrewMonth.NISAN, 30).with(HebrewCalendar.MONTH_OF_YEAR, HebrewMonth.ADAR_I),
+            is(HebrewCalendar.of(5779, HebrewMonth.ADAR_I, 30)));
+    }
+
 }

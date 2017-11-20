@@ -99,6 +99,22 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
+ * <h4>Formatting of the month Adar-II</h4>
+ *
+ * <p>The month Adar-II is printed in different ways dependent on if the associated year is a leap year or not. </p>
+ *
+ * <pre>
+ *     HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.ADAR_II, 29);
+ *     ChronoFormatter&lt;HebrewCalendar&gt; f =
+ *          ChronoFormatter.ofPattern(
+ *              &quot;MMMM, dd (yyyy)&quot;,
+ *              PatternType.CLDR_DATE,
+ *              Locale.US,
+ *              HebrewCalendar.axis());
+ *     assertThat(f.format(date), is(&quot;Adar, 29 (5778)&quot;)); // no leap year
+ *     assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is(&quot;Adar II, 29 (5779)&quot;));
+ * </pre>
+ *
  * <h4>Support for unicode ca-extensions</h4>
  *
  * <pre>
@@ -110,6 +126,9 @@ import java.util.Locale;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     HebrewAnniversary
+ * @see     HebrewMonth
+ * @see     HebrewTime
  * @since   3.37/4.32
  */
 /*[deutsch]
@@ -143,6 +162,23 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
+ * <h4>Formatting of the month Adar-II</h4>
+ *
+ * <p>Der Monat Adar-II wird je nachdem, ob das assoziierte Jahr ein Schaltjahr ist oder nicht, verschieden
+ * formatiert: </p>
+ *
+ * <pre>
+ *     HebrewCalendar date = HebrewCalendar.of(5778, HebrewMonth.ADAR_II, 29);
+ *     ChronoFormatter&lt;HebrewCalendar&gt; f =
+ *          ChronoFormatter.ofPattern(
+ *              &quot;MMMM, dd (yyyy)&quot;,
+ *              PatternType.CLDR_DATE,
+ *              Locale.US,
+ *              HebrewCalendar.axis());
+ *     assertThat(f.format(date), is(&quot;Adar, 29 (5778)&quot;)); // kein Schaltjahr
+ *     assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is(&quot;Adar II, 29 (5779)&quot;));
+ * </pre>
+ *
  * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
  *
  * <pre>
@@ -154,6 +190,9 @@ import java.util.Locale;
  * </pre>
  *
  * @author  Meno Hochschild
+ * @see     HebrewAnniversary
+ * @see     HebrewMonth
+ * @see     HebrewTime
  * @since   3.37/4.32
  */
 @CalendarType("hebrew")
@@ -366,8 +405,7 @@ public final class HebrewCalendar
         ENGINE = builder.build();
     }
 
-    // TODO: update
-//    private static final long serialVersionUID = -8248846000788617742L;
+    private static final long serialVersionUID = -4183006723190472312L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -832,24 +870,35 @@ public final class HebrewCalendar
     }
 
     /**
-     * <p>Creates a new local timestamp with this date and given wall time. </p>
+     * <p>Creates a new local timestamp with this date and given civil time. </p>
      *
      * <p>If the time {@link PlainTime#midnightAtEndOfDay() T24:00} is used
      * then the resulting timestamp will automatically be normalized such
      * that the timestamp will contain the following day instead. </p>
      *
+     * <p>An alternative to the civil time is the usage of the {@link HebrewTime}
+     * according to the descriptions in the bible and torah. </p>
+     *
      * @param   time    wall time
      * @return  general timestamp as composition of this date and given time
+     * @see     HebrewTime#on(HebrewCalendar, SolarTime)
+     * @see     HebrewTime#on(HebrewCalendar, Timezone)
      */
     /*[deutsch]
-     * <p>Erzeugt einen allgemeinen Zeitstempel mit diesem Datum und der angegebenen Uhrzeit. </p>
+     * <p>Erzeugt einen allgemeinen Zeitstempel mit diesem Datum und der angegebenen
+     * b&uuml;rgerlichen Uhrzeit. </p>
      *
      * <p>Wenn {@link PlainTime#midnightAtEndOfDay() T24:00} angegeben wird,
      * dann wird der Zeitstempel automatisch so normalisiert, da&szlig; er auf
      * den n&auml;chsten Tag verweist. </p>
      *
+     * <p>Eine Alternative zur zivilen Zeit ist die Verwendung der {@link HebrewTime hebr&auml;ischen Zeit},
+     * wie sie in der Bibel und der Torah beschrieben wird. </p>
+     *
      * @param   time    wall time
      * @return  general timestamp as composition of this date and given time
+     * @see     HebrewTime#on(HebrewCalendar, SolarTime)
+     * @see     HebrewTime#on(HebrewCalendar, Timezone)
      */
     public GeneralTimestamp<HebrewCalendar> at(PlainTime time) {
 
@@ -864,6 +913,9 @@ public final class HebrewCalendar
      * @param   minute      minute of hour in range (0-59)
      * @return  general timestamp as composition of this date and given time
      * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #at(PlainTime)
+     * @see     HebrewTime#on(HebrewCalendar, SolarTime)
+     * @see     HebrewTime#on(HebrewCalendar, Timezone)
      */
     /*[deutsch]
      * <p>Entspricht {@code at(PlainTime.of(hour, minute))}. </p>
@@ -872,6 +924,9 @@ public final class HebrewCalendar
      * @param   minute      minute of hour in range (0-59)
      * @return  general timestamp as composition of this date and given time
      * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #at(PlainTime)
+     * @see     HebrewTime#on(HebrewCalendar, SolarTime)
+     * @see     HebrewTime#on(HebrewCalendar, Timezone)
      */
     public GeneralTimestamp<HebrewCalendar> atTime(
         int hour,
@@ -1057,7 +1112,7 @@ public final class HebrewCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.HEBREW);
+        return new SPX(this, SPX.HEBREW_DATE);
 
     }
 
