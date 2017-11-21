@@ -73,8 +73,6 @@ import java.util.Locale;
 /**
  * <p>Represents the calendar used by the worldwide Jewish community, but mainly in Israel for religious purposes. </p>
  *
- * <h4>Introduction</h4>
- *
  * <p>It is a lunisolar calendar which defines years consisting of 12 or 13 months. The month cycle
  * generally follows the lunar cycle of synodic moon. However, every two or three years, an extra
  * leap month called ADAR-I will be inserted to synchronize the calendar with the solar year. This
@@ -85,7 +83,7 @@ import java.util.Locale;
  * civil hebrew day starts at 18:00 o&#39;clock on the previous day. Time4J enables users to use
  * the sunset as begin of day for religious purposes. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p>Following elements which are declared as constants are registered by this class: </p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -99,7 +97,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Formatting of the month Adar-II</h4>
+ * <p><strong>Formatting of the month Adar-II</strong></p>
  *
  * <p>The month Adar-II is printed in different ways dependent on if the associated year is a leap year or not. </p>
  *
@@ -115,16 +113,6 @@ import java.util.Locale;
  *     assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is(&quot;Adar II, 29 (5779)&quot;));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
- *
- * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-hebrew&quot;);
- *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
- *      assertThat(
- *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, Tishri 11, 5778 AM&quot;));
- * </pre>
- *
  * @author  Meno Hochschild
  * @see     HebrewAnniversary
  * @see     HebrewMonth
@@ -134,8 +122,6 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der von der weltweitenj&uuml;dischen Gemeinschaft,
  * haupts&auml;chlich aber in Israel f&uuml;r religi&ouml;se Zwecke, verwendet wird. </p>
- *
- * <h4>Einleitung</h4>
  *
  * <p>Es handelt sich um einen kombinierten Sonnen- und Mondkalender, dessen Jahre aus 12 oder 13
  * Monaten bestehen. Grunds&auml;tzlich folgt der Monatszyklus dem Mondzyklus basierend auf dem
@@ -148,7 +134,7 @@ import java.util.Locale;
  * zivile hebr&auml;ische Tag f&auml;ngt um 18 Uhr am Vortag an. F&uuml;r religi&ouml;se Zwecke ist es im
  * Rahmen von Time4J auch m&ouml;glich, den exakten Sonnenuntergang des Vortags als Tagesbeginn zu berechnen. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -162,7 +148,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Formatting of the month Adar-II</h4>
+ * <p><strong>Formatting of the month Adar-II</strong></p>
  *
  * <p>Der Monat Adar-II wird je nachdem, ob das assoziierte Jahr ein Schaltjahr ist oder nicht, verschieden
  * formatiert: </p>
@@ -177,16 +163,6 @@ import java.util.Locale;
  *              HebrewCalendar.axis());
  *     assertThat(f.format(date), is(&quot;Adar, 29 (5778)&quot;)); // kein Schaltjahr
  *     assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is(&quot;Adar II, 29 (5779)&quot;));
- * </pre>
- *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
- *
- * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-hebrew&quot;);
- *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
- *      assertThat(
- *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, Tishri 11, 5778 AM&quot;));
  * </pre>
  *
  * @author  Meno Hochschild

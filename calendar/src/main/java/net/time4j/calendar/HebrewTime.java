@@ -73,8 +73,6 @@ import java.util.concurrent.TimeUnit;
  * <p>Represents the 12-hour-time used in Jewish calendar starting in the evening
  * at either sunset or simplified at 6 PM as zero point. </p>
  *
- * <h4>Introduction</h4>
- *
  * <p>The calendar day is divided into day and night, or more precisely into two periods from sunset
  * to sunrise and then to next sunset. Each period is again divided into 12 timely hours which have
  * no fixed length due to seasonal changes. And each such hour is divided into 1080 parts
@@ -83,7 +81,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <p style="text-align:center;"><img src="doc-files/hebrewclock.png" alt="Hebrew clock"></p>
  *
- * <h4>Following elements which are declared as constants are registered by this class: </h4>
+ * <p>Following elements which are declared as constants are registered by this class: </p>
  *
  * <ul>
  *  <li>{@link #CLOCK_CYCLE}</li>
@@ -92,7 +90,7 @@ import java.util.concurrent.TimeUnit;
  *  <li>{@link #PART_OF_HOUR}</li>
  * </ul>
  *
- * <h4>Formatting example</h4>
+ * <p><strong>Formatting example</strong></p>
  *
  * <p>A suitable formatter can be constructed by help of dynamic format patterns, but not by the
  * standard format pattern CLDR: </p>
@@ -113,8 +111,6 @@ import java.util.concurrent.TimeUnit;
  * <p>Repr&auml;sentiert die 12-Stunden-Uhr, die im j&uuml;dischen Kalender verwendet wird
  * und abends zum Sonnenuntergang oder im vereinfachten Zeitma&szlig; um 18 Uhr startet. </p>
  *
- * <h4>Einleitung</h4>
- *
  * <p>Der Kalendertag wird in zwei Perioden Tag und Nacht unterteilt. Diese Perioden wiederum
  * werden in 12 Stunden mit variabler L&auml;nge unterteilt. Deren L&auml;nge h&auml;ngt vom
  * Lauf der Jahreszeiten ab. Die hebr&auml;ische Stunde wird selbst noch in 1080 Teile
@@ -123,7 +119,7 @@ import java.util.concurrent.TimeUnit;
  *
  * <p style="text-align:center;"><img src="doc-files/hebrewclock.png" alt="Hebr&auml;ische Uhrk"></p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente: </h4>
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
  * <ul>
  *  <li>{@link #CLOCK_CYCLE}</li>
@@ -132,7 +128,7 @@ import java.util.concurrent.TimeUnit;
  *  <li>{@link #PART_OF_HOUR}</li>
  * </ul>
  *
- * <h4>Formatierungsbeispiel</h4>
+ * <p><strong>Formatierungsbeispiel</strong></p>
  *
  * <p>Ein geeigneter Formatierer kann mit Hilfe von dynamischen Formatmustern
  * (aber nicht mit dem Standardformatmuster CLDR) konstruiert werden: </p>
