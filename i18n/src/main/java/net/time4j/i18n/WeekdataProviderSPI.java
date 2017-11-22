@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdataProviderSPI.java) is part of project Time4J.
  *
@@ -115,43 +115,25 @@ public class WeekdataProviderSPI
 
                     if (prefix.startsWith("start-")) {
                         wd = prefix.substring(6);
-                        weekday = Weekday.SATURDAY;
+                        weekday = Weekday.SATURDAY; // default setting
                         map = tmpStart;
                     } else if (prefix.startsWith("end-")) {
                         wd = prefix.substring(4);
-                        weekday = Weekday.SUNDAY;
+                        weekday = Weekday.SUNDAY; // default setting
                         map = tmpEnd;
                     } else if (prefix.startsWith("first-")) {
                         wd = prefix.substring(6);
-                        weekday = Weekday.MONDAY;
+                        weekday = Weekday.MONDAY; // default setting
                         map = tmpFirst;
                     } else {
                         throw new IllegalStateException(
                             "Unexpected format: " + this.source);
                     }
 
-                    switch (wd) {
-                        case "sun":
-                            weekday = Weekday.SUNDAY;
-                            break;
-                        case "sat":
-                            weekday = Weekday.SATURDAY;
-                            break;
-                        case "fri":
-                            weekday = Weekday.FRIDAY;
-                            break;
-                        case "thu":
-                            weekday = Weekday.THURSDAY;
-                            break;
-                        case "wed":
-                            weekday = Weekday.WEDNESDAY;
-                            break;
-                        case "tue":
-                            weekday = Weekday.TUESDAY;
-                            break;
-                        case "mon":
-                            weekday = Weekday.MONDAY;
-                            break;
+                    Weekday test = toEnum(wd);
+
+                    if (test != null) {
+                        weekday = test;
                     }
 
                     for (String country : list) {
@@ -198,6 +180,15 @@ public class WeekdataProviderSPI
 
     @Override
     public int getFirstDayOfWeek(Locale country) {
+
+        String fw = country.getUnicodeLocaleType("fw");
+
+        if (fw != null) {
+            Weekday wd = toEnum(fw);
+            if (wd != null) { // else ignore fw-extension
+                return wd.getValue();
+            }
+        }
 
         if (this.firstDayOfWeek.isEmpty()) {
             // fallback
@@ -271,6 +262,29 @@ public class WeekdataProviderSPI
     public String toString() {
 
         return this.getClass().getName() + this.source;
+
+    }
+
+    private static Weekday toEnum(String weekday) {
+
+        switch (weekday) {
+            case "mon":
+                return Weekday.MONDAY;
+            case "tue":
+                return Weekday.TUESDAY;
+            case "wed":
+                return Weekday.WEDNESDAY;
+            case "thu":
+                return Weekday.THURSDAY;
+            case "fri":
+                return Weekday.FRIDAY;
+            case "sat":
+                return Weekday.SATURDAY;
+            case "sun":
+                return Weekday.SUNDAY;
+            default:
+                return null;
+        }
 
     }
 

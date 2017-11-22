@@ -147,4 +147,10 @@ public class WeekdataTest {
         assertThat(date.matches(Weekmodel.of(afghanistan).weekend()), is(true));
     }
 
+    @Test
+    public void fwExtension() {
+        Locale locale = Locale.forLanguageTag("en-US-u-fw-mon");
+        assertThat(Weekmodel.of(locale), is(Weekmodel.of(Weekday.MONDAY, 1)));
+    }
+
 }
