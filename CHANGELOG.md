@@ -4,6 +4,7 @@
 - Hebrew time [#708]
 - Hebrew birthdays and yahrzeit [#707]
 - Constants of solar time for Jerusalem and Mecca [#711]
+- Support unicode extensions fw and rg [#712]
 - Add Odia (Oriya) language [#709]
 - More flexible numberings of enums in formatting [#706]
 - Update to CLDR v32 [#690]
