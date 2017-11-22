@@ -33,6 +33,7 @@ import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.FormatUtils;
 import net.time4j.i18n.LanguageMatch;
 import net.time4j.i18n.SymbolProviderSPI;
 
@@ -358,7 +359,7 @@ final class AttributeSet
         String minus;
 
         String lang = LanguageMatch.getAlias(locale);
-        String country = locale.getCountry();
+        String country = FormatUtils.getRegion(locale);
 
         if (lang.isEmpty() && country.isEmpty()) {
             locale = Locale.ROOT;

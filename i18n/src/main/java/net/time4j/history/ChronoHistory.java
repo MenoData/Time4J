@@ -32,6 +32,7 @@ import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.format.internal.FormatUtils;
 import net.time4j.history.internal.HistoricVariant;
 
 import java.io.IOException;
@@ -686,7 +687,7 @@ public final class ChronoHistory
      */
     public static ChronoHistory of(Locale locale) {
 
-        String key = locale.getCountry();
+        String key = FormatUtils.getRegion(locale);
         ChronoHistory history = null;
 
         if (!locale.getVariant().isEmpty()) {

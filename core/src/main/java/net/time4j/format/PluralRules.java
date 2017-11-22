@@ -22,6 +22,7 @@
 package net.time4j.format;
 
 import net.time4j.base.ResourceLoader;
+import net.time4j.format.internal.FormatUtils;
 
 import java.util.Locale;
 import java.util.Map;
@@ -117,8 +118,9 @@ public abstract class PluralRules {
         PluralRules rules = null;
 
         if (!map.isEmpty()) {
-            if (!locale.getCountry().equals("")) {
-                rules = map.get(toKey(locale));
+            String region = FormatUtils.getRegion(locale);
+            if (!region.isEmpty()) {
+                rules = map.get(toKey(locale.getLanguage(), region));
             }
             if (rules == null) {
                 rules = map.get(locale.getLanguage());
@@ -156,9 +158,10 @@ public abstract class PluralRules {
 
         Map<String, PluralRules> map = getRuleMap(rules.getNumberType());
         String key = locale.getLanguage();
+        String region = FormatUtils.getRegion(locale);
 
-        if (!locale.getCountry().equals("")) {
-            key = toKey(locale);
+        if (!region.isEmpty()) {
+            key = toKey(key, region);
         }
 
         map.put(key, rules);
@@ -209,12 +212,12 @@ public abstract class PluralRules {
 
     }
 
-    private static String toKey(Locale country) {
+    private static String toKey(String language, String region) {
 
         StringBuilder kb = new StringBuilder();
-        kb.append(country.getLanguage());
+        kb.append(language);
         kb.append('_');
-        kb.append(country.getCountry());
+        kb.append(region);
         return kb.toString();
 
     }

@@ -24,6 +24,7 @@ package net.time4j.i18n;
 import net.time4j.Weekday;
 import net.time4j.base.ResourceLoader;
 import net.time4j.format.WeekdataProvider;
+import net.time4j.format.internal.FormatUtils;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -197,7 +198,7 @@ public class WeekdataProviderSPI
             return ((fd == 1) ? 7 : (fd - 1));
         }
 
-        String key = country.getCountry();
+        String key = FormatUtils.getRegion(country);
         Weekday first = Weekday.MONDAY;
 
         if (this.firstDayOfWeek.containsKey(key)) {
@@ -217,7 +218,7 @@ public class WeekdataProviderSPI
             return gc.getMinimalDaysInFirstWeek();
         }
 
-        String key = country.getCountry();
+        String key = FormatUtils.getRegion(country);
         int minDays = 1;
 
         if (key.isEmpty() && country.getLanguage().isEmpty()) {
@@ -233,7 +234,7 @@ public class WeekdataProviderSPI
     @Override
     public int getStartOfWeekend(Locale country) {
 
-        String key = country.getCountry();
+        String key = FormatUtils.getRegion(country);
         Weekday start = Weekday.SATURDAY;
 
         if (this.startOfWeekend.containsKey(key)) {
@@ -247,7 +248,7 @@ public class WeekdataProviderSPI
     @Override
     public int getEndOfWeekend(Locale country) {
 
-        String key = country.getCountry();
+        String key = FormatUtils.getRegion(country);
         Weekday end = Weekday.SUNDAY;
 
         if (this.endOfWeekend.containsKey(key)) {

@@ -148,13 +148,15 @@ public class WeekdataTest {
     }
 
     @Test
-    public void fwExtension() {
+    public void extension_fw_rg() {
         Locale locale1 = Locale.forLanguageTag("en-US-u-fw-mon");
         assertThat(Weekmodel.of(locale1), is(Weekmodel.of(Weekday.MONDAY, 1)));
         Locale locale2 = Locale.forLanguageTag("en-US-u-fw-xxx");
         assertThat(Weekmodel.of(locale2), is(Weekmodel.of(Weekday.SUNDAY, 1)));
-        Locale locale3 = Locale.forLanguageTag("en-US");
-        assertThat(Weekmodel.of(locale3), is(Weekmodel.of(Weekday.SUNDAY, 1)));
+        Locale locale3 = Locale.forLanguageTag("en-US-u-rg-GBZZZZ");
+        assertThat(Weekmodel.of(locale3), is(Weekmodel.of(Weekday.MONDAY, 4)));
+        Locale locale4 = Locale.forLanguageTag("en-US");
+        assertThat(Weekmodel.of(locale4), is(Weekmodel.of(Weekday.SUNDAY, 1)));
     }
 
 }

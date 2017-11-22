@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WinZoneProviderSPI.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.tz.spi;
 
 import net.time4j.base.ResourceLoader;
+import net.time4j.format.internal.FormatUtils;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -139,7 +140,7 @@ public class WinZoneProviderSPI
         boolean smart
     ) {
 
-        return getPreferredIDs(locale.getCountry(), smart);
+        return getPreferredIDs(FormatUtils.getRegion(locale), smart);
 
     }
 
@@ -154,7 +155,7 @@ public class WinZoneProviderSPI
             return "";
         }
 
-        Map<String, String> map = idsToNames(locale.getCountry());
+        Map<String, String> map = idsToNames(FormatUtils.getRegion(locale));
         String name = map.get("WINDOWS~" + tzid);
         return ((name == null) ? "" : name);
 

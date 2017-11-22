@@ -94,6 +94,7 @@ public class CalendarPickerTest
         alternativeCalendarPicker = CalendarPicker.minguoWithSystemDefaults();
         alternativeCalendarPicker = CalendarPicker.thaiWithSystemDefaults();
         alternativeCalendarPicker = CalendarPicker.hijriWithSystemDefaults(() -> HijriCalendar.VARIANT_UMALQURA);
+        alternativeCalendarPicker = CalendarPicker.persianWithSystemDefaults();
         alternativeCalendarPicker.setShowInfoLabel(true);
         alternativeCalendarPicker.setCellCustomizer(
             (cell, column, row, model, date) -> {
@@ -103,7 +104,7 @@ public class CalendarPickerTest
                 }
             }
         );
-        alternativeCalendarPicker.setLocale(new Locale("ar"));
+        alternativeCalendarPicker.setLocale(new Locale("fa", "IR"));
         alternativeCalendarPicker.setShowWeeks(true);
         gridPane.add(alternativeCalendarPicker, 0, 3);
 

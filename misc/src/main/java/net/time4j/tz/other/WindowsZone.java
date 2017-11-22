@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WindowsZone.java) is part of project Time4J.
  *
@@ -21,6 +21,7 @@
 
 package net.time4j.tz.other;
 
+import net.time4j.format.internal.FormatUtils;
 import net.time4j.tz.TZID;
 import net.time4j.tz.spi.WinZoneProviderSPI;
 
@@ -211,7 +212,7 @@ public final class WindowsZone
      */
     public Set<TZID> resolve(Locale country) {
 
-        Set<TZID> ids = WinZoneProviderSPI.NAME_BASED_MAP.get(this.name).get(country.getCountry());
+        Set<TZID> ids = WinZoneProviderSPI.NAME_BASED_MAP.get(this.name).get(FormatUtils.getRegion(country));
 
         if (ids == null) {
             return Collections.emptySet();

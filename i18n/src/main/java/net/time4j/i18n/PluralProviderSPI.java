@@ -25,6 +25,7 @@ import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralProvider;
 import net.time4j.format.PluralRules;
+import net.time4j.format.internal.FormatUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -150,12 +151,13 @@ public final class PluralProviderSPI
         }
 
         PluralRules rules = null;
+        String region = FormatUtils.getRegion(locale);
 
-        if (!locale.getCountry().equals("")) {
+        if (!region.isEmpty()) {
             StringBuilder kb = new StringBuilder();
             kb.append(locale.getLanguage());
             kb.append('_');
-            kb.append(locale.getCountry());
+            kb.append(region);
             rules = map.get(kb.toString());
         }
 

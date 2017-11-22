@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.engine.TimeSpan;
+import net.time4j.format.internal.FormatUtils;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -556,8 +557,9 @@ final class SPX
             out.writeObject(element.getCodeMap());
         } else {
             String lang = locale.getLanguage();
-            if (!locale.getCountry().isEmpty()) {
-                lang = lang + "-" + locale.getCountry();
+            String region = FormatUtils.getRegion(locale);
+            if (!region.isEmpty()) {
+                lang = lang + "-" + region;
             }
             out.writeUTF(lang);
             out.writeUTF(element.getCalendarType());

@@ -21,6 +21,7 @@
 
 package net.time4j.tz.spi;
 
+import net.time4j.format.internal.FormatUtils;
 import net.time4j.i18n.UTF8ResourceControl;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
@@ -164,7 +165,7 @@ public class ZoneNameProviderSPI
         boolean smart
     ) {
 
-        String country = locale.getCountry();
+        String country = FormatUtils.getRegion(locale);
 
         if (smart) {
             if (country.equals("US")) {
