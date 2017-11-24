@@ -33,6 +33,7 @@ import org.junit.runners.Suite.SuiteClasses;
         SerializationTest.class,
         StartOfDayTest.class,
         TransitionResolverTest.class,
+        ZoneConversionTest.class,
         ZoneNameParsingTest.class,
         ZoneNameResourceTest.class
     }

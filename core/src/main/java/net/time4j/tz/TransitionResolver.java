@@ -30,6 +30,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Calendar;
+import java.util.Date;
 import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.Map;
@@ -105,13 +106,12 @@ final class TransitionResolver
         if (
             (history == null)
             && (this.overlapResolver == OverlapResolver.LATER_OFFSET)
-            && (
-                (this.gapResolver == GapResolver.PUSH_FORWARD)
-                || (this.gapResolver == GapResolver.ABORT))
+            && ((this.gapResolver == GapResolver.PUSH_FORWARD) || (this.gapResolver == GapResolver.ABORT))
         ) {
             java.util.TimeZone javaTZ =
                 java.util.TimeZone.getTimeZone(tz.getID().canonical());
             GregorianCalendar cal = new GregorianCalendar(javaTZ);
+            cal.setGregorianChange(new Date(Long.MIN_VALUE)); // proleptic gregorian
             cal.set(Calendar.MILLISECOND, 0);
             cal.set(y, m - 1, d, h, min, s);
 
