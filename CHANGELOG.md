@@ -7,6 +7,7 @@
 - Add Odia (Oriya) language [#709]
 - More flexible numberings of enums in formatting [#706]
 - Update to CLDR v32 [#690]
+- Conversions to/from old java.util.Calendar + java.util.TimeZone [#705]
 
 ## [v3.36] published on 2017-10-20
 ### Added
