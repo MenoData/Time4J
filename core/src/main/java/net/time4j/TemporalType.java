@@ -41,6 +41,10 @@ import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalUnit;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.TimeZone;
 
 
 /**
@@ -72,7 +76,7 @@ public abstract class TemporalType<S, T>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int MIO = 1000_000;
+    private static final int MIO = 1_000_000;
 
     /**
      * <p>Bridge between a traditional Java timestamp of type
@@ -108,7 +112,7 @@ public abstract class TemporalType<S, T>
      *
      * @since   2.0
      */
-    public static final TemporalType<java.util.Date, Moment> JAVA_UTIL_DATE = new JavaUtilDateRule();
+    public static final TemporalType<Date, Moment> JAVA_UTIL_DATE = new JavaUtilDateRule();
 
     /**
      * <p>Bridge between a traditional Java timestamp as count of milliseconds
@@ -146,6 +150,46 @@ public abstract class TemporalType<S, T>
      * @since   2.0
      */
     public static final TemporalType<Long, Moment> MILLIS_SINCE_UNIX = new MillisSinceUnixRule();
+
+    /**
+     * <p>Bridge between a traditional Java calendar of type
+     * {@code java.util.Calendar} and the class {@code ZonalDateTime}.</p>
+     *
+     * <p>The conversion tries to keep the instant and zone data involved. A change
+     * of the local timestamp part of {@code Calendar} is possible, however. This
+     * concerns the conversion of any non-gregorian calendar. </p>
+     *
+     * @since   3.37/4.32
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einem traditionellen Java-Kalender des Typs
+     * {@code java.util.Calendar} und der Klasse {@code ZonalDateTime}. </p>
+     *
+     * <p>Die Konversion versucht, den Moment und die verwendeten Zeitzonendaten zu erhalten.
+     * Eine &Auml;nderung des lokalen Zeitstempels ist aber m&ouml;glich. Das betrifft die
+     * Umwandlung eines jeden nicht-gregorianischen Kalenders. </p>
+     *
+     * @since   3.37/4.32
+     */
+    public static final TemporalType<Calendar, ZonalDateTime> JAVA_UTIL_CALENDAR = new CalendarRule();
+
+    /**
+     * <p>Bridge between a traditional Java timezone of type
+     * {@code java.util.TimeZone} and the class {@code net.time4j.tz.Timezone}.</p>
+     *
+     * <p>The conversion tries to keep the data and rules of the zone to be converted. </p>
+     *
+     * @since   3.37/4.32
+     */
+    /*[deutsch]
+     * <p>Br&uuml;cke zwischen einer traditionellen Java-Zeitzone des Typs
+     * {@code java.util.TimeZone} und der Klasse {@code net.time4j.tz.Timezone}. </p>
+     *
+     * <p>Die Konversion versucht, die zugrundeliegenden Daten und Regeln des Ausgangsobjekts zu erhalten. </p>
+     *
+     * @since   3.37/4.32
+     */
+    public static final TemporalType<TimeZone, Timezone> JAVA_UTIL_TIMEZONE = new ZoneRule();
 
     /**
      * <p>Bridge between the JSR-310-class {@code java.time.LocalDate} and
@@ -406,6 +450,8 @@ public abstract class TemporalType<S, T>
      */
     public static final TemporalType<Clock, TimeSource<?>> CLOCK = new ClockRule();
 
+    private static final String JUT_PROVIDER = "java.util.TimeZone~";
+
     //~ Konstruktoren -----------------------------------------------------
 
     /**
@@ -471,12 +517,12 @@ public abstract class TemporalType<S, T>
     //~ Innere Klassen ----------------------------------------------------
 
     private static class JavaUtilDateRule
-        extends TemporalType<java.util.Date, Moment> {
+        extends TemporalType<Date, Moment> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public Moment translate(java.util.Date source) {
+        public Moment translate(Date source) {
 
             long millis = source.getTime();
             long seconds = MathUtils.floorDivide(millis, 1000);
@@ -486,7 +532,7 @@ public abstract class TemporalType<S, T>
         }
 
         @Override
-        public java.util.Date from(Moment target) {
+        public Date from(Moment target) {
 
             long posixTime = target.getPosixTime();
             int fraction = target.getNanosecond();
@@ -495,14 +541,14 @@ public abstract class TemporalType<S, T>
                 MathUtils.safeAdd(
                     MathUtils.safeMultiply(posixTime, 1000),
                     fraction / MIO);
-            return new java.util.Date(millis);
+            return new Date(millis);
 
         }
 
         @Override
-        public Class<java.util.Date> getSourceType() {
+        public Class<Date> getSourceType() {
 
-            return java.util.Date.class;
+            return Date.class;
 
         }
 
@@ -874,6 +920,84 @@ public abstract class TemporalType<S, T>
         public Class<Clock> getSourceType() {
 
             return Clock.class;
+
+        }
+
+    }
+
+    private static class CalendarRule
+        extends TemporalType<Calendar, ZonalDateTime> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public ZonalDateTime translate(Calendar source) {
+
+            Moment m = TemporalType.JAVA_UTIL_DATE.translate(source.getTime());
+            Timezone tz = TemporalType.JAVA_UTIL_TIMEZONE.translate(source.getTimeZone());
+            return ZonalDateTime.of(m, tz);
+
+        }
+
+        @Override
+        public Calendar from(ZonalDateTime time4j) {
+
+            Date jud = TemporalType.JAVA_UTIL_DATE.from(time4j.toMoment());
+            TimeZone tz = TemporalType.JAVA_UTIL_TIMEZONE.from(time4j.getTimezone0());
+            GregorianCalendar gcal = new GregorianCalendar();
+            gcal.setGregorianChange(new Date(Long.MIN_VALUE)); // proleptic gregorian
+            gcal.setFirstDayOfWeek(Calendar.MONDAY); // keeping ISO-8601-semantic
+            gcal.setMinimalDaysInFirstWeek(4); // keeping ISO-8601-semantic
+            gcal.setTimeZone(tz);
+            gcal.setTime(jud);
+            return gcal;
+
+        }
+
+        @Override
+        public Class<Calendar> getSourceType() {
+
+            return Calendar.class;
+
+        }
+
+    }
+
+    private static class ZoneRule
+        extends TemporalType<TimeZone, Timezone> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Timezone translate(TimeZone source) {
+
+            if (source instanceof OldApiTimezone) {
+                return ((OldApiTimezone) source).getDelegate();
+            } else {
+                return Timezone.of(JUT_PROVIDER + source.getID());
+            }
+
+        }
+
+        @Override
+        public TimeZone from(Timezone time4j) {
+
+            if (time4j.getHistory() == null) {
+                String id = time4j.getID().canonical();
+                if (id.startsWith(JUT_PROVIDER)) {
+                    id = id.substring(JUT_PROVIDER.length());
+                }
+                return TimeZone.getTimeZone(id);
+            } else {
+                return new OldApiTimezone(time4j);
+            }
+
+        }
+
+        @Override
+        public Class<TimeZone> getSourceType() {
+
+            return TimeZone.class;
 
         }
 

@@ -767,6 +767,13 @@ public final class ZonalDateTime
 
     }
 
+    // for conversion purposes
+    Timezone getTimezone0() {
+
+        return this.zone;
+
+    }
+
     private static Timezone toTimezone(
         TZID tzid,
         String text
