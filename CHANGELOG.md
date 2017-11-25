@@ -1,4 +1,6 @@
-## [v3.37] not yet released
+## [v3.38] not yet released
+
+## [v3.37] published on 2017-11-26
 ### Added
 - Hebrew calendar [#528]
 - Hebrew time [#708]
