@@ -1,5 +1,6 @@
 package net.time4j.tz.olson;
 
+import net.time4j.tz.spi.CountryToZonesTest;
 import net.time4j.tz.threeten.JdkZoneProviderTest;
 import net.time4j.tz.model.ArrayTransitionModelTest;
 import net.time4j.tz.model.CompositeTransitionModelTest;
@@ -23,6 +24,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         ArrayTransitionModelTest.class,
         CompositeTransitionModelTest.class,
+        CountryToZonesTest.class,
         CustomZoneTest.class,
         DaylightSavingRuleTest.class,
         JdkZoneProviderTest.class,

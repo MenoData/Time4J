@@ -3,17 +3,18 @@ package net.time4j.tz.olson;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -90,11 +91,16 @@ public class PredefinedIDTest {
     }
 
     @Test
-    public void getPreferredIDsOfBerlin() {
-        TZID tzid = EUROPE.BERLIN;
+    public void getPreferredIDsOfGermany() {
+        Set<TZID> expected = new HashSet<>();
+        expected.add(EUROPE.BERLIN); // Normalfall
+        expected.add(EUROPE.ZURICH); // Büsingen
         assertThat(
-            Timezone.getPreferredIDs(Locale.GERMANY, false, "DEFAULT"),
-            is(Collections.singleton(tzid)));
+            Timezone.getPreferredIDs(Locale.GERMANY, false, "DEFAULT"), // strict mode
+            is(expected));
+        assertThat(
+            Timezone.getPreferredIDs(Locale.GERMANY, true, "DEFAULT"), // smart mode
+            is(Collections.singleton(EUROPE.BERLIN)));
     }
 
     @Test
