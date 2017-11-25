@@ -9,6 +9,9 @@
 - Update to CLDR v32 [#690]
 - Conversions to/from old java.util.Calendar + java.util.TimeZone [#705]
 
+### Changed
+- Optimize ZoneNameProviderSPI [#713]
+
 ## [v3.36] published on 2017-10-20
 ### Added
 - Moon phases [#676]
