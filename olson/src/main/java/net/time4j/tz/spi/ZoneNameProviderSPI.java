@@ -21,20 +21,17 @@
 
 package net.time4j.tz.spi;
 
+import net.time4j.base.ResourceLoader;
 import net.time4j.i18n.UTF8ResourceControl;
 import net.time4j.tz.NameStyle;
-import net.time4j.tz.TZID;
 import net.time4j.tz.ZoneNameProvider;
-import net.time4j.tz.olson.AFRICA;
-import net.time4j.tz.olson.AMERICA;
-import net.time4j.tz.olson.ANTARCTICA;
-import net.time4j.tz.olson.ASIA;
-import net.time4j.tz.olson.ATLANTIC;
-import net.time4j.tz.olson.AUSTRALIA;
-import net.time4j.tz.olson.EUROPE;
-import net.time4j.tz.olson.INDIAN;
-import net.time4j.tz.olson.PACIFIC;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.io.UnsupportedEncodingException;
+import java.net.URI;
 import java.text.DateFormatSymbols;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -82,64 +79,24 @@ public class ZoneNameProviderSPI
         gmtZones.add("Zulu");
         GMT_ZONES = Collections.unmodifiableSet(gmtZones);
 
+        String name = "data/zone1970.tab";
         Map<String, Set<String>> temp = new HashMap<String, Set<String>>();
-
-        for (AFRICA tzid : AFRICA.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (AMERICA tzid : AMERICA.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (TZID tzid : AMERICA.ARGENTINA.values()) {
-            addTerritory(temp, "AR", tzid);
-        }
-        for (TZID tzid : AMERICA.INDIANA.values()) {
-            addTerritory(temp, "US", tzid);
-        }
-        for (TZID tzid : AMERICA.KENTUCKY.values()) {
-            addTerritory(temp, "US", tzid);
-        }
-        for (TZID tzid : AMERICA.NORTH_DAKOTA.values()) {
-            addTerritory(temp, "US", tzid);
-        }
-        for (ANTARCTICA tzid : ANTARCTICA.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (ASIA tzid : ASIA.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (ATLANTIC tzid : ATLANTIC.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (AUSTRALIA tzid : AUSTRALIA.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (EUROPE tzid : EUROPE.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (INDIAN tzid : INDIAN.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-        for (PACIFIC tzid : PACIFIC.values()) {
-            addTerritory(temp, tzid.getCountry(), tzid);
-        }
-
-        temp.put("SJ", Collections.singleton("Arctic/Longyearbyen"));
+        loadTerritories(temp, name);
         TERRITORIES = Collections.unmodifiableMap(temp);
 
-        // CLDR29 - supplemental\metaZones.xml - primaryZones
+        // CLDR32 - supplemental\metaZones.xml - primaryZones
         Map<String, String> primaries = new HashMap<String, String>();
-        addPrimary(primaries, "CL", AMERICA.SANTIAGO);
-        addPrimary(primaries, "CN", ASIA.SHANGHAI);
-        addPrimary(primaries, "DE", EUROPE.BERLIN);
-        addPrimary(primaries, "EC", AMERICA.GUAYAQUIL);
-        addPrimary(primaries, "ES", EUROPE.MADRID);
-        addPrimary(primaries, "MH", PACIFIC.MAJURO);
-        addPrimary(primaries, "MY", ASIA.KUALA_LUMPUR);
-        addPrimary(primaries, "NZ", PACIFIC.AUCKLAND);
-        addPrimary(primaries, "PT", EUROPE.LISBON);
-        addPrimary(primaries, "UA", EUROPE.KIEV);
-        addPrimary(primaries, "UZ", ASIA.TASHKENT);
+        addPrimary(primaries, "CL", "America/Santiago");
+        addPrimary(primaries, "CN", "Asia/Shanghai");
+        addPrimary(primaries, "DE", "Europe/Berlin");
+        addPrimary(primaries, "EC", "America/Guayaquil");
+        addPrimary(primaries, "ES", "Europe/Madrid");
+        addPrimary(primaries, "MH", "Pacific/Majuro");
+        addPrimary(primaries, "MY", "Asia/Kuala_Lumpur");
+        addPrimary(primaries, "NZ", "Pacific/Auckland");
+        addPrimary(primaries, "PT", "Europe/Lisbon");
+        addPrimary(primaries, "UA", "Europe/Kiev");
+        addPrimary(primaries, "UZ", "Asia/Tashkent");
         PRIMARIES = Collections.unmodifiableMap(primaries);
 
         CONTROL =
@@ -260,10 +217,54 @@ public class ZoneNameProviderSPI
 
     }
 
+    static void loadTerritories(
+        Map<String, Set<String>> map,
+        String name
+    ) {
+
+        URI uri = ResourceLoader.getInstance().locate("olson", ZoneNameProviderSPI.class, name);
+        InputStream is = ResourceLoader.getInstance().load(uri, true);
+
+        if (is == null) {
+            is = ZoneNameProviderSPI.class.getClassLoader().getResourceAsStream(name);
+        }
+
+        if (is != null) {
+            try {
+                BufferedReader br = new BufferedReader(new InputStreamReader(is, "UTF-8"));
+                String line;
+                while ((line = br.readLine()) != null) {
+                    if (line.startsWith("#") || line.isEmpty()) {
+                        continue; // Kommentarzeile überspringen
+                    }
+                    String[] columns = line.split("\t");
+                    if (columns.length >= 3) {
+                        for (String country : columns[0].split(",")) {
+                            addTerritory(map, country, columns[2]);
+                        }
+                    }
+                }
+            } catch (UnsupportedEncodingException uee) {
+                throw new AssertionError(uee);
+            } catch (IOException ex) {
+                throw new IllegalStateException(ex);
+            } finally {
+                try {
+                    is.close();
+                } catch (IOException ioe) {
+                    ioe.printStackTrace(System.err);
+                }
+            }
+        } else {
+            System.err.println("Warning: File \"" + name + "\" not found.");
+        }
+
+    }
+
     private static void addTerritory(
         Map<String, Set<String>> map,
         String country,
-        TZID tz
+        String tzid
     ) {
 
         Set<String> preferred = map.get(country);
@@ -273,17 +274,17 @@ public class ZoneNameProviderSPI
             map.put(country, preferred);
         }
 
-        preferred.add(tz.canonical());
+        preferred.add(tzid);
 
     }
 
     private static void addPrimary(
         Map<String, String> map,
         String country,
-        TZID tz
+        String tzid
     ) {
 
-        map.put(country, tz.canonical());
+        map.put(country, tzid);
 
     }
 

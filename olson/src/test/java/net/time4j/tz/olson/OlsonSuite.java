@@ -12,6 +12,7 @@ import net.time4j.tz.model.SerializationTest;
 import net.time4j.tz.model.StartOfDayTest;
 import net.time4j.tz.model.TransitionResolverTest;
 
+import net.time4j.tz.spi.CountryToZonesTest;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -22,6 +23,7 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         ArrayTransitionModelTest.class,
         CompositeTransitionModelTest.class,
+        CountryToZonesTest.class,
         CustomZoneTest.class,
         DaylightSavingRuleTest.class,
         JavaziTest.class,
