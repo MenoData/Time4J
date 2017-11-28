@@ -204,7 +204,7 @@ public class HebrewMiscellaneousTest {
         ChronoFormatter<HebrewCalendar> f =
             ChronoFormatter
                 .ofPattern("yyyy-MM-dd", PatternType.CLDR_DATE, Locale.UK, HebrewCalendar.axis())
-                .with(HebrewMonth.order(), HebrewMonth.Order.BIBILICAL);
+                .with(HebrewMonth.order(), HebrewMonth.Order.BIBLICAL);
         HebrewCalendar date = HebrewCalendar.ofBiblical(5778, 6, 11);
         assertThat(date.getMonth(), is(HebrewMonth.ELUL));
         assertThat(f.format(date), is("5778-06-11"));

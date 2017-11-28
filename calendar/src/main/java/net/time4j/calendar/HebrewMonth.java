@@ -209,7 +209,7 @@ public enum HebrewMonth
      * @param   leapYear    called in a leap year context?
      * @return  hebrew month of year as enum
      * @throws  IllegalArgumentException if given argument is out of range
-     * @see     net.time4j.calendar.HebrewMonth.Order#BIBILICAL
+     * @see     net.time4j.calendar.HebrewMonth.Order#BIBLICAL
      */
     /*[deutsch]
      * <p>Liefert die zum kalendarischen Integer-Wert passende Enum-Konstante in der biblischen Ordnung. </p>
@@ -218,7 +218,7 @@ public enum HebrewMonth
      * @param   leapYear    called in a leap year context?
      * @return  hebrew month of year as enum
      * @throws  IllegalArgumentException if given argument is out of range
-     * @see     net.time4j.calendar.HebrewMonth.Order#BIBILICAL
+     * @see     net.time4j.calendar.HebrewMonth.Order#BIBLICAL
      */
     public static HebrewMonth valueOfBiblical(
         int month,
@@ -284,7 +284,7 @@ public enum HebrewMonth
      *
      * @param   leapYear    called in a leap year context?
      * @return  biblical number of month in the range [1-13]
-     * @see     net.time4j.calendar.HebrewMonth.Order#BIBILICAL
+     * @see     net.time4j.calendar.HebrewMonth.Order#BIBLICAL
      */
     /*[deutsch]
      * <p>Liefert den korrespondierenden kalendarischen Integer-Wert entsprechend
@@ -295,7 +295,7 @@ public enum HebrewMonth
      *
      * @param   leapYear    called in a leap year context?
      * @return  biblical number of month in the range [1-13]
-     * @see     net.time4j.calendar.HebrewMonth.Order#BIBILICAL
+     * @see     net.time4j.calendar.HebrewMonth.Order#BIBLICAL
      */
     public int getBiblicalValue(boolean leapYear) {
 
@@ -492,13 +492,17 @@ public enum HebrewMonth
          * <p>The first month of the biblical numbering is NISAN. </p>
          *
          * <p>If no leap month exists then the numbers of following months will be reduced by one. </p>
+         *
+         * @since   3.38/4.33
          */
         /*[deutsch]
          * <p>Der erste Monat in der Bibelz&auml;hlweise ist NISAN. </p>
          *
          * <p>Falls kein Schaltmonat existiert, werden die Nummern der Folgemonate um 1 reduziert. </p>
+         *
+         * @since   3.38/4.33
          */
-        BIBILICAL,
+        BIBLICAL,
 
         /**
          * <p>This technical numbering is based on the ordinal number of enum, incremented by one. </p>
@@ -506,7 +510,24 @@ public enum HebrewMonth
         /*[deutsch]
          * <p>Diese technische Z&auml;hlweise beruht auf der um 1 erh&ouml;hten Ordinalnummer des Enums. </p>
          */
-        ENUM
+        ENUM,
+
+        /**
+         * <p>The first month of the biblical numbering is NISAN. </p>
+         *
+         * <p>If no leap month exists then the numbers of following months will be reduced by one. </p>
+         *
+         * @deprecated  Use {@link #BIBLICAL}
+         */
+        /*[deutsch]
+         * <p>Der erste Monat in der Bibelz&auml;hlweise ist NISAN. </p>
+         *
+         * <p>Falls kein Schaltmonat existiert, werden die Nummern der Folgemonate um 1 reduziert. </p>
+         *
+         * @deprecated  Use {@link #BIBLICAL}
+         */
+        @Deprecated
+        BIBILICAL
 
     }
 
