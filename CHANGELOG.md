@@ -1,4 +1,6 @@
 ## [v3.38] not yet released
+### Changed
+- HebrewMonth.Order.BIBILICAL contains a typo [#714]
 
 ## [v3.37] published on 2017-11-26
 ### Added
