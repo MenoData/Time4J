@@ -652,9 +652,8 @@ public enum StdSolarCalculator
      *
      * <p><strong>Introduction</strong></p>
      *
-     * <p>This calculation is the <strong>default</strong> method because it offers high precision
-     * with the general limitation that the local topology or special weather conditions cannot be
-     * calculated. </p>
+     * <p>This calculation offers high precision with the general limitation
+     * that the local topology or special weather conditions cannot be calculated. </p>
      *
      * <p>The altitude of the observer is taken into account using a spheroid (WGS84)
      * and the assumption of a standard atmosphere (for the refraction). </p>
@@ -676,9 +675,8 @@ public enum StdSolarCalculator
      *
      * <p><strong>Einleitung</strong></p>
      *
-     * <p>Dieses Verfahren ist der <strong>Standard</strong>, weil es hohe Genauigkeit bietet, aber mit der
-     * allgemeinen Einschr&auml;nkung, da&szlig; die lokale Topologie oder besondere Wetterbedingungen
-     * nicht berechnet werden k&ouml;nnen. </p>
+     * <p>Dieses Verfahren bietet hohe Genauigkeit, aber mit der allgemeinen Einschr&auml;nkung,
+     * da&szlig; die lokale Topologie oder besondere Wetterbedingungen nicht berechnet werden k&ouml;nnen. </p>
      *
      * <p>Die H&ouml;he des Beobachters wird mit Hilfe eines Rotationsellipsoids (WGS84)
      * als geod&auml;tischen Modell und der Annahme einer Standardatmosph&auml;re (f&uuml;r

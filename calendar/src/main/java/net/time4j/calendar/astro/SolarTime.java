@@ -127,6 +127,7 @@ public final class SolarTime
     static final double STD_REFRACTION = 34.0;
     static final double STD_ZENITH = 90.0 + (SUN_RADIUS + STD_REFRACTION) / 60.0;
     static final String DECLINATION = "declination";
+    static final String RIGHT_ASCENSION = "right-ascension";
 
     private static final Calculator DEFAULT_CALCULATOR;
     private static final ConcurrentMap<String, Calculator> CALCULATORS;
@@ -142,7 +143,7 @@ public final class SolarTime
             calculators.put(calculator.name(), calculator);
         }
         CALCULATORS = calculators;
-        DEFAULT_CALCULATOR = ((loaded == null) ? StdSolarCalculator.TIME4J : loaded);
+        DEFAULT_CALCULATOR = ((loaded == null) ? StdSolarCalculator.NOAA : loaded);
     }
 
     private static final SolarTime JERUSALEM = // temple area
@@ -226,7 +227,7 @@ public final class SolarTime
     /**
      * <p>Obtains the solar time for given geographical location at sea level. </p>
      *
-     * <p>The default calculator is usually {@link Calculator#NOAA} unless another calculator was
+     * <p>The default calculator is usually {@link StdSolarCalculator#NOAA} unless another calculator was
      * set up via the service loader mechnism. </p>
      *
      * <p>This method handles the geographical location in decimal degrees only. If these data are given
@@ -242,7 +243,7 @@ public final class SolarTime
     /*[deutsch]
      * <p>Liefert die Sonnenzeit zur angegebenen geographischen Position auf Meeresh&ouml;he. </p>
      *
-     * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn,
+     * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link StdSolarCalculator#NOAA}, es sei denn,
      * eine andere Methode wurde &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
      * <p>Diese Methode nimmt geographische Angaben nur in Dezimalgrad entgegen. Wenn diese Daten aber
@@ -927,7 +928,7 @@ public final class SolarTime
      * <p>Determines the apparent solar time of any moment at given local time zone offset. </p>
      *
      * <p>Based on the astronomical equation of time. The default calculator is usually
-     * {@link Calculator#NOAA} unless another calculator was set up via the service loader mechnism. </p>
+     * {@link StdSolarCalculator#NOAA} unless another calculator was set up via the service loader mechnism. </p>
      *
      * @param   offset      the time zone offset which might depend on the geographical longitude
      * @return  function for getting the apparent solar time
@@ -938,7 +939,7 @@ public final class SolarTime
      * <p>Ermittelt die wahre Ortszeit zur angegebenen lokalen Zeitzonendifferenz. </p>
      *
      * <p>Basiert auf der astronomischen Zeitgleichung. Die Standardberechnungsmethode ist
-     * gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn, eine andere Methode wurde
+     * gew&ouml;hnlich {@link StdSolarCalculator#NOAA}, es sei denn, eine andere Methode wurde
      * &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
      * @param   offset      the time zone offset which might depend on the geographical longitude
@@ -968,8 +969,6 @@ public final class SolarTime
      * @return  function for getting the apparent solar time
      * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
      * @see     #equationOfTime(Moment, String)
-     * @see     Calculator#NOAA
-     * @see     Calculator#SIMPLE
      * @since   3.34/4.29
      */
     /*[deutsch]
@@ -982,8 +981,6 @@ public final class SolarTime
      * @return  function for getting the apparent solar time
      * @see     ZonalOffset#atLongitude(OffsetSign, int, int, double)
      * @see     #equationOfTime(Moment, String)
-     * @see     Calculator#NOAA
-     * @see     Calculator#SIMPLE
      * @since   3.34/4.29
      */
     public static ChronoFunction<Moment, PlainTimestamp> apparentAt(
@@ -1027,7 +1024,7 @@ public final class SolarTime
      * <p>See also <a href="https://en.wikipedia.org/wiki/Equation_of_time">Wikipedia</a>.
      * Relation: mean-solar-time + equation-of-time = apparent-solar-time</p>
      *
-     * <p>The default calculator is usually {@link Calculator#NOAA} unless another calculator was
+     * <p>The default calculator is usually {@link StdSolarCalculator#NOAA} unless another calculator was
      * set up via the service loader mechnism. </p>
      *
      * @param   moment  the moment when to determine the equation of time
@@ -1040,7 +1037,7 @@ public final class SolarTime
      * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Zeitgleichung">Wikipedia</a>.
      * Relation: mittlere Sonnenzeit + Zeitgleichung = wahre Sonnenzeit</p>
      *
-     * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link Calculator#NOAA}, es sei denn,
+     * <p>Die Standardberechnungsmethode ist gew&ouml;hnlich {@link StdSolarCalculator#NOAA}, es sei denn,
      * eine andere Methode wurde &uuml;ber den {@code ServiceLoader}-Mechanismus geladen. </p>
      *
      * @param   moment  the moment when to determine the equation of time
@@ -1065,8 +1062,6 @@ public final class SolarTime
      * @param   calculator  name of solar time calculator
      * @return  difference between apparent solar time and mean solar time in seconds
      * @throws  IllegalArgumentException if the moment is out of year range -2000/+3000 or if the calculator is unknown
-     * @see     Calculator#NOAA
-     * @see     Calculator#SIMPLE
      * @since   3.34/4.29
      */
     /*[deutsch]
@@ -1080,8 +1075,6 @@ public final class SolarTime
      * @param   calculator  name of solar time calculator
      * @return  difference between apparent solar time and mean solar time in seconds
      * @throws  IllegalArgumentException if the moment is out of year range -2000/+3000 or if the calculator is unknown
-     * @see     Calculator#NOAA
-     * @see     Calculator#SIMPLE
      * @since   3.34/4.29
      */
     public static double equationOfTime(
