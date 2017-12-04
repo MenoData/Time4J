@@ -215,6 +215,17 @@ public enum StdSolarCalculator
             return Math.toDegrees(Math.asin(sinDec));
         }
         @Override
+        public double rightAscension(double jde) {
+            double t0 = time0(jde);
+            double L = trueLongitudeOfSunInDegrees(t0);
+            double RA = // right ascension of sun in degrees
+                Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
+            RA = adjustRange(RA);
+            double Lquadrant  = Math.floor(L / 90) * 90;
+            double RAquadrant = Math.floor(RA / 90) * 90;
+            return RA + Lquadrant - RAquadrant; // RA in same quadrant as L
+        }
+        @Override
         public double getFeature(
             double jde,
             String nameOfFeature
@@ -398,6 +409,17 @@ public enum StdSolarCalculator
             return Math.toDegrees(declinationRad(jct));
         }
         @Override
+        public double rightAscension(double jde) {
+            double jct = toJulianCenturies(jde);
+            double lRad = Math.toRadians(solarLongitude(jct));
+            double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
+            double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
+            if (ra < 0) {
+                ra += 360;
+            }
+            return ra;
+        }
+        @Override
         public double getFeature(
             double jde,
             String nameOfFeature
@@ -538,16 +560,6 @@ public enum StdSolarCalculator
         public Moment sunset(CalendarDate date, double latitude, double longitude, double zenith) {
             return this.event(false, date, latitude, longitude, zenith);
         }
-        @Override
-        public double getFeature(
-            double jde,
-            String nameOfFeature
-        ) {
-            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
-                return this.declination(jde);
-            }
-            return Double.NaN;
-        }
         private Moment event(
             boolean rise,
             CalendarDate date,
@@ -593,6 +605,27 @@ public enum StdSolarCalculator
         public double declination(double jde) {
             double jct = toJulianCenturies(jde);
             return Math.toDegrees(declinationRad(jct));
+        }
+        @Override
+        public double rightAscension(double jde) {
+            double jct = toJulianCenturies(jde);
+            double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
+            double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
+            double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
+            if (ra < 0) {
+                ra += 360;
+            }
+            return ra;
+        }
+        @Override
+        public double getFeature(
+            double jde,
+            String nameOfFeature
+        ) {
+            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
+                return this.declination(jde);
+            }
+            return Double.NaN;
         }
         @Override
         public double getGeodeticAngle(double latitude, int altitude) {
@@ -655,7 +688,13 @@ public enum StdSolarCalculator
         }
         private double declinationRad(double jct) {
             return Math.asin(
-                Math.sin(Math.toRadians(obliquity(jct))) * Math.sin(Math.toRadians(solarLongitude(jct))));
+                Math.sin(Math.toRadians(obliquity(jct)))
+                    * Math.sin(Math.toRadians(apparentSolarLongitude(jct, nutation(jct)))));
+        }
+        private double nutation(double jct) { // nutation in longitude (in degrees)
+            double a = Math.toRadians(124.9 + (-1934.134 + 0.002063 * jct) * jct);
+            double b = Math.toRadians(201.11 + (72001.5377 + 0.00057 * jct) * jct);
+            return -0.004778 * Math.sin(a) - 0.0003667 * Math.sin(b);
         }
         private double obliquity(double jct) {
             return 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
@@ -669,9 +708,6 @@ public enum StdSolarCalculator
         private double excentricity(double jct) {
             return 0.016708617 - (0.000042037 + 0.0000001236 * jct) * jct;
         }
-        private double solarLongitude(double jct) {
-            return apparentSolarLongitude(jct);
-        }
     },
 
     /**
@@ -680,17 +716,20 @@ public enum StdSolarCalculator
      *
      * <p><strong>Introduction</strong></p>
      *
-     * <p>This calculation is the <strong>default</strong> method because it offers high precision
-     * with the general limitation that the local topology or special weather conditions cannot be
-     * calculated. </p>
+     * <p>This calculation offers high precision with the general limitation
+     * that the local topology or special weather conditions cannot be calculated. </p>
      *
      * <p>The altitude of the observer is taken into account using a spheroid (WGS84)
      * and the assumption of a standard atmosphere (for the refraction). </p>
      *
-     * <p><strong>Supported features</strong></p>
+     * <p><strong>{@link #getFeature(double, String) Supported features}</strong> (in degrees)</p>
      *
      * <ul>
+     *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>nutation</li>
+     *     <li>obliquity</li>
+     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
      * </ul>
      */
@@ -700,18 +739,21 @@ public enum StdSolarCalculator
      *
      * <p><strong>Einleitung</strong></p>
      *
-     * <p>Dieses Verfahren ist der <strong>Standard</strong>, weil es hohe Genauigkeit bietet, aber mit der
-     * allgemeinen Einschr&auml;nkung, da&szlig; die lokale Topologie oder besondere Wetterbedingungen
-     * nicht berechnet werden k&ouml;nnen. </p>
+     * <p>Dieses Verfahren bietet hohe Genauigkeit, aber mit der allgemeinen Einschr&auml;nkung,
+     * da&szlig; die lokale Topologie oder besondere Wetterbedingungen nicht berechnet werden k&ouml;nnen. </p>
      *
      * <p>Die H&ouml;he des Beobachters wird mit Hilfe eines Rotationsellipsoids (WGS84)
      * als geod&auml;tischen Modell und der Annahme einer Standardatmosph&auml;re (f&uuml;r
      * die Refraktion) ber&uuml;cksichtigt. </p>
      *
-     * <p><strong>Unterst&uuml;tzte Merkmale</strong></p>
+     * <p><strong>{@link #getFeature(double, String) Unterst&uuml;tzte Merkmale}</strong> (in Grad)</p>
      *
      * <ul>
+     *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>nutation</li>
+     *     <li>obliquity</li>
+     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
      * </ul>
      */
@@ -728,7 +770,7 @@ public enum StdSolarCalculator
         @Override
         public double equationOfTime(double jde) {
             double jct = toJulianCenturies(jde);
-            double tanEpsilonHalf = Math.tan(Math.toRadians(obliquity(jct) / 2));
+            double tanEpsilonHalf = Math.tan(Math.toRadians(trueObliquity(jct) / 2));
             double y = tanEpsilonHalf * tanEpsilonHalf;
             double l2Rad = Math.toRadians(2 * meanLongitude(jct));
             double e = excentricity(jct);
@@ -748,23 +790,47 @@ public enum StdSolarCalculator
             return Math.toDegrees(declinationRad(jct));
         }
         @Override
+        public double rightAscension(double jde) {
+            return this.getFeature(jde, SolarTime.RIGHT_ASCENSION);
+        }
+        @Override
         public double getFeature(
             double jde,
             String nameOfFeature
         ) {
-
-            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
-                return this.declination(jde);
-            }
-
             double jct = toJulianCenturies(jde);
 
-            if (nameOfFeature.equals("solar-longitude")) {
-                return this.solarLongitude(jct);
+            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
+                return Math.toDegrees(declinationRad(jct));
+            } else if (nameOfFeature.equals(SolarTime.RIGHT_ASCENSION)) {
+                double[] result = new double[2];
+                nutations(jct, result);
+                double lRad = Math.toRadians(apparentSolarLongitude(jct, result[0]));
+                double y = Math.cos(Math.toRadians(meanObliquity(jct) + result[1])) * Math.sin(lRad);
+                double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
+                if (ra < 0) {
+                    ra += 360;
+                }
+                return ra;
+            } else if (nameOfFeature.equals("nutation")) {
+                double[] result = new double[2];
+                nutations(jct, result);
+                return result[0];
+            } else if (nameOfFeature.equals("obliquity")) {
+                double[] result = new double[2];
+                nutations(jct, result);
+                return meanObliquity(jct) + result[1];
+            } else if (nameOfFeature.equals("mean-anomaly")) {
+                return meanAnomaly(jct);
+            } else if (nameOfFeature.equals("solar-longitude")) {
+                double[] result = new double[2];
+                nutations(jct, result);
+                return apparentSolarLongitude(jct, result[0]);
+            } else if (nameOfFeature.equals("solar-latitude")) {
+                return 0.0; // approximation used in this algorithm
+            } else {
+                return Double.NaN;
             }
-
-            return Double.NaN;
-
         }
         @Override
         public double getGeodeticAngle(double latitude, int altitude) {
@@ -834,15 +900,15 @@ public enum StdSolarCalculator
             return hourAngle;
         }
         private double declinationRad(double jct) {
+            double[] no = new double[2];
+            nutations(jct, no);
             return Math.asin(
-                Math.sin(Math.toRadians(obliquity(jct))) * Math.sin(Math.toRadians(solarLongitude(jct))));
+                Math.sin(Math.toRadians(meanObliquity(jct) + no[1]))
+                    * Math.sin(Math.toRadians(apparentSolarLongitude(jct, no[0]))));
         }
-        // Meeus (22.2), in degrees
-        private double obliquity(double jct) {
-            double meanObliquity =
-                23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
-            double corr = 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct)); // Meeus (25.8)
-            return meanObliquity + corr;
+        // Meeus (25.8) - low accuracy model, used only for equation-of-time
+        private double trueObliquity(double jct) {
+            return meanObliquity(jct) + 0.00256 * Math.cos(Math.toRadians(125.04 - 1934.136 * jct));
         }
         // Meeus (25.2), in degrees
         private double meanLongitude(double jct) {
@@ -855,9 +921,6 @@ public enum StdSolarCalculator
         // Meeus (25.4), unit-less
         private double excentricity(double jct) {
             return 0.016708634 - (0.000042037 + 0.0000001267 * jct) * jct;
-        }
-        private double solarLongitude(double jct) {
-            return apparentSolarLongitude(jct);
         }
     };
 
@@ -890,28 +953,108 @@ public enum StdSolarCalculator
 
     //~ Methoden ----------------------------------------------------------
 
+    /**
+     * <p>Determines the declination of sun. </p>
+     *
+     * @param   jde     julian day in ephemeris time
+     * @return  declination of sun in degrees
+     * @see     #rightAscension(double)
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Deklination der Sonne. </p>
+     *
+     * @param   jde     julian day in ephemeris time
+     * @return  declination of sun in degrees
+     * @see     #rightAscension(double)
+     */
+    @Override
+    public double declination(double jde) {
+        throw new AbstractMethodError(); // implemented in subclass
+    }
+
+    /**
+     * <p>Determines the right ascension of sun. </p>
+     *
+     * @param   jde     julian day in ephemeris time
+     * @return  right ascension of sun in degrees
+     * @see     #declination(double)
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Rektaszension der Sonne. </p>
+     *
+     * @param   jde     julian day in ephemeris time
+     * @return  right ascension of sun in degrees
+     * @see     #declination(double)
+     */
+    public double rightAscension(double jde) {
+        throw new AbstractMethodError(); // implemented in subclass
+    }
+
+    // Meeus (22.2), in degrees
+    static double meanObliquity(double jct) {
+        return 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;
+    }
+
+    // Meeus (chapter 22)
+    static void nutations(
+        double jct,
+        double[] result
+    ) {
+
+        double D = Math.toRadians(
+            297.85036 + (445267.11148 + (-0.0019142 + (1.0 / 189474) * jct) * jct) * jct);
+        double M = Math.toRadians(
+            357.52772 + (35999.050340 + (-0.0001603 + (-1.0 / 300000) * jct) * jct) * jct);
+        double M2 = Math.toRadians(
+            134.96298 + (477198.867398 + (0.0086972 + (1.0 / 5625) * jct) * jct) * jct);
+        double F = Math.toRadians(
+            93.27191 + (483202.017538 + (-0.0036825 + (1.0 / 327270) * jct) * jct) * jct);
+        double O = Math.toRadians(
+            125.04452 + (-1934.136261 + (0.0020708 + (1.0 / 450000) * jct) * jct) * jct);
+
+        double resultL = 0.0; // nutation in longitude
+        double resultO = 0.0; // nutation in obliquity
+
+        for (int i = TABLE_22A.length - 1; i >= 0; i--) {
+            double[] row = TABLE_22A[i];
+            double arg = row[0] * D + row[1] * M + row[2] * M2 + row[3] * F + row[4] * O;
+            resultL += Math.sin(arg) * (row[5] + row[6] * jct);
+            resultO += Math.cos(arg) * (row[7] + row[8] * jct);
+        }
+
+        // results in degrees
+        result[0] = resultL * 0.0001 / 3600;
+        result[1] = resultO * 0.0001 / 3600;
+
+    }
+
     private static double toJulianCenturies(double jde) {
 
         return (jde - 2451545.0) / 36525; // julian centuries (J2000)
 
     }
 
-    private static double apparentSolarLongitude(double jct) {
+    private static double apparentSolarLongitude(
+        double jct,
+        double nutation
+    ) {
 
         // taken from "Planetary Programs and Tables from -4000 to +2800" (Bretagnon & Simon, 1986)
         // => described by Jean Meeus as being of higher accuracy
         double p49 = 0.0;
 
-        for (int i = 0; i < DG_X.length; i++) {
+        for (int i = DG_X.length - 1; i >= 0; i--) {
             p49 += (DG_X[i] * Math.sin(Math.toRadians(DG_Y[i] + DG_Z[i] * jct)));
         }
 
-        return (
+        double angle = (
             282.7771834 + 36000.76953744 * jct
                 + (5.729577951308232 * p49 / 1000000)
                 + aberration(jct)
-                + nutation(jct)
-        ) % 360;
+                + nutation
+        ) / 360;
+
+        return (angle - Math.floor(angle)) * 360;
 
     }
 
@@ -921,12 +1064,70 @@ public enum StdSolarCalculator
 
     }
 
-    private static double nutation(double jct) {
-
-        double a = Math.toRadians(124.9 + (-1934.134 + 0.002063 * jct) * jct);
-        double b = Math.toRadians(201.11 + (72001.5377 + 0.00057 * jct) * jct);
-        return -0.004778 * Math.sin(a) - 0.0003667 * Math.sin(b);
-
-    }
+    private static final double[][] TABLE_22A = {
+        {0, 0, 0, 0, 1, -171996, -174.2, 92025, 8.9},
+        {-2, 0, 0, 2, 2, -13187, -1.6, 5736, -3.1},
+        {0, 0, 0, 2, 2, -2274, -0.2, 977, -0.5},
+        {0, 0, 0, 0, 2, 2062, 0.2, -895, 0.5},
+        {0, 1, 0, 0, 0, 1426, -3.4, 54, -0.1},
+        {0, 0, 1, 0, 0, 712, 0.1, -7, 0},
+        {-2, 1, 0, 2, 2, -517, 1.2, 224, -0.6},
+        {0, 0, 0, 2, 1, -386, -0.4, 200, 0},
+        {0, 0, 1, 2, 2, -301, 0, 129, -0.1},
+        {-2, -1, 0, 2, 2, 217, -0.5, -95, 0.3},
+        {-2, 0, 1, 0, 0, -158, 0, 0, 0},
+        {-2, 0, 0, 2, 1, 129, 0.1, -70, 0},
+        {0, 0, -1, 2, 2, 123, 0, -53, 0},
+        {2, 0, 0, 0, 0, 63, 0, 0, 0},
+        {0, 0, 1, 0, 1, 63, 0.1, -33, 0},
+        {2, 0, -1, 2, 2, -59, 0, 26, 0},
+        {0, 0, -1, 0, 1, -58, -0.1, 32, 0},
+        {0, 0, 1, 2, 1, -51, 0, 27, 0},
+        {-2, 0, 2, 0, 0, 48, 0, 0, 0},
+        {0, 0, -2, 2, 1, 46, 0, -24, 0},
+        {2, 0, 0, 2, 2, -38, 0, 16, 0},
+        {0, 0, 2, 2, 2, -31, 0, 13, 0},
+        {0, 0, 2, 0, 0, 29, 0, 0, 0},
+        {-2, 0, 1, 2, 2, 29, 0, -12, 0},
+        {0, 0, 0, 2, 0, 26, 0, 0, 0},
+        {-2, 0, 0, 2, 0, -22, 0, 0, 0},
+        {0, 0, -1, 2, 1, 21, 0, -10, 0},
+        {0, 2, 0, 0, 0, 17, -0.1, 0, 0},
+        {2, 0, -1, 0, 1, 16, 0, -8, 0},
+        {-2, 2, 0, 2, 2, -16, 0.1, 7, 0},
+        {0, 1, 0, 0, 1, -15, 0, 9, 0},
+        {-2, 0, 1, 0, 1, -13, 0, 7, 0},
+        {0, -1, 0, 0, 1, -12, 0, 6, 0},
+        {0, 0, 2, -2, 0, 11, 0, 0, 0},
+        {2, 0, -1, 2, 1, -10, 0, 5, 0},
+        {2, 0, 1, 2, 2, -8, 0, 3, 0},
+        {0, 1, 0, 2, 2, 7, 0, -3, 0},
+        {-2, 1, 1, 0, 0, -7, 0, 0, 0},
+        {0, -1, 0, 2, 2, -7, 0, 3, 0},
+        {2, 0, 0, 2, 1, -7, 0, 3, 0},
+        {2, 0, 1, 0, 0, 6, 0, 0, 0},
+        {-2, 0, 2, 2, 2, 6, 0, -3, 0},
+        {-2, 0, 1, 2, 1, 6, 0, -3, 0},
+        {2, 0, -2, 0, 1, -6, 0, 3, 0},
+        {2, 0, 0, 0, 1, -6, 0, 3, 0},
+        {0, -1, 1, 0, 0, 5, 0, 0, 0},
+        {-2, -1, 0, 2, 1, -5, 0, 3, 0},
+        {-2, 0, 0, 0, 1, -5, 0, 3, 0},
+        {0, 0, 2, 2, 1, -5, 0, 3, 0},
+        {-2, 0, 2, 0, 1, 4, 0, 0, 0},
+        {-2, 1, 0, 2, 1, 4, 0, 0, 0},
+        {0, 0, 1, -2, 0, 4, 0, 0, 0},
+        {-1, 0, 1, 0, 0, -4, 0, 0, 0},
+        {-2, 1, 0, 0, 0, -4, 0, 0, 0},
+        {1, 0, 0, 0, 0, -4, 0, 0, 0},
+        {0, 0, 1, 2, 0, 3, 0, 0, 0},
+        {0, 0, -2, 2, 2, -3, 0, 0, 0},
+        {-1, -1, 1, 0, 0, -3, 0, 0, 0},
+        {0, 1, 1, 0, 0, -3, 0, 0, 0},
+        {0, -1, 1, 2, 2, -3, 0, 0, 0},
+        {2, -1, -1, 2, 2, -3, 0, 0, 0},
+        {0, 0, 3, 2, 2, -3, 0, 0, 0},
+        {2, -1, 0, 2, 2, -3, 0, 0, 0}
+    };
 
 }

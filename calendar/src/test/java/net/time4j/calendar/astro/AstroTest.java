@@ -801,4 +801,42 @@ public class AstroTest {
             .build();
     }
 
+    @Test
+    public void positionOfSun() {
+        JulianDay jd =
+            JulianDay.ofEphemerisTime(
+                PlainDate.of(1992, 10, 13),
+                PlainTime.midnightAtStartOfDay(),
+                ZonalOffset.UTC
+            );
+        assertThat(
+            StdSolarCalculator.SIMPLE.rightAscension(jd.getValue()),
+            is(198.76419030829365));
+        assertThat(
+            StdSolarCalculator.SIMPLE.declination(jd.getValue()),
+            is(-7.939068113994067));
+        assertThat(
+            StdSolarCalculator.NOAA.rightAscension(jd.getValue()),
+            is(198.38082521237328));
+        assertThat(
+            StdSolarCalculator.NOAA.declination(jd.getValue()),
+            is(-7.785069796023854));
+        assertThat(
+            StdSolarCalculator.CC.rightAscension(jd.getValue()),
+            is(198.37832979724269));
+        assertThat(
+            StdSolarCalculator.CC.declination(jd.getValue()),
+            is(-7.7841496152567915));
+        assertThat(
+            StdSolarCalculator.TIME4J.rightAscension(jd.getValue()),
+            is(198.37826281251168));
+        assertThat(
+            StdSolarCalculator.TIME4J.declination(jd.getValue()),
+            is(-7.784091134226315));
+
+        // comparison with VSOP87-theory
+        System.out.println("ra-VSOP87: " + String.valueOf(15 * (30.749 / 3600 + 13 / 60 + 13))); // 195.12812083333333
+        System.out.println("decl-VSOP87: " + String.valueOf(-1.74 / 3600 - 47 / 60 - 7)); // -7.000483333333333
+    }
+
 }
