@@ -1,4 +1,7 @@
 ## [v3.38] not yet released
+### Added
+- Make right ascension of sun accessible [#715]
+
 ### Changed
 - HebrewMonth.Order.BIBILICAL contains a typo [#714]
 
