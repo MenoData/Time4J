@@ -100,7 +100,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * of non-temporal state in year counting and sorting). In modern times, nengos are associated only once with
  * the actual emperor or tenno. </p>
  *
- * <p>While the gregorian period since Meiji 6 uses exactly the same mnnths from January to December) and
+ * <p>While the gregorian period since Meiji 6 uses exactly the same months from January to December) and
  * day-dating methods like in Western calendar, the lunisolar period in old times was completely different.
  * All months were either 29 or 30 days long. The month length depended on the astronomical event of New Moon,
  * but did often not follow exactly the new moon due to historical deviations and misleading calculations. The
