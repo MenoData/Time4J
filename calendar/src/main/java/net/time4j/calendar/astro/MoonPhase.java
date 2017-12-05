@@ -385,7 +385,7 @@ public enum MoonPhase {
 		int[] z = ((this == NEW_MOON || this == FULL_MOON) ? Z_NEW_FULL : Z_QUARTER);
 
 		double s = 0;
-		for (int i = 0; i < 24; i++) {
+		for (int i = 23; i >= 0; i--) {
 			double p = v[i];
 			if (w[i] == 1) {
 				p *= excentricity;
