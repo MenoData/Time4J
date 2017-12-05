@@ -198,7 +198,7 @@ public class AstroTest {
             is(SolarTime.ofLocation(53, 10)));
         assertThat( // Kilimanjaro
             SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build(),
-            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, StdSolarCalculator.TIME4J)));
+            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, StdSolarCalculator.NOAA)));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -300,7 +300,7 @@ public class AstroTest {
     @Test
     public void ofLocation() {
         SolarTime ny1 = SolarTime.ofLocation(40.9, -74.3);
-        SolarTime ny2 = SolarTime.ofLocation(40.9, -74.3, 0, "TIME4J");
+        SolarTime ny2 = SolarTime.ofLocation(40.9, -74.3, 0, "NOAA");
         assertThat(ny1, is(ny2)); // we assume no service loader in the background here
     }
 
