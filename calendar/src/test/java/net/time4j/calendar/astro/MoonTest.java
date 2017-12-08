@@ -130,4 +130,27 @@ public class MoonTest {
             is(0.5));
     }
 
+    @Test
+    public void moonPosition() {
+        JulianDay jd =
+            JulianDay.ofEphemerisTime(
+                PlainDate.of(1992, 4, 12),
+                PlainTime.midnightAtStartOfDay(),
+                ZonalOffset.UTC
+            );
+
+        // Meeus - example 47.a
+        MoonPosition position = MoonPosition.calculateMeeus(jd.getCenturyJ2000());
+
+        assertThat(
+            position.getRightAscension(),
+            is(134.68846856938873));
+        assertThat(
+            position.getDeclination(),
+            is(13.768366716980461));
+        assertThat(
+            position.getDistance(),
+            is(368409.6848161269));
+    }
+
 }
