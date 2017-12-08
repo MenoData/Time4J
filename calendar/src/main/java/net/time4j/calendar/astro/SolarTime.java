@@ -225,9 +225,19 @@ public final class SolarTime
     }
 
     private static final SolarTime JERUSALEM = // temple area
-        SolarTime.ofLocation().easternLongitude(35, 14, 5).northernLatitude(31, 46, 44).atAltitude(721).build();
-    private static final SolarTime MECCA =
-        SolarTime.ofLocation().easternLongitude(39, 49, 34.06).northernLatitude(21, 25, 21.22).atAltitude(298).build();
+        SolarTime.ofLocation()
+            .easternLongitude(35, 14, 5)
+            .northernLatitude(31, 46, 44)
+            .atAltitude(721)
+            .usingCalculator(StdSolarCalculator.TIME4J)
+            .build();
+    private static final SolarTime MECCA = // kaaba
+        SolarTime.ofLocation()
+            .easternLongitude(39, 49, 34.06)
+            .northernLatitude(21, 25, 21.22)
+            .atAltitude(298)
+            .usingCalculator(StdSolarCalculator.TIME4J)
+            .build();
 
     private static final long serialVersionUID = -4816619838743247977L;
 
@@ -1556,8 +1566,13 @@ public final class SolarTime
          * topology with mountains breaking the horizon line and special weather conditions cannot be taken
          * into account. </p>
          *
+         * <p>Attention: Users should also apply a calculator which is capable of altitude corrections. </p>
+         *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
+         * @see     #usingCalculator(Calculator)
+         * @see     StdSolarCalculator#CC
+         * @see     StdSolarCalculator#TIME4J
          */
         /*[deutsch]
          * <p>Setzt die H&ouml;he in Metern. </p>
@@ -1568,8 +1583,14 @@ public final class SolarTime
          * mit Bergen, die die Horizontlinie unterbrechen und spezielle Wetterbedingungen nicht berechenbar
          * sind. </p>
          *
+         * <p>Achtung: Anwender sollten auch einen {@code Calculator} nehmen, der in der Lage ist,
+         * H&ouml;henkorrekturen vorzunehmen. </p>
+         *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
+         * @see     #usingCalculator(Calculator)
+         * @see     StdSolarCalculator#CC
+         * @see     StdSolarCalculator#TIME4J
          */
         public Builder atAltitude(int altitude) {
 
