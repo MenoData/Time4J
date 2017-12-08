@@ -5,6 +5,9 @@
 ### Changed
 - HebrewMonth.Order.BIBILICAL contains a typo [#714]
 
+### Fixed
+- Class SolarTime normally expects LMT-dates not zoned dates [#719]
+
 ## [v3.37] published on 2017-11-26
 ### Added
 - Hebrew calendar [#528]
