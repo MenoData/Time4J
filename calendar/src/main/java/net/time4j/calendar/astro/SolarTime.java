@@ -30,6 +30,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
@@ -40,6 +41,7 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
+import java.math.BigDecimal;
 import java.util.Optional;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -52,7 +54,7 @@ import java.util.concurrent.TimeUnit;
  * <p>Notice: Most chronological functions use the astronomical equation of time. Hence they are only applicable
  * for years between -2000 and +3000 otherwise an {@code IllegalArgumentException} will be thrown. </p>
  *
- * <p>Example for sunrise and sunset on the top of Africas highest mountain Kilimanjaro: </p>
+ * <p><strong>Example for sunrise and sunset on the top of Africas highest mountain Kilimanjaro:</strong></p>
  *
  * <pre>
  *     PlainDate date = PlainDate.of(2017, 12, 22);
@@ -60,7 +62,12 @@ import java.util.concurrent.TimeUnit;
  *
  *     // high altitude implies earlier sunrise and later sunset
  *     SolarTime kibo5895 =
- *       SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
+ *       SolarTime.ofLocation()
+ *          .southernLatitude(3, 4, 0)
+ *          .easternLongitude(37, 21, 33)
+ *          .atAltitude(5895)
+ *          .usingCalculator(StdSolarCalculator.TIME4J) // this calculator takes into account the altitude
+ *          .build();
  *
  *     assertThat(
  *       date.get(kibo5895.sunrise(tzid)).get(),
@@ -78,6 +85,38 @@ import java.util.concurrent.TimeUnit;
  * Users should therefore not expect more than minute precision. This can be even worse for polar regions
  * because the sun crosses then the horizon under a very shallow angle. </p>
  *
+ * <p><strong>Interpretation of calendar dates:</strong></p>
+ *
+ * <p>This class interpretes every calendar date input as on LMT (Local Mean Time) unless the builder-method
+ * {@link net.time4j.calendar.astro.SolarTime.Builder#inTimezone(TZID)} is called. Users only need
+ * to pay attention to this subtile difference if a few areas along the international date border
+ * like Kiribati or Samoa are involved. Following example demonstrates the difference: </p>
+ *
+ * <p><i>LMT-date</i></p>
+ *
+ * <pre>
+ *     TZID tzid = Timezone.of(&quot;Pacific/Apia&quot;).getID();
+ *     SolarTime apia = SolarTime.ofLocation().southernLatitude(13, 50, 0).westernLongitude(171, 45, 0).build();
+ *     assertThat(
+ *       PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+ *       is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is one day later than LMT-date
+ * </pre>
+ *
+ * <p><i>Zoned date</i></p>
+ *
+ * <pre>
+ *     TZID tzid = Timezone.of(&quot;Pacific/Apia&quot;).getID();
+ *     SolarTime apia =
+ *       SolarTime.ofLocation()
+ *         .southernLatitude(13, 50, 0)
+ *         .westernLongitude(171, 45, 0)
+ *         .inTimezone(tzid)
+ *         .build();
+ *     assertThat(
+ *       PlainDate.of(2012, 1, 1).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+ *       is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is same as input
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.33/4.28
  */
@@ -88,15 +127,21 @@ import java.util.concurrent.TimeUnit;
  * sie nur f&uuml;r Jahre zwischen -2000 und +3000 anwendbar, sonst wird gegebenenfalls eine
  * {@code IllegalArgumentException} geworfen. </p>
  *
- * <p>Beispielrechnung f&uuml;r den Sonnenaufgang und -untergang auf Afrikas h&ouml;chstem Berg Kilimanjaro: </p>
+ * <p><strong>Beispielrechnung f&uuml;r den Sonnenaufgang und -untergang
+ * auf Afrikas h&ouml;chstem Berg Kilimanjaro:</strong></p>
  *
  * <pre>
  *     PlainDate date = PlainDate.of(2017, 12, 22);
  *     TZID tzid = () -&gt; &quot;Africa/Dar_es_Salaam&quot;; // Tanzania: UTC+03:00
  *
- *     // gro&szlig;e H&ouml;he verursacht fr&uuml;heren Sonnenaufgang und sp&auml;teren Sonnenuntergang
+ *     // die gro&szlig;e H&ouml;he berechnet einen fr&uuml;heren Sonnenaufgang und sp&auml;teren Sonnenuntergang
  *     SolarTime kibo5895 =
- *       SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build();
+ *       SolarTime.ofLocation()
+ *          .southernLatitude(3, 4, 0)
+ *          .easternLongitude(37, 21, 33)
+ *          .atAltitude(5895)
+ *          .usingCalculator(StdSolarCalculator.TIME4J) // ber&uuml;cksichtigt die H&ouml;he
+ *          .build();
  *
  *     assertThat(
  *       date.get(kibo5895.sunrise(tzid)).get(),
@@ -114,6 +159,39 @@ import java.util.concurrent.TimeUnit;
  * Berechnungsverfahren ist ebenfalls ein begrenzender Faktor f&uuml;r die erreichbare Genauigkeit.
  * Anwender sollten daher nicht mehr als Minutengenauigkeit erwarten. In Polargebieten ist sie sogar
  * schlechter, weil die Sonne dann nur unter einem sehr flachen Winkel den Horizont quert. </p>
+ *
+ * <p><strong>Interpretation von Kalenderdaten:</strong></p>
+ *
+ * <p>Diese Klasse interpretiert jedes Kalenderdatum als LMT-Datum (Local Mean Time = Mittlere Ortszeit),
+ * es sei denn, die <i>Builder</i>-Methode {@link net.time4j.calendar.astro.SolarTime.Builder#inTimezone(TZID)}
+ * wird aufgerufen. Anwender brauchen sich nur um diesen feinen Unterschied Gedanken zu machen, wenn einige
+ * wenige Gebiete der Erde entlang der internationalen Datumsgrenze wie Kiribati oder Samoa beteiligt sind.
+ * Folgende Beispiele demonstrieren den Unterschied: </p>
+ *
+ * <p><i>LMT-Datum</i></p>
+ *
+ * <pre>
+ *     TZID tzid = Timezone.of(&quot;Pacific/Apia&quot;).getID();
+ *     SolarTime apia = SolarTime.ofLocation().southernLatitude(13, 50, 0).westernLongitude(171, 45, 0).build();
+ *     assertThat(
+ *       PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+ *       is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // Zonendatum ist einen Tag nach dem LMT-Datum
+ * </pre>
+ *
+ * <p><i>Zonendatum</i></p>
+ *
+ * <pre>
+ *     TZID tzid = Timezone.of(&quot;Pacific/Apia&quot;).getID();
+ *     SolarTime apia =
+ *       SolarTime.ofLocation()
+ *         .southernLatitude(13, 50, 0)
+ *         .westernLongitude(171, 45, 0)
+ *         .inTimezone(tzid)
+ *         .build();
+ *     assertThat(
+ *       PlainDate.of(2012, 1, 1).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+ *       is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // Zonendatum entspricht dem Eingabedatum
+ * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.33/4.28
@@ -179,13 +257,20 @@ public final class SolarTime
      */
     private final String calculator;
 
+    /**
+     * @serial  zone identifier for the interpretation of calendar date input
+     * @since   3.38/4.33
+     */
+    private final TZID tzid;
+
     //~ Konstruktoren -----------------------------------------------------
 
     private SolarTime(
         double latitude,
         double longitude,
         int altitude,
-        String calculator
+        String calculator,
+        TZID tzid
     ) {
         super();
 
@@ -193,6 +278,7 @@ public final class SolarTime
         this.longitude = longitude;
         this.altitude = altitude;
         this.calculator = calculator;
+        this.tzid = tzid;
 
     }
 
@@ -303,7 +389,7 @@ public final class SolarTime
     ) {
 
         check(latitude, longitude, altitude, calculator);
-        return new SolarTime(latitude, longitude, altitude, calculator);
+        return new SolarTime(latitude, longitude, altitude, calculator, null);
 
     }
 
@@ -345,7 +431,7 @@ public final class SolarTime
         String name = calculator.name();
         CALCULATORS.putIfAbsent(name, calculator);
         check(latitude, longitude, altitude, name);
-        return new SolarTime(latitude, longitude, altitude, name);
+        return new SolarTime(latitude, longitude, altitude, name, null);
 
     }
 
@@ -503,7 +589,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Optional<Moment>> sunrise() {
 
-        return date -> this.getCalculator().sunrise(date, this.latitude, this.longitude, this.zenithAngle());
+        return date -> this.getCalculator().sunrise(toLMT(date), this.latitude, this.longitude, this.zenithAngle());
 
     }
 
@@ -530,7 +616,7 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Optional<Moment>> sunrise(Twilight twilight) {
 
         double effAngle = 90.0 + this.geodeticAngle() + twilight.getAngle();
-        return date -> this.getCalculator().sunrise(date, this.latitude, this.longitude, effAngle);
+        return date -> this.getCalculator().sunrise(toLMT(date), this.latitude, this.longitude, effAngle);
 
     }
 
@@ -560,7 +646,8 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunrise(TZID tzid) {
 
         return date -> {
-            Optional<Moment> m = this.getCalculator().sunrise(date, latitude, longitude, this.zenithAngle());
+            Optional<Moment> m = this.getCalculator().sunrise(
+                toLMT(date), this.latitude, this.longitude, this.zenithAngle());
             if (m.isPresent()) {
                 return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
             } else {
@@ -604,7 +691,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Optional<Moment>> sunset() {
 
-        return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, this.zenithAngle());
+        return date -> this.getCalculator().sunset(toLMT(date), this.latitude, this.longitude, this.zenithAngle());
 
     }
 
@@ -631,7 +718,7 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Optional<Moment>> sunset(Twilight twilight) {
 
         double effAngle = 90.0 + this.geodeticAngle() + twilight.getAngle();
-        return date -> this.getCalculator().sunset(date, this.latitude, this.longitude, effAngle);
+        return date -> this.getCalculator().sunset(toLMT(date), this.latitude, this.longitude, effAngle);
 
     }
 
@@ -661,7 +748,8 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunset(TZID tzid) {
 
         return date -> {
-            Optional<Moment> m = this.getCalculator().sunset(date, latitude, longitude, this.zenithAngle());
+            Optional<Moment> m = this.getCalculator().sunset(
+                toLMT(date), this.latitude, this.longitude, this.zenithAngle());
             if (m.isPresent()) {
                 return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
             } else {
@@ -688,7 +776,7 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Sunshine> sunshine(TZID tzid) {
 
         return date -> {
-            PlainDate d = toGregorian(date);
+            PlainDate d = toGregorian(toLMT(date));
             Calculator c = this.getCalculator();
             double zenith = this.zenithAngle();
             Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, zenith);
@@ -723,7 +811,7 @@ public final class SolarTime
             if (Double.compare(Math.abs(this.latitude), 66.0) < 0) {
                 return false;
             }
-            PlainDate d = toGregorian(date);
+            PlainDate d = toGregorian(toLMT(date));
             Calculator c = this.getCalculator();
             double zenith = this.zenithAngle();
             Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, zenith);
@@ -755,7 +843,7 @@ public final class SolarTime
             if (Double.compare(Math.abs(this.latitude), 66.0) < 0) {
                 return false;
             }
-            PlainDate d = toGregorian(date);
+            PlainDate d = toGregorian(toLMT(date));
             Calculator c = this.getCalculator();
             double zenith = this.zenithAngle();
             Optional<Moment> start = c.sunrise(date, this.latitude, this.longitude, zenith);
@@ -787,7 +875,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Moment> transitAtNoon() {
 
-        return date -> transitAtNoon(date, this.longitude, this.calculator);
+        return date -> transitAtNoon(toLMT(date), this.longitude, this.calculator);
 
     }
 
@@ -815,7 +903,7 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, PlainTime> transitAtNoon(TZID tzid) {
 
         return date -> {
-            Moment m = transitAtNoon(date, this.longitude, this.calculator);
+            Moment m = transitAtNoon(toLMT(date), this.longitude, this.calculator);
             return m.toZonalTimestamp(tzid).getWallTime();
         };
 
@@ -839,7 +927,7 @@ public final class SolarTime
      */
     public ChronoFunction<CalendarDate, Moment> transitAtMidnight() {
 
-        return date -> transitAtMidnight(date, this.longitude, this.calculator);
+        return date -> transitAtMidnight(toLMT(date), this.longitude, this.calculator);
 
     }
 
@@ -867,7 +955,7 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, PlainTime> transitAtMidnight(TZID tzid) {
 
         return date -> {
-            Moment m = transitAtMidnight(date, this.longitude, this.calculator);
+            Moment m = transitAtMidnight(toLMT(date), this.longitude, this.calculator);
             return m.toZonalTimestamp(tzid).getWallTime();
         };
 
@@ -884,7 +972,9 @@ public final class SolarTime
                 this.calculator.equals(that.calculator)
                     && (Double.compare(this.latitude, that.latitude) == 0)
                     && (Double.compare(this.longitude, that.longitude) == 0)
-                    && (this.altitude == that.altitude));
+                    && (this.altitude == that.altitude)
+                    && equalZones(this.tzid, that.tzid)
+            );
         } else {
             return false;
         }
@@ -918,6 +1008,10 @@ public final class SolarTime
         if (!this.calculator.equals(DEFAULT_CALCULATOR.name())) {
             sb.append(",calculator=");
             sb.append(this.calculator);
+        }
+        if (this.tzid != null) {
+            sb.append(",tzid=");
+            sb.append(this.tzid.canonical());
         }
         sb.append(']');
         return sb.toString();
@@ -1218,6 +1312,40 @@ public final class SolarTime
 
     }
 
+    private CalendarDate toLMT(CalendarDate input) {
+
+        if ((this.tzid == null) || (Math.abs(this.longitude) < 150.0)) {
+            return input;
+        }
+
+        PlainDate d = toGregorian(input);
+        PlainTimestamp noon = d.at(PlainTime.of(12));
+
+        if (!noon.isValid(this.tzid)) {
+            throw new ChronoException(
+                "Calendar date does not exist in zone: " + input + " (" + this.tzid.canonical() + ")");
+        }
+
+        ZonalOffset lmtOffset = ZonalOffset.atLongitude(new BigDecimal(this.longitude));
+        return noon.inTimezone(this.tzid).toZonalTimestamp(lmtOffset).getCalendarDate();
+
+    }
+
+    private static boolean equalZones(
+        TZID z1,
+        TZID z2
+    ) {
+
+        if (z1 == null) {
+            return (z2 == null);
+        } else if (z2 == null) {
+            return false;
+        } else {
+            return z1.canonical().equals(z2.canonical());
+        }
+
+    }
+
     /**
      * @serialData  Checks the sanity of the state.
      * @param       in                          object input stream
@@ -1253,6 +1381,7 @@ public final class SolarTime
         private double longitude = Double.NaN;
         private int altitude = 0;
         private String calculator = DEFAULT_CALCULATOR.name();
+        private TZID tzid = null;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1501,6 +1630,45 @@ public final class SolarTime
         }
 
         /**
+         * <p>Helps to associate any calendar date input with given timezone. </p>
+         *
+         * <p>If this method is not called then every calendar date input will be interpreted
+         * as LMT (=<i>Local Mean Time</i>). The subtile difference between an LMT-date and
+         * a zoned date is usually invisible but can be relevant for a few areas near the
+         * international date border (for example Kiribati or Samoa). Note that calendar dates
+         * need to exist in given timezone otherwise a {@code ChronoException} will be thrown. </p>
+         *
+         * @param   tzid    zone identifier for the interpretation of calendar date input
+         * @return  this instance for method chaining
+         * @since   3.38/4.33
+         */
+        /*[deutsch]
+         * <p>Hilft, jede beliebige Kalenderdatumseingabe mit der angegebenen Zeitzonen zu verkn&uuml;pfen. </p>
+         *
+         * <p>Wenn diese Methode nicht aufgerufen wird, wird jede Kalenderdatumseingabe als LMT
+         * (=<i>Local Mean Time</i> = Mittlere Ortzeit) interpretiert. Der subtile Unterschied
+         * zwischen einem Ortsdatum und einem Zonendatum ist normalerweise nicht sichtbar, kann
+         * aber f&uuml;r wenige Gebiete der Erde relevant sein, die entlang der internationalen
+         * Datumslinie liegen (zum Beispiel Kiribati oder Samoa). Zu beachten: Ein Kalenderdatum
+         * mu&szlig; in der angegebenen Zeitzone existieren, sonst wird eine {@code ChronoException}
+         * geworfen. </p>
+         *
+         * @param   tzid    zone identifier for the interpretation of calendar date input
+         * @return  this instance for method chaining
+         * @since   3.38/4.33
+         */
+        public Builder inTimezone(TZID tzid) {
+
+            if (tzid == null) {
+                throw new NullPointerException("Missing timezone identifier.");
+            }
+
+            this.tzid = tzid;
+            return this;
+
+        }
+
+        /**
          * <p>Finishes the build-process. </p>
          *
          * @return  new configured instance of {@code SolarTime}
@@ -1520,7 +1688,7 @@ public final class SolarTime
                 throw new IllegalStateException("Longitude was not yet set.");
             }
 
-            return new SolarTime(this.latitude, this.longitude, this.altitude, this.calculator);
+            return new SolarTime(this.latitude, this.longitude, this.altitude, this.calculator, this.tzid);
 
         }
 

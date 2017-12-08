@@ -9,6 +9,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDays;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -835,6 +836,30 @@ public class AstroTest {
         // comparison with VSOP87-theory
         System.out.println("ra-VSOP87: " + String.valueOf(15 * (30.749 / 3600 + 13 / 60 + 13))); // 195.12812083333333
         System.out.println("decl-VSOP87: " + String.valueOf(-1.74 / 3600 - 47 / 60 - 7)); // -7.000483333333333
+    }
+
+    @Test
+    public void lmtSamoa() {
+        TZID tzid = Timezone.of("Pacific/Apia").getID();
+        SolarTime apia =
+            SolarTime.ofLocation().southernLatitude(13, 50, 0).westernLongitude(171, 45, 0).build();
+        assertThat(
+            PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is one day later than LMT-date
+    }
+
+    @Test
+    public void zonedSamoa() {
+        TZID tzid = Timezone.of("Pacific/Apia").getID();
+        SolarTime apia =
+            SolarTime.ofLocation()
+                .southernLatitude(13, 50, 0)
+                .westernLongitude(171, 45, 0)
+                .inTimezone(tzid)
+                .build();
+        assertThat(
+            PlainDate.of(2012, 1, 1).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is same as input date
     }
 
 }
