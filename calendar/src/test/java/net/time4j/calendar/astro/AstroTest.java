@@ -839,4 +839,28 @@ public class AstroTest {
         System.out.println("decl-VSOP87: " + String.valueOf(-1.74 / 3600 - 47 / 60 - 7)); // -7.000483333333333
     }
 
+    @Test
+    public void lmtSamoa() {
+        TZID tzid = Timezone.of("Pacific/Apia").getID();
+        SolarTime apia =
+            SolarTime.ofLocation().southernLatitude(13, 50, 0).westernLongitude(171, 45, 0).build();
+        assertThat(
+            PlainDate.of(2011, 12, 31).get(apia.sunrise()).toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is one day later than LMT-date
+    }
+
+    @Test
+    public void zonedSamoa() {
+        TZID tzid = Timezone.of("Pacific/Apia").getID();
+        SolarTime apia =
+            SolarTime.ofLocation()
+                .southernLatitude(13, 50, 0)
+                .westernLongitude(171, 45, 0)
+                .inTimezone(tzid)
+                .build();
+        assertThat(
+            PlainDate.of(2012, 1, 1).get(apia.sunrise()).toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is same as input date
+    }
+
 }
