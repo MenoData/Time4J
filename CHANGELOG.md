@@ -2,8 +2,9 @@
 ### Added
 - Make right ascension of sun accessible [#715]
 
-### Changed
+### Changed/Deprecated
 - HebrewMonth.Order.BIBILICAL contains a typo [#714]
+- Four methods in SolarTime loose the day information [#724]
 
 ### Fixed
 - Class SolarTime normally expects LMT-dates not zoned dates [#719]
