@@ -271,7 +271,7 @@ public final class SolarTime
      * @serial  zone identifier for the interpretation of calendar date input
      * @since   3.38/4.33
      */
-    private final TZID tzid;
+    private final TZID observerZoneID;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -280,7 +280,7 @@ public final class SolarTime
         double longitude,
         int altitude,
         String calculator,
-        TZID tzid
+        TZID observerZoneID
     ) {
         super();
 
@@ -288,7 +288,7 @@ public final class SolarTime
         this.longitude = longitude;
         this.altitude = altitude;
         this.calculator = calculator;
-        this.tzid = tzid;
+        this.observerZoneID = observerZoneID;
 
     }
 
@@ -640,6 +640,7 @@ public final class SolarTime
      * @return  sunrise function applicable on any calendar date
      * @see     #sunrise()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users are asked to use {@code sunrise()} instead.
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit des Sonnenaufgangs an der Position dieser Instanz
@@ -652,7 +653,9 @@ public final class SolarTime
      * @return  sunrise function applicable on any calendar date
      * @see     #sunrise()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users are asked to use {@code sunrise()} instead.
      */
+    @Deprecated
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunrise(TZID tzid) {
 
         return date -> {
@@ -742,6 +745,7 @@ public final class SolarTime
      * @return  sunset function applicable on any calendar date
      * @see     #sunset()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users are asked to use {@code sunset()} instead.
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit des Sonnenuntergangs an der Position dieser Instanz
@@ -754,7 +758,9 @@ public final class SolarTime
      * @return  sunset function applicable on any calendar date
      * @see     #sunset()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users are asked to use {@code sunset()} instead.
      */
+    @Deprecated
     public ChronoFunction<CalendarDate, Optional<PlainTime>> sunset(TZID tzid) {
 
         return date -> {
@@ -772,12 +778,18 @@ public final class SolarTime
     /**
      * <p>Queries a given calendar date for its associated sunshine data. </p>
      *
+     * <p>The timezone parameter enables users to query for solar time data described in terms of a potentially
+     * quite different zone of the earth. However, the parameter does not interprete the input calendar date. </p>
+     *
      * @param   tzid    the identifier of the timezone any local times of the result refer to
      * @return  function for obtaining sunshine data
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Fragt zu einem gegebenen Kalenderdatum die damit verbundenen Sonnenscheindaten ab. </p>
+     *
+     * <p>Der Zeitzonenparameter erm&ouml;glicht es, die Sonnenzeitdaten im Kontext einer eventuell
+     * ganz anderen Zeitzone zu beschreiben. Er dient jedoch nicht der Interpretation des Eingabedatums. </p>
      *
      * @param   tzid    the identifier of the timezone any local times of the result refer to
      * @return  function for obtaining sunshine data
@@ -898,6 +910,7 @@ public final class SolarTime
      * @return  noon function applicable on any calendar date
      * @see     #transitAtNoon()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users are asked to use {@code transitAtNoon()} instead.
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit des Mittags an der Position dieser Instanz
@@ -909,7 +922,9 @@ public final class SolarTime
      * @return  noon function applicable on any calendar date
      * @see     #transitAtNoon()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users are asked to use {@code transitAtNoon()} instead.
      */
+    @Deprecated
     public ChronoFunction<CalendarDate, PlainTime> transitAtNoon(TZID tzid) {
 
         return date -> {
@@ -950,6 +965,7 @@ public final class SolarTime
      * @return  midnight function applicable on any calendar date
      * @see     #transitAtMidnight()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users ought to use {@code transitAtMidnight()} instead.
      */
     /*[deutsch]
      * <p>Berechnet die lokale Uhrzeit von Mitternacht an der Position dieser Instanz
@@ -961,7 +977,9 @@ public final class SolarTime
      * @return  midnight function applicable on any calendar date
      * @see     #transitAtMidnight()
      * @since   3.34/4.29
+     * @deprecated  This method looses the day information so users ought to use {@code transitAtMidnight()} instead.
      */
+    @Deprecated
     public ChronoFunction<CalendarDate, PlainTime> transitAtMidnight(TZID tzid) {
 
         return date -> {
@@ -983,7 +1001,7 @@ public final class SolarTime
                     && (Double.compare(this.latitude, that.latitude) == 0)
                     && (Double.compare(this.longitude, that.longitude) == 0)
                     && (this.altitude == that.altitude)
-                    && equalZones(this.tzid, that.tzid)
+                    && equalZones(this.observerZoneID, that.observerZoneID)
             );
         } else {
             return false;
@@ -1019,9 +1037,9 @@ public final class SolarTime
             sb.append(",calculator=");
             sb.append(this.calculator);
         }
-        if (this.tzid != null) {
-            sb.append(",tzid=");
-            sb.append(this.tzid.canonical());
+        if (this.observerZoneID != null) {
+            sb.append(",observerZoneID=");
+            sb.append(this.observerZoneID.canonical());
         }
         sb.append(']');
         return sb.toString();
@@ -1324,20 +1342,20 @@ public final class SolarTime
 
     private CalendarDate toLMT(CalendarDate input) {
 
-        if ((this.tzid == null) || (Math.abs(this.longitude) < 150.0)) {
+        if ((this.observerZoneID == null) || (Math.abs(this.longitude) < 150.0)) {
             return input;
         }
 
         PlainDate d = toGregorian(input);
         PlainTimestamp noon = d.at(PlainTime.of(12));
 
-        if (!noon.isValid(this.tzid)) {
+        if (!noon.isValid(this.observerZoneID)) {
             throw new ChronoException(
-                "Calendar date does not exist in zone: " + input + " (" + this.tzid.canonical() + ")");
+                "Calendar date does not exist in zone: " + input + " (" + this.observerZoneID.canonical() + ")");
         }
 
         ZonalOffset lmtOffset = ZonalOffset.atLongitude(new BigDecimal(this.longitude));
-        return noon.inTimezone(this.tzid).toZonalTimestamp(lmtOffset).getCalendarDate();
+        return noon.inTimezone(this.observerZoneID).toZonalTimestamp(lmtOffset).getCalendarDate();
 
     }
 
@@ -1391,7 +1409,7 @@ public final class SolarTime
         private double longitude = Double.NaN;
         private int altitude = 0;
         private String calculator = DEFAULT_CALCULATOR.name();
-        private TZID tzid = null;
+        private TZID observerZoneID = null;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1659,7 +1677,7 @@ public final class SolarTime
          * international date border (for example Kiribati or Samoa). Note that calendar dates
          * need to exist in given timezone otherwise a {@code ChronoException} will be thrown. </p>
          *
-         * @param   tzid    zone identifier for the interpretation of calendar date input
+         * @param   observerZoneID      zone identifier associated with chosen geographical position
          * @return  this instance for method chaining
          * @since   3.38/4.33
          */
@@ -1674,17 +1692,17 @@ public final class SolarTime
          * mu&szlig; in der angegebenen Zeitzone existieren, sonst wird eine {@code ChronoException}
          * geworfen. </p>
          *
-         * @param   tzid    zone identifier for the interpretation of calendar date input
+         * @param   observerZoneID      zone identifier associated with chosen geographical position
          * @return  this instance for method chaining
          * @since   3.38/4.33
          */
-        public Builder inTimezone(TZID tzid) {
+        public Builder inTimezone(TZID observerZoneID) {
 
-            if (tzid == null) {
+            if (observerZoneID == null) {
                 throw new NullPointerException("Missing timezone identifier.");
             }
 
-            this.tzid = tzid;
+            this.observerZoneID = observerZoneID;
             return this;
 
         }
@@ -1709,7 +1727,7 @@ public final class SolarTime
                 throw new IllegalStateException("Longitude was not yet set.");
             }
 
-            return new SolarTime(this.latitude, this.longitude, this.altitude, this.calculator, this.tzid);
+            return new SolarTime(this.latitude, this.longitude, this.altitude, this.calculator, this.observerZoneID);
 
         }
 

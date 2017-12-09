@@ -442,7 +442,7 @@ public class SunSydneyTest {
     public void simpleSunrise() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, "SIMPLE");
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunrise = date.get(sydney.sunrise(() -> "Australia/Sydney")).get();
+        PlainTime sunrise = date.get(sydney.sunrise()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunrise, this.minuteSunrise);
         assertThat(
             sunrise.toString(),
@@ -454,7 +454,7 @@ public class SunSydneyTest {
     public void simpleSunset() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, "SIMPLE");
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunset = date.get(sydney.sunset(() -> "Australia/Sydney")).get();
+        PlainTime sunset = date.get(sydney.sunset()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunset, this.minuteSunset);
         assertThat(
             sunset.toString(),
@@ -477,7 +477,7 @@ public class SunSydneyTest {
     public void noaaSunrise() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, "NOAA");
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunrise = date.get(sydney.sunrise(() -> "Australia/Sydney")).get();
+        PlainTime sunrise = date.get(sydney.sunrise()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunrise, this.minuteSunrise);
         assertThat(
             sunrise.toString(),
@@ -489,7 +489,7 @@ public class SunSydneyTest {
     public void noaaSunset() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, "NOAA");
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunset = date.get(sydney.sunset(() -> "Australia/Sydney")).get();
+        PlainTime sunset = date.get(sydney.sunset()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunset, this.minuteSunset);
         assertThat(
             sunset.toString(),
@@ -512,7 +512,7 @@ public class SunSydneyTest {
     public void ccSunrise() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.CC);
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunrise = date.get(sydney.sunrise(() -> "Australia/Sydney")).get();
+        PlainTime sunrise = date.get(sydney.sunrise()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunrise, this.minuteSunrise);
         assertThat(
             sunrise.toString(),
@@ -524,7 +524,7 @@ public class SunSydneyTest {
     public void ccSunset() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.CC);
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunset = date.get(sydney.sunset(() -> "Australia/Sydney")).get();
+        PlainTime sunset = date.get(sydney.sunset()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunset, this.minuteSunset);
         assertThat(
             sunset.toString(),
@@ -536,7 +536,7 @@ public class SunSydneyTest {
     public void time4jSunrise() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.TIME4J);
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunrise = date.get(sydney.sunrise(() -> "Australia/Sydney")).get();
+        PlainTime sunrise = date.get(sydney.sunrise()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunrise, this.minuteSunrise);
         assertThat(
             sunrise.toString(),
@@ -548,7 +548,7 @@ public class SunSydneyTest {
     public void time4jSunset() {
         SolarTime sydney = SolarTime.ofLocation(-33.85, 151.2, 0, StdSolarCalculator.TIME4J);
         PlainDate date = PlainDate.of(2017, this.doy);
-        PlainTime sunset = date.get(sydney.sunset(() -> "Australia/Sydney")).get();
+        PlainTime sunset = date.get(sydney.sunset()).get().toZonalTimestamp("Australia/Sydney").toTime();
         PlainTime expected = PlainTime.of(this.hourSunset, this.minuteSunset);
         assertThat(
             sunset.toString(),

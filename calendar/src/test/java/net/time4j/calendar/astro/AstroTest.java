@@ -329,10 +329,10 @@ public class AstroTest {
             ny.getAltitude(),
             is(0));
         assertThat(
-            date.get(ny.sunrise(tzid)).get(),
+            date.get(ny.sunrise()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(5, 26)));
         assertThat(
-            date.get(ny.sunset(tzid)).get(),
+            date.get(ny.sunset()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(20, 33)));
     }
 
@@ -347,9 +347,6 @@ public class AstroTest {
         assertThat(
             date.get(ny.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(1990, 6, 25, 12, 59, 47)));
-        assertThat(
-            date.get(ny.transitAtNoon(tzid)),
-            is(PlainTime.of(12, 59, 47)));
         assertThat(
             date.get(ny.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(1990, 6, 25, 20, 32, 56)));
@@ -406,17 +403,11 @@ public class AstroTest {
             date.get(germany.transitAtMidnight()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 1, 15, 19)));
         assertThat(
-            date.get(germany.transitAtMidnight(tzid)),
-            is(PlainTime.of(1, 15, 19)));
-        assertThat(
             date.get(germany.sunrise()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 4, 59, 27)));
         assertThat(
             date.get(germany.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 13, 15, 26)));
-        assertThat(
-            date.get(germany.transitAtNoon(tzid)),
-            is(PlainTime.of(13, 15, 26)));
         assertThat(
             date.get(germany.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 21, 31, 25)));
@@ -655,9 +646,6 @@ public class AstroTest {
             date.get(resolute.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2016, 11, 1, 13, 2, 51)));
         assertThat(
-            date.get(resolute.transitAtNoon(tzid)),
-            is(PlainTime.of(13, 2, 51)));
-        assertThat(
             date.get(resolute.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2016, 11, 1, 14, 43, 15)));
     }
@@ -757,10 +745,10 @@ public class AstroTest {
                 .usingCalculator(StdSolarCalculator.TIME4J)
                 .build();
         assertThat(
-            date.get(kibo5895.sunrise(tzid)).get(),
+            date.get(kibo5895.sunrise()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level
         assertThat(
-            date.get(kibo5895.sunset(tzid)).get(),
+            date.get(kibo5895.sunset()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(18, 47, 48))); // 18:48:55 with same atmospheric refraction as on sea level
         assertThat(
             kibo5895.getAltitude(),
@@ -777,10 +765,10 @@ public class AstroTest {
                 .usingCalculator("NOAA")
                 .build();
         assertThat(
-            date.get(kiboSeaLevel.sunrise(tzid)).get(),
+            date.get(kiboSeaLevel.sunrise()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(6, 20, 13)));
         assertThat(
-            date.get(kiboSeaLevel.sunset(tzid)).get(),
+            date.get(kiboSeaLevel.sunset()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(18, 38, 9)));
         assertThat(
             kiboSeaLevel.getAltitude(),
