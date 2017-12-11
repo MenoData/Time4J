@@ -44,7 +44,7 @@ public class MoonPosition
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final int MIO = 1000000;
-    private static final long serialVersionUID = -5075806426064082268L;
+    //private static final long serialVersionUID = -5075806426064082268L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -97,7 +97,8 @@ public class MoonPosition
      */
     public static MoonPosition at(Moment moment) {
 
-        return calculateMeeus(JulianDay.ofEphemerisTime(moment).getCenturyJ2000());
+        double[] data = calculateMeeus(JulianDay.ofEphemerisTime(moment).getCenturyJ2000());
+        return new MoonPosition(data[2], data[3], data[4]);
 
     }
 
@@ -149,6 +150,38 @@ public class MoonPosition
 
     }
 
+//    /**
+//     * <p>Performs a transformation to the horizon system and obtains the azimuth in degrees. </p>
+//     *
+//     * @param   location    geographical location
+//     * @return  azimuth in degrees measured from the north (compass orientation)
+//     */
+//    /*[deutsch]
+//     * <p>F&uuml;hrt eine Koordinatentransformation zum Horizontsystem aus und liefert den Azimuth in Grad. </p>
+//     *
+//     * @param   location    geographical location
+//     * @return  azimuth in degrees measured from the north (compass orientation)
+//     */
+//    public double getAzimuth(GeoLocation location) {
+//        throw new UnsupportedOperationException("Not yet implemented.");
+//    }
+//
+//    /**
+//     * <p>Performs a transformation to the horizon system and obtains the elevation respective altitude in degrees. </p>
+//     *
+//     * @param   location    geographical location
+//     * @return  elevation in degrees
+//     */
+//    /*[deutsch]
+//     * <p>F&uuml;hrt eine Koordinatentransformation zum Horizontsystem aus und liefert die H&ouml;he in Grad. </p>
+//     *
+//     * @param   location    geographical location
+//     * @return  elevation in degrees
+//     */
+//    public double getElevation(GeoLocation location) {
+//        throw new UnsupportedOperationException("Not yet implemented.");
+//    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -192,7 +225,7 @@ public class MoonPosition
     }
 
     // max error given by J. Meeus: 10'' in longitude and 4'' in latitude
-    static MoonPosition calculateMeeus(double jct) { // jct = julian centuries since J2000 in ephemeris time
+    static double[] calculateMeeus(double jct) { // jct = julian centuries since J2000 in ephemeris time
 
         // Meeus (47.1): L'
         double meanLongitude =
@@ -290,10 +323,11 @@ public class MoonPosition
                 - 115 * Math.sin(Math.toRadians(meanLongitude + meanAnomalyMoon))
         );
 
-        double[] no = new double[2];
-        StdSolarCalculator.nutations(jct, no);
-        double obliquityRad = Math.toRadians(StdSolarCalculator.meanObliquity(jct) + no[1]);
-        double lngRad = Math.toRadians(meanLongitude + (sumL / MIO) + no[0]);
+        double[] result = new double[5];
+        StdSolarCalculator.nutations(jct, result);
+        double trueObliquity = StdSolarCalculator.meanObliquity(jct) + result[1];
+        double obliquityRad = Math.toRadians(trueObliquity);
+        double lngRad = Math.toRadians(meanLongitude + (sumL / MIO) + result[0]);
         double latRad = Math.toRadians(sumB / MIO);
         double distance = 385000.56 + (sumR / 1000); // in km between centers of Earth and Moon
 
@@ -308,11 +342,12 @@ public class MoonPosition
                 + Math.cos(latRad) * Math.sin(obliquityRad) * Math.sin(lngRad)
             );
 
-        return new MoonPosition(
-            Math.toDegrees(ra),
-            Math.toDegrees(decl),
-            distance
-        );
+        // result[0] = nutation-in-longitude
+        result[1] = trueObliquity; // in degrees
+        result[2] = Math.toDegrees(ra);
+        result[3] = Math.toDegrees(decl);
+        result[4] = distance; // in km
+        return result;
 
     }
 
