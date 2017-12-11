@@ -196,7 +196,7 @@ import java.util.concurrent.TimeUnit;
  * @since   3.33/4.28
  */
 public final class SolarTime
-    implements Serializable {
+    implements GeoLocation, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -332,6 +332,7 @@ public final class SolarTime
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
+     * @throws  IllegalArgumentException if the coordinates are out of range
      * @see     #ofLocation(double, double, int, String)
      * @since   3.34/4.29
      */
@@ -348,6 +349,7 @@ public final class SolarTime
      * @param   latitude    geographical latitude in decimal degrees ({@code -90.0 <= x <= +90.0})
      * @param   longitude   geographical longitude in decimal degrees ({@code -180.0 <= x < 180.0})
      * @return  instance of local solar time
+     * @throws  IllegalArgumentException if the coordinates are out of range
      * @see     #ofLocation(double, double, int, String)
      * @since   3.34/4.29
      */
@@ -372,6 +374,7 @@ public final class SolarTime
      * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
+     * @throws  IllegalArgumentException if the coordinates are out of range or the calculator is unknown
      * @see     Calculator#name()
      * @since   3.34/4.29
      */
@@ -387,6 +390,7 @@ public final class SolarTime
      * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  name of solar time calculator
      * @return  instance of local solar time
+     * @throws  IllegalArgumentException if the coordinates are out of range or the calculator is unknown
      * @see     Calculator#name()
      * @since   3.34/4.29
      */
@@ -414,6 +418,7 @@ public final class SolarTime
      * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  instance of solar time calculator
      * @return  instance of local solar time
+     * @throws  IllegalArgumentException if the coordinates are out of range
      * @since   3.36/4.31
      */
     /*[deutsch]
@@ -428,6 +433,7 @@ public final class SolarTime
      * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
      * @param   calculator  instance of solar time calculator
      * @return  instance of local solar time
+     * @throws  IllegalArgumentException if the coordinates are out of range
      * @since   3.36/4.31
      */
     public static SolarTime ofLocation(
@@ -492,54 +498,21 @@ public final class SolarTime
 
     }
 
-    /**
-     * <p>Obtains the geographical latitude of this instance. </p>
-     *
-     * @return  latitude in decimal degrees
-     * @since   3.34/4.29
-     */
-    /*[deutsch]
-     * <p>Liefert den geographischen Breitengrad dieser Instanz. </p>
-     *
-     * @return  latitude in decimal degrees
-     * @since   3.34/4.29
-     */
+    @Override
     public double getLatitude() {
 
         return this.latitude;
 
     }
 
-    /**
-     * <p>Obtains the geographical longitude of this instance. </p>
-     *
-     * @return  longitude in decimal degrees
-     * @since   3.34/4.29
-     */
-    /*[deutsch]
-     * <p>Liefert den geographischen L&auml;ngengrad dieser Instanz. </p>
-     *
-     * @return  longitude in decimal degrees
-     * @since   3.34/4.29
-     */
+    @Override
     public double getLongitude() {
 
         return this.longitude;
 
     }
 
-    /**
-     * <p>Obtains the geographical altitude of this instance relative to sea level. </p>
-     *
-     * @return  altitude in meters
-     * @since   3.34/4.29
-     */
-    /*[deutsch]
-     * <p>Liefert die geographische H&ouml;he dieser Instanz relativ zum Meeresspiegel. </p>
-     *
-     * @return  altitude in meters
-     * @since   3.34/4.29
-     */
+    @Override
     public int getAltitude() {
 
         return this.altitude;
