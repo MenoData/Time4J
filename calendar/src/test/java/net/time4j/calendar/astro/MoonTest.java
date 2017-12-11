@@ -140,17 +140,23 @@ public class MoonTest {
             );
 
         // Meeus - example 47.a
-        MoonPosition position = MoonPosition.calculateMeeus(jd.getCenturyJ2000());
+        double[] data = MoonPosition.calculateMeeus(jd.getCenturyJ2000());
 
         assertThat(
-            position.getRightAscension(),
-            is(134.68846856938873));
+            data[0],
+            is(0.004609595895691879)); // nutation-in-longitude
         assertThat(
-            position.getDeclination(),
-            is(13.768366716980461));
+            data[1],
+            is(23.440635013964783)); // true obliquity in degrees
         assertThat(
-            position.getDistance(),
-            is(368409.6848161269));
+            data[2],
+            is(134.68846856938873)); // right ascension in degrees
+        assertThat(
+            data[3],
+            is(13.768366716980461)); // declination in degrees
+        assertThat(
+            data[4],
+            is(368409.6848161269)); // distance in km
     }
 
 }
