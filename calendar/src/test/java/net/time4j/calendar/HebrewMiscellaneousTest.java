@@ -96,11 +96,11 @@ public class HebrewMiscellaneousTest {
         HebrewTime time = HebrewTime.ofDay(12, 540);
         assertThat(
             time.on(HebrewCalendar.of(5778, HebrewMonth.NISAN, 1), SolarTime.ofJerusalem()).get(),
-            is(PlainTimestamp.of(2018, 3, 17, 4, 13, 25).atUTC())); // sunrise at 2018-03-17T03:43:02Z
+            is(PlainTimestamp.of(2018, 3, 17, 4, 13, 26).atUTC())); // sunrise at 2018-03-17T03:43:02Z
         time = HebrewTime.ofNight(12, 540);
         assertThat(
             time.on(HebrewCalendar.of(5778, HebrewMonth.NISAN, 1), SolarTime.ofJerusalem()).get(),
-            is(PlainTimestamp.of(2018, 3, 16, 16, 21, 14).atUTC())); // short after sunset
+            is(PlainTimestamp.of(2018, 3, 16, 16, 21, 11).atUTC())); // short after sunset
     }
 
     @Test
@@ -115,10 +115,10 @@ public class HebrewMiscellaneousTest {
     @Test
     public void atJerusalem() {
         assertThat(
-            PlainTimestamp.of(2018, 3, 17, 4, 13, 25).atUTC().get(HebrewTime.at(SolarTime.ofJerusalem())).get(),
+            PlainTimestamp.of(2018, 3, 17, 4, 13, 26).atUTC().get(HebrewTime.at(SolarTime.ofJerusalem())).get(),
             is(HebrewTime.ofDay(12, 539))); // small rounding error (normally 540P)
         assertThat(
-            PlainTimestamp.of(2018, 3, 16, 16, 21, 14).atUTC().get(HebrewTime.at(SolarTime.ofJerusalem())).get(),
+            PlainTimestamp.of(2018, 3, 16, 16, 21, 11).atUTC().get(HebrewTime.at(SolarTime.ofJerusalem())).get(),
             is(HebrewTime.ofNight(12, 539))); // small rounding error (normally 540P)
     }
 
