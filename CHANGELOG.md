@@ -8,6 +8,7 @@
 - Four methods in SolarTime loose the day information [#724]
 
 ### Fixed
+- StdSolarCalculator.CC has integer-division-error [#725]
 - Class SolarTime normally expects LMT-dates not zoned dates [#719]
 
 ## [v3.37] published on 2017-11-26
