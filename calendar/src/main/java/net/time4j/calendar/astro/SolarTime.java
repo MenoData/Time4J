@@ -36,6 +36,7 @@ import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -2004,6 +2005,9 @@ public final class SolarTime
         ) {
             super();
 
+            Timezone tz = Timezone.of(tzid);
+            boolean zoneHistory = (tz.getHistory() != null);
+
             if (absent) { // polar night
                 this.startUTC = null;
                 this.endUTC = null;
@@ -2015,22 +2019,39 @@ public final class SolarTime
                 if (end.isPresent()) { // standard use-case
                     this.endUTC = end.get();
                     this.endLocal = this.endUTC.toZonalTimestamp(tzid);
-                } else {
+                } else if (zoneHistory) {
                     PlainDate next = date.plus(1, CalendarUnit.DAYS);
                     this.endUTC = next.atFirstMoment(tzid);
                     this.endLocal = next.atStartOfDay(tzid);
+                } else {
+                    PlainDate next = date.plus(1, CalendarUnit.DAYS);
+                    this.endUTC = next.atStartOfDay().in(tz);
+                    this.endLocal = this.endUTC.toZonalTimestamp(tzid);
                 }
             } else if (end.isPresent()) {
-                this.startUTC = date.atFirstMoment(tzid);
-                this.startLocal = date.atStartOfDay(tzid);
-                this.endUTC = end.get();
-                this.endLocal = this.endUTC.toZonalTimestamp(tzid);
-            } else { // midnight sun
+                if (zoneHistory) {
+                    this.startUTC = date.atFirstMoment(tzid);
+                    this.startLocal = date.atStartOfDay(tzid);
+                    this.endUTC = end.get();
+                    this.endLocal = this.endUTC.toZonalTimestamp(tzid);
+                } else {
+                    this.startUTC = date.atStartOfDay().in(tz);
+                    this.startLocal = this.startUTC.toZonalTimestamp(tzid);
+                    this.endUTC = end.get();
+                    this.endLocal = this.endUTC.toZonalTimestamp(tzid);
+                }
+            } else if (zoneHistory) { // midnight sun
                 this.startUTC = date.atFirstMoment(tzid);
                 this.startLocal = date.atStartOfDay(tzid);
                 PlainDate next = date.plus(1, CalendarUnit.DAYS);
                 this.endUTC = next.atFirstMoment(tzid);
                 this.endLocal = next.atStartOfDay(tzid);
+            } else { // midnight sun
+                this.startUTC = date.atStartOfDay().in(tz);
+                this.startLocal = this.startUTC.toZonalTimestamp(tzid);
+                PlainDate next = date.plus(1, CalendarUnit.DAYS);
+                this.endUTC = next.atStartOfDay().in(tz);
+                this.endLocal = this.endUTC.toZonalTimestamp(tzid);
             }
 
         }
@@ -2040,12 +2061,18 @@ public final class SolarTime
         /**
          * <p>Obtains the moment of sunrise if it exists. </p>
          *
+         * <p>Note: If there is no sunrise but the sun is already above the horizon at the start of day
+         * then this method yields the start of day. </p>
+         *
          * @return  moment of sunrise
          * @throws  IllegalStateException in case of absent sunshine (polar night)
          * @see     #isAbsent()
          */
         /*[deutsch]
          * <p>Liefert den Moment des Sonnenaufgangs wenn vorhanden. </p>
+         *
+         * <p>Hinweis: Wenn es keinen Sonnenaufgang gibt, aber die Sonne schon &uuml;ber dem Horizont
+         * steht, dann liefert diese Methode den Anfang des Kalendertages. </p>
          *
          * @return  moment of sunrise
          * @throws  IllegalStateException in case of absent sunshine (polar night)
@@ -2060,12 +2087,18 @@ public final class SolarTime
         /**
          * <p>Obtains the moment of sunset if it exists. </p>
          *
+         * <p>Note: If there is no sunset but the sun is still above the horizon at the end of day
+         * then this method yields the end of day. </p>
+         *
          * @return  moment of sunset (exclusive)
          * @throws  IllegalStateException in case of absent sunshine (polar night)
          * @see     #isAbsent()
          */
         /*[deutsch]
          * <p>Liefert den Moment des Sonnenuntergangs wenn vorhanden. </p>
+         *
+         * <p>Hinweis: Wenn es keinen Sonnenuntergang gibt, aber die Sonne noch &uuml;ber dem Horizont
+         * steht, dann liefert diese Methode das Ende des Kalendertages. </p>
          *
          * @return  moment of sunset (exclusive)
          * @throws  IllegalStateException in case of absent sunshine (polar night)
@@ -2080,12 +2113,18 @@ public final class SolarTime
         /**
          * <p>Obtains the local timestamp of sunrise if it exists. </p>
          *
+         * <p>Note: If there is no sunrise but the sun is already above the horizon at the start of day
+         * then this method yields the start of day. </p>
+         *
          * @return  local timestamp of sunrise
          * @throws  IllegalStateException in case of absent sunshine (polar night)
          * @see     #isAbsent()
          */
         /*[deutsch]
          * <p>Liefert die lokale Zeit des Sonnenaufgangs wenn vorhanden. </p>
+         *
+         * <p>Hinweis: Wenn es keinen Sonnenaufgang gibt, aber die Sonne schon &uuml;ber dem Horizont
+         * steht, dann liefert diese Methode den Anfang des Kalendertages. </p>
          *
          * @return  local timestamp of sunrise
          * @throws  IllegalStateException in case of absent sunshine (polar night)
@@ -2100,12 +2139,18 @@ public final class SolarTime
         /**
          * <p>Obtains the local timestamp of sunset if it exists. </p>
          *
+         * <p>Note: If there is no sunset but the sun is still above the horizon at the end of day
+         * then this method yields the end of day. </p>
+         *
          * @return  local timestamp of sunset (exclusive)
          * @throws  IllegalStateException in case of absent sunshine (polar night)
          * @see     #isAbsent()
          */
         /*[deutsch]
          * <p>Liefert die lokale Zeit des Sonnenuntergangs wenn vorhanden. </p>
+         *
+         * <p>Hinweis: Wenn es keinen Sonnenuntergang gibt, aber die Sonne noch &uuml;ber dem Horizont
+         * steht, dann liefert diese Methode das Ende des Kalendertages. </p>
          *
          * @return  local timestamp of sunset (exclusive)
          * @throws  IllegalStateException in case of absent sunshine (polar night)
