@@ -747,16 +747,16 @@ public class AstroTest {
                 .build();
         assertThat(
             date.get(kibo5895.sunrise()).toZonalTimestamp(tzidObj).toTime(),
-            is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level
+            is(PlainTime.of(6, 10, 35))); // 6:09:28 with same atmospheric refraction as on sea level
         assertThat(
             date.get(kibo5895.sunset()).toZonalTimestamp(tzidObj).toTime(),
-            is(PlainTime.of(18, 47, 48))); // 18:48:55 with same atmospheric refraction as on sea level
+            is(PlainTime.of(18, 47, 47))); // 18:48:55 with same atmospheric refraction as on sea level
         assertThat(
             kibo5895.getAltitude(),
             is(5895));
         assertThat(
             date.get(kibo5895.sunshine(tzidObj)).length(),
-            is(12 * 3600 + 37 * 60 + 14));
+            is(12 * 3600 + 37 * 60 + 12));
         // good agreement with NOAA
         SolarTime kiboSeaLevel =
             SolarTime.ofLocation()
@@ -849,6 +849,12 @@ public class AstroTest {
         assertThat(
             PlainDate.of(2012, 1, 1).get(apia.sunrise()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is same as input date
+    }
+
+    @Test
+    public void geodeticAngleCC() {
+        double dip = StdSolarCalculator.CC.getGeodeticAngle(-22.36, 46);
+        assertThat(dip, is(0.2535051183347955));
     }
 
 }

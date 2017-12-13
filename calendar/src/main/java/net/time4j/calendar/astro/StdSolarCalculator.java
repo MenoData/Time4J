@@ -632,7 +632,7 @@ public enum StdSolarCalculator
             if (altitude == 0) {
                 return 0.0;
             }
-            int r = MEAN_EARTH_RADIUS;
+            double r = MEAN_EARTH_RADIUS;
             return Math.toDegrees(Math.acos(r / (r + altitude))) + (Math.sqrt(altitude) * (19.0 / 3600));
         }
         @Override
@@ -850,13 +850,7 @@ public enum StdSolarCalculator
             if (altitude == 0) {
                 return SolarTime.STD_ZENITH;
             }
-            // approximation assuming standard atmosphere below tropopause
-            // https://de.wikipedia.org/wiki/Normatmosph%C3%A4re
-            // https://de.wikipedia.org/wiki/Barometrische_H%C3%B6henformel#Atmosph.C3.A4re_mit_linearem_Temperaturverlauf
-            double temperature = 1 - ((0.0065 * altitude) / 288.15);
-            double pressure = Math.pow(temperature, 5.255);
-            // we neglect that the bennett term is rather for T=10K and p = 1010hPa
-            double refraction = BENNETT_TERM * (pressure / temperature); // Meeus p.107
+            double refraction = refractionOfStdAtmosphere(altitude);
             return 90 + this.getGeodeticAngle(latitude, altitude) + ((SolarTime.SUN_RADIUS + refraction) / 60.0);
         }
         private Moment event(
@@ -949,7 +943,6 @@ public enum StdSolarCalculator
     private static final int MEAN_EARTH_RADIUS = 6372000;
     private static final double EQUATORIAL_RADIUS = 6378137.0;
     private static final double POLAR_RADIUS = 6356752.3;
-    private static final double BENNETT_TERM = 1 / Math.tan(Math.toRadians(7.31 / 4.4)); // Meeus (16.3)
 
     //~ Methoden ----------------------------------------------------------
 
@@ -988,6 +981,18 @@ public enum StdSolarCalculator
      */
     public double rightAscension(double jde) {
         throw new AbstractMethodError(); // implemented in subclass
+    }
+
+    // approximation assuming standard atmosphere below tropopause - in arc minutes
+    static double refractionOfStdAtmosphere(int altitude) {
+
+        // https://de.wikipedia.org/wiki/Normatmosph%C3%A4re
+        // https://de.wikipedia.org/wiki/Barometrische_H%C3%B6henformel#Atmosph.C3.A4re_mit_linearem_Temperaturverlauf
+        double temperature = 1 - ((0.0065 * altitude) / 288.15);
+        double pressureDivTemperature = Math.pow(temperature, 4.255);
+        // we neglect that the underlying bennett term is rather valid for T=10K and p = 1010hPa
+        return SolarTime.STD_REFRACTION * (pressureDivTemperature); // Meeus p.107
+
     }
 
     // Meeus (22.2), in degrees
