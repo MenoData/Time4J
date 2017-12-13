@@ -4,6 +4,8 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.tz.OffsetSign;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -157,6 +159,106 @@ public class MoonTest {
         assertThat(
             data[4],
             is(368409.6848161269)); // distance in km
+    }
+
+    @Test
+    public void moonlightYannarie() {
+        Timezone tz = Timezone.of("Australia/Perth");
+        LunarTime lunarTime =
+            LunarTime.ofLocation(tz.getID())
+                .southernLatitude(22, 35, 37.31)
+                .easternLongitude(114, 57, 39.24)
+                .atAltitude(46)
+                .build();
+        LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2016, 7, 4));
+        assertThat(moonlight.moonrise().get(),
+            is(PlainTimestamp.of(2016, 7, 4, 6, 25, 10).in(tz)));
+            // sea-level: 06:26:12, mooncalc: 06:26:09, noaa: 06:26
+        assertThat(moonlight.moonset().get(),
+            is(PlainTimestamp.of(2016, 7, 4, 17, 48, 40).in(tz)));
+            // sea-level: 17:47:38, mooncalc: 17:47:45, noaa: 17:47
+        assertThat(moonlight.moonriseLocal().get(),
+            is(PlainTimestamp.of(2016, 7, 4, 6, 25, 10)));
+        assertThat(moonlight.moonsetLocal().get(),
+            is(PlainTimestamp.of(2016, 7, 4, 17, 48, 40)));
+        assertThat(moonlight.moonrise(ZonalOffset.UTC).get(),
+            is(PlainTimestamp.of(2016, 7, 3, 22, 25, 10)));
+        assertThat(moonlight.moonset(ZonalOffset.UTC).get(),
+            is(PlainTimestamp.of(2016, 7, 4, 9, 48, 40)));
+        assertThat(moonlight.length(), is(41010));
+        assertThat(moonlight.isAbsent(), is(false));
+        assertThat(moonlight.isPresentAllDay(), is(false));
+        assertThat(moonlight.isPresent(PlainTimestamp.of(2016, 7, 4, 6, 25, 9).in(tz)), is(false));
+        assertThat(moonlight.isPresent(PlainTimestamp.of(2016, 7, 4, 6, 25, 10).in(tz)), is(true));
+    }
+
+    @Test
+    public void moonlightLondon() {
+        Timezone tz = Timezone.of("Europe/London");
+        LunarTime lunarTime =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(51, 30, 33.8)
+                .westernLongitude(0, 7, 5.95)
+                .build();
+        LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2016, 8, 19));
+        assertThat(moonlight.moonrise().get(),
+            is(PlainTimestamp.of(2016, 8, 19, 20, 45, 13).in(tz)));
+        assertThat(moonlight.moonset().get(),
+            is(PlainTimestamp.of(2016, 8, 19, 7, 3, 14).in(tz)));
+        assertThat(moonlight.length(), is(37081));
+        assertThat(moonlight.isAbsent(), is(false));
+        assertThat(moonlight.isPresentAllDay(), is(false));
+    }
+
+    @Test
+    public void moonlightMunich() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        LunarTime lunarTime = LunarTime.ofLocation(tz.getID(), 48.1, 11.6);
+        LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2000, 3, 25));
+        assertThat(moonlight.moonrise().isPresent(), is(false));
+        assertThat(moonlight.moonset().get(),
+            is(PlainTimestamp.of(2000, 3, 25, 8, 58, 33).in(tz)));
+        assertThat(moonlight.length(), is(32313));
+        assertThat(moonlight.isAbsent(), is(false));
+        assertThat(moonlight.isPresentAllDay(), is(false));
+    }
+
+    @Test
+    public void moonlightShanghai() {
+        Timezone tz = Timezone.of("Asia/Shanghai");
+        LunarTime lunarTime =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2017, 12, 13));
+        assertThat(moonlight.moonrise().get(),
+            is(PlainTimestamp.of(2017, 12, 13, 1, 55, 53).in(tz)));
+        assertThat(moonlight.moonset().get(),
+            is(PlainTimestamp.of(2017, 12, 13, 13, 54, 32).in(tz)));
+        assertThat(moonlight.length(), is(43119));
+        assertThat(moonlight.isAbsent(), is(false));
+        assertThat(moonlight.isPresentAllDay(), is(false));
+    }
+
+    @Test
+    public void moonlightPolarCircle() { // see also: https://www.mooncalc.org
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2);
+        LunarTime lunarTime = LunarTime.ofLocation(offset, 65, 10);
+
+        LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2007, 6, 14));
+        assertThat(moonlight.moonrise().isPresent(), is(false));
+        assertThat(moonlight.moonset().isPresent(), is(false));
+        assertThat(moonlight.length(), is(86400));
+        assertThat(moonlight.isAbsent(), is(false));
+        assertThat(moonlight.isPresentAllDay(), is(true));
+
+        LunarTime.Moonlight moonlight2 = lunarTime.on(PlainDate.of(2007, 6, 30));
+        assertThat(moonlight2.moonrise().isPresent(), is(false));
+        assertThat(moonlight2.moonset().isPresent(), is(false));
+        assertThat(moonlight2.length(), is(0));
+        assertThat(moonlight2.isAbsent(), is(true));
+        assertThat(moonlight2.isPresentAllDay(), is(false));
     }
 
 }
