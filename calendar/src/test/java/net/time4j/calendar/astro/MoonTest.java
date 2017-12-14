@@ -173,10 +173,10 @@ public class MoonTest {
         LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2016, 7, 4));
         assertThat(moonlight.moonrise().get(),
             is(PlainTimestamp.of(2016, 7, 4, 6, 25, 10).in(tz)));
-            // sea-level: 06:26:12, mooncalc: 06:26:09, noaa: 06:26
+            // sea-level: 06:26:12, mooncalc: 06:26:09, usno: 06:26
         assertThat(moonlight.moonset().get(),
             is(PlainTimestamp.of(2016, 7, 4, 17, 48, 40).in(tz)));
-            // sea-level: 17:47:38, mooncalc: 17:47:45, noaa: 17:47
+            // sea-level: 17:47:38, mooncalc: 17:47:45, usno: 17:47
         assertThat(moonlight.moonriseLocal().get(),
             is(PlainTimestamp.of(2016, 7, 4, 6, 25, 10)));
         assertThat(moonlight.moonsetLocal().get(),
@@ -208,6 +208,36 @@ public class MoonTest {
         assertThat(moonlight.length(), is(37081));
         assertThat(moonlight.isAbsent(), is(false));
         assertThat(moonlight.isPresentAllDay(), is(false));
+    }
+
+    @Test
+    public void moonlightHamburg() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        LunarTime lunarTime =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(53, 33, 2.0)
+                .easternLongitude(9, 59, 36.0)
+                .build();
+
+        LunarTime.Moonlight moonlight1 = lunarTime.on(PlainDate.of(1982, 9, 26)); // end of summer time
+        assertThat(moonlight1.moonrise().get(),
+            is(PlainTimestamp.of(1982, 9, 26, 15, 41, 59).in(tz)));
+        assertThat(moonlight1.moonset().get(),
+            is(PlainTimestamp.of(1982, 9, 26, 23, 17, 43).in(tz)));
+        assertThat(moonlight1.length(), is(27344));
+
+        LunarTime.Moonlight moonlight2 = lunarTime.on(PlainDate.of(1982, 9, 27)); // standard time
+        assertThat(moonlight2.moonrise().get(),
+            is(PlainTimestamp.of(1982, 9, 27, 16, 21, 37).in(tz)));
+        assertThat(moonlight2.moonset().isPresent(), is(false));
+        assertThat(moonlight2.length(), is(27503));
+
+        LunarTime.Moonlight moonlight3 = lunarTime.on(PlainDate.of(1982, 9, 28));
+        assertThat(moonlight3.moonset().get(),
+            is(PlainTimestamp.of(1982, 9, 28, 0, 18, 37).in(tz)));
+        assertThat(moonlight3.moonrise().get(),
+            is(PlainTimestamp.of(1982, 9, 28, 16, 53, 38).in(tz)));
+        assertThat(moonlight3.length(), is(26699));
     }
 
     @Test
@@ -259,6 +289,52 @@ public class MoonTest {
         assertThat(moonlight2.length(), is(0));
         assertThat(moonlight2.isAbsent(), is(true));
         assertThat(moonlight2.isPresentAllDay(), is(false));
+    }
+
+    @Test
+    public void moonlightNorthPole() {
+        // see also:
+        // http://aa.usno.navy.mil/cgi-bin/aa_rstablew.pl?ID=AA&year=2017&task=1&place=north+pole&lon_sign=1&lon_deg=0&lon_min=0&lat_sign=1&lat_deg=90&lat_min=0&tz=2&tz_sign=1
+        Timezone tz = Timezone.of("Arctic/Longyearbyen"); // = Europe/Oslo
+        LunarTime lunarTime =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(90, 0, 0.0)
+                .easternLongitude(0, 0, 0.0)
+                .build();
+
+        LunarTime.Moonlight moonlight1 = lunarTime.on(PlainDate.of(2017, 5, 22));
+        assertThat(moonlight1.isAbsent(), is(false));
+        assertThat(moonlight1.isPresentAllDay(), is(false));
+        assertThat(moonlight1.moonrise().get(), is(PlainTimestamp.of(2017, 5, 22, 1, 29, 45).in(tz)));
+        assertThat(moonlight1.moonset().isPresent(), is(false));
+
+        LunarTime.Moonlight moonlight2 = lunarTime.on(PlainDate.of(2017, 6, 1));
+        assertThat(moonlight2.isAbsent(), is(false));
+        assertThat(moonlight2.isPresentAllDay(), is(true));
+
+        LunarTime.Moonlight moonlight3 = lunarTime.on(PlainDate.of(2017, 8, 15));
+        assertThat(moonlight3.isAbsent(), is(false));
+        assertThat(moonlight3.isPresentAllDay(), is(true));
+
+        LunarTime.Moonlight moonlight4 = lunarTime.on(PlainDate.of(2017, 8, 24));
+        assertThat(moonlight4.isAbsent(), is(false));
+        assertThat(moonlight4.isPresentAllDay(), is(false));
+        assertThat(moonlight4.moonset().get(), is(PlainTimestamp.of(2017, 8, 24, 17, 59, 57).in(tz)));
+        assertThat(moonlight4.moonrise().isPresent(), is(false));
+
+        LunarTime.Moonlight moonlight5 = lunarTime.on(PlainDate.of(2017, 8, 31));
+        assertThat(moonlight5.isAbsent(), is(true));
+        assertThat(moonlight5.isPresentAllDay(), is(false));
+
+        LunarTime.Moonlight moonlight6 = lunarTime.on(PlainDate.of(2017, 9, 21));
+        assertThat(moonlight6.isAbsent(), is(false));
+        assertThat(moonlight6.isPresentAllDay(), is(false));
+        assertThat(moonlight6.moonset().get(), is(PlainTimestamp.of(2017, 9, 21, 2, 48, 18).in(tz)));
+        assertThat(moonlight6.moonrise().isPresent(), is(false));
+
+        LunarTime.Moonlight moonlight7 = lunarTime.on(PlainDate.of(2017, 12, 13));
+        assertThat(moonlight7.isAbsent(), is(true));
+        assertThat(moonlight7.isPresentAllDay(), is(false));
     }
 
 }
