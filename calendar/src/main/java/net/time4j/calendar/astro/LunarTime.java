@@ -58,7 +58,7 @@ public final class LunarTime
 
     private static final int MRD = 1_000_000_000;
 
-    //private static final long serialVersionUID = -4816619838743247977L;
+    private static final long serialVersionUID = -8029871830105935048L;
 
     //~ Instanzvariablen --------------------------------------------------
 
