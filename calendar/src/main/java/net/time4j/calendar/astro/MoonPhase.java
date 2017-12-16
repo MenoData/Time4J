@@ -215,26 +215,72 @@ public enum MoonPhase {
 	}
 
 	/**
+	 * <p>Obtains the minimum supported lunation. </p>
+	 *
+	 * @return	int
+	 * @see 	#atLunation(int)
+	 * @since 	3.38/4.33
+	 */
+	/*[deutsch]
+	 * <p>Liefert die minimal unterst&uuml;tzte Lunation. </p>
+	 *
+	 * @return	int
+	 * @see 	#atLunation(int)
+	 * @since 	3.38/4.33
+	 */
+	public static int minLunation() {
+
+		return -49473;
+
+	}
+
+	/**
+	 * <p>Obtains the maximum supported lunation. </p>
+	 *
+	 * @return	int
+	 * @see 	#atLunation(int)
+	 * @since 	3.38/4.33
+	 */
+	/*[deutsch]
+	 * <p>Liefert die maximal unterst&uuml;tzte Lunation. </p>
+	 *
+	 * @return	int
+	 * @see 	#atLunation(int)
+	 * @since 	3.38/4.33
+	 */
+	public static int maxLunation() {
+
+		return 12379;
+
+	}
+
+	/**
 	 * <p>Obtains the time of n-th lunation based on this type of phase. </p>
 	 *
 	 * <p>The parameter value {@code n = 0} will determine the first phase after the calendar date 2000-01-01.
 	 * For example, the expression {@code NEW_MOON.atLunation(0)} calculates the first new moon in year 2000
-	 * which is on the date 2000-01-06 (UTC). </p>
+	 * which is on the date 2000-01-06 (UTC). The lunation parameter should be chosen within the range
+	 * {@code minLunation() <= n <= maxLunation()}. </p>
 	 *
 	 * @param 	n	count of lunations (distance between two consecutive moon phases of same type)
 	 * @return	moment of this phase after given lunations
 	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 * @see 	#minLunation()
+	 * @see 	#maxLunation()
 	 */
 	/*[deutsch]
 	 * <p>Liefert den Zeitpunkt der n-ten Lunation basierend auf diesem Phasentyp. </p>
 	 *
 	 * <p>Der Parameterwert {@code n = 0} bestimmt die erste Phase nach dem Kalenderdatum 2000-01-01.
 	 * Zum Beispiel wird der Ausdruck {@code NEW_MOON.atLunation(0)} den ersten Neumond im Jahre 2000
-	 * berechnen, und zwar zum Datum 2000-01-06 (UTC). </p>
+	 * berechnen, und zwar zum Datum 2000-01-06 (UTC). Die Lunation sollte innerhalb des Bereichs
+	 * {@code minLunation() <= n <= maxLunation()} liegen. </p>
 	 *
 	 * @param 	n	count of lunations (distance between two consecutive moon phases of same type)
 	 * @return	moment of this phase after given lunations
 	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 * @see 	#minLunation()
+	 * @see 	#maxLunation()
 	 */
 	public Moment atLunation(int n) {
 

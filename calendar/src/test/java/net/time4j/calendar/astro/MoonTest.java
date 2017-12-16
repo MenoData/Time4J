@@ -16,6 +16,7 @@ import java.util.concurrent.TimeUnit;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
+import static org.junit.Assert.fail;
 
 
 @RunWith(JUnit4.class)
@@ -336,6 +337,42 @@ public class MoonTest {
         LunarTime.Moonlight moonlight7 = lunarTime.on(PlainDate.of(2017, 12, 13));
         assertThat(moonlight7.isAbsent(), is(true));
         assertThat(moonlight7.isPresentAllDay(), is(false));
+    }
+
+    @Test
+    public void minLunation() {
+        int min = MoonPhase.minLunation();
+        try {
+            MoonPhase.NEW_MOON.atLunation(min);
+        } catch (IllegalArgumentException iae) {
+            fail("min-lunation failed: " + min);
+        }
+
+        min--;
+        try {
+            MoonPhase.NEW_MOON.atLunation(min);
+            fail("min-lunation should have failed: " + min);
+        } catch (IllegalArgumentException iae) {
+            // expected
+        }
+    }
+
+    @Test
+    public void maxLunation() {
+        int max = MoonPhase.maxLunation();
+        try {
+            MoonPhase.LAST_QUARTER.atLunation(max);
+        } catch (IllegalArgumentException iae) {
+            fail("max-lunation failed: " + max);
+        }
+
+        max++;
+        try {
+            MoonPhase.LAST_QUARTER.atLunation(max);
+            fail("max-lunation should have failed: " + max);
+        } catch (IllegalArgumentException iae) {
+            // expected
+        }
     }
 
 }
