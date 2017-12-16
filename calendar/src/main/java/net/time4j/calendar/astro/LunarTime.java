@@ -40,12 +40,46 @@ import java.util.concurrent.TimeUnit;
 /**
  * <p>Contains various routines to determine times of some moon events like moonrise or moonset. </p>
  *
+ * <p>Moonrise and moonset are not tightly coupled to the day cycle which follows the sun.
+ * Therefore it is sometimes possible to have only one or none of both events happening at a given
+ * calendar date. Furthermore, the moon can also first sets and then rises on the same day. Example
+ * of usage: </p>
+ *
+ * <pre>
+ *     Timezone tz = Timezone.of(&quot;Europe/Berlin&quot;);
+ *     LunarTime munich = LunarTime.ofLocation(tz.getID(), 48.1, 11.6);
+ *     LunarTime.Moonlight moonlight = munich.on(PlainDate.of(2000, 3, 25));
+ *     assertThat(
+ *       moonlight.moonrise(),
+ *       nullValue());
+ *     assertThat(
+ *       moonlight.moonset(),
+ *       is(PlainTimestamp.of(2000, 3, 25, 8, 58, 33).in(tz)));
+ * </pre>
+ *
  * @author  Meno Hochschild
  * @since   3.38/4.33
  */
 /*[deutsch]
  * <p>Enth&auml;lt diverse Methoden zur Bestimmung der Zeit von lunaren Ereignissen
  * wie Mondaufgang oder Monduntergang. </p>
+ *
+ * <p>Mondaufgang und Monduntergang sind nicht eng an den Tageszyklus gebunden, der der Sonne folgt.
+ * Deshalb ist es manchmal m&ouml;glich, da&szlig; nur eines der beiden Ereignisse oder gar kein solches
+ * Ereignis zu einem gegebenen Kalenderdatum auftreten. Au&szlig;erdem ist es oft m&ouml;glich, da&szlig;
+ * an selben Tag der Mond zuerst untergeht und dann aufgeht. Anwendungsbeispiel: </p>
+ *
+ * <pre>
+ *     Timezone tz = Timezone.of(&quot;Europe/Berlin&quot;);
+ *     LunarTime munich = LunarTime.ofLocation(tz.getID(), 48.1, 11.6);
+ *     LunarTime.Moonlight moonlight = munich.on(PlainDate.of(2000, 3, 25));
+ *     assertThat(
+ *       moonlight.moonrise(),
+ *       nullValue());
+ *     assertThat(
+ *       moonlight.moonset(),
+ *       is(PlainTimestamp.of(2000, 3, 25, 8, 58, 33).in(tz)));
+ * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.38/4.33
