@@ -3,6 +3,7 @@
 - Moon rise/set [#704]
 - Positions of Sun and Moon in terms of right ascension and declination [#716]
 - Make right ascension of sun accessible [#715]
+- Determine min/max-range of possible lunations [#720]
 
 ### Changed/Deprecated
 - HebrewMonth.Order.BIBILICAL contains a typo [#714]
