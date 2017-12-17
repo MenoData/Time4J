@@ -1,6 +1,7 @@
 ## [v3.38] not yet released
 ### Added
 - Moon rise/set [#704]
+- Calculation for azimuth/elevation of Sun and Moon [#723]
 - Positions of Sun and Moon in terms of right ascension and declination [#716]
 - Make right ascension of sun accessible [#715]
 - Determine min/max-range of possible lunations [#720]
