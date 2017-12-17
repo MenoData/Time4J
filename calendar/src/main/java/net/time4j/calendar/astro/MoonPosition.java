@@ -102,7 +102,7 @@ public class MoonPosition
     };
 
     private static final int MIO = 1_000_000;
-    //private static final long serialVersionUID = -5075806426064082268L;
+    private static final long serialVersionUID = 5736859564589473324L;
 
     //~ Instanzvariablen --------------------------------------------------
 

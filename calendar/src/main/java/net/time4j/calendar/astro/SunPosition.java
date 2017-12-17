@@ -47,8 +47,7 @@ public class SunPosition
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int MIO = 1_000_000;
-    //private static final long serialVersionUID = -5075806426064082268L;
+    private static final long serialVersionUID = -3023032442869934354L;
 
     //~ Instanzvariablen --------------------------------------------------
 
