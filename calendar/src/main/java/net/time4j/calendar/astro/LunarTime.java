@@ -335,7 +335,7 @@ public final class LunarTime
         double cosLatitude = Math.cos(Math.toRadians(this.latitude));
         double sinLatitude = Math.sin(Math.toRadians(this.latitude));
         double geodeticAngle = StdSolarCalculator.TIME4J.getGeodeticAngle(this.latitude, this.altitude);
-        double refraction = StdSolarCalculator.refractionOfStdAtmosphere(this.altitude) / 60;
+        double refraction = AstroUtils.refractionFactorOfStdAtmosphere(this.altitude) * SolarTime.STD_REFRACTION / 60;
         double deltaT = TimeScale.deltaT(d);
         double hour = 1.0;
         double y_minus = sinAlt(mjd0, 0.0, longitudeRad, cosLatitude, sinLatitude, geodeticAngle, refraction, deltaT);
@@ -438,7 +438,7 @@ public final class LunarTime
         double jct = toJulianCenturies(mjd + (deltaT / 86400));
         double[] data = MoonPosition.calculateMeeus(jct);
         double nutationCorr = data[0] * Math.cos(Math.toRadians(data[1])); // for apparent sidereal time
-        double tau = gmst(mjd) + Math.toRadians(nutationCorr) + longitudeRad - Math.toRadians(data[2]);
+        double tau = AstroUtils.gmst(mjd) + Math.toRadians(nutationCorr) + longitudeRad - Math.toRadians(data[2]);
         double decl = Math.toRadians(data[3]);
 
         // transformation to horizontal coordinate system
@@ -449,20 +449,6 @@ public final class LunarTime
 
         // we search for the roots of this function
         return sinAltitude - Math.sin(Math.toRadians(correction));
-
-    }
-
-    // mean sidereal time of Greenwich in radians
-    private static double gmst(double mjd) {
-
-        double mjd0 = Math.floor(mjd);
-        double ut = 86400 * (mjd - mjd0);
-        double jct0 = toJulianCenturies(mjd0);
-        double jct = toJulianCenturies(mjd);
-        double gmstInSecs =
-            24110.54841 + 8640184.812866 * jct0 + 1.0027379093 * ut + (0.093104 - 0.0000062 * jct) * jct * jct;
-        double gmstInDays = gmstInSecs / 86400;
-        return (gmstInDays - Math.floor(gmstInDays)) * 2 * Math.PI;
 
     }
 

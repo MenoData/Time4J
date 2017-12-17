@@ -850,7 +850,7 @@ public enum StdSolarCalculator
             if (altitude == 0) {
                 return SolarTime.STD_ZENITH;
             }
-            double refraction = refractionOfStdAtmosphere(altitude);
+            double refraction = AstroUtils.refractionFactorOfStdAtmosphere(altitude) * SolarTime.STD_REFRACTION;
             return 90 + this.getGeodeticAngle(latitude, altitude) + ((SolarTime.SUN_RADIUS + refraction) / 60.0);
         }
         private Moment event(
@@ -981,18 +981,6 @@ public enum StdSolarCalculator
      */
     public double rightAscension(double jde) {
         throw new AbstractMethodError(); // implemented in subclass
-    }
-
-    // approximation assuming standard atmosphere below tropopause - in arc minutes
-    static double refractionOfStdAtmosphere(int altitude) {
-
-        // https://de.wikipedia.org/wiki/Normatmosph%C3%A4re
-        // https://de.wikipedia.org/wiki/Barometrische_H%C3%B6henformel#Atmosph.C3.A4re_mit_linearem_Temperaturverlauf
-        double temperature = 1 - ((0.0065 * altitude) / 288.15);
-        double pressureDivTemperature = Math.pow(temperature, 4.255);
-        // we neglect that the underlying bennett term is rather valid for T=10K and p = 1010hPa
-        return SolarTime.STD_REFRACTION * (pressureDivTemperature); // Meeus p.107
-
     }
 
     // Meeus (22.2), in degrees
