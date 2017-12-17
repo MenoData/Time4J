@@ -856,4 +856,48 @@ public class AstroTest {
         assertThat(dip, is(0.2535051183347955));
     }
 
+    @Test
+    public void sunPositionHamburg() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        SolarTime hh =
+            SolarTime.ofLocation()
+                .northernLatitude(53, 33, 0.0)
+                .easternLongitude(10, 0, 0.0)
+                .build();
+        Moment moment = PlainTimestamp.of(2017, 6, 15, 7, 30).in(tz);
+        SunPosition position = SunPosition.at(moment, hh);
+
+        assertThat(
+            position.getAzimuth(),
+            is(77.44408289997781)); // usno => 77.4
+        assertThat(
+            position.getElevation(),
+            is(19.986857686242704)); // usno => 20.0
+    }
+
+    @Test
+    public void sunPositionShanghai() {
+        Timezone tz = Timezone.of("Asia/Shanghai");
+        SolarTime shanghai =
+            SolarTime.ofLocation()
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        Moment moment = PlainTimestamp.of(2017, 12, 13, 8, 10).in(tz);
+        SunPosition position = SunPosition.at(moment, shanghai);
+
+        assertThat(
+            position.getRightAscension(),
+            is(260.38484838292726));
+        assertThat(
+            position.getDeclination(),
+            is(-23.140561983747027));
+        assertThat(
+            position.getAzimuth(),
+            is(129.28036788666304)); // usno => 129.3
+        assertThat(
+            position.getElevation(),
+            is(14.679074225415283)); // usno => 14.7
+    }
+
 }

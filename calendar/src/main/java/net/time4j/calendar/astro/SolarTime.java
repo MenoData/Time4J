@@ -1562,7 +1562,7 @@ public final class SolarTime
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
-         * @see     #usingCalculator(Calculator)
+         * @see     #usingCalculator(SolarTime.Calculator)
          * @see     StdSolarCalculator#CC
          * @see     StdSolarCalculator#TIME4J
          */
@@ -1580,7 +1580,7 @@ public final class SolarTime
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
-         * @see     #usingCalculator(Calculator)
+         * @see     #usingCalculator(SolarTime.Calculator)
          * @see     StdSolarCalculator#CC
          * @see     StdSolarCalculator#TIME4J
          */

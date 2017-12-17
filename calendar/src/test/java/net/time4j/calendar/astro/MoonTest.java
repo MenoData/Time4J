@@ -134,7 +134,7 @@ public class MoonTest {
     }
 
     @Test
-    public void moonPosition() {
+    public void moonPositionMeeus47a() {
         JulianDay jd =
             JulianDay.ofEphemerisTime(
                 PlainDate.of(1992, 4, 12),
@@ -160,6 +160,99 @@ public class MoonTest {
         assertThat(
             data[4],
             is(368409.6848161269)); // distance in km
+    }
+
+    @Test
+    public void moonPositionHamburg() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        LunarTime hh =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(53, 33, 0.0)
+                .easternLongitude(10, 0, 0.0)
+                .build();
+        Moment moment = PlainTimestamp.of(2017, 6, 15, 7, 30).in(tz);
+        MoonPosition position = MoonPosition.at(moment, hh);
+
+        assertThat(
+            position.getAzimuth(),
+            is(207.6220337901229)); // usno => 207.6, mooncalc => 207.62
+        assertThat(
+            position.getElevation(),
+            is(19.34313658741523)); // usno => 19.4, mooncalc => 19.4
+    }
+
+    @Test
+    public void moonPositionNY() {
+        Timezone tz = Timezone.of("America/New_York");
+        LunarTime ny =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(40, 43, 0.0)
+                .westernLongitude(74, 0, 0.0)
+                .build();
+
+        Moment m = PlainTimestamp.of(2018, 1, 1, 0, 30).in(tz);
+        MoonPosition position = MoonPosition.at(m, ny);
+        assertThat(
+            position.getAzimuth(),
+            is(226.80838342906432)); // usno => 226.8
+        assertThat(
+            position.getElevation(),
+            is(61.2341366304413)); // usno => 61.8
+
+        m = PlainTimestamp.of(2018, 1, 1, 5, 20).in(tz);
+        position = MoonPosition.at(m, ny);
+        assertThat(
+            position.getAzimuth(),
+            is(285.6150230123558)); // usno => 285.6
+        assertThat(
+            position.getElevation(),
+            is(11.417767062383334)); // usno => 11.4
+
+        m = PlainTimestamp.of(2018, 1, 1, 16, 50).in(tz);
+        position = MoonPosition.at(m, ny);
+        assertThat(
+            position.getAzimuth(),
+            is(65.70561602012208)); // usno => 65.7
+        assertThat(
+            position.getElevation(),
+            is(1.9708028936549722)); // usno => 2.0
+
+        m = PlainTimestamp.of(2018, 1, 1, 21, 0).in(tz);
+        position = MoonPosition.at(m, ny);
+        assertThat(
+            position.getAzimuth(),
+            is(105.11861494255274)); // usno => 105.1
+        assertThat(
+            position.getElevation(),
+            is(46.04943472445113)); // usno => 46.4
+    }
+
+    @Test
+    public void moonPositionShanghai() {
+        Timezone tz = Timezone.of("Asia/Shanghai");
+        LunarTime shanghai =
+            LunarTime.ofLocation(tz.getID())
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        Moment moment = PlainTimestamp.of(2017, 12, 13, 8, 10).in(tz);
+        MoonPosition position = MoonPosition.at(moment, shanghai);
+
+        assertThat(
+            position.getRightAscension(),
+            is(-157.12821896197514));
+        assertThat(
+            position.getDeclination(),
+            is(-4.551668018004738));
+        assertThat(
+            position.getAzimuth(),
+            is(185.0553169644683)); // usno => 185.1, mooncalc => 186.28
+        assertThat(
+            position.getElevation(),
+            is(53.18921727502208)); // usno => 53.6, mooncalc => 53.5
+        assertThat(
+            position.getDistance(),
+            is(394687.49161370925));
     }
 
     @Test
