@@ -1693,4 +1693,15 @@ public class TimeOperatorTest {
             is(PlainTime.of(24)));
     }
 
+    @Test
+    public void combinedOperators() {
+        PlainTime time = PlainTime.nowInSystemTime();
+        assertThat(
+            time.with(PlainTime.DIGITAL_HOUR_OF_DAY.atFloor(7)),
+            is(PlainTime.of(7, 0)));
+        assertThat(
+            time.with(PlainTime.DIGITAL_HOUR_OF_DAY.atCeiling(7)),
+            is(PlainTime.of(7, 59, 59, 999_999_999)));
+    }
+
 }
