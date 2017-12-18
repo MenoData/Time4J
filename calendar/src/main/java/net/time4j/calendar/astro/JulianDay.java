@@ -94,6 +94,8 @@ public final class JulianDay
      */
     public static final double MAX = 2817152.0;
 
+    private static final long serialVersionUID = 486345450973062467L;
+
     //~ Instanzvariablen --------------------------------------------------
 
     /**
