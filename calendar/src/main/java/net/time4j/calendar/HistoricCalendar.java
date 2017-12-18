@@ -1681,6 +1681,32 @@ public final class HistoricCalendar
 
         }
 
+        @Override
+        public int printToInt(
+            HistoricEra value,
+            ChronoDisplay context,
+            AttributeQuery attributes
+        ) {
+
+            return value.ordinal();
+
+        }
+
+        @Override
+        public boolean parseFromInt(
+            ChronoEntity<?> entity,
+            int value
+        ) {
+
+            try {
+                entity.with(this, HistoricEra.values()[value]);
+                return true;
+            } catch (RuntimeException re) {
+                return false;
+            }
+
+        }
+
         private Object readResolve() throws ObjectStreamException {
 
             return ERA;
@@ -1863,13 +1889,6 @@ public final class HistoricCalendar
             ChronoHistory history = getHistory(attributes);
             DualFormatElement element = DualFormatElement.class.cast(history.yearOfEra());
             return element.parse(text, status, attributes, parsedResult);
-
-        }
-
-        @Override
-        public int numerical(Integer value) {
-
-            return value.intValue();
 
         }
 

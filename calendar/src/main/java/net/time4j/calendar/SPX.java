@@ -80,6 +80,12 @@ final class SPX
     /** Serialisierungstyp. */
     static final int HISTORIC = 11;
 
+    /** Serialisierungstyp. */
+    static final int HEBREW_DATE = 12;
+
+    /** Serialisierungstyp. */
+    static final int HEBREW_TIME = 13;
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -179,6 +185,12 @@ final class SPX
             case HISTORIC:
                 this.writeHistoric(out);
                 break;
+            case HEBREW_DATE:
+                this.writeHebrewDate(out);
+                break;
+            case HEBREW_TIME:
+                this.writeHebrewTime(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -238,6 +250,12 @@ final class SPX
                 break;
             case HISTORIC:
                 this.obj = this.readHistoric(in);
+                break;
+            case HEBREW_DATE:
+                this.obj = this.readHebrewDate(in);
+                break;
+            case HEBREW_TIME:
+                this.obj = this.readHebrewTime(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -478,6 +496,45 @@ final class SPX
 
         PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
         return date.transform(HistoricCalendar.family(), variant);
+
+    }
+
+    private void writeHebrewDate(ObjectOutput out)
+        throws IOException {
+
+        HebrewCalendar cal = (HebrewCalendar) this.obj;
+        out.writeInt(cal.getYear());
+        out.writeByte(cal.getMonth().getValue());
+        out.writeByte(cal.getDayOfMonth());
+
+    }
+
+    private HebrewCalendar readHebrewDate(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int year = in.readInt();
+        HebrewMonth month = HebrewMonth.valueOf(in.readByte());
+        int dom = in.readByte();
+        return HebrewCalendar.of(year, month, dom);
+
+    }
+
+    private void writeHebrewTime(ObjectOutput out)
+        throws IOException {
+
+        HebrewTime time = (HebrewTime) this.obj;
+        out.writeByte(time.getDigitalHour());
+        out.writeShort(time.getPart());
+
+    }
+
+    private HebrewTime readHebrewTime(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int hour23 = in.readByte();
+        int part = in.readShort();
+
+        return HebrewTime.ofDigital(hour23, part);
 
     }
 

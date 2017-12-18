@@ -61,7 +61,7 @@ public class DateTimePatternTest {
                 {"MM/dd/yyyy hh:mm a (e)",
                         "de",
                         "2014-05-30T23:45",
-                        "05/30/2014 11:45 nachm. (5)"},
+                        "05/30/2014 11:45 PM (5)"},
                 {"MM/dd/yyyy hh:mm a (ee)",
                         "us",
                         "2014-05-30T23:45",

@@ -69,7 +69,7 @@ public class PrettyTimeTest {
                 .printRelative(
                     PlainTimestamp.of(2014, 9, 4, 14, 40, 5).atUTC(), ZonalOffset.UTC
                 ),
-            is("há 5 seg.")); // Brazilian
+            is("5 seg. atrás")); // Brazilian
         assertThat(
             PrettyTime.of(new Locale("pt", "PT"))
                 .withReferenceClock(clock)
@@ -77,7 +77,7 @@ public class PrettyTimeTest {
                 .printRelative(
                     PlainTimestamp.of(2014, 9, 4, 12, 40, 5).atUTC(), ZonalOffset.UTC
                 ),
-            is("há 2 h")); // inherited from Brazilian, does not exist in pt_PT-resource
+            is("há 2 h"));
     }
 
     @Test
@@ -302,7 +302,7 @@ public class PrettyTimeTest {
     public void print0DaysLatvian() {
         assertThat(
             PrettyTime.of(new Locale("lv")).print(0, DAYS, TextWidth.WIDE),
-            is("0 dienas"));
+            is("0 dienu"));
     }
 
     @Test

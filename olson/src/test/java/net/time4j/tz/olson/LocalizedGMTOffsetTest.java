@@ -30,13 +30,13 @@ public class LocalizedGMTOffsetTest {
                     "sq",
                     "UTC",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-06-30T23:59:60.123 Ora e Grinuiçit",
+                    "2012-06-30T23:59:60.123 GMT",
                     false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSS OOOO",
                     "sq",
                     "Europe/Berlin",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-07-01T01:59:60.123 Ora e Grinuiçit: +02:00",
+                    "2012-07-01T01:59:60.123 GMT+02:00",
                     false},
                 {"uuuu-MM-dd HH:mm:ss OOOO",
                     "fa",
@@ -66,13 +66,13 @@ public class LocalizedGMTOffsetTest {
                     "ar",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣جرينتش\u061C+٠٥:٣٠", // with ALM-marker
+                    "٢٠١٢-٠٧-٠١T٠٥:٢٩:٦٠.١٢٣غرينتش\u061C+٠٥:٣٠", // with ALM-marker
                     false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "ar-DZ",
                     "Asia/Kolkata",
                     "2012-06-30T23:59:60,123000000Z",
-                    "2012-07-01T05:29:60.123جرينتش\u061C+05:30", // with ALM-marker
+                    "2012-07-01T05:29:60.123غرينتش\u061C+05:30", // with ALM-marker
                     false},
                 {"uuuu-MM-dd'T'HH:mm:ss.SSSOOOO",
                     "ar-DZ",

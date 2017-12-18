@@ -15,6 +15,20 @@ import static org.junit.Assert.assertThat;
 public class EraNameTest {
 
     @Test
+    public void getDisplayNameWideHebrew() {
+        assertThat(
+            HebrewEra.ANNO_MUNDI.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("AM"));
+    }
+
+    @Test
+    public void getDisplayShortWideHebrew() {
+        assertThat(
+            HebrewEra.ANNO_MUNDI.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
+            is("AM"));
+    }
+
+    @Test
     public void getDisplayNameWideIslamic() {
         assertThat(
             HijriEra.ANNO_HEGIRAE.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
@@ -115,7 +129,7 @@ public class EraNameTest {
             is("Rattanakosin Sok"));
         assertThat(
             ThaiSolarEra.BUDDHIST.getDisplayName(Locale.FRANCE, TextWidth.WIDE),
-            is("ère bouddhiste"));
+            is("ère bouddhique"));
     }
 
     @Test

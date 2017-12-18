@@ -23,6 +23,7 @@ package net.time4j.range;
 
 import net.time4j.CalendarUnit;
 import net.time4j.Duration;
+import net.time4j.IsoDateUnit;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -707,13 +708,42 @@ public final class DateInterval
     /**
      * <p>Moves this interval along the time axis by given units. </p>
      *
+     * <p>Note: This method will be removed in next major release in favor of alternative
+     * overloaded method {@link #move(long, IsoDateUnit)}. </p>
+     *
      * @param   amount  amount of units
      * @param   unit    time unit for moving
      * @return  moved copy of this interval
      */
+    // TODO: remove this method (in favor of overloaded method) in next major release
     public DateInterval move(
         long amount,
         CalendarUnit unit
+    ) {
+
+        return this.move(amount, IsoDateUnit.class.cast(unit));
+
+    }
+
+    /**
+     * <p>Moves this interval along the time axis by given units. </p>
+     *
+     * @param   amount  amount of units
+     * @param   unit    time unit for moving
+     * @return  moved copy of this interval
+     * @since   3.37/4.32
+     */
+    /*[deutsch]
+     * <p>Versetzt dieses Intervall entlang der Datumsachse um die angegebenen Zeiteinheiten. </p>
+     *
+     * @param   amount  amount of units
+     * @param   unit    time unit for moving
+     * @return  moved copy of this interval
+     * @since   3.37/4.32
+     */
+    public DateInterval move(
+        long amount,
+        IsoDateUnit unit
     ) {
 
         if (amount == 0) {

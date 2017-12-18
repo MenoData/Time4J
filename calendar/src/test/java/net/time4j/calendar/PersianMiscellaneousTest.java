@@ -272,13 +272,12 @@ public class PersianMiscellaneousTest {
 
     @Test
     public void formatPersianCalendar() throws ParseException {
-        ChronoFormatter<PersianCalendar> formatter = // pattern => G y MMMM d, EEEE
+        ChronoFormatter<PersianCalendar> formatter = // y MMMM d, EEEE
             ChronoFormatter.ofStyle(DisplayMode.FULL, new Locale("fa"), PersianCalendar.axis());
         PersianCalendar jalali = PersianCalendar.of(1393, 2, 10);
 
-        String expected = "ه\u200D.ش."; // era
-        expected += " ";
-        expected += "۱۳۹۳"; // year
+        // String expected = "ه\u200D.ش." + " "; // era - removed in CLDR v32
+        String expected = "۱۳۹۳"; // year
         expected += " ";
         expected += "اردیبهشت"; // month
         expected += " ";

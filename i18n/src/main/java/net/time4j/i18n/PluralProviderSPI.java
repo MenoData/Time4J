@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PluralProviderSPI.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.format.NumberType;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralProvider;
 import net.time4j.format.PluralRules;
+import net.time4j.format.internal.FormatUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
@@ -113,6 +114,8 @@ public final class PluralProviderSPI
         fillO(omap, "cy", 16);
         fillO(omap, "be", 17);
         fillO(omap, "uk", 18);
+        fillO(omap, "tk", 19);
+        fillO(omap, "or", 20);
         ORDINAL_MAP.putAll(omap);
     }
 
@@ -148,12 +151,13 @@ public final class PluralProviderSPI
         }
 
         PluralRules rules = null;
+        String region = FormatUtils.getRegion(locale);
 
-        if (!locale.getCountry().equals("")) {
+        if (!region.isEmpty()) {
             StringBuilder kb = new StringBuilder();
             kb.append(locale.getLanguage());
             kb.append('_');
-            kb.append(locale.getCountry());
+            kb.append(region);
             rules = map.get(kb.toString());
         }
 
@@ -722,6 +726,23 @@ public final class PluralProviderSPI
                         && (mod100 != 13)
                     ) {
                         return FEW;
+                    }
+                    return OTHER;
+                case 19: // turkmenisch (tk)
+                    mod10 = n % 10;
+                    if (mod10 == 6 || mod10 == 9 || n == 10) {
+                        return FEW;
+                    }
+                    return OTHER;
+                case 20: // orija (or)
+                    if (n == 1 || n == 5 || n == 7 || n == 8 || n == 9) {
+                        return ONE;
+                    } else if (n == 2 || n == 3) {
+                        return TWO;
+                    } else if (n == 4) {
+                        return FEW;
+                    } else if (n == 6) {
+                        return MANY;
                     }
                     return OTHER;
                 default: // fallback

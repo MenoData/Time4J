@@ -4572,11 +4572,9 @@ public final class ChronoFormatter<T>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology or its preparser
-         * @throws  IllegalStateException if a numerical element is added
-         *          multiple times in a row
+         * @throws  IllegalStateException if a numerical element is added multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     NumericalElement#numerical(java.lang.Object)
-         *          NumericalElement.numerical(V)
+         * @see     NumericalElement#numerical(java.lang.Object) NumericalElement.numerical(V)
          * @see     SignPolicy#SHOW_NEVER
          */
         /*[deutsch]
@@ -4607,11 +4605,9 @@ public final class ChronoFormatter<T>
          *          {@code maxDigits} are out of range {@code 1-9} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology or its preparser
-         * @throws  IllegalStateException if a numerical element is added
-         *          multiple times in a row
+         * @throws  IllegalStateException if a numerical element is added multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     NumericalElement#numerical(java.lang.Object)
-         *          NumericalElement.numerical(V)
+         * @see     NumericalElement#numerical(java.lang.Object) NumericalElement.numerical(V)
          * @see     SignPolicy#SHOW_NEVER
          */
         public <V extends Enum<V>> Builder<T> addNumerical(
@@ -4651,7 +4647,6 @@ public final class ChronoFormatter<T>
          *          by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addNumerical(ChronoElement, int, int)
-         *          addNumerical(ChronoElement, int, int)
          */
         /*[deutsch]
          * <p>Definiert ein Ganzzahlformat ohne Vorzeichen und mit fester Breite
@@ -4675,7 +4670,6 @@ public final class ChronoFormatter<T>
          *          by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          * @see     #addNumerical(ChronoElement, int, int)
-         *          addNumerical(ChronoElement, int, int)
          */
         public <V extends Enum<V>> Builder<T> addFixedNumerical(
             ChronoElement<V> element,

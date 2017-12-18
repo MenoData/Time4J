@@ -1,4 +1,37 @@
-## [v4.32] not yet released
+## [v4.34] not yet released
+
+## [v4.33] published on 2017-12-18
+### Added
+- Moon rise/set [#704]
+- Calculation for azimuth/elevation of Sun and Moon [#723]
+- Positions of Sun and Moon in terms of right ascension and declination [#716]
+- Make right ascension of sun accessible [#715]
+- Determine min/max-range of possible lunations [#720]
+- Convenience combination of operators atFloor() and newValue() [#721]
+
+### Changed/Deprecated
+- HebrewMonth.Order.BIBILICAL contains a typo [#714]
+- Four methods in SolarTime loose the day information [#724]
+
+### Fixed
+- StdSolarCalculator.CC has integer-division-error [#725]
+- Class SolarTime normally expects LMT-dates not zoned dates [#719]
+- JulianDay misses definition of serialVersionUID [#727]
+
+## [v4.32] published on 2017-11-26
+### Added
+- Hebrew calendar [#528]
+- Hebrew time [#708]
+- Hebrew birthdays and yahrzeit [#707]
+- Constants of solar time for Jerusalem and Mecca [#711]
+- Support unicode extensions fw and rg [#712]
+- Add Odia (Oriya) language [#709]
+- More flexible numberings of enums in formatting [#706]
+- Update to CLDR v32 [#690]
+- Conversions to/from old java.util.Calendar + java.util.TimeZone [#705]
+
+### Changed
+- Optimize ZoneNameProviderSPI [#713]
 
 ## [v4.31] published on 2017-10-20
 ### Added

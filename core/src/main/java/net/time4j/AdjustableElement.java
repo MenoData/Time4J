@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AdjustableElement.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoOperator;
 
 
 /**
@@ -218,5 +219,75 @@ public interface AdjustableElement<V, T>
      * @return  operator directly applicable also on {@code PlainTimestamp}
      */
     ElementOperator<T> atCeiling();
+
+    /**
+     * <p>Combines {@code newValue(V)} and then {@code atFloor()}. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     PlainTime time = PlainTime.nowInSystemTime();
+     *     assertThat(
+     *       time.with(PlainTime.DIGITAL_HOUR_OF_DAY.atFloor(7)),
+     *       is(PlainTime.of(7, 0)));
+     * </pre>
+     *
+     * @param   value   new element value
+     * @return  combined operator
+     * @since   4.33
+     * @see     net.time4j.engine.ChronoEntity#with(ChronoElement,Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     * @see     #newValue(Object) newValue(V)
+     * @see     #atFloor()
+     */
+    /*[deutsch]
+     * <p>Kombiniert {@code newValue(V)} und dann {@code atFloor()}. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     PlainTime time = PlainTime.nowInSystemTime();
+     *     assertThat(
+     *       time.with(PlainTime.DIGITAL_HOUR_OF_DAY.atFloor(7)),
+     *       is(PlainTime.of(7, 0)));
+     * </pre>
+     *
+     * @param   value   new element value
+     * @return  combined operator
+     * @since   4.33
+     * @see     net.time4j.engine.ChronoEntity#with(ChronoElement,Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     * @see     #newValue(Object) newValue(V)
+     * @see     #atFloor()
+     */
+    default ChronoOperator<T> atFloor(V value) {
+        return entity -> atFloor().apply(newValue(value).apply(entity));
+    }
+
+    /**
+     * <p>Combines {@code newValue(V)} and then {@code atCeiling()}. </p>
+     *
+     * @param   value   new element value
+     * @return  combined operator
+     * @since   4.33
+     * @see     net.time4j.engine.ChronoEntity#with(ChronoElement,Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     * @see     #newValue(Object) newValue(V)
+     * @see     #atCeiling()
+     */
+    /*[deutsch]
+     * <p>Kombiniert {@code newValue(V)} und dann {@code atCeiling()}. </p>
+     *
+     * @param   value   new element value
+     * @return  combined operator
+     * @since   4.33
+     * @see     net.time4j.engine.ChronoEntity#with(ChronoElement,Object)
+     *          ChronoEntity.with(ChronoElement, V)
+     * @see     #newValue(Object) newValue(V)
+     * @see     #atCeiling()
+     */
+    default ChronoOperator<T> atCeiling(V value) {
+        return entity -> atCeiling().apply(newValue(value).apply(entity));
+    }
 
 }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (YOWElement.java) is part of project Time4J.
  *
@@ -30,7 +30,6 @@ import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.UnitRule;
-import net.time4j.format.NumericalElement;
 
 import java.io.ObjectStreamException;
 
@@ -45,8 +44,7 @@ import static net.time4j.PlainTime.WALL_TIME;
  * @doctags.concurrency {immutable}
  */
 final class YOWElement
-    extends AbstractDateElement<Integer>
-    implements NumericalElement<Integer> {
+    extends AbstractDateElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -88,13 +86,6 @@ final class YOWElement
     public char getSymbol() {
 
         return 'Y';
-
-    }
-
-    @Override
-    public int numerical(Integer value) {
-
-        return value.intValue();
 
     }
 

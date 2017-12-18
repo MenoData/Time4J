@@ -37,6 +37,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
+import net.time4j.format.internal.FormatUtils;
 
 import java.io.ObjectStreamException;
 import java.util.Collections;
@@ -326,7 +327,7 @@ public class CommonElements {
             AttributeQuery attributes
         ) {
 
-            Weekmodel model = (locale.getCountry().isEmpty() ? this.defaultWeekmodel : Weekmodel.of(locale));
+            Weekmodel model = (FormatUtils.useDefaultWeekmodel(locale) ? this.defaultWeekmodel : Weekmodel.of(locale));
             Set<ChronoElement<?>> set = new HashSet<>();
             set.add(
                 new DayOfWeekElement<>(this.chronoType, model));

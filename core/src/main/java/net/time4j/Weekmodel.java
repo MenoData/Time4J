@@ -350,8 +350,17 @@ public final class Weekmodel
      *
      * <p>Note: In order to get a weekend definition deviating from the
      * standard Saturday + Sunday, the i18n-module must be present in
-     * classpath since v2.2. If the country-part of given locale is missing
+     * classpath since v2.2. If the given locale is the root locale
      * then this method will just return {@link #ISO}. </p>
+     *
+     * <p>This method is able to handle the unicode extension &quot;fw&quot;
+     * which specifies and overrides the first day of week since v4.32 and
+     * if the default {@code WeekdataProvider} has not been changed. Example: </p>
+     *
+     * <pre>
+     *     Locale locale = Locale.forLanguageTag(&quot;en-US-u-fw-mon&quot;);
+     *     assertThat(Weekmodel.of(locale), is(Weekmodel.of(Weekday.MONDAY, 1)));
+     * </pre>
      *
      * @param   locale      country setting
      * @return  localized week model
@@ -363,15 +372,25 @@ public final class Weekmodel
      * <p>Hinweis: Damit eine von Samstag und Sonntag abweichende
      * lokalisierte Wochenenddefinition erzeugt werden kann, mu&szlig;
      * seit Version v2.2 das i18n-Modul im Klassenpfad vorhanden sein.
-     * Falls die Landeskomponente des Arguments fehlt, wird diese Methode
-     * lediglich {@link #ISO} liefern. </p>
+     * Falls das angegebene Argument gleich {@code Locale.ROOT} ist,
+     * wird diese Methode lediglich {@link #ISO} liefern. </p>
+     *
+     * <p>Diese Methode kann die Unicode-Erweiterung &quot;fw&quot; verarbeiten,
+     * die den ersten Tag der Woche festlegt und &uuml;berschreibt (seit v4.32
+     * und wenn der standardm&auml;&szlig;ige {@code WeekdataProvider} nicht
+     * ver&auml;ndert wurde). Beispiel: </p>
+     *
+     * <pre>
+     *     Locale locale = Locale.forLanguageTag(&quot;en-US-u-fw-mon&quot;);
+     *     assertThat(Weekmodel.of(locale), is(Weekmodel.of(Weekday.MONDAY, 1)));
+     * </pre>
      *
      * @param   locale      country setting
      * @return  localized week model
      */
     public static Weekmodel of(Locale locale) {
 
-        if (locale.getCountry().isEmpty()) {
+        if (locale.equals(Locale.ROOT)) {
             return Weekmodel.ISO;
         }
 
@@ -952,9 +971,7 @@ public final class Weekmodel
 
     private class DayOfWeekElement
         extends AbstractDateElement<Weekday>
-        implements NavigableElement<Weekday>,
-                   NumericalElement<Weekday>,
-                   TextElement<Weekday> {
+        implements NavigableElement<Weekday>, NumericalElement<Weekday>, TextElement<Weekday> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -1281,8 +1298,7 @@ public final class Weekmodel
     }
 
     private class CalendarWeekElement
-        extends AbstractDateElement<Integer>
-        implements NumericalElement<Integer> {
+        extends AbstractDateElement<Integer> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
@@ -1328,13 +1344,6 @@ public final class Weekmodel
         public Class<Integer> getType() {
 
             return Integer.class;
-
-        }
-
-        @Override
-        public int numerical(Integer value) {
-
-            return value.intValue();
 
         }
 

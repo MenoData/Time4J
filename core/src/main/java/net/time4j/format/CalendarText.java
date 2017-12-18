@@ -27,6 +27,7 @@ import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 import net.time4j.format.internal.ExtendedPatterns;
+import net.time4j.format.internal.FormatUtils;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -412,7 +413,7 @@ public final class CalendarText {
         sb.append(calendarType);
         sb.append(':');
         sb.append(locale.getLanguage());
-        String country = locale.getCountry();
+        String country = FormatUtils.getRegion(locale);
         if (!country.isEmpty()) {
             sb.append('-');
             sb.append(country);
@@ -1759,7 +1760,7 @@ public final class CalendarText {
         public String getIntervalPattern(Locale locale) {
 
             if (this.delegate == null) {
-                if (locale.getLanguage().isEmpty() && locale.getCountry().isEmpty()) {
+                if (locale.getLanguage().isEmpty() && FormatUtils.getRegion(locale).isEmpty()) {
                     return "{0}/{1}"; // ISO-8601-style
 //                } else if (isRTL(locale)) {
 //                    return "{0} - {1}"; // based on analysis of CLDR-data

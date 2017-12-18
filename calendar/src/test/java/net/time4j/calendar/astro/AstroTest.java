@@ -9,6 +9,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDays;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -198,7 +199,7 @@ public class AstroTest {
             is(SolarTime.ofLocation(53, 10)));
         assertThat( // Kilimanjaro
             SolarTime.ofLocation().southernLatitude(3, 4, 0).easternLongitude(37, 21, 33).atAltitude(5895).build(),
-            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, StdSolarCalculator.TIME4J)));
+            is(SolarTime.ofLocation(-3 - 4 / 60.0, 37 + 21 / 60.0 + 33 / 3600.0, 5895, StdSolarCalculator.NOAA)));
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -300,7 +301,7 @@ public class AstroTest {
     @Test
     public void ofLocation() {
         SolarTime ny1 = SolarTime.ofLocation(40.9, -74.3);
-        SolarTime ny2 = SolarTime.ofLocation(40.9, -74.3, 0, "TIME4J");
+        SolarTime ny2 = SolarTime.ofLocation(40.9, -74.3, 0, "NOAA");
         assertThat(ny1, is(ny2)); // we assume no service loader in the background here
     }
 
@@ -328,10 +329,10 @@ public class AstroTest {
             ny.getAltitude(),
             is(0));
         assertThat(
-            date.get(ny.sunrise(tzid)).get(),
+            date.get(ny.sunrise()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(5, 26)));
         assertThat(
-            date.get(ny.sunset(tzid)).get(),
+            date.get(ny.sunset()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(20, 33)));
     }
 
@@ -346,9 +347,6 @@ public class AstroTest {
         assertThat(
             date.get(ny.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(1990, 6, 25, 12, 59, 47)));
-        assertThat(
-            date.get(ny.transitAtNoon(tzid)),
-            is(PlainTime.of(12, 59, 47)));
         assertThat(
             date.get(ny.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(1990, 6, 25, 20, 32, 56)));
@@ -405,17 +403,11 @@ public class AstroTest {
             date.get(germany.transitAtMidnight()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 1, 15, 19)));
         assertThat(
-            date.get(germany.transitAtMidnight(tzid)),
-            is(PlainTime.of(1, 15, 19)));
-        assertThat(
             date.get(germany.sunrise()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 4, 59, 27)));
         assertThat(
             date.get(germany.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 13, 15, 26)));
-        assertThat(
-            date.get(germany.transitAtNoon(tzid)),
-            is(PlainTime.of(13, 15, 26)));
         assertThat(
             date.get(germany.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2014, 6, 21, 21, 31, 25)));
@@ -654,9 +646,6 @@ public class AstroTest {
             date.get(resolute.transitAtNoon()).toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2016, 11, 1, 13, 2, 51)));
         assertThat(
-            date.get(resolute.transitAtNoon(tzid)),
-            is(PlainTime.of(13, 2, 51)));
-        assertThat(
             date.get(resolute.sunset()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2016, 11, 1, 14, 43, 15)));
     }
@@ -756,17 +745,17 @@ public class AstroTest {
                 .usingCalculator(StdSolarCalculator.TIME4J)
                 .build();
         assertThat(
-            date.get(kibo5895.sunrise(tzid)).get(),
-            is(PlainTime.of(6, 10, 34))); // 6:09:28 with same atmospheric refraction as on sea level
+            date.get(kibo5895.sunrise()).get().toZonalTimestamp(tzid).toTime(),
+            is(PlainTime.of(6, 10, 35))); // 6:09:28 with same atmospheric refraction as on sea level
         assertThat(
-            date.get(kibo5895.sunset(tzid)).get(),
-            is(PlainTime.of(18, 47, 48))); // 18:48:55 with same atmospheric refraction as on sea level
+            date.get(kibo5895.sunset()).get().toZonalTimestamp(tzid).toTime(),
+            is(PlainTime.of(18, 47, 47))); // 18:48:55 with same atmospheric refraction as on sea level
         assertThat(
             kibo5895.getAltitude(),
             is(5895));
         assertThat(
             date.get(kibo5895.sunshine(tzid)).length(),
-            is(12 * 3600 + 37 * 60 + 14));
+            is(12 * 3600 + 37 * 60 + 12));
         // good agreement with NOAA
         SolarTime kiboSeaLevel =
             SolarTime.ofLocation()
@@ -776,10 +765,10 @@ public class AstroTest {
                 .usingCalculator("NOAA")
                 .build();
         assertThat(
-            date.get(kiboSeaLevel.sunrise(tzid)).get(),
+            date.get(kiboSeaLevel.sunrise()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(6, 20, 13)));
         assertThat(
-            date.get(kiboSeaLevel.sunset(tzid)).get(),
+            date.get(kiboSeaLevel.sunset()).get().toZonalTimestamp(tzid).toTime(),
             is(PlainTime.of(18, 38, 9)));
         assertThat(
             kiboSeaLevel.getAltitude(),
@@ -797,6 +786,142 @@ public class AstroTest {
             .westernLongitude(10, 0, 0)
             .easternLongitude(72, 0, 0)
             .build();
+    }
+
+    @Test
+    public void positionOfSun() {
+        JulianDay jd =
+            JulianDay.ofEphemerisTime(
+                PlainDate.of(1992, 10, 13),
+                PlainTime.midnightAtStartOfDay(),
+                ZonalOffset.UTC
+            );
+        assertThat(
+            StdSolarCalculator.SIMPLE.rightAscension(jd.getValue()),
+            is(198.76419030829365));
+        assertThat(
+            StdSolarCalculator.SIMPLE.declination(jd.getValue()),
+            is(-7.939068113994067));
+        assertThat(
+            StdSolarCalculator.NOAA.rightAscension(jd.getValue()),
+            is(198.38082521237328));
+        assertThat(
+            StdSolarCalculator.NOAA.declination(jd.getValue()),
+            is(-7.785069796023854));
+        assertThat(
+            StdSolarCalculator.CC.rightAscension(jd.getValue()),
+            is(198.37832979724269));
+        assertThat(
+            StdSolarCalculator.CC.declination(jd.getValue()),
+            is(-7.7841496152567915));
+        assertThat(
+            StdSolarCalculator.TIME4J.rightAscension(jd.getValue()),
+            is(198.37826281251168));
+        assertThat(
+            StdSolarCalculator.TIME4J.declination(jd.getValue()),
+            is(-7.784091134226315));
+
+        // comparison with VSOP87-theory
+        System.out.println("ra-VSOP87: " + String.valueOf(15 * (30.749 / 3600 + 13 / 60 + 13))); // 195.12812083333333
+        System.out.println("decl-VSOP87: " + String.valueOf(-1.74 / 3600 - 47 / 60 - 7)); // -7.000483333333333
+    }
+
+    @Test
+    public void lmtSamoa() {
+        TZID tzid = Timezone.of("Pacific/Apia").getID();
+        SolarTime apia =
+            SolarTime.ofLocation().southernLatitude(13, 50, 0).westernLongitude(171, 45, 0).build();
+        assertThat(
+            PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is one day later than LMT-date
+    }
+
+    @Test
+    public void zonedSamoa() {
+        TZID tzid = Timezone.of("Pacific/Apia").getID();
+        SolarTime apia =
+            SolarTime.ofLocation()
+                .southernLatitude(13, 50, 0)
+                .westernLongitude(171, 45, 0)
+                .inTimezone(tzid)
+                .build();
+        assertThat(
+            PlainDate.of(2012, 1, 1).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is same as input date
+    }
+
+    @Test
+    public void geodeticAngleCC() {
+        double dip = StdSolarCalculator.CC.getGeodeticAngle(-22.36, 46);
+        assertThat(dip, is(0.2535051183347955));
+    }
+
+    @Test
+    public void sunPositionHamburg() {
+        Timezone tz = Timezone.of("Europe/Berlin");
+        SolarTime hh =
+            SolarTime.ofLocation()
+                .northernLatitude(53, 33, 0.0)
+                .easternLongitude(10, 0, 0.0)
+                .build();
+        Moment moment = PlainTimestamp.of(2017, 6, 15, 7, 30).in(tz);
+        SunPosition position = SunPosition.at(moment, hh);
+
+        assertThat(
+            position.getAzimuth(),
+            is(77.44408289997781)); // usno => 77.4
+        assertThat(
+            position.getElevation(),
+            is(19.986857686242704)); // usno => 20.0
+    }
+
+    @Test
+    public void sunPositionShanghai() {
+        Timezone tz = Timezone.of("Asia/Shanghai");
+        SolarTime shanghai =
+            SolarTime.ofLocation()
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        Moment moment = PlainTimestamp.of(2017, 12, 13, 8, 10).in(tz);
+        SunPosition position = SunPosition.at(moment, shanghai);
+
+        assertThat(
+            position.getRightAscension(),
+            is(260.38484838292726));
+        assertThat(
+            position.getDeclination(),
+            is(-23.140561983747027));
+        assertThat(
+            position.getAzimuth(),
+            is(129.28036788666304)); // usno => 129.3
+        assertThat(
+            position.getElevation(),
+            is(14.679074225415283)); // usno => 14.7
+    }
+
+    @Test
+    public void sunAtZenith() {
+        SolarTime lakeNasser =
+            SolarTime.ofLocation()
+                .northernLatitude(23, 26, 7.2)
+                .easternLongitude(25, 0, 0.0)
+                .build();
+        Moment moment = lakeNasser.transitAtNoon().apply(PlainDate.of(2018, 6, 21)); // summer solstice
+        SunPosition position = SunPosition.at(moment, lakeNasser);
+        System.out.println(StdSolarCalculator.TIME4J.getGeodeticAngle(53.0, 11000));
+        assertThat(
+            position.getRightAscension(),
+            is(90.01069057923154));
+        assertThat(
+            position.getDeclination(),
+            is(23.435194643263145));
+        assertThat(
+            position.getAzimuth(),
+            is(93.61015814829585));
+        assertThat(
+            position.getElevation(),
+            is(89.99779837537335)); // ~ zenith = 90°
     }
 
 }

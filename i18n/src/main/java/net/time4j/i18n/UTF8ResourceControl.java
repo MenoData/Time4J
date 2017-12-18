@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UTF8ResourceControl.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.i18n;
 
 import net.time4j.base.ResourceLoader;
+import net.time4j.format.internal.FormatUtils;
 
 import java.io.IOException;
 import java.io.InputStream;
@@ -147,7 +148,7 @@ public class UTF8ResourceControl
         }
 
         String language = LanguageMatch.getAlias(locale);
-        String country = locale.getCountry();
+        String country = FormatUtils.getRegion(locale);
         String variant = locale.getVariant();
 
         if (language.isEmpty() && country.isEmpty() && variant.isEmpty()) {
