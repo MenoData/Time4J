@@ -13,6 +13,7 @@
 ### Fixed
 - StdSolarCalculator.CC has integer-division-error [#725]
 - Class SolarTime normally expects LMT-dates not zoned dates [#719]
+- JulianDay misses definition of serialVersionUID [#727]
 
 ## [v4.32] published on 2017-11-26
 ### Added
