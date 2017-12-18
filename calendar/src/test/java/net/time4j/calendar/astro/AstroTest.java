@@ -901,4 +901,28 @@ public class AstroTest {
             is(14.679074225415283)); // usno => 14.7
     }
 
+    @Test
+    public void sunAtZenith() {
+        SolarTime lakeNasser =
+            SolarTime.ofLocation()
+                .northernLatitude(23, 26, 7.2)
+                .easternLongitude(25, 0, 0.0)
+                .build();
+        Moment moment = lakeNasser.transitAtNoon().apply(PlainDate.of(2018, 6, 21)); // summer solstice
+        SunPosition position = SunPosition.at(moment, lakeNasser);
+
+        assertThat(
+            position.getRightAscension(),
+            is(90.01069057923154));
+        assertThat(
+            position.getDeclination(),
+            is(23.435194643263145));
+        assertThat(
+            position.getAzimuth(),
+            is(93.61015814829585));
+        assertThat(
+            position.getElevation(),
+            is(89.99779837537335)); // ~ zenith = 90°
+    }
+
 }
