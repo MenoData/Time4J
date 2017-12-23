@@ -5,6 +5,12 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 
 import java.util.Locale;
+
+import net.time4j.format.Attributes;
+import net.time4j.format.OutputContext;
+import net.time4j.format.TextWidth;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -157,6 +163,36 @@ public class WeekdataTest {
         assertThat(Weekmodel.of(locale3), is(Weekmodel.of(Weekday.MONDAY, 4)));
         Locale locale4 = Locale.forLanguageTag("en-US");
         assertThat(Weekmodel.of(locale4), is(Weekmodel.of(Weekday.SUNDAY, 1)));
+    }
+
+    @Test
+    public void hantScript() {
+        Locale simplifiedChinese = Locale.SIMPLIFIED_CHINESE;
+        Locale traditionalChinese = Locale.forLanguageTag("zh-Hant");
+        assertThat(
+            Weekday.MONDAY.getDisplayName(simplifiedChinese, TextWidth.ABBREVIATED, OutputContext.STANDALONE),
+            is("周一")
+        );
+        assertThat(
+            Weekday.MONDAY.getDisplayName(traditionalChinese, TextWidth.ABBREVIATED, OutputContext.STANDALONE),
+            is("週一")
+        );
+        ChronoFormatter<PlainDate> f =
+            ChronoFormatter.setUp(PlainDate.axis(), simplifiedChinese)
+                .addPattern("EEE", PatternType.CLDR)
+                .addLiteral('/')
+                .startSection(Attributes.TEXT_WIDTH, TextWidth.ABBREVIATED)
+                .addText(Weekmodel.of(simplifiedChinese).localDayOfWeek())
+                .endSection()
+                .build();
+        assertThat(
+            f.format(PlainDate.of(2000, 1, Weekday.MONDAY)),
+            is("周一/周一")
+        );
+        assertThat(
+            f.with(traditionalChinese).format(PlainDate.of(2000, 1, Weekday.MONDAY)),
+            is("週一/週一")
+        );
     }
 
 }

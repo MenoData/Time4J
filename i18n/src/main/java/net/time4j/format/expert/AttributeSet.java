@@ -361,6 +361,10 @@ final class AttributeSet
         String lang = LanguageMatch.getAlias(locale);
         String country = FormatUtils.getRegion(locale);
 
+        if (lang.equals("zh") && locale.getScript().equals("Hant")) {
+            country = "TW";
+        }
+
         if (lang.isEmpty() && country.isEmpty()) {
             locale = Locale.ROOT;
             builder.set(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);

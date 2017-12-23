@@ -155,6 +155,10 @@ public class UTF8ResourceControl
             return baseName;
         }
 
+        if (language.equals("zh") && locale.getScript().equals("Hant")) {
+            country = "TW";
+        }
+
         StringBuilder sb = new StringBuilder(baseName);
         sb.append('_').append(language);
 
