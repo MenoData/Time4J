@@ -1,4 +1,6 @@
 ## [v4.34] not yet released
+### Added
+- Traditional Chinese now recognizes hant-script in locale [#728]
 
 ## [v4.33] published on 2017-12-18
 ### Added
