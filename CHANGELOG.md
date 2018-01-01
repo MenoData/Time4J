@@ -1,5 +1,7 @@
 ## [v4.34] not yet released
 ### Added
+- Extra features for StdSolarCalculator.CC [#731]
+- Search for moon phase at or after a moment [#730]
 - Traditional Chinese now recognizes hant-script in locale [#728]
 
 ## [v4.33] published on 2017-12-18
