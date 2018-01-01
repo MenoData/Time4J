@@ -174,6 +174,49 @@ public enum MoonPhase {
 	}
 
 	/**
+	 * <p>Obtains the first moon phase which is at or after given moment. </p>
+	 *
+	 * @param 	moment	the moment to be compared with
+	 * @return	first time of this phase at or after given moment
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 * @since 	3.39/4.34
+	 */
+	/*[deutsch]
+	 * <p>Liefert die erste Mondphase, die gleich oder nach dem angegebenen Zeitpunkt liegt. </p>
+	 *
+	 * @param 	moment	the moment to be compared with
+	 * @return	first time of this phase at or after given moment
+	 * @throws  IllegalArgumentException if the associated year is not in the range {@code -2000 <= year <= 3000}
+	 * @since 	3.39/4.34
+	 */
+	public Moment atOrAfter(Moment moment) {
+
+		int estimation = this.getEstimatedLunations(moment);
+		Moment m = this.atLunation(estimation);
+		int n = estimation;
+
+		while (m.isBefore(moment)) {
+			n++;
+			m = this.atLunation(n);
+		}
+
+		if (n <= estimation) {
+			while (true) {
+				n--;
+				Moment test = this.atLunation(n);
+				if (!test.isBefore(moment)) {
+					m = test;
+				} else {
+					break;
+				}
+			}
+		}
+
+		return m;
+
+	}
+
+	/**
 	 * <p>Obtains the last moon phase which is still before given moment. </p>
 	 *
 	 * @param 	moment	the moment to be compared with
@@ -199,7 +242,7 @@ public enum MoonPhase {
 		}
 
 		if (n >= estimation) {
-			while (true) {
+			while (m.plus(29, TimeUnit.DAYS).isBefore(moment)) { // optimization
 				n++;
 				Moment test = this.atLunation(n);
 				if (test.isBefore(moment)) {
