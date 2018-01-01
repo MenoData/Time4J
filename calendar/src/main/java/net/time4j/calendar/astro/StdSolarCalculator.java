@@ -496,6 +496,17 @@ public enum StdSolarCalculator
      * &quot;Calendrical Calculations&quot; (third edition).
      *
      * <p>The altitude of the observer is taken into account by an approximated geodetic model. </p>
+     *
+     * <p><strong>{@link #getFeature(double, String) Supported features}</strong> (in degrees)</p>
+     *
+     * <ul>
+     *     <li>right-ascension</li>
+     *     <li>declination</li>
+     *     <li>nutation</li>
+     *     <li>obliquity</li>
+     *     <li>mean-anomaly</li>
+     *     <li>solar-longitude</li>
+     * </ul>
      */
     /*[deutsch]
      * Folgt nahe den Algorithmen, die von Dershowitz/Reingold in ihrem Buch
@@ -503,6 +514,17 @@ public enum StdSolarCalculator
      *
      * <p>Die H&ouml;he des Beobachters wird mit Hilfe eines angen&auml;herten geod&auml;tischen Modells
      * ber&uuml;cksichtigt. </p>
+     *
+     * <p><strong>{@link #getFeature(double, String) Unterst&uuml;tzte Merkmale}</strong> (in Grad)</p>
+     *
+     * <ul>
+     *     <li>right-ascension</li>
+     *     <li>declination</li>
+     *     <li>nutation</li>
+     *     <li>obliquity</li>
+     *     <li>mean-anomaly</li>
+     *     <li>solar-longitude</li>
+     * </ul>
      */
     CC() {
         @Override
@@ -569,6 +591,40 @@ public enum StdSolarCalculator
                 ra += 360;
             }
             return ra;
+        }
+        @Override
+        public double getFeature(
+            double jde,
+            String nameOfFeature
+        ) {
+            double jct = toJulianCenturies(jde);
+
+            switch (nameOfFeature) {
+                case SolarTime.DECLINATION:
+                    return Math.toDegrees(declinationRad(jct));
+                case SolarTime.RIGHT_ASCENSION: {
+                    double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
+                    double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
+                    double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
+                    if (ra < 0) {
+                        ra += 360;
+                    }
+                    return ra;
+                }
+                case "nutation": {
+                    return nutation(jct);
+                }
+                case "obliquity":
+                    return obliquity(jct);
+                case "mean-anomaly":
+                    return meanAnomaly(jct);
+                case "solar-longitude":
+                    return apparentSolarLongitude(jct, nutation(jct));
+                case "solar-latitude":
+                    return 0.0; // approximation used in this algorithm
+                default:
+                    return Double.NaN;
+            }
         }
         @Override
         public double getGeodeticAngle(double latitude, int altitude) {
