@@ -1108,7 +1108,7 @@ public final class HebrewCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Hebrew calendar. </p>
+     * <p>Defines some calendar units for the Hebrew calendar. </p>
      */
     /*[deutsch]
      * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den hebr&auml;ischen Kalender. </p>

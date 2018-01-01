@@ -902,7 +902,7 @@ public final class PersianCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Persian calendar. </p>
+     * <p>Defines some calendar units for the Persian calendar. </p>
      *
      * @since   3.9/4.6
      */

@@ -895,7 +895,7 @@ public final class JulianCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Julian calendar. </p>
+     * <p>Defines some calendar units for the Julian calendar. </p>
      *
      * @since   3.15/4.12
      */

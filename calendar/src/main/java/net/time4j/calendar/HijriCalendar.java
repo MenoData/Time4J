@@ -1331,7 +1331,7 @@ public final class HijriCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Hijri calendar. </p>
+     * <p>Defines some calendar units for the Hijri calendar. </p>
      *
      * @since   3.14/4.10
      */

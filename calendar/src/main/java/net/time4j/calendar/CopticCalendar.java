@@ -840,7 +840,7 @@ public final class CopticCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Coptic calendar. </p>
+     * <p>Defines some calendar units for the Coptic calendar. </p>
      *
      * @since   3.11/4.8
      */
