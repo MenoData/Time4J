@@ -543,6 +543,17 @@ public enum StdSolarCalculator
      * &quot;Calendrical Calculations&quot; (third edition).
      *
      * <p>The altitude of the observer is taken into account by an approximated geodetic model. </p>
+     *
+     * <p><strong>{@link #getFeature(double, String) Supported features}</strong> (in degrees)</p>
+     *
+     * <ul>
+     *     <li>right-ascension</li>
+     *     <li>declination</li>
+     *     <li>nutation</li>
+     *     <li>obliquity</li>
+     *     <li>mean-anomaly</li>
+     *     <li>solar-longitude</li>
+     * </ul>
      */
     /*[deutsch]
      * Folgt nahe den Algorithmen, die von Dershowitz/Reingold in ihrem Buch
@@ -550,6 +561,17 @@ public enum StdSolarCalculator
      *
      * <p>Die H&ouml;he des Beobachters wird mit Hilfe eines angen&auml;herten geod&auml;tischen Modells
      * ber&uuml;cksichtigt. </p>
+     *
+     * <p><strong>{@link #getFeature(double, String) Unterst&uuml;tzte Merkmale}</strong> (in Grad)</p>
+     *
+     * <ul>
+     *     <li>right-ascension</li>
+     *     <li>declination</li>
+     *     <li>nutation</li>
+     *     <li>obliquity</li>
+     *     <li>mean-anomaly</li>
+     *     <li>solar-longitude</li>
+     * </ul>
      */
     CC() {
         @Override
@@ -622,10 +644,31 @@ public enum StdSolarCalculator
             double jde,
             String nameOfFeature
         ) {
+            double jct = toJulianCenturies(jde);
+
             if (nameOfFeature.equals(SolarTime.DECLINATION)) {
-                return this.declination(jde);
+                return Math.toDegrees(declinationRad(jct));
+            } else if (nameOfFeature.equals(SolarTime.RIGHT_ASCENSION)) {
+                double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
+                double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
+                double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
+                if (ra < 0) {
+                    ra += 360;
+                }
+                return ra;
+            } else if (nameOfFeature.equals("nutation")) {
+                return nutation(jct);
+            } else if (nameOfFeature.equals("obliquity")) {
+                return obliquity(jct);
+            } else if (nameOfFeature.equals("mean-anomaly")) {
+                return meanAnomaly(jct);
+            } else if (nameOfFeature.equals("solar-longitude")) {
+                return apparentSolarLongitude(jct, nutation(jct));
+            } else if (nameOfFeature.equals("solar-latitude")) {
+                return 0.0; // approximation used in this algorithm
+            } else {
+                return Double.NaN;
             }
-            return Double.NaN;
         }
         @Override
         public double getGeodeticAngle(double latitude, int altitude) {
@@ -800,7 +843,11 @@ public enum StdSolarCalculator
         ) {
             double jct = toJulianCenturies(jde);
 
-            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
+            if (nameOfFeature.equals("solar-longitude")) {
+                double[] result = new double[2];
+                nutations(jct, result);
+                return apparentSolarLongitude(jct, result[0]);
+            } else if (nameOfFeature.equals(SolarTime.DECLINATION)) {
                 return Math.toDegrees(declinationRad(jct));
             } else if (nameOfFeature.equals(SolarTime.RIGHT_ASCENSION)) {
                 double[] result = new double[2];
@@ -822,10 +869,6 @@ public enum StdSolarCalculator
                 return meanObliquity(jct) + result[1];
             } else if (nameOfFeature.equals("mean-anomaly")) {
                 return meanAnomaly(jct);
-            } else if (nameOfFeature.equals("solar-longitude")) {
-                double[] result = new double[2];
-                nutations(jct, result);
-                return apparentSolarLongitude(jct, result[0]);
             } else if (nameOfFeature.equals("solar-latitude")) {
                 return 0.0; // approximation used in this algorithm
             } else {
