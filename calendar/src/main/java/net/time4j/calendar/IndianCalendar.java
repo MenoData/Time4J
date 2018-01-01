@@ -832,7 +832,7 @@ public final class IndianCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Indian calendar. </p>
+     * <p>Defines some calendar units for the Indian calendar. </p>
      */
     /*[deutsch]
      * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den indischen Kalender. </p>

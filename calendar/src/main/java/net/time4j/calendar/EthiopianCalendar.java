@@ -983,7 +983,7 @@ public final class EthiopianCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines come calendar units for the Ethiopian calendar. </p>
+     * <p>Defines some calendar units for the Ethiopian calendar. </p>
      *
      * @since   3.11/4.8
      */
