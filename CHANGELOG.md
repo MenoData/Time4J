@@ -3,6 +3,9 @@
 - Extra features for StdSolarCalculator.CC [#731]
 - Search for moon phase at or after a moment [#730]
 
+### Fixed
+- date.getMaximum(<week-related-element>) can crash near end of timeline [#732]
+
 ## [v3.38] published on 2017-12-18
 ### Added
 - Moon rise/set [#704]
