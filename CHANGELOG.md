@@ -4,6 +4,9 @@
 - Search for moon phase at or after a moment [#730]
 - Traditional Chinese now recognizes hant-script in locale [#728]
 
+### Fixed
+- date.getMaximum(<week-related-element>) can crash near end of timeline [#732]
+
 ## [v4.33] published on 2017-12-18
 ### Added
 - Moon rise/set [#704]

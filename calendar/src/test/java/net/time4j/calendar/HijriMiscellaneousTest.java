@@ -3,6 +3,7 @@ package net.time4j.calendar;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
+import net.time4j.Weekmodel;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarSystem;
@@ -288,6 +289,57 @@ public class HijriMiscellaneousTest {
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         String today = f.format(SystemClock.inLocalView().today());
         System.out.println(today);
+    }
+
+    @Test
+    public void isValidIfWeekdayOutOfRange() {
+        CalendarSystem<HijriCalendar> calsys =
+            HijriCalendar.family().getCalendarSystem(HijriCalendar.VARIANT_UMALQURA);
+        HijriCalendar min = calsys.transform(calsys.getMinimumSinceUTC());
+        HijriCalendar max = calsys.transform(calsys.getMaximumSinceUTC());
+        assertThat(min.getDayOfWeek(), is(Weekday.SUNDAY));
+        assertThat(max.getDayOfWeek(), is(Weekday.TUESDAY));
+
+        assertThat(min.isValid(HijriCalendar.DAY_OF_WEEK, Weekday.SUNDAY), is(true));
+        assertThat(min.isValid(HijriCalendar.DAY_OF_WEEK, Weekday.WEDNESDAY), is(true));
+        assertThat(max.isValid(HijriCalendar.DAY_OF_WEEK, Weekday.WEDNESDAY), is(false));
+        assertThat(max.isValid(HijriCalendar.DAY_OF_WEEK, Weekday.TUESDAY), is(true));
+
+        assertThat(min.getMinimum(HijriCalendar.DAY_OF_WEEK), is(Weekday.SUNDAY));
+        assertThat(min.getMaximum(HijriCalendar.DAY_OF_WEEK), is(Weekday.SATURDAY));
+        assertThat(max.getMinimum(HijriCalendar.DAY_OF_WEEK), is(Weekday.SUNDAY));
+        assertThat(max.getMaximum(HijriCalendar.DAY_OF_WEEK), is(Weekday.TUESDAY));
+
+        StdCalendarElement<Weekday, HijriCalendar> elementUS =
+            CommonElements.localDayOfWeek(HijriCalendar.family(), Weekmodel.of(Locale.US));
+        assertThat(min.getMinimum(elementUS), is(Weekday.SUNDAY));
+        assertThat(min.getMaximum(elementUS), is(Weekday.SATURDAY));
+        assertThat(max.getMinimum(elementUS), is(Weekday.SUNDAY));
+        assertThat(max.getMaximum(elementUS), is(Weekday.TUESDAY));
+
+        StdCalendarElement<Weekday, HijriCalendar> elementISO =
+            CommonElements.localDayOfWeek(HijriCalendar.family(), Weekmodel.ISO);
+        assertThat(min.getMinimum(elementISO), is(Weekday.SUNDAY));
+        assertThat(min.getMaximum(elementISO), is(Weekday.SUNDAY));
+        assertThat(max.getMinimum(elementISO), is(Weekday.MONDAY));
+        assertThat(max.getMaximum(elementISO), is(Weekday.TUESDAY));
+
+    }
+
+    @Test
+    public void maxWeekAtEndOfTimeAxis() {
+        CalendarSystem<HijriCalendar> calsys =
+            HijriCalendar.family().getCalendarSystem(HijriCalendar.VARIANT_UMALQURA);
+        HijriCalendar min = calsys.transform(calsys.getMinimumSinceUTC());
+        HijriCalendar max = calsys.transform(calsys.getMaximumSinceUTC());
+
+        assertThat(
+            min.getMinimum(CommonElements.weekOfYear(HijriCalendar.family(), Weekmodel.of(Locale.US))),
+            is(1));
+        assertThat(
+            max.getMaximum(CommonElements.weekOfYear(HijriCalendar.family(), Weekmodel.of(Locale.US))),
+            is(52));
+        // should be first week of next year but the end of time axis is already reached so we just continue to count
     }
 
 }

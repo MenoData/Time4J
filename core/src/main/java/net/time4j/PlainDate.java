@@ -178,11 +178,11 @@ public final class PlainDate
 
     /** Fr&uuml;hestm&ouml;gliches Datum [-999999999-01-01]. */
     static final PlainDate MIN =
-        new PlainDate(GregorianMath.MIN_YEAR, 1, 1, null);
+        new PlainDate(GregorianMath.MIN_YEAR, 1, 1, Weekday.MONDAY);
 
     /** Sp&auml;testm&ouml;gliches Datum [+999999999-12-31]. */
     static final PlainDate MAX =
-        new PlainDate(GregorianMath.MAX_YEAR, 12, 31, null);
+        new PlainDate(GregorianMath.MAX_YEAR, 12, 31, Weekday.FRIDAY);
 
     /** Entspricht dem Jahr {@code -999999999}. */
     static final Integer MIN_YEAR =
@@ -3229,6 +3229,15 @@ public final class PlainDate
         @Override
         public V getMaximum(PlainDate context) {
 
+            if (
+                (this.index == EnumElement.DAY_OF_WEEK)
+                && (context.year == GregorianMath.MAX_YEAR)
+                && (context.month == 12)
+                && (context.dayOfMonth >= 27)
+            ) {
+                return this.type.cast(Weekday.FRIDAY);
+            }
+
             return this.max;
 
         }
@@ -3239,7 +3248,17 @@ public final class PlainDate
             V value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            } else if ((this.index == EnumElement.DAY_OF_WEEK) && (context.year == GregorianMath.MAX_YEAR)) {
+                try {
+                    this.withValue(context, value, false);
+                } catch (IllegalArgumentException ex) {
+                    return false;
+                }
+            }
+
+            return true;
 
         }
 

@@ -291,7 +291,10 @@ public final class MinguoCalendar
                 CalendarUnit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                FieldRule.of(DAY_OF_WEEK),
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem()
+                ),
                 CalendarUnit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -956,8 +959,6 @@ public final class MinguoCalendar
                 result = context.getDayOfMonth();
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.getDayOfYear();
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = context.getDayOfWeek();
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -977,8 +978,6 @@ public final class MinguoCalendar
                 result = Integer.valueOf(1);
             } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = Month.JANUARY;
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekday.SUNDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -1006,8 +1005,6 @@ public final class MinguoCalendar
                 result = context.iso.getMaximum(PlainDate.DAY_OF_MONTH);
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.iso.getMaximum(PlainDate.DAY_OF_YEAR);
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekday.SATURDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -1059,9 +1056,6 @@ public final class MinguoCalendar
                 return new MinguoCalendar(date);
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 PlainDate date = context.iso.with(PlainDate.DAY_OF_YEAR, toNumber(value));
-                return new MinguoCalendar(date);
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                PlainDate date = context.iso.with(getDefaultWeekmodel().localDayOfWeek(), Weekday.class.cast(value));
                 return new MinguoCalendar(date);
             }
 
@@ -1170,6 +1164,7 @@ public final class MinguoCalendar
         }
 
         @Override
+        @Deprecated
         public MinguoCalendar createFrom(
             TemporalAccessor threeten,
             AttributeQuery attributes

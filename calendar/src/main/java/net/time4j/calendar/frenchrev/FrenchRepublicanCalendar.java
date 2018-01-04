@@ -2393,14 +2393,14 @@ public final class FrenchRepublicanCalendar
         @Override
         public Weekday getMinimum(FrenchRepublicanCalendar context) {
 
-            return getDefaultWeekmodel().getFirstDayOfWeek();
+            return ((context.fyear == 1) && (context.fdoy == 1)) ? Weekday.SATURDAY : Weekday.SUNDAY;
 
         }
 
         @Override
         public Weekday getMaximum(FrenchRepublicanCalendar context) {
 
-            return getDefaultWeekmodel().getFirstDayOfWeek().roll(6);
+            return ((context.fyear == MAX_YEAR) && (context.fdoy == 366)) ? Weekday.SUNDAY : Weekday.SATURDAY;
 
         }
 
@@ -2410,7 +2410,14 @@ public final class FrenchRepublicanCalendar
             Weekday value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            }
+
+            int w = value.getValue(FrenchRepublicanCalendar.getDefaultWeekmodel());
+            int wMin = this.getMinimum(context).getValue(FrenchRepublicanCalendar.getDefaultWeekmodel());
+            int wMax = this.getMaximum(context).getValue(FrenchRepublicanCalendar.getDefaultWeekmodel());
+            return ((wMin <= w) && (w <= wMax));
 
         }
 

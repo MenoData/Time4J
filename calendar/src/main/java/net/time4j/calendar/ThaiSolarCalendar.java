@@ -319,7 +319,10 @@ public final class ThaiSolarCalendar
                 CalendarUnit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                FieldRule.of(DAY_OF_WEEK),
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem()
+                ),
                 CalendarUnit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1040,8 +1043,6 @@ public final class ThaiSolarCalendar
                 result = context.getDayOfMonth();
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.getDayOfYear();
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = context.getDayOfWeek();
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -1061,8 +1062,6 @@ public final class ThaiSolarCalendar
                 result = Integer.valueOf(1);
             } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = ((context.iso.getYear() >= 1941) ? Month.JANUARY : Month.APRIL);
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekday.SUNDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -1086,8 +1085,6 @@ public final class ThaiSolarCalendar
                 result = Integer.valueOf(context.lengthOfMonth());
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = Integer.valueOf(context.lengthOfYear());
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekday.SATURDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -1144,9 +1141,6 @@ public final class ThaiSolarCalendar
                 int minMonth = ((context.iso.getYear() >= 1941) ? 1 : 4);
                 ThaiSolarCalendar start = ThaiSolarCalendar.ofBuddhist(context.getYear(), minMonth, 1);
                 PlainDate date = start.iso.plus(toNumber(value) - 1, CalendarUnit.DAYS);
-                return new ThaiSolarCalendar(date);
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                PlainDate date = context.iso.with(getDefaultWeekmodel().localDayOfWeek(), Weekday.class.cast(value));
                 return new ThaiSolarCalendar(date);
             }
 
