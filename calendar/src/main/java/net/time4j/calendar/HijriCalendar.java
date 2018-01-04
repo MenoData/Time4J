@@ -497,7 +497,10 @@ public final class HijriCalendar
                 new IntegerRule(DAY_OF_YEAR_INDEX))
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule())
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem(context.getVariant())
+                ))
             .appendElement(
                 WIM_ELEMENT,
                 WeekdayInMonthElement.getRule(WIM_ELEMENT))
@@ -1858,76 +1861,6 @@ public final class HijriCalendar
         public ChronoElement<?> getChildAtCeiling(HijriCalendar context) {
 
             return YEAR_OF_ERA;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<HijriCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(HijriCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(HijriCalendar context) {
-
-            return Weekday.SUNDAY;
-
-        }
-
-        @Override
-        public Weekday getMaximum(HijriCalendar context) {
-
-            return Weekday.SATURDAY;
-
-        }
-
-        @Override
-        public boolean isValid(
-            HijriCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public HijriCalendar withValue(
-            HijriCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(HijriCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(HijriCalendar context) {
-
-            return null;
 
         }
 

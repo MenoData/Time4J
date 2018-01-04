@@ -1205,6 +1205,41 @@ public final class Weekmodel
         //~ Methoden ------------------------------------------------------
 
         @Override
+        public Weekday getValue(T context) {
+
+            return context.get(CALENDAR_DATE).getDayOfWeek();
+
+        }
+
+        @Override
+        public Weekday getMinimum(T context) {
+
+            PlainDate date = context.get(CALENDAR_DATE);
+            int oldNum = date.getDayOfWeek().getValue(this.element.getModel());
+
+            if (date.getDaysSinceEpochUTC() + 1 - oldNum < PlainDate.axis().getCalendarSystem().getMinimumSinceUTC()) {
+                return PlainDate.MIN.getDayOfWeek();
+            }
+
+            return this.element.getDefaultMinimum();
+
+        }
+
+        @Override
+        public Weekday getMaximum(T context) {
+
+            PlainDate date = context.get(CALENDAR_DATE);
+            int oldNum = date.getDayOfWeek().getValue(this.element.getModel());
+
+            if (date.getDaysSinceEpochUTC() + 7 - oldNum > PlainDate.axis().getCalendarSystem().getMaximumSinceUTC()) {
+                return PlainDate.MAX.getDayOfWeek();
+            }
+
+            return this.element.getDefaultMaximum();
+
+        }
+
+        @Override
         public boolean isValid(
             T context,
             Weekday value
@@ -1220,52 +1255,6 @@ public final class Weekmodel
             } catch (ArithmeticException | IllegalArgumentException ex) {
                 return false;
             }
-
-        }
-
-        @Override
-        public Weekday getMinimum(T context) {
-
-            return this.element.getDefaultMinimum();
-
-        }
-
-        @Override
-        public Weekday getMaximum(T context) {
-
-            return this.element.getDefaultMaximum();
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(T context) {
-
-            return this.getChild(context);
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(T context) {
-
-            return this.getChild(context);
-
-        }
-
-        private ChronoElement<?> getChild(T context) {
-
-            if (context.contains(PlainTime.WALL_TIME)) {
-                return PlainTime.WALL_TIME;
-            } else {
-                return null;
-            }
-
-        }
-
-        @Override
-        public Weekday getValue(T context) {
-
-            return getDayOfWeek(
-                context.get(CALENDAR_DATE).getDaysSinceUTC());
 
         }
 
@@ -1292,6 +1281,30 @@ public final class Weekmodel
             int neu = value.getValue(this.element.getModel());
             date = date.withDaysSinceUTC(utcDays + neu - old);
             return context.with(CALENDAR_DATE, date);
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(T context) {
+
+            return this.getChild(context);
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(T context) {
+
+            return this.getChild(context);
+
+        }
+
+        private ChronoElement<?> getChild(T context) {
+
+            if (context.contains(PlainTime.WALL_TIME)) {
+                return PlainTime.WALL_TIME;
+            } else {
+                return null;
+            }
 
         }
 
@@ -1584,8 +1597,13 @@ public final class Weekmodel
                 int wNext =
                     getFirstCalendarWeekAsDay(date, 1) + getLengthOfYM(date, 0);
                 if (wNext <= scaledDay) { // reference date points to next week cycle
-                    wCurrent = getFirstCalendarWeekAsDay(date, 1);
-                    wNext = getFirstCalendarWeekAsDay(date, 2) + getLengthOfYM(date, 1);
+                    try {
+                        int wStart = getFirstCalendarWeekAsDay(date, 1);
+                        wNext = getFirstCalendarWeekAsDay(date, 2) + getLengthOfYM(date, 1);
+                        wCurrent = wStart;
+                    } catch (RuntimeException re) {
+                        wNext += 7; // theoretical rare edge case near the end of time axis
+                    }
                 }
                 return (wNext - wCurrent) / 7;
             } else {

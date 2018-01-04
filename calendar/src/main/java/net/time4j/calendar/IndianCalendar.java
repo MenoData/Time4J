@@ -327,7 +327,10 @@ public final class IndianCalendar
                 Unit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule(),
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem()
+                ),
                 Unit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1426,76 +1429,6 @@ public final class IndianCalendar
         public ChronoElement<?> getChildAtCeiling(IndianCalendar context) {
 
             return YEAR_OF_ERA;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<IndianCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(IndianCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(IndianCalendar context) {
-
-            return getDefaultWeekmodel().getFirstDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMaximum(IndianCalendar context) {
-
-            return getDefaultWeekmodel().getFirstDayOfWeek().roll(6);
-
-        }
-
-        @Override
-        public boolean isValid(
-            IndianCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public IndianCalendar withValue(
-            IndianCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(IndianCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(IndianCalendar context) {
-
-            return null;
 
         }
 

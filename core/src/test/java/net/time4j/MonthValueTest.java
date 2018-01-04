@@ -78,6 +78,8 @@ public class MonthValueTest {
     @Test
     public void roll() {
         assertThat(Month.FEBRUARY.roll(-2), is(Month.DECEMBER));
+        assertThat(Month.FEBRUARY.roll(22), is(Month.DECEMBER));
+        assertThat(Month.FEBRUARY.roll(-38), is(Month.DECEMBER));
     }
 
     @Test

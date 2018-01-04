@@ -331,7 +331,10 @@ public final class JulianCalendar
                 Unit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule(),
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem()
+                ),
                 Unit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1492,76 +1495,6 @@ public final class JulianCalendar
             }
 
             return JulianCalendar.of(value.getEra(), value.getYearOfEra(), value.getMonth(), value.getDayOfMonth());
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(JulianCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(JulianCalendar context) {
-
-            return null;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<JulianCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(JulianCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(JulianCalendar context) {
-
-            return Weekday.SUNDAY;
-
-        }
-
-        @Override
-        public Weekday getMaximum(JulianCalendar context) {
-
-            return Weekday.SATURDAY;
-
-        }
-
-        @Override
-        public boolean isValid(
-            JulianCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public JulianCalendar withValue(
-            JulianCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
 
         }
 

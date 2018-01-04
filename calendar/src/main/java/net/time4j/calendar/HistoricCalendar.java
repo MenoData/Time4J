@@ -432,7 +432,10 @@ public final class HistoricCalendar
                 new IntegerRule(DAY_OF_YEAR_INDEX))
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule())
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem(context.getVariant())
+                ))
             .appendElement(
                 WIM_ELEMENT,
                 WeekdayInMonthElement.getRule(WIM_ELEMENT))
@@ -1515,76 +1518,6 @@ public final class HistoricCalendar
         public ChronoElement<?> getChildAtCeiling(HistoricCalendar context) {
 
             throw new UnsupportedOperationException("Never called.");
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<HistoricCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(HistoricCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(HistoricCalendar context) {
-
-            return Weekday.SUNDAY;
-
-        }
-
-        @Override
-        public Weekday getMaximum(HistoricCalendar context) {
-
-            return Weekday.SATURDAY;
-
-        }
-
-        @Override
-        public boolean isValid(
-            HistoricCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public HistoricCalendar withValue(
-            HistoricCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(HistoricCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(HistoricCalendar context) {
-
-            return null;
 
         }
 
