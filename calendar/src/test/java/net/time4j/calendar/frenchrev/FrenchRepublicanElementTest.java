@@ -746,16 +746,42 @@ public class FrenchRepublicanElementTest {
 
     @Test
     public void min() {
+        FrenchRepublicanCalendar min = FrenchRepublicanCalendar.axis().getMinimum(); // Saturday
         assertThat(
-            FrenchRepublicanCalendar.axis().getMinimum(),
+            min,
             is(FrenchRepublicanCalendar.of(1, FrenchRepublicanMonth.VENDEMIAIRE, 1)));
+        assertThat(
+            min.getMinimum(FrenchRepublicanCalendar.DAY_OF_WEEK),
+            is(Weekday.SATURDAY));
+        assertThat(
+            min.getMaximum(FrenchRepublicanCalendar.DAY_OF_WEEK),
+            is(Weekday.SATURDAY));
+        assertThat(
+            min.isValid(FrenchRepublicanCalendar.DAY_OF_WEEK, Weekday.SATURDAY),
+            is(true));
+        assertThat(
+            min.isValid(FrenchRepublicanCalendar.DAY_OF_WEEK, Weekday.FRIDAY),
+            is(false));
     }
 
     @Test
     public void max() {
+        FrenchRepublicanCalendar max = FrenchRepublicanCalendar.axis().getMaximum(); // Sunday
         assertThat(
-            FrenchRepublicanCalendar.axis().getMaximum(), // 2994-09-21
+            max, // 2994-09-21
             is(FrenchRepublicanCalendar.of(1202, Sansculottides.LEAP_DAY)));
+        assertThat(
+            max.getMinimum(FrenchRepublicanCalendar.DAY_OF_WEEK),
+            is(Weekday.SUNDAY));
+        assertThat(
+            max.getMaximum(FrenchRepublicanCalendar.DAY_OF_WEEK),
+            is(Weekday.SUNDAY));
+        assertThat(
+            max.isValid(FrenchRepublicanCalendar.DAY_OF_WEEK, Weekday.SUNDAY),
+            is(true));
+        assertThat(
+            max.isValid(FrenchRepublicanCalendar.DAY_OF_WEEK, Weekday.MONDAY),
+            is(false));
     }
 
 }
