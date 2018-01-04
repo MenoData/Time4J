@@ -37,10 +37,12 @@ import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
@@ -301,7 +303,15 @@ public final class CopticCalendar
                 Unit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule(),
+                new WeekdayRule<CopticCalendar>(
+                    getDefaultWeekmodel(),
+                    new ChronoFunction<CopticCalendar, CalendarSystem<CopticCalendar>>() {
+                        @Override
+                        public CalendarSystem<CopticCalendar> apply(CopticCalendar context) {
+                            return context.getChronology().getCalendarSystem();
+                        }
+                    }
+                ),
                 Unit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1315,76 +1325,6 @@ public final class CopticCalendar
         public ChronoElement<?> getChildAtCeiling(CopticCalendar context) {
 
             return YEAR_OF_ERA;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<CopticCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(CopticCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(CopticCalendar context) {
-
-            return Weekday.SATURDAY;
-
-        }
-
-        @Override
-        public Weekday getMaximum(CopticCalendar context) {
-
-            return Weekday.FRIDAY;
-
-        }
-
-        @Override
-        public boolean isValid(
-            CopticCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public CopticCalendar withValue(
-            CopticCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(CopticCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(CopticCalendar context) {
-
-            return null;
 
         }
 

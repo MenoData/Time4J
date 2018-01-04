@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.Month;
 import net.time4j.Weekday;
+import net.time4j.Weekmodel;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.history.HistoricEra;
@@ -62,6 +63,36 @@ public class JulianMiscellaneousTest {
     @Test
     public void defaultFirstDayOfWeek() {
         assertThat(JulianCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void isValidIfWeekdayOutOfRange() {
+        JulianCalendar min = JulianCalendar.axis().getMinimum(); // wednesday
+        JulianCalendar max = JulianCalendar.axis().getMaximum(); // sunday
+
+        assertThat(min.isValid(JulianCalendar.DAY_OF_WEEK, Weekday.TUESDAY), is(false));
+        assertThat(min.isValid(JulianCalendar.DAY_OF_WEEK, Weekday.WEDNESDAY), is(true));
+        assertThat(max.isValid(JulianCalendar.DAY_OF_WEEK, Weekday.MONDAY), is(false));
+        assertThat(max.isValid(JulianCalendar.DAY_OF_WEEK, Weekday.SUNDAY), is(true));
+
+        assertThat(min.getMinimum(JulianCalendar.DAY_OF_WEEK), is(Weekday.WEDNESDAY));
+        assertThat(min.getMaximum(JulianCalendar.DAY_OF_WEEK), is(Weekday.SATURDAY));
+        assertThat(max.getMinimum(JulianCalendar.DAY_OF_WEEK), is(Weekday.SUNDAY));
+        assertThat(max.getMaximum(JulianCalendar.DAY_OF_WEEK), is(Weekday.SUNDAY));
+
+        StdCalendarElement<Weekday, JulianCalendar> elementUS =
+            CommonElements.localDayOfWeek(JulianCalendar.axis(), Weekmodel.of(Locale.US));
+        assertThat(min.getMinimum(elementUS), is(Weekday.WEDNESDAY));
+        assertThat(min.getMaximum(elementUS), is(Weekday.SATURDAY));
+        assertThat(max.getMinimum(elementUS), is(Weekday.SUNDAY));
+        assertThat(max.getMaximum(elementUS), is(Weekday.SUNDAY));
+
+        StdCalendarElement<Weekday, JulianCalendar> elementISO =
+            CommonElements.localDayOfWeek(JulianCalendar.axis(), Weekmodel.ISO);
+        assertThat(min.getMinimum(elementISO), is(Weekday.WEDNESDAY));
+        assertThat(min.getMaximum(elementISO), is(Weekday.SUNDAY));
+        assertThat(max.getMinimum(elementISO), is(Weekday.MONDAY));
+        assertThat(max.getMaximum(elementISO), is(Weekday.SUNDAY));
     }
 
 }

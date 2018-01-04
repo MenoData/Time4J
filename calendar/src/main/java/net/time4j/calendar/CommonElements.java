@@ -29,6 +29,7 @@ import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.CalendarDate;
+import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -566,9 +567,14 @@ public class CommonElements {
                 int wNext =
                     getFirstCalendarWeekAsDay(context, 1) + getLengthOfYM(context, 0);
                 if (wNext <= scaledDay) { // reference date points to next week cycle
-                    wCurrent = getFirstCalendarWeekAsDay(context, 1);
-                    D corrected = context.with(EpochDays.UTC, context.get(EpochDays.UTC).longValue() + 7);
-                    wNext = getFirstCalendarWeekAsDay(corrected, 1) + getLengthOfYM(context, 1);
+                    try {
+                        int wStart = getFirstCalendarWeekAsDay(context, 1);
+                        D corrected = context.with(EpochDays.UTC, context.get(EpochDays.UTC).longValue() + 7);
+                        wNext = getFirstCalendarWeekAsDay(corrected, 1) + getLengthOfYM(context, 1);
+                        wCurrent = wStart;
+                    } catch (RuntimeException re) {
+                        wNext += 7; // rare edge case near the end of time axis
+                    }
                 }
                 return (wNext - wCurrent) / 7;
             } else {
@@ -838,12 +844,44 @@ public class CommonElements {
         @Override
         public Weekday getMinimum(T context) {
 
+            Chronology<?> c = Chronology.lookup(context.getClass());
+            long min;
+
+            if (context instanceof CalendarVariant) {
+                min = c.getCalendarSystem(CalendarVariant.class.cast(context).getVariant()).getMinimumSinceUTC();
+            } else {
+                min = c.getCalendarSystem().getMinimumSinceUTC();
+            }
+
+            long utcDays = context.get(EpochDays.UTC).longValue();
+            int oldNum = getDayOfWeek(utcDays).getValue(this.element.model);
+
+            if (utcDays + 1 - oldNum < min) {
+                return getDayOfWeek(min);
+            }
+
             return this.element.getDefaultMinimum();
 
         }
 
         @Override
         public Weekday getMaximum(T context) {
+
+            Chronology<?> c = Chronology.lookup(context.getClass());
+            long max;
+
+            if (context instanceof CalendarVariant) {
+                max = c.getCalendarSystem(CalendarVariant.class.cast(context).getVariant()).getMaximumSinceUTC();
+            } else {
+                max = c.getCalendarSystem().getMaximumSinceUTC();
+            }
+
+            long utcDays = context.get(EpochDays.UTC).longValue();
+            int oldNum = getDayOfWeek(utcDays).getValue(this.element.model);
+
+            if (utcDays + 7 - oldNum > max) {
+                return getDayOfWeek(max);
+            }
 
             return this.element.getDefaultMaximum();
 

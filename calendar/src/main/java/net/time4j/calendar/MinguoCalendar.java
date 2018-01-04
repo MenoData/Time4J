@@ -39,11 +39,13 @@ import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
@@ -268,7 +270,15 @@ public final class MinguoCalendar
                 CalendarUnit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                FieldRule.of(DAY_OF_WEEK),
+                new WeekdayRule<MinguoCalendar>(
+                    getDefaultWeekmodel(),
+                    new ChronoFunction<MinguoCalendar, CalendarSystem<MinguoCalendar>>() {
+                        @Override
+                        public CalendarSystem<MinguoCalendar> apply(MinguoCalendar context) {
+                            return context.getChronology().getCalendarSystem();
+                        }
+                    }
+                ),
                 CalendarUnit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -933,8 +943,6 @@ public final class MinguoCalendar
                 result = context.getDayOfMonth();
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.getDayOfYear();
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = context.getDayOfWeek();
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -954,8 +962,6 @@ public final class MinguoCalendar
                 result = Integer.valueOf(1);
             } else if (this.element.equals(MONTH_OF_YEAR)) {
                 result = Month.JANUARY;
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekday.SUNDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -983,8 +989,6 @@ public final class MinguoCalendar
                 result = context.iso.getMaximum(PlainDate.DAY_OF_MONTH);
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 result = context.iso.getMaximum(PlainDate.DAY_OF_YEAR);
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                result = Weekday.SATURDAY;
             } else {
                 throw new ChronoException("Missing rule for: " + this.element.name());
             }
@@ -1036,9 +1040,6 @@ public final class MinguoCalendar
                 return new MinguoCalendar(date);
             } else if (this.element.equals(DAY_OF_YEAR)) {
                 PlainDate date = context.iso.with(PlainDate.DAY_OF_YEAR, toNumber(value));
-                return new MinguoCalendar(date);
-            } else if (this.element.equals(DAY_OF_WEEK)) {
-                PlainDate date = context.iso.with(getDefaultWeekmodel().localDayOfWeek(), Weekday.class.cast(value));
                 return new MinguoCalendar(date);
             }
 

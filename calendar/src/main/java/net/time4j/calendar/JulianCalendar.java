@@ -37,10 +37,12 @@ import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
@@ -309,7 +311,15 @@ public final class JulianCalendar
                 Unit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule(),
+                new WeekdayRule<JulianCalendar>(
+                    getDefaultWeekmodel(),
+                    new ChronoFunction<JulianCalendar, CalendarSystem<JulianCalendar>>() {
+                        @Override
+                        public CalendarSystem<JulianCalendar> apply(JulianCalendar context) {
+                            return context.getChronology().getCalendarSystem();
+                        }
+                    }
+                ),
                 Unit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1470,76 +1480,6 @@ public final class JulianCalendar
             }
 
             return JulianCalendar.of(value.getEra(), value.getYearOfEra(), value.getMonth(), value.getDayOfMonth());
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(JulianCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(JulianCalendar context) {
-
-            return null;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<JulianCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(JulianCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(JulianCalendar context) {
-
-            return Weekday.SUNDAY;
-
-        }
-
-        @Override
-        public Weekday getMaximum(JulianCalendar context) {
-
-            return Weekday.SATURDAY;
-
-        }
-
-        @Override
-        public boolean isValid(
-            JulianCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public JulianCalendar withValue(
-            JulianCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
 
         }
 

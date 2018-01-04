@@ -38,10 +38,12 @@ import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
@@ -302,7 +304,15 @@ public final class IndianCalendar
                 Unit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule(),
+                new WeekdayRule<IndianCalendar>(
+                    getDefaultWeekmodel(),
+                    new ChronoFunction<IndianCalendar, CalendarSystem<IndianCalendar>>() {
+                        @Override
+                        public CalendarSystem<IndianCalendar> apply(IndianCalendar context) {
+                            return context.getChronology().getCalendarSystem();
+                        }
+                    }
+                ),
                 Unit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1401,76 +1411,6 @@ public final class IndianCalendar
         public ChronoElement<?> getChildAtCeiling(IndianCalendar context) {
 
             return YEAR_OF_ERA;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<IndianCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(IndianCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(IndianCalendar context) {
-
-            return getDefaultWeekmodel().getFirstDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMaximum(IndianCalendar context) {
-
-            return getDefaultWeekmodel().getFirstDayOfWeek().roll(6);
-
-        }
-
-        @Override
-        public boolean isValid(
-            IndianCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public IndianCalendar withValue(
-            IndianCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(IndianCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(IndianCalendar context) {
-
-            return null;
 
         }
 

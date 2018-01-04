@@ -37,10 +37,12 @@ import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
@@ -372,7 +374,15 @@ public final class EthiopianCalendar
                 Unit.DAYS)
             .appendElement(
                 DAY_OF_WEEK,
-                new WeekdayRule(),
+                new WeekdayRule<EthiopianCalendar>(
+                    getDefaultWeekmodel(),
+                    new ChronoFunction<EthiopianCalendar, CalendarSystem<EthiopianCalendar>>() {
+                        @Override
+                        public CalendarSystem<EthiopianCalendar> apply(EthiopianCalendar context) {
+                            return context.getChronology().getCalendarSystem();
+                        }
+                    }
+                ),
                 Unit.DAYS)
             .appendElement(
                 WIM_ELEMENT,
@@ -1538,76 +1548,6 @@ public final class EthiopianCalendar
             }
 
             return context.with(DAY_OF_MONTH, value.getDayOfMonth());
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtFloor(EthiopianCalendar context) {
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoElement<?> getChildAtCeiling(EthiopianCalendar context) {
-
-            return null;
-
-        }
-
-    }
-
-    private static class WeekdayRule
-        implements ElementRule<EthiopianCalendar, Weekday> {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public Weekday getValue(EthiopianCalendar context) {
-
-            return context.getDayOfWeek();
-
-        }
-
-        @Override
-        public Weekday getMinimum(EthiopianCalendar context) {
-
-            return Weekday.SUNDAY;
-
-        }
-
-        @Override
-        public Weekday getMaximum(EthiopianCalendar context) {
-
-            return Weekday.SATURDAY;
-
-        }
-
-        @Override
-        public boolean isValid(
-            EthiopianCalendar context,
-            Weekday value
-        ) {
-
-            return (value != null);
-
-        }
-
-        @Override
-        public EthiopianCalendar withValue(
-            EthiopianCalendar context,
-            Weekday value,
-            boolean lenient
-        ) {
-
-            if (value == null) {
-                throw new IllegalArgumentException("Missing weekday.");
-            }
-
-            Weekmodel model = getDefaultWeekmodel();
-            int oldValue = context.getDayOfWeek().getValue(model);
-            int newValue = value.getValue(model);
-            return context.plus(CalendarDays.of(newValue - oldValue));
 
         }
 

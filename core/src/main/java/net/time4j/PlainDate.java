@@ -3091,6 +3091,15 @@ public final class PlainDate
         @Override
         public V getMaximum(PlainDate context) {
 
+            if (
+                (this.index == EnumElement.DAY_OF_WEEK)
+                && (context.year == GregorianMath.MAX_YEAR)
+                && (context.month == 12)
+                && (context.dayOfMonth >= 27)
+            ) {
+                return this.type.cast(Weekday.FRIDAY);
+            }
+
             return this.max;
 
         }
@@ -3101,7 +3110,17 @@ public final class PlainDate
             V value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            } else if ((this.index == EnumElement.DAY_OF_WEEK) && (context.year == GregorianMath.MAX_YEAR)) {
+                try {
+                    this.withValue(context, value, false);
+                } catch (IllegalArgumentException ex) {
+                    return false;
+                }
+            }
+
+            return true;
 
         }
 
