@@ -131,18 +131,18 @@ abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
         int yearOfCycle
     ) {
         int[] leapMonths = this.getLeapMonths();
-        int y = cycle * 60 + yearOfCycle - 1;
-        int index = 2 * ((y - leapMonths[0]) / 3); // first lower bound estimation
+        int elapsedYears = (cycle - 1) * 60 + yearOfCycle - 1;
+        int index = 2 * ((elapsedYears - leapMonths[0]) / 3); // first lower bound estimation
         int lm = 0;
 
         while ((index < leapMonths.length)) {
             int test = leapMonths[index];
 
-            if (test < y) {
-                index += Math.max(2 * ((y - test) / 3), 2);
-            } else if (test > y) {
+            if (test < elapsedYears) {
+                index += Math.max(2 * ((elapsedYears - test) / 3), 2);
+            } else if (test > elapsedYears) {
                 break;
-            } else { // test == y
+            } else { // test == elapsedYears
                 lm = leapMonths[index + 1];
                 break;
             }
@@ -175,6 +175,7 @@ abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
         if (
             (cycle < 72) || (cycle > 94)
             || (yearOfCycle < 1) || (yearOfCycle > 60)
+            || ((cycle == 72) && (yearOfCycle < 22))
             || ((cycle == 94) && (yearOfCycle > 56))
             || (dayOfMonth < 1) || (dayOfMonth > 30)
             || (month == null)
