@@ -22,7 +22,6 @@
 package net.time4j.calendar;
 
 import net.time4j.Moment;
-import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
@@ -40,7 +39,6 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
-import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
@@ -55,14 +53,10 @@ import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.io.OutputStreamWriter;
 import java.util.Collections;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
@@ -84,6 +78,7 @@ import java.util.Map;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -132,6 +127,7 @@ import java.util.Map;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -269,6 +265,22 @@ public final class ChineseCalendar
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = EastAsianME.SINGLETON_EA;
 
     /**
+     * <p>Represents the ordinal index of a Chinese month. </p>
+     *
+     * <p>This element can be used in conjunction with
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) ordinal formatting}. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Ordnungsnummer eines chinesischen Monats. </p>
+     *
+     * <p>Dieses Element kann in Verbindung mit einem
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) OrdinalFormat}
+     * verwendet werden. </p>
+     */
+    public static final StdCalendarElement<Integer, ChineseCalendar> MONTH_AS_ORDINAL =
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", ChineseCalendar.class, 1, 12, '\u0000', null, null);
+
+    /**
      * <p>Represents the Chinese day of month. </p>
      *
      * <p>Months have either 29 or 30 days. </p>
@@ -348,6 +360,10 @@ public final class ChineseCalendar
             .appendElement(
                 MONTH_OF_YEAR,
                 EastAsianCalendar.getMonthOfYearRule(DAY_OF_MONTH),
+                Unit.MONTHS)
+            .appendElement(
+                MONTH_AS_ORDINAL,
+                EastAsianCalendar.getMonthAsOrdinalRule(DAY_OF_MONTH),
                 Unit.MONTHS)
             .appendElement(
                 DAY_OF_MONTH,
@@ -523,13 +539,11 @@ public final class ChineseCalendar
      * <p>Returns the associated time axis. </p>
      *
      * @return  chronology
-     * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  chronology
-     * @since   3.11/4.8
      */
     public static TimeAxis<Unit, ChineseCalendar> axis() {
 

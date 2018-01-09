@@ -61,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -92,6 +93,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -154,6 +156,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -275,21 +278,37 @@ public final class VietnameseCalendar
             null);
 
     /**
-     * <p>Represents the Chinese month. </p>
+     * <p>Represents the Vietnamese month. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Monat. </p>
+     * <p>Repr&auml;sentiert den vietnamesischen Monat. </p>
      */
     @FormattableElement(format = "M", standalone = "L")
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = EastAsianME.SINGLETON_EA;
 
     /**
-     * <p>Represents the Chinese day of month. </p>
+     * <p>Represents the ordinal index of a Vietnamese month. </p>
+     *
+     * <p>This element can be used in conjunction with
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) ordinal formatting}. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Ordnungsnummer eines vietnamesischen Monats. </p>
+     *
+     * <p>Dieses Element kann in Verbindung mit einem
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) OrdinalFormat}
+     * verwendet werden. </p>
+     */
+    public static final StdCalendarElement<Integer, VietnameseCalendar> MONTH_AS_ORDINAL =
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", VietnameseCalendar.class, 1, 12, '\u0000', null, null);
+
+    /**
+     * <p>Represents the Vietnamese day of month. </p>
      *
      * <p>Months have either 29 or 30 days. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Tag des Monats. </p>
+     * <p>Repr&auml;sentiert den vietnamesischen Tag des Monats. </p>
      *
      * <p>Monate haben entweder 29 oder 30 Tage. </p>
      */
@@ -298,29 +317,29 @@ public final class VietnameseCalendar
         new StdIntegerDateElement<>("DAY_OF_MONTH", VietnameseCalendar.class, 1, 30, 'd');
 
     /**
-     * <p>Represents the Chinese day of year. </p>
+     * <p>Represents the Vietnamese day of year. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Tag des Jahres. </p>
+     * <p>Repr&auml;sentiert den vietnamesischen Tag des Jahres. </p>
      */
     @FormattableElement(format = "D")
     public static final StdCalendarElement<Integer, VietnameseCalendar> DAY_OF_YEAR =
         new StdIntegerDateElement<>("DAY_OF_YEAR", VietnameseCalendar.class, 1, 355, 'D');
 
     /**
-     * <p>Represents the Chinese day of week. </p>
+     * <p>Represents the Vietnamese day of week. </p>
      *
      * <p>If the day-of-week is set to a new value then Time4J handles the Chinese calendar week
-     * as starting on Sunday (like in China). </p>
+     * as starting on Monday (like in modern Vietnam). </p>
      *
      * @see     #getDefaultWeekmodel()
      * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Tag der Woche. </p>
+     * <p>Repr&auml;sentiert den vietnamesischen Tag der Woche. </p>
      *
-     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die chinesische
-     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt (wie in China). </p>
+     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die vietnamesische
+     * Kalenderwoche so, da&szlig; sie am Montag beginnt (wie im heutigen Vietnam). </p>
      *
      * @see     #getDefaultWeekmodel()
      * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
@@ -363,6 +382,10 @@ public final class VietnameseCalendar
             .appendElement(
                 MONTH_OF_YEAR,
                 EastAsianCalendar.getMonthOfYearRule(DAY_OF_MONTH),
+                Unit.MONTHS)
+            .appendElement(
+                MONTH_AS_ORDINAL,
+                EastAsianCalendar.getMonthAsOrdinalRule(DAY_OF_MONTH),
                 Unit.MONTHS)
             .appendElement(
                 DAY_OF_MONTH,
@@ -430,7 +453,7 @@ public final class VietnameseCalendar
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates a new instance of a Chinese calendar date. </p>
+     * <p>Creates a new instance of a Vietnamese calendar date. </p>
      *
      * @param   cycle       the count of sexagesimal year cycles in range 72-94
      * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
@@ -440,7 +463,7 @@ public final class VietnameseCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues chinesisches Kalenderdatum. </p>
+     * <p>Erzeugt ein neues vietnamesisches Kalenderdatum. </p>
      *
      * @param   cycle       the count of sexagesimal year cycles in range 72-94
      * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
@@ -464,7 +487,7 @@ public final class VietnameseCalendar
     /**
      * <p>Obtains the current calendar date in system time. </p>
      *
-     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(ChineseCalendar.axis())}. </p>
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(VietnameseCalendar.axis())}. </p>
      *
      * @return  current calendar date in system time zone using the system clock
      * @see     SystemClock#inLocalView()
@@ -473,7 +496,7 @@ public final class VietnameseCalendar
     /*[deutsch]
      * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
      *
-     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(ChineseCalendar.axis())}. </p>
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(VietnameseCalendar.axis())}. </p>
      *
      * @return  current calendar date in system time zone using the system clock
      * @see     SystemClock#inLocalView()
@@ -538,13 +561,11 @@ public final class VietnameseCalendar
      * <p>Returns the associated time axis. </p>
      *
      * @return  chronology
-     * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  chronology
-     * @since   3.11/4.8
      */
     public static TimeAxis<Unit, VietnameseCalendar> axis() {
 

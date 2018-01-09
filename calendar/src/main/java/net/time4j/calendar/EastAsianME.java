@@ -53,13 +53,6 @@ class EastAsianME
 
     //private static final long serialVersionUID = -2978966174642315851L;
 
-    //~ Konstruktoren -------------------------------------------------
-
-    private EastAsianME() {
-        super();
-
-    }
-
     //~ Methoden ------------------------------------------------------
 
     @Override

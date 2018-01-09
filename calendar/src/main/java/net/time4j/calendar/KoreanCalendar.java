@@ -61,6 +61,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -79,6 +80,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -127,6 +129,7 @@ import java.util.Locale;
  *  <li>{@link #DAY_OF_YEAR}</li>
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
+ *  <li>{@link #MONTH_AS_ORDINAL}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
@@ -254,21 +257,37 @@ public final class KoreanCalendar
             null);
 
     /**
-     * <p>Represents the Chinese month. </p>
+     * <p>Represents the Korean month. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Monat. </p>
+     * <p>Repr&auml;sentiert den koreanischen Monat. </p>
      */
     @FormattableElement(format = "M", standalone = "L")
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = EastAsianME.SINGLETON_EA;
 
     /**
-     * <p>Represents the Chinese day of month. </p>
+     * <p>Represents the ordinal index of a Korean month. </p>
+     *
+     * <p>This element can be used in conjunction with
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) ordinal formatting}. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Ordnungsnummer eines koreanischen Monats. </p>
+     *
+     * <p>Dieses Element kann in Verbindung mit einem
+     * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) OrdinalFormat}
+     * verwendet werden. </p>
+     */
+    public static final StdCalendarElement<Integer, KoreanCalendar> MONTH_AS_ORDINAL =
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", KoreanCalendar.class, 1, 12, '\u0000', null, null);
+
+    /**
+     * <p>Represents the Korean day of month. </p>
      *
      * <p>Months have either 29 or 30 days. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Tag des Monats. </p>
+     * <p>Repr&auml;sentiert den koreanischen Tag des Monats. </p>
      *
      * <p>Monate haben entweder 29 oder 30 Tage. </p>
      */
@@ -277,29 +296,29 @@ public final class KoreanCalendar
         new StdIntegerDateElement<>("DAY_OF_MONTH", KoreanCalendar.class, 1, 30, 'd');
 
     /**
-     * <p>Represents the Chinese day of year. </p>
+     * <p>Represents the Korean day of year. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Tag des Jahres. </p>
+     * <p>Repr&auml;sentiert den koreanischen Tag des Jahres. </p>
      */
     @FormattableElement(format = "D")
     public static final StdCalendarElement<Integer, KoreanCalendar> DAY_OF_YEAR =
         new StdIntegerDateElement<>("DAY_OF_YEAR", KoreanCalendar.class, 1, 355, 'D');
 
     /**
-     * <p>Represents the Chinese day of week. </p>
+     * <p>Represents the Korean day of week. </p>
      *
-     * <p>If the day-of-week is set to a new value then Time4J handles the Chinese calendar week
-     * as starting on Sunday (like in China). </p>
+     * <p>If the day-of-week is set to a new value then Time4J handles the Korean calendar week
+     * as starting on Sunday (like in South-Korea). </p>
      *
      * @see     #getDefaultWeekmodel()
      * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert den chinesischen Tag der Woche. </p>
+     * <p>Repr&auml;sentiert den koreanischen Tag der Woche. </p>
      *
-     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die chinesische
-     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt (wie in China). </p>
+     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J die koreanische
+     * Kalenderwoche so, da&szlig; sie am Sonntag beginnt (wie in S&uuml;dkorea). </p>
      *
      * @see     #getDefaultWeekmodel()
      * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
@@ -342,6 +361,10 @@ public final class KoreanCalendar
             .appendElement(
                 MONTH_OF_YEAR,
                 EastAsianCalendar.getMonthOfYearRule(DAY_OF_MONTH),
+                Unit.MONTHS)
+            .appendElement(
+                MONTH_AS_ORDINAL,
+                EastAsianCalendar.getMonthAsOrdinalRule(DAY_OF_MONTH),
                 Unit.MONTHS)
             .appendElement(
                 DAY_OF_MONTH,
@@ -409,7 +432,7 @@ public final class KoreanCalendar
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates a new instance of a Chinese calendar date. </p>
+     * <p>Creates a new instance of a Korean calendar date. </p>
      *
      * @param   cycle       the count of sexagesimal year cycles in range 72-94
      * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
@@ -419,7 +442,7 @@ public final class KoreanCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues chinesisches Kalenderdatum. </p>
+     * <p>Erzeugt ein neues koreanisches Kalenderdatum. </p>
      *
      * @param   cycle       the count of sexagesimal year cycles in range 72-94
      * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
@@ -443,7 +466,7 @@ public final class KoreanCalendar
     /**
      * <p>Obtains the current calendar date in system time. </p>
      *
-     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(ChineseCalendar.axis())}. </p>
+     * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(KoreanCalendar.axis())}. </p>
      *
      * @return  current calendar date in system time zone using the system clock
      * @see     SystemClock#inLocalView()
@@ -452,7 +475,7 @@ public final class KoreanCalendar
     /*[deutsch]
      * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
      *
-     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(ChineseCalendar.axis())}. </p>
+     * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(KoreanCalendar.axis())}. </p>
      *
      * @return  current calendar date in system time zone using the system clock
      * @see     SystemClock#inLocalView()
@@ -496,20 +519,20 @@ public final class KoreanCalendar
     /**
      * <p>Obtains the standard week model of this calendar. </p>
      *
-     * <p>The Chinese calendar usually starts on Sunday. </p>
+     * <p>The Korean calendar usually starts on Sunday (in South Korea). </p>
      *
      * @return  Weekmodel
      */
     /*[deutsch]
      * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
      *
-     * <p>Der chinesische Kalender startet normalerweise am Sonntag. </p>
+     * <p>Der koreanische Kalender startet (in S&uuml;dkorea) normalerweise am Sonntag. </p>
      *
      * @return  Weekmodel
      */
     public static Weekmodel getDefaultWeekmodel() {
 
-        return Weekmodel.of(Locale.CHINA);
+        return Weekmodel.of(new Locale("ko", "KR"));
 
     }
 
@@ -517,13 +540,11 @@ public final class KoreanCalendar
      * <p>Returns the associated time axis. </p>
      *
      * @return  chronology
-     * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Liefert die zugeh&ouml;rige Zeitachse. </p>
      *
      * @return  chronology
-     * @since   3.11/4.8
      */
     public static TimeAxis<Unit, KoreanCalendar> axis() {
 
@@ -582,10 +603,10 @@ public final class KoreanCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     /**
-     * <p>Defines some calendar units for the Chinese calendar. </p>
+     * <p>Defines some calendar units for the Korean calendar. </p>
      */
     /*[deutsch]
-     * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den chinesischen Kalender. </p>
+     * <p>Definiert einige kalendarische Zeiteinheiten f&uuml;r den koreanischen Kalender. </p>
      */
     public static enum Unit
         implements ChronoUnit {
@@ -627,7 +648,7 @@ public final class KoreanCalendar
         }
 
         /**
-         * <p>Calculates the difference between given Chinese dates in this unit. </p>
+         * <p>Calculates the difference between given Korean dates in this unit. </p>
          *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)

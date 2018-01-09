@@ -60,6 +60,10 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
     //~ Statische Felder/Initialisierungen ------------------------------------
 
+    static final int DAY_OF_MONTH_INDEX = 0;
+    static final int DAY_OF_YEAR_INDEX = 1;
+    static final int MONTH_AS_ORDINAL_INDEX = 2;
+
     static final int UNIT_YEARS = 1;
     static final int UNIT_MONTHS = 2;
     static final int UNIT_WEEKS = 3;
@@ -357,12 +361,16 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         return new MonthRule<>(c);
     }
 
+    static <D extends EastAsianCalendar<?, D>> ElementRule<D, Integer> getMonthAsOrdinalRule(ChronoElement<?> c) {
+        return new IntegerElementRule<>(MONTH_AS_ORDINAL_INDEX, c);
+    }
+
     static <D extends EastAsianCalendar<?, D>> ElementRule<D, Integer> getDayOfMonthRule() {
-        return new DayElementRule<>(true);
+        return new IntegerElementRule<>(DAY_OF_MONTH_INDEX, null);
     }
 
     static <D extends EastAsianCalendar<?, D>> ElementRule<D, Integer> getDayOfYearRule() {
-        return new DayElementRule<>(false);
+        return new IntegerElementRule<>(DAY_OF_YEAR_INDEX, null);
     }
 
     static <D extends EastAsianCalendar<?, D>> UnitRule<D> getUnitRule(int index) {
@@ -384,26 +392,45 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class DayElementRule<D extends EastAsianCalendar<?, D>>
+    private static class IntegerElementRule<D extends EastAsianCalendar<?, D>>
         implements IntElementRule<D> {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private final boolean monthly;
+        private final ChronoElement<?> child;
+        private final int index;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private DayElementRule(boolean monthly) {
+        private IntegerElementRule(
+            int index,
+            ChronoElement<?> child
+        ) {
             super();
 
-            this.monthly = monthly;
+            this.index = index;
+            this.child = child;
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
         public int getInt(D context) {
-            return (this.monthly ? context.getDayOfMonth() : context.getDayOfYear());
+            switch (this.index) {
+                case DAY_OF_MONTH_INDEX:
+                    return context.getDayOfMonth();
+                case DAY_OF_YEAR_INDEX:
+                    return context.getDayOfYear();
+                case MONTH_AS_ORDINAL_INDEX:
+                    int num = context.getMonth().getNumber();
+                    int lm = context.getLeapMonth();
+                    if (((lm > 0) && (lm < num)) || context.getMonth().isLeap()) {
+                        num++;
+                    }
+                    return num;
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+            }
         }
 
         @Override
@@ -413,7 +440,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         ) {
             if (value < 1) {
                 return false;
-            } else if (this.monthly) {
+            } else if (this.index == DAY_OF_MONTH_INDEX) {
                 if (value > 30) {
                     return false;
                 } else if (value == 30) {
@@ -421,8 +448,12 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                 } else { // range 1-29
                     return true;
                 }
-            } else {
+            } else if (this.index == DAY_OF_YEAR_INDEX) {
                 return (value <= context.lengthOfYear());
+            } else if (this.index == MONTH_AS_ORDINAL_INDEX) {
+                return (value <= 12) || ((value == 13) && (context.getLeapMonth() > 0));
+            } else {
+                throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
         }
 
@@ -432,23 +463,44 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
             int value,
             boolean lenient
         ) {
-            if (this.monthly) {
-                if (lenient) {
-                    long utcDays = context.getDaysSinceEpochUTC() + value - context.getDayOfMonth();
-                    return context.getCalendarSystem().transform(utcDays);
-                } else if ((value < 1) || (value > 30) || ((value == 30) && context.lengthOfMonth() < 30)) {
-                    throw new IllegalArgumentException("Day of month out of range: " + value);
-                } else {
-                    long utcDays = context.getDaysSinceEpochUTC() + value - context.getDayOfMonth();
-                    return context.getCalendarSystem().create(
-                        context.getCycle(), context.getYear(), context.getMonth(), value, utcDays);
-                }
-            } else {
-                if (!lenient && ((value < 1) || (value > context.lengthOfYear()))) {
-                    throw new IllegalArgumentException("Day of year out of range: " + value);
-                }
-                long utcDays = context.getDaysSinceEpochUTC() + value - context.getDayOfYear();
-                return context.getCalendarSystem().transform(utcDays);
+            switch (this.index) {
+                case DAY_OF_MONTH_INDEX:
+                    if (lenient) {
+                        long utcDays = context.getDaysSinceEpochUTC() + value - context.getDayOfMonth();
+                        return context.getCalendarSystem().transform(utcDays);
+                    } else if ((value < 1) || (value > 30) || ((value == 30) && context.lengthOfMonth() < 30)) {
+                        throw new IllegalArgumentException("Day of month out of range: " + value);
+                    } else {
+                        long utcDays = context.getDaysSinceEpochUTC() + value - context.getDayOfMonth();
+                        return context.getCalendarSystem().create(
+                            context.getCycle(), context.getYear(), context.getMonth(), value, utcDays);
+                    }
+                case DAY_OF_YEAR_INDEX:
+                    if (!lenient && ((value < 1) || (value > context.lengthOfYear()))) {
+                        throw new IllegalArgumentException("Day of year out of range: " + value);
+                    }
+                    long utcDaysNew = context.getDaysSinceEpochUTC() + value - context.getDayOfYear();
+                    return context.getCalendarSystem().transform(utcDaysNew);
+                case MONTH_AS_ORDINAL_INDEX:
+                    if (this.isValid(context, value)) {
+                        int lm = context.getLeapMonth();
+                        boolean leap = false;
+                        if ((lm > 0) && (lm < value)) {
+                            if (value == lm + 1) {
+                                leap = true;
+                            }
+                            value--;
+                        }
+                        EastAsianMonth eam = EastAsianMonth.valueOf(value);
+                        if (leap) {
+                            eam = eam.withLeap();
+                        }
+                        return MonthRule.withMonth(context, eam);
+                    } else {
+                        throw new IllegalArgumentException("Ordinal month out of range: " + value);
+                    }
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
         }
 
@@ -464,7 +516,20 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
         @Override
         public Integer getMaximum(D context) {
-            int max = (this.monthly ? context.lengthOfMonth() : context.lengthOfYear());
+            int max;
+            switch (this.index) {
+                case DAY_OF_MONTH_INDEX:
+                    max = context.lengthOfMonth();
+                    break;
+                case DAY_OF_YEAR_INDEX:
+                    max = context.lengthOfYear();
+                    break;
+                case MONTH_AS_ORDINAL_INDEX:
+                    max = (context.isLeapYear() ? 13 : 12);
+                    break;
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+            }
             return Integer.valueOf(max);
         }
 
@@ -483,19 +548,19 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
             boolean lenient
         ) {
             if (value == null) {
-                throw new IllegalArgumentException("Missing day of " + (this.monthly ? "month." : "year."));
+                throw new IllegalArgumentException("Missing element value.");
             }
             return this.withValue(context, value.intValue(), lenient);
         }
 
         @Override
         public ChronoElement<?> getChildAtFloor(D context) {
-            return null;
+            return this.child;
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(D context) {
-            return null;
+            return this.child;
         }
 
     }
@@ -547,17 +612,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
             boolean lenient
         ) {
             if (this.isValid(context, value)) {
-                EastAsianCS<D> cs = context.getCalendarSystem();
-                int dom = context.getDayOfMonth();
-                if (dom <= 29) {
-                    long utcDays = cs.transform(context.getCycle(), context.getYear(), value, dom);
-                    return cs.create(context.getCycle(), context.getYear(), value, dom, utcDays);
-                } else {
-                    long utcDays = cs.transform(context.getCycle(), context.getYear(), value, 1);
-                    D first = cs.transform(utcDays);
-                    dom = Math.min(dom, first.lengthOfMonth());
-                    return cs.create(context.getCycle(), context.getYear(), value, dom, utcDays + dom - 1);
-                }
+                return withMonth(context, value);
             } else {
                 throw new IllegalArgumentException("Invalid month: " + value);
             }
@@ -571,6 +626,23 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         @Override
         public ChronoElement<?> getChildAtCeiling(D context) {
             return this.child;
+        }
+
+        static <D extends EastAsianCalendar<?, D>> D withMonth(
+            D context,
+            EastAsianMonth eam
+        ) {
+            EastAsianCS<D> cs = context.getCalendarSystem();
+            int dom = context.getDayOfMonth();
+            if (dom <= 29) {
+                long utcDays = cs.transform(context.getCycle(), context.getYear(), eam, dom);
+                return cs.create(context.getCycle(), context.getYear(), eam, dom, utcDays);
+            } else {
+                long utcDays = cs.transform(context.getCycle(), context.getYear(), eam, 1);
+                D first = cs.transform(utcDays);
+                dom = Math.min(dom, first.lengthOfMonth());
+                return cs.create(context.getCycle(), context.getYear(), eam, dom, utcDays + dom - 1);
+            }
         }
 
     }
