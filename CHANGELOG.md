@@ -4,6 +4,9 @@
 - Search for moon phase at or after a moment [#730]
 - Traditional Chinese now recognizes hant-script in locale [#728]
 
+### Changed
+- Update leap second expiry date [#734]
+
 ### Fixed
 - date.getMaximum(<week-related-element>) can crash near end of timeline [#732]
 
