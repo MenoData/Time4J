@@ -3,6 +3,9 @@
 - Extra features for StdSolarCalculator.CC [#731]
 - Search for moon phase at or after a moment [#730]
 
+### Changed
+- Update leap second expiry date [#734]
+
 ### Fixed
 - date.getMaximum(<week-related-element>) can crash near end of timeline [#732]
 
