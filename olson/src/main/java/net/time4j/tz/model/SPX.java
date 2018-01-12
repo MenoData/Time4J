@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -438,7 +438,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings());
+            writeOffset(out, pattern.getSavings0());
         }
 
         if (timeIndex == NO_COMPRESSION) {
@@ -503,7 +503,7 @@ final class SPX
         out.writeByte(third & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings());
+            writeOffset(out, pattern.getSavings0());
         }
 
         if (!timeWritten) {
@@ -572,7 +572,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings());
+            writeOffset(out, pattern.getSavings0());
         }
 
         if (!timeWritten) {
@@ -841,7 +841,7 @@ final class SPX
 
         int first = (rule.getMonthValue() << 4);
         int indicator = rule.getIndicator().ordinal();
-        int dst = rule.getSavings();
+        int dst = rule.getSavings0();
         boolean offsetWritten = true;
 
         switch (dst) {

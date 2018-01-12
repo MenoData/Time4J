@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DaylightSavingRule.java) is part of project Time4J.
  *
@@ -84,7 +84,7 @@ public abstract class DaylightSavingRule {
      * @param   timeOfDay   time of day when the rule switches the offset
      * @param   indicator   offset indicator
      * @param   savings     daylight saving offset in effect after this rule
-     * @throws  IllegalArgumentException if the last argument is negative
+     * @throws  IllegalArgumentException if the last argument is out of range
      */
     /*[deutsch]
      * <p>Nur f&uuml;r nicht-standardisierte Subklassen. </p>
@@ -92,7 +92,7 @@ public abstract class DaylightSavingRule {
      * @param   timeOfDay   time of day when the rule switches the offset
      * @param   indicator   offset indicator
      * @param   savings     daylight saving offset in effect after this rule
-     * @throws  IllegalArgumentException if the last argument is negative
+     * @throws  IllegalArgumentException if the last argument is out of range
      */
     protected DaylightSavingRule(
         PlainTime timeOfDay,
@@ -105,9 +105,8 @@ public abstract class DaylightSavingRule {
             throw new NullPointerException("Missing time of day.");
         } else if (indicator == null) {
             throw new NullPointerException("Missing offset indicator.");
-        } else if (savings < 0) {
-            throw new IllegalArgumentException(
-                "Negative daylight saving offset: " + savings);
+        } else if ((savings != Integer.MAX_VALUE) && ((savings < -18 * 3600) || (savings > 18 * 3600))) {
+            throw new IllegalArgumentException("DST out of range: " + savings);
         }
 
         this.timeOfDay = timeOfDay.with(PlainTime.PRECISION, ClockUnit.SECONDS);
@@ -204,7 +203,7 @@ public abstract class DaylightSavingRule {
      */
     public int getSavings() {
 
-        return this.savings;
+        return ((this.savings == Integer.MAX_VALUE) ? 0 : this.savings);
 
     }
 
@@ -268,6 +267,20 @@ public abstract class DaylightSavingRule {
         }
 
         return ct.value();
+
+    }
+
+    // for internal use only
+    int getSavings0() {
+
+        return this.savings;
+
+    }
+
+    // for internal use only
+    boolean isSaving() {
+
+        return (this.savings > 0);
 
     }
 

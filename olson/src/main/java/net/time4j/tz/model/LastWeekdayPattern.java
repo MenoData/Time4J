@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LastWeekdayPattern.java) is part of project Time4J.
  *
@@ -120,6 +120,8 @@ final class LastWeekdayPattern
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");
         sb.append(this.getIndicator());
+        sb.append(",dst-active=");
+        sb.append(this.isSaving());
         sb.append(",dst-offset=");
         sb.append(this.getSavings());
         sb.append(']');
