@@ -418,6 +418,11 @@ public final class CalendarText {
             sb.append('-');
             sb.append(country);
         }
+        String script = locale.getScript();
+        if (!script.isEmpty()) {
+            sb.append('#');
+            sb.append(script);
+        }
         String key = sb.toString();
 
         CalendarText instance = CACHE.get(key);
