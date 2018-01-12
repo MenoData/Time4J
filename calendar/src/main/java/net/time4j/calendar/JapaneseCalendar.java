@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JapaneseCalendar.java) is part of project Time4J.
  *
@@ -78,7 +78,6 @@ import java.io.InputStream;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.ObjectStreamException;
-import java.io.Serializable;
 import java.net.URI;
 import java.text.ParsePosition;
 import java.util.Collections;
@@ -560,7 +559,7 @@ public final class JapaneseCalendar
                 Unit.YEARS)
             .appendElement(
                 MONTH_OF_YEAR,
-                MonthPrimitiveElement.SINGLETON,
+                MonthPrimitiveElement.SINGLETON_JP,
                 Unit.MONTHS)
             .appendElement(
                 MONTH_AS_ORDINAL,
@@ -581,7 +580,7 @@ public final class JapaneseCalendar
                     new ChronoFunction<JapaneseCalendar, CalendarSystem<JapaneseCalendar>>() {
                         @Override
                         public CalendarSystem<JapaneseCalendar> apply(JapaneseCalendar context) {
-                            return context.getChronology().getCalendarSystem();
+                            return CALSYS;
                         }
                     }
                 ),
@@ -2577,99 +2576,16 @@ public final class JapaneseCalendar
 
 
     private static class MonthPrimitiveElement
-        implements TextElement<EastAsianMonth>, ElementRule<JapaneseCalendar, EastAsianMonth>, Serializable {
+        extends EastAsianME
+        implements ElementRule<JapaneseCalendar, EastAsianMonth> {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        static final MonthPrimitiveElement SINGLETON = new MonthPrimitiveElement();
+        static final MonthPrimitiveElement SINGLETON_JP = new MonthPrimitiveElement();
 
         private static final long serialVersionUID = -2978966174642315851L;
 
-        //~ Konstruktoren -------------------------------------------------
-
-        private MonthPrimitiveElement() {
-            super();
-
-        }
-
         //~ Methoden ------------------------------------------------------
-
-        @Override
-        public String name() {
-
-            return "MONTH_OF_YEAR";
-
-        }
-
-        @Override
-        public Class<EastAsianMonth> getType() {
-
-            return EastAsianMonth.class;
-
-        }
-
-        @Override
-        public char getSymbol() {
-
-            return 'M';
-
-        }
-
-        @Override
-        public int compare(
-            ChronoDisplay o1,
-            ChronoDisplay o2
-        ) {
-
-            EastAsianMonth m1 = o1.get(this);
-            EastAsianMonth m2 = o2.get(this);
-            return m1.compareTo(m2);
-
-        }
-
-        @Override
-        public EastAsianMonth getDefaultMinimum() {
-
-            return EastAsianMonth.valueOf(1);
-
-        }
-
-        @Override
-        public EastAsianMonth getDefaultMaximum() {
-
-            return EastAsianMonth.valueOf(12);
-
-        }
-
-        @Override
-        public boolean isDateElement() {
-
-            return true;
-
-        }
-
-        @Override
-        public boolean isTimeElement() {
-
-            return false;
-
-        }
-
-        @Override
-        public boolean isLenient() {
-
-            return false;
-
-        }
-
-        @Override
-        public String getDisplayName(Locale language) {
-
-            String key = "L_month";
-            String lname = CalendarText.getIsoInstance(language).getTextForms().get(key);
-            return ((lname == null) ? this.name() : lname);
-
-        }
 
         @Override
         public EastAsianMonth getValue(JapaneseCalendar context) {
@@ -2750,9 +2666,9 @@ public final class JapaneseCalendar
          * @serialData  Preserves the singleton semantic
          * @return      singleton instance
          */
-        private Object readResolve() throws ObjectStreamException {
+        protected Object readResolve() throws ObjectStreamException {
 
-            return SINGLETON;
+            return SINGLETON_JP;
 
         }
 

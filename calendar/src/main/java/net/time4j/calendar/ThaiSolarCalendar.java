@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ThaiSolarCalendar.java) is part of project Time4J.
  *
@@ -301,7 +301,7 @@ public final class ThaiSolarCalendar
                     new ChronoFunction<ThaiSolarCalendar, CalendarSystem<ThaiSolarCalendar>>() {
                         @Override
                         public CalendarSystem<ThaiSolarCalendar> apply(ThaiSolarCalendar context) {
-                            return context.getChronology().getCalendarSystem();
+                            return CALSYS;
                         }
                     }
                 ),

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PersianCalendar.java) is part of project Time4J.
  *
@@ -308,7 +308,7 @@ public final class PersianCalendar
                     new ChronoFunction<PersianCalendar, CalendarSystem<PersianCalendar>>() {
                         @Override
                         public CalendarSystem<PersianCalendar> apply(PersianCalendar context) {
-                            return context.getChronology().getCalendarSystem();
+                            return CALSYS;
                         }
                     }
                 ),

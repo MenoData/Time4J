@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IndianCalendar.java) is part of project Time4J.
  *
@@ -309,7 +309,7 @@ public final class IndianCalendar
                     new ChronoFunction<IndianCalendar, CalendarSystem<IndianCalendar>>() {
                         @Override
                         public CalendarSystem<IndianCalendar> apply(IndianCalendar context) {
-                            return context.getChronology().getCalendarSystem();
+                            return CALSYS;
                         }
                     }
                 ),

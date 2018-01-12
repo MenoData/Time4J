@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewCalendar.java) is part of project Time4J.
  *
@@ -351,7 +351,7 @@ public final class HebrewCalendar
                     new ChronoFunction<HebrewCalendar, CalendarSystem<HebrewCalendar>>() {
                         @Override
                         public CalendarSystem<HebrewCalendar> apply(HebrewCalendar context) {
-                            return context.getChronology().getCalendarSystem();
+                            return CALSYS;
                         }
                     }
                 ),
