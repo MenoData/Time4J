@@ -3,9 +3,6 @@ package net.time4j.i18n;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
-
-import java.util.Locale;
-
 import net.time4j.format.Attributes;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
@@ -14,6 +11,8 @@ import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -168,7 +167,8 @@ public class WeekdataTest {
     @Test
     public void hantScript() {
         Locale simplifiedChinese = Locale.SIMPLIFIED_CHINESE;
-        Locale traditionalChinese = Locale.forLanguageTag("zh-Hant");
+        Locale traditionalChinese = new Locale.Builder().setLanguage("zh").setScript("Hant").build();
+        assertThat(traditionalChinese, is(Locale.forLanguageTag("zh-Hant")));
         assertThat(
             Weekday.MONDAY.getDisplayName(simplifiedChinese, TextWidth.ABBREVIATED, OutputContext.STANDALONE),
             is("周一")

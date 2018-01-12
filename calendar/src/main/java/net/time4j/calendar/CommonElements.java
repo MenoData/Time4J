@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CommonElements.java) is part of project Time4J.
  *
@@ -332,10 +332,12 @@ public class CommonElements {
             Set<ChronoElement<?>> set = new HashSet<>();
             set.add(
                 new DayOfWeekElement<>(this.chronoType, model));
-            set.add(new CalendarWeekElement<>(
-                "WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement));
-            set.add(new CalendarWeekElement<>(
-                "WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement));
+            set.add(
+                new CalendarWeekElement<>(
+                    "WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement));
+            set.add(
+                new CalendarWeekElement<>(
+                    "WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement));
             return Collections.unmodifiableSet(set);
 
         }
