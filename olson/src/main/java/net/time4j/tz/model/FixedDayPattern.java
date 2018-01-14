@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FixedDayPattern.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.base.GregorianMath;
 
+import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 
@@ -109,6 +110,8 @@ final class FixedDayPattern
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");
         sb.append(this.getIndicator());
+        sb.append(",dst-active=");
+        sb.append(this.isSaving());
         sb.append(",dst-offset=");
         sb.append(this.getSavings());
         sb.append(']');
@@ -147,7 +150,7 @@ final class FixedDayPattern
      *              that allmost all transitions happen at full hours around
      *              midnight. Insight in details see source code.
      *
-     * @return  replacement object
+     * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
@@ -156,12 +159,12 @@ final class FixedDayPattern
     }
 
     /**
-     * @param       in  serialization stream
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws InvalidObjectException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

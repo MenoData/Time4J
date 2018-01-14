@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalTransition.java) is part of project Time4J.
  *
@@ -126,12 +126,15 @@ public final class ZonalTransition
     /**
      * <p>Creates a new transition between two shifts. </p>
      *
+     * <p>The given daylight-saving offset might be exceptionally equal to {@code Integer.MAX_VALUE}
+     * which signals an offset of zero but interpreted as daylight-saving. This special feature is
+     * supported since version v3.39/4.34. </p>
+     *
      * @param   posixTime               POSIX time of transition
      * @param   previousOffset          previous total shift in seconds
      * @param   totalOffset             new total shift in seconds
      * @param   daylightSavingOffset    DST-shift in seconds
-     * @throws  IllegalArgumentException if the DST-shift is negative or if any
-     *          offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
+     * @throws  IllegalArgumentException if any offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
      * @see     net.time4j.scale.UniversalTime#getPosixTime()
      * @see     ZonalOffset#getIntegralAmount()
      */
@@ -139,12 +142,15 @@ public final class ZonalTransition
      * <p>Konstruiert einen neuen &Uuml;bergang zwischen zwei
      * Verschiebungen. </p>
      *
+     * <p>Die angegebene DST-Verschiebung darf ausnahmsweise auch gleich {@code Integer.MAX_VALUE} sein.
+     * Dieser besondere Wert zeigt eine Null-Verschiebung an, die aber als abweichende Sommerzeiteinstellung
+     * interpretiert wird. Dieses spezielle Verhalten wird erst seit Version v3.39/4.34 angeboten. </p>
+     *
      * @param   posixTime               POSIX time of transition
      * @param   previousOffset          previous total shift in seconds
      * @param   totalOffset             new total shift in seconds
      * @param   daylightSavingOffset    DST-shift in seconds
-     * @throws  IllegalArgumentException if the DST-shift is negative or if any
-     *          offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
+     * @throws  IllegalArgumentException if any offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
      * @see     net.time4j.scale.UniversalTime#getPosixTime()
      * @see     ZonalOffset#getIntegralAmount()
      */
@@ -154,6 +160,7 @@ public final class ZonalTransition
         int totalOffset,
         int daylightSavingOffset
     ) {
+        super();
 
         this.posix = posixTime;
         this.previous = previousOffset;
@@ -266,7 +273,7 @@ public final class ZonalTransition
      */
     public int getStandardOffset() {
 
-        return (this.total - this.dst);
+        return (this.total - this.getDaylightSavingOffset());
 
     }
 
@@ -296,7 +303,7 @@ public final class ZonalTransition
      */
     public int getDaylightSavingOffset() {
 
-        return this.dst;
+        return ((this.dst == Integer.MAX_VALUE) ? 0 : this.dst);
 
     }
 
@@ -314,7 +321,7 @@ public final class ZonalTransition
      */
     public boolean isDaylightSaving() {
 
-        return (this.dst != 0);
+        return (this.dst > 0);
 
     }
 
@@ -496,10 +503,8 @@ public final class ZonalTransition
 
     private static void checkDST(int dst) {
 
-        if (dst < 0) {
-            throw new IllegalArgumentException("Negative DST: " + dst);
-        } else if (dst > 18 * 3600) {
-            throw new IllegalArgumentException("DST out of range: " + dst);
+        if (dst != Integer.MAX_VALUE) {
+            checkRange(dst);
         }
 
     }
@@ -508,7 +513,7 @@ public final class ZonalTransition
      * @serialData  Checks the consistency.
      * @param       in      object input stream
      * @throws      IOException in any case of inconsistencies
-     * @throws      ClassNotFoundException if class loading fails
+     * @throws      ClassNotFoundException if class-loading fails
      */
     private void readObject(ObjectInputStream in)
         throws IOException, ClassNotFoundException {

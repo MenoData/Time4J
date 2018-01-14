@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OldApiTimezone.java) is part of project Time4J.
  *
@@ -30,7 +30,7 @@ import java.util.List;
 
 
 /**
- * <p>Spezialimplementierung, die die Daten und Regeln einer Time4J-Zeitzone im Gewand des alten API bewahrt.. </p>
+ * <p>Spezialimplementierung, die die Daten und Regeln einer Time4J-Zeitzone im Gewand des alten API bewahrt. </p>
  *
  * @author      Meno Hochschild
  * @since       3.37/4.32
@@ -121,6 +121,7 @@ final class OldApiTimezone
                 ZonalTransition t = transitions.get(i);
                 if (t.isDaylightSaving()) {
                     dst = t.getDaylightSavingOffset() * 1000;
+                    break;
                 }
             }
             return dst;
@@ -133,7 +134,20 @@ final class OldApiTimezone
     @Override
     public boolean useDaylightTime() {
 
-        return !this.tz.isFixed() && (this.getDSTSavings() != 0);
+        if (!this.tz.isFixed()) {
+            TransitionHistory history = this.tz.getHistory();
+
+            if (history != null) {
+                List<ZonalTransition> transitions = history.getStdTransitions();
+                for (int i = transitions.size() - 1; i >= 0; i--) {
+                    if (transitions.get(i).isDaylightSaving()) {
+                        return true;
+                    }
+                }
+            }
+        }
+
+        return false;
 
     }
 

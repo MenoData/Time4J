@@ -5,6 +5,7 @@ import net.time4j.tz.model.ArrayTransitionModelTest;
 import net.time4j.tz.model.CompositeTransitionModelTest;
 import net.time4j.tz.model.CustomZoneTest;
 import net.time4j.tz.model.DaylightSavingRuleTest;
+import net.time4j.tz.model.EireZoneTest;
 import net.time4j.tz.model.RulesLikeBerlin1947Test;
 import net.time4j.tz.model.RulesLikeDhaka2009Test;
 import net.time4j.tz.model.RulesOfEuropeanUnionTest;
@@ -26,6 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
         CountryToZonesTest.class,
         CustomZoneTest.class,
         DaylightSavingRuleTest.class,
+        EireZoneTest.class,
         JavaziTest.class,
         LocalizedGMTOffsetTest.class,
         PredefinedIDTest.class,

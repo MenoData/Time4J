@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleBasedTransitionModel.java) is part of project Time4J.
  *
@@ -71,9 +71,8 @@ final class RuleBasedTransitionModel
     private transient final ZonalTransition initial;
     private transient final List<DaylightSavingRule> rules;
 
-    private transient final
-        ConcurrentMap<Integer, List<ZonalTransition>> tCache =
-            new ConcurrentHashMap<Integer, List<ZonalTransition>>();
+    private transient final ConcurrentMap<Integer, List<ZonalTransition>> tCache =
+        new ConcurrentHashMap<Integer, List<ZonalTransition>>();
     private transient final List<ZonalTransition> stdTransitions;
     private transient final boolean gregorian;
 
@@ -131,7 +130,7 @@ final class RuleBasedTransitionModel
 
         if (sortedRules.size() > 1) {
             for (DaylightSavingRule rule : sortedRules) {
-                if (rule.getSavings() == 0) {
+                if (!rule.isSaving()) {
                     hasRuleWithoutDST = true;
                 }
                 if (calendarType == null) {
@@ -144,7 +143,7 @@ final class RuleBasedTransitionModel
 
             if (!hasRuleWithoutDST) {
                 throw new IllegalArgumentException(
-                    "No daylight saving rule with zero dst-offset found: "
+                    "No daylight saving rule with standard offset found: "
                     + rules);
             }
         }
@@ -237,13 +236,6 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
-
-        return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
-
-    }
-
-    @Override
     public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
@@ -283,6 +275,13 @@ final class RuleBasedTransitionModel
             this.rules,
             startInclusive.getPosixTime(),
             endExclusive.getPosixTime());
+
+    }
+
+    @Override
+    public ZonalTransition getNextTransition(UnixTime ut) {
+
+        return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
 
     }
 
@@ -480,7 +479,7 @@ final class RuleBasedTransitionModel
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings()));
+                        rule.getSavings0()));
             }
         }
 
@@ -518,7 +517,7 @@ final class RuleBasedTransitionModel
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings());
+                        rule.getSavings0());
             }
         }
 
@@ -583,7 +582,7 @@ final class RuleBasedTransitionModel
                         getTransitionTime(rule, year, shift),
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings()));
+                        rule.getSavings0()));
             }
 
             transitions = Collections.unmodifiableList(list);
@@ -625,7 +624,7 @@ final class RuleBasedTransitionModel
      *              that allmost all transitions happen at full hours around
      *              midnight. Insight in details see source code.
      *
-     * @return  replacement object
+     * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
@@ -634,12 +633,12 @@ final class RuleBasedTransitionModel
     }
 
     /**
-     * @param       in  serialization stream
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws InvalidObjectException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 
