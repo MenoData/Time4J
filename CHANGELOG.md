@@ -5,6 +5,7 @@
 - Traditional Chinese now recognizes hant-script in locale [#728]
 
 ### Changed
+- Allow negative DST-offsets [#735]
 - Update leap second expiry date [#734]
 
 ### Fixed
