@@ -4,6 +4,7 @@
 - Search for moon phase at or after a moment [#730]
 
 ### Changed
+- Allow negative DST-offsets [#735]
 - Update leap second expiry date [#734]
 
 ### Fixed
