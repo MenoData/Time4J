@@ -208,6 +208,24 @@ public abstract class DaylightSavingRule {
     }
 
     /**
+     * Does this rule indicate a switch to daylight-saving-mode?
+     *
+     * @return  boolean
+     * @since   3.39/4.34
+     */
+    /**
+     * Zeigt diese Regel eine Umschaltung zu einem Sommerzeitmodus an?
+     *
+     * @return  boolean
+     * @since   3.39/4.34
+     */
+    public boolean isSaving() {
+
+        return (this.savings > 0);
+
+    }
+
+    /**
      * <p>Extracts the year from given epoch days. </p>
      *
      * @param   mjd     modified julian date
@@ -274,13 +292,6 @@ public abstract class DaylightSavingRule {
     int getSavings0() {
 
         return this.savings;
-
-    }
-
-    // for internal use only
-    boolean isSaving() {
-
-        return (this.savings > 0);
 
     }
 

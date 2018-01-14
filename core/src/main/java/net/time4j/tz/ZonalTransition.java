@@ -162,6 +162,7 @@ public final class ZonalTransition
         int totalOffset,
         int daylightSavingOffset
     ) {
+        super();
 
         this.posix = posixTime;
         this.previous = previousOffset;
