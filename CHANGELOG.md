@@ -1,4 +1,6 @@
-## [v3.39] not yet released
+## [v3.40] not yet released
+
+## [v3.39] published on 2018-01-15
 ### Added
 - Extra features for StdSolarCalculator.CC [#731]
 - Search for moon phase at or after a moment [#730]
