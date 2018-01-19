@@ -122,7 +122,7 @@ import java.util.Map;
  * </pre>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
@@ -185,7 +185,7 @@ import java.util.Map;
  * </pre>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  * @doctags.concurrency {immutable}
  */
 @CalendarType("vietnamese")
@@ -287,13 +287,13 @@ public final class VietnameseCalendar
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = EastAsianME.SINGLETON_EA;
 
     /**
-     * <p>Represents the ordinal index of a Vietnamese month. </p>
+     * <p>Represents the ordinal index of a Vietnamese month in the range {@code 1-12/13}. </p>
      *
      * <p>This element can be used in conjunction with
      * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) ordinal formatting}. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert die Ordnungsnummer eines vietnamesischen Monats. </p>
+     * <p>Repr&auml;sentiert die Ordnungsnummer eines vietnamesischen Monats im Bereich {@code 1-12/13}. </p>
      *
      * <p>Dieses Element kann in Verbindung mit einem
      * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) OrdinalFormat}

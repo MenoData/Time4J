@@ -33,6 +33,9 @@ import net.time4j.tz.ZonalOffset;
 
 /**
  * The heart of Chinese calendar.
+ *
+ * @author  Meno Hochschild
+ * @since   3.40/4.35
  */
 abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
     implements CalendarSystem<D> {

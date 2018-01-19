@@ -38,7 +38,7 @@ import java.util.Locale;
  * <p>See also <a href="https://en.wikipedia.org/wiki/Solar_term">Wikipedia</a>. </p>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  */
 /*[deutsch]
  * Die 24 Jahreseinteilungen des chinesischen Kalenderjahres entlang der Eklipse der Sonne.
@@ -46,7 +46,7 @@ import java.util.Locale;
  * <p>Siehe auch <a href="https://en.wikipedia.org/wiki/Solar_term">Wikipedia</a> (English). </p>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  */
 public enum SolarTerm {
 

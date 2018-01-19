@@ -277,9 +277,9 @@ final class SPX
             case KOREAN:
                 this.obj = this.readKorean(in);
                 break;
-//            case VIETNAMESE:
-//                this.obj = this.readVietnamese(in);
-//                break;
+            case VIETNAMESE:
+                this.obj = this.readVietnamese(in);
+                break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
         }
@@ -611,23 +611,23 @@ final class SPX
 
     }
 
-//    private VietnameseCalendar readVietnamese(ObjectInput in)
-//        throws IOException, ClassNotFoundException {
-//
-//        int cycle = in.readByte();
-//        int yearOfCycle = in.readByte();
-//        int month = in.readByte();
-//        boolean leap = in.readBoolean();
-//        int dom = in.readByte();
-//
-//        EastAsianMonth eam = EastAsianMonth.valueOf(month);
-//
-//        if (leap) {
-//            eam = eam.withLeap();
-//        }
-//
-//        return VietnameseCalendar.of(cycle, yearOfCycle, eam, dom);
-//
-//    }
+    private VietnameseCalendar readVietnamese(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int cycle = in.readByte();
+        int yearOfCycle = in.readByte();
+        int month = in.readByte();
+        boolean leap = in.readBoolean();
+        int dom = in.readByte();
+
+        EastAsianMonth eam = EastAsianMonth.valueOf(month);
+
+        if (leap) {
+            eam = eam.withLeap();
+        }
+
+        return VietnameseCalendar.of(cycle, yearOfCycle, eam, dom);
+
+    }
 
 }

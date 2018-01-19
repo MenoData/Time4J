@@ -42,7 +42,7 @@ import net.time4j.format.CalendarType;
  * for evaluating the astronomical data. </p>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  */
 /*[deutsch]
  * <p>Basisklasse aller Kalender, die vom lunisolaren Bauernkalender in China abgeleitet sind. </p>
@@ -53,7 +53,7 @@ import net.time4j.format.CalendarType;
  * und den geographischen Meridian, auf den sich die astronomischen Berechnungen beziehen. </p>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  */
 public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     extends Calendrical<U, D> {

@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (VietnameseCalendar.java) is part of project Time4J.
+ * This file (KoreanCalendar.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -109,7 +109,7 @@ import java.util.Map;
  * </pre>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
@@ -158,7 +158,7 @@ import java.util.Map;
  * </pre>
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   3.40/4.35
  * @doctags.concurrency {immutable}
  */
 @CalendarType("dangi")
@@ -266,13 +266,13 @@ public final class KoreanCalendar
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = EastAsianME.SINGLETON_EA;
 
     /**
-     * <p>Represents the ordinal index of a Korean month. </p>
+     * <p>Represents the ordinal index of a Korean month in the range {@code 1-12/13}. </p>
      *
      * <p>This element can be used in conjunction with
      * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) ordinal formatting}. </p>
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert die Ordnungsnummer eines koreanischen Monats. </p>
+     * <p>Repr&auml;sentiert die Ordnungsnummer eines koreanischen Monats im Bereich {@code 1-12/13}. </p>
      *
      * <p>Dieses Element kann in Verbindung mit einem
      * {@link net.time4j.format.expert.ChronoFormatter.Builder#addOrdinal(ChronoElement, Map) OrdinalFormat}
