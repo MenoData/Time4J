@@ -1,8 +1,14 @@
-## [v4.34] not yet released
+## [v4.35] not yet released
+
+## [v4.34] published on 2018-01-15
 ### Added
 - Extra features for StdSolarCalculator.CC [#731]
 - Search for moon phase at or after a moment [#730]
 - Traditional Chinese now recognizes hant-script in locale [#728]
+
+### Changed
+- Allow negative DST-offsets [#735]
+- Update leap second expiry date [#734]
 
 ### Fixed
 - date.getMaximum(<week-related-element>) can crash near end of timeline [#732]

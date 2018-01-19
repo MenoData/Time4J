@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PersianCalendar.java) is part of project Time4J.
  *
@@ -330,7 +330,7 @@ public final class PersianCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule<>(
                     getDefaultWeekmodel(),
-                    (context) -> context.getChronology().getCalendarSystem()
+                    (context) -> CALSYS
                 ),
                 Unit.DAYS)
             .appendElement(

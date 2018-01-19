@@ -601,7 +601,7 @@ public final class JapaneseCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule<>(
                     getDefaultWeekmodel(),
-                    (context) -> context.getChronology().getCalendarSystem()
+                    (context) -> CALSYS
                 ),
                 Unit.DAYS)
             .appendElement(

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -296,7 +296,7 @@ final class SPX
                 rawOffset = readOffset(in);
             }
 
-            int total = rawOffset + dstOffset;
+            int total = rawOffset + ((dstOffset == Integer.MAX_VALUE) ? 0 : dstOffset);
             ZonalTransition transition =
                 new ZonalTransition(posix, previous, total, dstOffset);
             previous = total;
@@ -438,7 +438,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings());
+            writeOffset(out, pattern.getSavings0());
         }
 
         if (timeIndex == NO_COMPRESSION) {
@@ -503,7 +503,7 @@ final class SPX
         out.writeByte(third & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings());
+            writeOffset(out, pattern.getSavings0());
         }
 
         if (!timeWritten) {
@@ -572,7 +572,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings());
+            writeOffset(out, pattern.getSavings0());
         }
 
         if (!timeWritten) {
@@ -640,7 +640,11 @@ final class SPX
 
         writeOffset(out, initial.getPreviousOffset());
         writeOffset(out, initial.getTotalOffset());
-        writeOffset(out, initial.getDaylightSavingOffset());
+        int dst = initial.getDaylightSavingOffset();
+        if (initial.isDaylightSaving() && (dst == 0)) {
+            dst = Integer.MAX_VALUE;
+        }
+        writeOffset(out, dst);
         writeRules(model.getRules(), out);
 
     }
@@ -733,9 +737,15 @@ final class SPX
             first |= (1 << 7);
         }
 
+        int dstOffset = transition.getDaylightSavingOffset();
+
+        if (transition.isDaylightSaving() && (dstOffset == 0)) {
+            dstOffset = Integer.MAX_VALUE;
+        }
+
         int dstIndex;
 
-        switch (transition.getDaylightSavingOffset()) {
+        switch (dstOffset) {
             case 0:
                 dstIndex = 1;
                 break;
@@ -777,7 +787,7 @@ final class SPX
         }
 
         if (dstIndex == NO_COMPRESSION) {
-            writeOffset(out, transition.getDaylightSavingOffset());
+            writeOffset(out, dstOffset);
         }
 
         if (newStdOffset) {
@@ -841,7 +851,7 @@ final class SPX
 
         int first = (rule.getMonthValue() << 4);
         int indicator = rule.getIndicator().ordinal();
-        int dst = rule.getSavings();
+        int dst = rule.getSavings0();
         boolean offsetWritten = true;
 
         switch (dst) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NegativeDayOfMonthPattern.java) is part of project Time4J.
  *
@@ -114,10 +114,7 @@ final class NegativeDayOfMonthPattern
             return (
                 (this.domIndicator == that.domIndicator)
                 && (this.dayOfWeek == that.dayOfWeek)
-                && (this.getMonth() == that.getMonth())
-                && (this.getIndicator() == that.getIndicator())
-                && (this.getSavings() == that.getSavings())
-                && this.getTimeOfDay().equals(that.getTimeOfDay())
+                && super.isEqual(that)
             );
         } else {
             return false;

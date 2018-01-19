@@ -51,6 +51,15 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfEireModel()
+        throws IOException, ClassNotFoundException {
+
+        CompositeTransitionModel model = EireZoneTest.createCompositeModel();
+        assertThat(model, is(roundtrip(model)));
+        Timezone.of("eire-model", model).dump(System.out);
+    }
+
+    @Test
     public void roundTripOfFixedDayPatternT24w0()
         throws IOException, ClassNotFoundException {
 

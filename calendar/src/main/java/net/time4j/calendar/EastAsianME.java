@@ -24,12 +24,17 @@ package net.time4j.calendar;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoException;
+<<<<<<< HEAD
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.TextElement;
 import net.time4j.format.internal.DualFormatElement;
+=======
+import net.time4j.format.CalendarText;
+import net.time4j.format.TextElement;
+>>>>>>> refs/remotes/origin/master
 
 import java.io.IOException;
 import java.io.ObjectStreamException;
@@ -51,7 +56,11 @@ class EastAsianME
 
     static final EastAsianME SINGLETON_EA = new EastAsianME();
 
+<<<<<<< HEAD
     //private static final long serialVersionUID = -2978966174642315851L;
+=======
+    private static final long serialVersionUID = -5874268477318061153L;
+>>>>>>> refs/remotes/origin/master
 
     //~ Methoden ------------------------------------------------------
 
@@ -147,6 +156,7 @@ class EastAsianME
         AttributeQuery attributes
     ) throws IOException, ChronoException {
 
+<<<<<<< HEAD
         Locale loc = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
         int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
         EastAsianMonth eam = context.get(this);
@@ -159,6 +169,9 @@ class EastAsianME
         }
         NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
         buffer.append(numsys.toNumeral(num)); // no padding in lunisolar case
+=======
+        throw new AbstractMethodError("Not yet available.");
+>>>>>>> refs/remotes/origin/master
 
     }
 
@@ -169,6 +182,7 @@ class EastAsianME
         AttributeQuery attributes
     ) {
 
+<<<<<<< HEAD
         Locale loc = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
         int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
         int start = status.getIndex();
@@ -235,6 +249,9 @@ class EastAsianME
 
         status.setIndex(pos);
         return month;
+=======
+        throw new AbstractMethodError("Not yet available.");
+>>>>>>> refs/remotes/origin/master
 
     }
 

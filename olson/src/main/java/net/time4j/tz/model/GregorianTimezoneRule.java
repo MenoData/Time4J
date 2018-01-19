@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GregorianTimezoneRule.java) is part of project Time4J.
  *
@@ -71,7 +71,7 @@ public class GregorianTimezoneRule
      * @param   timeOfDay   time of day
      * @param   indicator   offset indicator
      * @param   savings     daylight saving amount
-     * @since  4.0
+     * @since   4.0
      */
     /*[deutsch]
      * <p>Konstruktor nur f&uuml;r Subklassen. </p>
@@ -80,7 +80,7 @@ public class GregorianTimezoneRule
      * @param   timeOfDay   time of day
      * @param   indicator   offset indicator
      * @param   savings     daylight saving amount
-     * @since  4.0
+     * @since   4.0
      */
     protected GregorianTimezoneRule(
         Month month,
@@ -105,7 +105,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
+     * @throws  IllegalArgumentException if the last argument is out of range or
      *          if the day of month is not valid in context of given month
      * @since   2.2
      */
@@ -119,7 +119,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
+     * @throws  IllegalArgumentException if the last argument is out of range or
      *          if the day of month is not valid in context of given month
      * @since   2.2
      */
@@ -145,7 +145,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative
+     * @throws  IllegalArgumentException if the last argument is out of range
      * @since   2.2
      */
     /*[deutsch]
@@ -158,7 +158,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative
+     * @throws  IllegalArgumentException if the last argument is out of range
      * @since   2.2
      */
     public static GregorianTimezoneRule ofLastWeekday(
@@ -187,7 +187,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
+     * @throws  IllegalArgumentException if the last argument is out of range or
      *          if the day of month is not valid in context of given month
      * @since   2.2
      */
@@ -205,7 +205,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
+     * @throws  IllegalArgumentException if the last argument is out of range or
      *          if the day of month is not valid in context of given month
      * @since   2.2
      */
@@ -233,7 +233,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
+     * @throws  IllegalArgumentException if the last argument is out of range or
      *          if the day of month is not valid in context of given month
      * @since   2.2
      */
@@ -248,7 +248,7 @@ public class GregorianTimezoneRule
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
-     * @throws  IllegalArgumentException if the last argument is negative or
+     * @throws  IllegalArgumentException if the last argument is out of range or
      *          if the day of month is not valid in context of given month
      * @since   2.2
      */
@@ -313,12 +313,12 @@ public class GregorianTimezoneRule
     }
 
     // für Subklassen
-    boolean isEqual(GregorianTimezoneRule rule) {
+    protected boolean isEqual(GregorianTimezoneRule rule) {
 
         return (
             this.getTimeOfDay().equals(rule.getTimeOfDay())
             && (this.getIndicator() == rule.getIndicator())
-            && (this.getSavings() == rule.getSavings())
+            && (this.getSavings0() == rule.getSavings0())
             && (this.month == rule.month));
 
     }

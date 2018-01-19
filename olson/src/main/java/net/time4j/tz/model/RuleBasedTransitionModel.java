@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleBasedTransitionModel.java) is part of project Time4J.
  *
@@ -131,7 +131,7 @@ final class RuleBasedTransitionModel
 
         if (sortedRules.size() > 1) {
             for (DaylightSavingRule rule : sortedRules) {
-                if (rule.getSavings() == 0) {
+                if (!rule.isSaving()) {
                     hasRuleWithoutDST = true;
                 }
                 if (calendarType == null) {
@@ -144,7 +144,7 @@ final class RuleBasedTransitionModel
 
             if (!hasRuleWithoutDST) {
                 throw new IllegalArgumentException(
-                    "No daylight saving rule with zero dst-offset found: "
+                    "No daylight saving rule with standard offset found: "
                     + rules);
             }
         }
@@ -481,7 +481,7 @@ final class RuleBasedTransitionModel
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings()));
+                        rule.getSavings0()));
             }
         }
 
@@ -519,7 +519,7 @@ final class RuleBasedTransitionModel
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings());
+                        rule.getSavings0());
             }
         }
 
@@ -584,7 +584,7 @@ final class RuleBasedTransitionModel
                         getTransitionTime(rule, year, shift),
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings()));
+                        rule.getSavings0()));
             }
 
             transitions = Collections.unmodifiableList(list);
