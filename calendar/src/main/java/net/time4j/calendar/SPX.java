@@ -566,7 +566,7 @@ final class SPX
 
         EastAsianCalendar<?, ?> cal = (EastAsianCalendar<?, ?>) this.obj;
         out.writeByte(cal.getCycle());
-        out.writeByte(cal.getYear());
+        out.writeByte(cal.getYear().getNumber());
         out.writeByte(cal.getMonth().getNumber());
         out.writeBoolean(cal.getMonth().isLeap());
         out.writeByte(cal.getDayOfMonth());

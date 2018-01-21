@@ -27,7 +27,7 @@ public class ChineseMiscellaneousTest {
         EastAsianCS<ChineseCalendar> calsys = ChineseCalendar.nowInSystemTime().getCalendarSystem();
         ChineseCalendar cal = calsys.transform(calsys.getMinimumSinceUTC());
         int prev = 0;
-        int year = cal.getYear();
+        int year = cal.getYear().getNumber();
         int mCount = 12;
         boolean leapYear = false;
         boolean hasNoMajorSolarTerm = false;
@@ -37,7 +37,7 @@ public class ChineseMiscellaneousTest {
             long utcDays = cal.getDaysSinceEpochUTC();
             if (year != prev) {
                 assertThat(cal.getDayOfYear(), is(1));
-                long ny = calsys.newYear(cal.getCycle(), cal.getYear());
+                long ny = calsys.newYear(cal.getCycle(), cal.getYear().getNumber());
                 assertThat(utcDays, is(ny));
                 assertThat(calsys.transform(ny), is(cal));
                 assertThat(mCount, is(leapYear ? 13 : 12)); // length of leap year
@@ -62,7 +62,7 @@ public class ChineseMiscellaneousTest {
                     assertThat(calsys.getMajorSolarTerm(utcDays) <= winterSolstice, is(true));
                     assertThat(calsys.getMajorSolarTerm(next.getDaysSinceEpochUTC()) >= winterSolstice, is(true));
                 }
-                year = next.getYear();
+                year = next.getYear().getNumber();
                 mCount++;
                 if ((year != prev) && !leapYear) {
                     assertThat(cal.getLeapMonth(), is(0));
@@ -107,7 +107,7 @@ public class ChineseMiscellaneousTest {
         do {
             cal = calsys.transform(calsys.newMoonOnOrAfter(cal.getDaysSinceEpochUTC() + 1));
             year = PlainDate.of(cal.getDaysSinceEpochUTC(), EpochDays.UTC).getYear();
-            int elapsedYears = (cal.getCycle() - 1) * 60 + cal.getYear() - 1;
+            int elapsedYears = (cal.getCycle() - 1) * 60 + cal.getYear().getNumber() - 1;
             if (cal.getMonth().isLeap()) {
                 map.put(elapsedYears, cal.getMonth().getNumber());
             }

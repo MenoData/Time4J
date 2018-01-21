@@ -24,9 +24,10 @@ package net.time4j.calendar;
 import net.time4j.base.MathUtils;
 import net.time4j.format.CalendarText;
 
-import java.io.InvalidObjectException;
-import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
 import java.io.Serializable;
+import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -55,6 +56,9 @@ public final class CyclicYear
     //~ Statische Felder/Initialisierungen ------------------------------------
 
     // https://en.wikipedia.org/wiki/Celestial_stem
+    private static final String[] STEMS_SIMPLE = {
+        "jia", "yi", "bing", "ding", "wu", "ji", "geng", "xin", "ren", "gui"
+    };
     private static final String[] STEMS_PINYIN = {
         "jiǎ", "yǐ", "bǐng", "dīng", "wù", "jǐ", "gēng", "xīn", "rén", "guǐ"
     };
@@ -72,6 +76,9 @@ public final class CyclicYear
     };
 
     // https://en.wikipedia.org/wiki/Earthly_Branches
+    private static final String[] BRANCHES_SIMPLE = {
+        "zi", "chou", "yin", "mao", "chen", "si", "wu", "wei", "shen", "you", "xu", "hai"
+    };
     private static final String[] BRANCHES_PINYIN = {
         "zǐ", "chǒu", "yín", "mǎo", "chén", "sì", "wǔ", "wèi", "shēn", "yǒu", "xū", "hài"
     };
@@ -88,12 +95,20 @@ public final class CyclicYear
         "Цзы", "Чоу", "Инь", "Мао", "Чэнь", "Сы", "У", "Вэй", "Шэнь", "Ю", "Сюй", "Хай"
     };
 
+    private static final CyclicYear[] INSTANCES;
     private static final Map<String, String[]> LANG_2_STEM;
     private static final Map<String, String[]> LANG_2_BRANCH;
-    private static final Set<String> LANGS_WITHOUT_SEP;
+    private static final Set<String> LANGS_WITHOUT_SEP; // implicit invariant: only one char for stem or branch
 
     static {
+        CyclicYear[] instances = new CyclicYear[60];
+        for (int i = 0; i < 60; i++) {
+            instances[i] = new CyclicYear(i + 1);
+        }
+        INSTANCES = instances;
+
         Map<String, String[]> stems = new HashMap<>();
+        stems.put("root", STEMS_SIMPLE);
         stems.put("zh", STEMS_CHINESE);
         stems.put("ja", STEMS_CHINESE);
         stems.put("ko", STEMS_KOREAN);
@@ -102,6 +117,7 @@ public final class CyclicYear
         LANG_2_STEM = Collections.unmodifiableMap(stems);
 
         Map<String, String[]> branches = new HashMap<>();
+        branches.put("root", BRANCHES_SIMPLE);
         branches.put("zh", BRANCHES_CHINESE);
         branches.put("ja", BRANCHES_CHINESE);
         branches.put("ko", BRANCHES_KOREAN);
@@ -130,10 +146,6 @@ public final class CyclicYear
     private CyclicYear(int year) {
         super();
 
-        if ((year < 1) || (year > 60)) {
-            throw new IllegalArgumentException("Out of range: " + year);
-        }
-
         this.year = year;
     }
 
@@ -155,7 +167,11 @@ public final class CyclicYear
      */
     public static CyclicYear of(int yearOfCycle) {
 
-        return new CyclicYear(yearOfCycle);
+        if ((yearOfCycle < 1) || (yearOfCycle > 60)) {
+            throw new IllegalArgumentException("Out of range: " + yearOfCycle);
+        }
+
+        return INSTANCES[yearOfCycle - 1];
 
     }
 
@@ -181,7 +197,7 @@ public final class CyclicYear
         int a = stem.ordinal();
         int b = branch.ordinal();
         int yearOfCycle = (a + 1 + MathUtils.floorModulo(25 * (b - a), 60));
-        return new CyclicYear(yearOfCycle);
+        return CyclicYear.of(yearOfCycle);
 
     }
 
@@ -246,6 +262,47 @@ public final class CyclicYear
     }
 
     /**
+     * <p>Parses the given localized name as a combination of stem and branch to a cyclic year. </p>
+     *
+     * <p>The original Chinese names are usually not translatable. A few languages like Korean,
+     * Vietnamese and Russian use their own transcriptions. The pinyin-transcription (official
+     * Chinese romanization) serves as fallback for other languages. </p>
+     *
+     * @param   text        the text to be parsed
+     * @param   locale      language
+     * @return  parsed cyclic year
+     * @throws  ParseException if the text cannot be parsed
+     */
+    /*[deutsch]
+     * <p>Interpretiert den sprachabh&auml;ngigen Namen als Kombination von Himmelsstamm und Erdzweig. </p>
+     *
+     * <p>Die chinesischen Originalnamen sind normalerweise nicht &uuml;bersetzbar. Einige wenige
+     * Sprachen wie Koreanisch, Vietnamesisch und Russisch haben ihre eigenen Transkriptionen. Die
+     * Pinyin-Transkription (offizielle chinesische Romanisierung) dient als Ausweichoption f&uuml;r
+     * andere Sprachen. </p>
+     *
+     * @param   text        the text to be parsed
+     * @param   locale      language
+     * @return  parsed cyclic year
+     * @throws  ParseException if the text cannot be parsed
+     */
+    public static CyclicYear parse(
+        String text,
+        Locale locale
+    ) throws ParseException {
+
+        ParsePosition pp = new ParsePosition(0);
+        CyclicYear cy = parse(text, pp, locale, true);
+
+        if (cy == null) {
+            throw new ParseException(text, 0);
+        }
+
+        return cy;
+
+    }
+
+    /**
      * <p>Obtains the localized name of this cyclic year. </p>
      *
      * <p>The original Chinese names are usually not translatable. A few languages like Korean,
@@ -293,6 +350,28 @@ public final class CyclicYear
 
     }
 
+    /**
+     * <p>Rolls this cyclic year by given amount. </p>
+     *
+     * @param   amount  determines how many years/units this instance should be rolled
+     * @return  changed copy of this instance
+     */
+    /*[deutsch]
+     * <p>Rollt dieses zyklische Jahr um den angegebenen Betrag. </p>
+     *
+     * @param   amount  determines how many years/units this instance should be rolled
+     * @return  changed copy of this instance
+     */
+    public CyclicYear roll(int amount) {
+
+        if (amount == 0) {
+            return this;
+        }
+
+        return CyclicYear.of(MathUtils.floorModulo(MathUtils.safeAdd(this.year - 1, amount), 60) + 1);
+
+    }
+
     @Override
     public int compareTo(CyclicYear other) {
 
@@ -326,16 +405,170 @@ public final class CyclicYear
     }
 
     /**
-     * @serialData  Checks the consistency of deserialized data
-     * @param       in      object input stream
-     * @throws      InvalidObjectException if the year is not in range 1-60
+     * <p>Parses the given localized name to a cyclic year. </p>
+     *
+     * @param   text        the text to be parsed
+     * @param   pp          when to start parsing
+     * @param   locale      language
+     * @return  parsed cyclic year or {@code null} if the text cannot be parsed
      */
-    private void readObject(ObjectInputStream in)
-        throws InvalidObjectException {
+    /*[deutsch]
+     * <p>Interpretiert den sprachabh&auml;ngigen Namen als zyklisches Jahr. </p>
+     *
+     * @param   text        the text to be parsed
+     * @param   pp          when to start parsing
+     * @param   locale      language
+     * @return  parsed cyclic year or {@code null} if the text cannot be parsed
+     */
+    static CyclicYear parse(
+        CharSequence text,
+        ParsePosition pp,
+        Locale locale,
+        boolean lenient
+    ) {
 
-        if ((year < 1) || (year > 60)) {
-            throw new InvalidObjectException("Out of range: " + this.year);
+        int pos = pp.getIndex();
+        int len = text.length();
+        boolean root = locale.getLanguage().isEmpty();
+
+        if ((pos + 1 >= len) ||(pos < 0)) {
+            pp.setErrorIndex(pos);
+            return null;
         }
+
+        Stem stem = null;
+        Branch branch = null;
+
+        if (LANGS_WITHOUT_SEP.contains(locale.getLanguage())) {
+            for (Stem s : Stem.values()) {
+                if (s.getDisplayName(locale).charAt(pos) == text.charAt(pos)) {
+                    stem = s;
+                    pos++;
+                    break;
+                }
+            }
+            for (Branch b : Branch.values()) {
+                if (b.getDisplayName(locale).charAt(pos + 1) == text.charAt(pos + 1)) {
+                    branch = b;
+                    pos++;
+                    break;
+                }
+            }
+        } else {
+            int sep = -1;
+
+            for (int i = pos + 1; i < len; i++) {
+                if (text.charAt(i) == '-') {
+                    sep = i;
+                    break;
+                }
+            }
+
+            if (sep == -1) {
+                pp.setErrorIndex(pos);
+                return null;
+            }
+
+            for (Stem s : Stem.values()) {
+                String test = s.getDisplayName(locale);
+                for (int i = pos; i < sep; i++) {
+                    int offset = i - pos;
+                    char c = text.charAt(i);
+                    if (root) {
+                        c = toASCII(c);
+                    }
+                    if ((offset < test.length()) && (test.charAt(offset) == c)) {
+                        if (offset + 1 == test.length()) {
+                            stem = s;
+                            break;
+                        }
+                    } else {
+                        break; // not found
+                    }
+                }
+            }
+
+            if (stem == null) {
+                if (lenient && !root && (sep + 1 < len)) {
+                    return parse(text, pp, Locale.ROOT, true); // recursive
+                } else {
+                    pp.setErrorIndex(pos);
+                    return null;
+                }
+            }
+
+            for (Branch b : Branch.values()) {
+                String test = b.getDisplayName(locale);
+                for (int i = sep + 1; i < len; i++) {
+                    int offset = i - sep - 1;
+                    char c = text.charAt(i);
+                    if (root) {
+                        c = toASCII(c);
+                    }
+                    if ((offset < test.length()) && (test.charAt(offset) == c)) {
+                        if (offset + 1 == test.length()) {
+                            branch = b;
+                            pos = i + 1;
+                            break;
+                        }
+                    } else {
+                        break; // not found
+                    }
+                }
+            }
+        }
+
+        if ((stem == null) || (branch == null)) {
+            if (lenient && !root) {
+                return parse(text, pp, Locale.ROOT, true); // recursive
+            } else {
+                pp.setErrorIndex(pos);
+                return null;
+            }
+        }
+
+        pp.setIndex(pos);
+        return CyclicYear.of(stem, branch);
+
+    }
+
+    /*
+            "jiǎ", "yǐ", "bǐng", "dīng", "wù", "jǐ", "gēng", "xīn", "rén", "guǐ"
+            "zǐ", "chǒu", "yín", "mǎo", "chén", "sì", "wǔ", "wèi", "shēn", "yǒu", "xū", "hài"
+    */
+    private static char toASCII(char c) {
+
+        switch (c) {
+            case 'ǎ':
+            case 'à':
+                return 'a';
+            case 'ǐ':
+            case 'ī':
+            case 'í':
+            case 'ì':
+                return 'i';
+            case 'ū':
+            case 'ù':
+                return 'u';
+            case 'ē':
+            case 'é':
+            case 'è':
+                return 'e';
+            case 'ǒ':
+                return 'o';
+            default:
+                return c;
+        }
+
+    }
+
+    /**
+     * @serialData  Checks the consistency of deserialized data and ensures singleton semantic
+     * @throws      IllegalArgumentException if the year is not in range 1-60
+     */
+    private Object readResolve() throws ObjectStreamException {
+
+        return CyclicYear.of(this.year);
 
     }
 
@@ -389,7 +622,8 @@ public final class CyclicYear
          */
         public String getDisplayName(Locale locale) {
 
-            String[] array = LANG_2_STEM.get(locale.getLanguage());
+            String lang = locale.getLanguage();
+            String[] array = LANG_2_STEM.get(lang.isEmpty() ? "root" : lang);
 
             if (array == null) {
                 array = STEMS_PINYIN;
@@ -453,7 +687,8 @@ public final class CyclicYear
          */
         public String getDisplayName(Locale locale) {
 
-            String[] array = LANG_2_BRANCH.get(locale.getLanguage());
+            String lang = locale.getLanguage();
+            String[] array = LANG_2_BRANCH.get(lang.isEmpty() ? "root" : lang);
 
             if (array == null) {
                 array = BRANCHES_PINYIN;

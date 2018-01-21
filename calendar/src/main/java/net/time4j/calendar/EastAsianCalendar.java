@@ -114,9 +114,9 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
      *
      * @return  CyclicYear
      */
-    public int getYear() { // TODO: use CyclicYear as return value
+    public CyclicYear getYear() {
 
-        return this.yearOfCycle;
+        return CyclicYear.of(this.yearOfCycle);
 
     }
 
@@ -473,7 +473,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                     } else {
                         long utcDays = context.getDaysSinceEpochUTC() + value - context.getDayOfMonth();
                         return context.getCalendarSystem().create(
-                            context.getCycle(), context.getYear(), context.getMonth(), value, utcDays);
+                            context.getCycle(), context.getYear().getNumber(), context.getMonth(), value, utcDays);
                     }
                 case DAY_OF_YEAR_INDEX:
                     if (!lenient && ((value < 1) || (value > context.lengthOfYear()))) {
@@ -634,14 +634,15 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         ) {
             EastAsianCS<D> cs = context.getCalendarSystem();
             int dom = context.getDayOfMonth();
+            int y = context.getYear().getNumber();
             if (dom <= 29) {
-                long utcDays = cs.transform(context.getCycle(), context.getYear(), eam, dom);
-                return cs.create(context.getCycle(), context.getYear(), eam, dom, utcDays);
+                long utcDays = cs.transform(context.getCycle(), y, eam, dom);
+                return cs.create(context.getCycle(), y, eam, dom, utcDays);
             } else {
-                long utcDays = cs.transform(context.getCycle(), context.getYear(), eam, 1);
+                long utcDays = cs.transform(context.getCycle(), y, eam, 1);
                 D first = cs.transform(utcDays);
                 dom = Math.min(dom, first.lengthOfMonth());
-                return cs.create(context.getCycle(), context.getYear(), eam, dom, utcDays + dom - 1);
+                return cs.create(context.getCycle(), y, eam, dom, utcDays + dom - 1);
             }
         }
 
@@ -670,7 +671,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
             EastAsianCS<D> cs = date.getCalendarSystem();
             int dom = date.getDayOfMonth();
             int c = date.getCycle();
-            int y = date.getYear();
+            int y = date.getYear().getNumber();
             EastAsianMonth month = date.getMonth();
 
             switch (this.index) {
@@ -749,7 +750,9 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
             switch (this.index) {
                 case UNIT_YEARS:
-                    int deltaY = end.getCycle() * 60 + end.getYear() - start.getCycle() * 60 - start.getYear();
+                    int deltaY =
+                        end.getCycle() * 60 + end.getYear().getNumber()
+                            - start.getCycle() * 60 - start.getYear().getNumber();
                     if (deltaY > 0) {
                         int mComp = start.getMonth().compareTo(end.getMonth());
                         if ((mComp > 0) || ((mComp == 0) && (start.getDayOfMonth() > end.getDayOfMonth()))) {
@@ -772,13 +775,13 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                         negative = true;
                     }
                     int c = s.getCycle();
-                    int y = s.getYear();
+                    int y = s.getYear().getNumber();
                     EastAsianMonth month = s.getMonth();
                     int num = month.getNumber();
                     boolean leap = month.isLeap();
                     int lm = calsys.getLeapMonth(c, y);
                     int amount = 0;
-                    while ((c != e.getCycle()) || (y != e.getYear()) || !month.equals(e.getMonth())) {
+                    while ((c != e.getCycle()) || (y != e.getYear().getNumber()) || !month.equals(e.getMonth())) {
                         if (leap) {
                             leap = false;
                             num++;

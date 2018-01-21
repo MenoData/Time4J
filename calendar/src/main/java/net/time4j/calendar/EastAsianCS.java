@@ -98,7 +98,7 @@ abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
     @Override
     public final long transform(D date) {
 
-        return this.transform(date.getCycle(), date.getYear(), date.getMonth(), date.getDayOfMonth());
+        return this.transform(date.getCycle(), date.getYear().getNumber(), date.getMonth(), date.getDayOfMonth());
 
     }
 

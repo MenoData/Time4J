@@ -20,7 +20,7 @@ public class KoreanMiscellaneousTest {
         EastAsianCS<KoreanCalendar> calsys = KoreanCalendar.nowInSystemTime().getCalendarSystem();
         KoreanCalendar cal = calsys.transform(calsys.getMinimumSinceUTC());
         int prev = 0;
-        int year = cal.getYear();
+        int year = cal.getYear().getNumber();
         int mCount = 12;
         boolean leapYear = false;
         boolean hasNoMajorSolarTerm = false;
@@ -30,7 +30,7 @@ public class KoreanMiscellaneousTest {
             long utcDays = cal.getDaysSinceEpochUTC();
             if (year != prev) {
                 assertThat(cal.getDayOfYear(), is(1));
-                long ny = calsys.newYear(cal.getCycle(), cal.getYear());
+                long ny = calsys.newYear(cal.getCycle(), cal.getYear().getNumber());
                 assertThat(utcDays, is(ny));
                 assertThat(calsys.transform(ny), is(cal));
                 assertThat(mCount, is(leapYear ? 13 : 12)); // length of leap year
@@ -55,7 +55,7 @@ public class KoreanMiscellaneousTest {
                     assertThat(calsys.getMajorSolarTerm(utcDays) <= winterSolstice, is(true));
                     assertThat(calsys.getMajorSolarTerm(next.getDaysSinceEpochUTC()) >= winterSolstice, is(true));
                 }
-                year = next.getYear();
+                year = next.getYear().getNumber();
                 mCount++;
                 if ((year != prev) && !leapYear) {
                     assertThat(cal.getLeapMonth(), is(0));

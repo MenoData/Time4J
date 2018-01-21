@@ -4,6 +4,7 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -95,6 +96,35 @@ public class CyclicYearTest {
         assertThat(
             CyclicYear.of(60).getDisplayName(Locale.ROOT),
             is("guǐ-hài"));
+    }
+
+    @Test
+    public void roll() {
+        assertThat(
+            CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG).roll(5),
+            is(CyclicYear.of(17)));
+        assertThat(
+            CyclicYear.of(59).roll(3),
+            is(CyclicYear.of(2)));
+        assertThat(
+            CyclicYear.of(2).roll(-3),
+            is(CyclicYear.of(59)));
+    }
+
+    @Test
+    public void parse() throws ParseException {
+        assertThat(
+            CyclicYear.parse("yi-hai", Locale.ROOT),
+            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+        assertThat(
+            CyclicYear.parse("yǐ-hài", Locale.ROOT),
+            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+        assertThat(
+            CyclicYear.parse("yi-hai", Locale.GERMAN),
+            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+        assertThat(
+            CyclicYear.parse("yǐ-hài", Locale.GERMAN),
+            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
     }
 
 }
