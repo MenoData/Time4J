@@ -113,18 +113,28 @@ public class CyclicYearTest {
 
     @Test
     public void parse() throws ParseException {
+        CyclicYear expected = CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG);
         assertThat(
             CyclicYear.parse("yi-hai", Locale.ROOT),
-            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+            is(expected));
         assertThat(
             CyclicYear.parse("yǐ-hài", Locale.ROOT),
-            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+            is(expected));
         assertThat(
             CyclicYear.parse("yi-hai", Locale.GERMAN),
-            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+            is(expected));
         assertThat(
             CyclicYear.parse("yǐ-hài", Locale.GERMAN),
-            is(CyclicYear.of(CyclicYear.Stem.YI_2_WOOD_YIN, CyclicYear.Branch.HAI_12_PIG)));
+            is(expected));
+        assertThat(
+            CyclicYear.parse("乙亥", Locale.CHINESE),
+            is(expected));
+        assertThat(
+            CyclicYear.parse("을해", Locale.KOREAN),
+            is(expected));
+        assertThat(
+            CyclicYear.parse("И-Хай", new Locale("ru")),
+            is(expected));
     }
 
 }

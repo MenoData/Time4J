@@ -266,12 +266,16 @@ public final class CyclicYear
      *
      * <p>The original Chinese names are usually not translatable. A few languages like Korean,
      * Vietnamese and Russian use their own transcriptions. The pinyin-transcription (official
-     * Chinese romanization) serves as fallback for other languages. </p>
+     * Chinese romanization) serves as fallback for other languages. And the root locale will use
+     * a simplified version of pinyin without diacritic accents. This method will always expect
+     * a minus sign as separator between stem and branch unless the language is Chinese, Korean
+     * or Japanese. </p>
      *
      * @param   text        the text to be parsed
      * @param   locale      language
      * @return  parsed cyclic year
      * @throws  ParseException if the text cannot be parsed
+     * @see     #getDisplayName(Locale)
      */
     /*[deutsch]
      * <p>Interpretiert den sprachabh&auml;ngigen Namen als Kombination von Himmelsstamm und Erdzweig. </p>
@@ -279,12 +283,15 @@ public final class CyclicYear
      * <p>Die chinesischen Originalnamen sind normalerweise nicht &uuml;bersetzbar. Einige wenige
      * Sprachen wie Koreanisch, Vietnamesisch und Russisch haben ihre eigenen Transkriptionen. Die
      * Pinyin-Transkription (offizielle chinesische Romanisierung) dient als Ausweichoption f&uuml;r
-     * andere Sprachen. </p>
+     * andere Sprachen. Und die {@code Locale.ROOT}-Einstellung wird eine vereinfachte Pinyin-Version
+     * ohne diakritische Akzente verwenden. Zwischen Himmelsstamm und Erdzweig wird immer ein Minus-Zeichen
+     * erwartet, es sei denn, die Sprache ist Chinesisch, Koreanisch oder Japanisch. </p>
      *
      * @param   text        the text to be parsed
      * @param   locale      language
      * @return  parsed cyclic year
      * @throws  ParseException if the text cannot be parsed
+     * @see     #getDisplayName(Locale)
      */
     public static CyclicYear parse(
         String text,
@@ -311,6 +318,7 @@ public final class CyclicYear
      *
      * @param   locale      language
      * @return  display name
+     * @see     #parse(String, Locale)
      */
     /*[deutsch]
      * <p>Liefert den sprachabh&auml;ngigen Namen dieses zyklischen Jahres. </p>
@@ -322,6 +330,7 @@ public final class CyclicYear
      *
      * @param   locale      language
      * @return  display name
+     * @see     #parse(String, Locale)
      */
     public String getDisplayName(Locale locale) {
 
@@ -441,17 +450,18 @@ public final class CyclicYear
 
         if (LANGS_WITHOUT_SEP.contains(locale.getLanguage())) {
             for (Stem s : Stem.values()) {
-                if (s.getDisplayName(locale).charAt(pos) == text.charAt(pos)) {
+                if (s.getDisplayName(locale).charAt(0) == text.charAt(pos)) {
                     stem = s;
-                    pos++;
                     break;
                 }
             }
-            for (Branch b : Branch.values()) {
-                if (b.getDisplayName(locale).charAt(pos + 1) == text.charAt(pos + 1)) {
-                    branch = b;
-                    pos++;
-                    break;
+            if (stem != null) {
+                for (Branch b : Branch.values()) {
+                    if (b.getDisplayName(locale).charAt(0) == text.charAt(pos + 1)) {
+                        branch = b;
+                        pos += 2;
+                        break;
+                    }
                 }
             }
         } else {
