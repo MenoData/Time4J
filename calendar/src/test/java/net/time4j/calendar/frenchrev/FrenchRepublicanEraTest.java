@@ -25,7 +25,7 @@ public class FrenchRepublicanEraTest {
     public void eraNames() {
         assertThat(
             FrenchRepublicanEra.REPUBLICAN.getDisplayName(Locale.FRENCH, TextWidth.WIDE),
-            is("République Française"));
+            is("république française"));
         assertThat(
             FrenchRepublicanEra.REPUBLICAN.getDisplayName(Locale.FRENCH, TextWidth.ABBREVIATED),
             is("RF"));

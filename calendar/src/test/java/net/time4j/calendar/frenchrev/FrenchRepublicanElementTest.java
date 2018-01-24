@@ -137,7 +137,7 @@ public class FrenchRepublicanElementTest {
             is(DayOfDecade.DECADI));
         assertThat(
             FrenchRepublicanCalendar.DAY_OF_DECADE.getDisplayName(Locale.ENGLISH),
-            is("DAY_OF_DECADE"));
+            is("day of decade"));
 
         // values
         FrenchRepublicanCalendar fcal = FrenchRepublicanCalendar.of(8, FrenchRepublicanMonth.BRUMAIRE, 18);
@@ -702,8 +702,8 @@ public class FrenchRepublicanElementTest {
             FrenchRepublicanCalendar.SANSCULOTTIDES.getDefaultMaximum(),
             is(Sansculottides.COMPLEMENTARY_DAY_5));
         assertThat(
-            FrenchRepublicanCalendar.SANSCULOTTIDES.getDisplayName(Locale.ENGLISH),
-            is("SANSCULOTTIDES"));
+            FrenchRepublicanCalendar.SANSCULOTTIDES.getDisplayName(Locale.GERMAN),
+            is("Sansculottiden"));
 
         // values
         FrenchRepublicanCalendar fcal = FrenchRepublicanCalendar.of(11, Sansculottides.COMPLEMENTARY_DAY_3);
