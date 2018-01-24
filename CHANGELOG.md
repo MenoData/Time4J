@@ -1,4 +1,6 @@
 ## [v4.35] not yet released
+### Added
+- Improved localization for French Rev. calendar [#741]
 
 ## [v4.34] published on 2018-01-15
 ### Added
