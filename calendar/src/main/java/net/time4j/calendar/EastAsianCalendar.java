@@ -357,6 +357,10 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
     }
 
+    static <D extends EastAsianCalendar<?, D>> ElementRule<D, CyclicYear> getYearOfCycleRule(ChronoElement<?> c) {
+        return new CyclicYearRule(c);
+    }
+
     static <D extends EastAsianCalendar<?, D>>  ElementRule<D, EastAsianMonth> getMonthOfYearRule(ChronoElement<?> c) {
         return new MonthRule<>(c);
     }
@@ -563,6 +567,88 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
             return this.child;
         }
 
+    }
+
+    private static class CyclicYearRule<D extends EastAsianCalendar<?, D>>
+        implements ElementRule<D, CyclicYear> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final ChronoElement<?> child;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private CyclicYearRule(ChronoElement<?> child) {
+            super();
+
+            this.child = child;
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public CyclicYear getValue(D context) {
+            return context.getYear();
+        }
+
+        @Override
+        public CyclicYear getMinimum(D context) {
+            return (context.getCycle() == 72) ? CyclicYear.of(22) : CyclicYear.of(1);
+        }
+
+        @Override
+        public CyclicYear getMaximum(D context) {
+            return (context.getCycle() == 94) ? CyclicYear.of(56) : CyclicYear.of(60);
+        }
+
+        @Override
+        public boolean isValid(
+            D context,
+            CyclicYear value
+        ) {
+            CyclicYear min = this.getMinimum(context);
+            CyclicYear max = this.getMaximum(context);
+            return (value != null) && (min.compareTo(value) <= 0) && (max.compareTo(value) >= 0);
+        }
+
+        @Override
+        public D withValue(
+            D context,
+            CyclicYear value,
+            boolean lenient
+        ) {
+            if (this.isValid(context, value)) {
+                EastAsianCS<D> cs = context.getCalendarSystem();
+                int dom = context.getDayOfMonth();
+                EastAsianMonth eam = context.getMonth();
+                int y = value.getNumber();
+                int cycle = context.getCycle();
+                if (eam.isLeap() && (eam.getNumber() != cs.getLeapMonth(cycle, y))) {
+                    eam = EastAsianMonth.valueOf(eam.getNumber());
+                }
+                if (dom <= 29) {
+                    long utcDays = cs.transform(cycle, y, eam, dom);
+                    return cs.create(cycle, y, eam, dom, utcDays);
+                } else {
+                    long utcDays = cs.transform(cycle, y, eam, 1);
+                    D first = cs.transform(utcDays);
+                    dom = Math.min(dom, first.lengthOfMonth());
+                    return cs.create(cycle, y, eam, dom, utcDays + dom - 1);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid cyclic year: " + value);
+            }
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(D context) {
+            return this.child;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(D context) {
+            return this.child;
+        }
     }
 
     private static class MonthRule<D extends EastAsianCalendar<?, D>>

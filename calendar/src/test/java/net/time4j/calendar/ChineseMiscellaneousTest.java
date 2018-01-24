@@ -134,4 +134,21 @@ public class ChineseMiscellaneousTest {
         writer.close();
     }
 
+    @Test
+    public void minmax(){
+        ChineseCalendar min = ChineseCalendar.axis().getMinimum();
+        assertThat(min.getCycle(), is(72));
+        assertThat(min.getYear().getNumber(), is(22));
+        assertThat(min.getMinimum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(22)));
+        assertThat(min.getMaximum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(60)));
+        System.out.println(min);
+
+        ChineseCalendar max = ChineseCalendar.axis().getMaximum();
+        assertThat(max.getCycle(), is(94));
+        assertThat(max.getYear().getNumber(), is(56));
+        assertThat(max.getMinimum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(1)));
+        assertThat(max.getMaximum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(56)));
+        System.out.println(max);
+    }
+
 }

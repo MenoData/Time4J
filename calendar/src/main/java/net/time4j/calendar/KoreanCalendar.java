@@ -257,6 +257,15 @@ public final class KoreanCalendar
             null);
 
     /**
+     * <p>Represents the Korean year related to the current sexagesimal cycle. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das koreanische Jahr des aktuellen sexagesimalen Zyklus. </p>
+     */
+    @FormattableElement(format = "U")
+    public static final TextElement<CyclicYear> YEAR_OF_CYCLE = EastAsianCY.SINGLETON;
+
+    /**
      * <p>Represents the Korean month. </p>
      */
     /*[deutsch]
@@ -358,6 +367,10 @@ public final class KoreanCalendar
 //                YEAR_OF_ERA,
 //                null,
 //                Unit.YEARS)
+            .appendElement(
+                YEAR_OF_CYCLE,
+                EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
+                Unit.YEARS)
             .appendElement(
                 MONTH_OF_YEAR,
                 EastAsianCalendar.getMonthOfYearRule(DAY_OF_MONTH),

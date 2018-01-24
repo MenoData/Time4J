@@ -256,6 +256,15 @@ public final class ChineseCalendar
             null);
 
     /**
+     * <p>Represents the Chinese year related to the current sexagesimal cycle. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das chinesische Jahr des aktuellen sexagesimalen Zyklus. </p>
+     */
+    @FormattableElement(format = "U")
+    public static final TextElement<CyclicYear> YEAR_OF_CYCLE = EastAsianCY.SINGLETON;
+
+    /**
      * <p>Represents the Chinese month. </p>
      */
     /*[deutsch]
@@ -357,6 +366,10 @@ public final class ChineseCalendar
 //                YEAR_OF_ERA,
 //                null,
 //                Unit.YEARS)
+            .appendElement(
+                YEAR_OF_CYCLE,
+                EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
+                Unit.YEARS)
             .appendElement(
                 MONTH_OF_YEAR,
                 EastAsianCalendar.getMonthOfYearRule(DAY_OF_MONTH),

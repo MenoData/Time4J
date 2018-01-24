@@ -52,49 +52,49 @@ public class CyclicYearTest {
     @Test
     public void getDisplayName() {
         assertThat(
-            CyclicYear.of(1).getDisplayName(Locale.ROOT),
+            CyclicYear.of(1).getDisplayName(Locale.ENGLISH),
             is("jiǎ-zǐ"));
         assertThat(
-            CyclicYear.of(2).getDisplayName(Locale.ROOT),
+            CyclicYear.of(2).getDisplayName(Locale.ENGLISH),
             is("yǐ-chǒu"));
         assertThat(
-            CyclicYear.of(3).getDisplayName(Locale.ROOT),
+            CyclicYear.of(3).getDisplayName(Locale.ENGLISH),
             is("bǐng-yín"));
         assertThat(
-            CyclicYear.of(4).getDisplayName(Locale.ROOT),
+            CyclicYear.of(4).getDisplayName(Locale.ENGLISH),
             is("dīng-mǎo"));
         assertThat(
-            CyclicYear.of(5).getDisplayName(Locale.ROOT),
+            CyclicYear.of(5).getDisplayName(Locale.ENGLISH),
             is("wù-chén"));
         assertThat(
-            CyclicYear.of(6).getDisplayName(Locale.ROOT),
+            CyclicYear.of(6).getDisplayName(Locale.ENGLISH),
             is("jǐ-sì"));
         assertThat(
-            CyclicYear.of(7).getDisplayName(Locale.ROOT),
+            CyclicYear.of(7).getDisplayName(Locale.ENGLISH),
             is("gēng-wǔ"));
         assertThat(
-            CyclicYear.of(8).getDisplayName(Locale.ROOT),
+            CyclicYear.of(8).getDisplayName(Locale.ENGLISH),
             is("xīn-wèi"));
         assertThat(
-            CyclicYear.of(9).getDisplayName(Locale.ROOT),
+            CyclicYear.of(9).getDisplayName(Locale.ENGLISH),
             is("rén-shēn"));
         assertThat(
-            CyclicYear.of(10).getDisplayName(Locale.ROOT),
+            CyclicYear.of(10).getDisplayName(Locale.ENGLISH),
             is("guǐ-yǒu"));
         assertThat(
-            CyclicYear.of(11).getDisplayName(Locale.ROOT),
+            CyclicYear.of(11).getDisplayName(Locale.ENGLISH),
             is("jiǎ-xū"));
         assertThat(
-            CyclicYear.of(12).getDisplayName(Locale.ROOT),
+            CyclicYear.of(12).getDisplayName(Locale.ENGLISH),
             is("yǐ-hài"));
         assertThat(
-            CyclicYear.of(13).getDisplayName(Locale.ROOT),
+            CyclicYear.of(13).getDisplayName(Locale.ENGLISH),
             is("bǐng-zǐ"));
         assertThat(
-            CyclicYear.of(59).getDisplayName(Locale.ROOT),
+            CyclicYear.of(59).getDisplayName(Locale.ENGLISH),
             is("rén-xū"));
         assertThat(
-            CyclicYear.of(60).getDisplayName(Locale.ROOT),
+            CyclicYear.of(60).getDisplayName(Locale.ENGLISH),
             is("guǐ-hài"));
     }
 
