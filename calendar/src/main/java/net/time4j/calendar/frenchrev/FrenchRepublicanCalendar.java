@@ -2164,6 +2164,15 @@ public final class FrenchRepublicanCalendar
         }
 
         @Override
+        public String getDisplayName(Locale language) {
+
+            String key = "L_dayofdecade";
+            String lname = CalendarText.getInstance("extra/frenchrev", language).getTextForms().get(key);
+            return ((lname == null) ? this.name() : lname);
+
+        }
+
+        @Override
         public boolean isDateElement() {
 
             return true;
@@ -2363,6 +2372,14 @@ public final class FrenchRepublicanCalendar
         protected boolean isSingleton() {
 
             return true;
+
+        }
+
+        @Override
+        public String getDisplayName(Locale language) {
+            String key = "L_sansculottides";
+            String lname = CalendarText.getInstance("extra/frenchrev", language).getTextForms().get(key);
+            return ((lname == null) ? this.name() : lname);
 
         }
 
