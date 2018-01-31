@@ -25,6 +25,7 @@ import net.time4j.Moment;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdEnumDateElement;
@@ -56,6 +57,7 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -446,9 +448,8 @@ public final class ChineseCalendar
     /**
      * <p>Creates a new instance of a Chinese calendar date. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles in range 72-94
-     * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
-     * @param   month       the month to be checked
+     * @param   year        references the year using different systems like eras or sexagesimal cycles
+     * @param   month       the month which might be a leap month
      * @param   dayOfMonth  the day of month to be checked
      * @return  new instance of {@code ChineseCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
@@ -456,22 +457,25 @@ public final class ChineseCalendar
     /*[deutsch]
      * <p>Erzeugt ein neues chinesisches Kalenderdatum. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles in range 72-94
-     * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
-     * @param   month       the month to be checked
+     * @param   year        references the year using different systems like eras or sexagesimal cycles
+     * @param   month       the month which might be a leap month
      * @param   dayOfMonth  the day of month to be checked
      * @return  new instance of {@code ChineseCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
-    public static ChineseCalendar of( // TODO: diese Methode privat machen
-        int cycle,
-        int yearOfCycle,
+    public static ChineseCalendar of(
+        EastAsianYear year,
         EastAsianMonth month,
         int dayOfMonth
     ) {
 
-        long utcDays = CALSYS.transform(cycle, yearOfCycle, month, dayOfMonth);
-        return new ChineseCalendar(cycle, yearOfCycle, month, dayOfMonth, utcDays);
+        int elapsed = year.getElapsedCyclicYears();
+        int cycle = MathUtils.floorDivide(elapsed - 1, 60) + 1;
+        int yearOfCycle = MathUtils.floorModulo(elapsed, 60);
+        if (yearOfCycle == 0) {
+            yearOfCycle = 60;
+        }
+        return ChineseCalendar.of(cycle, yearOfCycle, month, dayOfMonth);
 
     }
 
@@ -582,6 +586,18 @@ public final class ChineseCalendar
     EastAsianCS<ChineseCalendar> getCalendarSystem() {
 
         return CALSYS;
+
+    }
+
+    static ChineseCalendar of(
+        int cycle,
+        int yearOfCycle,
+        EastAsianMonth month,
+        int dayOfMonth
+    ) {
+
+        long utcDays = CALSYS.transform(cycle, yearOfCycle, month, dayOfMonth);
+        return new ChineseCalendar(cycle, yearOfCycle, month, dayOfMonth, utcDays);
 
     }
 
@@ -699,10 +715,7 @@ public final class ChineseCalendar
 
         @Override
         public List<CalendarEra> getEras() {
-
-            // TODO: implementieren
-            return Collections.emptyList();
-
+            return Arrays.asList(ChineseEra.values());
         }
 
         @Override

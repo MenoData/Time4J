@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdEnumDateElement;
@@ -447,9 +448,8 @@ public final class KoreanCalendar
     /**
      * <p>Creates a new instance of a Korean calendar date. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles in range 72-94
-     * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
-     * @param   month       the month to be checked
+     * @param   year        references the year using different systems like eras or sexagesimal cycles
+     * @param   month       the month which might be a leap month
      * @param   dayOfMonth  the day of month to be checked
      * @return  new instance of {@code ChineseCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
@@ -457,22 +457,25 @@ public final class KoreanCalendar
     /*[deutsch]
      * <p>Erzeugt ein neues koreanisches Kalenderdatum. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles in range 72-94
-     * @param   yearOfCycle the year of associated sexagesimal cycle in range 1-60
-     * @param   month       the month to be checked
+     * @param   year        references the year using different systems like eras or sexagesimal cycles
+     * @param   month       the month which might be a leap month
      * @param   dayOfMonth  the day of month to be checked
      * @return  new instance of {@code ChineseCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
-    public static KoreanCalendar of( // TODO: diese Methode privat machen
-        int cycle,
-        int yearOfCycle,
+    public static KoreanCalendar of(
+        EastAsianYear year,
         EastAsianMonth month,
         int dayOfMonth
     ) {
 
-        long utcDays = CALSYS.transform(cycle, yearOfCycle, month, dayOfMonth);
-        return new KoreanCalendar(cycle, yearOfCycle, month, dayOfMonth, utcDays);
+        int elapsed = year.getElapsedCyclicYears();
+        int cycle = MathUtils.floorDivide(elapsed - 1, 60) + 1;
+        int yearOfCycle = MathUtils.floorModulo(elapsed, 60);
+        if (yearOfCycle == 0) {
+            yearOfCycle = 60;
+        }
+        return KoreanCalendar.of(cycle, yearOfCycle, month, dayOfMonth);
 
     }
 
@@ -583,6 +586,18 @@ public final class KoreanCalendar
     EastAsianCS<KoreanCalendar> getCalendarSystem() {
 
         return CALSYS;
+
+    }
+
+    static KoreanCalendar of(
+        int cycle,
+        int yearOfCycle,
+        EastAsianMonth month,
+        int dayOfMonth
+    ) {
+
+        long utcDays = CALSYS.transform(cycle, yearOfCycle, month, dayOfMonth);
+        return new KoreanCalendar(cycle, yearOfCycle, month, dayOfMonth, utcDays);
 
     }
 
