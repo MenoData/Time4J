@@ -28,7 +28,6 @@ import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
-import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
@@ -36,19 +35,23 @@ import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
+import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.DisplayElement;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TextElement;
+import net.time4j.format.TextWidth;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -57,6 +60,8 @@ import net.time4j.tz.ZonalOffset;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.io.ObjectStreamException;
+import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
@@ -224,13 +229,17 @@ public final class ChineseCalendar
 
     /**
      * <p>Represents the Chinese era. </p>
+     *
+     * <p>This element is effectively read-only. Its value cannot be changed in a direct and meaningful way. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die chinesische &Auml;ra. </p>
+     *
+     * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
+      * ge&auml;ndert werden. </p>
      */
     @FormattableElement(format = "G")
-    static final ChronoElement<CopticEra> ERA =
-        new StdEnumDateElement<>("ERA", ChineseCalendar.class, CopticEra.class, 'G');
+    public static final ChronoElement<ChineseEra> ERA = EraElement.INSTANCE;
 
     /**
      * <p>Represents the Chinese year related to the introduction of sexagesimal cycles
@@ -361,9 +370,9 @@ public final class ChineseCalendar
                 ChineseCalendar.class,
                 new Merger(),
                 CALSYS)
-//            .appendElement(
-//                ERA,
-//                new EraRule())
+            .appendElement(
+                ERA,
+                EraElement.INSTANCE)
 //            .appendElement(
 //                YEAR_OF_ERA,
 //                null,
@@ -469,9 +478,9 @@ public final class ChineseCalendar
         int dayOfMonth
     ) {
 
-        int elapsed = year.getElapsedCyclicYears();
-        int cycle = MathUtils.floorDivide(elapsed - 1, 60) + 1;
-        int yearOfCycle = MathUtils.floorModulo(elapsed, 60);
+        int extYear = year.getElapsedCyclicYears() + 1;
+        int cycle = MathUtils.floorDivide(extYear - 1, 60) + 1;
+        int yearOfCycle = MathUtils.floorModulo(extYear, 60);
         if (yearOfCycle == 0) {
             yearOfCycle = 60;
         }
@@ -737,6 +746,186 @@ public final class ChineseCalendar
         @Override
         int[] getLeapMonths() {
             return LEAP_MONTHS;
+        }
+
+    }
+
+    private static class EraElement
+        extends DisplayElement<ChineseEra>
+        implements TextElement<ChineseEra>, ElementRule<ChineseCalendar, ChineseEra> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final EraElement INSTANCE = new EraElement();
+
+        // TODO: serialversionUID
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private EraElement() {
+            super("ERA");
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Class<ChineseEra> getType() {
+            return ChineseEra.class;
+        }
+
+        @Override
+        public char getSymbol() {
+            return 'G';
+        }
+
+        @Override
+        public ChineseEra getDefaultMinimum() {
+            return ChineseEra.QING_SHUNZHI_1644_1662;
+        }
+
+        @Override
+        public ChineseEra getDefaultMaximum() {
+            return ChineseEra.YELLOW_EMPEROR;
+        }
+
+        @Override
+        public boolean isDateElement() {
+            return true;
+        }
+
+        @Override
+        public boolean isTimeElement() {
+            return false;
+        }
+
+        @Override
+        public ChineseEra getValue(ChineseCalendar context) {
+            int relgregyear = this.getRelatedGregorianYear(context);
+
+            if (relgregyear < 1662) {
+                return ChineseEra.QING_SHUNZHI_1644_1662;
+            } else if (relgregyear < 1723) {
+                return ChineseEra.QING_KANGXI_1662_1723;
+            } else if (relgregyear < 1736) {
+                return ChineseEra.QING_YONGZHENG_1723_1736;
+            } else if (relgregyear < 1796) {
+                return ChineseEra.QING_QIANLONG_1736_1796;
+            } else if (relgregyear < 1821) {
+                return ChineseEra.QING_JIAQING_1796_1821;
+            } else if (relgregyear < 1851) {
+                return ChineseEra.QING_DAOGUANG_1821_1851;
+            } else if (relgregyear < 1862) {
+                return ChineseEra.QING_XIANFENG_1851_1862;
+            } else if (relgregyear < 1875) {
+                return ChineseEra.QING_TONGZHI_1862_1875;
+            } else if (relgregyear < 1909) {
+                return ChineseEra.QING_GUANGXU_1875_1909;
+            } else if (context.getDaysSinceEpochUTC() < -21873L) { // < 1912-02-12
+                return ChineseEra.QING_XUANTONG_1909_1912;
+            } else {
+                return ChineseEra.YELLOW_EMPEROR; // fallback
+            }
+        }
+
+        @Override
+        public ChineseEra getMinimum(ChineseCalendar context) {
+            return ChineseEra.QING_SHUNZHI_1644_1662;
+        }
+
+        @Override
+        public ChineseEra getMaximum(ChineseCalendar context) {
+            return ChineseEra.YELLOW_EMPEROR;
+        }
+
+        @Override
+        public boolean isValid(
+            ChineseCalendar context,
+            ChineseEra value
+        ) {
+            return (this.getValue(context) == value);
+        }
+
+        @Override
+        public ChineseCalendar withValue(
+            ChineseCalendar context,
+            ChineseEra value,
+            boolean lenient
+        ) {
+            if (this.isValid(context, value)) {
+                return context;
+            } else {
+                throw new IllegalArgumentException("Chinese era is read-only.");
+            }
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(ChineseCalendar context) {
+            return YEAR_OF_ERA;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(ChineseCalendar context) {
+            return YEAR_OF_ERA;
+        }
+
+        @Override
+        public void print(
+            ChronoDisplay context,
+            Appendable buffer,
+            AttributeQuery attributes
+        ) throws IOException, ChronoException {
+            Locale locale = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
+            TextWidth width = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+            String name = context.get(this).getDisplayName(locale, width);
+            buffer.append(name);
+        }
+
+        @Override
+        public ChineseEra parse(
+            CharSequence text,
+            ParsePosition status,
+            AttributeQuery attributes
+        ) {
+            Locale locale = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
+            boolean caseInsensitive = attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue();
+            boolean partialCompare = attributes.get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE).booleanValue();
+            TextWidth width = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
+            int offset = status.getIndex();
+
+            for (ChineseEra era : ChineseEra.values()) {
+                String name = era.getDisplayName(locale, width);
+                int end = Math.max(Math.min(offset + name.length(), text.length()), offset);
+                if (end > offset) {
+                    String test = text.subSequence(offset, end).toString();
+                    if (caseInsensitive) {
+                        name = name.toLowerCase(locale);
+                        test = test.toLowerCase(locale);
+                    }
+                    if (name.equals(test) || (partialCompare && name.startsWith(test))) {
+                        status.setIndex(end);
+                        return era;
+                    }
+                }
+            }
+
+            status.setErrorIndex(offset);
+            return null;
+        }
+
+        @Override
+        protected boolean isSingleton() {
+            return true;
+        }
+
+        private Object readResolve() throws ObjectStreamException {
+            return INSTANCE;
+        }
+
+        private int getRelatedGregorianYear(ChineseCalendar context) {
+            int cycle = context.getCycle();
+            int y = context.getYear().getNumber();
+            return (cycle - 1) * 60 + y - 2637;
         }
 
     }

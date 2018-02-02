@@ -157,33 +157,7 @@ public enum ChineseEra
      * Huang-di das Jahr 2697 BC (vermutlich hat sich Sun-yat-sen um ein Jahr verz&auml;hlt oder das Jahr 0
      * falsch ber&uuml;cksichtigt). </p>
      */
-    YELLOW_EMPEROR,
-
-    /**
-     * <p>An additional era which counts the years since the birth of Confucius in year 551 BCE. </p>
-     */
-    /*[deutsch]
-     * <p>Eine zus&auml;tzliche &Auml;ra, die die Jahre seit der Geburt von Konfuzius im Jahre 551 BC z&auml;hlt. </p>
-     */
-    ANNO_CONFUCIUS,
-
-    /**
-     * <p>An additional era which counts the years since the foundation of Chinese republic in year 1912. </p>
-     *
-     * <p>This way of counting years was accompanied by the introduction of gregorian calendar on 1912-01-01.
-     * It was used in mainland from 1912 until 1949 and is still used on Taiwan today. </p>
-     *
-     * @see     MinguoCalendar
-     */
-    /*[deutsch]
-     * <p>Eine zus&auml;tzliche &Auml;ra, die die Jahre seit der Gr&uuml;ndung der chinesischen Republik
-     * im Jahre 1912 z&auml;hlt. </p>
-     *
-     * <p>Diese Art der Jahresz&auml;hlung wurde mit der Einf&uuml;hrung des gregorianischen Kalenders
-     * ab 1912-01-01 angewandt und im heutigen China von 1912 bis 1949 verwendet. Taiwand verwendet diese
-     * &Auml;ra heute noch. </p>
-     */
-    REPUBLICAN;
+    YELLOW_EMPEROR;
 
     //~ Methoden ----------------------------------------------------------
 
@@ -330,27 +304,13 @@ public enum ChineseEra
                     return "黄帝紀年";
                 } else if (width == TextWidth.WIDE) {
                     return (lang.isEmpty() ? "Anno Huangdi" : "Anno Huángdì");
+                } else if (width == TextWidth.NARROW) {
+                    return "H";
                 } else {
-                    return "AH";
-                }
-            case ANNO_CONFUCIUS:
-                if (lang.equals("zh")) {
-                    return "孔子紀年";
-                } else if (width == TextWidth.WIDE) {
-                    return "Anno Confucius";
-                } else {
-                    return "AC";
-                }
-            case REPUBLICAN:
-                if (lang.equals("zh")) {
-                    return (locale.getScript().equals("Hant") || locale.getCountry().equals("TW") ? "民國" : "民国");
-                } else if (lang.isEmpty()) {
-                    return "Minguo";
-                } else {
-                    return "Mínguó";
+                    return (lang.isEmpty() ? "Huangdi" : "Huángdì");
                 }
             default:
-                return this.name();
+                throw new UnsupportedOperationException("Not yet implemented: " + this.name());
         }
 
     }
@@ -368,6 +328,43 @@ public enum ChineseEra
     public boolean isQingDynasty() {
 
         return (this.ordinal() <= QING_XUANTONG_1909_1912.ordinal());
+
+    }
+
+    int getMinYearOfEra() {
+
+        return (this == YELLOW_EMPEROR) ? 1645 + 2636 + 1 : 1;
+
+    }
+
+    int getMaxYearOfEra() {
+
+        switch (this) {
+            case QING_SHUNZHI_1644_1662:
+                return 1662 - 1644;
+            case QING_KANGXI_1662_1723:
+                return 1723 - 1662;
+            case QING_YONGZHENG_1723_1736:
+                return 1736 - 1723;
+            case QING_QIANLONG_1736_1796:
+                return 1796 - 1736;
+            case QING_JIAQING_1796_1821:
+                return 1821 - 1796;
+            case QING_DAOGUANG_1821_1851:
+                return 1851 - 1821;
+            case QING_XIANFENG_1851_1862:
+                return 1862 - 1851;
+            case QING_TONGZHI_1862_1875:
+                return 1875 - 1862;
+            case QING_GUANGXU_1875_1909:
+                return 1909 - 1875;
+            case QING_XUANTONG_1909_1912:
+                return 3; // new year in 1912 is 6 days after abdication: 1912-02-18
+            case YELLOW_EMPEROR:
+                return 2999 + 2636 + 1;
+            default:
+                throw new UnsupportedOperationException("Not yet implemented: " + this.name());
+        }
 
     }
 

@@ -469,9 +469,9 @@ public final class KoreanCalendar
         int dayOfMonth
     ) {
 
-        int elapsed = year.getElapsedCyclicYears();
-        int cycle = MathUtils.floorDivide(elapsed - 1, 60) + 1;
-        int yearOfCycle = MathUtils.floorModulo(elapsed, 60);
+        int extYear = year.getElapsedCyclicYears() + 1;
+        int cycle = MathUtils.floorDivide(extYear - 1, 60) + 1;
+        int yearOfCycle = MathUtils.floorModulo(extYear, 60);
         if (yearOfCycle == 0) {
             yearOfCycle = 60;
         }

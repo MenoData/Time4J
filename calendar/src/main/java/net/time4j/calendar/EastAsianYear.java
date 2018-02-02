@@ -22,6 +22,8 @@
 package net.time4j.calendar;
 
 
+import net.time4j.base.MathUtils;
+
 /**
  * <p>Represents a way to specify the year used in Chinese calendar and its derivates. </p>
  *
@@ -44,6 +46,7 @@ public interface EastAsianYear {
      *
      * @param   relatedGregorianYear    the gregorian calendar year which contains the first day of East Asian year
      * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the year is out of range of Chinese calendar
      */
     /*[deutsch]
      * <p>Bestimmt das ostasiatische Jahr, das dem angegebenen gregorianischen Kalenderjahr entspricht, so da&szlig;
@@ -51,9 +54,36 @@ public interface EastAsianYear {
      *
      * @param   relatedGregorianYear    the gregorian calendar year which contains the first day of East Asian year
      * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the year is out of range of Chinese calendar
      */
     static EastAsianYear forGregorian(int relatedGregorianYear) {
-        return () -> relatedGregorianYear + 2637;
+        if (relatedGregorianYear < 1645 || relatedGregorianYear > 2999) {
+            throw new IllegalArgumentException("Related gregorian year out of range: " + relatedGregorianYear);
+        }
+        return () -> relatedGregorianYear + 2636;
+    }
+
+    /**
+     * <p>Determines the East Asian year corresponding to given minguo year
+     * which starts counting in gregorian year 1912 or later. </p>
+     *
+     * @param   minguoYear    the minguo year which contains the first day of East Asian year
+     * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the year is smaller than 1
+     */
+    /*[deutsch]
+     * <p>Bestimmt das ostasiatische Jahr, das dem angegebenen Minguo-Kalenderjahr entspricht, so da&szlig;
+     * das Minguo-Jahr (ab gregorianisch 1912) den Neujahrstag des ostasiatischen Jahres enth&auml;lt. </p>
+     *
+     * @param   relatedGregorianYear    the gregorian calendar year which contains the first day of East Asian year
+     * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the year is smaller than 1
+     */
+    static EastAsianYear forMinguo(int minguoYear) {
+        if (minguoYear < 1) {
+            throw new IllegalArgumentException("Minguo year must not be smaller than 1: " + minguoYear);
+        }
+        return forGregorian(MathUtils.safeAdd(minguoYear, 1911));
     }
 
     /**
