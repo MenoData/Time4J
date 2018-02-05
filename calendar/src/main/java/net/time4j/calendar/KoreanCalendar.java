@@ -469,12 +469,8 @@ public final class KoreanCalendar
         int dayOfMonth
     ) {
 
-        int extYear = year.getElapsedCyclicYears() + 1;
-        int cycle = MathUtils.floorDivide(extYear - 1, 60) + 1;
-        int yearOfCycle = MathUtils.floorModulo(extYear, 60);
-        if (yearOfCycle == 0) {
-            yearOfCycle = 60;
-        }
+        int cycle = year.getCycle();
+        int yearOfCycle = year.getYearOfCycle().getNumber();
         return KoreanCalendar.of(cycle, yearOfCycle, month, dayOfMonth);
 
     }
@@ -506,28 +502,27 @@ public final class KoreanCalendar
     /**
      * <p>Queries if given parameter values form a well defined calendar date. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles
-     * @param   yearOfCycle the year of associated sexagesimal cycle
+     * @param   year        the year to be checked
      * @param   month       the month to be checked
      * @param   dayOfMonth  the day of month to be checked
-     * @return  {@code true} if valid else  {@code false}
+     * @return  {@code true} if valid else {@code false}
      */
     /*[deutsch]
      * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles
-     * @param   yearOfCycle the year of associated sexagesimal cycle
+     * @param   year        the year to be checked
      * @param   month       the month to be checked
      * @param   dayOfMonth  the day of month to be checked
-     * @return  {@code true} if valid else  {@code false}
+     * @return  {@code true} if valid else {@code false}
      */
     public static boolean isValid(
-        int cycle,
-        int yearOfCycle,
+        EastAsianYear year,
         EastAsianMonth month,
         int dayOfMonth
     ) {
 
+        int cycle = year.getCycle();
+        int yearOfCycle = year.getYearOfCycle().getNumber();
         return CALSYS.isValid(cycle, yearOfCycle, month, dayOfMonth);
 
     }
