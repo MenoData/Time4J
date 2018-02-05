@@ -21,8 +21,8 @@
 
 package net.time4j.calendar;
 
-
 import net.time4j.base.MathUtils;
+
 
 /**
  * <p>Represents a way to specify the year used in Chinese calendar and its derivates. </p>
@@ -84,6 +84,40 @@ public interface EastAsianYear {
             throw new IllegalArgumentException("Minguo year must not be smaller than 1: " + minguoYear);
         }
         return forGregorian(MathUtils.safeAdd(minguoYear, 1911));
+    }
+
+    /**
+     * <p>Determines the number of associated sexagesimal year cycle. </p>
+     *
+     * @return  number of cycle
+     */
+    /*[deutsch]
+     * <p>Bestimmt die Nummer des assoziierten sexagesimalen Jahreszyklus. </p>
+     *
+     * @return  number of cycle
+     */
+    default int getCycle() {
+        int extYear = this.getElapsedCyclicYears() + 1;
+        return MathUtils.floorDivide(extYear - 1, 60) + 1;
+    }
+
+    /**
+     * <p>Determines the cyclic year. </p>
+     *
+     * @return  cyclic year
+     */
+    /*[deutsch]
+     * <p>Bestimmt das zyklische Jahr. </p>
+     *
+     * @return  cyclic year
+     */
+    default CyclicYear getYearOfCycle() {
+        int extYear = this.getElapsedCyclicYears() + 1;
+        int yearOfCycle = MathUtils.floorModulo(extYear, 60);
+        if (yearOfCycle == 0) {
+            yearOfCycle = 60;
+        }
+        return CyclicYear.of(yearOfCycle);
     }
 
     /**

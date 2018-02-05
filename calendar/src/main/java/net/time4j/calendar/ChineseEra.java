@@ -368,4 +368,35 @@ public enum ChineseEra
 
     }
 
+    int getStartAsGregorianYear() {
+
+        switch (this) {
+            case QING_SHUNZHI_1644_1662:
+                return 1644;
+            case QING_KANGXI_1662_1723:
+                return 1662;
+            case QING_YONGZHENG_1723_1736:
+                return 1723;
+            case QING_QIANLONG_1736_1796:
+                return 1736;
+            case QING_JIAQING_1796_1821:
+                return 1796;
+            case QING_DAOGUANG_1821_1851:
+                return 1821;
+            case QING_XIANFENG_1851_1862:
+                return 1851;
+            case QING_TONGZHI_1862_1875:
+                return 1862;
+            case QING_GUANGXU_1875_1909:
+                return 1875;
+            case QING_XUANTONG_1909_1912:
+                return 1909;
+            case YELLOW_EMPEROR:
+                return -2636;
+            default:
+                throw new UnsupportedOperationException("Not yet implemented: " + this.name());
+        }
+
+    }
+
 }

@@ -25,12 +25,15 @@ import net.time4j.GeneralTimestamp;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.CalendarType;
+
+import java.util.Locale;
 
 
 /**
@@ -63,6 +66,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     static final int DAY_OF_MONTH_INDEX = 0;
     static final int DAY_OF_YEAR_INDEX = 1;
     static final int MONTH_AS_ORDINAL_INDEX = 2;
+    static final int CYCLE_INDEX = 3;
 
     static final int UNIT_YEARS = 1;
     static final int UNIT_MONTHS = 2;
@@ -342,7 +346,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         StringBuilder sb = new StringBuilder();
         sb.append(this.getClass().getAnnotation(CalendarType.class).value());
         sb.append('[');
-        sb.append(this.yearOfCycle); // TODO: use cyclic name
+        sb.append(this.getYear().getDisplayName(Locale.ROOT));
         sb.append('(');
         sb.append(this.getInt(CommonElements.RELATED_GREGORIAN_YEAR));
         sb.append(")-");
@@ -357,8 +361,12 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
     }
 
+    static <D extends EastAsianCalendar<?, D>>  ElementRule<D, Integer> getCycleRule(ChronoElement<?> c) {
+        return new IntegerElementRule<>(CYCLE_INDEX, c);
+    }
+
     static <D extends EastAsianCalendar<?, D>> ElementRule<D, CyclicYear> getYearOfCycleRule(ChronoElement<?> c) {
-        return new CyclicYearRule(c);
+        return new CyclicYearRule<>(c);
     }
 
     static <D extends EastAsianCalendar<?, D>>  ElementRule<D, EastAsianMonth> getMonthOfYearRule(ChronoElement<?> c) {
@@ -432,6 +440,8 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                         num++;
                     }
                     return num;
+                case CYCLE_INDEX:
+                    return context.getCycle();
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -456,6 +466,11 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                 return (value <= context.lengthOfYear());
             } else if (this.index == MONTH_AS_ORDINAL_INDEX) {
                 return (value <= 12) || ((value == 13) && (context.getLeapMonth() > 0));
+            } else if (this.index == CYCLE_INDEX) {
+                CalendarSystem<D> calsys = context.getCalendarSystem();
+                int min = calsys.transform(calsys.getMinimumSinceUTC()).getCycle();
+                int max = calsys.transform(calsys.getMaximumSinceUTC()).getCycle();
+                return ((value >= min) && (value <= max));
             } else {
                 throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -503,6 +518,8 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                     } else {
                         throw new IllegalArgumentException("Ordinal month out of range: " + value);
                     }
+                case CYCLE_INDEX:
+
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -515,7 +532,12 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
         @Override
         public Integer getMinimum(D context) {
-            return Integer.valueOf(1);
+            if (this.index == CYCLE_INDEX) {
+                CalendarSystem<D> calsys = context.getCalendarSystem();
+                return Integer.valueOf(calsys.transform(calsys.getMinimumSinceUTC()).getCycle());
+            } else {
+                return Integer.valueOf(1);
+            }
         }
 
         @Override
@@ -530,6 +552,10 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                     break;
                 case MONTH_AS_ORDINAL_INDEX:
                     max = (context.isLeapYear() ? 13 : 12);
+                    break;
+                case CYCLE_INDEX:
+                    CalendarSystem<D> calsys = context.getCalendarSystem();
+                    max = calsys.transform(calsys.getMaximumSinceUTC()).getCycle();
                     break;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);

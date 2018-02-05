@@ -381,6 +381,44 @@ public final class CyclicYear
 
     }
 
+    /**
+     * <p>Obtains an unambivalent year reference for given Qing dynasty. </p>
+     *
+     * @param   era    the Chinese era representing a historic Qing dynasty
+     * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the era is not a Qing dynasty or if the combination of this cyclic year
+     *          together with the era is ambivalent (rare case in {@code QING_KANGXI_1662_1723})
+     */
+    /*[deutsch]
+     * <p>Liefert eine eindeutige Jahresreferenz zur angegebenen Qing-Dynastie. </p>
+     *
+     * @param   era    the Chinese era representing a historic Qing dynasty
+     * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the era is not a Qing dynasty or if the combination of this cyclic year
+     *          together with the era is ambivalent (rare case in {@code QING_KANGXI_1662_1723})
+     */
+    public EastAsianYear inQingDynasty(ChineseEra era) {
+
+        if (era.isQingDynasty()) {
+            if ((era == ChineseEra.QING_KANGXI_1662_1723) && (this.year == 39)){
+                throw new IllegalArgumentException(
+                    "Ambivalent cyclic year in Kangxi-era: " + this.getDisplayName(Locale.ROOT));
+            } else {
+                int relgregyear = era.getStartAsGregorianYear() + this.year - 1;
+                return () -> relgregyear + 2636; // TODO: falsch (berichtigen)
+            }
+        } else {
+            throw new IllegalArgumentException("Chinese era must be related to a Qing dynasty.");
+        }
+
+    }
+
+    public static void main(String[] args) {
+        System.out.println(EastAsianYear.forGregorian(1662).getYearOfCycle());
+        System.out.println(EastAsianYear.forGregorian(1722).getYearOfCycle());
+        System.out.println(CyclicYear.of(40).inQingDynasty(ChineseEra.QING_KANGXI_1662_1723).getYearOfCycle());
+    }
+
     @Override
     public int compareTo(CyclicYear other) {
 

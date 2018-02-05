@@ -21,13 +21,9 @@
 
 package net.time4j.calendar;
 
-import net.time4j.Moment;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
-import net.time4j.base.MathUtils;
-import net.time4j.base.TimeSource;
-import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
@@ -36,25 +32,20 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
-import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
-import net.time4j.engine.StartOfDay;
+import net.time4j.engine.IntElementRule;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
 import net.time4j.format.DisplayElement;
-import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.tz.OffsetSign;
-import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -86,7 +77,9 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #CYCLE}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
  *
@@ -135,7 +128,9 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #CYCLE}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
  *
@@ -231,32 +226,72 @@ public final class ChineseCalendar
      * <p>Represents the Chinese era. </p>
      *
      * <p>This element is effectively read-only. Its value cannot be changed in a direct and meaningful way. </p>
+     *
+     * @see     #YEAR_OF_ERA
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die chinesische &Auml;ra. </p>
      *
      * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
       * ge&auml;ndert werden. </p>
+     *
+     * @see     #YEAR_OF_ERA
      */
     @FormattableElement(format = "G")
     public static final ChronoElement<ChineseEra> ERA = EraElement.INSTANCE;
 
     /**
-     * <p>Represents the Chinese year related to the introduction of sexagesimal cycles
+     * <p>Represents the cycle number related to the introduction of sexagesimal cycles
      * by the legendary yellow emperor Huang-Di on -2636-02-15 (gregorian). </p>
      *
-     * <p><strong>This kind of year counting is NOT in common use in China and only
-     * offered for technical reasons.</strong> Prefer the cyclic year instead. </p>
+     * <p><strong>This kind of counting is NOT in common use in China and only
+     * offered for technical reasons.</strong> Prefer just the cyclic year together
+     * with the related gregorian year instead. </p>
+     *
+     * @see     #YEAR_OF_CYCLE
+     * @see     CommonElements#RELATED_GREGORIAN_YEAR
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert das chinesische Jahr relativ zur Einf&uuml;hrung der sexagesimalen Zyklen
+     * <p>Nummer des Jahreszyklus relativ zur Einf&uuml;hrung der sexagesimalen Zyklen
      * durch den legendenhaften Kaiser Huang-Di am Tag -2636-02-15 (gregorianisch). </p>
      *
-     * <p><strong>Diese Art der Jahresz&auml;hlung ist in China NICHT gebr&auml;uchlich und wird nur aus
-     * technischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr ist der Vorzug zu geben. </p>
+     * <p><strong>Diese Art der Z&auml;hlung ist in China NICHT gebr&auml;uchlich und wird nur aus
+     * technischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr in Verbindung mit einer
+     * gregorianischen Bezugsjahresangabe ist der Vorzug zu geben. </p>
+     *
+     * @see     #YEAR_OF_CYCLE
+     * @see     CommonElements#RELATED_GREGORIAN_YEAR
+     */
+    public static final ChronoElement<Integer> CYCLE =
+        new StdIntegerDateElement<>(
+            "CYCLE",
+            ChineseCalendar.class,
+            72,
+            94,
+            '\u0000',
+            null,
+            null);
+
+    /**
+     * <p>Represents the Chinese year related to the Chinese era. </p>
+     *
+     * <p><strong>This kind of year counting is NOT in common use in China today and only
+     * offered for historical reasons.</strong> Prefer the cyclic year instead. </p>
+     *
+     * @see     #ERA
+     * @see     #YEAR_OF_CYCLE
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das chinesische Jahr relativ zur chinesischen &Auml;ra. </p>
+     *
+     * <p><strong>Diese Art der Jahresz&auml;hlung ist in China heute NICHT gebr&auml;uchlich und wird nur aus
+     * historischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr ist der Vorzug zu geben. </p>
+     *
+     * @see     #ERA
+     * @see     #YEAR_OF_CYCLE
      */
     @FormattableElement(format = "y")
-    static final StdCalendarElement<Integer, ChineseCalendar> YEAR_OF_ERA =
+    public static final ChronoElement<Integer> YEAR_OF_ERA =
         new StdIntegerDateElement<>(
             "YEAR_OF_ERA",
             ChineseCalendar.class,
@@ -268,9 +303,13 @@ public final class ChineseCalendar
 
     /**
      * <p>Represents the Chinese year related to the current sexagesimal cycle. </p>
+     *
+     * <p>This is the standard way to specify a Chinese year. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das chinesische Jahr des aktuellen sexagesimalen Zyklus. </p>
+     *
+     * <p>Das ist der Standardweg, ein chinesisches Jahr zu definieren. </p>
      */
     @FormattableElement(format = "U")
     public static final TextElement<CyclicYear> YEAR_OF_CYCLE = EastAsianCY.SINGLETON;
@@ -373,10 +412,12 @@ public final class ChineseCalendar
             .appendElement(
                 ERA,
                 EraElement.INSTANCE)
-//            .appendElement(
-//                YEAR_OF_ERA,
-//                null,
-//                Unit.YEARS)
+            .appendElement(
+                CYCLE,
+                EastAsianCalendar.getCycleRule(YEAR_OF_CYCLE))
+            .appendElement(
+                YEAR_OF_ERA,
+                new YearOfEraRule())
             .appendElement(
                 YEAR_OF_CYCLE,
                 EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
@@ -478,12 +519,8 @@ public final class ChineseCalendar
         int dayOfMonth
     ) {
 
-        int extYear = year.getElapsedCyclicYears() + 1;
-        int cycle = MathUtils.floorDivide(extYear - 1, 60) + 1;
-        int yearOfCycle = MathUtils.floorModulo(extYear, 60);
-        if (yearOfCycle == 0) {
-            yearOfCycle = 60;
-        }
+        int cycle = year.getCycle();
+        int yearOfCycle = year.getYearOfCycle().getNumber();
         return ChineseCalendar.of(cycle, yearOfCycle, month, dayOfMonth);
 
     }
@@ -515,28 +552,27 @@ public final class ChineseCalendar
     /**
      * <p>Queries if given parameter values form a well defined calendar date. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles
-     * @param   yearOfCycle the year of associated sexagesimal cycle
+     * @param   year        the year to be checked
      * @param   month       the month to be checked
      * @param   dayOfMonth  the day of month to be checked
-     * @return  {@code true} if valid else  {@code false}
+     * @return  {@code true} if valid else {@code false}
      */
     /*[deutsch]
      * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles
-     * @param   yearOfCycle the year of associated sexagesimal cycle
+     * @param   year        the year to be checked
      * @param   month       the month to be checked
      * @param   dayOfMonth  the day of month to be checked
-     * @return  {@code true} if valid else  {@code false}
+     * @return  {@code true} if valid else {@code false}
      */
     public static boolean isValid(
-        int cycle,
-        int yearOfCycle,
+        EastAsianYear year,
         EastAsianMonth month,
         int dayOfMonth
     ) {
 
+        int cycle = year.getCycle();
+        int yearOfCycle = year.getYearOfCycle().getNumber();
         return CALSYS.isValid(cycle, yearOfCycle, month, dayOfMonth);
 
     }
@@ -854,6 +890,8 @@ public final class ChineseCalendar
         ) {
             if (this.isValid(context, value)) {
                 return context;
+            } else if (value == null) {
+                throw new IllegalArgumentException("Missing Chinese era.");
             } else {
                 throw new IllegalArgumentException("Chinese era is read-only.");
             }
@@ -930,54 +968,121 @@ public final class ChineseCalendar
 
     }
 
-    private static class Merger
-        implements ChronoMerger<ChineseCalendar> {
+    private static class YearOfEraRule
+        implements IntElementRule<ChineseCalendar> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public String getFormatPattern(
-            DisplayStyle style,
-            Locale locale
-        ) {
-
-            return GenericDatePatterns.get("chinese", style, locale);
-
+        public Integer getValue(ChineseCalendar context) {
+            return Integer.valueOf(this.getInt(context));
         }
 
         @Override
-        public ChineseCalendar createFrom(
-            TimeSource<?> clock,
-            AttributeQuery attributes
+        public Integer getMinimum(ChineseCalendar context) {
+            ChineseEra era = context.get(ERA);
+            return Integer.valueOf(era.getMinYearOfEra());
+        }
+
+        @Override
+        public Integer getMaximum(ChineseCalendar context) {
+            ChineseEra era = context.get(ERA);
+            return Integer.valueOf(era.getMaxYearOfEra());
+        }
+
+        @Override
+        public boolean isValid(
+            ChineseCalendar context,
+            Integer value
         ) {
+            return ((value != null) && this.isValid(context, value.intValue()));
+        }
 
-            TZID tzid;
-
-            if (attributes.contains(Attributes.TIMEZONE_ID)) {
-                tzid = attributes.get(Attributes.TIMEZONE_ID);
-            } else if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
-                tzid = Timezone.ofSystem().getID();
-            } else {
-                return null;
+        @Override
+        public ChineseCalendar withValue(
+            ChineseCalendar context,
+            Integer value,
+            boolean lenient
+        ) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing year of era.");
             }
-
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
-            return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
+            return this.withValue(context, value.intValue(), lenient);
         }
 
         @Override
-        @Deprecated
-        public ChineseCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
+        public ChronoElement<?> getChildAtFloor(ChineseCalendar context) {
+            return MONTH_OF_YEAR;
+        }
 
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
+        @Override
+        public ChronoElement<?> getChildAtCeiling(ChineseCalendar context) {
+            return MONTH_OF_YEAR;
+        }
+
+        @Override
+        public int getInt(ChineseCalendar context) {
+            int relgregyear = EraElement.INSTANCE.getRelatedGregorianYear(context);
+            if (relgregyear < 1662) {
+                return relgregyear - 1644 + 1;
+            } else if (relgregyear < 1723) {
+                return relgregyear - 1662 + 1;
+            } else if (relgregyear < 1736) {
+                return relgregyear - 1723 + 1;
+            } else if (relgregyear < 1796) {
+                return relgregyear - 1736 + 1;
+            } else if (relgregyear < 1821) {
+                return relgregyear - 1796 + 1;
+            } else if (relgregyear < 1851) {
+                return relgregyear - 1821 + 1;
+            } else if (relgregyear < 1862) {
+                return relgregyear - 1851 + 1;
+            } else if (relgregyear < 1875) {
+                return relgregyear - 1862 + 1;
+            } else if (relgregyear < 1909) {
+                return relgregyear - 1875 + 1;
+            } else if (context.getDaysSinceEpochUTC() < -21873L) { // < 1912-02-12
+                return relgregyear - 1909 + 1;
+            } else {
+                return relgregyear + 2637 + 61;
+            }
+        }
+
+        @Override
+        public boolean isValid(
+            ChineseCalendar context,
+            int value
+        ) {
+            ChineseEra era = context.get(ERA);
+            return ((value >= era.getMinYearOfEra()) && (value <= era.getMaxYearOfEra()));
+        }
+
+        @Override
+        public ChineseCalendar withValue(
+            ChineseCalendar context,
+            int value,
+            boolean lenient
+        ) {
+            if (this.isValid(context, value)) {
+                int yoe = this.getInt(context);
+                return context.plus(value - yoe, Unit.YEARS);
+            } else {
+                throw new IllegalArgumentException("Invalid year of era: " + value);
+            }
+        }
+    }
+
+    private static class Merger
+        extends AbstractMergerEA<ChineseCalendar> {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Merger() {
+            super(ChineseCalendar.class);
 
         }
+
+        //~ Methoden ------------------------------------------------------
 
         @Override
         public ChineseCalendar createFrom(
@@ -987,73 +1092,54 @@ public final class ChineseCalendar
             boolean preparsing
         ) {
 
-            int cyear = entity.getInt(YEAR_OF_ERA);
+            EastAsianYear eastAsianYear = null;
+            int relgregyear = entity.getInt(CommonElements.RELATED_GREGORIAN_YEAR);
 
-            if (cyear == Integer.MIN_VALUE) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
-                return null;
-            }
-
-            if (entity.contains(MONTH_OF_YEAR)) {
-                int cmonth = 1; // entity.get(MONTH_OF_YEAR).getValue();
-                int cdom = entity.getInt(DAY_OF_MONTH);
-
-                if (cdom != Integer.MIN_VALUE) {
-//                    if (CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
-//                        return ChineseCalendar.of(cyear, cmonth, cdom);
-//                    } else {
-//                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
-//                    }
-                }
-            } else {
-                int cdoy = entity.getInt(DAY_OF_YEAR);
-                if (cdoy != Integer.MIN_VALUE) {
-                    if (cdoy > 0) {
-                        int cmonth = 1;
-                        int daycount = 0;
-                        while (cmonth <= 13) {
-                            int len = 0; //CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
-                            if (cdoy > daycount + len) {
-                                cmonth++;
-                                daycount += len;
-                            } else {
-                                return null; // ChineseCalendar.of(cyear, cmonth, cdoy - daycount);
+            if (relgregyear == Integer.MIN_VALUE) {
+                if (entity.contains(YEAR_OF_CYCLE)) {
+                    CyclicYear cy = entity.get(YEAR_OF_CYCLE);
+                    int cycle = entity.getInt(CYCLE);
+                    if (cycle == Integer.MIN_VALUE) {
+                        if (entity.contains(ERA)) {
+                            ChineseEra era = entity.get(ERA);
+                            if (era.isQingDynasty()) {
+                                eastAsianYear = cy.inQingDynasty(era);
                             }
                         }
+                    } else {
+                        eastAsianYear = () -> (cycle - 1) * 60 + cy.getNumber() - 1;
                     }
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+                } else if (entity.contains(ERA)) {
+                    int yoe = entity.getInt(YEAR_OF_ERA);
+                    if (yoe != Integer.MIN_VALUE) {
+                        ChineseEra era = entity.get(ERA);
+                        eastAsianYear = EastAsianYear.forGregorian(era.getStartAsGregorianYear() + yoe - 1);
+                    }
+                }
+            } else {
+                eastAsianYear = EastAsianYear.forGregorian(relgregyear);
+            }
+
+            if (eastAsianYear == null) {
+                entity.with(
+                    ValidationElement.ERROR_MESSAGE,
+                    "Cannot determine East Asian year.");
+                return null;
+            } else if (entity.contains(MONTH_OF_YEAR)) {
+                EastAsianMonth month = entity.get(MONTH_OF_YEAR);
+                int dom = entity.getInt(DAY_OF_MONTH);
+                if (dom != Integer.MIN_VALUE) {
+                    return ChineseCalendar.of(eastAsianYear, month, dom);
+                }
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+                if ((doy != Integer.MIN_VALUE) && (doy >= 1)) {
+                    ChineseCalendar cc = ChineseCalendar.of(eastAsianYear, EastAsianMonth.valueOf(1), 1);
+                    return cc.plus(doy - 1, Unit.DAYS);
                 }
             }
 
             return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(ChineseCalendar context, AttributeQuery attributes) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
-
-        }
-
-        @Override
-        public StartOfDay getDefaultStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
-
-        }
-
-        @Override
-        public int getDefaultPivotYear() {
-
-            return 100; // two-digit-years are effectively switched off
 
         }
 

@@ -93,6 +93,7 @@ public class VietnameseMiscellaneousTest {
         assertThat(min.get(VietnameseCalendar.DAY_OF_MONTH), is(1));
         assertThat(min.get(VietnameseCalendar.DAY_OF_YEAR), is(1));
         assertThat(min.get(VietnameseCalendar.MONTH_OF_YEAR), is(EastAsianMonth.valueOf(1)));
+        assertThat(min.get(VietnameseCalendar.CYCLE), is(75));
     }
 
     @Test
@@ -104,6 +105,7 @@ public class VietnameseMiscellaneousTest {
         assertThat(max.get(VietnameseCalendar.DAY_OF_MONTH), is(30));
         assertThat(max.get(VietnameseCalendar.DAY_OF_YEAR), is(355));
         assertThat(max.get(VietnameseCalendar.MONTH_OF_YEAR), is(EastAsianMonth.valueOf(12)));
+        assertThat(max.get(VietnameseCalendar.CYCLE), is(94));
     }
 
 }
