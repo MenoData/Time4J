@@ -26,10 +26,8 @@ import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
-import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
-import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
@@ -95,8 +93,8 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
- *  <li>{@link #YEAR_OF_ERA}</li>
- *  <li>{@link #ERA}</li>
+ *  <li>{@link #YEAR_OF_CYCLE}</li>
+ *  <li>{@link #CYCLE}</li>
  * </ul>
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
@@ -127,8 +125,8 @@ import java.util.Map;
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert den chinesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
- * Bereich 1645-01-28/3000-01-27. </p>
+ * <p>Repr&auml;sentiert den vietnamesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
+ * Bereich 1813-02-01/3000-01-27. </p>
  *
  * <h4>Einleitung</h4>
  *
@@ -158,8 +156,8 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
- *  <li>{@link #YEAR_OF_ERA}</li>
- *  <li>{@link #ERA}</li>
+ *  <li>{@link #YEAR_OF_CYCLE}</li>
+ *  <li>{@link #CYCLE}</li>
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
@@ -244,37 +242,34 @@ public final class VietnameseCalendar
     };
 
     /**
-     * <p>Represents the Chinese era. </p>
+     * <p>Represents the cycle number related to the introduction of sexagesimal cycles
+     * by the legendary Chinese yellow emperor Huang-Di on -2636-02-15 (gregorian). </p>
+     *
+     * <p><strong>This kind of counting is NOT in common use in Vietnam and only
+     * offered for technical reasons.</strong> Prefer just the cyclic year together
+     * with the related gregorian year instead. </p>
+     *
+     * @see     #YEAR_OF_CYCLE
+     * @see     CommonElements#RELATED_GREGORIAN_YEAR
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert die chinesische &Auml;ra. </p>
-     */
-    @FormattableElement(format = "G")
-    static final ChronoElement<CopticEra> ERA =
-        new StdEnumDateElement<>("ERA", VietnameseCalendar.class, CopticEra.class, 'G');
-
-    /**
-     * <p>Represents the Chinese year related to the introduction of sexagesimal cycles
-     * by the legendary yellow emperor Huang-Di on -2636-02-15 (gregorian). </p>
+     * <p>Nummer des Jahreszyklus relativ zur Einf&uuml;hrung der sexagesimalen Zyklen
+     * durch den legendenhaften chinesischen Kaiser Huang-Di am Tag -2636-02-15 (gregorianisch). </p>
      *
-     * <p><strong>This kind of year counting is NOT in common use in China and only
-     * offered for technical reasons.</strong> Prefer the cyclic year instead. </p>
-     */
-    /*[deutsch]
-     * <p>Repr&auml;sentiert das chinesische Jahr relativ zur Einf&uuml;hrung der sexagesimalen Zyklen
-     * durch den legendenhaften Kaiser Huang-Di am Tag -2636-02-15 (gregorianisch). </p>
+     * <p><strong>Diese Art der Z&auml;hlung ist in Vietnam NICHT gebr&auml;uchlich und wird nur aus
+     * technischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr in Verbindung mit einer
+     * gregorianischen Bezugsjahresangabe ist der Vorzug zu geben. </p>
      *
-     * <p><strong>Diese Art der Jahresz&auml;hlung ist in China NICHT gebr&auml;uchlich und wird nur aus
-     * technischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr ist der Vorzug zu geben. </p>
+     * @see     #YEAR_OF_CYCLE
+     * @see     CommonElements#RELATED_GREGORIAN_YEAR
      */
-    @FormattableElement(format = "y")
-    static final StdCalendarElement<Integer, VietnameseCalendar> YEAR_OF_ERA =
+    public static final ChronoElement<Integer> CYCLE =
         new StdIntegerDateElement<>(
-            "YEAR_OF_ERA",
+            "CYCLE",
             VietnameseCalendar.class,
-            1,
-            5636,
-            'y',
+            75,
+            94,
+            '\u0000',
             null,
             null);
 
@@ -382,13 +377,9 @@ public final class VietnameseCalendar
                 VietnameseCalendar.class,
                 new Merger(),
                 CALSYS)
-//            .appendElement(
-//                ERA,
-//                new EraRule())
-//            .appendElement(
-//                YEAR_OF_ERA,
-//                null,
-//                Unit.YEARS)
+            .appendElement(
+                CYCLE,
+                EastAsianCalendar.getCycleRule(YEAR_OF_CYCLE))
             .appendElement(
                 YEAR_OF_CYCLE,
                 EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
@@ -490,12 +481,8 @@ public final class VietnameseCalendar
         int dayOfMonth
     ) {
 
-        int extYear = year.getElapsedCyclicYears() + 1;
-        int cycle = MathUtils.floorDivide(extYear - 1, 60) + 1;
-        int yearOfCycle = MathUtils.floorModulo(extYear, 60);
-        if (yearOfCycle == 0) {
-            yearOfCycle = 60;
-        }
+        int cycle = year.getCycle();
+        int yearOfCycle = year.getYearOfCycle().getNumber();
         return VietnameseCalendar.of(cycle, yearOfCycle, month, dayOfMonth);
 
     }
@@ -527,28 +514,27 @@ public final class VietnameseCalendar
     /**
      * <p>Queries if given parameter values form a well defined calendar date. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles
-     * @param   yearOfCycle the year of associated sexagesimal cycle
+     * @param   year        the year to be checked
      * @param   month       the month to be checked
      * @param   dayOfMonth  the day of month to be checked
-     * @return  {@code true} if valid else  {@code false}
+     * @return  {@code true} if valid else {@code false}
      */
     /*[deutsch]
      * <p>Pr&uuml;ft, ob die angegebenen Parameter ein wohldefiniertes Kalenderdatum beschreiben. </p>
      *
-     * @param   cycle       the count of sexagesimal year cycles
-     * @param   yearOfCycle the year of associated sexagesimal cycle
+     * @param   year        the year to be checked
      * @param   month       the month to be checked
      * @param   dayOfMonth  the day of month to be checked
-     * @return  {@code true} if valid else  {@code false}
+     * @return  {@code true} if valid else {@code false}
      */
     public static boolean isValid(
-        int cycle,
-        int yearOfCycle,
+        EastAsianYear year,
         EastAsianMonth month,
         int dayOfMonth
     ) {
 
+        int cycle = year.getCycle();
+        int yearOfCycle = year.getYearOfCycle().getNumber();
         return CALSYS.isValid(cycle, yearOfCycle, month, dayOfMonth);
 
     }
@@ -747,17 +733,12 @@ public final class VietnameseCalendar
 
         @Override
         public long getMinimumSinceUTC() {
-
             return MIN_LIMIT;
-
         }
 
         @Override
         public List<CalendarEra> getEras() {
-
-            // TODO: implementieren
             return Collections.emptyList();
-
         }
 
         @Override
@@ -858,7 +839,7 @@ public final class VietnameseCalendar
             boolean preparsing
         ) {
 
-            int cyear = entity.getInt(YEAR_OF_ERA);
+            int cyear = 0; //entity.getInt(YEAR_OF_ERA);
 
             if (cyear == Integer.MIN_VALUE) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
