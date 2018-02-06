@@ -21,36 +21,25 @@
 
 package net.time4j.calendar;
 
-import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
-import net.time4j.base.TimeSource;
-import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.FormattableElement;
-import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
-import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
-import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TextElement;
 import net.time4j.tz.OffsetSign;
-import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -783,53 +772,16 @@ public final class VietnameseCalendar
     }
 
     private static class Merger
-        implements ChronoMerger<VietnameseCalendar> {
+        extends AbstractMergerEA<VietnameseCalendar> {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Merger() {
+            super(VietnameseCalendar.class);
+
+        }
 
         //~ Methoden ------------------------------------------------------
-
-        @Override
-        public String getFormatPattern(
-            DisplayStyle style,
-            Locale locale
-        ) {
-
-            return GenericDatePatterns.get("vietnamese", style, locale);
-
-        }
-
-        @Override
-        public VietnameseCalendar createFrom(
-            TimeSource<?> clock,
-            AttributeQuery attributes
-        ) {
-
-            TZID tzid;
-
-            if (attributes.contains(Attributes.TIMEZONE_ID)) {
-                tzid = attributes.get(Attributes.TIMEZONE_ID);
-            } else if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
-                tzid = Timezone.ofSystem().getID();
-            } else {
-                return null;
-            }
-
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
-            return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public VietnameseCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
 
         @Override
         public VietnameseCalendar createFrom(
@@ -839,73 +791,41 @@ public final class VietnameseCalendar
             boolean preparsing
         ) {
 
-            int cyear = 0; //entity.getInt(YEAR_OF_ERA);
+            EastAsianYear eastAsianYear = null;
+            int relgregyear = entity.getInt(CommonElements.RELATED_GREGORIAN_YEAR);
 
-            if (cyear == Integer.MIN_VALUE) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
-                return null;
-            }
-
-            if (entity.contains(MONTH_OF_YEAR)) {
-                int cmonth = 1; // entity.get(MONTH_OF_YEAR).getValue();
-                int cdom = entity.getInt(DAY_OF_MONTH);
-
-                if (cdom != Integer.MIN_VALUE) {
-//                    if (CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
-//                        return ChineseCalendar.of(cyear, cmonth, cdom);
-//                    } else {
-//                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
-//                    }
+            if (relgregyear == Integer.MIN_VALUE) {
+                if (entity.contains(YEAR_OF_CYCLE)) {
+                    CyclicYear cy = entity.get(YEAR_OF_CYCLE);
+                    int cycle = entity.getInt(CYCLE);
+                    if (cycle != Integer.MIN_VALUE) {
+                        eastAsianYear = cy.inCycle(cycle);
+                    }
                 }
             } else {
-                int cdoy = entity.getInt(DAY_OF_YEAR);
-                if (cdoy != Integer.MIN_VALUE) {
-                    if (cdoy > 0) {
-                        int cmonth = 1;
-                        int daycount = 0;
-                        while (cmonth <= 13) {
-                            int len = 0; //CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
-                            if (cdoy > daycount + len) {
-                                cmonth++;
-                                daycount += len;
-                            } else {
-                                return null; // ChineseCalendar.of(cyear, cmonth, cdoy - daycount);
-                            }
-                        }
-                    }
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+                eastAsianYear = EastAsianYear.forGregorian(relgregyear);
+            }
+
+            if (eastAsianYear == null) {
+                entity.with(
+                    ValidationElement.ERROR_MESSAGE,
+                    "Cannot determine East Asian year.");
+                return null;
+            } else if (entity.contains(MONTH_OF_YEAR)) {
+                EastAsianMonth month = entity.get(MONTH_OF_YEAR);
+                int dom = entity.getInt(DAY_OF_MONTH);
+                if (dom != Integer.MIN_VALUE) {
+                    return VietnameseCalendar.of(eastAsianYear, month, dom);
+                }
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+                if ((doy != Integer.MIN_VALUE) && (doy >= 1)) {
+                    VietnameseCalendar cc = VietnameseCalendar.of(eastAsianYear, EastAsianMonth.valueOf(1), 1);
+                    return cc.plus(doy - 1, Unit.DAYS);
                 }
             }
 
             return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(VietnameseCalendar context, AttributeQuery attributes) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
-
-        }
-
-        @Override
-        public StartOfDay getDefaultStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
-
-        }
-
-        @Override
-        public int getDefaultPivotYear() {
-
-            return 100; // two-digit-years are effectively switched off
 
         }
 
