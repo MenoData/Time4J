@@ -7,13 +7,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.BufferedWriter;
-import java.io.FileOutputStream;
-import java.io.IOException;
-import java.io.OutputStreamWriter;
-import java.util.LinkedHashMap;
-import java.util.Map;
-
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -91,6 +84,8 @@ public class ChineseMiscellaneousTest {
 //        }
     }
 
+/* Generating method for leap month infos
+
     @Test
     public void createLeapMonthInfos() throws IOException {
         write();
@@ -115,7 +110,7 @@ public class ChineseMiscellaneousTest {
 
         BufferedWriter writer =
             new BufferedWriter(
-                new OutputStreamWriter(new FileOutputStream("C:\\work\\vietnamese-leap.txt"), "UTF-8")
+                new OutputStreamWriter(new FileOutputStream("C:\\work\\chinese-leap.txt"), "UTF-8")
             );
         int i = 0;
 
@@ -133,12 +128,15 @@ public class ChineseMiscellaneousTest {
 
         writer.close();
     }
+*/
 
     @Test
     public void minmax(){
         ChineseCalendar min = ChineseCalendar.axis().getMinimum();
         assertThat(min.getCycle(), is(72));
         assertThat(min.getYear().getNumber(), is(22));
+        assertThat(min.get(ChineseCalendar.CYCLE), is(72));
+        assertThat(min.getMinimum(ChineseCalendar.CYCLE), is(72));
         assertThat(min.getMinimum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(22)));
         assertThat(min.getMaximum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(60)));
         System.out.println(min);
@@ -146,9 +144,45 @@ public class ChineseMiscellaneousTest {
         ChineseCalendar max = ChineseCalendar.axis().getMaximum();
         assertThat(max.getCycle(), is(94));
         assertThat(max.getYear().getNumber(), is(56));
+        assertThat(max.get(ChineseCalendar.CYCLE), is(94));
+        assertThat(max.getMaximum(ChineseCalendar.CYCLE), is(94));
         assertThat(max.getMinimum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(1)));
         assertThat(max.getMaximum(ChineseCalendar.YEAR_OF_CYCLE), is(CyclicYear.of(56)));
         System.out.println(max);
+    }
+
+    @Test
+    public void yongzheng() {
+        PlainDate d = PlainDate.of(1723, 7, 1);
+        ChineseCalendar cc = d.transform(ChineseCalendar.axis()).with(ChineseCalendar.DAY_OF_YEAR, 1);
+        System.out.println(cc); // chinese[40(1723)-1-01]
+        System.out.println(cc.transform(PlainDate.axis())); // 1723-02-05
+        System.out.println(EastAsianYear.forGregorian(2018).getElapsedCyclicYears() + 1); // 4655 = 4716 - 60 - 1
+        System.out.println(EastAsianYear.forGregorian(1998).getElapsedCyclicYears() + 1); // 4635
+        System.out.println(EastAsianYear.forGregorian(-2636).getElapsedCyclicYears()); // 0
+
+        int[] years = {1662, 1723, 1736, 1796, 1821, 1851, 1862, 1875, 1909, 1912};
+        for (int i = 0; i < years.length; i++) {
+            System.out.println(
+                ChineseCalendar.of(EastAsianYear.forGregorian(years[i]), EastAsianMonth.valueOf(1), 1)
+                    .transform(PlainDate.axis())
+            );
+        }
+        System.out.println();
+        System.out.println(PlainDate.of(1912, 2, 12).getDaysSinceEpochUTC());
+
+/*
+        1662-02-18
+        1723-02-05
+        1736-02-12
+        1796-02-09
+        1821-02-03
+        1851-02-01
+        1862-01-30
+        1875-02-06
+        1909-01-22
+        1912-02-18
+*/
     }
 
 }

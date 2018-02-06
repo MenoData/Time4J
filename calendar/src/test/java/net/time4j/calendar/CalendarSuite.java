@@ -12,6 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         AstroSuite.class,
         CalendarOverrideTest.class,
+        ChineseMiscellaneousTest.class,
+        ChineseYearTest.class,
         ClockTest.class,
         CopticCalendarTest.class,
         CopticMiscellaneousTest.class,

@@ -152,4 +152,17 @@ public class EraNameTest {
             is("शक"));
     }
 
+    @Test
+    public void getDisplayNameChinese() {
+        assertThat(
+            ChineseEra.QING_SHUNZHI_1644_1662.getDisplayName(Locale.ROOT),
+            is("Shunzhi"));
+        assertThat(
+            ChineseEra.QING_SHUNZHI_1644_1662.getDisplayName(Locale.ENGLISH),
+            is("Shùnzhì"));
+        assertThat(
+            ChineseEra.QING_SHUNZHI_1644_1662.getDisplayName(Locale.CHINA),
+            is("順治"));
+    }
+
 }

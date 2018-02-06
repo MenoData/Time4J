@@ -1107,7 +1107,7 @@ public final class ChineseCalendar
                             }
                         }
                     } else {
-                        eastAsianYear = () -> (cycle - 1) * 60 + cy.getNumber() - 1;
+                        eastAsianYear = cy.inCycle(cycle);
                     }
                 } else if (entity.contains(ERA)) {
                     int yoe = entity.getInt(YEAR_OF_ERA);
