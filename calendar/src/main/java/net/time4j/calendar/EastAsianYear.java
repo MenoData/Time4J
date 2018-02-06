@@ -29,12 +29,16 @@ import net.time4j.base.MathUtils;
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
+ * @see     CyclicYear#inQingDynasty(ChineseEra)
+ * @see     CyclicYear#inCycle(int)
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert einen Weg, das Jahr im chinesischen Kalender oder dessen Ableitungen anzugeben. </p>
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
+ * @see     CyclicYear#inQingDynasty(ChineseEra)
+ * @see     CyclicYear#inCycle(int)
  */
 @FunctionalInterface
 public interface EastAsianYear {
@@ -46,7 +50,6 @@ public interface EastAsianYear {
      *
      * @param   relatedGregorianYear    the gregorian calendar year which contains the first day of East Asian year
      * @return  EastAsianYear
-     * @throws  IllegalArgumentException if the year is out of range of Chinese calendar
      */
     /*[deutsch]
      * <p>Bestimmt das ostasiatische Jahr, das dem angegebenen gregorianischen Kalenderjahr entspricht, so da&szlig;
@@ -54,13 +57,9 @@ public interface EastAsianYear {
      *
      * @param   relatedGregorianYear    the gregorian calendar year which contains the first day of East Asian year
      * @return  EastAsianYear
-     * @throws  IllegalArgumentException if the year is out of range of Chinese calendar
      */
     static EastAsianYear forGregorian(int relatedGregorianYear) {
-        if (relatedGregorianYear < 1645 || relatedGregorianYear > 2999) {
-            throw new IllegalArgumentException("Related gregorian year out of range: " + relatedGregorianYear);
-        }
-        return () -> relatedGregorianYear + 2636;
+        return () -> MathUtils.safeAdd(relatedGregorianYear, 2636);
     }
 
     /**

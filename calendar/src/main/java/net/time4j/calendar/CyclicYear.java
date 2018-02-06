@@ -132,7 +132,8 @@ public final class CyclicYear
         LANGS_WITHOUT_SEP = Collections.unmodifiableSet(set);
     }
 
-    private static final long serialVersionUID = 6677607109702604931L;
+    // TODO: evaluate again
+    // private static final long serialVersionUID = 6677607109702604931L;
 
     //~ Instanzvariablen ------------------------------------------------------
 
@@ -384,6 +385,9 @@ public final class CyclicYear
     /**
      * <p>Obtains an unambivalent year reference for given Qing dynasty. </p>
      *
+     * <p>Note: The years AD 1662 and AD 1722 have the same cyclic year so an unambivalent year reference
+     * cannot be determined. This is because the Kangxi-era was 61 years long. </p>
+     *
      * @param   era    the Chinese era representing a historic Qing dynasty
      * @return  EastAsianYear
      * @throws  IllegalArgumentException if the era is not a Qing dynasty or if the combination of this cyclic year
@@ -391,6 +395,9 @@ public final class CyclicYear
      */
     /*[deutsch]
      * <p>Liefert eine eindeutige Jahresreferenz zur angegebenen Qing-Dynastie. </p>
+     *
+     * <p>Hinweis: Die Jahre AD 1662 und AD 1722 haben das gleiche zyklische Jahr, so da&szlig; eine eindeutige
+     * Jahresreferenz unm&ouml;glich ist. Das ist durch die L&auml;nge der Kangxi-&Auml;ra von 61 Jahren bedingt. </p>
      *
      * @param   era    the Chinese era representing a historic Qing dynasty
      * @return  EastAsianYear
@@ -402,10 +409,11 @@ public final class CyclicYear
         if (era.isQingDynasty()) {
             if ((era == ChineseEra.QING_KANGXI_1662_1723) && (this.year == 39)){
                 throw new IllegalArgumentException(
-                    "Ambivalent cyclic year in Kangxi-era: " + this.getDisplayName(Locale.ROOT));
+                    "Ambivalent cyclic year in Kangxi-era (1662 or 1722): " + this.getDisplayName(Locale.ROOT));
             } else {
-                int relgregyear = era.getStartAsGregorianYear() + this.year - 1;
-                return () -> relgregyear + 2636; // TODO: falsch (berichtigen)
+                int start = era.getStartAsGregorianYear();
+                int delta = this.year - EastAsianYear.forGregorian(start).getYearOfCycle().getNumber();
+                return () -> start + delta + ((delta < 0) ? 2696 : 2636);
             }
         } else {
             throw new IllegalArgumentException("Chinese era must be related to a Qing dynasty.");
@@ -413,10 +421,28 @@ public final class CyclicYear
 
     }
 
-    public static void main(String[] args) {
-        System.out.println(EastAsianYear.forGregorian(1662).getYearOfCycle());
-        System.out.println(EastAsianYear.forGregorian(1722).getYearOfCycle());
-        System.out.println(CyclicYear.of(40).inQingDynasty(ChineseEra.QING_KANGXI_1662_1723).getYearOfCycle());
+    /**
+     * <p>Obtains a year reference for given cycle number (technical identifier). </p>
+     *
+     * @param   cycle   number of sexagesimal year cycle
+     * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the cycle is smaller than {@code 1}
+     */
+    /*[deutsch]
+     * <p>Liefert eine Jahresreferenz zur angegebenen Jahreszyklusnummer (technisches Kennzeichen). </p>
+     *
+     * @param   cycle   number of sexagesimal year cycle
+     * @return  EastAsianYear
+     * @throws  IllegalArgumentException if the cycle is smaller than {@code 1}
+     */
+    public EastAsianYear inCycle(int cycle) {
+
+        if (cycle < 1) {
+            throw new IllegalArgumentException("Cycle number must not be smaller than 1: " + cycle);
+        }
+
+        return () -> (cycle - 1) * 60 + this.year - 1;
+
     }
 
     @Override
@@ -447,7 +473,7 @@ public final class CyclicYear
     @Override
     public String toString() {
 
-        return String.valueOf(this.year);
+        return this.getDisplayName(Locale.ROOT) + "(" + String.valueOf(this.year) + ")";
 
     }
 
