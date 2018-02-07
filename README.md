@@ -147,6 +147,8 @@ Support for alternative calendars:
 - Persian (3000 years)
 - ThaiSolar (Suriyakati), also valid before 1941
 
+Coming soon: Chinese, Korean and Vietnamese calendar
+
 Plans for next releases:
 ------------------------
 
