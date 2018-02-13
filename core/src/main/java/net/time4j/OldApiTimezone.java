@@ -30,7 +30,7 @@ import java.util.List;
 
 
 /**
- * <p>Spezialimplementierung, die die Daten und Regeln einer Time4J-Zeitzone im Gewand des alten API bewahrt.. </p>
+ * <p>Spezialimplementierung, die die Daten und Regeln einer Time4J-Zeitzone im Gewand des alten API bewahrt. </p>
  *
  * @author      Meno Hochschild
  * @since       3.37/4.32
