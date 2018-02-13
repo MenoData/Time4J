@@ -137,7 +137,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *     ChronoFormatter&lt;JapaneseCalendar&gt; formatter =
  *       ChronoFormatter.ofPattern(
  *         &quot;MMMM/dd, G y&quot;,
- *         PatternType.NON_ISO_DATE,
+ *         PatternType.CLDR_DATE,
  *         Locale.ENGLISH,
  *         JapaneseCalendar.axis());
  *     JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 14);
@@ -146,7 +146,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *     ChronoFormatter&lt;JapaneseCalendar&gt; parser =
  *       ChronoFormatter.ofPattern(
  *         &quot;Gy年M月d日&quot;,
- *         PatternType.NON_ISO_DATE,
+ *         PatternType.CLDR_DATE,
  *         Locale.JAPANESE,
  *         JapaneseCalendar.axis()
  *       ).with(Leniency.LAX); // use parsed nengo (attention: Ansei-1 == Kaei-7)
@@ -225,7 +225,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *     ChronoFormatter&lt;JapaneseCalendar&gt; formatter =
  *       ChronoFormatter.ofPattern(
  *         &quot;MMMM/dd, G y&quot;,
- *         PatternType.NON_ISO_DATE,
+ *         PatternType.CLDR_DATE,
  *         Locale.ENGLISH,
  *         JapaneseCalendar.axis());
  *     JapaneseCalendar jcal = JapaneseCalendar.ofGregorian(Nengo.HEISEI, 29, 4, 14);
@@ -234,7 +234,7 @@ import static net.time4j.calendar.Nengo.Selector.*;
  *     ChronoFormatter&lt;JapaneseCalendar&gt; parser =
  *       ChronoFormatter.ofPattern(
  *         &quot;Gy年M月d日&quot;,
- *         PatternType.NON_ISO_DATE,
+ *         PatternType.CLDR_DATE,
  *         Locale.JAPANESE,
  *         JapaneseCalendar.axis()
  *       ).with(Leniency.LAX); // verwende den Original-Nengo (beachte: Ansei-1 == Kaei-7)

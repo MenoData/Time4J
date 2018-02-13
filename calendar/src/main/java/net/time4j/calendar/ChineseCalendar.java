@@ -103,7 +103,7 @@ import java.util.Map;
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, 8 12, 2017(dīng-yǒu)&quot;));
+ *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -154,7 +154,7 @@ import java.util.Map;
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, 8 12, 2017(dīng-yǒu)&quot;));
+ *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
