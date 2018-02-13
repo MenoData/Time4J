@@ -91,22 +91,22 @@ import java.util.Map;
  * <h4>Example of usage</h4>
  *
  * <pre>
- *     ChronoFormatter&lt;ChineseCalendar&gt; formatter =
- *       ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(VietnameseCalendar.axis(), Locale.ENGLISH)
+ *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     ChineseCalendar chineseDate = today.transform(ChineseCalendar.class);
- *     System.out.println(formatter.format(chineseDate));
+ *     VietnameseCalendar vietDate = today.transform(VietnameseCalendar.class);
+ *     System.out.println(formatter.format(vietDate));
  * </pre>
  *
  * <h4>Support for unicode ca-extensions</h4>
  *
  * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnamese&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, Tout 21, 1734 A.M.&quot;));
+ *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -154,29 +154,29 @@ import java.util.Map;
  * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
- *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
- *       ChronoFormatter.setUp(CopticCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(VietnameseCalendar.axis(), Locale.ENGLISH)
+ *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // Konversion zu 12 Uhr mittags
- *     System.out.println(formatter.format(copticDate));
+ *     VietnameseCalendar vietDate = today.transform(VietnameseCalendar.class);
+ *     System.out.println(formatter.format(vietDate));
  * </pre>
  *
  * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
  *
  * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnamese&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, Tout 21, 1734 A.M.&quot;));
+ *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
  * @doctags.concurrency {immutable}
  */
-@CalendarType("vietnamese")
+@CalendarType("vietnam")
 public final class VietnameseCalendar
     extends EastAsianCalendar<VietnameseCalendar.Unit, VietnameseCalendar>
     implements LocalizedPatternSupport {

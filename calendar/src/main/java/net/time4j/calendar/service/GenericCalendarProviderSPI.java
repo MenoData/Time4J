@@ -92,7 +92,7 @@ public class GenericCalendarProviderSPI
                 return Optional.of(PersianCalendar.axis());
             case "roc":
                 return Optional.of(MinguoCalendar.axis());
-            case "vietnamese":
+            case "vietnam":
                 return Optional.of(VietnameseCalendar.axis());
             default:
                 return Optional.empty();

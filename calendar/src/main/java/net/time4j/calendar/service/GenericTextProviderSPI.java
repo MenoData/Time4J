@@ -109,7 +109,7 @@ public final class GenericTextProviderSPI
         types.add("japanese");
         types.add("persian");
         types.add("roc");
-        types.add("vietnamese");
+        types.add("vietnam");
         TYPES = Collections.unmodifiableSet(types);
     }
 
@@ -165,7 +165,7 @@ public final class GenericTextProviderSPI
             return months.toArray(new String[months.size()]);
         } else if (calendarType.equals("japanese")) {
             return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
-        } else if (calendarType.equals("dangi") || calendarType.equals("vietnamese")) {
+        } else if (calendarType.equals("dangi") || calendarType.equals("vietnam")) {
             calendarType = "chinese"; // Umleitung
         }
 
@@ -238,7 +238,7 @@ public final class GenericTextProviderSPI
         TextWidth tw
     ) {
 
-        if (calendarType.equals("chinese") || calendarType.equals("dangi") || calendarType.equals("vietnamese")) {
+        if (calendarType.equals("chinese") || calendarType.equals("dangi") || calendarType.equals("vietnam")) {
             return EMPTY_STRINGS; // special handling in era elements of East Asian calendars
         } else if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
             if (tw == TextWidth.NARROW) {

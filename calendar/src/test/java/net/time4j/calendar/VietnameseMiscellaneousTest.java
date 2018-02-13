@@ -2,10 +2,15 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.EpochDays;
+import net.time4j.format.DisplayMode;
+import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -106,6 +111,15 @@ public class VietnameseMiscellaneousTest {
         assertThat(max.get(VietnameseCalendar.DAY_OF_YEAR), is(355));
         assertThat(max.get(VietnameseCalendar.MONTH_OF_YEAR), is(EastAsianMonth.valueOf(12)));
         assertThat(max.get(VietnameseCalendar.CYCLE), is(94));
+    }
+
+    @Test
+    public void caSupport() {
+        Locale locale = Locale.forLanguageTag("en-u-ca-vietnam");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2017, 10, 1)),
+            is("Sunday, M08 12, 2017(dīng-yǒu)"));
     }
 
 }
