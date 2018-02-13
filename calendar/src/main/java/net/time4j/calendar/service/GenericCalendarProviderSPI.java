@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericCalendarProviderSPI.java) is part of project Time4J.
  *
@@ -21,6 +21,7 @@
 
 package net.time4j.calendar.service;
 
+import net.time4j.calendar.ChineseCalendar;
 import net.time4j.calendar.CopticCalendar;
 import net.time4j.calendar.EthiopianCalendar;
 import net.time4j.calendar.HebrewCalendar;
@@ -29,9 +30,11 @@ import net.time4j.calendar.HistoricCalendar;
 import net.time4j.calendar.IndianCalendar;
 import net.time4j.calendar.JapaneseCalendar;
 import net.time4j.calendar.JulianCalendar;
+import net.time4j.calendar.KoreanCalendar;
 import net.time4j.calendar.MinguoCalendar;
 import net.time4j.calendar.PersianCalendar;
 import net.time4j.calendar.ThaiSolarCalendar;
+import net.time4j.calendar.VietnameseCalendar;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarProvider;
 import net.time4j.engine.Chronology;
@@ -56,8 +59,12 @@ public class GenericCalendarProviderSPI
         switch (name) {
             case "buddhist":
                 return Optional.of(ThaiSolarCalendar.axis());
+            case "chinese":
+                return Optional.of(ChineseCalendar.axis());
             case "coptic":
                 return Optional.of(CopticCalendar.axis());
+            case "dangi":
+                return Optional.of(KoreanCalendar.axis());
             case "ethiopic":
             case "ethioaa":
             case "ethiopic-amete-alem":
@@ -85,6 +92,8 @@ public class GenericCalendarProviderSPI
                 return Optional.of(PersianCalendar.axis());
             case "roc":
                 return Optional.of(MinguoCalendar.axis());
+            case "vietnamese":
+                return Optional.of(VietnameseCalendar.axis());
             default:
                 return Optional.empty();
         }

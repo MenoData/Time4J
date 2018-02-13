@@ -2,10 +2,15 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
+import net.time4j.engine.CalendarDate;
 import net.time4j.engine.EpochDays;
+import net.time4j.format.DisplayMode;
+import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -183,6 +188,15 @@ public class ChineseMiscellaneousTest {
         1909-01-22
         1912-02-18
 */
+    }
+
+    @Test
+    public void caSupport() {
+        Locale locale = Locale.forLanguageTag("en-u-ca-chinese");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2017, 10, 1)),
+            is("Sunday, M08 12, 2017(dīng-yǒu)"));
     }
 
 }

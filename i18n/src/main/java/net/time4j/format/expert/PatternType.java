@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -1726,25 +1726,17 @@ public enum PatternType
                 addQuarterOfYear(builder, count);
                 break;
             case 'q':
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    addQuarterOfYear(builder, count);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                addQuarterOfYear(builder, count);
+                builder.endSection();
                 break;
             case 'M':
                 addMonth(builder, Math.min(count, sdf ? 4 : count));
                 break;
             case 'L':
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    addMonth(builder, count);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                addMonth(builder, Math.min(count, sdf ? 4 : count));
+                builder.endSection();
                 break;
             case 'w':
                 if (count <= 2) {
@@ -1824,16 +1816,13 @@ public enum PatternType
                 }
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    if (count == 1) {
-                        builder.addFixedNumerical(
-                            Weekmodel.of(locale).localDayOfWeek(), 1);
-                    } else {
-                        cldrISO(builder, chronology, locale, 'E', count, sdf);
-                    }
-                } finally {
-                    builder.endSection();
+                if (count == 1) {
+                    builder.addFixedNumerical(
+                        Weekmodel.of(locale).localDayOfWeek(), 1);
+                } else {
+                    cldrISO(builder, chronology, locale, 'E', count, sdf);
                 }
+                builder.endSection();
                 break;
             case 'a':
                 width = (sdf ? TextWidth.ABBREVIATED : getPeriodWidth(count));
@@ -2010,6 +1999,7 @@ public enum PatternType
             case 'Q':
             case 'q':
             case 'r':
+            case 'U':
             case 'g':
             case 'e':
             case 'c':
@@ -2134,13 +2124,9 @@ public enum PatternType
                     throw new IllegalArgumentException(
                         "Invalid pattern count of 2 for symbol 'c'.");
                 }
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    threeten(builder, chronology, locale, 'e', count);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection( Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                threeten(builder, chronology, locale, 'e', count);
+                builder.endSection();
                 break;
             case 'a':
                 width = getPeriodWidth(count);
@@ -2468,16 +2454,12 @@ public enum PatternType
                 builder.endSection();
                 break;
             case 'M':
-                addMonth(builder, Math.min(count, count), textElement);
+                addMonth(builder, count, textElement);
                 break;
             case 'L':
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    addMonth(builder, count, textElement);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                addMonth(builder, count, textElement);
+                builder.endSection();
                 break;
             case 'w':
                 addNumber(intElement, symbol, builder, count, false);
@@ -2536,16 +2518,13 @@ public enum PatternType
                 }
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    if (count == 1) {
-                        ChronoElement<Weekday> wde = cast(element);
-                        builder.addFixedNumerical(wde, 1);
-                    } else {
-                        general(builder, chronology, 'E', count, locale);
-                    }
-                } finally {
-                    builder.endSection();
+                if (count == 1) {
+                    ChronoElement<Weekday> wde = cast(element);
+                    builder.addFixedNumerical(wde, 1);
+                } else {
+                    general(builder, chronology, 'E', count, locale);
                 }
+                builder.endSection();
                 break;
             case 'F':
                 if (count == 1) {
