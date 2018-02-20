@@ -1,5 +1,6 @@
 ## [v3.40] not yet released
 ### Added
+- Optimize chronological extensions during parsing [#749]
 - Improved localization for French Rev. calendar [#741]
 
 ## [v3.39] published on 2018-01-15
