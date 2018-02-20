@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekExtension.java) is part of project Time4J.
  *
@@ -65,6 +65,13 @@ class WeekExtension
     ) {
 
         return entity; // no-op
+
+    }
+
+    @Override
+    public boolean canResolve(ChronoElement<?> element) {
+
+        return false;
 
     }
 

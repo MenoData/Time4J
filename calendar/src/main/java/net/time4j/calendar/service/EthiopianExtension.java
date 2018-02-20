@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianExtension.java) is part of project Time4J.
  *
@@ -80,6 +80,13 @@ public class EthiopianExtension
         }
 
         return entity;
+
+    }
+
+    @Override
+    public boolean canResolve(ChronoElement<?> element) {
+
+        return EthiopianTime.ETHIOPIAN_HOUR.equals(element);
 
     }
 
