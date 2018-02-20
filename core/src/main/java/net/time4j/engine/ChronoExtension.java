@@ -21,6 +21,8 @@
 
 package net.time4j.engine;
 
+import net.time4j.format.Attributes;
+
 import java.util.Locale;
 import java.util.Set;
 
@@ -134,5 +136,38 @@ public interface ChronoExtension {
         Locale locale,
         AttributeQuery attributes
     );
+
+    /**
+     * <p>Gives a hint to the parser if the element in question can be resolved by {@code resolve()}. </p>
+     *
+     * <p>This method serves for optimization purpose and helps the parser to decide if this extension
+     * is needed during parsing. Subclasses should override this method in most cases. </p>
+     *
+     * @param   element     the element to be checked
+     * @return  {@code true} if this extension can resolve given element else {@code false}
+     * @see     #resolve(ChronoEntity, Locale, AttributeQuery)
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>Gibt dem Textinterpretierer einen Hinweis, ob das fragliche Element mittels
+     * {@code resolve()} aufgel&ouml;st werden kann. </p>
+     *
+     * <p>Diese Methode dient der Optimierung des Interpretationsvorgangs und hilft zu entscheiden,
+     * ob diese chronologische Erweiterung &uuml;berhaupt gebraucht wird. Subklassen sollten diese
+     * Methode in der Regel &uuml;berschreiben. </p>
+     *
+     * @param   element     the element to be checked
+     * @return  {@code true} if this extension can resolve given element else {@code false}
+     * @see     #resolve(ChronoEntity, Locale, AttributeQuery)
+     * @since   3.40/4.35
+     */
+    default boolean canResolve(ChronoElement<?> element) {
+        for (ChronoElement<?> e : this.getElements(Locale.ROOT, Attributes.empty())) {
+            if (e.getClass().equals(element.getClass())) {
+                return true;
+            }
+        }
+        return false;
+    }
 
 }
