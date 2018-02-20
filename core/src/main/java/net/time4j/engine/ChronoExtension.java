@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoExtension.java) is part of project Time4J.
  *
@@ -134,5 +134,31 @@ public interface ChronoExtension {
         Locale locale,
         AttributeQuery attributes
     );
+
+    /**
+     * <p>Gives a hint to the parser if the element in question can be resolved by {@code resolve()}. </p>
+     *
+     * <p>This method serves for optimization purpose and helps the parser to decide if this extension
+     * is needed during parsing. Subclasses should override this method in most cases. </p>
+     *
+     * @param   element     the element to be checked
+     * @return  {@code true} if this extension can resolve given element else {@code false}
+     * @see     #resolve(ChronoEntity, Locale, AttributeQuery)
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>Gibt dem Textinterpretierer einen Hinweis, ob das fragliche Element mittels
+     * {@code resolve()} aufgel&ouml;st werden kann. </p>
+     *
+     * <p>Diese Methode dient der Optimierung des Interpretationsvorgangs und hilft zu entscheiden,
+     * ob diese chronologische Erweiterung &uuml;berhaupt gebraucht wird. Subklassen sollten diese
+     * Methode in der Regel &uuml;berschreiben. </p>
+     *
+     * @param   element     the element to be checked
+     * @return  {@code true} if this extension can resolve given element else {@code false}
+     * @see     #resolve(ChronoEntity, Locale, AttributeQuery)
+     * @since   3.40/4.35
+     */
+    boolean canResolve(ChronoElement<?> element);
 
 }

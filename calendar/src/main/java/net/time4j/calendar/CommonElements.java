@@ -351,6 +351,13 @@ public class CommonElements {
 
         }
 
+        @Override
+        public boolean canResolve(ChronoElement<?> element) {
+
+            return false;
+
+        }
+
     }
 
     private static class CalendarWeekElement<T extends ChronoEntity<T>>

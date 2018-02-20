@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPeriod.java) is part of project Time4J.
  *
@@ -722,6 +722,11 @@ public final class DayPeriod {
             }
 
             return entity;
+        }
+
+        @Override
+        public boolean canResolve(ChronoElement<?> element) {
+            return (element instanceof Element);
         }
 
         private static int getHour12(ChronoEntity<?> entity) {

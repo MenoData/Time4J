@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFormatter.java) is part of project Time4J.
  *
@@ -63,7 +63,6 @@ import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
-import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
 import net.time4j.tz.NameStyle;
@@ -213,7 +212,6 @@ public final class ChronoFormatter<T>
     // serves for optimization
     private final boolean hasOptionals;
     private final boolean hasOrMarkers;
-    private final boolean needsHistorization;
     private final boolean needsExtensions;
     private final int countOfElements;
     private final Leniency leniency;
@@ -255,10 +253,9 @@ public final class ChronoFormatter<T>
         FractionProcessor fp = null;
         boolean ho = false;
         boolean hm = false;
-        boolean nh = false;
-        boolean dp = false;
-        int co = 0;
+        boolean ne = false;
         boolean ix = true;
+        int co = 0;
 
         for (FormatStep step : steps) {
             if (step.isNewOrBlockStarted()) {
@@ -276,10 +273,8 @@ public final class ChronoFormatter<T>
                 if (ix && !ParsedValues.isIndexed(element)) {
                     ix = false;
                 }
-                if (element instanceof DualFormatElement) {
-                    nh = true;
-                } else if (!dp && element.name().endsWith("_DAY_PERIOD")) {
-                    dp = true;
+                if (!ne) {
+                    ne = needsExtension(chronology, override, element);
                 }
             }
         }
@@ -287,21 +282,9 @@ public final class ChronoFormatter<T>
         this.fracproc = fp;
         this.hasOptionals = ho;
         this.hasOrMarkers = hm;
-        this.needsHistorization = nh;
+        this.needsExtensions = ne;
         this.countOfElements = co;
         this.indexable = ix;
-
-        Class<?> chronoType = chronology.getChronoType();
-
-        if (PlainDate.class.isAssignableFrom(chronoType)) {
-            this.needsExtensions = (nh || (chronology.getExtensions().size() > 2));
-        } else if (PlainTime.class.isAssignableFrom(chronoType)) {
-            this.needsExtensions = (dp || (chronology.getExtensions().size() > 1));
-        } else if (PlainTimestamp.class.isAssignableFrom(chronoType)) {
-            this.needsExtensions = (dp || nh || (chronology.getExtensions().size() > 3));
-        } else {
-            this.needsExtensions = true;
-        }
 
         this.trailing = this.globalAttributes.get(Attributes.TRAILING_CHARACTERS, Boolean.FALSE).booleanValue();
         this.noPreparser = this.hasNoPreparser();
@@ -350,8 +333,7 @@ public final class ChronoFormatter<T>
         this.fracproc = old.fracproc;
         this.hasOptionals = old.hasOptionals;
         this.hasOrMarkers = old.hasOrMarkers;
-        this.needsHistorization = (old.needsHistorization || (history != null));
-        this.needsExtensions = (old.needsExtensions || this.needsHistorization);
+        this.needsExtensions = (old.needsExtensions || (history != null));
         this.countOfElements = old.countOfElements;
 
         // update extension elements and historizable elements
@@ -453,7 +435,6 @@ public final class ChronoFormatter<T>
         this.fracproc = formatter.fracproc;
         this.hasOptionals = formatter.hasOptionals;
         this.hasOrMarkers = formatter.hasOrMarkers;
-        this.needsHistorization = formatter.needsHistorization;
         this.needsExtensions = formatter.needsExtensions;
         this.countOfElements = formatter.countOfElements;
         this.trailing = formatter.trailing;
@@ -3627,6 +3608,48 @@ public final class ChronoFormatter<T>
         }
 
         throw new IllegalArgumentException("Unsupported element: " + element.name());
+
+    }
+
+    private static boolean needsExtension(
+        Chronology<?> chronology,
+        Chronology<?> override,
+        ChronoElement<?> element
+    ) {
+
+        for (ChronoExtension ext : chronology.getExtensions()) {
+            if (ext.canResolve(element)) {
+                return true;
+            }
+        }
+
+        if (override == null) {
+            Chronology<?> child = chronology;
+            while ((child = child.preparser()) != null) {
+                for (ChronoExtension ext : child.getExtensions()) {
+                    if (ext.canResolve(element)) {
+                        return true;
+                    }
+                }
+            }
+        } else if (element.isDateElement()) {
+            while (override instanceof BridgeChronology) {
+                override = override.preparser();
+            }
+            for (ChronoExtension ext : override.getExtensions()) {
+                if (ext.canResolve(element)) {
+                    return true;
+                }
+            }
+        } else if (element.isTimeElement() && PlainTime.axis().isSupported(element)) {
+            for (ChronoExtension ext : PlainTime.axis().getExtensions()) {
+                if (ext.canResolve(element)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
 
     }
 
