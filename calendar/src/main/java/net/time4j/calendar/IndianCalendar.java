@@ -101,7 +101,7 @@ import java.util.Locale;
  * <pre>
  *     ChronoFormatter&lt;IndianCalendar&gt; formatter =
  *       ChronoFormatter.ofPattern(
- *         &quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE, Locale.ENGLISH, IndianCalendar.axis());
+ *         &quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE, Locale.ENGLISH, IndianCalendar.axis());
  *     PlainDate today = SystemClock.inLocalView().today();
  *     IndianCalendar indianDate = today.transform(IndianCalendar.class);
  *     System.out.println(formatter.format(indianDate));
@@ -160,7 +160,7 @@ import java.util.Locale;
  * <pre>
  *     ChronoFormatter&lt;IndianCalendar&gt; formatter =
  *       ChronoFormatter.ofPattern(
- *         &quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE, Locale.ENGLISH, IndianCalendar.axis());
+ *         &quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE, Locale.ENGLISH, IndianCalendar.axis());
  *     PlainDate today = SystemClock.inLocalView().today();
  *     IndianCalendar indianDate = today.transform(IndianCalendar.class);
  *     System.out.println(formatter.format(indianDate));
