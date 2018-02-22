@@ -68,6 +68,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     static final int MONTH_AS_ORDINAL_INDEX = 2;
     static final int CYCLE_INDEX = 3;
 
+    static final int UNIT_CYCLES = 0;
     static final int UNIT_YEARS = 1;
     static final int UNIT_MONTHS = 2;
     static final int UNIT_WEEKS = 3;
@@ -344,7 +345,8 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     public String toString() {
 
         StringBuilder sb = new StringBuilder();
-        sb.append(this.getClass().getAnnotation(CalendarType.class).value());
+        String ct = this.getClass().getAnnotation(CalendarType.class).value();
+        sb.append(ct.equals("dangi") ? "korean" : ct);
         sb.append('[');
         sb.append(this.getYear().getDisplayName(Locale.ROOT));
         sb.append('(');
@@ -366,7 +368,11 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     }
 
     static <D extends EastAsianCalendar<?, D>> ElementRule<D, CyclicYear> getYearOfCycleRule(ChronoElement<?> c) {
-        return new CyclicYearRule<>(c);
+        return new CyclicYearRule<>(c, false);
+    }
+
+    static <D extends EastAsianCalendar<?, D>> ElementRule<D, CyclicYear> getVietYearOfCycleRule(ChronoElement<?> c) {
+        return new CyclicYearRule<>(c, true);
     }
 
     static <D extends EastAsianCalendar<?, D>>  ElementRule<D, EastAsianMonth> getMonthOfYearRule(ChronoElement<?> c) {
@@ -519,7 +525,13 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
                         throw new IllegalArgumentException("Ordinal month out of range: " + value);
                     }
                 case CYCLE_INDEX:
-
+                    if (this.isValid(context, value)) {
+                        int delta = value - context.getCycle();
+                        UnitRule<D> rule = EastAsianCalendar.getUnitRule(UNIT_CYCLES);
+                        return rule.addTo(context, delta);
+                    } else {
+                        throw new IllegalArgumentException("Sexagesimal cycle out of range: " + value);
+                    }
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -601,13 +613,18 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         //~ Instanzvariablen ----------------------------------------------
 
         private final ChronoElement<?> child;
+        private final boolean vietnam;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private CyclicYearRule(ChronoElement<?> child) {
+        private CyclicYearRule(
+            ChronoElement<?> child,
+            boolean vietnam
+        ) {
             super();
 
             this.child = child;
+            this.vietnam = vietnam;
         }
 
         //~ Methoden ------------------------------------------------------
@@ -619,7 +636,11 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
         @Override
         public CyclicYear getMinimum(D context) {
-            return (context.getCycle() == 72) ? CyclicYear.of(22) : CyclicYear.of(1);
+            if (this.vietnam) {
+                return (context.getCycle() == 75) ? CyclicYear.of(10) : CyclicYear.of(1);
+            } else {
+                return (context.getCycle() == 72) ? CyclicYear.of(22) : CyclicYear.of(1);
+            }
         }
 
         @Override
@@ -787,6 +808,9 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
             EastAsianMonth month = date.getMonth();
 
             switch (this.index) {
+                case UNIT_CYCLES:
+                    amount = MathUtils.safeMultiply(amount, 60);
+                    // fall-through
                 case UNIT_YEARS:
                     long years = MathUtils.safeAdd(c * 60 + y - 1, amount);
                     c = MathUtils.safeCast(MathUtils.floorDivide(years, 60));
@@ -858,9 +882,21 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         @Override
         public long between(D start, D end) {
 
+            return between(start, end, this.index);
+
+        }
+
+        private static <D extends EastAsianCalendar<?, D>> long between(
+            D start,
+            D end,
+            int index
+        ) {
+
             EastAsianCS<D> calsys = start.getCalendarSystem();
 
-            switch (this.index) {
+            switch (index) {
+                case UNIT_CYCLES:
+                    return between(start, end, UNIT_YEARS) / 60;
                 case UNIT_YEARS:
                     int deltaY =
                         end.getCycle() * 60 + end.getYear().getNumber()
