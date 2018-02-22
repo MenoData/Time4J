@@ -524,6 +524,16 @@ public class WeekmodelTest {
     }
 
     @Test
+    public void flooredISOBoundedWeekOfMonth() {
+        assertThat(
+            PlainDate.of(2018, 5, 4).getDayOfWeek(),
+            is(Weekday.FRIDAY));
+        assertThat(
+            PlainDate.of(2018, 5, 4).with(Weekmodel.ISO.boundedWeekOfMonth().atFloor()),
+            is(PlainDate.of(2018, 5, 1)));
+    }
+
+    @Test
     public void ceilingISOBoundedWeekOfYear() {
         assertThat(
             PlainDate.of(2000, 12, 1).with(
