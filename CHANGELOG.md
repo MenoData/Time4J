@@ -1,4 +1,4 @@
-## [v4.35] not int released
+## [v4.35] not yet released
 ### Added
 - Bounded calendar-week-elements in CommonElements [#738]
 - Optimize chronological extensions during parsing [#749]
