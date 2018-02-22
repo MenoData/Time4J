@@ -394,6 +394,41 @@ public class WeekCalculationTest {
     }
 
     @Test
+    public void ceilingBoundedWeekOfMonthISO() {
+        CopticCalendar coptic = CopticCalendar.of(1723, 13, 5);
+        assertThat(
+            coptic.getDayOfWeek(),
+            is(Weekday.MONDAY));
+        assertThat(
+            coptic.with(CommonElements.boundedWeekOfMonth(CopticCalendar.axis(), Weekmodel.ISO).atCeiling()),
+            is(CopticCalendar.of(1723, 13, 6)));
+    }
+
+    @Test
+    public void floorBoundedWeekOfMonthISO() {
+        CopticCalendar coptic = CopticCalendar.of(1724, 1, 3);
+        assertThat(
+            coptic.getDayOfWeek(),
+            is(Weekday.FRIDAY));
+        assertThat(
+            coptic.with(CommonElements.boundedWeekOfMonth(CopticCalendar.axis(), Weekmodel.ISO).atFloor()),
+            is(CopticCalendar.of(1724, 1, 1)));
+    }
+
+    @Test
+    public void persianBoundedWeekOfMonth() {
+        PersianCalendar pcal = PersianCalendar.of(1396, 10, 4); // month with 30 days beginning on Friday
+        assertThat(
+            pcal.getDayOfWeek(),
+            is(Weekday.MONDAY));
+        assertThat(
+            pcal.getMaximum(
+                CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())),
+            // persian default week model has Saturday as first day of week and only needs one day in first week
+            is(6));
+    }
+
+    @Test
     public void serialization() throws IOException, ClassNotFoundException {
         roundtrip(CommonElements.localDayOfWeek(HijriCalendar.family(), Weekmodel.ISO));
         roundtrip(CommonElements.localDayOfWeek(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
@@ -401,6 +436,8 @@ public class WeekCalculationTest {
         roundtrip(CommonElements.weekOfMonth(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
         roundtrip(CommonElements.weekOfYear(HijriCalendar.family(), Weekmodel.ISO));
         roundtrip(CommonElements.weekOfYear(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
+        roundtrip(CommonElements.boundedWeekOfYear(HijriCalendar.family(), Weekmodel.ISO));
+        roundtrip(CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), Weekmodel.of(Locale.CHINA)));
     }
 
     private static void roundtrip(Object obj)

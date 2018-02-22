@@ -1,7 +1,11 @@
 ## [v4.35] not yet released
 ### Added
+- Bounded calendar-week-elements in CommonElements [#738]
 - Optimize chronological extensions during parsing [#749]
 - Improved localization for French Rev. calendar [#741]
+
+### Fixed
+- Weekmodel.ISO.boundedWeekOfMonth().atFloor() not working as expected [#750]
 
 ## [v4.34] published on 2018-01-15
 ### Added
