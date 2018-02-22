@@ -6,10 +6,12 @@ import net.time4j.engine.CalendarDate;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -157,37 +159,61 @@ public class ChineseMiscellaneousTest {
     }
 
     @Test
-    public void yongzheng() {
-        PlainDate d = PlainDate.of(1723, 7, 1);
-        ChineseCalendar cc = d.transform(ChineseCalendar.axis()).with(ChineseCalendar.DAY_OF_YEAR, 1);
-        System.out.println(cc); // chinese[40(1723)-1-01]
-        System.out.println(cc.transform(PlainDate.axis())); // 1723-02-05
-        System.out.println(EastAsianYear.forGregorian(2018).getElapsedCyclicYears() + 1); // 4655 = 4716 - 60 - 1
-        System.out.println(EastAsianYear.forGregorian(1998).getElapsedCyclicYears() + 1); // 4635
-        System.out.println(EastAsianYear.forGregorian(-2636).getElapsedCyclicYears()); // 0
+    public void qingDynastyShunzhi() {
+        ChineseCalendar min = ChineseCalendar.axis().getMinimum();
+        assertThat(min.get(ChineseCalendar.ERA), is(ChineseEra.QING_SHUNZHI_1644_1662));
+        assertThat(min.get(ChineseCalendar.YEAR_OF_ERA), is(2));
+    }
 
-        int[] years = {1662, 1723, 1736, 1796, 1821, 1851, 1862, 1875, 1909, 1912};
+    @Test
+    public void qingDynastiesStart() {
+        int[] years = {1662, 1723, 1736, 1796, 1821, 1851, 1862, 1875, 1909};
+        PlainDate[] dates = {
+            PlainDate.of(1662, 2, 18),
+            PlainDate.of(1723, 2, 5),
+            PlainDate.of(1736, 2, 12),
+            PlainDate.of(1796, 2, 9),
+            PlainDate.of(1821, 2, 3),
+            PlainDate.of(1851, 2, 1),
+            PlainDate.of(1862, 1, 30),
+            PlainDate.of(1875, 2, 6),
+            PlainDate.of(1909, 1, 22)
+        };
         for (int i = 0; i < years.length; i++) {
-            System.out.println(
-                ChineseCalendar.of(EastAsianYear.forGregorian(years[i]), EastAsianMonth.valueOf(1), 1)
-                    .transform(PlainDate.axis())
-            );
+            ChineseCalendar cc = ChineseCalendar.ofNewYear(years[i]);
+            assertThat(
+                cc.transform(PlainDate.axis()),
+                is(dates[i]));
+            assertThat(
+                cc.get(ChineseCalendar.YEAR_OF_ERA),
+                is(1));
+            assertThat(
+                cc.get(ChineseCalendar.ERA),
+                is(ChineseEra.values()[i + 1]));
         }
-        System.out.println();
-        System.out.println(PlainDate.of(1912, 2, 12).getDaysSinceEpochUTC());
+    }
 
-/*
-        1662-02-18
-        1723-02-05
-        1736-02-12
-        1796-02-09
-        1821-02-03
-        1851-02-01
-        1862-01-30
-        1875-02-06
-        1909-01-22
-        1912-02-18
-*/
+    @Test
+    public void qingDynastyLast() {
+        ChineseCalendar last = PlainDate.of(1912, 2, 11).transform(ChineseCalendar.axis());
+        ChineseCalendar next = last.plus(1, ChineseCalendar.Unit.DAYS); // day of abdication
+        assertThat(last.get(ChineseCalendar.ERA), is(ChineseEra.QING_XUANTONG_1909_1912));
+        assertThat(last.get(ChineseCalendar.YEAR_OF_ERA), is(3));
+        assertThat(next.get(ChineseCalendar.ERA), is(ChineseEra.YELLOW_EMPEROR));
+        assertThat(next.get(ChineseCalendar.YEAR_OF_ERA), is(1911 + 2698));
+    }
+
+    @Test
+    public void parseEraAndYearOfEra() throws ParseException {
+        ChronoFormatter<ChineseCalendar> f =
+            ChronoFormatter.ofPattern("G yyyy, MMM/d", PatternType.CLDR, Locale.ENGLISH, ChineseCalendar.axis());
+        ChineseCalendar cc = f.parse("Huángdì 4696, M1/1");
+        assertThat(cc.get(ChineseCalendar.ERA), is(ChineseEra.YELLOW_EMPEROR));
+        assertThat(cc.get(ChineseCalendar.YEAR_OF_ERA), is(4696)); // year-counting of Sun-yat-sen
+        assertThat(f.parse("Huangdi 4696, M1/1"), is(cc)); // root locale as fallback
+        PlainDate d = cc.transform(PlainDate.axis());
+        assertThat(d, is(PlainDate.of(1998, 1, 28)));
+        assertThat(f.format(cc), is("Huángdì 4696, M1/1"));
     }
 
     @Test
@@ -197,6 +223,15 @@ public class ChineseMiscellaneousTest {
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, M08 12, 2017(dīng-yǒu)"));
+    }
+
+    @Test
+    public void newYear() {
+        ChineseCalendar c = ChineseCalendar.ofNewYear(1968);
+        assertThat(
+            c.transform(PlainDate.axis()),
+            is(PlainDate.of(1968, 1, 30)));
+        // Tet-festival in South Vietnam, see also: http://www.math.nus.edu.sg/aslaksen/calendar/cal.pdf (page 29)
     }
 
 }

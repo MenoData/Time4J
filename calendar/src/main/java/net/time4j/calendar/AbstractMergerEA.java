@@ -70,7 +70,7 @@ abstract class AbstractMergerEA<C extends EastAsianCalendar<?, C>>
         Locale locale
     ) {
 
-        return GenericDatePatterns.get("chinese", style, locale);
+        return GenericDatePatterns.get("chinese", style, locale); // always redirect to chinese calendar
 
     }
 

@@ -449,10 +449,15 @@ public final class ChineseCalendar
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
             .appendUnit(
+                Unit.CYCLES,
+                EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_CYCLES),
+                Unit.CYCLES.getLength(),
+                Collections.singleton(Unit.YEARS))
+            .appendUnit(
                 Unit.YEARS,
                 EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_YEARS),
                 Unit.YEARS.getLength(),
-                Collections.emptySet())
+                Collections.singleton(Unit.CYCLES))
             .appendUnit(
                 Unit.MONTHS,
                 EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_MONTHS),
@@ -494,6 +499,26 @@ public final class ChineseCalendar
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Creates a new instance of a Chinese calendar date on traditional New Year. </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code ChineseCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues chinesisches Kalenderdatum am traditionellen Neujahrstag. </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code ChineseCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    public static ChineseCalendar ofNewYear(int gregorianYear) {
+
+        return ChineseCalendar.of(EastAsianYear.forGregorian(gregorianYear), EastAsianMonth.valueOf(1), 1);
+
+    }
 
     /**
      * <p>Creates a new instance of a Chinese calendar date. </p>
@@ -685,6 +710,8 @@ public final class ChineseCalendar
         implements ChronoUnit {
 
         //~ Statische Felder/Initialisierungen ----------------------------
+
+        CYCLES(EastAsianCS.MEAN_TROPICAL_YEAR * 86400.0 * 60),
 
         YEARS(EastAsianCS.MEAN_TROPICAL_YEAR * 86400.0),
 
@@ -939,6 +966,23 @@ public final class ChineseCalendar
                     if (caseInsensitive) {
                         name = name.toLowerCase(locale);
                         test = test.toLowerCase(locale);
+                    }
+                    if (name.equals(test) || (partialCompare && name.startsWith(test))) {
+                        status.setIndex(end);
+                        return era;
+                    }
+                }
+            }
+
+            // use root locale as fallback
+            for (ChineseEra era : ChineseEra.values()) {
+                String name = era.getDisplayName(Locale.ROOT, width);
+                int end = Math.max(Math.min(offset + name.length(), text.length()), offset);
+                if (end > offset) {
+                    String test = text.subSequence(offset, end).toString();
+                    if (caseInsensitive) {
+                        name = name.toLowerCase(Locale.ROOT);
+                        test = test.toLowerCase(Locale.ROOT);
                     }
                     if (name.equals(test) || (partialCompare && name.startsWith(test))) {
                         status.setIndex(end);

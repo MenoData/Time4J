@@ -333,7 +333,7 @@ public enum ChineseEra
 
     int getMinYearOfEra() {
 
-        return (this == YELLOW_EMPEROR) ? 1645 + 2636 + 1 : 1;
+        return (this == YELLOW_EMPEROR) ? 1645 + 2698 : 1;
 
     }
 
@@ -361,7 +361,7 @@ public enum ChineseEra
             case QING_XUANTONG_1909_1912:
                 return 3; // new year in 1912 is 6 days after abdication: 1912-02-18
             case YELLOW_EMPEROR:
-                return 2999 + 2636 + 1;
+                return 2999 + 2698;
             default:
                 throw new UnsupportedOperationException("Not yet implemented: " + this.name());
         }
@@ -392,7 +392,7 @@ public enum ChineseEra
             case QING_XUANTONG_1909_1912:
                 return 1909;
             case YELLOW_EMPEROR:
-                return -2636;
+                return -2697;
             default:
                 throw new UnsupportedOperationException("Not yet implemented: " + this.name());
         }
