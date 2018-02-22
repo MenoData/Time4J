@@ -106,7 +106,7 @@ import java.util.Locale;
  *     // printing to English
  *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
  *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // conversion at noon
  *     System.out.println(formatter.format(ethiopianDate));
@@ -150,7 +150,7 @@ import java.util.Locale;
  *     // Englische Textausgabe
  *     ChronoFormatter&lt;EthiopianCalendar&gt; formatter =
  *       ChronoFormatter.setUp(EthiopianCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     EthiopianCalendar ethiopianDate = today.transform(EthiopianCalendar.class); // Umwandlung zur Mittagszeit
  *     System.out.println(formatter.format(ethiopianDate));
@@ -315,7 +315,7 @@ public final class EthiopianCalendar
      * <pre>
      *  ChronoFormatter&lt;EthiopianCalendar&gt; f =
      *      ChronoFormatter.setUp(EthiopianCalendar.axis(), new Locale(&quot;am&quot;))
-     *      .addPattern(&quot;d MMMM y G&quot;, PatternType.NON_ISO_DATE)
+     *      .addPattern(&quot;d MMMM y G&quot;, PatternType.CLDR_DATE)
      *      .addLiteral(&quot; (&quot;)
      *      .addText(EthiopianCalendar.TABOT)
      *      .addLiteral(&#39;)&#39;)
@@ -331,7 +331,7 @@ public final class EthiopianCalendar
      * <pre>
      *  ChronoFormatter&lt;EthiopianCalendar&gt; f =
      *      ChronoFormatter.setUp(EthiopianCalendar.axis(), new Locale(&quot;am&quot;))
-     *      .addPattern(&quot;d MMMM y G&quot;, PatternType.NON_ISO_DATE)
+     *      .addPattern(&quot;d MMMM y G&quot;, PatternType.CLDR_DATE)
      *      .addLiteral(&quot; (&quot;)
      *      .addText(EthiopianCalendar.TABOT)
      *      .addLiteral(&#39;)&#39;)

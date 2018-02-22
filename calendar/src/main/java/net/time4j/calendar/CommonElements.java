@@ -178,7 +178,7 @@ public class CommonElements {
             throw new IllegalArgumentException("Cannot derive a rule for given chronology: " + chronology);
         }
 
-        return new CalendarWeekElement<T>("WEEK_OF_YEAR", chronology.getChronoType(), 1, 52, 'w', model, e);
+        return new CalendarWeekElement<T>("WEEK_OF_YEAR", chronology.getChronoType(), 1, 52, 'w', model, e, false);
 
     }
 
@@ -221,7 +221,95 @@ public class CommonElements {
             throw new IllegalArgumentException("Cannot derive a rule for given chronology: " + chronology);
         }
 
-        return new CalendarWeekElement<T>("WEEK_OF_MONTH", chronology.getChronoType(), 1, 5, 'W', model, e);
+        return new CalendarWeekElement<T>("WEEK_OF_MONTH", chronology.getChronoType(), 1, 5, 'W', model, e, false);
+
+    }
+
+    /**
+     * <p>Creates an integer element for the week of year in given chronology dependent on given week model
+     * and constrained by year boundaries. </p>
+     *
+     * <p>The given chronology must support a 7-day-week with elements of names &quot;DAY_OF_WEEK&quot;
+     * and &quot;DAY_OF_YEAR&quot;, otherwise an exception will be thrown. </p>
+     *
+     * @param   <T> chronological type
+     * @param   chronology  the calendrical chronology
+     * @param   model       the underlying week model
+     * @return  generic calendar element
+     * @throws  IllegalArgumentException if the chronology does not support this element
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Integer-Element f&uuml;r die Kalenderwoche des Jahres zum angegebenen Kalendersystem
+     * unter Benutzung des angegebenen Wochenmodells und unter Beachtung der Jahresgrenzen. </p>
+     *
+     * <p>Die angegebene Chronologie mu&szlig; eine 7-Tage-Woche mit Elementen namens &quot;DAY_OF_WEEK&quot;
+     * und &quot;DAY_OF_YEAR&quot; unterst&uuml;tzen, sonst wird eine Ausnahme geworfen. </p>
+     *
+     * @param   <T> chronological type
+     * @param   chronology  the calendrical chronology
+     * @param   model       the underlying week model
+     * @return  generic calendar element
+     * @throws  IllegalArgumentException if the chronology does not support this element
+     * @since   3.40/4.35
+     */
+    public static <T extends ChronoEntity<T> & CalendarDate> StdCalendarElement<Integer, T> boundedWeekOfYear(
+        Chronology<T> chronology,
+        Weekmodel model
+    ) {
+
+        ChronoElement<Integer> e = findDayElement(chronology, "DAY_OF_YEAR");
+
+        if (e == null) {
+            throw new IllegalArgumentException("Cannot derive a rule for given chronology: " + chronology);
+        }
+
+        return new CalendarWeekElement<T>(
+            "BOUNDED_WEEK_OF_YEAR", chronology.getChronoType(), 1, 52, '\u0000', model, e, true);
+
+    }
+
+    /**
+     * <p>Creates an integer element for the week of month in given chronology dependent on given week model
+     * and constrained by month boundaries. </p>
+     *
+     * <p>The given chronology must support a 7-day-week with elements of names &quot;DAY_OF_WEEK&quot;
+     * and &quot;DAY_OF_MONTH&quot;, otherwise an exception will be thrown. </p>
+     *
+     * @param   <T> chronological type
+     * @param   chronology  the calendar chronology
+     * @param   model       the underlying week model
+     * @return  generic calendar element
+     * @throws  IllegalArgumentException if the chronology does not support this element
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Integer-Element f&uuml;r die Kalenderwoche des Monats zum angegebenen Kalendersystem
+     * unter Benutzung des angegebenen Wochenmodells und unter Beachtung der Monatsgrenzen. </p>
+     *
+     * <p>Die angegebene Chronologie mu&szlig; eine 7-Tage-Woche mit Elementen namens &quot;DAY_OF_WEEK&quot;
+     * und &quot;DAY_OF_MONTH&quot; unterst&uuml;tzen, sonst wird eine Ausnahme geworfen. </p>
+     *
+     * @param   <T> chronological type
+     * @param   chronology  the calendar chronology
+     * @param   model       the underlying week model
+     * @return  generic calendar element
+     * @throws  IllegalArgumentException if the chronology does not support this element
+     * @since   3.40/4.35
+     */
+    public static <T extends ChronoEntity<T> & CalendarDate> StdCalendarElement<Integer, T> boundedWeekOfMonth(
+        Chronology<T> chronology,
+        Weekmodel model
+    ) {
+
+        ChronoElement<Integer> e = findDayElement(chronology, "DAY_OF_MONTH");
+
+        if (e == null) {
+            throw new IllegalArgumentException("Cannot derive a rule for given chronology: " + chronology);
+        }
+
+        return new CalendarWeekElement<T>(
+            "BOUNDED_WEEK_OF_MONTH", chronology.getChronoType(), 1, 5, '\u0000', model, e, true);
 
     }
 
@@ -333,9 +421,17 @@ public class CommonElements {
             set.add(
                 DayOfWeekElement.of(this.chronoType, model));
             set.add(
-                CalendarWeekElement.of("WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement));
+                CalendarWeekElement.of(
+                    "WEEK_OF_MONTH", this.chronoType, 1, 5, 'W', model, this.dayOfMonthElement, false));
             set.add(
-                CalendarWeekElement.of("WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement));
+                CalendarWeekElement.of(
+                    "WEEK_OF_YEAR", this.chronoType, 1, 52, 'w', model, this.dayOfYearElement, false));
+            set.add(
+                CalendarWeekElement.of(
+                    "BOUNDED_WEEK_OF_MONTH", this.chronoType, 1, 5, '\u0000', model, this.dayOfMonthElement, true));
+            set.add(
+                CalendarWeekElement.of(
+                    "BOUNDED_WEEK_OF_YEAR", this.chronoType, 1, 52, '\u0000', model, this.dayOfYearElement, true));
             return Collections.unmodifiableSet(set);
 
         }
@@ -379,16 +475,22 @@ public class CommonElements {
          */
         private final ChronoElement<Integer> dayElement;
 
+        /**
+         * @serial  bounded week
+         */
+        private final boolean bounded;
+
         //~ Konstruktoren -------------------------------------------------
 
-        private CalendarWeekElement(
+        CalendarWeekElement(
             String name,
             Class<T> chrono,
             int min,
             int max,
             char symbol,
             Weekmodel model,
-            ChronoElement<Integer> dayElement
+            ChronoElement<Integer> dayElement,
+            boolean bounded
         ) {
             super(name, chrono, min, max, symbol);
 
@@ -398,10 +500,12 @@ public class CommonElements {
 
             this.model = model;
             this.dayElement = dayElement;
+            this.bounded = bounded;
 
         }
 
         //~ Methoden ------------------------------------------------------
+
 
         static <T extends ChronoEntity<T>> CalendarWeekElement<T> of(
             String name,
@@ -410,10 +514,11 @@ public class CommonElements {
             int max,
             char symbol,
             Weekmodel model,
-            ChronoElement<Integer> dayElement
+            ChronoElement<Integer> dayElement,
+            boolean bounded
         ) {
 
-            return new CalendarWeekElement<T>(name, chrono, min, max, symbol, model, dayElement);
+            return new CalendarWeekElement<T>(name, chrono, min, max, symbol, model, dayElement, bounded);
 
         }
 
@@ -443,7 +548,7 @@ public class CommonElements {
 
             if (super.doEquals(obj)) {
                 CalendarWeekElement<?> that = CalendarWeekElement.class.cast(obj);
-                return this.model.equals(that.model);
+                return this.model.equals(that.model) && (this.bounded == that.bounded);
             }
 
             return false;
@@ -454,7 +559,7 @@ public class CommonElements {
         protected <D extends ChronoEntity<D>> ElementRule<D, Integer> derive(Chronology<D> chronology) {
 
             if (this.getChronoType().equals(chronology.getChronoType())) {
-                return new CWRule<D>(this);
+                return (this.bounded ? new BWRule<D>(this) : new CWRule<D>(this));
             }
 
             return null;
@@ -700,6 +805,189 @@ public class CommonElements {
 
     }
 
+    private static class BWRule<D extends ChronoEntity<D>>
+        implements ElementRule<D, Integer> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final CalendarWeekElement<?> owner;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private BWRule(CalendarWeekElement<?> owner) {
+            super();
+
+            this.owner = owner;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Integer getValue(D context) {
+
+            return Integer.valueOf(this.getWeek(context));
+
+        }
+
+        @Override
+        public Integer getMinimum(D context) {
+
+            return Integer.valueOf(this.getMinWeek(context));
+
+        }
+
+        @Override
+        public Integer getMaximum(D context) {
+
+            return Integer.valueOf(this.getMaxWeek(context));
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(D context) {
+
+            return this.getChild(context, false);
+
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(D context) {
+
+            return this.getChild(context, true);
+
+        }
+
+        private ChronoElement<?> getChild(
+            D context,
+            boolean ceiling
+        ) {
+
+            ChronoElement<Weekday> dow = DayOfWeekElement.of(context.getClass(), this.owner.model);
+            int weeknum = this.getWeek(context);
+            long utc = context.get(EpochDays.UTC).longValue();
+            int daynum = context.getInt(this.owner.dayElement);
+
+            if (ceiling) {
+                D max = context.with(dow, context.getMaximum(dow));
+                long delta = max.get(EpochDays.UTC).longValue() - utc;
+                if (context.getMaximum(this.owner.dayElement).intValue() < daynum + delta) {
+                    return this.owner.dayElement;
+                }
+            } else if (weeknum <= 1) {
+                D min = context.with(dow, context.getMinimum(dow));
+                long delta = utc - min.get(EpochDays.UTC).longValue();
+                if (context.getMinimum(this.owner.dayElement).intValue() > daynum - delta) {
+                    return this.owner.dayElement;
+                }
+            }
+
+            return dow;
+
+        }
+
+        @Override
+        public boolean isValid(
+            D context,
+            Integer value
+        ) {
+
+            if (value == null) {
+                return false;
+            }
+
+            int v = value.intValue();
+            return ((v >= this.getMinWeek(context)) && (v <= this.getMaxWeek(context)));
+
+        }
+
+        @Override
+        public D withValue(
+            D context,
+            Integer value,
+            boolean lenient
+        ) {
+
+            if ((value == null) || (!lenient && !this.isValid(context, value))) {
+                throw new IllegalArgumentException(
+                    "Invalid value: " + value + " (context=" + context + ")");
+            }
+
+            return this.setWeek(context, value.intValue());
+
+        }
+
+        private int getWeek(D context) {
+
+            return this.getWeek(context, 0);
+
+        }
+
+        private int getMinWeek(D context) {
+
+            return this.getWeek(context, -1);
+
+        }
+
+        private int getMaxWeek(D context) {
+
+            return this.getWeek(context, 1);
+
+        }
+
+        private int getWeek(
+            D context,
+            int mode // -1 = Jahres-/Monatsanfang, 0 = aktueller Tag, 1 = Ende
+        ) {
+
+            int scaledDay = context.getInt(this.owner.dayElement);
+            Weekday wd = getDayOfWeek(context.get(EpochDays.UTC).longValue() - scaledDay + 1);
+            int dow = wd.getValue(this.owner.model);
+
+            int wstart = (
+                (dow <= 8 - this.owner.model.getMinimalDaysInFirstWeek())
+                    ? 2 - dow
+                    : 9 - dow
+            );
+
+            int refday;
+
+            switch (mode) {
+                case -1:
+                    refday = 1;
+                    break;
+                case 0:
+                    refday = scaledDay;
+                    break;
+                case 1:
+                    refday = context.getMaximum(this.owner.dayElement).intValue();
+                    break;
+                default:
+                    throw new AssertionError("Unexpected: " + mode);
+            }
+
+            return MathUtils.floorDivide((refday - wstart), 7) + 1;
+
+        }
+
+        private D setWeek(
+            D context,
+            int value
+        ) {
+
+            int old = this.getWeek(context);
+
+            if (value == old) {
+                return context;
+            } else {
+                int delta = 7 * (value - old);
+                return context.with(EpochDays.UTC, context.get(EpochDays.UTC).longValue() + delta);
+            }
+
+        }
+
+    }
+
     private static class DayOfWeekElement<T extends ChronoEntity<T>>
         extends StdEnumDateElement<Weekday, T> {
 
@@ -716,7 +1004,7 @@ public class CommonElements {
 
         //~ Konstruktoren -------------------------------------------------
 
-        private DayOfWeekElement(
+        DayOfWeekElement(
             Class<T> chronoType,
             Weekmodel model
         ) {
@@ -907,7 +1195,9 @@ public class CommonElements {
             try {
                 this.withValue(context, value, false);
                 return true;
-            } catch (RuntimeException ex) {
+            } catch (ArithmeticException ex) {
+                return false;
+            } catch (IllegalArgumentException ex) {
                 return false;
             }
 

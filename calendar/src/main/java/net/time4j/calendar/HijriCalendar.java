@@ -104,7 +104,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     // parse a Hijri-string and convert to a gregorian date
  *     ChronoFormatter&lt;HijriCalendar&gt; formatter =
  *       ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.CLDR_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
  *       .with(Attributes.PIVOT_YEAR, 1500); // mapped to range 1400-1499
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);
@@ -188,7 +188,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     // Hijri-Text interpretieren und in ein gregorianisches Datum umwandeln
  *     ChronoFormatter&lt;HijriCalendar&gt; formatter =
  *       ChronoFormatter.setUp(HijriCalendar.class, Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.NON_ISO_DATE).build()
+ *       .addPattern(&quot;EEE, d. MMMM yy&quot;, PatternType.CLDR_DATE).build()
  *       .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA)
  *       .with(Attributes.PIVOT_YEAR, 1500); // abgebildet auf den Bereich 1400-1499
  *     HijriCalendar hijri = formatter.parse(&quot;Thu, 29. Ramadan 36&quot;);

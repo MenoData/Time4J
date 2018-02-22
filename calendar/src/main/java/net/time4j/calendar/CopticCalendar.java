@@ -105,7 +105,7 @@ import java.util.Locale;
  * <pre>
  *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
  *       ChronoFormatter.setUp(CopticCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // conversion at noon
  *     System.out.println(formatter.format(copticDate));
@@ -147,7 +147,7 @@ import java.util.Locale;
  * <pre>
  *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
  *       ChronoFormatter.setUp(CopticCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // Konversion zu 12 Uhr mittags
  *     System.out.println(formatter.format(copticDate));
