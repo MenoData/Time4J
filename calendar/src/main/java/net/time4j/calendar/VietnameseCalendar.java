@@ -93,7 +93,7 @@ import java.util.Map;
  * <pre>
  *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
  *       ChronoFormatter.setUp(VietnameseCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
+ *       .addPattern(&quot;EEE, d. MMMM U(r)&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     VietnameseCalendar vietDate = today.transform(VietnameseCalendar.class);
  *     System.out.println(formatter.format(vietDate));
@@ -102,7 +102,7 @@ import java.util.Map;
  * <h4>Support for unicode ca-extensions</h4>
  *
  * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnamese&quot;);
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnam&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
@@ -156,7 +156,7 @@ import java.util.Map;
  * <pre>
  *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
  *       ChronoFormatter.setUp(VietnameseCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.CLDR_DATE).build();
+ *       .addPattern(&quot;EEE, d. MMMM U(r)&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
  *     VietnameseCalendar vietDate = today.transform(VietnameseCalendar.class);
  *     System.out.println(formatter.format(vietDate));
@@ -165,7 +165,7 @@ import java.util.Map;
  * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
  *
  * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnamese&quot;);
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnam&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
@@ -371,7 +371,7 @@ public final class VietnameseCalendar
                 EastAsianCalendar.getCycleRule(YEAR_OF_CYCLE))
             .appendElement(
                 YEAR_OF_CYCLE,
-                EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
+                EastAsianCalendar.getVietYearOfCycleRule(MONTH_OF_YEAR),
                 Unit.YEARS)
             .appendElement(
                 MONTH_OF_YEAR,
@@ -400,10 +400,15 @@ public final class VietnameseCalendar
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
             .appendUnit(
+                Unit.CYCLES,
+                EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_CYCLES),
+                Unit.CYCLES.getLength(),
+                Collections.singleton(Unit.YEARS))
+            .appendUnit(
                 Unit.YEARS,
                 EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_YEARS),
                 Unit.YEARS.getLength(),
-                Collections.emptySet())
+                Collections.singleton(Unit.CYCLES))
             .appendUnit(
                 Unit.MONTHS,
                 EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_MONTHS),
@@ -445,6 +450,26 @@ public final class VietnameseCalendar
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Creates a new instance of a Vietnamese calendar date on New Year (Tet). </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code VietnameseCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues vietnamesisches Kalenderdatum am Neujahrstag (Tet). </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code VietnameseCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    public static VietnameseCalendar ofTet(int gregorianYear) {
+
+        return VietnameseCalendar.of(EastAsianYear.forGregorian(gregorianYear), EastAsianMonth.valueOf(1), 1);
+
+    }
 
     /**
      * <p>Creates a new instance of a Vietnamese calendar date. </p>
@@ -636,6 +661,8 @@ public final class VietnameseCalendar
         implements ChronoUnit {
 
         //~ Statische Felder/Initialisierungen ----------------------------
+
+        CYCLES(EastAsianCS.MEAN_TROPICAL_YEAR * 86400.0 * 60),
 
         YEARS(EastAsianCS.MEAN_TROPICAL_YEAR * 86400.0),
 

@@ -3,6 +3,7 @@ package net.time4j.calendar;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.engine.CalendarDate;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -99,6 +100,9 @@ public class VietnameseMiscellaneousTest {
         assertThat(min.get(VietnameseCalendar.DAY_OF_YEAR), is(1));
         assertThat(min.get(VietnameseCalendar.MONTH_OF_YEAR), is(EastAsianMonth.valueOf(1)));
         assertThat(min.get(VietnameseCalendar.CYCLE), is(75));
+        assertThat(min.get(VietnameseCalendar.YEAR_OF_CYCLE).getNumber(), is(10));
+        assertThat(min.getMinimum(VietnameseCalendar.YEAR_OF_CYCLE).getNumber(), is(10));
+        assertThat(min.getMaximum(VietnameseCalendar.YEAR_OF_CYCLE).getNumber(), is(60));
     }
 
     @Test
@@ -111,6 +115,9 @@ public class VietnameseMiscellaneousTest {
         assertThat(max.get(VietnameseCalendar.DAY_OF_YEAR), is(355));
         assertThat(max.get(VietnameseCalendar.MONTH_OF_YEAR), is(EastAsianMonth.valueOf(12)));
         assertThat(max.get(VietnameseCalendar.CYCLE), is(94));
+        assertThat(max.get(VietnameseCalendar.YEAR_OF_CYCLE).getNumber(), is(56));
+        assertThat(max.getMinimum(VietnameseCalendar.YEAR_OF_CYCLE).getNumber(), is(1));
+        assertThat(max.getMaximum(VietnameseCalendar.YEAR_OF_CYCLE).getNumber(), is(56));
     }
 
     @Test
@@ -120,6 +127,63 @@ public class VietnameseMiscellaneousTest {
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, M08 12, 2017(dīng-yǒu)"));
+    }
+
+    @Test
+    public void unitOfCycles() {
+        VietnameseCalendar c1 = VietnameseCalendar.of(EastAsianYear.forGregorian(1958), EastAsianMonth.valueOf(1), 1);
+        VietnameseCalendar c2 = VietnameseCalendar.of(EastAsianYear.forGregorian(2018), EastAsianMonth.valueOf(1), 1);
+        assertThat(
+            VietnameseCalendar.Unit.CYCLES.between(c1, c2),
+            is(1));
+        assertThat(
+            VietnameseCalendar.Unit.CYCLES.between(c1, c2.minus(CalendarDays.ONE)),
+            is(0));
+        assertThat(
+            c1.until(c2, VietnameseCalendar.Unit.CYCLES),
+            is(1L));
+        assertThat(
+            c1.until(c2.minus(CalendarDays.ONE), VietnameseCalendar.Unit.CYCLES),
+            is(0L));
+        assertThat(
+            c1.plus(1, VietnameseCalendar.Unit.CYCLES),
+            is(c2));
+        assertThat(
+            c2.minus(1, VietnameseCalendar.Unit.CYCLES),
+            is(c1));
+    }
+
+    @Test
+    public void unitOfYears() {
+        VietnameseCalendar c1 = VietnameseCalendar.of(EastAsianYear.forGregorian(1958), EastAsianMonth.valueOf(1), 1);
+        VietnameseCalendar c2 = VietnameseCalendar.of(EastAsianYear.forGregorian(2018), EastAsianMonth.valueOf(1), 1);
+        assertThat(
+            VietnameseCalendar.Unit.YEARS.between(c1, c2),
+            is(60));
+        assertThat(
+            VietnameseCalendar.Unit.YEARS.between(c1, c2.minus(CalendarDays.ONE)),
+            is(59));
+        assertThat(
+            c1.until(c2, VietnameseCalendar.Unit.YEARS),
+            is(60L));
+        assertThat(
+            c1.until(c2.minus(CalendarDays.ONE), VietnameseCalendar.Unit.YEARS),
+            is(59L));
+        assertThat(
+            c1.plus(60, VietnameseCalendar.Unit.YEARS),
+            is(c2));
+        assertThat(
+            c2.minus(60, VietnameseCalendar.Unit.YEARS),
+            is(c1));
+    }
+
+    @Test
+    public void tet() {
+        VietnameseCalendar c = VietnameseCalendar.ofTet(1968);
+        assertThat(
+            c.transform(PlainDate.axis()),
+            is(PlainDate.of(1968, 1, 29)));
+            // North Vietnam, see also: http://www.math.nus.edu.sg/aslaksen/calendar/cal.pdf (page 29)
     }
 
 }
