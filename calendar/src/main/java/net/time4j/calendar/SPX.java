@@ -95,6 +95,9 @@ final class SPX
     /** Serialisierungstyp. */
     static final int VIETNAMESE = 16;
 
+    /** Serialisierungstyp. */
+    static final int JUCHE = 17;
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
@@ -205,6 +208,9 @@ final class SPX
             case VIETNAMESE:
                 this.writeEAC(out);
                 break;
+            case JUCHE:
+                this.writeJuche(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -279,6 +285,9 @@ final class SPX
                 break;
             case VIETNAMESE:
                 this.obj = this.readVietnamese(in);
+                break;
+            case JUCHE:
+                this.obj = this.readJuche(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -627,6 +636,22 @@ final class SPX
         }
 
         return VietnameseCalendar.of(cycle, yearOfCycle, eam, dom);
+
+    }
+
+    private void writeJuche(ObjectOutput out)
+        throws IOException {
+
+        JucheCalendar jc = (JucheCalendar) this.obj;
+        out.writeObject(jc.toISO());
+
+    }
+
+    private JucheCalendar readJuche(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        PlainDate iso = PlainDate.class.cast(in.readObject());
+        return new JucheCalendar(iso);
 
     }
 

@@ -29,6 +29,7 @@ import net.time4j.calendar.HijriCalendar;
 import net.time4j.calendar.HistoricCalendar;
 import net.time4j.calendar.IndianCalendar;
 import net.time4j.calendar.JapaneseCalendar;
+import net.time4j.calendar.JucheCalendar;
 import net.time4j.calendar.JulianCalendar;
 import net.time4j.calendar.KoreanCalendar;
 import net.time4j.calendar.MinguoCalendar;
@@ -86,6 +87,8 @@ public class GenericCalendarProviderSPI
                 return Optional.of(HijriCalendar.family());
             case "japanese":
                 return Optional.of(JapaneseCalendar.axis());
+            case "juche":
+                return Optional.of(JucheCalendar.axis());
             case "julian":
                 return Optional.of(JulianCalendar.axis());
             case "persian":

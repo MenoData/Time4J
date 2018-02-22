@@ -107,6 +107,7 @@ public final class GenericTextProviderSPI
         types.add("indian");
         types.add("islamic");
         types.add("japanese");
+        types.add("juche");
         types.add("persian");
         types.add("roc");
         types.add("vietnam");
@@ -167,6 +168,8 @@ public final class GenericTextProviderSPI
             return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
         } else if (calendarType.equals("dangi") || calendarType.equals("vietnam")) {
             calendarType = "chinese"; // Umleitung
+        } else if (calendarType.equals("juche")) {
+            return CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms().toArray(new String[12]);
         }
 
         ResourceBundle rb = getBundle(calendarType, locale);
@@ -238,7 +241,7 @@ public final class GenericTextProviderSPI
         TextWidth tw
     ) {
 
-        if (calendarType.equals("chinese") || calendarType.equals("dangi") || calendarType.equals("vietnam")) {
+        if (calendarType.equals("chinese") || calendarType.equals("vietnam")) {
             return EMPTY_STRINGS; // special handling in era elements of East Asian calendars
         } else if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
             if (tw == TextWidth.NARROW) {
@@ -246,6 +249,11 @@ public final class GenericTextProviderSPI
             } else {
                 return new String[] { "Meiji", "Taishō", "Shōwa", "Heisei" };
             }
+        } else if (calendarType.equals("dangi") || calendarType.equals("juche")) {
+            String[] koreans = this.eras("korean", locale, tw);
+            String[] names = new String[1];
+            names[0] = (calendarType.equals("dangi") ? koreans[0] : koreans[1]);
+            return names;
         }
 
         ResourceBundle rb = getBundle(calendarType, locale);
@@ -254,14 +262,13 @@ public final class GenericTextProviderSPI
             tw = TextWidth.ABBREVIATED;
         }
 
-        String key = getKey(rb, "ERA");
         String[] names =
             lookupBundle(
                 rb,
                 calendarType,
                 locale.getLanguage(),
                 countOfEras(calendarType),
-                key,
+                getKey(rb, "ERA"),
                 tw,
                 OutputContext.FORMAT,
                 false,
@@ -478,7 +485,8 @@ public final class GenericTextProviderSPI
     private static int countOfEras(String ct) {
 
         return (
-            (ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc") || ct.equals("buddhist")) ? 2 : 1);
+            (ct.equals("ethiopic") || ct.equals("generic")
+                || ct.equals("roc") || ct.equals("buddhist") || ct.equals("korean")) ? 2 : 1);
 
     }
 
