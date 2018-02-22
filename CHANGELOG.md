@@ -1,5 +1,6 @@
 ## [v3.40] not yet released
 ### Added
+- Bounded calendar-week-elements in CommonElements [#738]
 - Optimize chronological extensions during parsing [#749]
 - Improved localization for French Rev. calendar [#741]
 
