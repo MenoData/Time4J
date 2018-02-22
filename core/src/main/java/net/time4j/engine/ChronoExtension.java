@@ -138,8 +138,8 @@ public interface ChronoExtension {
     /**
      * <p>Gives a hint to the parser if the element in question can be resolved by {@code resolve()}. </p>
      *
-     * <p>This method serves for optimization purpose and helps the parser to decide if this extension
-     * is needed during parsing. Subclasses should override this method in most cases. </p>
+     * <p>This method serves for optimization purpose and helps the parser to decide if chronological extensions
+     * are needed at all during parsing. Subclasses should override this method in most cases. </p>
      *
      * @param   element     the element to be checked
      * @return  {@code true} if this extension can resolve given element else {@code false}
@@ -151,7 +151,7 @@ public interface ChronoExtension {
      * {@code resolve()} aufgel&ouml;st werden kann. </p>
      *
      * <p>Diese Methode dient der Optimierung des Interpretationsvorgangs und hilft zu entscheiden,
-     * ob diese chronologische Erweiterung &uuml;berhaupt gebraucht wird. Subklassen sollten diese
+     * ob chronologische Erweiterungen &uuml;berhaupt gebraucht werden. Subklassen sollten diese
      * Methode in der Regel &uuml;berschreiben. </p>
      *
      * @param   element     the element to be checked
