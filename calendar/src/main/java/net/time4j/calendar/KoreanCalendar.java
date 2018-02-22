@@ -21,38 +21,26 @@
 
 package net.time4j.calendar;
 
-import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
-import net.time4j.base.MathUtils;
-import net.time4j.base.TimeSource;
-import net.time4j.calendar.service.GenericDatePatterns;
-import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
+import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
-import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.ValidationElement;
-import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
-import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TextElement;
 import net.time4j.tz.OffsetSign;
-import net.time4j.tz.TZID;
-import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
@@ -82,31 +70,34 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #CYCLE}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
  *
- * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
+ * <p>Furthermore, all elements defined in {@code KoreanEra}, {@code EpochDays}
+ * and {@link CommonElements} are supported. </p>
  *
  * <h4>Example of usage</h4>
  *
  * <pre>
- *     ChronoFormatter&lt;ChineseCalendar&gt; formatter =
- *       ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *     ChronoFormatter&lt;KoreanCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(KoreanCalendar.axis(), Locale.ENGLISH)
+ *       .addPattern(&quot;EEE, d. MMMM U(r)&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     ChineseCalendar chineseDate = today.transform(ChineseCalendar.class);
- *     System.out.println(formatter.format(chineseDate));
+ *     KoreanCalendar koreanDate = today.transform(KoreanCalendar.class);
+ *     System.out.println(formatter.format(koreanDate));
  * </pre>
  *
  * <h4>Support for unicode ca-extensions</h4>
  *
  * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-dangi&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, Tout 21, 1734 A.M.&quot;));
+ *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -131,31 +122,34 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
+ *  <li>{@link #CYCLE}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
  *
- * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
+ * <p>Au&slig;erdem werden alle Elemente von {@code KoreanEra}, {@code EpochDays}
+ * und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * <h4>Anwendungsbeispiel</h4>
  *
  * <pre>
- *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
- *       ChronoFormatter.setUp(CopticCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM yyyy&quot;, PatternType.NON_ISO_DATE).build();
+ *     ChronoFormatter&lt;KoreanCalendar&gt; formatter =
+ *       ChronoFormatter.setUp(KoreanCalendar.axis(), Locale.ENGLISH)
+ *       .addPattern(&quot;EEE, d. MMMM U(r)&quot;, PatternType.CLDR_DATE).build();
  *     PlainDate today = SystemClock.inLocalView().today();
- *     CopticCalendar copticDate = today.transform(CopticCalendar.class); // Konversion zu 12 Uhr mittags
- *     System.out.println(formatter.format(copticDate));
+ *     KoreanCalendar koreanDate = today.transform(KoreanCalendar.class);
+ *     System.out.println(formatter.format(koreanDate));
  * </pre>
  *
  * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
  *
  * <pre>
- *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
+ *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-dangi&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, Tout 21, 1734 A.M.&quot;));
+ *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -223,45 +217,122 @@ public final class KoreanCalendar
     };
 
     /**
-     * <p>Represents the Chinese era. </p>
+     * <p>Represents the Korean era. </p>
+     *
+     * <p>This element is effectively read-only. Its value cannot be changed in a direct and meaningful way.
+     * The dangi era can also be used in conjunction with {@code PlainDate}. </p>
+     *
+     * @see     #YEAR_OF_ERA
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert die chinesische &Auml;ra. </p>
+     * <p>Repr&auml;sentiert die koreanische &Auml;ra. </p>
+     *
+     * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll ge&auml;ndert
+     * werden. Die Dangi-&Auml;ra kann auch in Verbindung mit {@code PlainDate} verwendet werden. </p>
+     *
+     * @see     #YEAR_OF_ERA
      */
     @FormattableElement(format = "G")
-    static final ChronoElement<CopticEra> ERA =
-        new StdEnumDateElement<>("ERA", KoreanCalendar.class, CopticEra.class, 'G');
+    public static final ChronoElement<KoreanEra> ERA = KoreanEra.DANGI.era();
 
     /**
-     * <p>Represents the Chinese year related to the introduction of sexagesimal cycles
+     * <p>Represents the cycle number related to the introduction of sexagesimal cycles
      * by the legendary yellow emperor Huang-Di on -2636-02-15 (gregorian). </p>
      *
-     * <p><strong>This kind of year counting is NOT in common use in China and only
-     * offered for technical reasons.</strong> Prefer the cyclic year instead. </p>
+     * <p><strong>This kind of counting is NOT in common use in Korea and only
+     * offered for technical reasons.</strong> Prefer just the cyclic year together
+     * with the related gregorian year instead. </p>
+     *
+     * @see     #YEAR_OF_CYCLE
+     * @see     CommonElements#RELATED_GREGORIAN_YEAR
      */
     /*[deutsch]
-     * <p>Repr&auml;sentiert das chinesische Jahr relativ zur Einf&uuml;hrung der sexagesimalen Zyklen
+     * <p>Nummer des Jahreszyklus relativ zur Einf&uuml;hrung der sexagesimalen Zyklen
      * durch den legendenhaften Kaiser Huang-Di am Tag -2636-02-15 (gregorianisch). </p>
      *
-     * <p><strong>Diese Art der Jahresz&auml;hlung ist in China NICHT gebr&auml;uchlich und wird nur aus
-     * technischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr ist der Vorzug zu geben. </p>
+     * <p><strong>Diese Art der Z&auml;hlung ist in Korea NICHT gebr&auml;uchlich und wird nur aus
+     * technischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr in Verbindung mit einer
+     * gregorianischen Bezugsjahresangabe ist der Vorzug zu geben. </p>
+     *
+     * @see     #YEAR_OF_CYCLE
+     * @see     CommonElements#RELATED_GREGORIAN_YEAR
      */
-    @FormattableElement(format = "y")
-    static final StdCalendarElement<Integer, KoreanCalendar> YEAR_OF_ERA =
+    public static final ChronoElement<Integer> CYCLE =
         new StdIntegerDateElement<>(
-            "YEAR_OF_ERA",
+            "CYCLE",
             KoreanCalendar.class,
-            1,
-            5636,
-            'y',
+            72,
+            94,
+            '\u0000',
             null,
             null);
 
     /**
+     * <p>Represents the Korean year related to the Korean era. </p>
+     *
+     * <p><strong>This kind of year counting is NOT in common use in Korea today and only
+     * offered for historical reasons.</strong> Prefer the cyclic year instead. The dangi era
+     * can also be used in conjunction with {@code PlainDate}. It was in use in South Korea
+     * from 1952 until 1961: </p>
+     *
+     * <pre>
+     *    ChronoFormatter&lt;PlainDate&gt; f =
+     *      ChronoFormatter.setUp(PlainDate.axis(), Locale.ENGLISH)
+     *        .addText(KoreanEra.DANGI.era())
+     *        .addLiteral(&quot; &quot;)
+     *        .addInteger(KoreanEra.DANGI.yearOfEra(), 1, 4)
+     *        .addPattern(&quot;, MM/dd&quot;, PatternType.CLDR)
+     *        .build();
+     *    assertThat(
+     *      f.format(PlainDate.of(2018, 10, 1)),
+     *      is(&quot;Dangi 4351, 10/01&quot;));
+     *    assertThat(
+     *      f.parse(&quot;Dangi 4351, 10/01&quot;),
+     *      is(PlainDate.of(2018, 10, 1)));
+     * </pre>
+     *
+     * @see     #ERA
+     * @see     #YEAR_OF_CYCLE
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das koreanische Jahr relativ zur koreanischen &Auml;ra. </p>
+     *
+     * <p><strong>Diese Art der Jahresz&auml;hlung ist in Korea heute NICHT gebr&auml;uchlich und
+     * wird nur aus historischen Gr&uuml;nden angeboten.</strong> Dem zyklischen Jahr ist der Vorzug
+     * zu geben. Die Dangi-&Auml;ra kann auch in Verbindung mit {@code PlainDate} verwendet werden
+     * (verwendet in S&uuml;dkorea von 1952 bis 1961): </p>
+     *
+     * <pre>
+     *    ChronoFormatter&lt;PlainDate&gt; f =
+     *      ChronoFormatter.setUp(PlainDate.axis(), Locale.ENGLISH)
+     *        .addText(KoreanEra.DANGI.era())
+     *        .addLiteral(&quot; &quot;)
+     *        .addInteger(KoreanEra.DANGI.yearOfEra(), 1, 4)
+     *        .addPattern(&quot;, MM/dd&quot;, PatternType.CLDR)
+     *        .build();
+     *    assertThat(
+     *      f.format(PlainDate.of(2018, 10, 1)),
+     *      is(&quot;Dangi 4351, 10/01&quot;));
+     *    assertThat(
+     *      f.parse(&quot;Dangi 4351, 10/01&quot;),
+     *      is(PlainDate.of(2018, 10, 1)));
+     * </pre>
+     *
+     * @see     #ERA
+     * @see     #YEAR_OF_CYCLE
+     */
+    @FormattableElement(format = "y")
+    public static final ChronoElement<Integer> YEAR_OF_ERA = KoreanEra.DANGI.yearOfEra();
+
+    /**
      * <p>Represents the Korean year related to the current sexagesimal cycle. </p>
+     *
+     * <p>This is the standard way to specify a Korean year. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das koreanische Jahr des aktuellen sexagesimalen Zyklus. </p>
+     *
+     * <p>Das ist der Standardweg, ein koreanisches Jahr zu definieren. </p>
      */
     @FormattableElement(format = "U")
     public static final TextElement<CyclicYear> YEAR_OF_CYCLE = EastAsianCY.SINGLETON;
@@ -361,13 +432,16 @@ public final class KoreanCalendar
                 KoreanCalendar.class,
                 new Merger(),
                 CALSYS)
-//            .appendElement(
-//                ERA,
-//                new EraRule())
-//            .appendElement(
-//                YEAR_OF_ERA,
-//                null,
-//                Unit.YEARS)
+            .appendElement(
+                ERA,
+                new EraRule())
+            .appendElement(
+                CYCLE,
+                EastAsianCalendar.getCycleRule(YEAR_OF_CYCLE))
+            .appendElement(
+                YEAR_OF_ERA,
+                new YearOfEraRule(),
+                Unit.YEARS)
             .appendElement(
                 YEAR_OF_CYCLE,
                 EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
@@ -399,10 +473,15 @@ public final class KoreanCalendar
                 CommonElements.RELATED_GREGORIAN_YEAR,
                 new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
             .appendUnit(
+                Unit.CYCLES,
+                EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_CYCLES),
+                Unit.CYCLES.getLength(),
+                Collections.singleton(Unit.YEARS))
+            .appendUnit(
                 Unit.YEARS,
                 EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_YEARS),
                 Unit.YEARS.getLength(),
-                Collections.emptySet())
+                Collections.singleton(Unit.CYCLES))
             .appendUnit(
                 Unit.MONTHS,
                 EastAsianCalendar.getUnitRule(EastAsianCalendar.UNIT_MONTHS),
@@ -446,12 +525,32 @@ public final class KoreanCalendar
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Creates a new instance of a Korean calendar date on traditional New Year. </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code KoreanCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues koreanisches Kalenderdatum am traditionellen Neujahrstag. </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code KoreanCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    public static KoreanCalendar ofNewYear(int gregorianYear) {
+
+        return KoreanCalendar.of(EastAsianYear.forGregorian(gregorianYear), EastAsianMonth.valueOf(1), 1);
+
+    }
+
+    /**
      * <p>Creates a new instance of a Korean calendar date. </p>
      *
      * @param   year        references the year using different systems like eras or sexagesimal cycles
      * @param   month       the month which might be a leap month
      * @param   dayOfMonth  the day of month to be checked
-     * @return  new instance of {@code ChineseCalendar}
+     * @return  new instance of {@code KoreanCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
     /*[deutsch]
@@ -460,7 +559,7 @@ public final class KoreanCalendar
      * @param   year        references the year using different systems like eras or sexagesimal cycles
      * @param   month       the month which might be a leap month
      * @param   dayOfMonth  the day of month to be checked
-     * @return  new instance of {@code ChineseCalendar}
+     * @return  new instance of {@code KoreanCalendar}
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
     public static KoreanCalendar of(
@@ -636,6 +735,8 @@ public final class KoreanCalendar
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
+        CYCLES(EastAsianCS.MEAN_TROPICAL_YEAR * 86400.0 * 60),
+
         YEARS(EastAsianCS.MEAN_TROPICAL_YEAR * 86400.0),
 
         MONTHS(EastAsianCS.MEAN_SYNODIC_MONTH * 86400.0),
@@ -721,10 +822,7 @@ public final class KoreanCalendar
 
         @Override
         public List<CalendarEra> getEras() {
-
-            // TODO: implementieren
-            return Collections.emptyList();
-
+            return Collections.singletonList(KoreanEra.DANGI);
         }
 
         @Override
@@ -760,54 +858,135 @@ public final class KoreanCalendar
 
     }
 
-    private static class Merger
-        implements ChronoMerger<KoreanCalendar> {
+    private static class EraRule
+        implements ElementRule<KoreanCalendar, KoreanEra> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public String getFormatPattern(
-            DisplayStyle style,
-            Locale locale
-        ) {
-
-            return GenericDatePatterns.get("dangi", style, locale);
-
+        public KoreanEra getValue(KoreanCalendar context) {
+            return KoreanEra.DANGI;
         }
 
         @Override
-        public KoreanCalendar createFrom(
-            TimeSource<?> clock,
-            AttributeQuery attributes
+        public KoreanEra getMinimum(KoreanCalendar context) {
+            return KoreanEra.DANGI;
+        }
+
+        @Override
+        public KoreanEra getMaximum(KoreanCalendar context) {
+            return KoreanEra.DANGI;
+        }
+
+        @Override
+        public boolean isValid(
+            KoreanCalendar context,
+            KoreanEra value
         ) {
+            return (value == KoreanEra.DANGI);
+        }
 
-            TZID tzid;
-
-            if (attributes.contains(Attributes.TIMEZONE_ID)) {
-                tzid = attributes.get(Attributes.TIMEZONE_ID);
-            } else if (attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax()) {
-                tzid = Timezone.ofSystem().getID();
+        @Override
+        public KoreanCalendar withValue(
+            KoreanCalendar context,
+            KoreanEra value,
+            boolean lenient
+        ) {
+            if (this.isValid(context, value)) {
+                return context;
             } else {
-                return null;
+                throw new IllegalArgumentException("Invalid Korean era: " + value);
             }
-
-            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
-            return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
         }
 
         @Override
-        @Deprecated
-        public KoreanCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
+        public ChronoElement<?> getChildAtFloor(KoreanCalendar context) {
+            throw new AbstractMethodError("Never called.");
+        }
 
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
+        @Override
+        public ChronoElement<?> getChildAtCeiling(KoreanCalendar context) {
+            throw new AbstractMethodError("Never called.");
+        }
+
+    }
+
+    private static class YearOfEraRule
+        implements ElementRule<KoreanCalendar, Integer> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public Integer getValue(KoreanCalendar context) {
+            return Integer.valueOf(this.getInt(context));
+        }
+
+        @Override
+        public Integer getMinimum(KoreanCalendar context) {
+            return Integer.valueOf(1645 + 2333);
+        }
+
+        @Override
+        public Integer getMaximum(KoreanCalendar context) {
+            return Integer.valueOf(2999 + 2333);
+        }
+
+        @Override
+        public boolean isValid(
+            KoreanCalendar context,
+            Integer value
+        ) {
+            if (value == null) {
+                return false;
+            }
+            int min = this.getMinimum(context).intValue();
+            int max = this.getMaximum(context).intValue();
+            return ((value >= min) && (value <= max));
+        }
+
+        @Override
+        public KoreanCalendar withValue(
+            KoreanCalendar context,
+            Integer value,
+            boolean lenient
+        ) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing year of era.");
+            } else if (this.isValid(context, value)) {
+                int yoe = this.getInt(context);
+                return context.plus(value - yoe, KoreanCalendar.Unit.YEARS);
+            } else {
+                throw new IllegalArgumentException("Invalid year of era: " + value);
+            }
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(KoreanCalendar context) {
+            throw new AbstractMethodError("Never called.");
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(KoreanCalendar context) {
+            throw new AbstractMethodError("Never called.");
+        }
+
+        private int getInt(KoreanCalendar context) {
+            return 60 * context.getCycle() + context.getYear().getNumber() - 364;
+        }
+
+    }
+
+    private static class Merger
+        extends AbstractMergerEA<KoreanCalendar> {
+
+        //~ Konstruktoren -------------------------------------------------
+
+        Merger() {
+            super(KoreanCalendar.class);
 
         }
+
+        //~ Methoden ------------------------------------------------------
 
         @Override
         public KoreanCalendar createFrom(
@@ -817,73 +996,44 @@ public final class KoreanCalendar
             boolean preparsing
         ) {
 
-            int cyear = entity.getInt(YEAR_OF_ERA);
+            EastAsianYear eastAsianYear = null;
+            int relgregyear = entity.getInt(CommonElements.RELATED_GREGORIAN_YEAR);
 
-            if (cyear == Integer.MIN_VALUE) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Coptic year.");
-                return null;
-            }
-
-            if (entity.contains(MONTH_OF_YEAR)) {
-                int cmonth = 1; // entity.get(MONTH_OF_YEAR).getValue();
-                int cdom = entity.getInt(DAY_OF_MONTH);
-
-                if (cdom != Integer.MIN_VALUE) {
-//                    if (CALSYS.isValid(CopticEra.ANNO_MARTYRUM, cyear, cmonth, cdom)) {
-//                        return ChineseCalendar.of(cyear, cmonth, cdom);
-//                    } else {
-//                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
-//                    }
+            if (relgregyear == Integer.MIN_VALUE) {
+                if (entity.contains(YEAR_OF_CYCLE) && entity.contains(CYCLE)) {
+                    CyclicYear cy = entity.get(YEAR_OF_CYCLE);
+                    int cycle = entity.getInt(CYCLE);
+                    eastAsianYear = cy.inCycle(cycle);
+                } else {
+                    int yoe = entity.getInt(KoreanEra.DANGI.yearOfEra());
+                    if (yoe != Integer.MIN_VALUE) {
+                        eastAsianYear = EastAsianYear.forDangi(yoe);
+                    }
                 }
             } else {
-                int cdoy = entity.getInt(DAY_OF_YEAR);
-                if (cdoy != Integer.MIN_VALUE) {
-                    if (cdoy > 0) {
-                        int cmonth = 1;
-                        int daycount = 0;
-                        while (cmonth <= 13) {
-                            int len = 0; //CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
-                            if (cdoy > daycount + len) {
-                                cmonth++;
-                                daycount += len;
-                            } else {
-                                return null; // ChineseCalendar.of(cyear, cmonth, cdoy - daycount);
-                            }
-                        }
-                    }
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Coptic date.");
+                eastAsianYear = EastAsianYear.forGregorian(relgregyear);
+            }
+
+            if (eastAsianYear == null) {
+                entity.with(
+                    ValidationElement.ERROR_MESSAGE,
+                    "Cannot determine East Asian year.");
+                return null;
+            } else if (entity.contains(MONTH_OF_YEAR)) {
+                EastAsianMonth month = entity.get(MONTH_OF_YEAR);
+                int dom = entity.getInt(DAY_OF_MONTH);
+                if (dom != Integer.MIN_VALUE) {
+                    return KoreanCalendar.of(eastAsianYear, month, dom);
+                }
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+                if ((doy != Integer.MIN_VALUE) && (doy >= 1)) {
+                    KoreanCalendar cc = KoreanCalendar.of(eastAsianYear, EastAsianMonth.valueOf(1), 1);
+                    return cc.plus(doy - 1, Unit.DAYS);
                 }
             }
 
             return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(KoreanCalendar context, AttributeQuery attributes) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
-
-        }
-
-        @Override
-        public StartOfDay getDefaultStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
-
-        }
-
-        @Override
-        public int getDefaultPivotYear() {
-
-            return 100; // two-digit-years are effectively switched off
 
         }
 

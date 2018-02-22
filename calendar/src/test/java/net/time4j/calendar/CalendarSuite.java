@@ -46,8 +46,10 @@ import org.junit.runners.Suite.SuiteClasses;
         JapaneseElementTest.class,
         JapaneseTransitionTest.class,
         JapaneseUnitTest.class,
+        JucheMiscellaneousTest.class,
         JulianCalendarTest.class,
         JulianMiscellaneousTest.class,
+        KoreanMiscellaneousTest.class,
         MinguoCalendarTest.class,
         MinguoMiscellaneousTest.class,
         MonthNameTest.class,
@@ -63,6 +65,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ThaiSolarMiscellaneousTest.class,
         ThaiSolarOperatorTest.class,
         UmalquraDataTest.class,
+        VietnameseMiscellaneousTest.class,
         WeekCalculationTest.class
     }
 )
