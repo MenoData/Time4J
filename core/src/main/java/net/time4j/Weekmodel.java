@@ -1830,7 +1830,7 @@ public final class Weekmodel
                         return PlainDate.DAY_OF_MONTH;
                     }
                 }
-            } else if (weeknum == 0) {
+            } else if (weeknum <= 1) {
                 PlainDate min = date.with(dow, context.getMinimum(dow));
                 if (this.owner.isYearRelated()) {
                     if (min.getDayOfYear() > date.getDayOfYear()) {
