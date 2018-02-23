@@ -39,6 +39,8 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriUnitTest.class,
         HijriYearTest.class,
         HistoricCalendarTest.class,
+        HongkongObservatory1Test.class,
+        HongkongObservatory2Test.class,
         IndianCalendarTest.class,
         IndianMiscellaneousTest.class,
         IndianOperatorTest.class,

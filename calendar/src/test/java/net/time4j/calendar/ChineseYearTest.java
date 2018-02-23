@@ -1,11 +1,8 @@
 package net.time4j.calendar;
 
-import net.time4j.format.TextWidth;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

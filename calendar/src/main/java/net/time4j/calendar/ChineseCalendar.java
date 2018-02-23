@@ -85,6 +85,20 @@ import java.util.Map;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
+ * <h4>Accuracy note</h4>
+ *
+ * <p>The calculations are based on the algorithms of Dershowitz/Reingold in their book
+ * &quot;Calendrical calculations&quot; and astronomical calculations in nowadays precision.
+ * Old scholar Chinese astronomers had applied less precise calculations in historic times
+ * so tiny deviations for the period 1645-1906 are possible in some rare cases. That means,
+ * this class rather models a theoretical ideal than the historic reality. </p>
+ *
+ * <p>The future data from 1907 onwards had been compared to the published data of Hongkong observatory.
+ * Only the dates 2057-09-29 and 2097-08-08 deviate by one day (so all following days of same month).
+ * However, the observatory has explicitly declared these dates to be uncertain because their calculations
+ * of New Moon are not accurate enough to decide which day exactly is right (the results are very close
+ * to local midnight). </p>
+ *
  * <h4>Example of usage</h4>
  *
  * <pre>
@@ -135,6 +149,22 @@ import java.util.Map;
  * </ul>
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
+ *
+ * <h4>Hinweis zur Genauigkeit</h4>
+ *
+ * <p>Die Berechnungen fu&szlig;en auf den Algorithmen von Dershowitz/Reingold in ihrem Buch
+ * &quot;Calendrical calculations&quot; und astronomischen Verfahren in der heute verf&uuml;gbaren
+ * Genauigkeit. Chinesische Astronomen der alten Schule hatten weniger genaue Berechnungsverfahren
+ * zur Hand, so da&szlig; kleine Abweichungen f&uuml;r die Periode 1645-1906 in seltenen F&auml;llen
+ * m&ouml;glich sind. Das bedeutet, diese Klasse modelliert eher ein theoretisches Ideal als die
+ * historische Wirklichkeit. </p>
+ *
+ * <p>Zuk&uuml;nftige Datumsangaben von 1907 aufw&auml;rts wurden mit den ver&ouml;ffentlichten Daten
+ * des Observatoriums von Hongkong verglichen. Nur die Tage 2057-09-29 und 2097-08-08 weichen um einen
+ * Tag ab (so auch die folgenden Tage des jeweils gleichen Monats). Allerdings hat das Observatorium
+ * ausdr&uuml;cklich diese Tage als ungesichert erkl&auml;rt, weil dessen Berechnungen nicht genau genug
+ * sind, um zu entscheiden, welcher Monatsbeginn wirklich der richtige ist (die Ergebnisse sind sehr
+ * nahe zur &ouml;rtlichen Mitternacht). </p>
  *
  * <h4>Anwendungsbeispiel</h4>
  *

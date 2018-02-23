@@ -1,12 +1,18 @@
 package net.time4j.calendar;
 
+import net.time4j.ClockUnit;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
+import net.time4j.calendar.astro.MoonPhase;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
+import net.time4j.tz.OffsetSign;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -232,6 +238,30 @@ public class ChineseMiscellaneousTest {
             c.transform(PlainDate.axis()),
             is(PlainDate.of(1968, 1, 30)));
         // Tet-festival in South Vietnam, see also: http://www.math.nus.edu.sg/aslaksen/calendar/cal.pdf (page 29)
+    }
+
+    @Test
+    public void hongkongObservatory2057() {
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 8);
+        Moment newMoon = MoonPhase.NEW_MOON.atOrAfter(PlainTimestamp.of(2057, 9, 27, 0, 0).at(offset));
+        assertThat(
+            ClockUnit.SECONDS.between(
+                PlainDate.of(2057, 9, 29).atStartOfDay(),
+                newMoon.toZonalTimestamp(offset) // 2057-09-29T00:00:37
+            ) <= 120L,
+        is(true));
+    }
+
+    @Test
+    public void hongkongObservatory2097() {
+        ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 8);
+        Moment newMoon = MoonPhase.NEW_MOON.atOrAfter(PlainTimestamp.of(2097, 8, 6, 0, 0).at(offset));
+        assertThat(
+            ClockUnit.SECONDS.between(
+                PlainDate.of(2097, 8, 8).atStartOfDay(),
+                newMoon.toZonalTimestamp(offset) // 2097-08-08T00:01:47
+            ) <= 120L,
+            is(true));
     }
 
 }
