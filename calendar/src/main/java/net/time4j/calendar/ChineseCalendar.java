@@ -93,11 +93,12 @@ import java.util.Map;
  * so tiny deviations for the period 1645-1906 are possible in some rare cases. That means,
  * this class rather models a theoretical ideal than the historic reality. </p>
  *
- * <p>The future data from 1907 onwards had been compared to the published data of Hongkong observatory.
+ * <p>The future data from 1907 onwards had been compared to the published data of
+ * <a href="http://www.hko.gov.hk/gts/time/conversion.htm">Hongkong observatory</a>.
  * Only the dates 2057-09-29 and 2097-08-08 deviate by one day (so all following days of same month).
  * However, the observatory has explicitly declared these dates to be uncertain because their calculations
- * of New Moon are not accurate enough to decide which day exactly is right (the results are very close
- * to local midnight). </p>
+ * of New Moon are not accurate enough to decide which month start exactly is right (the results are very
+ * close to local midnight). </p>
  *
  * <h4>Example of usage</h4>
  *
@@ -160,11 +161,11 @@ import java.util.Map;
  * historische Wirklichkeit. </p>
  *
  * <p>Zuk&uuml;nftige Datumsangaben von 1907 aufw&auml;rts wurden mit den ver&ouml;ffentlichten Daten
- * des Observatoriums von Hongkong verglichen. Nur die Tage 2057-09-29 und 2097-08-08 weichen um einen
- * Tag ab (so auch die folgenden Tage des jeweils gleichen Monats). Allerdings hat das Observatorium
- * ausdr&uuml;cklich diese Tage als ungesichert erkl&auml;rt, weil dessen Berechnungen nicht genau genug
- * sind, um zu entscheiden, welcher Monatsbeginn wirklich der richtige ist (die Ergebnisse sind sehr
- * nahe zur &ouml;rtlichen Mitternacht). </p>
+ * des <a href="http://www.hko.gov.hk/gts/time/conversion.htm">Observatoriums von Hongkong</a> verglichen.
+ * Nur die Tage 2057-09-29 und 2097-08-08 weichen um einen Tag ab (so auch die folgenden Tage des jeweils
+ * gleichen Monats). Allerdings hat das Observatorium ausdr&uuml;cklich diese Tage als ungesichert
+ * erkl&auml;rt, weil dessen Berechnungen nicht genau genug sind, um zu entscheiden, welcher Monatsbeginn
+ * wirklich der richtige ist (die Ergebnisse sind sehr nahe an der &ouml;rtlichen Mitternacht). </p>
  *
  * <h4>Anwendungsbeispiel</h4>
  *
