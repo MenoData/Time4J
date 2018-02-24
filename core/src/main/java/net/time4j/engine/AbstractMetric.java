@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractMetric.java) is part of project Time4J.
  *
@@ -24,11 +24,9 @@ package net.time4j.engine;
 import net.time4j.base.MathUtils;
 
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Set;
 
 
 /**
@@ -119,63 +117,20 @@ public abstract class AbstractMetric
             throw new IllegalArgumentException("Missing units.");
         }
 
-        for (int i = 0; i < units.length - 1; i++) {
-            for (int j = i + 1; j < units.length; j++) {
-                if (units[i].equals(units[j])) {
-                    throw new IllegalArgumentException(
-                        "Duplicate unit: " + units[i]);
+        List<U> list = new ArrayList<U>(units.length);
+        Collections.addAll(list, units);
+        Collections.sort(list, this);
+
+        for (int i = 0, n = list.size(); i < n; i++) {
+            for (int j = i + 1; j < n; j++) {
+                if (list.get(i).equals(list.get(j))) {
+                    throw new IllegalArgumentException("Duplicate unit: " + list.get(i));
                 }
             }
         }
 
-        Arrays.sort(units, this);
-
-        this.sortedUnits =
-            Collections.unmodifiableList(Arrays.asList(units));
-        this.normalizing = normalizing;
-
-    }
-
-    /**
-     * <p>Creates a new default metric with given set of time units. </p>
-     *
-     * <p>The given time units can be in any arbitrary order, but internally
-     * the will be automatically sorted by their default estimated length. </p>
-     *
-     * @param   normalizing     Is normalizing required that is shall amounts
-     *                          in small units be converted to bigger units?
-     * @param   units           time units to be used for calculating time span
-     * @throws  IllegalArgumentException if there is not time unit at all
-     */
-    /*[deutsch]
-     * <p>Konstruiert eine neue Standardmetrik mit einem {@code Set}
-     * von Zeiteinheiten. </p>
-     *
-     * <p>Die Zeiteinheiten k&ouml;nnen in beliebiger Reihenfolge
-     * angegeben werden, aber intern werden sie &uuml;ber ihre
-     * Standardl&auml;nge automatisch sortiert. </p>
-     *
-     * @param   normalizing     Is normalizing required that is shall amounts
-     *                          in small units be converted to bigger units?
-     * @param   units           time units to be used for calculating time span
-     * @throws  IllegalArgumentException if there is not time unit at all
-     */
-    protected AbstractMetric(
-        boolean normalizing,
-        Set<U> units
-    ) {
-        super();
-
-        if (units.isEmpty()) {
-            throw new IllegalArgumentException("Missing units.");
-        }
-
-        List<U> list = new ArrayList<U>(units);
-        Collections.sort(list, this);
-
         this.sortedUnits = Collections.unmodifiableList(list);
         this.normalizing = normalizing;
-
     }
 
     //~ Methoden ----------------------------------------------------------
