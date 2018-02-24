@@ -322,7 +322,7 @@ public final class ChineseCalendar
      * @see     #YEAR_OF_CYCLE
      */
     @FormattableElement(format = "y")
-    public static final ChronoElement<Integer> YEAR_OF_ERA =
+    public static final StdCalendarElement<Integer, ChineseCalendar> YEAR_OF_ERA =
         new StdIntegerDateElement<>(
             "YEAR_OF_ERA",
             ChineseCalendar.class,
