@@ -215,4 +215,14 @@ public class JucheMiscellaneousTest {
         JucheCalendar.of(0, 12, 31);
     }
 
+    @Test
+    public void forJuche() {
+        EastAsianYear eay = EastAsianYear.forJuche(2);
+        assertThat(eay.getCycle(), is(76));
+        assertThat(eay.getYearOfCycle().getNumber(), is(50));
+        assertThat(eay.getElapsedCyclicYears(), is(4634 - 85));
+        CyclicYear cy = eay.getYearOfCycle();
+        assertThat(cy.inCycle(eay.getCycle()).getElapsedCyclicYears(), is(eay.getElapsedCyclicYears()));
+    }
+
 }
