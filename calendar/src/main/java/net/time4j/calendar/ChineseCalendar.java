@@ -77,6 +77,7 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #SOLAR_TERM}</li>
  *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #CYCLE}</li>
@@ -105,10 +106,21 @@ import java.util.Map;
  * <pre>
  *     ChronoFormatter&lt;ChineseCalendar&gt; formatter =
  *       ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM r(U)&quot;, PatternType.CLDR_DATE).build();
- *     PlainDate today = SystemClock.inLocalView().today();
- *     ChineseCalendar chineseDate = today.transform(ChineseCalendar.class);
- *     System.out.println(formatter.format(chineseDate));
+ *         .addPattern(&quot;EEE, d. MMMM r(U) &quot;, PatternType.CLDR_DATE)
+ *         .addText(ChineseCalendar.SOLAR_TERM)
+ *         .build();
+ *     PlainDate winter =
+ *       AstronomicalSeason.WINTER_SOLSTICE
+ *         .inYear(2018)
+ *         .toZonalTimestamp(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 8))
+ *         .getCalendarDate();
+ *     ChineseCalendar chineseDate = winter.transform(ChineseCalendar.class);
+ *     assertThat(
+ *       formatter.with(Locale.CHINESE).parse(&quot;周六, 16. 十一月 2018(戊戌) 冬至&quot;),
+ *       is(chineseDate));
+ *     assertThat(
+ *       formatter.format(chineseDate),
+ *       is(&quot;Sat, 16. M11 2018(wù-xū) dōngzhì&quot;));
  * </pre>
  *
  * <h4>Support for unicode ca-extensions</h4>
@@ -117,8 +129,8 @@ import java.util.Map;
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-chinese&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
- *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
+ *          f.format(PlainDate.of(2020, 5, 24)),
+ *          is(&quot;Sunday, (leap) M04 2, 2020(gēng-zǐ)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -143,6 +155,7 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #SOLAR_TERM}</li>
  *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #CYCLE}</li>
@@ -172,10 +185,21 @@ import java.util.Map;
  * <pre>
  *     ChronoFormatter&lt;ChineseCalendar&gt; formatter =
  *       ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.ENGLISH)
- *       .addPattern(&quot;EEE, d. MMMM r(U)&quot;, PatternType.CLDR_DATE).build();
- *     PlainDate today = SystemClock.inLocalView().today();
- *     ChineseCalendar chineseDate = today.transform(ChineseCalendar.class);
- *     System.out.println(formatter.format(chineseDate));
+ *         .addPattern(&quot;EEE, d. MMMM r(U) &quot;, PatternType.CLDR_DATE)
+ *         .addText(ChineseCalendar.SOLAR_TERM)
+ *         .build();
+ *     PlainDate winter =
+ *       AstronomicalSeason.WINTER_SOLSTICE
+ *         .inYear(2018)
+ *         .toZonalTimestamp(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 8))
+ *         .getCalendarDate();
+ *     ChineseCalendar chineseDate = winter.transform(ChineseCalendar.class);
+ *     assertThat(
+ *       formatter.with(Locale.CHINESE).parse(&quot;周六, 16. 十一月 2018(戊戌) 冬至&quot;),
+ *       is(chineseDate));
+ *     assertThat(
+ *       formatter.format(chineseDate),
+ *       is(&quot;Sat, 16. M11 2018(wù-xū) dōngzhì&quot;));
  * </pre>
  *
  * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
@@ -184,8 +208,8 @@ import java.util.Map;
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-chinese&quot;);
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
- *          f.format(PlainDate.of(2017, 10, 1)),
- *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
+ *          f.format(PlainDate.of(2020, 5, 24)),
+ *          is(&quot;Sunday, (leap) M04 2, 2020(gēng-zǐ)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -356,7 +380,7 @@ public final class ChineseCalendar
      * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
       * ge&auml;ndert werden. </p>
      */
-    public static final TextElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
+    public static final ChronoElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
 
     /**
      * <p>Represents the Chinese month. </p>

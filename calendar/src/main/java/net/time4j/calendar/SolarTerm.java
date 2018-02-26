@@ -484,10 +484,11 @@ public enum SolarTerm {
 
         String[] textforms = getTextForms(locale);
         boolean rootLocale = locale.getLanguage().isEmpty();
+        int offset = status.getIndex();
 
         for (int i = 0; i < textforms.length; i++) {
             String test = textforms[i];
-            String comp = text.subSequence(0, Math.min(text.length(), test.length())).toString();
+            String comp = text.subSequence(offset, Math.min(text.length(), offset + test.length())).toString();
             if ((rootLocale && comp.equalsIgnoreCase(test)) || comp.equals(test)) {
                 status.setIndex(status.getIndex() + test.length());
                 return ENUMS[i];

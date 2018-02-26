@@ -2,6 +2,8 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.AstronomicalSeason;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -391,6 +393,30 @@ public class SolarTermTest {
                 .toZonalTimestamp(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 8))
                 .getCalendarDate(),
             is(PlainDate.of(2018, 12, 22)));
+    }
+
+    @Test
+    public void format() throws ParseException {
+        ChronoFormatter<ChineseCalendar> formatter =
+            ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.ENGLISH)
+                .addPattern("EEE, d. MMMM r(U) ", PatternType.CLDR_DATE)
+                .addText(ChineseCalendar.SOLAR_TERM)
+                .build();
+        PlainDate winter =
+            AstronomicalSeason.WINTER_SOLSTICE
+                .inYear(2018)
+                .toZonalTimestamp(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 8))
+                .getCalendarDate();
+        ChineseCalendar chineseDate = winter.transform(ChineseCalendar.class);
+        assertThat(
+            formatter.with(Locale.CHINESE).parse("周六, 16. 十一月 2018(戊戌) 冬至"),
+            is(chineseDate));
+        assertThat(
+            formatter.with(Locale.CHINESE).format(chineseDate),
+            is("周六, 16. 十一月 2018(戊戌) 冬至"));
+        assertThat(
+            formatter.format(chineseDate),
+            is("Sat, 16. M11 2018(wù-xū) dōngzhì"));
     }
 
 }

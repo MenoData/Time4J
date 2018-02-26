@@ -227,8 +227,8 @@ public class ChineseMiscellaneousTest {
         Locale locale = Locale.forLanguageTag("en-u-ca-chinese");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(
-            f.format(PlainDate.of(2017, 10, 1)),
-            is("Sunday, M08 12, 2017(dīng-yǒu)"));
+            f.format(PlainDate.of(2020, 5, 24)),
+            is("Sunday, (leap) M04 2, 2020(gēng-zǐ)"));
     }
 
     @Test

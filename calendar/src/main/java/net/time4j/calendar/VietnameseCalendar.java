@@ -82,6 +82,7 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #SOLAR_TERM}</li>
  *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #CYCLE}</li>
  * </ul>
@@ -145,6 +146,7 @@ import java.util.Map;
  *  <li>{@link #WEEKDAY_IN_MONTH}</li>
  *  <li>{@link #MONTH_OF_YEAR}</li>
  *  <li>{@link #MONTH_AS_ORDINAL}</li>
+ *  <li>{@link #SOLAR_TERM}</li>
  *  <li>{@link #YEAR_OF_CYCLE}</li>
  *  <li>{@link #CYCLE}</li>
  * </ul>
@@ -282,7 +284,7 @@ public final class VietnameseCalendar
      * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
       * ge&auml;ndert werden. </p>
      */
-    public static final TextElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
+    public static final ChronoElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
 
     /**
      * <p>Represents the Vietnamese month. </p>
