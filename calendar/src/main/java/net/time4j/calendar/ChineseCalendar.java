@@ -372,13 +372,26 @@ public final class ChineseCalendar
     /**
      * <p>Represents the solar term as one of 24 possible stations of the sun on the ecliptic. </p>
      *
-     * <p>This element is effectively read-only. Its value cannot be changed in a direct and meaningful way. </p>
+     * <p>When manipulating then this element behaves as if the next solar term on or after new year
+     * is set. Example: </p>
+     *
+     * <pre>
+     *     ChineseCalendar date = PlainDate.of(2017, 12, 22).transform(ChineseCalendar.axis());
+     *     date = date.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015);
+     *     System.out.println(date.transform(PlainDate.axis())); // 2017-04-04
+     * </pre>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Sonnenmonat als eine von 24 m&ouml;glichen Stationen auf der Ekliptik der Sonne. </p>
      *
-     * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
-      * ge&auml;ndert werden. </p>
+     * <p>In Manipulationen verh&auml;lt sich dieses Element so, da&szlig; der am oder nach dem aktuellen
+     * Neujahrstag passende Sonnenmonat bestimmt wird. Beispiel: </p>
+     *
+     * <pre>
+     *     ChineseCalendar date = PlainDate.of(2017, 12, 22).transform(ChineseCalendar.axis());
+     *     date = date.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015);
+     *     System.out.println(date.transform(PlainDate.axis())); // 2017-04-04
+     * </pre>
      */
     public static final ChronoElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
 
@@ -1045,19 +1058,21 @@ public final class ChineseCalendar
                 }
             }
 
-            // use root locale as fallback
-            for (ChineseEra era : ChineseEra.values()) {
-                String name = era.getDisplayName(Locale.ROOT, width);
-                int end = Math.max(Math.min(offset + name.length(), text.length()), offset);
-                if (end > offset) {
-                    String test = text.subSequence(offset, end).toString();
-                    if (caseInsensitive) {
-                        name = name.toLowerCase(Locale.ROOT);
-                        test = test.toLowerCase(Locale.ROOT);
-                    }
-                    if (name.equals(test) || (partialCompare && name.startsWith(test))) {
-                        status.setIndex(end);
-                        return era;
+            if (!locale.getLanguage().isEmpty() && !locale.getLanguage().equals("zh")) {
+                // use root locale as fallback
+                for (ChineseEra era : ChineseEra.values()) {
+                    String name = era.getDisplayName(Locale.ROOT, width);
+                    int end = Math.max(Math.min(offset + name.length(), text.length()), offset);
+                    if (end > offset) {
+                        String test = text.subSequence(offset, end).toString();
+                        if (caseInsensitive) {
+                            name = name.toLowerCase(Locale.ROOT);
+                            test = test.toLowerCase(Locale.ROOT);
+                        }
+                        if (name.equals(test) || (partialCompare && name.startsWith(test))) {
+                            status.setIndex(end);
+                            return era;
+                        }
                     }
                 }
             }

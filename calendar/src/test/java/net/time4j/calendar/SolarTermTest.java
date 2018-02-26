@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.AstronomicalSeason;
+import net.time4j.engine.CalendarDays;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.OffsetSign;
@@ -417,6 +418,46 @@ public class SolarTermTest {
         assertThat(
             formatter.format(chineseDate),
             is("Sat, 16. M11 2018(wù-xū) dōngzhì"));
+    }
+
+    @Test
+    public void onOrAfter() {
+        ChineseCalendar date = PlainDate.of(2017, 12, 22).transform(ChineseCalendar.axis());
+        assertThat(
+            SolarTerm.MAJOR_11_DONGZHI_270.onOrAfter(date),
+            is(date));
+        assertThat(
+            SolarTerm.MAJOR_11_DONGZHI_270.onOrAfter(date.plus(CalendarDays.ONE)),
+            is(PlainDate.of(2018, 12, 22).transform(ChineseCalendar.axis())));
+    }
+
+    @Test
+    public void isValidNull() {
+        ChineseCalendar date = PlainDate.of(2017, 12, 22).transform(ChineseCalendar.axis());
+        assertThat(date.isValid(ChineseCalendar.SOLAR_TERM, null), is(false));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void withNull() {
+        ChineseCalendar date = PlainDate.of(2017, 12, 22).transform(ChineseCalendar.axis());
+        date.with(ChineseCalendar.SOLAR_TERM, null);
+    }
+
+    @Test
+    public void withSolarTerm() {
+        ChineseCalendar date = PlainDate.of(2017, 12, 22).transform(ChineseCalendar.axis());
+        assertThat(
+            date.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MAJOR_11_DONGZHI_270),
+            is(date));
+        assertThat(
+            date.minus(CalendarDays.of(100)).with(ChineseCalendar.SOLAR_TERM, SolarTerm.MAJOR_11_DONGZHI_270),
+            is(date));
+        assertThat( // new year
+            date.with(ChineseCalendar.DAY_OF_YEAR, 1).with(ChineseCalendar.SOLAR_TERM, SolarTerm.MAJOR_11_DONGZHI_270),
+            is(date));
+        assertThat(
+            date.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015),
+            is(date.with(ChineseCalendar.MONTH_AS_ORDINAL, 3).with(ChineseCalendar.DAY_OF_MONTH, 8)));
     }
 
 }

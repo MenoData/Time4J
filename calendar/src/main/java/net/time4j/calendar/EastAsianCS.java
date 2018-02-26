@@ -204,17 +204,10 @@ abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
         return this.newYearOnOrBefore(midYear); // starts with new moon on or after winter solstice
     }
 
-    // index of major solar term
+    // index of major solar term (used in test cases only)
     final int getMajorSolarTerm(long utcDays) {
         double jd = JulianDay.ofEphemerisTime(this.midnight(utcDays)).getValue();
         int index = (2 + (int) Math.floor(SolarTerm.solarLongitude(jd) / 30)) % 12;
-        return ((index == 0) ? 12 : index);
-    }
-
-    // index of minor solar term
-    final int getMinorSolarTerm(long utcDays) {
-        double jd = JulianDay.ofEphemerisTime(this.midnight(utcDays)).getValue();
-        int index = (3 + (int) Math.floor((SolarTerm.solarLongitude(jd) - 15) / 30)) % 12;
         return ((index == 0) ? 12 : index);
     }
 
@@ -310,31 +303,6 @@ abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
             d = winter.toZonalTimestamp(offset).getCalendarDate();
         }
         return d.getDaysSinceEpochUTC();
-
-// *** algorithm in "Calendrical Calculations" **************************************************************
-//    private long winterOnOrBefore(long utcDays) {
-//        double jd0 = localMidnightOnNextDay(date, offset);
-//        double tau = jd0 - modulo360(solarLongitude(jd0) - 270.0) * MEAN_TROPICAL_YEAR / 360.0;
-//        tau = tau - (modulo360(solarLongitude(tau) - 90.0) - 180.0) * MEAN_TROPICAL_YEAR / 360.0;
-//        PlainDate d = PlainDate.of((long) Math.floor(Math.min(jd0, tau)) - 1, EpochDays.JULIAN_DAY_NUMBER);
-//
-//        while (solarLongitude(localMidnightOnNextDay(d, offset)) <= 270.0) {
-//            d = d.plus(1, CalendarUnit.DAYS);
-//        }
-//
-//        return d;
-//    }
-//        private static double localMidnightOnNextDay(
-//            PlainDate date,
-//            ZonalOffset offset
-//        ) {
-//            return JulianDay.ofEphemerisTime(
-//                date,
-//                PlainTime.midnightAtEndOfDay(),
-//                offset
-//            ).getValue();
-//        }
-// **********************************************************************************************************
     }
 
 }

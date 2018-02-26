@@ -23,6 +23,7 @@ package net.time4j.calendar;
 
 import net.time4j.Moment;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoException;
@@ -180,7 +181,7 @@ class EastAsianST<D extends EastAsianCalendar<?, D>>
         D context,
         SolarTerm value
     ) {
-        return (this.getValue(context) == value);
+        return (value != null);
     }
 
     @Override
@@ -189,12 +190,11 @@ class EastAsianST<D extends EastAsianCalendar<?, D>>
         SolarTerm value,
         boolean lenient
     ) {
-        if (this.isValid(context, value)) {
-            return context;
-        } else if (value == null) {
+        if (value == null) {
             throw new IllegalArgumentException("Missing solar term.");
         } else {
-            throw new IllegalArgumentException("Solar term is read-only.");
+            long newYear = context.getCalendarSystem().newYear(context.getCycle(), context.getYear().getNumber());
+            return value.onOrAfter(context.minus(CalendarDays.of(context.getDaysSinceEpochUTC() - newYear)));
         }
     }
 

@@ -276,13 +276,12 @@ public final class VietnameseCalendar
     /**
      * <p>Represents the solar term as one of 24 possible stations of the sun on the ecliptic. </p>
      *
-     * <p>This element is effectively read-only. Its value cannot be changed in a direct and meaningful way. </p>
+     * @see     ChineseCalendar#SOLAR_TERM
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Sonnenmonat als eine von 24 m&ouml;glichen Stationen auf der Ekliptik der Sonne. </p>
      *
-     * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
-      * ge&auml;ndert werden. </p>
+     * @see     ChineseCalendar#SOLAR_TERM
      */
     public static final ChronoElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
 

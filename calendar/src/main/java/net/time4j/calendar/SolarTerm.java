@@ -22,8 +22,6 @@
 package net.time4j.calendar;
 
 import net.time4j.Moment;
-import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.calendar.astro.JulianDay;
 import net.time4j.calendar.astro.StdSolarCalculator;
 import net.time4j.tz.ZonalOffset;
@@ -388,40 +386,24 @@ public enum SolarTerm {
     }
 
     /**
-     * <p>Determines the time when this solar term will happen at or after given moment. </p>
+     * <p>Determines the date when this solar term will happen on or after given date. </p>
      *
-     * @param   moment  the starting time of the search for this solar term
-     * @return  time when this solar term will happen
+     * @param   date    the starting date of the search for this solar term
+     * @return  resulting date when this solar term will happen first
      */
     /*[deutsch]
-     * <p>Ermittelt die Zeit, wann diese Jahreseinteilung zum oder nach dem angegebenen Moment auftreten wird. </p>
+     * <p>Ermittelt das Datum, wann diese Jahreseinteilung zum oder nach dem angegebenen Datum auftreten wird. </p>
      *
-     * @param   moment  the starting time of the search for this solar term
-     * @return  time when this solar term will happen
+     * @param   date    the starting date of the search for this solar term
+     * @return  resulting date when this solar term will happen first
      */
-    public Moment atOrAfter(Moment moment) {
+    public <D extends EastAsianCalendar<?, D>> D onOrAfter(D date) {
 
-        double angle = this.getSolarLongitude();
-        double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
-        double estimate = jd0 + modulo360(angle - solarLongitude(jd0)) * MEAN_TROPICAL_YEAR / 360.0;
-        double low = Math.max(jd0, estimate - 5);
-        double high = estimate + 5;
-
-        while (true) {
-            double x = (low + high) / 2;
-
-            if (high - low < 0.00001) { // < 0.9 seconds
-                return JulianDay.ofEphemerisTime(x).toMoment();
-            }
-
-            double delta = (solarLongitude(x) - angle); // call depth ~ 20 times
-
-            if (modulo360(delta) < 180.0) {
-                high = x;
-            } else {
-                low = x;
-            }
-        }
+        EastAsianCS<D> calsys = date.getCalendarSystem();
+        long utcDays = date.getDaysSinceEpochUTC();
+        ZonalOffset offset = calsys.getOffset(utcDays);
+        Moment m = calsys.midnight(utcDays);
+        return calsys.transform(this.atOrAfter(m).toZonalTimestamp(offset).toDate().getDaysSinceEpochUTC());
 
     }
 
@@ -532,75 +514,30 @@ public enum SolarTerm {
         }
     }
 
-    // **************************************************************************************************************
+    private Moment atOrAfter(Moment moment) {
 
-    public static void main(String[] args) {
-
-        System.out.println(Locale.TRADITIONAL_CHINESE.toLanguageTag());
-        System.out.println(Locale.TAIWAN.toLanguageTag());
-        System.out.println(Locale.forLanguageTag("zh-Hant"));
-        System.out.println(Locale.forLanguageTag("zh-Hant").getScript());
-        System.out.println(MAJOR_02_CHUNFEN_000.getDisplayName(Locale.forLanguageTag("vi")));
-
-//        System.out.println(
-//            MAJOR_11_DONGZHI_270.atOrAfter(PlainTimestamp.of(2000, 1, 1, 0, 0).at(offset))
-//        );
-//
-//        System.out.println(
-//            SolarTerm.of(
-//                PlainTimestamp.of(2000, 12, 21, 7, 0).at(offset)
-//            )
-//        );
-//
-//        System.out.println(MINOR_02_JINGZHE_345.getSolarLongitude());
-//        System.out.println(MAJOR_02_CHUNFEN_000.getSolarLongitude());
-//        System.out.println(MINOR_03_QINGMING_015.getSolarLongitude());
-//        System.out.println(MAJOR_12_DAHAN_300.getSolarLongitude());
-//
-//        System.out.println("C=>" +
-//                JulianDay.ofEphemerisTime(
-//                    momentOfSolarLongitude(270, 2000)
-//                ).toMoment().toZonalTimestamp(offset)
-//        ); // 2000-12-21T07:37:23,334157958
-//
-//        PlainTimestamp winter = AstronomicalSeason.WINTER_SOLSTICE.inYear(2000).toZonalTimestamp(offset);
-//        System.out.println("M=>" + winter
-//        ); // 2000-12-21T07:37:40,176302075
-    }
-
-    static double momentOfSolarLongitude(
-        double angle,
-        int year
-    ) {
-        double jd0 =
-            JulianDay.ofEphemerisTime(
-                PlainDate.of(year, 1, 1),
-                PlainTime.midnightAtStartOfDay(),
-                ZonalOffset.UTC
-            ).getValue();
+        double angle = this.getSolarLongitude();
+        double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
         double estimate = jd0 + modulo360(angle - solarLongitude(jd0)) * MEAN_TROPICAL_YEAR / 360.0;
         double low = Math.max(jd0, estimate - 5);
         double high = estimate + 5;
-        return momentOfSolarLongitudeAfter(angle, low, high);
-    }
 
-    private static double momentOfSolarLongitudeAfter(
-        double angle, // in degrees
-        double low, // jd-ephemeris
-        double high // jd-ephemeris
-    ) {
         while (true) {
             double x = (low + high) / 2;
-            if (high - low < 0.00001) {
-                return x;
+
+            if (high - low < 0.00001) { // < 0.9 seconds
+                return JulianDay.ofEphemerisTime(x).toMoment();
             }
+
             double delta = (solarLongitude(x) - angle); // call depth ~ 20 times
+
             if (modulo360(delta) < 180.0) {
                 high = x;
             } else {
                 low = x;
             }
         }
+
     }
 
 }
