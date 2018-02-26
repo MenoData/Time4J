@@ -114,7 +114,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
      *
      * @return  CyclicYear
      */
-    /**
+    /*[deutsch]
      * <p>Liefert das zyklische Jahr (unter Verwendung eines 60-Jahre-Zyklus). </p>
      *
      * @return  CyclicYear
