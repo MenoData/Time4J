@@ -29,6 +29,7 @@ import net.time4j.calendar.astro.StdSolarCalculator;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
+import java.text.ParsePosition;
 import java.util.Locale;
 
 
@@ -174,6 +175,12 @@ public enum SolarTerm {
 
     private static final SolarTerm[] ENUMS = SolarTerm.values();
     private static final double MEAN_TROPICAL_YEAR = 365.242189;
+
+    private static final String[] SIMPLE = {
+        "lichun", "yushui", "jingzhe", "chunfen", "qingming", "guyu", "lixia", "xiaoman",
+        "mangzhong", "xiazhi", "xiaoshu", "dashu", "liqiu", "chushu", "bailu", "qiufen",
+        "hanlu", "shuangjiang", "lidong", "xiaoxue", "daxue", "dongzhi", "xiaohan", "dahan"
+    };
 
     private static final String[] TRANSSCRIPTION = {
         "lìchūn", "yǔshuǐ", "jīngzhé", "chūnfēn", "qīngmíng", "gǔyǔ", "lìxià", "xiǎomǎn",
@@ -458,16 +465,41 @@ public enum SolarTerm {
         Locale locale
     ) throws ParseException {
 
+        SolarTerm st = parse(text, locale, new ParsePosition(0));
+
+        if (st == null) {
+            throw new ParseException("Cannot parse: " + text, 0);
+        } else {
+            return st;
+        }
+
+    }
+
+    // also called by EastAsianST
+    static SolarTerm parse(
+        CharSequence text,
+        Locale locale,
+        ParsePosition status
+    ) {
+
         String[] textforms = getTextForms(locale);
+        boolean rootLocale = locale.getLanguage().isEmpty();
 
         for (int i = 0; i < textforms.length; i++) {
             String test = textforms[i];
-            if (text.subSequence(0, test.length()).toString().equals(test)) {
+            String comp = text.subSequence(0, Math.min(text.length(), test.length())).toString();
+            if ((rootLocale && comp.equalsIgnoreCase(test)) || comp.equals(test)) {
+                status.setIndex(status.getIndex() + test.length());
                 return ENUMS[i];
             }
         }
 
-        throw new ParseException("Cannot parse: " + text, 0);
+        if (locale.getLanguage().isEmpty() || (textforms != TRANSSCRIPTION)) {
+            status.setErrorIndex(status.getIndex());
+            return null;
+        } else {
+            return parse(text, Locale.ROOT, status);
+        }
 
     }
 
@@ -495,7 +527,7 @@ public enum SolarTerm {
             case "ja":
                 return JAPANESE;
             default:
-                return TRANSSCRIPTION;
+                return locale.getLanguage().isEmpty() ? SIMPLE : TRANSSCRIPTION;
         }
     }
 

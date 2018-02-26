@@ -233,15 +233,15 @@ abstract class EastAsianCS<D extends EastAsianCalendar<?, D>>
         return m.toZonalTimestamp(this.getOffset(utcDays)).toDate().getDaysSinceEpochUTC();
     }
 
+    // local midnight
+    Moment midnight(long utcDays) {
+        return PlainDate.of(utcDays, EpochDays.UTC).atStartOfDay().at(this.getOffset(utcDays));
+    }
+
     // result in utc-days
     private long newMoonBefore(long utcDays) {
         Moment m = MoonPhase.NEW_MOON.before(this.midnight(utcDays));
         return m.toZonalTimestamp(this.getOffset(utcDays)).toDate().getDaysSinceEpochUTC();
-    }
-
-    // local midnight
-    private Moment midnight(long utcDays) {
-        return PlainDate.of(utcDays, EpochDays.UTC).atStartOfDay().at(this.getOffset(utcDays));
     }
 
     // count of lunations between m1 and m2

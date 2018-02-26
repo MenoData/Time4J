@@ -126,12 +126,29 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     }
 
     /**
-     * <p>Yields the month including the numerical value and the possible leap month flag. </p>
+     * <p>Obtains the solar term as one of 24 on the ecliptic of the sun. </p>
+     *
+     * @return  SolarTerm
+     */
+    /*[deutsch]
+     * <p>Liefert den Sonnenmonat (als eine von 24 Stationen auf der Ekliptik der Sonne). </p>
+     *
+     * @return  SolarTerm
+     */
+    public SolarTerm getSolarTerm() {
+
+        return EastAsianST.<D>getInstance().getValue(this.getContext());
+
+    }
+
+    /**
+     * <p>Yields the (lunar) month including the numerical value and the possible leap month flag. </p>
      *
      * @return  EastAsianMonth
      */
     /*[deutsch]
-     * <p>Liefert den Monat einschlie&szlig;lich seiner Nummer und eines m&ouml;glichen Schaltmonatskennzeichens. </p>
+     * <p>Liefert den (Mond-)Monat einschlie&szlig;lich seiner Nummer
+     * und eines m&ouml;glichen Schaltmonatskennzeichens. </p>
      *
      * @return  EastAsianMonth
      */

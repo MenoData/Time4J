@@ -338,6 +338,19 @@ public final class KoreanCalendar
     public static final TextElement<CyclicYear> YEAR_OF_CYCLE = EastAsianCY.SINGLETON;
 
     /**
+     * <p>Represents the solar term as one of 24 possible stations of the sun on the ecliptic. </p>
+     *
+     * <p>This element is effectively read-only. Its value cannot be changed in a direct and meaningful way. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert den Sonnenmonat als eine von 24 m&ouml;glichen Stationen auf der Ekliptik der Sonne. </p>
+     *
+     * <p>Dieses Element ist effektiv nur zur Anzeige. Sein Wert kann nicht direkt und sinnvoll
+      * ge&auml;ndert werden. </p>
+     */
+    public static final TextElement<SolarTerm> SOLAR_TERM = EastAsianST.getInstance();
+
+    /**
      * <p>Represents the Korean month. </p>
      */
     /*[deutsch]
@@ -446,6 +459,9 @@ public final class KoreanCalendar
                 YEAR_OF_CYCLE,
                 EastAsianCalendar.getYearOfCycleRule(MONTH_OF_YEAR),
                 Unit.YEARS)
+            .appendElement(
+                SOLAR_TERM,
+                EastAsianST.getInstance())
             .appendElement(
                 MONTH_OF_YEAR,
                 EastAsianCalendar.getMonthOfYearRule(DAY_OF_MONTH),
