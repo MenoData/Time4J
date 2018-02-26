@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericTextProviderSPI.java) is part of project Time4J.
  *
@@ -97,7 +97,9 @@ public final class GenericTextProviderSPI
 
         Set<String> types = new HashSet<>();
         types.add("buddhist");
+        types.add("chinese");
         types.add("coptic");
+        types.add("dangi");
         types.add("ethiopic");
         types.add("extra/frenchrev");
         types.add("generic");
@@ -105,8 +107,10 @@ public final class GenericTextProviderSPI
         types.add("indian");
         types.add("islamic");
         types.add("japanese");
+        types.add("juche");
         types.add("persian");
         types.add("roc");
+        types.add("vietnam");
         TYPES = Collections.unmodifiableSet(types);
     }
 
@@ -162,6 +166,10 @@ public final class GenericTextProviderSPI
             return months.toArray(new String[months.size()]);
         } else if (calendarType.equals("japanese")) {
             return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
+        } else if (calendarType.equals("dangi") || calendarType.equals("vietnam")) {
+            calendarType = "chinese"; // Umleitung
+        } else if (calendarType.equals("juche")) {
+            return CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms().toArray(new String[12]);
         }
 
         ResourceBundle rb = getBundle(calendarType, locale);
@@ -170,8 +178,11 @@ public final class GenericTextProviderSPI
             tw = TextWidth.ABBREVIATED;
         }
 
-        String key = getKey(rb, "MONTH_OF_YEAR");
-        String[] names = lookupBundle(rb, calendarType, countOfMonths(calendarType), key, tw, oc, leapForm, 1);
+        String key =
+            getKey(rb, "MONTH_OF_YEAR");
+        String[] names =
+            lookupBundle(
+                rb, calendarType, locale.getLanguage(), countOfMonths(calendarType), key, tw, oc, leapForm, 1);
 
         // fallback rules as found in CLDR-root-properties via alias paths
         if (names == null) {
@@ -230,12 +241,19 @@ public final class GenericTextProviderSPI
         TextWidth tw
     ) {
 
-        if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
+        if (calendarType.equals("chinese") || calendarType.equals("vietnam")) {
+            return EMPTY_STRINGS; // special handling in era elements of East Asian calendars
+        } else if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
             if (tw == TextWidth.NARROW) {
                 return new String[] { "M", "T", "S", "H" };
             } else {
                 return new String[] { "Meiji", "Taishō", "Shōwa", "Heisei" };
             }
+        } else if (calendarType.equals("dangi") || calendarType.equals("juche")) {
+            String[] koreans = this.eras("korean", locale, tw);
+            String[] names = new String[1];
+            names[0] = (calendarType.equals("dangi") ? koreans[0] : koreans[1]);
+            return names;
         }
 
         ResourceBundle rb = getBundle(calendarType, locale);
@@ -244,9 +262,17 @@ public final class GenericTextProviderSPI
             tw = TextWidth.ABBREVIATED;
         }
 
-        String key = getKey(rb, "ERA");
         String[] names =
-            lookupBundle(rb, calendarType, countOfEras(calendarType), key, tw, OutputContext.FORMAT, false, 0);
+            lookupBundle(
+                rb,
+                calendarType,
+                locale.getLanguage(),
+                countOfEras(calendarType),
+                getKey(rb, "ERA"),
+                tw,
+                OutputContext.FORMAT,
+                false,
+                0);
 
         if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
             names = eras(calendarType, locale, TextWidth.ABBREVIATED);
@@ -312,6 +338,7 @@ public final class GenericTextProviderSPI
     private static String[] lookupBundle(
         ResourceBundle rb,
         String calendarType,
+        String language,
         int len,
         String elementName,
         TextWidth tw,
@@ -352,20 +379,75 @@ public final class GenericTextProviderSPI
             b.append(')');
             b.append('_');
             b.append(i + baseIndex);
-            if ((i == 6) && leapForm && elementName.equals("M") && calendarType.equals("hebrew")) {
+            if (leapForm && (i == 6) && calendarType.equals("hebrew")) {
                 // special case for ADAR-II
                 b.append('L');
             }
             String key = b.toString();
 
             if (rb.containsKey(key)) {
-                names[i] = rb.getString(key);
+                String s = rb.getString(key);
+                if (leapForm && calendarType.equals("chinese")) {
+                    s = toLeapForm(s, language, tw, oc);
+                }
+                names[i] = s;
             } else {
                 return null;
             }
         }
 
         return names;
+
+    }
+
+    private static String toLeapForm(
+        String s,
+        String language,
+        TextWidth tw,
+        OutputContext oc
+    ) {
+
+        switch (language) {
+            case "en":
+                if (tw == TextWidth.NARROW) {
+                    s = "i" + s;
+                } else {
+                    s = "(leap) " + s;
+                }
+                break;
+            case "de":
+            case "es":
+            case "fr":
+            case "it":
+            case "pt":
+            case "ro":
+                if (tw == TextWidth.NARROW) {
+                    s = "i" + s;
+                } else {
+                    s = "(i) " + s;
+                }
+                break;
+            case "ja":
+                s = "閏" + s;
+                break;
+            case "ko":
+                s = "윤" + s;
+                break;
+            case "zh":
+                s = "閏" + s;
+                break;
+            case "vi":
+                if (tw == TextWidth.NARROW) {
+                    s = s + "n";
+                } else {
+                    s = s + ((oc == OutputContext.STANDALONE) ? " Nhuận" : " nhuận");
+                }
+                break;
+            default:
+                s = "*" + s;
+        }
+
+        return s;
 
     }
 
@@ -403,7 +485,8 @@ public final class GenericTextProviderSPI
     private static int countOfEras(String ct) {
 
         return (
-            (ct.equals("ethiopic") || ct.equals("generic") || ct.equals("roc") || ct.equals("buddhist")) ? 2 : 1);
+            (ct.equals("ethiopic") || ct.equals("generic")
+                || ct.equals("roc") || ct.equals("buddhist") || ct.equals("korean")) ? 2 : 1);
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -85,6 +85,18 @@ final class SPX
 
     /** Serialisierungstyp. */
     static final int HEBREW_TIME = 13;
+
+    /** Serialisierungstyp. */
+    static final int CHINESE = 14;
+
+    /** Serialisierungstyp. */
+    static final int KOREAN = 15;
+
+    /** Serialisierungstyp. */
+    static final int VIETNAMESE = 16;
+
+    /** Serialisierungstyp. */
+    static final int JUCHE = 17;
 
     private static final long serialVersionUID = 1L;
 
@@ -191,6 +203,14 @@ final class SPX
             case HEBREW_TIME:
                 this.writeHebrewTime(out);
                 break;
+            case CHINESE:
+            case KOREAN:
+            case VIETNAMESE:
+                this.writeEAC(out);
+                break;
+            case JUCHE:
+                this.writeJuche(out);
+                break;
             default:
                 throw new InvalidClassException("Unsupported calendar type.");
         }
@@ -256,6 +276,18 @@ final class SPX
                 break;
             case HEBREW_TIME:
                 this.obj = this.readHebrewTime(in);
+                break;
+            case CHINESE:
+                this.obj = this.readChinese(in);
+                break;
+            case KOREAN:
+                this.obj = this.readKorean(in);
+                break;
+            case VIETNAMESE:
+                this.obj = this.readVietnamese(in);
+                break;
+            case JUCHE:
+                this.obj = this.readJuche(in);
                 break;
             default:
                 throw new InvalidObjectException("Unknown calendar type.");
@@ -535,6 +567,91 @@ final class SPX
         int part = in.readShort();
 
         return HebrewTime.ofDigital(hour23, part);
+
+    }
+
+    private void writeEAC(ObjectOutput out)
+        throws IOException {
+
+        EastAsianCalendar<?, ?> cal = (EastAsianCalendar<?, ?>) this.obj;
+        out.writeByte(cal.getCycle());
+        out.writeByte(cal.getYear().getNumber());
+        out.writeByte(cal.getMonth().getNumber());
+        out.writeBoolean(cal.getMonth().isLeap());
+        out.writeByte(cal.getDayOfMonth());
+
+    }
+
+    private ChineseCalendar readChinese(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int cycle = in.readByte();
+        int yearOfCycle = in.readByte();
+        int month = in.readByte();
+        boolean leap = in.readBoolean();
+        int dom = in.readByte();
+
+        EastAsianMonth eam = EastAsianMonth.valueOf(month);
+
+        if (leap) {
+            eam = eam.withLeap();
+        }
+
+        return ChineseCalendar.of(cycle, yearOfCycle, eam, dom);
+
+    }
+
+    private KoreanCalendar readKorean(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int cycle = in.readByte();
+        int yearOfCycle = in.readByte();
+        int month = in.readByte();
+        boolean leap = in.readBoolean();
+        int dom = in.readByte();
+
+        EastAsianMonth eam = EastAsianMonth.valueOf(month);
+
+        if (leap) {
+            eam = eam.withLeap();
+        }
+
+        return KoreanCalendar.of(cycle, yearOfCycle, eam, dom);
+
+    }
+
+    private VietnameseCalendar readVietnamese(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        int cycle = in.readByte();
+        int yearOfCycle = in.readByte();
+        int month = in.readByte();
+        boolean leap = in.readBoolean();
+        int dom = in.readByte();
+
+        EastAsianMonth eam = EastAsianMonth.valueOf(month);
+
+        if (leap) {
+            eam = eam.withLeap();
+        }
+
+        return VietnameseCalendar.of(cycle, yearOfCycle, eam, dom);
+
+    }
+
+    private void writeJuche(ObjectOutput out)
+        throws IOException {
+
+        JucheCalendar jc = (JucheCalendar) this.obj;
+        out.writeObject(jc.toISO());
+
+    }
+
+    private JucheCalendar readJuche(ObjectInput in)
+        throws IOException, ClassNotFoundException {
+
+        PlainDate iso = PlainDate.class.cast(in.readObject());
+        return new JucheCalendar(iso);
 
     }
 
