@@ -450,8 +450,7 @@ public final class VietnameseCalendar
         ENGINE = builder.build();
     }
 
-    // TODO: serial-support
-    //private static final long serialVersionUID = -8248846000788617742L;
+    private static final long serialVersionUID = -3151525803739185874L;
 
     //~ Konstruktoren -----------------------------------------------------
 

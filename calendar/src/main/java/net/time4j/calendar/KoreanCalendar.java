@@ -523,8 +523,7 @@ public final class KoreanCalendar
         ENGINE = builder.build();
     }
 
-    // TODO: serial-support
-    //private static final long serialVersionUID = -8248846000788617742L;
+    private static final long serialVersionUID = -4284841131270593971L;
 
     //~ Konstruktoren -----------------------------------------------------
 

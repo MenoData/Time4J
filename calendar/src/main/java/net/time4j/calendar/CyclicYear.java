@@ -132,8 +132,7 @@ public final class CyclicYear
         LANGS_WITHOUT_SEP = Collections.unmodifiableSet(set);
     }
 
-    // TODO: evaluate again
-    // private static final long serialVersionUID = 6677607109702604931L;
+    private static final long serialVersionUID = 4908662352833192131L;
 
     //~ Instanzvariablen ------------------------------------------------------
 

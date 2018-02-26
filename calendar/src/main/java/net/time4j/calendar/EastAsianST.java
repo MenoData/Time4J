@@ -51,7 +51,7 @@ class EastAsianST<D extends EastAsianCalendar<?, D>>
 
     private static final EastAsianST SINGLETON = new EastAsianST();
 
-    //private static final long serialVersionUID = -5874268477318061153L;
+    private static final long serialVersionUID = 4572549754637955194L;
 
     //~ Methoden ------------------------------------------------------
 

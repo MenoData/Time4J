@@ -566,8 +566,7 @@ public final class ChineseCalendar
         ENGINE = builder.build();
     }
 
-    // TODO: serial-support
-    //private static final long serialVersionUID = -8248846000788617742L;
+    private static final long serialVersionUID = 8743381746750717307L;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -905,7 +904,7 @@ public final class ChineseCalendar
 
         static final EraElement INSTANCE = new EraElement();
 
-        // TODO: serialversionUID
+        private static final long serialVersionUID = -7868534502157983978L;
 
         //~ Konstruktoren -------------------------------------------------
 
