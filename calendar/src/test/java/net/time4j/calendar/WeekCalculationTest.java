@@ -426,6 +426,9 @@ public class WeekCalculationTest {
                 CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())),
             // persian default week model has Saturday as first day of week and only needs one day in first week
             is(6));
+        assertThat(
+            pcal.getMaximum(PersianCalendar.BOUNDED_WEEK_OF_MONTH), // convenience
+            is(6));
     }
 
     @Test

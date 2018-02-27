@@ -342,4 +342,23 @@ public class HijriMiscellaneousTest {
         // should be first week of next year but the end of time axis is already reached so we just continue to count
     }
 
+    @Test
+    public void weekElements() {
+        assertThat(
+            HijriCalendar.LOCAL_DAY_OF_WEEK,
+            is(CommonElements.localDayOfWeek(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())));
+        assertThat(
+            HijriCalendar.WEEK_OF_YEAR,
+            is(CommonElements.weekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())));
+        assertThat(
+            HijriCalendar.WEEK_OF_MONTH,
+            is(CommonElements.weekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())));
+        assertThat(
+            HijriCalendar.BOUNDED_WEEK_OF_YEAR,
+            is(CommonElements.boundedWeekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())));
+        assertThat(
+            HijriCalendar.BOUNDED_WEEK_OF_MONTH,
+            is(CommonElements.boundedWeekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())));
+    }
+
 }
