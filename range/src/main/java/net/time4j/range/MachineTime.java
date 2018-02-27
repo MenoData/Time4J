@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MachineTime.java) is part of project Time4J.
  *
@@ -1179,7 +1179,6 @@ public final class MachineTime<U>
      *
      * @see     #ofPattern(String)
      * @since   3.26/4.22
-     * @doctags.concurrency {immutable}
      */
     /*[deutsch]
      * <p>Nicht-lokalisiertes benutzerdefiniertes Dauerformat, das auf
@@ -1196,7 +1195,6 @@ public final class MachineTime<U>
      *
      * @see     #ofPattern(String)
      * @since   3.26/4.22
-     * @doctags.concurrency {immutable}
      */
     public static final class Formatter
         extends TimeSpanFormatter<TimeUnit, MachineTime<TimeUnit>> {
