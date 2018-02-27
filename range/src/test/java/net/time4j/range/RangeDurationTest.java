@@ -13,6 +13,8 @@ import net.time4j.scale.TimeScale;
 import net.time4j.tz.Timezone;
 
 import java.util.concurrent.TimeUnit;
+
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -165,6 +167,16 @@ public class RangeDurationTest {
             is(
                 Duration.ofPositive().months(2).days(29)
                 .hours(8).minutes(15).build()));
+    }
+
+    @Test
+    public void getNominalDurationOfMomentInterval() {
+        Moment m1 = Moment.of(1278028823, TimeScale.UTC);
+        Moment m2 = Moment.of(1278028826, 1, TimeScale.UTC);
+        Duration<?> duration =
+            MomentInterval.between(m1, m2).getNominalDuration(Timezone.of(ZonalOffset.UTC), ClockUnit.SECONDS);
+        Duration<?> expected = Duration.of(2, ClockUnit.SECONDS);
+        assertThat(duration, is(expected));
     }
 
     @Test

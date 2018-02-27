@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentInterval.java) is part of project Time4J.
  *
@@ -34,6 +34,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -61,6 +62,8 @@ import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static net.time4j.PlainDate.*;
 import static net.time4j.format.Attributes.PROTECTED_CHARACTERS;
@@ -907,6 +910,104 @@ public final class MomentInterval
     }
 
     /**
+     * <p>Obtains a stream iterating over every moment which is the result of addition of given duration
+     * to start until the end of this interval is reached. </p>
+     *
+     * <p>The stream size is limited to {@code Integer.MAX_VALUE - 1} else an {@code ArithmeticException}
+     * will be thrown. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @return  stream consisting of distinct moments which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(MachineTime, Moment, Moment)
+     * @since   4.35
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils einen Moment als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende dieses Intervalls geht. </p>
+     *
+     * <p>Die Gr&ouml;&szlig;e des {@code Stream} ist maximal {@code Integer.MAX_VALUE - 1}, ansonsten wird
+     * eine {@code ArithmeticException} geworfen. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @throws  IllegalArgumentException if the duration is not positive
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @return  stream consisting of distinct moments which are the result of adding the duration to the start
+     * @see     #toCanonical()
+     * @see     #stream(MachineTime, Moment, Moment)
+     * @since   4.35
+     */
+    public Stream<Moment> stream(MachineTime<?> duration) {
+
+        MomentInterval interval = this.toCanonical();
+        Moment start = interval.getStartAsMoment();
+        Moment end = interval.getEndAsMoment();
+
+        if ((start == null) || (end == null)) {
+            throw new IllegalStateException("Streaming is not supported for infinite intervals.");
+        }
+
+        return MomentInterval.stream(duration, start, end);
+
+    }
+
+    /**
+     * <p>Obtains a stream iterating over every moment which is the result of addition of given duration
+     * to start until the end is reached. </p>
+     *
+     * <p>This static method avoids the costs of constructing an instance of {@code MomentInterval}.
+     * The stream size is limited to {@code Integer.MAX_VALUE - 1} else an {@code ArithmeticException}
+     * will be thrown. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - exclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct moments which are the result of adding the duration to the start
+     * @since   4.35
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeweils einen Moment als Vielfaches der Dauer angewandt auf
+     * den Start und bis zum Ende geht. </p>
+     *
+     * <p>Diese statische Methode vermeidet die Kosten der Intervallerzeugung. Die Gr&ouml;&szlig;e des
+     * {@code Stream} ist maximal {@code Integer.MAX_VALUE - 1}, ansonsten wird eine {@code ArithmeticException}
+     * geworfen. </p>
+     *
+     * @param   duration    duration which has to be added to the start multiple times
+     * @param   start       start boundary - inclusive
+     * @param   end         end boundary - exclusive
+     * @throws  IllegalArgumentException if start is after end or if the duration is not positive
+     * @return  stream consisting of distinct moments which are the result of adding the duration to the start
+     * @since   4.35
+     */
+    public static Stream<Moment> stream(
+        MachineTime<?> duration,
+        Moment start,
+        Moment end
+    ) {
+
+        if (!duration.isPositive()) {
+            throw new IllegalArgumentException("Duration must be positive: " + duration);
+        }
+
+        int comp = start.compareTo(end);
+
+        if (comp > 0) {
+            throw new IllegalArgumentException("Start after end: " + start + "/" + end);
+        } else if (comp == 0) {
+            return Stream.empty();
+        } else if (duration.getScale() == TimeScale.UTC) {
+            return streamUTC(MachineTime.cast(duration), start, end);
+        } else {
+            return streamPOSIX(MachineTime.cast(duration), start, end);
+        }
+
+    }
+
+    /**
      * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
      *
      * @param   dateStyle       iso-compatible date style
@@ -1618,6 +1719,104 @@ public final class MomentInterval
             MachineTime<TimeUnit> mt = (MachineTime<TimeUnit>) duration;
             return moment.minus(mt);
         }
+
+    }
+
+    private static Stream<Moment> streamPOSIX(
+        MachineTime<TimeUnit> duration,
+        Moment start,
+        Moment end
+    ) {
+
+        double secs = 0.0;
+
+        for (TimeSpan.Item<? extends TimeUnit> item : duration.getTotalLength()) {
+            secs += TimeUnit.SECONDS.convert(item.getAmount(), item.getUnit());
+        }
+
+        double est; // first estimate
+
+        if (secs < 1.0) {
+            est = (start.until(end, TimeUnit.NANOSECONDS) / (secs * 1_000_000_000));
+        } else {
+            est = (start.until(end, TimeUnit.SECONDS) / secs);
+        }
+
+        if (Double.compare(est, Integer.MAX_VALUE) >= 0) {
+            throw new ArithmeticException();
+        }
+
+        int n = (int) Math.floor(est);
+        boolean backwards = false;
+
+        while ((n > 0) && !start.plus(duration.multipliedBy(n)).isBefore(end)) {
+            n--;
+            backwards = true;
+        }
+
+        int size = n + 1;
+
+        if (!backwards) {
+            do {
+                size = Math.addExact(n, 1);
+                n++;
+            } while (start.plus(duration.multipliedBy(n)).isBefore(end));
+        }
+
+        if (size == 1) {
+            return Stream.of(start); // short-cut
+        }
+
+        return IntStream.range(0, size).mapToObj(index -> start.plus(duration.multipliedBy(index)));
+
+    }
+
+    private static Stream<Moment> streamUTC(
+        MachineTime<SI> duration,
+        Moment start,
+        Moment end
+    ) {
+
+        double secs = 0.0;
+
+        for (TimeSpan.Item<? extends SI> item : duration.getTotalLength()) {
+            secs += item.getUnit().getLength() * item.getAmount();
+        }
+
+        double est; // first estimate
+
+        if (secs < 1.0) {
+            est = (SI.NANOSECONDS.between(start, end) / (secs * 1_000_000_000));
+        } else {
+            est = (SI.SECONDS.between(start, end) / secs);
+        }
+
+        if (Double.compare(est, Integer.MAX_VALUE) >= 0) {
+            throw new ArithmeticException();
+        }
+
+        int n = (int) Math.floor(est);
+        boolean backwards = false;
+
+        while ((n > 0) && !start.plus(duration.multipliedBy(n)).isBefore(end)) {
+            n--;
+            backwards = true;
+        }
+
+        int size = n + 1;
+
+        if (!backwards) {
+            do {
+                size = Math.addExact(n, 1);
+                n++;
+            } while (start.plus(duration.multipliedBy(n)).isBefore(end));
+        }
+
+        if (size == 1) {
+            return Stream.of(start); // short-cut
+        }
+
+        return IntStream.range(0, size).mapToObj(index -> start.plus(duration.multipliedBy(index)));
 
     }
 

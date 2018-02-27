@@ -8,7 +8,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.time.Instant;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
@@ -355,5 +358,22 @@ public class BasicMomentRangeTest {
         assertThat(MomentInterval.ALWAYS.getStart().isInfinite(), is(true));
         assertThat(MomentInterval.ALWAYS.getEnd().isInfinite(), is(true));
     }
+
+    @Test
+    public void stream() {
+        Moment start = PlainTimestamp.of(2014, 5, 1, 23, 0).atUTC();
+        Moment end = PlainTimestamp.of(2014, 5, 2, 1, 30).atUTC();
+        MomentInterval interval = MomentInterval.between(start, end);
+        MachineTime<?> duration = MachineTime.ofPosixUnits(3601, 0);
+
+        List<Moment> expected = new ArrayList<>();
+        expected.add(start);
+        expected.add(PlainTimestamp.of(2014, 5, 2, 0, 0, 1).atUTC());
+        expected.add(PlainTimestamp.of(2014, 5, 2, 1, 0, 2).atUTC());
+
+        List<Moment> result = interval.stream(duration).collect(Collectors.toList());
+        assertThat(result, is(expected));
+    }
+
 
 }

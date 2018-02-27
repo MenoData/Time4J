@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MachineTime.java) is part of project Time4J.
  *
@@ -1161,9 +1161,9 @@ public final class MachineTime<U>
     }
 
     @SuppressWarnings("unchecked")
-    private static <U> U cast(Object unit) {
+    static <T> T cast(Object obj) {
 
-        return (U) unit;
+        return (T) obj;
 
     }
 
