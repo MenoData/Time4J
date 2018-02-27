@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FixedClock.java) is part of project Time4J.
  *
@@ -30,7 +30,6 @@ import net.time4j.base.UnixTime;
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine stillstehende Uhr, die immer die gleiche feste
@@ -38,7 +37,6 @@ import net.time4j.base.UnixTime;
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @doctags.concurrency <immutable>
  */
 public final class FixedClock
     extends AbstractClock {

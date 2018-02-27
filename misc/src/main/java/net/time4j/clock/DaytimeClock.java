@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DaytimeClock.java) is part of project Time4J.
  *
@@ -53,7 +53,6 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @since       2.1
- * @doctags.concurrency <threadsafe>
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Verbindung zu einem DAYTIME-Server nach der
@@ -67,7 +66,6 @@ import java.util.Locale;
  *
  * @author      Meno Hochschild
  * @since       2.1
- * @doctags.concurrency <threadsafe>
  */
 public class DaytimeClock
     extends NetTimeConnector<NetTimeConfiguration> {

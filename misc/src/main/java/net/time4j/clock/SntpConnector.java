@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SntpConnector.java) is part of project Time4J.
  *
@@ -43,7 +43,6 @@ import java.util.ServiceLoader;
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @doctags.concurrency <threadsafe>
  */
 /*[deutsch]
  * <p>Nimmt die Verbindung zu einem modernen Uhrzeit-Server gem&auml;&szlig;
@@ -63,7 +62,6 @@ import java.util.ServiceLoader;
  *
  * @author  Meno Hochschild
  * @since   2.1
- * @doctags.concurrency <threadsafe>
  */
 public class SntpConnector
     extends NetTimeConnector<SntpConfiguration> {
