@@ -101,7 +101,18 @@ import java.util.Map;
  * of New Moon are not accurate enough to decide which month start exactly is right (the results are very
  * close to local midnight). </p>
  *
- * <h4>Example of usage</h4>
+ * <h4>Examples of usage</h4>
+ *
+ * <p>How to determine the festivals of New Year and Qing-Ming as gregorian dates: </p>
+ *
+ * <pre>
+ *     ChineseCalendar newyear = ChineseCalendar.ofNewYear(2020);
+ *     ChineseCalendar qingming = newyear.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015);
+ *     System.out.println(newyear.transform(PlainDate.axis())); // 2020-01-25
+ *     System.out.println(qingming.transform(PlainDate.axis())); // 2020-04-04
+ * </pre>
+ *
+ * <p>Formatting with cyclic years and solar terms: </p>
  *
  * <pre>
  *     ChronoFormatter&lt;ChineseCalendar&gt; formatter =
@@ -121,6 +132,21 @@ import java.util.Map;
  *     assertThat(
  *       formatter.format(chineseDate),
  *       is(&quot;Sat, 16. M11 2018(wù-xū) dōngzhì&quot;));
+ * </pre>
+ *
+ * <p>Leap months can be formatted in various ways. Following example shows how to customize numerical printing
+ * when a non-Chinese language is used: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;ChineseCalendar&gt; f =
+ *       ChronoFormatter.ofPattern(&quot;M/d, U(r)&quot;, PatternType.CLDR, Locale.ENGLISH, ChineseCalendar.axis())
+ *         .with(EastAsianMonth.LEAP_MONTH_IS_TRAILING, true)
+ *         .with(EastAsianMonth.LEAP_MONTH_INDICATOR, &#39;b&#39;);
+ *     ChineseCalendar cc =
+ *       ChineseCalendar.of(EastAsianYear.forGregorian(2020), EastAsianMonth.valueOf(4).withLeap(), 5);
+ *     assertThat(
+ *       f.format(cc),
+ *       is(&quot;4b/5, &quot; + cc.getYear().getDisplayName(Locale.ENGLISH) + &quot;(2020)&quot;));
  * </pre>
  *
  * <h4>Support for unicode ca-extensions</h4>
@@ -180,7 +206,19 @@ import java.util.Map;
  * erkl&auml;rt, weil dessen Berechnungen nicht genau genug sind, um zu entscheiden, welcher Monatsbeginn
  * wirklich der richtige ist (die Ergebnisse sind sehr nahe an der &ouml;rtlichen Mitternacht). </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <h4>Anwendungsbeispiele</h4>
+ *
+ * <p>Wie k&ouml;nnen die Feiertage des chinesischen Neujahrs und von Qing-Ming als gregorianische
+ * Datumsangaben bestimmt werden? </p>
+ *
+ * <pre>
+ *     ChineseCalendar newyear = ChineseCalendar.ofNewYear(2020);
+ *     ChineseCalendar qingming = newyear.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015);
+ *     System.out.println(newyear.transform(PlainDate.axis())); // 2020-01-25
+ *     System.out.println(qingming.transform(PlainDate.axis())); // 2020-04-04
+ * </pre>
+ *
+ * <p>Formatierung mit zyklischen Jahren und Sonnenmonaten: </p>
  *
  * <pre>
  *     ChronoFormatter&lt;ChineseCalendar&gt; formatter =
@@ -200,6 +238,21 @@ import java.util.Map;
  *     assertThat(
  *       formatter.format(chineseDate),
  *       is(&quot;Sat, 16. M11 2018(wù-xū) dōngzhì&quot;));
+ * </pre>
+ *
+ * <p>Schaltmonate k&ouml;nnen verschieden formatiert werden. Das folgende Beispiel zeigt, wie man
+ * die numerische Formatierung im Fall einer nicht-chinesischen Sprache anpassen kann: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;ChineseCalendar&gt; f =
+ *       ChronoFormatter.ofPattern(&quot;M/d, U(r)&quot;, PatternType.CLDR, Locale.ENGLISH, ChineseCalendar.axis())
+ *         .with(EastAsianMonth.LEAP_MONTH_IS_TRAILING, true)
+ *         .with(EastAsianMonth.LEAP_MONTH_INDICATOR, &#39;b&#39;);
+ *     ChineseCalendar cc =
+ *       ChineseCalendar.of(EastAsianYear.forGregorian(2020), EastAsianMonth.valueOf(4).withLeap(), 5);
+ *     assertThat(
+ *       f.format(cc),
+ *       is(&quot;4b/5, &quot; + cc.getYear().getDisplayName(Locale.ENGLISH) + &quot;(2020)&quot;));
  * </pre>
  *
  * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>

@@ -223,6 +223,17 @@ public class ChineseMiscellaneousTest {
     }
 
     @Test
+    public void customizedLeapMonthFormat() {
+        ChronoFormatter<ChineseCalendar> f =
+            ChronoFormatter.ofPattern("M/d, U(r)", PatternType.CLDR, Locale.ENGLISH, ChineseCalendar.axis())
+                .with(EastAsianMonth.LEAP_MONTH_IS_TRAILING, true)
+                .with(EastAsianMonth.LEAP_MONTH_INDICATOR, 'b');
+        ChineseCalendar cc =
+            ChineseCalendar.of(EastAsianYear.forGregorian(2020), EastAsianMonth.valueOf(4).withLeap(), 5);
+        assertThat(f.format(cc), is("4b/5, " + cc.getYear().getDisplayName(Locale.ENGLISH) + "(2020)"));
+    }
+
+    @Test
     public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-chinese");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);

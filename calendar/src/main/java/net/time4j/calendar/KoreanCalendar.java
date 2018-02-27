@@ -101,6 +101,7 @@ import java.util.Map;
  *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
+ * @see     ChineseCalendar
  * @author  Meno Hochschild
  * @since   3.40/4.35
  * @doctags.concurrency {immutable}
@@ -154,6 +155,7 @@ import java.util.Map;
  *          is(&quot;Sunday, M08 12, 2017(dīng-yǒu)&quot;));
  * </pre>
  *
+ * @see     ChineseCalendar
  * @author  Meno Hochschild
  * @since   3.40/4.35
  * @doctags.concurrency {immutable}
