@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -84,7 +84,7 @@ public enum PatternType
      *
      * <p>Non-ISO-chronologies are also supported if their elements define CLDR-symbols. </p>
      *
-     * <div style="margin-top:5px;">
+     * <div style="margin-top:5px;margin-bottom:5px;">
      * <table border="1">
      *  <caption>Legend</caption>
      *  <tr>
@@ -97,7 +97,8 @@ public enum PatternType
      *      <td>G</td>
      *      <td>One to three symbols indicate an abbreviation, four symbols
      *      indicate the long form and five symbols stand for a letter. The era
-     *      is based on the chronological history of the current format locale. </td>
+     *      is based on the expression {@code ChronoHistory.of(format-locale)}
+     *      unless a non-ISO-chronology defines the era in a different way. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link ChronoHistory#yearOfEra() YEAR_OF_ERA}</td>
@@ -106,12 +107,12 @@ public enum PatternType
      *      digits. If it is 2 however then the year will be printed with
      *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}.
      *      Important: If the era is not present then this symbol will simply
-     *      be mapped to {@link PlainDate#YEAR}. </td>
+     *      be mapped to {@link PlainDate#YEAR} (for ISO-like types). </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
      *      <td>Y</td>
-     *      <td>Represents the year in an ISO-8601 week date and behaves
+     *      <td>Represents the year in an ISO-8601 week date only and behaves
      *      like the calendar year in formatting. The week-based year can
      *      deviate from the calendar year however because it is bound to
      *      the week cycle. </td>
@@ -123,7 +124,15 @@ public enum PatternType
      *      a pivot year, also not for &quot;uu&quot;. A positive sign
      *      will be used exactly if the year has more digits than given
      *      by count of symbols. In contrast to the symbol y, this year
-     *      can never be the historized year-of-era. </td>
+     *      can never be the historized year-of-era. It is also not supported
+     *      by non-ISO-chronologies (small deviation from original CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_CYCLE</td>
+     *      <td>U</td>
+     *      <td>Can only be processed by calendars which know cyclic years like the Chinese calendar.
+     *      The count of symbols has to be in range {@code 1-5} but is else not relevant because
+     *      there is usually no concept of abbreviations versus full names. </td>
      *  </tr>
      *  <tr>
      *      <td>RELATED_GREGORIAN_YEAR</td>
@@ -197,7 +206,7 @@ public enum PatternType
      *      <td>The count of symbols usually controls the minimum count of
      *      digits of modified julian year, that is the count of days relative
      *      to 1858-11-17. Is only supported by calendrical types like
-     *      {@code PlainDate}. </td>
+     *      {@code PlainDate} etc. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#DAY_OF_WEEK}</td>
@@ -327,7 +336,12 @@ public enum PatternType
      * </table>
      * </div>
      *
-     * <p>Special notes for the Ethiopian calendar: </p>
+     * <p><strong>Special notes for the Vietnamese calendar: </strong></p>
+     *
+     * <p>There is no era so the symbols &quot;G&quot; and &quot;y&quot; are not supported. Use the cyclic year
+     * &quot;U&quot; (maybe in combination with related gregorian year &quot;r&quot;) instead. </p>
+     *
+     * <p><strong>Special notes for the Ethiopian calendar: </strong></p>
      *
      * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour can be overridden
      * on builder-level. And the clock time (symbol &quot;h&quot;) will use the Ethiopian time starting
@@ -349,7 +363,7 @@ public enum PatternType
      *
      * <p>Nicht-ISO-Chronologien werden auch unterst&uuml;tzt, wenn ihre Elemente CLDR-Symbole definieren. </p>
      *
-     * <div style="margin-top:5px;">
+     * <div style="margin-top:5px;margin-bottom:5px;">
      * <table border="1">
      *  <caption>Legende</caption>
      *  <tr>
@@ -363,7 +377,8 @@ public enum PatternType
      *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
      *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
      *      Buchstabensymbol. Die &Auml;ra basiert auf dem Ausdruck
-     *      {@code ChronoHistory.of(format-locale)}. </td>
+     *      {@code ChronoHistory.of(format-locale)}, es sei denn, eine
+     *      Nicht-ISO-Chronologie definiert die &Auml;ra anders. </td>
      *  </tr>
      *  <tr>
      *      <td>YEAR_OF_ERA</td>
@@ -372,15 +387,15 @@ public enum PatternType
      *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
      *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}.
      *      Wichtig: Ist die &Auml;ra nicht im Muster vorhanden, wird dieses
-     *      Symbol dem Element {@link PlainDate#YEAR} zugeordnet. </td>
+     *      Symbol dem Element {@link PlainDate#YEAR} (f&uuml;r ISO-Typen) zugeordnet. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#YEAR_OF_WEEKDATE}</td>
      *      <td>Y</td>
-     *      <td>Entspricht dem Jahr in einem ISO-Wochendatum und verh&auml;lt
-     *      sich in der Formatierung wie das Kalenderjahr. Das wochenbasierte
-     *      Jahr kann im Wochenmodell des ISO-8601-Standards vom Kalenderjahr
-     *      abweichen, weil es an den Wochenzyklus gebunden ist. </td>
+     *      <td>Entspricht dem Jahr ausschlie&szlig;lich in einem ISO-Wochendatum
+     *      und verh&auml;lt sich in der Formatierung wie das Kalenderjahr. Das
+     *      wochenbasierte Jahr kann im Wochenmodell des ISO-8601-Standards vom
+     *      Kalenderjahr abweichen, weil es an den Wochenzyklus gebunden ist. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#YEAR}</td>
@@ -390,7 +405,15 @@ public enum PatternType
      *      positives Vorzeichen wird genau dann ausgegeben, wenn das Jahr
      *      mehr Stellen hat als an Symbolen vorgegeben. Im Kontrast zum
      *      Symbol y kann dieses Jahr niemals das historische Jahr einer
-     *      &Auml;ra sein. </td>
+     *      &Auml;ra sein. Es wird auch nur von ISO-Chronologien unterst&uuml;tzt
+     *      (kleine Abweichung vom Original-CLDR-Standard). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_CYCLE</td>
+     *      <td>U</td>
+     *      <td>Kann nur von Kalendern verarbeitet werden, die wie der chinesische zyklische Jahre kennen.
+     *      Die Anzahl der Symbole liegt im Bereich {@code 1-5}, ist aber nicht relevant, weil es normalerweise
+     *      kein Konzept von Abk&uuml;rzungen versus vollen Namen gibt. </td>
      *  </tr>
      *  <tr>
      *      <td>RELATED_GREGORIAN_YEAR</td>
@@ -399,8 +422,8 @@ public enum PatternType
      *      ISO-Jahr des Beginns des jeweiligen Kalenderjahres. F&uuml;r ISO-Kalender
      *      ist es identisch mit dem proleptischen ISO-Kalenderjahr. Zur Formatierung
      *      werden immer die ASCII-Ziffern 0-9 verwendet, selbst wenn andere Teile
-     *      des Formats andere numerische Ziffern oder sogar andere Numeralsystem
-     *      verwenden. </td>
+     *      des Formats andere numerische Ziffern oder sogar andere Numeralsysteme
+     *      verwenden. Die Anzahl der Symbole ist im Bereich 1-9 zu w&auml;hlen. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#QUARTER_OF_YEAR}</td>
@@ -471,7 +494,7 @@ public enum PatternType
      *      <td>Die Anzahl der Symbole regelt wie &uuml;blich die minimale
      *      Anzahl der Stellen des modifizierten julianischen Jahres, also
      *      der Anzahl der Tage seit 1858-11-17. Wird nur von reinen
-     *      Datumsklassen wie {@code PlainDate} unterst&uuml;tzt. </td>
+     *      Datumsklassen wie {@code PlainDate} etc. unterst&uuml;tzt. </td>
      *  </tr>
      *  <tr>
      *      <td>{@link PlainDate#DAY_OF_WEEK}</td>
@@ -603,7 +626,13 @@ public enum PatternType
      * </table>
      * </div>
      *
-     * <p>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </p>
+     * <p><strong>Anmerkungen f&uuml;r den vietnamesischen Kalender: </strong></p>
+     *
+     * <p>Es gibt keine &Auml;ra, so da&szlig; die Symbole &quot;G&quot; und &quot;y&quot; nicht
+     * unterst&uuml;tzt werden. Verwende stattdessen das zyklische Jahr &quot;U&quot; (eventuell
+     * in Verbindung mit dem gregorianischen Bezugsjahr &quot;r&quot;). </p>
+     *
+     * <p><strong>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </strong></p>
      *
      * <p>Das &auml;thiopische Jahr wird in Amharic die &auml;thiopischen Numerale verwenden. Dieses
      * Standardverhalten kann auf <i>builder</i>-Ebene &uuml;berschrieben werden. Und die Uhrzeit
@@ -659,6 +688,11 @@ public enum PatternType
      *  <tr>
      *      <td>QUARTER_OF_YEAR</td>
      *      <td>q</td>
+     *      <td>Not supported (as work-around: use CLDR). </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_CYCLE</td>
+     *      <td>U</td>
      *      <td>Not supported (as work-around: use CLDR). </td>
      *  </tr>
      *  <tr>
@@ -770,6 +804,11 @@ public enum PatternType
      *  <tr>
      *      <td>QUARTER_OF_YEAR</td>
      *      <td>q</td>
+     *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_CYCLE</td>
+     *      <td>U</td>
      *      <td>Unterst&uuml;tzung nicht hier, sondern nur in CLDR. </td>
      *  </tr>
      *  <tr>
@@ -895,7 +934,7 @@ public enum PatternType
      * controls the minimum count of digits in case of a numerical element.
      * Is an element shorter then the zero digit will be used for padding. </p>
      *
-     * <div style="margin-top:5px;">
+     * <div style="margin-top:5px;margin-bottom:5px;">
      * <table border="1">
      *  <caption>Legend</caption>
      *  <tr>
@@ -915,6 +954,13 @@ public enum PatternType
      *      <td>The count of symbols normally controls the minimum count of
      *      digits. If it is 2 however then the year will be printed with
      *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_CYCLE</td>
+     *      <td>U</td>
+     *      <td>Can only be processed by calendars which know cyclic years like the Chinese calendar.
+     *      The count of symbols has to be in range {@code 1-5} but is else not relevant because
+     *      there is usually no concept of abbreviations versus full names. </td>
      *  </tr>
      *  <tr>
      *      <td>MONTH_OF_YEAR</td>
@@ -983,10 +1029,32 @@ public enum PatternType
      *      alternative digits or other numeral systems. The count of symbols is
      *      defined within the range 1-9. </td>
      *  </tr>
+     *  <tr>
+     *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
+     *      <td>g</td>
+     *      <td>The count of symbols usually controls the minimum count of
+     *      digits of modified julian year, that is the count of days relative
+     *      to 1858-11-17. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_WEEKDATE</td>
+     *      <td>Y</td>
+     *      <td>Not supported here. Use ISO-8601-types only in combination with {@link #CLDR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR</td>
+     *      <td>u</td>
+     *      <td>Not supported here. Use ISO-8601-types only in combination with {@link #CLDR}. </td>
+     *  </tr>
      * </table>
      * </div>
      *
-     * <p>Special notes for the Ethiopian calendar: </p>
+     * <p><strong>Special notes for the Vietnamese calendar: </strong></p>
+     *
+     * <p>There is no era so the symbols &quot;G&quot; and &quot;y&quot; are not supported. Use the cyclic year
+     * &quot;U&quot; (maybe in combination with related gregorian year &quot;r&quot;) instead. </p>
+     *
+     * <p><strong>Special notes for the Ethiopian calendar: </strong></p>
      *
      * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour
      * can be overridden on builder-level using a sectional attribute for the number system. </p>
@@ -1006,7 +1074,7 @@ public enum PatternType
      * Element vorausgesetzt. Ist also ein Element in der Darstellung
      * k&uuml;rzer, dann wird mit der Null-Ziffer aufgef&uuml;llt. </p>
      *
-     * <div style="margin-top:5px;">
+     * <div style="margin-top:5px;margin-bottom:5px;">
      * <table border="1">
      *  <caption>Legende</caption>
      *  <tr>
@@ -1027,6 +1095,13 @@ public enum PatternType
      *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
      *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
      *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_CYCLE</td>
+     *      <td>U</td>
+     *      <td>Kann nur von Kalendern verarbeitet werden, die wie der chinesische zyklische Jahre kennen.
+     *      Die Anzahl der Symbole liegt im Bereich {@code 1-5}, ist aber nicht relevant, weil es normalerweise
+     *      kein Konzept von Abk&uuml;rzungen versus vollen Namen gibt. </td>
      *  </tr>
      *  <tr>
      *      <td>MONTH_OF_YEAR</td>
@@ -1097,13 +1172,36 @@ public enum PatternType
      *      <td>In nicht-gregorianischen Kalendersystemen entspricht es dem
      *      ISO-Jahr des Beginns des jeweiligen Kalenderjahres. Zur Formatierung
      *      werden immer die ASCII-Ziffern 0-9 verwendet, selbst wenn andere Teile
-     *      des Formats andere numerische Ziffern oder sogar andere Numeralsystem
+     *      des Formats andere numerische Ziffern oder sogar andere Numeralsysteme
      *      verwenden. Die Anzahl der Symbole ist im Bereich 1-9 zu w&auml;hlen. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>{@link EpochDays#MODIFIED_JULIAN_DATE}</td>
+     *      <td>g</td>
+     *      <td>Die Anzahl der Symbole regelt wie &uuml;blich die minimale
+     *      Anzahl der Stellen des modifizierten julianischen Jahres, also
+     *      der Anzahl der Tage seit 1858-11-17. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR_OF_WEEKDATE</td>
+     *      <td>Y</td>
+     *      <td>Hier nicht unterst&uuml;tzt. Verwende nur ISO-8601-Typen in Verbindung mit {@link #CLDR}. </td>
+     *  </tr>
+     *  <tr>
+     *      <td>YEAR</td>
+     *      <td>u</td>
+     *      <td>Hier nicht unterst&uuml;tzt. Verwende nur ISO-8601-Typen in Verbindung mit {@link #CLDR}. </td>
      *  </tr>
      * </table>
      * </div>
      *
-     * <p>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </p>
+     * <p><strong>Anmerkungen f&uuml;r den vietnamesischen Kalender: </strong></p>
+     *
+     * <p>Es gibt keine &Auml;ra, so da&szlig; die Symbole &quot;G&quot; und &quot;y&quot; nicht
+     * unterst&uuml;tzt werden. Verwende stattdessen das zyklische Jahr &quot;U&quot; (eventuell
+     * in Verbindung mit dem gregorianischen Bezugsjahr &quot;r&quot;). </p>
+     *
+     * <p><strong>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </strong></p>
      *
      * <p>Das &auml;thiopische Jahr wird per Standard in Amharic die &auml;thiopischen Numerale verwenden.
      * Diese Vorgabe kann auf <i>builder</i>-Ebene mit einem sektionalen Attribut f&uuml;r das Zahlsystem
@@ -1121,106 +1219,6 @@ public enum PatternType
      * <p>A small subset of CLDR applicable on any non-ISO-chronology which has registered the
      * associated elements with same symbols. </p>
      *
-     * <p>If not explicitly stated otherwise the count of symbols always
-     * controls the minimum count of digits in case of a numerical element.
-     * Is an element shorter then the zero digit will be used for padding. </p>
-     *
-     * <div style="margin-top:5px;">
-     * <table border="1">
-     *  <caption>Legend</caption>
-     *  <tr>
-     *      <th>Element</th>
-     *      <th>Symbol</th>
-     *      <th>Description</th>
-     *  </tr>
-     *  <tr>
-     *      <td>ERA</td>
-     *      <td>G</td>
-     *      <td>One to three symbols indicate an abbreviation, four symbols
-     *      indicate the long form and five symbols stand for a letter. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>YEAR_OF_ERA</td>
-     *      <td>y</td>
-     *      <td>The count of symbols normally controls the minimum count of
-     *      digits. If it is 2 however then the year will be printed with
-     *      exact two digits using the attribute {@link Attributes#PIVOT_YEAR}. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>MONTH_OF_YEAR</td>
-     *      <td>M</td>
-     *      <td>One or two symbols for the numerical form, three symbols
-     *      for the abbreviation, four for the full name and five for
-     *      a letter symbol (NARROW). </td>
-     *  </tr>
-     *  <tr>
-     *      <td>MONTH_OF_YEAR</td>
-     *      <td>L</td>
-     *      <td>Like M, but in the version {@link OutputContext#STANDALONE}.
-     *      In some languages (not english) the stand-alone-version requires
-     *      a special grammar. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>WEEK_OF_YEAR</td>
-     *      <td>w</td>
-     *      <td>One or two symbols for the country-dependent week of year. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>WEEK_OF_MONTH</td>
-     *      <td>W</td>
-     *      <td>One symbol for the country-dependent week of month. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>DAY_OF_MONTH</td>
-     *      <td>d</td>
-     *      <td>One or two symbols for the day of month. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>DAY_OF_YEAR</td>
-     *      <td>D</td>
-     *      <td>One, two or three symbols for the day of year. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>DAY_OF_WEEK</td>
-     *      <td>E</td>
-     *      <td>One to three symbols for the abbreviation, four for the full
-     *      name, five for a letter symbol or six for the short form. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>WEEKDAY_IN_MONTH</td>
-     *      <td>F</td>
-     *      <td>One symbol for the weekday in month. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>LOCAL_DAY_OF_WEEK</td>
-     *      <td>e</td>
-     *      <td>Like E, but if there are only one or two symbols then the
-     *      formatter will choose the localized numerical form. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>LOCAL_DAY_OF_WEEK</td>
-     *      <td>c</td>
-     *      <td>Like e, but in the version {@link OutputContext#STANDALONE}.
-     *      In some languages (not english) the stand-alone-version requires
-     *      a special grammar. However, 2 symbols are not allowed. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>RELATED_GREGORIAN_YEAR</td>
-     *      <td>r</td>
-     *      <td>The related gregorian year corresponds to the begin of the calendar year
-     *      in non-gregorian calender systems. For formatting or parsing, only the
-     *      ASCII-digits 0-9 will be used, even if other parts of the format use
-     *      alternative digits or other numeral systems. The count of symbols is
-     *      defined within the range 1-9. </td>
-     *  </tr>
-     * </table>
-     * </div>
-     *
-     * <p>Special notes for the Ethiopian calendar: </p>
-     *
-     * <p>The Ethiopian year will use the Ethiopic numerals in Amharic. This default behaviour
-     * can be overridden on builder-level. </p>
-     *
      * @since       3.5/4.3
      * @deprecated  Use {@link #CLDR_DATE} as replacement because the name of this pattern type can be
      *              confusing considering the fact that not all calendars can be handled by this pattern type
@@ -1229,113 +1227,6 @@ public enum PatternType
     /*[deutsch]
      * <p>Eine kleine Untermenge von CLDR, die auf jede Non-ISO-Chronologie anwendbar ist, die die
      * assoziierten Elemente mit gleichen Symbolen registriert hat. </p>
-     *
-     * <p>Wenn nicht explizit anders angegeben, steuert die Anzahl der Symbole
-     * immer die minimale Anzahl der zu formatierenden Stellen, ein numerisches
-     * Element vorausgesetzt. Ist also ein Element in der Darstellung
-     * k&uuml;rzer, dann wird mit der Null-Ziffer aufgef&uuml;llt. </p>
-     *
-     * <div style="margin-top:5px;">
-     * <table border="1">
-     *  <caption>Legende</caption>
-     *  <tr>
-     *      <th>Element</th>
-     *      <th>Symbol</th>
-     *      <th>Beschreibung</th>
-     *  </tr>
-     *  <tr>
-     *      <td>ERA</td>
-     *      <td>G</td>
-     *      <td>Ein bis drei Symbole implizieren eine Abk&uuml;rzung, vier
-     *      Symbole die Langform und f&uuml;nf Symbole stehen f&uuml;r ein
-     *      Buchstabensymbol. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>YEAR_OF_ERA</td>
-     *      <td>y</td>
-     *      <td>Die Anzahl der Symbole regelt normalerweise die minimale
-     *      Ziffernzahl. Ist sie jedoch 2, dann wird das Jahr zweistellig
-     *      angezeigt - mit dem Attribut {@link Attributes#PIVOT_YEAR}. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>MONTH_OF_YEAR</td>
-     *      <td>M</td>
-     *      <td>Ein oder zwei Symbole f&uuml;r die numerische Form, drei
-     *      f&uuml;r die Abk&uuml;rzung, vier f&uuml;r den vollen Namen
-     *      oder f&uuml;nf f&uuml;r ein Buchstabensymbol (NARROW). </td>
-     *  </tr>
-     *  <tr>
-     *      <td>MONTH_OF_YEAR</td>
-     *      <td>L</td>
-     *      <td>Wie M, aber in der {@link OutputContext#STANDALONE
-     *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
-     *      erfordert die alleinstehende Variante eine besondere
-     *      Deklination. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>WEEK_OF_YEAR</td>
-     *      <td>w</td>
-     *      <td>Ein oder zwei Symbole f&uuml;r die l&auml;nderabh&auml;ngige
-     *      Woche des Jahres. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>WEEK_OF_MONTH</td>
-     *      <td>W</td>
-     *      <td>Ein Symbol f&uuml;r die l&auml;nderabh&auml;ngige
-     *      Woche des Monats. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>DAY_OF_MONTH</td>
-     *      <td>d</td>
-     *      <td>Ein oder zwei Symbole f&uuml;r den Tag des Monats. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>DAY_OF_YEAR</td>
-     *      <td>D</td>
-     *      <td>Ein, zwei oder drei Symbole f&uuml;r den Tag des Jahres. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>DAY_OF_WEEK</td>
-     *      <td>E</td>
-     *      <td>Ein bis drei Symbole f&uuml;r die Abk&uuml;rzung, vier
-     *      f&uuml;r den vollen Namen, f&uuml;nf f&uuml;r ein Buchstabensymbol
-     *      oder sechs f&uuml;r die Kurzform. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>WEEKDAY_IN_MONTH</td>
-     *      <td>F</td>
-     *      <td>Ein Symbol f&uuml;r den Wochentag im Monat. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>LOCAL_DAY_OF_WEEK</td>
-     *      <td>e</td>
-     *      <td>Wie E, aber wenn ein oder zwei Symbole angegeben sind, dann
-     *      wird die lokalisierte numerische Form gew&auml;hlt. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>LOCAL_DAY_OF_WEEK</td>
-     *      <td>c</td>
-     *      <td>Wie e, aber in der {@link OutputContext#STANDALONE
-     *      Stand-Alone-Version}. In manchen Sprachen (nicht englisch)
-     *      erfordert die alleinstehende Variante eine besondere
-     *      Deklination. Zu beachten: 2 Symbole sind nicht erlaubt. </td>
-     *  </tr>
-     *  <tr>
-     *      <td>RELATED_GREGORIAN_YEAR</td>
-     *      <td>r</td>
-     *      <td>In nicht-gregorianischen Kalendersystemen entspricht es dem
-     *      ISO-Jahr des Beginns des jeweiligen Kalenderjahres. Zur Formatierung
-     *      werden immer die ASCII-Ziffern 0-9 verwendet, selbst wenn andere Teile
-     *      des Formats andere numerische Ziffern oder sogar andere Numeralsystem
-     *      verwenden. Die Anzahl der Symbole ist im Bereich 1-9 zu w&auml;hlen. </td>
-     *  </tr>
-     * </table>
-     * </div>
-     *
-     * <p>Anmerkungen f&uuml;r den &auml;thiopischen Kalender: </p>
-     *
-     * <p>Das &auml;thiopische Jahr wird per Standard in Amharic die &auml;thiopischen Numerale verwenden.
-     * Diese Vorgabe kann auf <i>builder</i>-Ebene &uuml;berschrieben werden. </p>
      *
      * @since       3.5/4.3
      * @deprecated  Use {@link #CLDR_DATE} as replacement because the name of this pattern type can be
@@ -1457,7 +1348,9 @@ public enum PatternType
             case 'M':
             case 'd':
             case 'y':
+            case 'U':
             case 'r':
+            case 'g':
             case 'w':
             case 'W':
             case 'e':
@@ -1597,25 +1490,17 @@ public enum PatternType
                 addQuarterOfYear(builder, count);
                 break;
             case 'q':
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    addQuarterOfYear(builder, count);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                addQuarterOfYear(builder, count);
+                builder.endSection();
                 break;
             case 'M':
                 addMonth(builder, Math.min(count, sdf ? 4 : count));
                 break;
             case 'L':
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    addMonth(builder, count);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                addMonth(builder, Math.min(count, sdf ? 4 : count));
+                builder.endSection();
                 break;
             case 'w':
                 if (count <= 2) {
@@ -1693,16 +1578,13 @@ public enum PatternType
                 }
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    if (count == 1) {
-                        builder.addFixedNumerical(
-                            Weekmodel.of(locale).localDayOfWeek(), 1);
-                    } else {
-                        cldrISO(builder, chronology, locale, 'E', count, sdf);
-                    }
-                } finally {
-                    builder.endSection();
+                if (count == 1) {
+                    builder.addFixedNumerical(
+                        Weekmodel.of(locale).localDayOfWeek(), 1);
+                } else {
+                    cldrISO(builder, chronology, locale, 'E', count, sdf);
                 }
+                builder.endSection();
                 break;
             case 'a':
                 width = (sdf ? TextWidth.ABBREVIATED : getPeriodWidth(count));
@@ -1870,6 +1752,7 @@ public enum PatternType
             case 'Q':
             case 'q':
             case 'r':
+            case 'U':
             case 'g':
             case 'e':
             case 'c':
@@ -2054,6 +1937,15 @@ public enum PatternType
         Locale locale
     ) {
 
+        if (symbol == 'g') {
+            builder.addLongNumber(
+                EpochDays.MODIFIED_JULIAN_DATE,
+                count,
+                18,
+                SignPolicy.SHOW_WHEN_NEGATIVE);
+            return Collections.emptyMap();
+        }
+
         Set<ChronoElement<?>> elements = getElements(chronology, symbol, locale);
         String chronoType = builder.getChronology().getChronoType().getName();
         ChronoElement<?> element = find(elements, symbol, chronoType);
@@ -2105,6 +1997,26 @@ public enum PatternType
                     builder.endSection();
                 }
                 break;
+            case 'U':
+                if (textElement == null) {
+                    throw new IllegalStateException("Implementation error: " + element + " in \"" + chronoType + "\"");
+                } else {
+                    TextWidth width;
+                    if (count <= 3) {
+                        width = TextWidth.ABBREVIATED;
+                    } else if (count == 4) {
+                        width = TextWidth.WIDE;
+                    } else if (count == 5) {
+                        width = TextWidth.NARROW;
+                    } else {
+                        throw new IllegalArgumentException(
+                            "Too many pattern letters (U): " + count);
+                    }
+                    builder.startSection(Attributes.TEXT_WIDTH, width);
+                    builder.addText(textElement);
+                    builder.endSection();
+                }
+                break;
             case 'r':
                 builder.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
                 builder.startSection(Attributes.ZERO_DIGIT, '0');
@@ -2113,16 +2025,12 @@ public enum PatternType
                 builder.endSection();
                 break;
             case 'M':
-                addMonth(builder, Math.min(count, count), textElement);
+                addMonth(builder, count, textElement);
                 break;
             case 'L':
-                builder.startSection(
-                    Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    addMonth(builder, count, textElement);
-                } finally {
-                    builder.endSection();
-                }
+                builder.startSection(Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
+                addMonth(builder, count, textElement);
+                builder.endSection();
                 break;
             case 'w':
                 addNumber(intElement, symbol, builder, count, false);
@@ -2181,16 +2089,13 @@ public enum PatternType
                 }
                 builder.startSection(
                     Attributes.OUTPUT_CONTEXT, OutputContext.STANDALONE);
-                try {
-                    if (count == 1) {
-                        ChronoElement<Weekday> wde = cast(element);
-                        builder.addFixedNumerical(wde, 1);
-                    } else {
-                        general(builder, chronology, 'E', count, locale);
-                    }
-                } finally {
-                    builder.endSection();
+                if (count == 1) {
+                    ChronoElement<Weekday> wde = cast(element);
+                    builder.addFixedNumerical(wde, 1);
+                } else {
+                    general(builder, chronology, 'E', count, locale);
                 }
+                builder.endSection();
                 break;
             case 'F':
                 if (count == 1) {
