@@ -317,4 +317,23 @@ public class PersianMiscellaneousTest {
         date.get(element); // throws an exception because the element is not registered
     }
 
+    @Test
+    public void weekElements() {
+        assertThat(
+            PersianCalendar.LOCAL_DAY_OF_WEEK,
+            is(CommonElements.localDayOfWeek(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())));
+        assertThat(
+            PersianCalendar.WEEK_OF_YEAR,
+            is(CommonElements.weekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())));
+        assertThat(
+            PersianCalendar.WEEK_OF_MONTH,
+            is(CommonElements.weekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())));
+        assertThat(
+            PersianCalendar.BOUNDED_WEEK_OF_YEAR,
+            is(CommonElements.boundedWeekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())));
+        assertThat(
+            PersianCalendar.BOUNDED_WEEK_OF_MONTH,
+            is(CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())));
+    }
+
 }

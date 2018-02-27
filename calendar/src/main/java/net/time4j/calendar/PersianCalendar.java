@@ -350,6 +350,101 @@ public final class PersianCalendar
         ENGINE = builder.build();
     }
 
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.localDayOfWeek(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.localDayOfWeek(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Weekday, PersianCalendar> LOCAL_DAY_OF_WEEK =
+        CommonElements.localDayOfWeek(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.weekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.weekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, PersianCalendar> WEEK_OF_YEAR =
+        CommonElements.weekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.weekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.weekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, PersianCalendar> WEEK_OF_MONTH =
+        CommonElements.weekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.boundedWeekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.boundedWeekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, PersianCalendar> BOUNDED_WEEK_OF_YEAR =
+        CommonElements.boundedWeekOfYear(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, PersianCalendar> BOUNDED_WEEK_OF_MONTH =
+        CommonElements.boundedWeekOfMonth(PersianCalendar.axis(), PersianCalendar.getDefaultWeekmodel());
+
     private static final long serialVersionUID = -411339992208638290L;
 
     //~ Instanzvariablen --------------------------------------------------

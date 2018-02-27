@@ -467,6 +467,101 @@ public final class HijriCalendar
         ENGINE = builder.build();
     }
 
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.localDayOfWeek(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#localDayOfWeek(net.time4j.engine.Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.localDayOfWeek(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Weekday, HijriCalendar> LOCAL_DAY_OF_WEEK =
+        CommonElements.localDayOfWeek(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.weekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfYear(net.time4j.engine.Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.weekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, HijriCalendar> WEEK_OF_YEAR =
+        CommonElements.weekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.weekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfMonth(net.time4j.engine.Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.weekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, HijriCalendar> WEEK_OF_MONTH =
+        CommonElements.weekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.boundedWeekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfYear(net.time4j.engine.Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.boundedWeekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, HijriCalendar> BOUNDED_WEEK_OF_YEAR =
+        CommonElements.boundedWeekOfYear(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.boundedWeekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfMonth(net.time4j.engine.Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.boundedWeekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.40/4.35
+     */
+    public static final StdCalendarElement<Integer, HijriCalendar> BOUNDED_WEEK_OF_MONTH =
+        CommonElements.boundedWeekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel());
+
     private static final long serialVersionUID = 4666707700222367373L;
 
     //~ Instanzvariablen --------------------------------------------------
