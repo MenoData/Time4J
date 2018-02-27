@@ -86,6 +86,21 @@ public class SerializationTest {
     }
 
     @Test
+    public void serializeChinese() throws IOException, ClassNotFoundException {
+        roundtrip(ChineseCalendar.ofNewYear(2018));
+    }
+
+    @Test
+    public void serializeKorean() throws IOException, ClassNotFoundException {
+        roundtrip(KoreanCalendar.ofNewYear(2018));
+    }
+
+    @Test
+    public void serializeVietnamese() throws IOException, ClassNotFoundException {
+        roundtrip(VietnameseCalendar.ofTet(2018));
+    }
+
+    @Test
     public void serializeJuche() throws IOException, ClassNotFoundException {
         roundtrip(JucheCalendar.of(105, 1, 7));
     }
