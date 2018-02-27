@@ -85,6 +85,11 @@ public class SerializationTest {
         roundtrip(HebrewTime.ofDay(12, 540));
     }
 
+    @Test
+    public void serializeJuche() throws IOException, ClassNotFoundException {
+        roundtrip(JucheCalendar.of(105, 1, 7));
+    }
+
     private static int roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

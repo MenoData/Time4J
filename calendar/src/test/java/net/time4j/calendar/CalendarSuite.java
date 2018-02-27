@@ -1,6 +1,7 @@
 package net.time4j.calendar;
 
 import net.time4j.calendar.astro.AstroSuite;
+import net.time4j.calendar.frenchrev.FrenchRepublicanSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -11,6 +12,9 @@ import org.junit.runners.Suite.SuiteClasses;
     {
         AstroSuite.class,
         CalendarOverrideTest.class,
+        ChineseMiscellaneousTest.class,
+        ChineseOperatorTest.class,
+        ChineseYearTest.class,
         ClockTest.class,
         CopticCalendarTest.class,
         CopticMiscellaneousTest.class,
@@ -23,6 +27,7 @@ import org.junit.runners.Suite.SuiteClasses;
         EthiopianOperatorTest.class,
         EthiopianTimeTest.class,
         EvangelistTest.class,
+        FrenchRepublicanSuite.class,
         HebrewAnniversaryTest.class,
         HebrewCalendarTest.class,
         HebrewMiscellaneousTest.class,
@@ -35,6 +40,8 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriUnitTest.class,
         HijriYearTest.class,
         HistoricCalendarTest.class,
+        HongkongObservatory1Test.class,
+        HongkongObservatory2Test.class,
         IndianCalendarTest.class,
         IndianMiscellaneousTest.class,
         IndianOperatorTest.class,
@@ -42,8 +49,10 @@ import org.junit.runners.Suite.SuiteClasses;
         JapaneseElementTest.class,
         JapaneseTransitionTest.class,
         JapaneseUnitTest.class,
+        JucheMiscellaneousTest.class,
         JulianCalendarTest.class,
         JulianMiscellaneousTest.class,
+        KoreanMiscellaneousTest.class,
         MinguoCalendarTest.class,
         MinguoMiscellaneousTest.class,
         MonthNameTest.class,
@@ -53,12 +62,14 @@ import org.junit.runners.Suite.SuiteClasses;
         PersianOperatorTest.class,
         RelatedGregorianYearTest.class,
         SerializationTest.class,
+        SolarTermTest.class,
         StartOfDayTest.class,
         TabotTest.class,
         ThaiSolarCalendarTest.class,
         ThaiSolarMiscellaneousTest.class,
         ThaiSolarOperatorTest.class,
         UmalquraDataTest.class,
+        VietnameseMiscellaneousTest.class,
         WeekCalculationTest.class
     }
 )

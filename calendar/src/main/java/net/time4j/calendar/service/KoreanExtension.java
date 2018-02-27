@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (EthiopianExtension.java) is part of project Time4J.
+ * This file (KoreanExtension.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,8 +21,8 @@
 
 package net.time4j.calendar.service;
 
-import net.time4j.PlainTime;
-import net.time4j.calendar.EthiopianTime;
+import net.time4j.PlainDate;
+import net.time4j.calendar.KoreanCalendar;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -34,11 +34,12 @@ import java.util.Set;
 
 
 /**
- * <p>&Auml;thiopische Uhrzeit-Erweiterung. </p>
+ * <p>Koreanische Datumserweiterung. </p>
  *
  * @author  Meno Hochschild
+ * @since   3.40/4.35
  */
-public class EthiopianExtension
+public class KoreanExtension
     implements ChronoExtension {
 
     //~ Methoden ------------------------------------------------------
@@ -46,7 +47,7 @@ public class EthiopianExtension
     @Override
     public boolean accept(Class<?> chronoType) {
 
-        return false; // never called
+        return (chronoType == PlainDate.class);
 
     }
 
@@ -56,7 +57,7 @@ public class EthiopianExtension
         AttributeQuery attributes
     ) {
 
-        return Collections.<ChronoElement<?>>singleton(EthiopianTime.ETHIOPIAN_HOUR);
+        return Collections.emptySet();
 
     }
 
@@ -67,16 +68,9 @@ public class EthiopianExtension
         AttributeQuery attributes
     ) {
 
-        if (entity.contains(EthiopianTime.ETHIOPIAN_HOUR)) {
-            int h = entity.get(EthiopianTime.ETHIOPIAN_HOUR);
-            if (h == 12) {
-                h = 0;
-            }
-            h += 6;
-            if (h >= 12) {
-                h -= 12;
-            }
-            entity = entity.with(PlainTime.DIGITAL_HOUR_OF_AMPM, h);
+        if (entity.contains(KoreanCalendar.YEAR_OF_ERA)) {
+            int dangi = entity.getInt(KoreanCalendar.YEAR_OF_ERA);
+            entity = entity.with(PlainDate.YEAR, dangi - 2333);
         }
 
         return entity;
@@ -86,7 +80,7 @@ public class EthiopianExtension
     @Override
     public boolean canResolve(ChronoElement<?> element) {
 
-        return EthiopianTime.ETHIOPIAN_HOUR.equals(element);
+        return (element == KoreanCalendar.YEAR_OF_ERA);
 
     }
 

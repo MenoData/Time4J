@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EastAsianMonth.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.calendar;
 
 import net.time4j.engine.AttributeKey;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumberSystem;
@@ -34,7 +35,7 @@ import java.util.Map;
 
 
 /**
- * <p>Represents a month used in the East Asian countries China, Korea or Japan. </p>
+ * <p>Represents a month used in the East Asian countries China, Japan, Korea or Vietnam. </p>
  *
  * <p>This kind of month has its origins in the Chinese calendar. It is defined within the
  * lunisolar context and sometimes allows a leap month. Such a leap month happens about
@@ -49,7 +50,7 @@ import java.util.Map;
  * @since   3.32/4.27
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert den ostasiatischen Kalendermonat, der in den L&auml;ndern China, Korea und Japan
+ * <p>Repr&auml;sentiert den ostasiatischen Kalendermonat, der in den L&auml;ndern China, Japan, Korea und Vietnam
  * verwendet wird. </p>
  *
  * <p>Dieser Monatstyp hat seinen Ursprung in China, ist im lunisolaren Kontext definiert und erlaubt
@@ -71,15 +72,44 @@ public final class EastAsianMonth
     /**
      * <p>Format attribute which defines a symbol character for the leap month deviating from standard. </p>
      *
+     * <p>This attribute is only relevant for the numeric formatting of leap months. </p>
+     *
      * @see     net.time4j.format.expert.ChronoFormatter#with(AttributeKey, char)
+     * @see     #LEAP_MONTH_IS_TRAILING
      */
     /*[deutsch]
      * <p>Formatattribut, das ein Symbolzeichen f&uuml;r den Schaltmonat abweichend vom Standard definiert. </p>
      *
+     * <p>Dieses Attribut ist nur f&uuml;r die numerische Darstellung von Schaltmonaten von Interesse. </p>
+     *
      * @see     net.time4j.format.expert.ChronoFormatter#with(AttributeKey, char)
+     * @see     #LEAP_MONTH_IS_TRAILING
      */
     public static final AttributeKey<Character> LEAP_MONTH_INDICATOR =
         Attributes.createKey("LEAP_MONTH_INDICATOR", Character.class);
+
+    /**
+     * <p>Format attribute which defines if the symbol character for the leap month should be printed
+     * after the month (default is {@code false} for most languages). </p>
+     *
+     * <p>This attribute is only relevant for the numeric formatting of leap months. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#with(AttributeKey, boolean)
+     * @see     #LEAP_MONTH_INDICATOR
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>Formatattribut, das angibt, ob das Symbolzeichen f&uuml;r den Schaltmonat nach dem Monat
+     * angezeigt werden soll (Standard ist f&uuml;r die meisten Sprachen {@code false}). </p>
+     *
+     * <p>Dieses Attribut ist nur f&uuml;r die numerische Darstellung von Schaltmonaten von Interesse. </p>
+     *
+     * @see     net.time4j.format.expert.ChronoFormatter#with(AttributeKey, boolean)
+     * @see     #LEAP_MONTH_INDICATOR
+     * @since   3.40/4.35
+     */
+    public static final AttributeKey<Boolean> LEAP_MONTH_IS_TRAILING =
+        Attributes.createKey("LEAP_MONTH_IS_TRAILING", Boolean.class);
 
     private static final EastAsianMonth[] CACHE;
 
@@ -229,7 +259,7 @@ public final class EastAsianMonth
     }
 
     /**
-     * <p>Obtains a textual representation of this month for display purposes. </p>
+     * <p>Obtains a mainly numeric representation of this month for display purposes. </p>
      *
      * <p>East Asian months are traditionally displayed in a numeric way. Example: </p>
      *
@@ -241,14 +271,15 @@ public final class EastAsianMonth
      *
      * <p>The leap indicator is locale-sensitive. Time4J uses the asterisk as default, but for the major
      * European languages with some affinity to Latin also the small letter &quot;i&quot; (intercalary).
-     * The East Asian languages Japanese, Chinese and Korean have their own special characters. </p>
+     * The East Asian languages Chinese (閏), Japanese (閏), Korean (윤) and Vietnamese (n) have their own
+     * special characters. </p>
      *
      * @param   locale      language setting
      * @param   numsys      number system
      * @return  descriptive text (never {@code null})
      */
     /*[deutsch]
-     * <p>Liefert eine Textdarstellung dieses Monats f&uuml;r Anzeigezwecke. </p>
+     * <p>Liefert eine weitgehend numerische Darstellung dieses Monats f&uuml;r Anzeigezwecke. </p>
      *
      * <p>Ostasiatische Monate werden traditionell in einer numerischen Darstellung pr&auml;sentiert. Beispiel: </p>
      *
@@ -261,7 +292,8 @@ public final class EastAsianMonth
      * <p>Das Schalt-Sonderzeichen h&auml;ngt von der verwendeten Sprache ab. Time4J benutzt das Sternchen
      * &quot;*&quot; als Standard, aber die wichtigsten europ&auml;ischen Sprachen mit einer gewissen N&auml;he
      * zu Lateinisch (inklusive Englisch und Deutsch) definieren den Kleinbuchstaben &quot;i&quot;. Die
-     * ostasiatischen Sprachen Japanisch, Chinesisch und Koreanisch haben ihre eigenen Sonderzeichen. </p>
+     * ostasiatischen Sprachen Chinesisch (閏), Japanisch (閏), Koreanisch (윤) und Vietnamesisch (n) haben
+     * ihre eigenen Sonderzeichen. </p>
      *
      * @param   locale      language setting
      * @param   numsys      number system
@@ -272,15 +304,18 @@ public final class EastAsianMonth
         NumberSystem numsys
     ) {
 
-        Map<String, String> textForms = CalendarText.getInstance("generic", locale).getTextForms();
-        String pattern = textForms.get("month-num-pattern");
-        String display = pattern.replace("{0}", numsys.toNumeral(this.getNumber()));
+        String s = this.getDisplayName(locale, numsys, Attributes.empty());
+        String lang = locale.getLanguage();
 
-        if (this.leap) {
-            display = textForms.get("leap-month") + display;
+        if (lang.equals("zh")) {
+            s = s + "月";
+        } else if (lang.equals("ko")) {
+            s = s + "월";
+        } else if (lang.equals("ja")) {
+            s = s + "月";
         }
 
-        return display;
+        return s;
 
     }
 
@@ -325,6 +360,58 @@ public final class EastAsianMonth
 
         String s = String.valueOf(this.index + 1);
         return (this.leap ? "*" + s : s);
+
+    }
+
+    // also called by EastAsianME
+    String getDisplayName(
+        Locale locale,
+        NumberSystem numsys,
+        AttributeQuery attributes
+    ) {
+
+        Map<String, String> textForms = CalendarText.getInstance("generic", locale).getTextForms();
+        char zeroDigit = attributes.get(Attributes.ZERO_DIGIT, numsys.getDigits().charAt(0));
+        String display = toNumeral(numsys, zeroDigit, this.getNumber());
+
+        if (this.leap) {
+            boolean trailing =
+                attributes.get(LEAP_MONTH_IS_TRAILING, "R".equals(textForms.get("leap-alignment")));
+            char indicator =
+                attributes.get(LEAP_MONTH_INDICATOR, textForms.get("leap-indicator").charAt(0));
+            display = (trailing ? display + indicator : indicator + display);
+        }
+
+        return display;
+
+    }
+
+    // also called by EastAsianME
+    static String toNumeral(
+        NumberSystem numsys,
+        char zeroDigit,
+        int number
+    ) {
+
+        if (numsys.isDecimal()) {
+            int delta = zeroDigit - '0';
+            String standard = Integer.toString(number);
+
+            if (delta == 0) {
+                return standard;
+            }
+
+            StringBuilder numeral = new StringBuilder();
+
+            for (int i = 0, n = standard.length(); i < n; i++) {
+                int codepoint = standard.charAt(i) + delta;
+                numeral.append((char) codepoint);
+            }
+
+            return numeral.toString();
+        } else {
+            return numsys.toNumeral(number);
+        }
 
     }
 

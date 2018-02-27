@@ -2573,8 +2573,6 @@ public final class JapaneseCalendar
 
     }
 
-
-
     private static class MonthPrimitiveElement
         extends EastAsianME
         implements ElementRule<JapaneseCalendar, EastAsianMonth> {
@@ -2679,21 +2677,20 @@ public final class JapaneseCalendar
             AttributeQuery attributes
         ) throws IOException, ChronoException {
 
-            Locale loc = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
-            int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
-            EastAsianMonth eam = context.get(MONTH_OF_YEAR);
-            int num = eam.getNumber();
-
             if (context.get(CommonElements.RELATED_GREGORIAN_YEAR) >= 1873) {
+                int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
+                int num = context.get(MONTH_OF_YEAR).getNumber();
+
                 if (count == 0) {
+                    Locale loc = attributes.get(Attributes.LANGUAGE, Locale.ROOT);
                     TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
                     OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
                     buffer.append(CalendarText.getIsoInstance(loc).getStdMonths(tw, oc).print(Month.valueOf(num)));
                 } else {
                     NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
-                    String s = numsys.toNumeral(num);
+                    char zeroDigit = attributes.get(Attributes.ZERO_DIGIT, numsys.getDigits().charAt(0));
+                    String s = EastAsianMonth.toNumeral(numsys, zeroDigit, num);
                     if (numsys.isDecimal()) {
-                        char zeroDigit = numsys.getDigits().charAt(0);
                         int padding = count - s.length();
                         while (padding > 0) {
                             buffer.append(zeroDigit);
@@ -2703,13 +2700,7 @@ public final class JapaneseCalendar
                     buffer.append(s);
                 }
             } else {
-                if (eam.isLeap()) {
-                    char defaultLI =
-                        CalendarText.getInstance("generic", loc).getTextForms().get("leap-month").charAt(0);
-                    buffer.append(attributes.get(EastAsianMonth.LEAP_MONTH_INDICATOR, defaultLI));
-                }
-                NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
-                buffer.append(numsys.toNumeral(num)); // no padding in lunisolar case
+                super.print(context, buffer, attributes); // no padding in numeric lunisolar case
             }
 
         }
@@ -2729,80 +2720,16 @@ public final class JapaneseCalendar
                 TextWidth tw = attributes.get(Attributes.TEXT_WIDTH, TextWidth.WIDE);
                 OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
                 TextAccessor accessor = CalendarText.getIsoInstance(loc).getStdMonths(tw, oc);
-
-                for (int num = 1; num <= 12; num++) {
-                    Month gregorianMonth = accessor.parse(text, status, Month.class, attributes);
-                    if (gregorianMonth != null) {
-                        return EastAsianMonth.valueOf(gregorianMonth.getValue());
-                    } else { // reset
-                        status.setIndex(start);
-                        status.setErrorIndex(-1);
-                    }
+                Month gregorianMonth = accessor.parse(text, status, Month.class, attributes);
+                if (gregorianMonth != null) {
+                    return EastAsianMonth.valueOf(gregorianMonth.getValue());
+                } else { // reset
+                    status.setIndex(start);
+                    status.setErrorIndex(-1);
                 }
             }
 
-            char defaultLI =
-                CalendarText.getInstance("generic", loc).getTextForms().get("leap-month").charAt(0);
-            char li = attributes.get(EastAsianMonth.LEAP_MONTH_INDICATOR, defaultLI).charValue();
-            int pos = start;
-            boolean leap = false;
-
-            if (text.charAt(pos) == li) {
-                leap = true;
-                pos++;
-            }
-
-            NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
-            int total = 0;
-            boolean decimal = numsys.isDecimal();
-            int minPos = pos + 1;
-            int maxPos = (decimal ? pos + 2 : pos + 9); // safe
-
-            if (decimal) {
-                char zeroDigit = numsys.getDigits().charAt(0);
-                while (pos < maxPos) {
-                    int digit = text.charAt(pos) - zeroDigit;
-
-                    if ((digit >= 0) && (digit <= 9)) {
-                        total = total * 10 + digit;
-                        pos++;
-                    } else {
-                        break;
-                    }
-                }
-            } else {
-                while (pos < maxPos) {
-                    if (numsys.contains(text.charAt(pos))) {
-                        pos++;
-                    } else {
-                        break;
-                    }
-                }
-
-                try {
-                    if (pos >= minPos) {
-                        Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
-                        total = numsys.toInteger(text.subSequence(minPos - 1, pos).toString(), leniency);
-                    }
-                } catch (NumberFormatException nfe) {
-                    status.setErrorIndex(start);
-                    return null;
-                }
-            }
-
-            if ((pos < minPos) || (total < 1) || (total > 12)) {
-                status.setErrorIndex(start);
-                return null;
-            }
-
-            EastAsianMonth month = EastAsianMonth.valueOf(total);
-
-            if (leap) {
-                month = month.withLeap();
-            }
-
-            status.setIndex(pos);
-            return month;
+            return super.parse(text, status, attributes); // numeric gregorian or lunisolar
 
         }
 
