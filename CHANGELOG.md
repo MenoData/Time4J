@@ -5,6 +5,7 @@
 - Vietnamese lunar calendar [#641]
 - Cyclic year used in East Asian calendars [#638]
 - Juche calendar (North Korea) [#748]
+- Increase displayed precision of moon illumination [#747]
 - Convenience constants for calendar-specific week elements [#753]
 - Bounded calendar-week-elements in CommonElements [#738]
 - Optimize chronological extensions during parsing [#749]
