@@ -118,7 +118,7 @@ public class MoonTest {
                 ZonalOffset.UTC
             ).toMoment();
         assertThat(
-            MoonPhase.getIllumination(m),
+            MoonPhase.getIllumination(m, 0),
             is(0.68)); // Meeus (example 48.a)
         assertThat(
             MoonPhase.getIllumination(MoonPhase.NEW_MOON.after(m)),
@@ -132,6 +132,24 @@ public class MoonTest {
         assertThat(
             MoonPhase.getIllumination(MoonPhase.LAST_QUARTER.after(m)),
             is(0.5));
+    }
+
+    @Test
+    public void illuminationOfMoonWithMoreDigits() {
+        Moment m =
+            JulianDay.ofEphemerisTime(
+                PlainDate.of(1992, 4, 12),
+                PlainTime.midnightAtStartOfDay(),
+                ZonalOffset.UTC
+            ).toMoment();
+        assertThat(
+            MoonPhase.getIllumination(m, 3),
+            is(0.68013));
+    }
+
+    @Test(expected=ArrayIndexOutOfBoundsException.class)
+    public void illuminationOfMoonWithInvalidPrecision() {
+        MoonPhase.getIllumination(Moment.UNIX_EPOCH, 4);
     }
 
     @Test

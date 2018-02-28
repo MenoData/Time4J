@@ -76,6 +76,7 @@ public enum MoonPhase {
 	 */
 	LAST_QUARTER(270);
 
+	private static final int[] FACTORS = {100, 1000, 10000, 100000};
 	private static final double MEAN_SYNODIC_MONTH = 29.530588861;
 	private static final Moment ZERO_REF = PlainTimestamp.of(2000, 1, 6, 18, 13, 42).atUTC(); // NEW_MOON.atLunation(0)
 
@@ -405,9 +406,9 @@ public enum MoonPhase {
 	/**
 	 * <p>Determines the degree of illumination of the moon at given moment. </p>
 	 *
-	 * <p>The accuracy is limited to percent values (two digits after decimal point). </p>
+	 * <p>The precision is limited to percent values (two digits after decimal point). </p>
 	 *
-	 * @param 	moment	universal time
+	 * @param 	moment	    universal time
 	 * @return	degree of illumination in range {@code 0.00 <= i <= 1.00}
 	 */
 	/*[deutsch]
@@ -415,10 +416,48 @@ public enum MoonPhase {
 	 *
 	 * <p>Die Genauigkeit ist auf Prozentwerte beschr&auml;nkt (zwei Nachkommastellen). </p>
 	 *
-	 * @param 	moment	universal time
+	 * @param 	moment	    universal time
 	 * @return	degree of illumination in range {@code 0.00 <= i <= 1.00}
 	 */
 	public static double getIllumination(Moment moment) {
+
+		return getIllumination(moment, 0);
+
+	}
+
+	/**
+	 * <p>Determines the degree of illumination of the moon at given moment. </p>
+	 *
+	 * <p>The accuracy is limited to percent values (two digits after decimal point)
+	 * if specified as {@code 0}. For promille values, specify {@code 1} etc. However,
+	 * an increased precision does not imply more accuracy but is only suitable to
+	 * show some vague tendencies. Percent precision is usually the best choice. </p>
+	 *
+	 * @param 	moment		universal time
+	 * @param 	precision	desired count of fractional digits of percent values (in range {@code 0-3})
+	 * @return	degree of illumination in range {@code 0.00 <= i <= 1.00}
+	 * @throws 	IndexOutOfBoundsException if the precision is out of range
+	 * @since 	3.40/4.35
+	 */
+	/*[deutsch]
+	 * <p>Ermittelt den Beleuchtungsgrad des Mondes zur angegebenen Zeit. </p>
+	 *
+	 * <p>Die Genauigkeit ist auf Prozentwerte beschr&auml;nkt (zwei Nachkommastellen), wenn
+	 * als {@code 0} angegeben. F&uuml;r Promillewerte setze {@code 1} usw. Zu beachten ist
+	 * aber, da&szlig; h&ouml;here Genauigkeiten nicht notwendig real sind und lediglich
+	 * geeignet sind, ungef&auml;hre Tendenzen anzuzeigen. Meistens ist eine reine
+	 * Prozentgenauigkeit sinnvoll. </p>
+	 *
+	 * @param 	moment		universal time
+	 * @param 	precision	desired count of fractional digits of percent values (in range {@code 0-3})
+	 * @return	degree of illumination in range {@code 0.00 <= i <= 1.00}
+	 * @throws 	IndexOutOfBoundsException if the precision is out of range
+	 * @since 	3.40/4.35
+	 */
+	public static double getIllumination(
+		Moment moment,
+		int precision
+	) {
 
 		double jct = JulianDay.ofEphemerisTime(moment).getCenturyJ2000();
 
@@ -444,11 +483,12 @@ public enum MoonPhase {
 				- 0.11 * sin(meanElongation);
 
 		double k = (cos(i) + 1) / 2; // Meeus (48.1)
+		int factor = FACTORS[precision];
 
-		if (k >= 0.995) {
+		if (factor - k * factor <= 0.5) {
 			return 1.0;
 		} else {
-			return Math.floor(k * 100) / 100; // rounding
+			return Math.floor(k * factor) / factor; // rounding
 		}
 
 	}
