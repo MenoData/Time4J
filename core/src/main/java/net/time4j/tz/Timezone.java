@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Timezone.java) is part of project Time4J.
  *
@@ -791,25 +791,37 @@ public abstract class Timezone
     public abstract ZonalOffset getStandardOffset(UnixTime ut);
 
     /**
-     * <p>Calculates the dst-offset for given global timestamp. </p>
+     * <p>Calculates the daylight saving amount for given global timestamp. </p>
      *
-     * <p>Note: The returned offset has never any subsecond part, normally
-     * not even seconds but full minutes or hours. </p>
+     * <p>Notes: The returned offset has never any subsecond part, normally
+     * not even seconds but full minutes or hours. Starting with tzdb-version 2018b,
+     * the obtained daylight saving amount might also be negative in some rare cases,
+     * see the case of Ireland (Europe/Dublin) which has a negative DST-offset in
+     * winter and zero in summer standard time. Users are asked not to interprete
+     * too much in this method. It should only be interpreted as deviation relative
+     * to standard time (what ever this might be). </p>
      *
      * @param   ut      unix time
-     * @return  dst-shift in seconds which yields local wall time if added to standard local time
+     * @return  DST-shift in seconds which yields local wall time if added to standard local time
      * @since   3.2/4.1
      */
     /*[deutsch]
-     * <p>Ermittelt die Sommerzeitverschiebung zum angegebenen Zeitpunkt auf
+     * <p>Ermittelt die Tageslichtverschiebung zum angegebenen Zeitpunkt auf
      * der UT-Weltzeitlinie in Sekunden. </p>
      *
-     * <p>Hinweis: Die zur&uuml;ckgegebene Verschiebung hat niemals
+     * <p>Hinweise: Die zur&uuml;ckgegebene Verschiebung hat niemals
      * Subsekundenteile, normalerweise auch nicht Sekundenteile, sondern
-     * nur volle Minuten oder Stunden. </p>
+     * nur volle Minuten oder Stunden. Beginnend mit der TZDB-Version 2018b
+     * kann der erhaltene Betrag in seltenen F&auml;llen auch negativ sein.
+     * Siehe zum Beispiel den Fall von Irland (Europe/Dublin), das eine
+     * negative Tageslichtverschiebung im Winter kennt, die nur im Sommer
+     * als Standardzeit gleich null ist. Anwender sollten nicht zuviel in
+     * diese Methode hineininterpretieren. Stattdessen ist die Tageslichtverschiebung
+     * einfach nur als Abweichung von der Standardzeit zu deuten, was auch immer
+     * letztere sei. </p>
      *
      * @param   ut      unix time
-     * @return  dst-shift in seconds which yields local wall time if added to standard local time
+     * @return  DST-shift in seconds which yields local wall time if added to standard local time
      * @since   3.2/4.1
      */
     public abstract ZonalOffset getDaylightSavingOffset(UnixTime ut);
@@ -891,18 +903,20 @@ public abstract class Timezone
 
     /**
      * <p>Queries if given global timestamp matches daylight saving time
-     * in this timezone? </p>
+     * relative to winter in this timezone? </p>
      *
      * <p>The DST correction can be obtained as difference between total
      * offset and raw offset if the raw offset has not changed yet.
-     * As alternative the DST correction can be obtained by evaluating
-     * the transition offset history. </p>
+     * As alternative, the DST correction can be obtained by evaluating
+     * the transition offset history. About the rare case of Ireland
+     * which observes standard time in summer and has a negative DST
+     * correction in winter (using the TZDB-version 2018b), this method
+     * will yield {@code true} in summer and {@code false} in winter. </p>
      *
      * @param   ut      unix time
-     * @return  {@code true} if the argument represents summer time
-     *          else {@code false}
-     * @see     java.util.TimeZone#inDaylightTime(java.util.Date)
-     *          java.util.TimeZone.inDaylightTime(java.util.Date)
+     * @return  {@code true} if the argument represents summer time else {@code false}
+     * @return  {@code true} if the argument represents any kind of summer time else {@code false}
+     * @see     java.util.TimeZone#inDaylightTime(java.util.Date) java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     /*[deutsch]
      * <p>Herrscht zum angegebenen Zeitpunkt Sommerzeit in der Zeitzone? </p>
@@ -910,13 +924,15 @@ public abstract class Timezone
      * <p>Die DST-Korrektur selbst kann als Differenz zwischen dem Gesamt-Offset
      * und dem Standard-Offset erhalten werden, wenn sich der Standard-Offset
      * historisch nicht ge&auml;ndert hat. Alternativ und genauer kann die
-     * DST-Korrektur &uuml;ber die Offset-Historie ermittelt werden. </p>
+     * DST-Korrektur &uuml;ber die Offset-Historie ermittelt werden. Was den
+     * Fall von Irland angeht, das die Sommerzeit als Standardzeit definiert
+     * und im Winter eine negative DST-Verschiebung kennt (in der TZDB-Version
+     * 2018b), so wird diese Methode {@code true} im Sommer und {@code false}
+     * im Winter liefern. </p>
      *
      * @param   ut      unix time
-     * @return  {@code true} if the argument represents summer time
-     *          else {@code false}
-     * @see     java.util.TimeZone#inDaylightTime(java.util.Date)
-     *          java.util.TimeZone.inDaylightTime(java.util.Date)
+     * @return  {@code true} if the argument represents any kind of summer time else {@code false}
+     * @see     java.util.TimeZone#inDaylightTime(java.util.Date) java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     public abstract boolean isDaylightSaving(UnixTime ut);
 

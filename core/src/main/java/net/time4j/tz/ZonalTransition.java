@@ -279,10 +279,7 @@ public final class ZonalTransition
 
     /**
      * <p>Returns the DST-shift (daylight savings) after this transition that is
-     * the shift induced by change to summer time. </p>
-     *
-     * <p>If the method {@code isDaylightSaving()} yields the value {@code false}
-     * then this method will simply yield {@code 0}. </p>
+     * the shift normally induced by change to summer time. </p>
      *
      * @return  daylight-saving-shift in seconds after transition
      * @see     #getTotalOffset()
@@ -290,11 +287,8 @@ public final class ZonalTransition
      * @see     #isDaylightSaving()
      */
     /*[deutsch]
-     * <p>Liefert die DST-Verschiebung nach dem &Uuml;bergang, also den durch
-     * die Sommerzeit induzierten Versatz. </p>
-     *
-     * <p>Wenn die Methode {@code isDaylightSaving()} den Wert {@code false}
-     * ergibt, dann liefert diese Methode einfach nur den Wert {@code 0}. </p>
+     * <p>Liefert die DST-Verschiebung nach dem &Uuml;bergang, also
+     * normalerweise den durch die Sommerzeit induzierten Versatz. </p>
      *
      * @return  daylight-saving-shift in seconds after transition
      * @see     #getTotalOffset()
@@ -308,7 +302,7 @@ public final class ZonalTransition
     }
 
     /**
-     * <p>Queries if there is any daylight savings after this transition. </p>
+     * <p>Queries if there is any positive daylight savings after this transition. </p>
      *
      * @return  boolean
      * @see     #getDaylightSavingOffset()
