@@ -44,12 +44,15 @@ public class SystemClockTest {
 
     @Test
     public void realTimeInMicros() {
-        SystemClock clock = SystemClock.MONOTONIC;
+        SystemClock clock1 = SystemClock.MONOTONIC;
+        SystemClock clock2 = SystemClock.INSTANCE;
+        long delta = Math.abs(clock1.realTimeInMicros() - clock2.realTimeInMicros());
+        System.out.println("=>" + delta);
         assertThat(
-            Math.abs(clock.realTimeInMicros() - SystemClock.INSTANCE.realTimeInMicros()) < 1000,
+            delta < 5000,
             is(true));
-        long utc = clock.realTimeInMicros() / 1000000;
-        long unix = clock.currentTimeInMicros() / 1000000;
+        long utc = clock1.realTimeInMicros() / 1000000;
+        long unix = clock1.currentTimeInMicros() / 1000000;
         assertThat(
             LeapSeconds.getInstance().strip(utc),
             is(unix));
