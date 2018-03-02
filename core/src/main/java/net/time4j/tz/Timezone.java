@@ -914,7 +914,6 @@ public abstract class Timezone
      * will yield {@code true} in summer and {@code false} in winter. </p>
      *
      * @param   ut      unix time
-     * @return  {@code true} if the argument represents summer time else {@code false}
      * @return  {@code true} if the argument represents any kind of summer time else {@code false}
      * @see     java.util.TimeZone#inDaylightTime(java.util.Date) java.util.TimeZone.inDaylightTime(java.util.Date)
      */
