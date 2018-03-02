@@ -42,7 +42,7 @@ import java.io.Serializable;
  * @author  Meno Hochschild
  * @since   3.38/4.33
  */
-public final class SunPosition
+public class SunPosition
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -251,17 +251,19 @@ public final class SunPosition
      */
     public double getShadowLength(double objectHeight) {
 
+        final double e = this.getElevation();
+
         if (Double.isInfinite(objectHeight) || Double.isNaN(objectHeight)) {
             throw new IllegalArgumentException("Object height must be finite and positive: " + objectHeight);
         } else {
             if (objectHeight <= 0.0) {
                 throw new IllegalArgumentException("Object height must be greater than zero: " + objectHeight);
-            } else if (this.elevation <= 0.0) {
+            } else if (e <= 0.0) {
                 return Double.POSITIVE_INFINITY;
-            } else if (this.elevation == 90.0) {
+            } else if (e == 90.0) {
                 return 0.0;
             } else {
-                return objectHeight / Math.tan(Math.toRadians(this.elevation));
+                return objectHeight / Math.tan(Math.toRadians(e));
             }
         }
 
