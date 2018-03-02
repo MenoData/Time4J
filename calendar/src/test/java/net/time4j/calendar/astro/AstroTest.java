@@ -899,6 +899,9 @@ public class AstroTest {
         assertThat(
             position.getElevation(),
             is(14.679074225415283)); // usno => 14.7
+        assertThat(
+            Math.round(position.getShadowLength(1.8) * 100) / 100.0,
+            is(6.87));
     }
 
     @Test
@@ -923,6 +926,9 @@ public class AstroTest {
         assertThat(
             position.getElevation(),
             is(89.99779837537335)); // ~ zenith = 90°
+        assertThat(
+            position.getShadowLength(1.8) < 0.001,
+            is(true));
     }
 
 }

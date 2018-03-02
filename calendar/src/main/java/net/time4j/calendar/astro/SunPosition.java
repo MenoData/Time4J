@@ -42,7 +42,7 @@ import java.io.Serializable;
  * @author  Meno Hochschild
  * @since   3.38/4.33
  */
-public class SunPosition
+public final class SunPosition
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -229,6 +229,43 @@ public class SunPosition
 
     }
 
+    /**
+     * <p>Determines the length of shadow casted by an object of given height. </p>
+     *
+     * <p>If the sun is at or below the horizon then the length of shadow is positive infinity. </p>
+     *
+     * @param   objectHeight    the height of object in meters
+     * @return  length of shadow in meters (or positive infinity)
+     * @throws  IllegalArgumentException if the object height is not finite and positive
+     * @since   3.40/4.35
+     */
+    /*[deutsch]
+     * <p>Bestimmt die L&auml;nge des Schattens, der von einem Objekt der angegebenen H&ouml;he geworfen wird. </p>
+     *
+     * <p>Wenn die Sonne am oder unter dem Horizont steht, ist die Schattenl&auml;nge positiv unendlich. </p>
+     *
+     * @param   objectHeight    the height of object in meters
+     * @return  length of shadow in meters (or positive infinity)
+     * @throws  IllegalArgumentException if the object height is not finite and positive
+     * @since   3.40/4.35
+     */
+    public double getShadowLength(double objectHeight) {
+
+        if (Double.isInfinite(objectHeight) || Double.isNaN(objectHeight)) {
+            throw new IllegalArgumentException("Object height must be finite and positive: " + objectHeight);
+        } else {
+            if (objectHeight <= 0.0) {
+                throw new IllegalArgumentException("Object height must be greater than zero: " + objectHeight);
+            } else if (this.elevation <= 0.0) {
+                return Double.POSITIVE_INFINITY;
+            } else if (this.elevation == 90.0) {
+                return 0.0;
+            } else {
+                return objectHeight / Math.tan(Math.toRadians(this.elevation));
+            }
+        }
+
+    }
 
     @Override
     public boolean equals(Object obj) {
