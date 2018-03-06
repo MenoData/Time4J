@@ -81,7 +81,7 @@ import java.util.Set;
  *
  * <p>See also: <a href="https://en.wikipedia.org/wiki/North_Korean_calendar">Wikipedia</a>. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p>Following elements which are declared as constants are registered by this class</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -105,7 +105,7 @@ import java.util.Set;
  *
  * <p>Siehe auch: <a href="https://en.wikipedia.org/wiki/North_Korean_calendar">Wikipedia</a>. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>

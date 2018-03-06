@@ -57,8 +57,6 @@ import java.util.Map;
 /**
  * <p>Represents the Vietnamese calendar supported in the gregorian range 1813-02-01/3000-01-27. </p>
  *
- * <h4>Introduction</h4>
- *
  * <p>It is a lunisolar calendar which is supposed to be structurally identical to the Chinese calendar.
  * See also the page of <a href="https://www.informatik.uni-leipzig.de/~duc/amlich/">Ho Ngoc Duc</a>. The
  * historic details of the calendar rules before 1954 are somehow debatable. Probably different authorities or
@@ -75,7 +73,7 @@ import java.util.Map;
  *     since reunification in 1975 also in Southern part).</li>
  * </ul>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p>Following elements which are declared as constants are registered by this class</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -91,7 +89,7 @@ import java.util.Map;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p>Example of usage</p>
  *
  * <pre>
  *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
@@ -110,8 +108,6 @@ import java.util.Map;
  * <p>Repr&auml;sentiert den vietnamesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
  * Bereich 1813-02-01/3000-01-27. </p>
  *
- * <h4>Einleitung</h4>
- *
  * <p>Es handelt sich um einen lunisolaren Kalender, der strukturell mit dem chinesischen Kalender identisch ist.
  * Siehe auch die Webseite von <a href="https://www.informatik.uni-leipzig.de/~duc/amlich/">Ho Ngoc Duc</a>. Die
  * historischen Details der Kalenderregeln vor 1954 sind leicht unsicher. Wahrscheinlich haben verschiedene
@@ -129,7 +125,7 @@ import java.util.Map;
  *     auch in S&uuml;dvietnam).</li>
  * </ul>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -145,7 +141,7 @@ import java.util.Map;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <p>Anwendungsbeispiel</p>
  *
  * <pre>
  *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =

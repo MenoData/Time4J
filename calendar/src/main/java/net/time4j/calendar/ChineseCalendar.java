@@ -65,12 +65,10 @@ import java.util.Map;
 /**
  * <p>Represents the Chinese calendar supported in the gregorian range 1645-01-28/3000-01-27. </p>
  *
- * <h4>Introduction</h4>
- *
  * <p>It is a lunisolar calendar which defines years consisting of 12 or 13 months. See also
  * <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p>Following elements which are declared as constants are registered by this class</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -88,7 +86,7 @@ import java.util.Map;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Accuracy note</h4>
+ * <p><strong>Accuracy note</strong></p>
  *
  * <p>The calculations are based on the algorithms of Dershowitz/Reingold in their book
  * &quot;Calendrical calculations&quot; and astronomical calculations in nowadays precision.
@@ -102,8 +100,6 @@ import java.util.Map;
  * However, the observatory has explicitly declared these dates to be uncertain because their calculations
  * of New Moon are not accurate enough to decide which month start exactly is right (the results are very
  * close to local midnight). </p>
- *
- * <h4>Examples of usage</h4>
  *
  * <p>How to determine the festivals of New Year and Qing-Ming as gregorian dates: </p>
  *
@@ -158,12 +154,10 @@ import java.util.Map;
  * <p>Repr&auml;sentiert den chinesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
  * Bereich 1645-01-28/3000-01-27. </p>
  *
- * <h4>Einleitung</h4>
- *
  * <p>Es handelt sich um einen lunisolaren Kalender, dessen Jahre aus 12 oder 13 Monaten bestehen.
  * Siehe auch <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p>Registriert sind folgende als Konstanten deklarierte Elemente</p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -181,7 +175,7 @@ import java.util.Map;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Hinweis zur Genauigkeit</h4>
+ * <p><strong>Hinweis zur Genauigkeit</strong></p>
  *
  * <p>Die Berechnungen fu&szlig;en auf den Algorithmen von Dershowitz/Reingold in ihrem Buch
  * &quot;Calendrical calculations&quot; und astronomischen Verfahren in der heute verf&uuml;gbaren
@@ -196,8 +190,6 @@ import java.util.Map;
  * gleichen Monats). Allerdings hat das Observatorium ausdr&uuml;cklich diese Tage als ungesichert
  * erkl&auml;rt, weil dessen Berechnungen nicht genau genug sind, um zu entscheiden, welcher Monatsbeginn
  * wirklich der richtige ist (die Ergebnisse sind sehr nahe an der &ouml;rtlichen Mitternacht). </p>
- *
- * <h4>Anwendungsbeispiele</h4>
  *
  * <p>Wie k&ouml;nnen die Feiertage des chinesischen Neujahrs und von Qing-Ming als gregorianische
  * Datumsangaben bestimmt werden? </p>
