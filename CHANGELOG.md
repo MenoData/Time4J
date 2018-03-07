@@ -1,4 +1,6 @@
-## [v4.35] not yet released
+## [v4.36] not yet released
+
+## [v4.35] published on 2018-03-07
 ### Added
 - Traditional Chinese calendar [#396]
 - Dangi calendar (Korean) [#722]
