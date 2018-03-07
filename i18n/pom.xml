@@ -10,7 +10,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     
-    <groupId>net.time4j</groupId>
     <artifactId>time4j-i18n</artifactId>
     <packaging>jar</packaging>
     <name>Time4J-I18n</name>
@@ -28,4 +27,59 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>*</Import-Package>
+                        <Export-Package>
+                            net.time4j.format.expert,
+                            net.time4j.history
+                        </Export-Package>
+                        <Private-Package>
+                            net.time4j.format.internal
+                            net.time4j.history.internal
+                            net.time4j.i18n
+                        </Private-Package>
+                        <Require-Capability>
+                            osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
+                        </Require-Capability>
+                        <Provide-Capability>
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.engine.CalendarProvider,
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.engine.ChronoExtension,
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.FormatEngine
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.FormatPatternProvider
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.NumberSymbolProvider
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.PluralProvider
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.TextProvider
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.UnitPatternProvider
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.format.WeekdataProvider
+                        </Provide-Capability>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

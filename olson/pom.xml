@@ -10,7 +10,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     
-    <groupId>net.time4j</groupId>
     <artifactId>time4j-olson</artifactId>
     <packaging>jar</packaging>
     <name>Time4J-Olson</name>
@@ -34,4 +33,51 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>*</Import-Package>
+                        <Export-Package>
+                            net.time4j.tz.model,
+                            net.time4j.tz.olson
+                        </Export-Package>
+                        <Private-Package>
+                            net.time4j.tz.spi,
+                            net.time4j.tz.threeten
+                        </Private-Package>
+                        <Require-Capability>
+                            osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
+                        </Require-Capability>
+                        <Provide-Capability>
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneModelProvider,
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneNameProvider
+                        </Provide-Capability>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>

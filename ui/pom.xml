@@ -10,7 +10,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     
-    <groupId>net.time4j</groupId>
     <artifactId>time4j-ui</artifactId>
     <packaging>jar</packaging>
     <name>Time4J-UI</name>

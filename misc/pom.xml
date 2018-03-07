@@ -10,7 +10,6 @@
         <relativePath>../pom.xml</relativePath>
     </parent>
     
-    <groupId>net.time4j</groupId>
     <artifactId>time4j-misc</artifactId>
     <packaging>jar</packaging>
     <name>Time4J-Misc</name>
@@ -34,4 +33,49 @@
         </dependency>
     </dependencies>
 
+    <build>
+        <plugins>
+            <plugin>
+                <artifactId>maven-jar-plugin</artifactId>
+                <configuration>
+                    <archive>
+                        <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                    </archive>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-bundle-plugin</artifactId>
+                <extensions>true</extensions>
+                <executions>
+                    <execution>
+                        <id>bundle-manifest</id>
+                        <phase>process-classes</phase>
+                        <goals>
+                            <goal>manifest</goal>
+                        </goals>
+                    </execution>
+                </executions>
+                <configuration>
+                    <instructions>
+                        <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
+                        <Import-Package>*</Import-Package>
+                        <Export-Package>
+                            net.time4j.clock,
+                            net.time4j.tz.other
+                        </Export-Package>
+                        <Private-Package>
+                            net.time4j.tz.spi
+                        </Private-Package>
+                        <Require-Capability>
+                            osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
+                        </Require-Capability>
+                        <Provide-Capability>
+                            osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneModelProvider
+                        </Provide-Capability>
+                    </instructions>
+                </configuration>
+            </plugin>
+        </plugins>
+    </build>
 </project>
