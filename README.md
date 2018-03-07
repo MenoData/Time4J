@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2018-01-15, the version v4.34 of Time4J has been finished and released. It requires Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
+On 2018-03-07, the version v4.35 of Time4J has been finished and released. It requires at least Java-8. The older version line v3.x will be continued however and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
 
 - **time4j-olson** contains predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
 - **time4j-tzdata** is the timezone repository of Time4J based on the IANA-TZDB
@@ -134,7 +134,9 @@ g) **Powerful format engine**: The built-in format engine located in format/expe
 Support for alternative calendars:
 ----------------------------------
 
+- Chinese (since 1645)
 - Coptic
+- Dangi (old Korean)
 - Ethiopian (including support for Ethiopian time)
 - French revolutionary
 - Hebrew (including support for Hebrew time)
@@ -142,12 +144,12 @@ Support for alternative calendars:
 - Historic christian (includes british, byzantine, swedish etc.)
 - Indian national (Saka)
 - Japanese (including lunisolar part since AD 701)
+- Juche (North Korea)
 - Julian
 - Minguo (Taiwan)
 - Persian (3000 years)
 - ThaiSolar (Suriyakati), also valid before 1941
-
-Coming soon: Chinese, Korean and Vietnamese calendar
+- Vietnamese
 
 Plans for next releases:
 ------------------------
