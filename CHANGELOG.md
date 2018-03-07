@@ -1,4 +1,4 @@
-## [v3.40] not yet released
+## [v3.40] published on 2018-03-05 (final version of level-6)
 ### Added
 - Traditional Chinese calendar [#396]
 - Dangi calendar (Korean) [#722]
