@@ -178,6 +178,7 @@ public abstract class Timezone
     private static final String NAME_DEFAULT = "DEFAULT";
 
     private static final Map<String, TZID> PREDEFINED;
+    private static final Map<String, TZID> ETCETERA;
     private static final ZoneModelProvider PLATFORM_PROVIDER;
     private static final ZoneModelProvider DEFAULT_PROVIDER;
     private static final ConcurrentMap<String, NamedReference> CACHE;
@@ -237,6 +238,10 @@ public abstract class Timezone
         }
 
         PREDEFINED = Collections.unmodifiableMap(temp1);
+
+        Map<String, TZID> etcetera = new HashMap<>();
+        fillEtcetera(etcetera);
+        ETCETERA = Collections.unmodifiableMap(etcetera);
 
         ZoneModelProvider zp = null;
         ZoneNameProvider np = null;
@@ -739,7 +744,7 @@ public abstract class Timezone
      *
      * <p>This method is only capable of resolving old aliases to modern identifiers if the underlying
      * {@code ZoneModelProvider} supports resolving of aliases. Fixed offsets like &quot;UTC+01&quot;
-     * can be resolved to instances of {@code ZonalOffset}. </p>
+     * or the outdated form &quot;Etc/GMT+4&quot; can be resolved to instances of {@code ZonalOffset}. </p>
      *
      * @param   tzid        timezone id which might need normalization
      * @return  normalized identifier
@@ -754,7 +759,8 @@ public abstract class Timezone
      *
      * <p>Diese Methode kann nur dann veraltete Aliaskennungen aufl&ouml;sen, wenn der zugrundeliegende
      * {@code ZoneModelProvider} das unterst&uuml;tzt. Feste Zeitzonenverschiebungen wie &quot;UTC+01&quot;
-     * k&ouml;nnen zu Instanzen von {@code ZonalOffset} aufgel&ouml;st werden. </p>
+     * oder die veraltete Form &quot;Etc/GMT+4&quot; k&ouml;nnen zu Instanzen von {@code ZonalOffset}
+     * aufgel&ouml;st werden. </p>
      *
      * @param   tzid        timezone id which might need normalization
      * @return  normalized identifier
@@ -803,6 +809,10 @@ public abstract class Timezone
 
         while ((resolved = aliases.get(alias)) != null) {
             alias = resolved;
+        }
+
+        if (ETCETERA.containsKey(alias)) {
+            return ETCETERA.get(alias);
         }
 
         return resolve(alias);
@@ -1626,6 +1636,44 @@ public abstract class Timezone
 
         return resolved;
 
+    }
+
+    private static void fillEtcetera(Map<String, TZID> map) {
+        map.put("Etc/GMT", ZonalOffset.UTC);
+        map.put("Etc/Greenwich", ZonalOffset.UTC);
+        map.put("Etc/Universal", ZonalOffset.UTC);
+        map.put("Etc/Zulu", ZonalOffset.UTC);
+        map.put("Etc/GMT+0", ZonalOffset.UTC);
+        map.put("Etc/GMT-0", ZonalOffset.UTC);
+        map.put("Etc/GMT0", ZonalOffset.UTC);
+        map.put("Etc/UTC", ZonalOffset.UTC);
+        map.put("Etc/UCT", ZonalOffset.UTC);
+        map.put("Etc/GMT-14", ZonalOffset.ofTotalSeconds(14 * 3600));
+        map.put("Etc/GMT-13", ZonalOffset.ofTotalSeconds(13 * 3600));
+        map.put("Etc/GMT-12", ZonalOffset.ofTotalSeconds(12 * 3600));
+        map.put("Etc/GMT-11", ZonalOffset.ofTotalSeconds(11 * 3600));
+        map.put("Etc/GMT-10", ZonalOffset.ofTotalSeconds(10 * 3600));
+        map.put("Etc/GMT-9", ZonalOffset.ofTotalSeconds(9 * 3600));
+        map.put("Etc/GMT-8", ZonalOffset.ofTotalSeconds(8 * 3600));
+        map.put("Etc/GMT-7", ZonalOffset.ofTotalSeconds(7 * 3600));
+        map.put("Etc/GMT-6", ZonalOffset.ofTotalSeconds(6 * 3600));
+        map.put("Etc/GMT-5", ZonalOffset.ofTotalSeconds(5 * 3600));
+        map.put("Etc/GMT-4", ZonalOffset.ofTotalSeconds(4 * 3600));
+        map.put("Etc/GMT-3", ZonalOffset.ofTotalSeconds(3 * 3600));
+        map.put("Etc/GMT-2", ZonalOffset.ofTotalSeconds(2 * 3600));
+        map.put("Etc/GMT-1", ZonalOffset.ofTotalSeconds(3600));
+        map.put("Etc/GMT+1", ZonalOffset.ofTotalSeconds(-3600));
+        map.put("Etc/GMT+2", ZonalOffset.ofTotalSeconds(-2 * 3600));
+        map.put("Etc/GMT+3", ZonalOffset.ofTotalSeconds(-3 * 3600));
+        map.put("Etc/GMT+4", ZonalOffset.ofTotalSeconds(-4 * 3600));
+        map.put("Etc/GMT+5", ZonalOffset.ofTotalSeconds(-5 * 3600));
+        map.put("Etc/GMT+6", ZonalOffset.ofTotalSeconds(-6 * 3600));
+        map.put("Etc/GMT+7", ZonalOffset.ofTotalSeconds(-7 * 3600));
+        map.put("Etc/GMT+8", ZonalOffset.ofTotalSeconds(-8 * 3600));
+        map.put("Etc/GMT+9", ZonalOffset.ofTotalSeconds(-9 * 3600));
+        map.put("Etc/GMT+10", ZonalOffset.ofTotalSeconds(-10 * 3600));
+        map.put("Etc/GMT+11", ZonalOffset.ofTotalSeconds(-11 * 3600));
+        map.put("Etc/GMT+12", ZonalOffset.ofTotalSeconds(-12 * 3600));
     }
 
     @SuppressWarnings("unchecked")

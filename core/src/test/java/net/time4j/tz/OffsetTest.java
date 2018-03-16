@@ -376,6 +376,7 @@ public class OffsetTest {
 
     @Test
     public void normalize() {
+        assertThat(Timezone.normalize("Etc/GMT-7"), is(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 7)));
         assertThat(Timezone.normalize("GMT-07"), is(ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 7)));
         assertThat(Timezone.normalize("UTC+1"), is(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 1)));
         assertThat(Timezone.normalize("+05:30"), is(ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30)));
