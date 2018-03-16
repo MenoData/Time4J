@@ -4,6 +4,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
@@ -53,6 +54,13 @@ public class JdkZoneProviderTest {
         assertThat(
             zp.getAliases().isEmpty(),
             is(true));
+    }
+
+    @Test
+    public void normalize() {
+        assertThat(
+            Timezone.normalize("Asia/Calcutta").canonical().equals("Asia/Kolkata"),
+            is(false)); // no support for normalization in JSR-310
     }
 
     /*
