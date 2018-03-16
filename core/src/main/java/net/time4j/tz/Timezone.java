@@ -118,8 +118,7 @@ public abstract class Timezone
     private static final String REPOSITORY_VERSION =
         System.getProperty("net.time4j.tz.repository.version");
 
-    private static final Comparator<TZID> ID_COMPARATOR =
-        (o1, o2) -> o1.canonical().compareTo(o2.canonical());
+    private static final Comparator<TZID> ID_COMPARATOR = Comparator.comparing(TZID::canonical);
 
     /**
      * <p>This standard strategy which is also used by the JDK-class
@@ -169,7 +168,7 @@ public abstract class Timezone
 
     private static final boolean ALLOW_SYSTEM_TZ_OVERRIDE = Boolean.getBoolean("net.time4j.allow.system.tz.override");
 
-    private static volatile ZonalKeys zonalKeys = null;
+    private static volatile ZonalKeys zonalKeys;
     private static volatile Timezone currentSystemTZ = null;
     private static volatile boolean cacheActive = true;
     private static int softLimit = 11;
@@ -313,10 +312,7 @@ public abstract class Timezone
         try {
             String zoneID = System.getProperty("user.timezone");
 
-            if (
-                "Z".equals(zoneID)
-                || "UTC".equals(zoneID)
-            ) {
+            if ("Z".equals(zoneID) || "UTC".equals(zoneID)) {
                 systemTZ = ZonalOffset.UTC.getModel();
             } else if (zoneID != null) {
                 systemTZ = Timezone.getTZ(resolve(zoneID), zoneID, false);
@@ -711,6 +707,105 @@ public abstract class Timezone
     ) {
 
         return new HistorizedTimezone(resolve(tzid), history);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code normalize(tzid.canonical())}. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     #normalize(String)
+     * @since   4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code normalize(tzid.canonical())}. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     #normalize(String)
+     * @since   4.36
+     */
+    public static TZID normalize(TZID tzid) {
+
+        return normalize(tzid.canonical());
+
+    }
+
+    /**
+     * <p>Tries to normalize given timezone identifier on the base of best efforts. </p>
+     *
+     * <p>This method is only capable of resolving old aliases to modern identifiers if the underlying
+     * {@code ZoneModelProvider} supports resolving of aliases. Fixed offsets like &quot;UTC+01&quot;
+     * can be resolved to instances of {@code ZonalOffset}. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     TZID#canonical()
+     * @see     ZonalOffset#parse(String)
+     * @since   4.36
+     */
+    /*[deutsch]
+     * <p>Versucht das Beste, die angegebene Zeitzonenkennung zu einer gebr&auml;chlicheren Variante
+     * zu normalisieren. </p>
+     *
+     * <p>Diese Methode kann nur dann veraltete Aliaskennungen aufl&ouml;sen, wenn der zugrundeliegende
+     * {@code ZoneModelProvider} das unterst&uuml;tzt. Feste Zeitzonenverschiebungen wie &quot;UTC+01&quot;
+     * k&ouml;nnen zu Instanzen von {@code ZonalOffset} aufgel&ouml;st werden. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     TZID#canonical()
+     * @see     ZonalOffset#parse(String)
+     * @since   4.36
+     */
+    public static TZID normalize(String tzid) {
+
+        String providerName = "";
+        String zoneKey = tzid;
+
+        for (int i = 0, n = zoneKey.length(); i < n; i++) {
+            if (zoneKey.charAt(i) == '~') {
+                providerName = zoneKey.substring(0, i);
+                zoneKey = zoneKey.substring(i + 1); // maybe empty string
+                break;
+            }
+        }
+
+        if (zoneKey.isEmpty()) {
+            throw new IllegalArgumentException("Empty zone identifier: " + tzid);
+        }
+
+        ZoneModelProvider provider = DEFAULT_PROVIDER;
+        boolean useDefault = (providerName.isEmpty() || providerName.equals(NAME_DEFAULT));
+
+        if (!useDefault && !providerName.equals("WINDOWS") && !providerName.equals("MILITARY")) {
+            provider = PROVIDERS.get(providerName);
+
+            if (provider == null) {
+                String msg;
+                if (providerName.equals(NAME_TZDB)) {
+                    msg = "TZDB provider not available: ";
+                } else {
+                    msg = "Timezone model provider not registered: ";
+                }
+                throw new IllegalArgumentException(msg + tzid);
+            }
+        }
+
+        String resolved;
+        String alias = zoneKey;
+        Map<String, String> aliases = provider.getAliases();
+
+        while ((resolved = aliases.get(alias)) != null) {
+            alias = resolved;
+        }
+
+        return resolve(alias);
 
     }
 
@@ -1796,10 +1891,8 @@ public abstract class Timezone
         @Override
         public Set<String> getAvailableIDs() {
 
-            Set<String> ret = new HashSet<>();
             String[] temp = java.util.TimeZone.getAvailableIDs();
-            ret.addAll(Arrays.asList(temp));
-            return ret;
+            return new HashSet<>(Arrays.asList(temp));
 
         }
 

@@ -114,4 +114,11 @@ public class MilitaryZoneTest {
         assertThat(m, is(Moment.UNIX_EPOCH));
     }
 
+    @Test
+    public void normalize() {
+        assertThat(
+            Timezone.normalize(MilitaryZone.BRAVO),
+            is(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2)));
+    }
+
 }
