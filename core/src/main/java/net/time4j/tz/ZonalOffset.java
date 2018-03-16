@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalOffset.java) is part of project Time4J.
  *
@@ -941,7 +941,7 @@ public final class ZonalOffset
     /**
      * <p>Interpretiert eine kanonische Darstellung als Verschiebung. </p>
      *
-     * <p>Unterst&uuml;tzt werden alle von den Methoden {@code canonical} oder
+     * <p>Unterst&uuml;tzt werden alle von den Methoden {@code canonical()} oder
      * {@code toString()} produzierten Ausgaben. </p>
      *
      * @param   offset          zonal offset in canonical form to be parsed

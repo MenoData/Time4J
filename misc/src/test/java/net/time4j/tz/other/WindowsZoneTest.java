@@ -182,6 +182,13 @@ public class WindowsZoneTest {
         assertThat(tz, is(roundtrip(tz)));
     }
 
+    @Test
+    public void normalize() {
+        assertThat(
+            Timezone.normalize(WindowsZone.of("Eastern Standard Time").resolveSmart(Locale.US)).canonical(),
+            is("America/New_York"));
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

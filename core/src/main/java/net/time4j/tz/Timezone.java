@@ -186,6 +186,7 @@ public abstract class Timezone
     private static final String NAME_DEFAULT = "DEFAULT";
 
     private static final Map<String, TZID> PREDEFINED;
+    private static final Map<String, TZID> ETCETERA;
     private static final ZoneModelProvider PLATFORM_PROVIDER;
     private static final ZoneModelProvider DEFAULT_PROVIDER;
     private static final ConcurrentMap<String, NamedReference> CACHE;
@@ -245,6 +246,10 @@ public abstract class Timezone
         }
 
         PREDEFINED = Collections.unmodifiableMap(temp1);
+
+        Map<String, TZID> etcetera = new HashMap<String, TZID>();
+        fillEtcetera(etcetera);
+        ETCETERA = Collections.unmodifiableMap(etcetera);
 
         ZoneModelProvider zp = null;
         ZoneNameProvider np = null;
@@ -719,6 +724,110 @@ public abstract class Timezone
     ) {
 
         return new HistorizedTimezone(resolve(tzid), history);
+
+    }
+
+    /**
+     * <p>Equivalent to {@code normalize(tzid.canonical())}. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     #normalize(String)
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu {@code normalize(tzid.canonical())}. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     #normalize(String)
+     * @since   3.41/4.36
+     */
+    public static TZID normalize(TZID tzid) {
+
+        return normalize(tzid.canonical());
+
+    }
+
+    /**
+     * <p>Tries to normalize given timezone identifier on the base of best efforts. </p>
+     *
+     * <p>This method is only capable of resolving old aliases to modern identifiers if the underlying
+     * {@code ZoneModelProvider} supports resolving of aliases. Fixed offsets like &quot;UTC+01&quot;
+     * or the outdated form &quot;Etc/GMT+4&quot; can be resolved to instances of {@code ZonalOffset}. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     TZID#canonical()
+     * @see     ZonalOffset#parse(String)
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>Versucht das Beste, die angegebene Zeitzonenkennung zu einer gebr&auml;chlicheren Variante
+     * zu normalisieren. </p>
+     *
+     * <p>Diese Methode kann nur dann veraltete Aliaskennungen aufl&ouml;sen, wenn der zugrundeliegende
+     * {@code ZoneModelProvider} das unterst&uuml;tzt. Feste Zeitzonenverschiebungen wie &quot;UTC+01&quot;
+     * oder die veraltete Form &quot;Etc/GMT+4&quot; k&ouml;nnen zu Instanzen von {@code ZonalOffset}
+     * aufgel&ouml;st werden. </p>
+     *
+     * @param   tzid        timezone id which might need normalization
+     * @return  normalized identifier
+     * @throws  IllegalArgumentException if given identifier is invalid (for example empty)
+     * @see     TZID#canonical()
+     * @see     ZonalOffset#parse(String)
+     * @since   3.41/4.36
+     */
+    public static TZID normalize(String tzid) {
+
+        String providerName = "";
+        String zoneKey = tzid;
+
+        for (int i = 0, n = zoneKey.length(); i < n; i++) {
+            if (zoneKey.charAt(i) == '~') {
+                providerName = zoneKey.substring(0, i);
+                zoneKey = zoneKey.substring(i + 1); // maybe empty string
+                break;
+            }
+        }
+
+        if (zoneKey.isEmpty()) {
+            throw new IllegalArgumentException("Empty zone identifier: " + tzid);
+        }
+
+        ZoneModelProvider provider = DEFAULT_PROVIDER;
+        boolean useDefault = (providerName.isEmpty() || providerName.equals(NAME_DEFAULT));
+
+        if (!useDefault && !providerName.equals("WINDOWS") && !providerName.equals("MILITARY")) {
+            provider = PROVIDERS.get(providerName);
+
+            if (provider == null) {
+                String msg;
+                if (providerName.equals(NAME_TZDB)) {
+                    msg = "TZDB provider not available: ";
+                } else {
+                    msg = "Timezone model provider not registered: ";
+                }
+                throw new IllegalArgumentException(msg + tzid);
+            }
+        }
+
+        String resolved;
+        String alias = zoneKey;
+        Map<String, String> aliases = provider.getAliases();
+
+        while ((resolved = aliases.get(alias)) != null) {
+            alias = resolved;
+        }
+
+        if (ETCETERA.containsKey(alias)) {
+            return ETCETERA.get(alias);
+        }
+
+        return resolve(alias);
 
     }
 
@@ -1539,6 +1648,44 @@ public abstract class Timezone
 
         return resolved;
 
+    }
+
+    private static void fillEtcetera(Map<String, TZID> map) {
+        map.put("Etc/GMT", ZonalOffset.UTC);
+        map.put("Etc/Greenwich", ZonalOffset.UTC);
+        map.put("Etc/Universal", ZonalOffset.UTC);
+        map.put("Etc/Zulu", ZonalOffset.UTC);
+        map.put("Etc/GMT+0", ZonalOffset.UTC);
+        map.put("Etc/GMT-0", ZonalOffset.UTC);
+        map.put("Etc/GMT0", ZonalOffset.UTC);
+        map.put("Etc/UTC", ZonalOffset.UTC);
+        map.put("Etc/UCT", ZonalOffset.UTC);
+        map.put("Etc/GMT-14", ZonalOffset.ofTotalSeconds(14 * 3600));
+        map.put("Etc/GMT-13", ZonalOffset.ofTotalSeconds(13 * 3600));
+        map.put("Etc/GMT-12", ZonalOffset.ofTotalSeconds(12 * 3600));
+        map.put("Etc/GMT-11", ZonalOffset.ofTotalSeconds(11 * 3600));
+        map.put("Etc/GMT-10", ZonalOffset.ofTotalSeconds(10 * 3600));
+        map.put("Etc/GMT-9", ZonalOffset.ofTotalSeconds(9 * 3600));
+        map.put("Etc/GMT-8", ZonalOffset.ofTotalSeconds(8 * 3600));
+        map.put("Etc/GMT-7", ZonalOffset.ofTotalSeconds(7 * 3600));
+        map.put("Etc/GMT-6", ZonalOffset.ofTotalSeconds(6 * 3600));
+        map.put("Etc/GMT-5", ZonalOffset.ofTotalSeconds(5 * 3600));
+        map.put("Etc/GMT-4", ZonalOffset.ofTotalSeconds(4 * 3600));
+        map.put("Etc/GMT-3", ZonalOffset.ofTotalSeconds(3 * 3600));
+        map.put("Etc/GMT-2", ZonalOffset.ofTotalSeconds(2 * 3600));
+        map.put("Etc/GMT-1", ZonalOffset.ofTotalSeconds(3600));
+        map.put("Etc/GMT+1", ZonalOffset.ofTotalSeconds(-3600));
+        map.put("Etc/GMT+2", ZonalOffset.ofTotalSeconds(-2 * 3600));
+        map.put("Etc/GMT+3", ZonalOffset.ofTotalSeconds(-3 * 3600));
+        map.put("Etc/GMT+4", ZonalOffset.ofTotalSeconds(-4 * 3600));
+        map.put("Etc/GMT+5", ZonalOffset.ofTotalSeconds(-5 * 3600));
+        map.put("Etc/GMT+6", ZonalOffset.ofTotalSeconds(-6 * 3600));
+        map.put("Etc/GMT+7", ZonalOffset.ofTotalSeconds(-7 * 3600));
+        map.put("Etc/GMT+8", ZonalOffset.ofTotalSeconds(-8 * 3600));
+        map.put("Etc/GMT+9", ZonalOffset.ofTotalSeconds(-9 * 3600));
+        map.put("Etc/GMT+10", ZonalOffset.ofTotalSeconds(-10 * 3600));
+        map.put("Etc/GMT+11", ZonalOffset.ofTotalSeconds(-11 * 3600));
+        map.put("Etc/GMT+12", ZonalOffset.ofTotalSeconds(-12 * 3600));
     }
 
     @SuppressWarnings("unchecked")

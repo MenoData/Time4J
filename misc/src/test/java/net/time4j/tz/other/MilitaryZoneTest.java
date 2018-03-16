@@ -5,6 +5,7 @@ import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
@@ -112,6 +113,13 @@ public class MilitaryZoneTest {
         String input = "1970-01-01 06:00 Foxtrot";
         Moment m = formatter.parse(input);
         assertThat(m, is(Moment.UNIX_EPOCH));
+    }
+
+    @Test
+    public void normalize() {
+        assertThat(
+            Timezone.normalize(MilitaryZone.BRAVO),
+            is((TZID) ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 2)));
     }
 
 }

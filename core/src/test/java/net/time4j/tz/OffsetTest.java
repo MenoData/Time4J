@@ -374,6 +374,22 @@ public class OffsetTest {
         assertThat(offset, is(roundtrip(offset)));
     }
 
+    @Test
+    public void normalize() {
+        assertThat(
+            Timezone.normalize("Etc/GMT-7"),
+            is((TZID) ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 7)));
+        assertThat(
+            Timezone.normalize("GMT-07"),
+            is((TZID) ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 7)));
+        assertThat(
+            Timezone.normalize("UTC+1"),
+            is((TZID) ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 1)));
+        assertThat(
+            Timezone.normalize("+05:30"),
+            is((TZID) ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30)));
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 
