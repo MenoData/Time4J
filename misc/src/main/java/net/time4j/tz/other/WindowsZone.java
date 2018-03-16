@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WindowsZone.java) is part of project Time4J.
  *
@@ -22,7 +22,10 @@
 package net.time4j.tz.other;
 
 import net.time4j.format.internal.FormatUtils;
+import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.spi.WinZoneProviderSPI;
 
 import java.io.IOException;
@@ -168,6 +171,33 @@ public final class WindowsZone
     public String toString() {
 
         return this.name;
+
+    }
+
+    /**
+     * <p>Deduces the windows name of given timezone reference and region. </p>
+     *
+     * @param   tzid    timezone identifier
+     * @param   locale  regional setting referring to a country
+     * @return  name of windows zone, maybe empty if resolving fails
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>Leitet den Windows-Namen aus der angegebenen Zeitzonenreferenz in der jeweiligen Region ab. </p>
+     *
+     * @param   tzid    timezone identifier
+     * @param   locale  regional setting referring to a country
+     * @return  name of windows zone, maybe empty if resolving fails
+     * @since   3.41/4.36
+     */
+    public static String toString(
+        String tzid,
+        Locale locale
+    ) {
+
+        String zoneID = Timezone.normalize(tzid).canonical();
+        ZoneNameProvider znp = new WinZoneProviderSPI();
+        return znp.getDisplayName(zoneID, NameStyle.LONG_GENERIC_TIME, locale);
 
     }
 
