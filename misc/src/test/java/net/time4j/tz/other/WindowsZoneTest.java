@@ -189,6 +189,17 @@ public class WindowsZoneTest {
             is("America/New_York"));
     }
 
+    @Test
+    public void toStringStatic() {
+        assertThat(
+            WindowsZone.toString(Timezone.of("America/New_York").getID(), Locale.US),
+            is("Eastern Standard Time"));
+        assertThat(
+            WindowsZone.toString("Asia/Kolkata", new Locale("en", "IN")),
+            is("India Standard Time"));
+        // CLDR uses "Asia/Calcutta", but Time4J adjusts it during compiling of winzone-data
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

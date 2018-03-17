@@ -47,7 +47,7 @@ public class SystemClockTest {
     public void realTimeInMicros() {
         SystemClock clock = SystemClock.MONOTONIC;
         assertThat(
-            Math.abs(clock.realTimeInMicros() - SystemClock.INSTANCE.realTimeInMicros()) < 1000,
+            Math.abs(clock.realTimeInMicros() - SystemClock.INSTANCE.realTimeInMicros()) < 5000,
             is(true));
         long utc = clock.realTimeInMicros() / 1000000;
         long unix = clock.currentTimeInMicros() / 1000000;
