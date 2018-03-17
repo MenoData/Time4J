@@ -1,4 +1,8 @@
-## [v3.40] published on 2018-03-05 (final version of level-6)
+## [v3.41] not yet published  (final version of level-6)
+### Added
+- Reverse engineering of windows zone names [#756]
+
+## [v3.40] published on 2018-03-05
 ### Added
 - Traditional Chinese calendar [#396]
 - Dangi calendar (Korean) [#722]
