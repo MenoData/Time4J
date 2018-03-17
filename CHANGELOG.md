@@ -2,6 +2,7 @@
 ### Added
 - Reverse engineering of windows zone names [#756]
 - Normalization of timezone identifiers [#756]
+- Support Asturian language (ISO-639: ast) [#757]
 
 ## [v4.35] published on 2018-03-07
 ### Added
