@@ -234,12 +234,21 @@ public class ChineseMiscellaneousTest {
     }
 
     @Test
-    public void caSupport() {
+    public void caSupport1() {
         Locale locale = Locale.forLanguageTag("en-u-ca-chinese");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2020, 5, 24)),
             is("Sunday, (leap) M04 2, 2020(gēng-zǐ)"));
+    }
+
+    @Test
+    public void caSupport2() {
+        Locale locale = Locale.forLanguageTag("ast-u-ca-chinese"); // r(U) MMMM d, EEEE
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2020, 5, 24)),
+            is("2020(gēng-zǐ) *mes 4 2, domingu"));
     }
 
     @Test
