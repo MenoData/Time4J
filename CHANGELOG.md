@@ -1,4 +1,6 @@
 ## [v4.36] not yet released
+### Added
+- Reverse engineering of windows zone names [#756]
 
 ## [v4.35] published on 2018-03-07
 ### Added
