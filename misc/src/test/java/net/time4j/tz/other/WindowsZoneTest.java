@@ -192,7 +192,7 @@ public class WindowsZoneTest {
     @Test
     public void toStringStatic() {
         assertThat(
-            WindowsZone.toString("America/New_York", Locale.US),
+            WindowsZone.toString(() -> "America/New_York", Locale.US),
             is("Eastern Standard Time"));
         assertThat(
             WindowsZone.toString("Asia/Kolkata", new Locale("en", "IN")),

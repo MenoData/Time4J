@@ -49,6 +49,18 @@ import java.util.Set;
  *  // output: WINDOWS~America/New_York
  * </pre>
  *
+ * <p>The <i>reverse</i> way: </p>
+ *
+ * <pre>
+ *  String winzone = WindowsZone.toString(&quot;America/New_York&quot;, Locale.US);
+ *  System.out.println(winzone);
+ *  // output: Eastern Standard Time
+ * </pre>
+ *
+ * <p><strong>Note:</strong> A perfect roundtrip is often not possible because there are many more IANA-zone
+ * identifiers than windows zones. For best results, it is recommended to use the tzdata-module and not the
+ * standard timezone data of the underlying platform. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.2
  */
@@ -64,6 +76,18 @@ import java.util.Set;
  *  System.out.println(winzone.canonical());
  *  // output: WINDOWS~America/New_York
  * </pre>
+ *
+ * <p>Der <i>umgekehrte</i> Weg: </p>
+ *
+ * <pre>
+ *  String winzone = WindowsZone.toString(&quot;America/New_York&quot;, Locale.US);
+ *  System.out.println(winzone);
+ *  // output: Eastern Standard Time
+ * </pre>
+ *
+ * <p><strong>Hinweis:</strong> Ein perfekter Kreisweg ist oft nicht m&ouml;glich, weil es viel mehr
+ * IANA-Zeitzonenkennungen als Windows-Zeitzonen gibt. Um beste Ergebnisse zu erzielen, wird empfohlen,
+ * das tzdata-Modul und nicht die Standardzeitzonendaten der jeweiligen Plattform zu nutzen. </p>
  *
  * @author  Meno Hochschild
  * @since   2.2
@@ -119,6 +143,7 @@ public final class WindowsZone
      * @throws  IllegalArgumentException if given name is not supported
      * @since   2.2
      * @see     #getAvailableNames()
+     * @see     #toString()
      */
     /*[deutsch]
      * <p>Erzeugt einen Namensbezug zu einer Windows-Zeitzone. </p>
@@ -128,6 +153,7 @@ public final class WindowsZone
      * @throws  IllegalArgumentException if given name is not supported
      * @since   2.2
      * @see     #getAvailableNames()
+     * @see     #toString()
      */
     public static WindowsZone of(String name) {
 
@@ -177,7 +203,7 @@ public final class WindowsZone
     /**
      * <p>Deduces the windows name of given timezone reference and region. </p>
      *
-     * @param   tzid    timezone identifier
+     * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
      * @param   locale  regional setting referring to a country
      * @return  name of windows zone, maybe empty if resolving fails
      * @since   3.41/4.36
@@ -185,7 +211,32 @@ public final class WindowsZone
     /*[deutsch]
      * <p>Leitet den Windows-Namen aus der angegebenen Zeitzonenreferenz in der jeweiligen Region ab. </p>
      *
-     * @param   tzid    timezone identifier
+     * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
+     * @param   locale  regional setting referring to a country
+     * @return  name of windows zone, maybe empty if resolving fails
+     * @since   3.41/4.36
+     */
+    public static String toString(
+        TZID tzid,
+        Locale locale
+    ) {
+
+        return toString(tzid.canonical(), locale);
+
+    }
+
+    /**
+     * <p>Deduces the windows name of given timezone reference and region. </p>
+     *
+     * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
+     * @param   locale  regional setting referring to a country
+     * @return  name of windows zone, maybe empty if resolving fails
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>Leitet den Windows-Namen aus der angegebenen Zeitzonenreferenz in der jeweiligen Region ab. </p>
+     *
+     * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
      * @param   locale  regional setting referring to a country
      * @return  name of windows zone, maybe empty if resolving fails
      * @since   3.41/4.36
@@ -197,7 +248,7 @@ public final class WindowsZone
 
         String zoneID = Timezone.normalize(tzid).canonical();
         ZoneNameProvider znp = new WinZoneProviderSPI();
-        return znp.getDisplayName(zoneID, NameStyle.LONG_GENERIC_TIME, locale);
+        return znp.getDisplayName(zoneID, NameStyle.LONG_STANDARD_TIME, locale);
 
     }
 
