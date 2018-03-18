@@ -4,6 +4,7 @@
 - Normalization of timezone identifiers [#756]
 - Support Asturian language (ISO-639: ast) [#757]
 - Convenience week elements for Hebrew calendar [#758]
+- Support of Hebrew calendar in JavaFX-CalendarPicker [#759]
 
 ## [v4.35] published on 2018-03-07
 ### Added
