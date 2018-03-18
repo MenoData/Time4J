@@ -391,6 +391,101 @@ public final class HebrewCalendar
         ENGINE = builder.build();
     }
 
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.localDayOfWeek(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.localDayOfWeek(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    public static final StdCalendarElement<Weekday, HebrewCalendar> LOCAL_DAY_OF_WEEK =
+        CommonElements.localDayOfWeek(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.weekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.weekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    public static final StdCalendarElement<Integer, HebrewCalendar> WEEK_OF_YEAR =
+        CommonElements.weekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.weekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.weekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#weekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    public static final StdCalendarElement<Integer, HebrewCalendar> WEEK_OF_MONTH =
+        CommonElements.weekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.boundedWeekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.boundedWeekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfYear(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    public static final StdCalendarElement<Integer, HebrewCalendar> BOUNDED_WEEK_OF_YEAR =
+        CommonElements.boundedWeekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel());
+
+    /**
+     * <p>Equivalent to
+     * {@code CommonElements.boundedWeekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    /*[deutsch]
+     * <p>&Auml;quivalent zu
+     * {@code CommonElements.boundedWeekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())}. </p>
+     *
+     * @see     CommonElements#boundedWeekOfMonth(Chronology, Weekmodel)
+     * @see     #getDefaultWeekmodel()
+     * @since   3.41/4.36
+     */
+    public static final StdCalendarElement<Integer, HebrewCalendar> BOUNDED_WEEK_OF_MONTH =
+        CommonElements.boundedWeekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel());
+
     private static final long serialVersionUID = -4183006723190472312L;
 
     //~ Instanzvariablen --------------------------------------------------

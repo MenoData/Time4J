@@ -432,6 +432,40 @@ public class WeekCalculationTest {
     }
 
     @Test
+    public void hebrewBoundedWeekOfMonth() {
+        HebrewCalendar hcal = HebrewCalendar.of(5778, HebrewMonth.NISAN, 2); // month with 30 days beginning on Saturday
+        assertThat(
+            hcal.getDayOfWeek(),
+            is(Weekday.SUNDAY));
+        assertThat(
+            hcal.getMaximum(
+                CommonElements.boundedWeekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel())),
+            is(6));
+        assertThat(
+            hcal.getMaximum(HebrewCalendar.BOUNDED_WEEK_OF_MONTH), // convenience
+            is(6));
+    }
+
+    @Test
+    public void hebrewWeekElements() {
+        assertThat(
+            CommonElements.localDayOfWeek(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel()),
+            is(HebrewCalendar.LOCAL_DAY_OF_WEEK));
+        assertThat(
+            CommonElements.weekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel()),
+            is(HebrewCalendar.WEEK_OF_YEAR));
+        assertThat(
+            CommonElements.weekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel()),
+            is(HebrewCalendar.WEEK_OF_MONTH));
+        assertThat(
+            CommonElements.boundedWeekOfYear(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel()),
+            is(HebrewCalendar.BOUNDED_WEEK_OF_YEAR));
+        assertThat(
+            CommonElements.boundedWeekOfMonth(HebrewCalendar.axis(), HebrewCalendar.getDefaultWeekmodel()),
+            is(HebrewCalendar.BOUNDED_WEEK_OF_MONTH));
+    }
+
+    @Test
     public void serialization() throws IOException, ClassNotFoundException {
         roundtrip(CommonElements.localDayOfWeek(HijriCalendar.family(), Weekmodel.ISO));
         roundtrip(CommonElements.localDayOfWeek(PersianCalendar.axis(), Weekmodel.of(new Locale("fa", "IR"))));
