@@ -754,9 +754,12 @@ public abstract class Timezone
     /**
      * <p>Tries to normalize given timezone identifier on the base of best efforts. </p>
      *
-     * <p>This method is only capable of resolving old aliases to modern identifiers if the underlying
-     * {@code ZoneModelProvider} supports resolving of aliases. Fixed offsets like &quot;UTC+01&quot;
-     * or the outdated form &quot;Etc/GMT+4&quot; can be resolved to instances of {@code ZonalOffset}. </p>
+     * <p>This method is only capable of resolving old aliases like &quot;Asia/Calcutta&quot;
+     * to modern identifiers (like &quot;Asia/Kolkata&quot;) if the underlying {@code ZoneModelProvider}
+     * supports resolving of aliases. This is true if the tzdata-module is present on the class-path.
+     * However, the standard platform zone data do not support such a feature. But fixed offsets like
+     * &quot;UTC+01&quot; or the outdated form &quot;Etc/GMT+4&quot; can always be resolved to instances
+     * of {@code ZonalOffset}. </p>
      *
      * @param   tzid        timezone id which might need normalization
      * @return  normalized identifier
@@ -769,9 +772,12 @@ public abstract class Timezone
      * <p>Versucht das Beste, die angegebene Zeitzonenkennung zu einer gebr&auml;chlicheren Variante
      * zu normalisieren. </p>
      *
-     * <p>Diese Methode kann nur dann veraltete Aliaskennungen aufl&ouml;sen, wenn der zugrundeliegende
-     * {@code ZoneModelProvider} das unterst&uuml;tzt. Feste Zeitzonenverschiebungen wie &quot;UTC+01&quot;
-     * oder die veraltete Form &quot;Etc/GMT+4&quot; k&ouml;nnen zu Instanzen von {@code ZonalOffset}
+     * <p>Diese Methode kann nur dann veraltete Aliaskennungen wie &quot;Asia/Calcutta&quot; (zu
+     * &quot;Asia/Kolkata&quot;) aufl&ouml;sen, wenn der zugrundeliegende {@code ZoneModelProvider}
+     * das unterst&uuml;tzt. Das ist der Fall, wenn das tzdata-Modul im Klassenpfad vorhanden ist.
+     * Allerdings wird diese F&auml;higkeit von den Standard-Zeitzonendaten von Java nicht in diesem
+     * Ausma&szlig; unterst&uuml;tzt. Aber feste Zeitzonenverschiebungen wie &quot;UTC+01&quot;
+     * oder die veraltete Form &quot;Etc/GMT+4&quot; k&ouml;nnen immer zu Instanzen von {@code ZonalOffset}
      * aufgel&ouml;st werden. </p>
      *
      * @param   tzid        timezone id which might need normalization
