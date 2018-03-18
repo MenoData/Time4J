@@ -870,7 +870,7 @@ public final class HebrewCalendar
      * @return  boolean
      */
     /*[deutsch]
-     * <p>Liegt dieses Datum in einem Sabbatjahr wie in der Bibel beschrieben? </p>
+     * <p>Entspricht dieses Datum <em>Rosh Chodesh</em>? </p>
      *
      * <p>Dieser Begriff beschreibt den Monatsanfang (Tag 1), es sei denn, es handelt sich um den
      * Monat Tishri. Wenn der vorherige Monat 30 Tage hat, ist dessen letzter Tag ebenfalls dem
