@@ -1,8 +1,8 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (FXCalendarSystemMinguo.java) is part of project Time4J.
+ * This file (FXCalendarSystemHebrew.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,104 +21,100 @@
 
 package net.time4j.ui.javafx;
 
-import net.time4j.CalendarUnit;
-import net.time4j.Month;
 import net.time4j.Weekmodel;
-import net.time4j.calendar.MinguoCalendar;
-import net.time4j.calendar.MinguoEra;
+import net.time4j.calendar.HebrewCalendar;
+import net.time4j.calendar.HebrewMonth;
 import net.time4j.engine.TimeAxis;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 
 import java.util.Locale;
 
-import static net.time4j.calendar.MinguoCalendar.*;
+import static net.time4j.calendar.HebrewCalendar.*;
 
 
-class FXCalendarSystemMinguo
-    extends FXCalendarSystemBase<CalendarUnit, MinguoCalendar> {
+class FXCalendarSystemHebrew
+    extends FXCalendarSystemBase<HebrewCalendar.Unit, HebrewCalendar> {
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
     public Weekmodel getDefaultWeekmodel() {
-        return MinguoCalendar.getDefaultWeekmodel();
+        return HebrewCalendar.getDefaultWeekmodel();
     }
 
     @Override
-    protected CalendarUnit getMonthsUnit() {
-        return CalendarUnit.MONTHS;
+    protected HebrewCalendar.Unit getMonthsUnit() {
+        return HebrewCalendar.Unit.MONTHS;
     }
 
     @Override
-    protected CalendarUnit getYearsUnit() {
-        return CalendarUnit.YEARS;
+    protected HebrewCalendar.Unit getYearsUnit() {
+        return HebrewCalendar.Unit.YEARS;
     }
 
     @Override
-    protected TimeAxis<CalendarUnit, MinguoCalendar> getChronology() {
-        return MinguoCalendar.axis();
+    protected TimeAxis<HebrewCalendar.Unit, HebrewCalendar> getChronology() {
+        return HebrewCalendar.axis();
     }
 
     @Override
-    public int getMonth(MinguoCalendar date) {
-        return date.getMonth().getValue();
+    public int getMonth(HebrewCalendar date) {
+        return date.getMonth().getCivilValue(date.isLeapYear());
     }
 
     @Override
-    public int getYear(MinguoCalendar date) {
+    public int getYear(HebrewCalendar date) {
         return date.getYear();
     }
 
     @Override
     public int getMaxCountOfMonths() {
-        return 12;
+        return 13;
     }
 
     @Override
     public String formatMonth(
         int month,
         Locale locale,
-        MinguoCalendar date
+        HebrewCalendar date
     ) {
-        return Month.valueOf(month).getDisplayName(locale, TextWidth.SHORT, OutputContext.STANDALONE);
+        boolean leapYear = date.isLeapYear();
+        return HebrewMonth.valueOfCivil(month, leapYear)
+            .getDisplayName(locale, TextWidth.SHORT, OutputContext.STANDALONE, leapYear);
     }
 
     @Override
-    public MinguoCalendar withMonth(
-        MinguoCalendar date,
+    public HebrewCalendar withMonth(
+        HebrewCalendar date,
         int month
     ) {
-        return date.with(MONTH_OF_YEAR, Month.valueOf(month));
+        return date.with(MONTH_OF_YEAR, HebrewMonth.valueOfCivil(month, date.isLeapYear()));
     }
 
     @Override
-    public MinguoCalendar withFirstDayOfMonth(MinguoCalendar date) {
+    public HebrewCalendar withFirstDayOfMonth(HebrewCalendar date) {
         return date.with(DAY_OF_MONTH, 1);
     }
 
     @Override
-    public MinguoCalendar withLastDayOfMonth(MinguoCalendar date) {
+    public HebrewCalendar withLastDayOfMonth(HebrewCalendar date) {
         return date.with(DAY_OF_MONTH.maximized());
     }
 
     @Override
-    public MinguoCalendar withFirstDayOfYear(MinguoCalendar date) {
+    public HebrewCalendar withFirstDayOfYear(HebrewCalendar date) {
         return date.with(DAY_OF_YEAR, 1);
     }
 
     @Override
-    public MinguoCalendar withLastDayOfYear(MinguoCalendar date) {
+    public HebrewCalendar withLastDayOfYear(HebrewCalendar date) {
         return date.with(DAY_OF_YEAR.maximized());
     }
 
     @Override
-    public int getProlepticYear(MinguoCalendar date) {
-        int yoe = this.getYear(date);
-        if (date.getEra() == MinguoEra.BEFORE_ROC) {
-            yoe = 1 - yoe;
-        }
-        return yoe;
+    public int getProlepticYear(HebrewCalendar date) {
+        return this.getYear(date);
     }
 
 }

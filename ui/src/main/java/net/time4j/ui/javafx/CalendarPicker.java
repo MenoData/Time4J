@@ -50,6 +50,7 @@ import javafx.util.Duration;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
+import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
 import net.time4j.calendar.MinguoCalendar;
 import net.time4j.calendar.PersianCalendar;
@@ -318,6 +319,62 @@ public class CalendarPicker<T extends CalendarDate>
     }
 
     /**
+     * <p>Creates a new {@code CalendarPicker} for the hebrew calendar system (jewish calendar) using system defaults
+     * for the locale and the current local time. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den hebr&auml;ischen (j&uuml;dischen) Kalender
+     * unter Benutzung von aus dem System abgeleiteten Standardwerten f&uuml;r die Sprach- und
+     * L&auml;dereinstellung und die aktuelle Zonenzeit. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     */
+    public static CalendarPicker<HebrewCalendar> hebrewWithSystemDefaults() {
+
+        return CalendarPicker.hebrew(
+            Locale.getDefault(Locale.Category.FORMAT),
+            () -> SystemClock.inLocalView().now(HebrewCalendar.axis())
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the hebrew calendar system (jewish calendar). </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den hebr&auml;ischen (j&uuml;dischen) Kalender. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     */
+    public static CalendarPicker<HebrewCalendar> hebrew(
+        Locale locale,
+        Supplier<HebrewCalendar> todaySupplier
+    ) {
+
+        return CalendarPicker.create(
+            HebrewCalendar.axis(),
+            new FXCalendarSystemHebrew(),
+            locale,
+            todaySupplier
+        );
+
+    }
+
+    /**
      * <p>Creates a new {@code CalendarPicker} for the islamic calendar using system defaults
      * for the locale and the current local time. </p>
      *
@@ -399,62 +456,6 @@ public class CalendarPicker<T extends CalendarDate>
     }
 
     /**
-     * <p>Creates a new {@code CalendarPicker} for the persian calendar system using system defaults
-     * for the locale and the current local time. </p>
-     *
-     * @return  CalendarPicker
-     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
-     * @see     SystemClock#inLocalView()
-     * @see     ZonalClock#now(Chronology)
-     */
-    /*[deutsch]
-     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r das persische Kalendersystem
-     * unter Benutzung von aus dem System abgeleiteten Standardwerten f&uuml;r die Sprach- und
-     * L&auml;dereinstellung und die aktuelle Zonenzeit. </p>
-     *
-     * @return  CalendarPicker
-     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
-     * @see     SystemClock#inLocalView()
-     * @see     ZonalClock#now(Chronology)
-     */
-    public static CalendarPicker<PersianCalendar> persianWithSystemDefaults() {
-
-        return CalendarPicker.persian(
-            Locale.getDefault(Locale.Category.FORMAT),
-            () -> SystemClock.inLocalView().now(PersianCalendar.axis())
-        );
-
-    }
-
-    /**
-     * <p>Creates a new {@code CalendarPicker} for the persian calendar system (jalali). </p>
-     *
-     * @param   locale          the language and country configuration
-     * @param   todaySupplier   determines the current calendar date
-     * @return  CalendarPicker
-     */
-    /*[deutsch]
-     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r das persische Kalendersystem (jalali). </p>
-     *
-     * @param   locale          the language and country configuration
-     * @param   todaySupplier   determines the current calendar date
-     * @return  CalendarPicker
-     */
-    public static CalendarPicker<PersianCalendar> persian(
-        Locale locale,
-        Supplier<PersianCalendar> todaySupplier
-    ) {
-
-        return CalendarPicker.create(
-            PersianCalendar.axis(),
-            new FXCalendarSystemPersian(),
-            locale,
-            todaySupplier
-        );
-
-    }
-
-    /**
      * <p>Creates a new {@code CalendarPicker} for the calendar system of Taiwan using system defaults
      * for the locale and the current local time. </p>
      *
@@ -504,6 +505,62 @@ public class CalendarPicker<T extends CalendarDate>
         return CalendarPicker.create(
             MinguoCalendar.axis(),
             new FXCalendarSystemMinguo(),
+            locale,
+            todaySupplier
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the persian calendar system using system defaults
+     * for the locale and the current local time. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r das persische Kalendersystem
+     * unter Benutzung von aus dem System abgeleiteten Standardwerten f&uuml;r die Sprach- und
+     * L&auml;dereinstellung und die aktuelle Zonenzeit. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     */
+    public static CalendarPicker<PersianCalendar> persianWithSystemDefaults() {
+
+        return CalendarPicker.persian(
+            Locale.getDefault(Locale.Category.FORMAT),
+            () -> SystemClock.inLocalView().now(PersianCalendar.axis())
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the persian calendar system (jalali). </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r das persische Kalendersystem (jalali). </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     */
+    public static CalendarPicker<PersianCalendar> persian(
+        Locale locale,
+        Supplier<PersianCalendar> todaySupplier
+    ) {
+
+        return CalendarPicker.create(
+            PersianCalendar.axis(),
+            new FXCalendarSystemPersian(),
             locale,
             todaySupplier
         );

@@ -113,7 +113,7 @@ class YearView<T extends CalendarDate>
     @Override
     protected void buildContent() {
 
-        for (int i = 0, n = this.getCalendarSystem().getCountOfMonths(); i < n; i++) {
+        for (int i = 0, n = this.getCalendarSystem().getMaxCountOfMonths(); i < n; i++) {
             Button button = new Button();
             button.getStyleClass().add(CSS_CALENDAR_CELL_INSIDE_RANGE);
 
@@ -151,7 +151,7 @@ class YearView<T extends CalendarDate>
         T min = null;
         T max = null;
 
-        for (int i = 0, n = this.getCalendarSystem().getCountOfMonths(); i < n; i++) {
+        for (int i = 0, n = this.getCalendarSystem().getMaxCountOfMonths(); i < n; i++) {
             Button button = (Button) getChildren().get(i);
             try {
                 T btnDate = this.getCalendarSystem().withMonth(date, i + 1);
@@ -172,7 +172,7 @@ class YearView<T extends CalendarDate>
                 } else {
                     button.setDisable(false);
                     int month = this.getCalendarSystem().getMonth(btnDate);
-                    button.setText(this.getCalendarSystem().formatMonth(month, locale));
+                    button.setText(this.getCalendarSystem().formatMonth(month, locale, btnDate));
                     button.setUserData(btnDate);
                 }
             } catch (ArithmeticException | IllegalArgumentException ex) {

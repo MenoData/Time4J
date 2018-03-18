@@ -69,14 +69,15 @@ class FXCalendarSystemPersian
     }
 
     @Override
-    public int getCountOfMonths() {
+    public int getMaxCountOfMonths() {
         return 12;
     }
 
     @Override
     public String formatMonth(
         int month,
-        Locale locale
+        Locale locale,
+        PersianCalendar date
     ) {
         return PersianMonth.valueOf(month).getDisplayName(locale, TextWidth.SHORT, OutputContext.STANDALONE);
     }

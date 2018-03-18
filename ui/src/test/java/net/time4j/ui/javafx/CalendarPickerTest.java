@@ -1,14 +1,24 @@
 package net.time4j.ui.javafx;
 
+import com.sun.prism.paint.Color;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.scene.control.DatePicker;
+import javafx.scene.control.Label;
+import javafx.scene.layout.Border;
+import javafx.scene.layout.BorderStroke;
+import javafx.scene.layout.BorderStrokeStyle;
+import javafx.scene.layout.BorderWidths;
+import javafx.scene.layout.CornerRadii;
 import javafx.scene.layout.GridPane;
+import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import net.time4j.PlainDate;
+import net.time4j.calendar.HebrewCalendar;
+import net.time4j.calendar.HebrewMonth;
 import net.time4j.calendar.HijriCalendar;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
@@ -80,11 +90,24 @@ public class CalendarPickerTest
         GridPane gridPane = new GridPane();
         gridPane.setHgap(5);
         gridPane.setVgap(5);
-        gridPane.add(picker, 0, 0);
-        gridPane.add(button, 0, 1);
-        gridPane.add(datePicker, 0, 2);
+        gridPane.setBorder(
+            new Border(
+                new BorderStroke(
+                    Paint.valueOf("transparent"), BorderStrokeStyle.SOLID, CornerRadii.EMPTY, new BorderWidths(5))));
+
+        Label labelISO = new Label("Gregorian");
+        labelISO.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelISO, 0, 0);
+        gridPane.add(picker, 1, 0);
+        gridPane.add(button, 1, 1);
+
+        Label labelJDK = new Label("JavaFX (Hijrah)");
+        labelJDK.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelJDK, 0, 2);
+        gridPane.add(datePicker, 1, 2);
 
         CalendarPicker<?> alternativeCalendarPicker;
+
         alternativeCalendarPicker = CalendarPicker.persianWithSystemDefaults();
         alternativeCalendarPicker.setLengthOfAnimations(Duration.seconds(0.7));
         assertThat(
@@ -94,7 +117,9 @@ public class CalendarPickerTest
         alternativeCalendarPicker = CalendarPicker.minguoWithSystemDefaults();
         alternativeCalendarPicker = CalendarPicker.thaiWithSystemDefaults();
         alternativeCalendarPicker = CalendarPicker.hijriWithSystemDefaults(() -> HijriCalendar.VARIANT_UMALQURA);
+
         alternativeCalendarPicker = CalendarPicker.persianWithSystemDefaults();
+
         alternativeCalendarPicker.setShowInfoLabel(true);
         alternativeCalendarPicker.setCellCustomizer(
             (cell, column, row, model, date) -> {
@@ -106,8 +131,18 @@ public class CalendarPickerTest
         );
         alternativeCalendarPicker.setLocale(new Locale("fa", "IR"));
         alternativeCalendarPicker.setShowWeeks(true);
-        gridPane.add(alternativeCalendarPicker, 0, 3);
+        Label labelPersian = new Label("Persian");
+        labelPersian.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelPersian, 0, 3);
+        gridPane.add(alternativeCalendarPicker, 1, 3);
+        gridPane.setAlignment(Pos.CENTER);
 
+        Label labelHebrew = new Label("Hebrew");
+        labelHebrew.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelHebrew, 0, 4);
+        CalendarPicker<HebrewCalendar> hebrewPicker = CalendarPicker.hebrewWithSystemDefaults();
+        hebrewPicker.setLocale(Locale.GERMAN);
+        gridPane.add(hebrewPicker, 1, 4);
         gridPane.setAlignment(Pos.CENTER);
 
         Scene scene = new Scene(gridPane, 300, 200);

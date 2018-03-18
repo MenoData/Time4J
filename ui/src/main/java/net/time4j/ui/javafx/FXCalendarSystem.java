@@ -98,11 +98,12 @@ interface FXCalendarSystem<T extends CalendarDate> {
 
     ChronoFormatter<T> createTooltipFormat(Locale locale);
 
-    int getCountOfMonths();
+    int getMaxCountOfMonths();
 
     String formatMonth(
         int month,
-        Locale locale
+        Locale locale,
+        T date
     );
 
     T withMonth(
