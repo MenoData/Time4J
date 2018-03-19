@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystemPersian.java) is part of project Time4J.
  *
@@ -64,7 +64,7 @@ class FXCalendarSystemPersian
     }
 
     @Override
-    public int getYear(PersianCalendar date) {
+    public int getProlepticYear(PersianCalendar date) {
         return date.getYear();
     }
 

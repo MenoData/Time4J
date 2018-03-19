@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (FXCalendarSystemMinguo.java) is part of project Time4J.
+ * This file (FXCalendarSystemJulian.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -21,54 +21,53 @@
 
 package net.time4j.ui.javafx;
 
-import net.time4j.CalendarUnit;
 import net.time4j.Month;
 import net.time4j.Weekmodel;
-import net.time4j.calendar.MinguoCalendar;
-import net.time4j.calendar.MinguoEra;
+import net.time4j.calendar.JulianCalendar;
 import net.time4j.engine.TimeAxis;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
+import net.time4j.history.HistoricEra;
 
 import java.util.Locale;
 
-import static net.time4j.calendar.MinguoCalendar.*;
+import static net.time4j.calendar.JulianCalendar.*;
 
 
-class FXCalendarSystemMinguo
-    extends FXCalendarSystemBase<CalendarUnit, MinguoCalendar> {
+class FXCalendarSystemJulian
+    extends FXCalendarSystemBase<JulianCalendar.Unit, JulianCalendar> {
 
     //~ Methoden ----------------------------------------------------------
 
     @Override
     public Weekmodel getDefaultWeekmodel() {
-        return MinguoCalendar.getDefaultWeekmodel();
+        return JulianCalendar.getDefaultWeekmodel();
     }
 
     @Override
-    protected CalendarUnit getMonthsUnit() {
-        return CalendarUnit.MONTHS;
+    protected JulianCalendar.Unit getMonthsUnit() {
+        return JulianCalendar.Unit.MONTHS;
     }
 
     @Override
-    protected CalendarUnit getYearsUnit() {
-        return CalendarUnit.YEARS;
+    protected JulianCalendar.Unit getYearsUnit() {
+        return JulianCalendar.Unit.YEARS;
     }
 
     @Override
-    protected TimeAxis<CalendarUnit, MinguoCalendar> getChronology() {
-        return MinguoCalendar.axis();
+    protected TimeAxis<JulianCalendar.Unit, JulianCalendar> getChronology() {
+        return JulianCalendar.axis();
     }
 
     @Override
-    public int getMonth(MinguoCalendar date) {
+    public int getMonth(JulianCalendar date) {
         return date.getMonth().getValue();
     }
 
     @Override
-    public int getProlepticYear(MinguoCalendar date) {
+    public int getProlepticYear(JulianCalendar date) {
         int yoe = date.getYear();
-        if (date.getEra() == MinguoEra.BEFORE_ROC) {
+        if (date.getEra() == HistoricEra.BC) {
             yoe = 1 - yoe;
         }
         return yoe;
@@ -83,37 +82,39 @@ class FXCalendarSystemMinguo
     public String formatMonth(
         int month,
         Locale locale,
-        MinguoCalendar date
+        JulianCalendar date
     ) {
         return Month.valueOf(month).getDisplayName(locale, TextWidth.SHORT, OutputContext.STANDALONE);
     }
 
     @Override
-    public MinguoCalendar withMonth(
-        MinguoCalendar date,
+    public JulianCalendar withMonth(
+        JulianCalendar date,
         int month
     ) {
-        return date.with(MONTH_OF_YEAR, Month.valueOf(month));
+        return date.with(MONTH_OF_YEAR, month);
     }
 
     @Override
-    public MinguoCalendar withFirstDayOfMonth(MinguoCalendar date) {
+    public JulianCalendar withFirstDayOfMonth(JulianCalendar date) {
         return date.with(DAY_OF_MONTH, 1);
     }
 
     @Override
-    public MinguoCalendar withLastDayOfMonth(MinguoCalendar date) {
-        return date.with(DAY_OF_MONTH.maximized());
+    public JulianCalendar withLastDayOfMonth(JulianCalendar date) {
+        int max = date.getMaximum(DAY_OF_MONTH);
+        return date.with(DAY_OF_MONTH, max);
     }
 
     @Override
-    public MinguoCalendar withFirstDayOfYear(MinguoCalendar date) {
+    public JulianCalendar withFirstDayOfYear(JulianCalendar date) {
         return date.with(DAY_OF_YEAR, 1);
     }
 
     @Override
-    public MinguoCalendar withLastDayOfYear(MinguoCalendar date) {
-        return date.with(DAY_OF_YEAR.maximized());
+    public JulianCalendar withLastDayOfYear(JulianCalendar date) {
+        int max = date.getMaximum(DAY_OF_YEAR);
+        return date.with(DAY_OF_YEAR, max);
     }
 
 }

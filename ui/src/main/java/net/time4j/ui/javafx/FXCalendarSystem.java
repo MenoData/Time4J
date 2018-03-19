@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystem.java) is part of project Time4J.
  *
@@ -48,8 +48,8 @@ interface FXCalendarSystem<T extends CalendarDate> {
         T oldDate,
         T newDate
     ) {
-        int oldYear = getYear(oldDate);
-        int newYear = getYear(newDate);
+        int oldYear = getProlepticYear(oldDate);
+        int newYear = getProlepticYear(newDate);
 
         if (viewIndex >= NavigationBar.YEAR_VIEW) {
             return (oldYear == newYear) ? 0 : (oldYear > newYear ? 1 : -1);
@@ -113,7 +113,7 @@ interface FXCalendarSystem<T extends CalendarDate> {
 
     int getMonth(T date);
 
-    int getYear(T date);
+    int getProlepticYear(T date);
 
     T withFirstDayOfYear(T date);
 
@@ -127,7 +127,5 @@ interface FXCalendarSystem<T extends CalendarDate> {
         T date,
         int amount
     );
-
-    int getProlepticYear(T date);
 
 }

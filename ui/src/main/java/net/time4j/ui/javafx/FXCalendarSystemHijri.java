@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystemHijri.java) is part of project Time4J.
  *
@@ -141,7 +141,7 @@ class FXCalendarSystemHijri
     }
 
     @Override
-    public int getYear(HijriCalendar date) {
+    public int getProlepticYear(HijriCalendar date) {
         return date.getYear();
     }
 
@@ -171,11 +171,6 @@ class FXCalendarSystemHijri
         int amount
     ) {
         return date.plus(amount, Unit.YEARS);
-    }
-
-    @Override
-    public int getProlepticYear(HijriCalendar date) {
-        return date.getYear();
     }
 
 }

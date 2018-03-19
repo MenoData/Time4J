@@ -64,7 +64,7 @@ class FXCalendarSystemHebrew
     }
 
     @Override
-    public int getYear(HebrewCalendar date) {
+    public int getProlepticYear(HebrewCalendar date) {
         return date.getYear();
     }
 
@@ -110,11 +110,6 @@ class FXCalendarSystemHebrew
     @Override
     public HebrewCalendar withLastDayOfYear(HebrewCalendar date) {
         return date.with(DAY_OF_YEAR.maximized());
-    }
-
-    @Override
-    public int getProlepticYear(HebrewCalendar date) {
-        return this.getYear(date);
     }
 
 }

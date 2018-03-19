@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarPicker.java) is part of project Time4J.
  *
@@ -52,6 +52,7 @@ import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
 import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
+import net.time4j.calendar.JulianCalendar;
 import net.time4j.calendar.MinguoCalendar;
 import net.time4j.calendar.PersianCalendar;
 import net.time4j.calendar.ThaiSolarCalendar;
@@ -253,9 +254,7 @@ public class CalendarPicker<T extends CalendarDate>
         );
 
         this.control.localeProperty().addListener(
-            observable -> {
-                updateTextField();
-            }
+            observable -> updateTextField()
         );
 
     }
@@ -352,6 +351,7 @@ public class CalendarPicker<T extends CalendarDate>
      * @param   locale          the language and country configuration
      * @param   todaySupplier   determines the current calendar date
      * @return  CalendarPicker
+     * @since   4.36
      */
     /*[deutsch]
      * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den hebr&auml;ischen (j&uuml;dischen) Kalender. </p>
@@ -359,6 +359,7 @@ public class CalendarPicker<T extends CalendarDate>
      * @param   locale          the language and country configuration
      * @param   todaySupplier   determines the current calendar date
      * @return  CalendarPicker
+     * @since   4.36
      */
     public static CalendarPicker<HebrewCalendar> hebrew(
         Locale locale,
@@ -449,6 +450,66 @@ public class CalendarPicker<T extends CalendarDate>
         return CalendarPicker.create(
             HijriCalendar.family(),
             new FXCalendarSystemHijri(variantSource.getVariant()),
+            locale,
+            todaySupplier
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the Julian calendar system using system defaults
+     * for the locale and the current local time. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     * @since   4.36
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den julianischen Kalender
+     * unter Benutzung von aus dem System abgeleiteten Standardwerten f&uuml;r die Sprach- und
+     * L&auml;dereinstellung und die aktuelle Zonenzeit. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     * @since   4.36
+     */
+    public static CalendarPicker<JulianCalendar> julianWithSystemDefaults() {
+
+        return CalendarPicker.julian(
+            Locale.getDefault(Locale.Category.FORMAT),
+            () -> SystemClock.inLocalView().now(JulianCalendar.axis())
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the Julian calendar system. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     * @since   4.36
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den julianischen Kalender. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     * @since   4.36
+     */
+    public static CalendarPicker<JulianCalendar> julian(
+        Locale locale,
+        Supplier<JulianCalendar> todaySupplier
+    ) {
+
+        return CalendarPicker.create(
+            JulianCalendar.axis(),
+            new FXCalendarSystemJulian(),
             locale,
             todaySupplier
         );
@@ -997,9 +1058,7 @@ public class CalendarPicker<T extends CalendarDate>
             CalendarContent<T> cc = new CalendarContent<>(this.control, this.calsys);
             cc.getStylesheets().setAll(this.getStylesheets());
             this.getStylesheets().addListener(
-                (Observable observable) -> {
-                    cc.getStylesheets().setAll(getStylesheets());
-                }
+                (Observable observable) -> cc.getStylesheets().setAll(getStylesheets())
             );
             p.getContent().add(cc);
             this.popupDialog = p;

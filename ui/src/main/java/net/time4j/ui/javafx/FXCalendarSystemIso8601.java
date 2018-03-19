@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystemIso8601.java) is part of project Time4J.
  *
@@ -66,7 +66,7 @@ class FXCalendarSystemIso8601
     }
 
     @Override
-    public int getYear(PlainDate date) {
+    public int getProlepticYear(PlainDate date) {
         return date.getYear();
     }
 

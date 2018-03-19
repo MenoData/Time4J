@@ -1,6 +1,5 @@
 package net.time4j.ui.javafx;
 
-import com.sun.prism.paint.Color;
 import javafx.application.Application;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
@@ -18,8 +17,10 @@ import javafx.stage.Stage;
 import javafx.util.Duration;
 import net.time4j.PlainDate;
 import net.time4j.calendar.HebrewCalendar;
-import net.time4j.calendar.HebrewMonth;
 import net.time4j.calendar.HijriCalendar;
+import net.time4j.calendar.JulianCalendar;
+import net.time4j.calendar.MinguoCalendar;
+import net.time4j.calendar.ThaiSolarCalendar;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -43,7 +44,7 @@ public class CalendarPickerTest
     }
 
     @Override
-    public void start(Stage stage) throws Exception {
+    public void start(Stage stage) {
         stage.setTitle("CalendarPicker-Test");
 
         CalendarPicker<PlainDate> picker = CalendarPicker.gregorianWithSystemDefaults();
@@ -101,51 +102,79 @@ public class CalendarPickerTest
         gridPane.add(picker, 1, 0);
         gridPane.add(button, 1, 1);
 
+        int row = 2;
+
         Label labelJDK = new Label("JavaFX (Hijrah)");
         labelJDK.setAlignment(Pos.CENTER_RIGHT);
-        gridPane.add(labelJDK, 0, 2);
-        gridPane.add(datePicker, 1, 2);
+        gridPane.add(labelJDK, 0, row);
+        gridPane.add(datePicker, 1, row);
 
-        CalendarPicker<?> alternativeCalendarPicker;
+        row++;
+        Label labelHebrew = new Label("Hebrew");
+        labelHebrew.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelHebrew, 0, row);
+        CalendarPicker<HebrewCalendar> hebrewPicker = CalendarPicker.hebrewWithSystemDefaults();
+        hebrewPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(hebrewPicker, 1, row);
 
-        alternativeCalendarPicker = CalendarPicker.persianWithSystemDefaults();
-        alternativeCalendarPicker.setLengthOfAnimations(Duration.seconds(0.7));
+        row++;
+        Label labelHijri = new Label("Islamic-Umalqura");
+        labelHijri.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelHijri, 0, row);
+        CalendarPicker<HijriCalendar> hijriPicker =
+            CalendarPicker.hijriWithSystemDefaults(() -> HijriCalendar.VARIANT_UMALQURA);
+        hijriPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(hijriPicker, 1, row);
+
+        row++;
+        Label labelJulian = new Label("Julian");
+        labelJulian.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelJulian, 0, row);
+        CalendarPicker<JulianCalendar> julianPicker = CalendarPicker.julianWithSystemDefaults();
+        julianPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(julianPicker, 1, row);
+
+        row++;
+        Label labelMinguo = new Label("Minguo");
+        labelMinguo.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelMinguo, 0, row);
+        CalendarPicker<MinguoCalendar> minguoPicker = CalendarPicker.minguoWithSystemDefaults();
+        minguoPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(minguoPicker, 1, row);
+
+        row++;
+        CalendarPicker<?> persianCalendarPicker = CalendarPicker.persianWithSystemDefaults();
+        persianCalendarPicker.setLengthOfAnimations(Duration.seconds(0.7));
         assertThat(
-            alternativeCalendarPicker.lengthOfAnimationsProperty().get(),
+            persianCalendarPicker.lengthOfAnimationsProperty().get(),
             is(Duration.seconds(0.7)));
-
-        alternativeCalendarPicker = CalendarPicker.minguoWithSystemDefaults();
-        alternativeCalendarPicker = CalendarPicker.thaiWithSystemDefaults();
-        alternativeCalendarPicker = CalendarPicker.hijriWithSystemDefaults(() -> HijriCalendar.VARIANT_UMALQURA);
-
-        alternativeCalendarPicker = CalendarPicker.persianWithSystemDefaults();
-
-        alternativeCalendarPicker.setShowInfoLabel(true);
-        alternativeCalendarPicker.setCellCustomizer(
-            (cell, column, row, model, date) -> {
-                if (CellCustomizer.isWeekend(column, model)) {
+        persianCalendarPicker = CalendarPicker.persianWithSystemDefaults();
+        persianCalendarPicker.setShowInfoLabel(true);
+        persianCalendarPicker.setCellCustomizer(
+            (cell, columnIndex, rowIndex, model, date) -> {
+                if (CellCustomizer.isWeekend(columnIndex, model)) {
                     cell.setStyle("-fx-background-color: #FFE0E0;");
                     cell.setDisable(true);
                 }
             }
         );
-        alternativeCalendarPicker.setLocale(new Locale("fa", "IR"));
-        alternativeCalendarPicker.setShowWeeks(true);
+        persianCalendarPicker.setLocale(new Locale("fa", "IR"));
+        persianCalendarPicker.setShowWeeks(true);
         Label labelPersian = new Label("Persian");
         labelPersian.setAlignment(Pos.CENTER_RIGHT);
-        gridPane.add(labelPersian, 0, 3);
-        gridPane.add(alternativeCalendarPicker, 1, 3);
-        gridPane.setAlignment(Pos.CENTER);
+        gridPane.add(labelPersian, 0, row);
+        gridPane.add(persianCalendarPicker, 1, row);
 
-        Label labelHebrew = new Label("Hebrew");
-        labelHebrew.setAlignment(Pos.CENTER_RIGHT);
-        gridPane.add(labelHebrew, 0, 4);
-        CalendarPicker<HebrewCalendar> hebrewPicker = CalendarPicker.hebrewWithSystemDefaults();
-        hebrewPicker.setLocale(Locale.GERMAN);
-        gridPane.add(hebrewPicker, 1, 4);
-        gridPane.setAlignment(Pos.CENTER);
+        row++;
+        Label labelThaisolar = new Label("Thai (Buddhist)");
+        labelThaisolar.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelThaisolar, 0, row);
+        CalendarPicker<ThaiSolarCalendar> thaisolarPicker = CalendarPicker.thaiWithSystemDefaults();
+        thaisolarPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(thaisolarPicker, 1, row);
 
-        Scene scene = new Scene(gridPane, 300, 200);
+        gridPane.setAlignment(Pos.CENTER);
+        Scene scene = new Scene(gridPane, 305, 320);
         stage.setScene(scene);
         stage.show();
 

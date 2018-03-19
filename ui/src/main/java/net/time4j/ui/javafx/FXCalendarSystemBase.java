@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystemBase.java) is part of project Time4J.
  *
@@ -90,11 +90,6 @@ abstract class FXCalendarSystemBase<U, D extends Calendrical<U, D> & LocalizedPa
         int amount
     ) {
         return date.plus(amount, this.getYearsUnit());
-    }
-
-    @Override
-    public int getProlepticYear(D date) {
-        return this.getYear(date);
     }
 
     protected abstract U getMonthsUnit();
