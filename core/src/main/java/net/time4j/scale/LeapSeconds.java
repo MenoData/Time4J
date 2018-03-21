@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapSeconds.java) is part of project Time4J.
  *
@@ -58,12 +58,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * by application classloader. If there is no source at all then Time4J
  * assumes that leap seconds shall not be used. </p>
  *
- * <p>The system property &quot;time4j.scale.leapseconds.suppressed&quot;
+ * <p>The system property &quot;net.time4j.scale.leapseconds.suppressed&quot;
  * determines if leap seconds shall be active at all. If this system
  * property has the value {@code true} then this class will never
  * register any leap seconds equal if the underlying sources are filled
  * or not. Furthermore, the system property
- * &quot;time4j.scale.leapseconds.final&quot; determines if leap seconds
+ * &quot;net.time4j.scale.leapseconds.final&quot; determines if leap seconds
  * are only registered at system start or if new ones can be lazily
  * registered at runtime using the methods {@code registerXYZ()}.
  * Setting one of both properties can improve the performance. </p>
@@ -88,12 +88,12 @@ import java.util.concurrent.CopyOnWriteArrayList;
  * Wird die Quelle nicht gefunden, so wird angenommen, da&szlig; keine
  * Schaltsekunden verwendet werden sollen. </p>
  *
- * <p>Die System-Property &quot;time4j.scale.leapseconds.suppressed&quot;
+ * <p>Die System-Property &quot;net.time4j.scale.leapseconds.suppressed&quot;
  * entscheidet, ob Schaltsekunden &uuml;berhaupt aktiviert sind. Wenn diese
  * System-Property den Wert {@code true} hat, wird diese Klasse niemals
  * Schaltsekunden registrieren, gleichg&uuml;ltig, ob die zugrundeliegenden
  * Quellen gef&uuml;llt sind. Daneben gibt es noch die System-Property
- * &quot;time4j.scale.leapseconds.final&quot;, die festlegt, ob Schaltsekunden
+ * &quot;net.time4j.scale.leapseconds.final&quot;, die festlegt, ob Schaltsekunden
  * nur zum Systemstart registriert werden oder auch nachtr&auml;glich zur
  * Laufzeit mittels {@code registerXYZ()} registriert werden k&ouml;nnen. Das
  * Setzen einer der beiden Properties kann die Performance verbessern. </p>
