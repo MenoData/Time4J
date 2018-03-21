@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JulianDay.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.PlainTime;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.EpochDays;
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.ZonalOffset;
 
@@ -522,9 +523,16 @@ public final class JulianDay
     public Moment toMoment() {
 
         double secs = this.value * DAY_IN_SECONDS;
-        long elapsed = (long) secs;
+        long elapsed = MathUtils.safeSubtract((long) secs, jdOffset(this.scale));
         int nano = (int) ((secs - Math.floor(secs)) * MRD);
-        return Moment.of(MathUtils.safeSubtract(elapsed, jdOffset(this.scale)), nano, this.scale);
+        TimeScale ts = this.scale;
+
+        if (!LeapSeconds.getInstance().isEnabled() && (ts != TimeScale.POSIX)) {
+            elapsed += (86400 * 730);
+            ts = TimeScale.POSIX;
+        }
+
+        return Moment.of(elapsed, nano, ts);
 
     }
 

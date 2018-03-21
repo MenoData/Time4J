@@ -27,6 +27,7 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.EpochDays;
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.ZonalOffset;
 
@@ -303,7 +304,12 @@ public enum StdSolarCalculator
             int tod = (int) Math.floor(ut * 3600);
             long secs = d.get(EpochDays.UTC) * 86400 + tod;
             // we truncate/neglect the fractional seconds here and round to full minutes
-            Moment utc = Moment.of(Math.round(secs / 60.0) * 60, TimeScale.UT);
+            TimeScale scale = TimeScale.UT;
+            if (!LeapSeconds.getInstance().isEnabled()) {
+                secs += (86400 * 730);
+                scale = TimeScale.POSIX;
+            }
+            Moment utc = Moment.of(Math.round(secs / 60.0) * 60, scale);
             return utc.with(Moment.PRECISION, TimeUnit.MINUTES);
         }
         private double adjustRange(double value) { // range [0.0, 360.0)

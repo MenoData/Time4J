@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AstronomicalSeason.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
 
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 
 
@@ -120,8 +121,14 @@ public enum AstronomicalSeason {
 
 		long seconds = (long) Math.floor(utc);
 		int nanos = (int) ((utc - seconds) * 1000000000);
+		TimeScale scale = TimeScale.UTC;
 
-		return Moment.of(seconds, nanos, TimeScale.UTC);
+		if (!LeapSeconds.getInstance().isEnabled()) {
+			seconds += (86400 * 730);
+			scale = TimeScale.POSIX;
+		}
+
+		return Moment.of(seconds, nanos, scale);
 
 	}
 
