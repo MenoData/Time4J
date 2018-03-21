@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SolarTime.java) is part of project Time4J.
  *
@@ -33,6 +33,7 @@ import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.EpochDays;
+import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
@@ -635,11 +636,7 @@ public final class SolarTime
         return date -> {
             Optional<Moment> m = this.getCalculator().sunrise(
                 toLMT(date), this.latitude, this.longitude, this.zenithAngle());
-            if (m.isPresent()) {
-                return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
-            } else {
-                return Optional.empty();
-            }
+            return m.map(moment -> moment.toZonalTimestamp(tzid).getWallTime());
         };
 
     }
@@ -740,11 +737,7 @@ public final class SolarTime
         return date -> {
             Optional<Moment> m = this.getCalculator().sunset(
                 toLMT(date), this.latitude, this.longitude, this.zenithAngle());
-            if (m.isPresent()) {
-                return Optional.of(m.get().toZonalTimestamp(tzid).getWallTime());
-            } else {
-                return Optional.empty();
-            }
+            return m.map(moment -> moment.toZonalTimestamp(tzid).getWallTime());
         };
 
     }
@@ -1224,7 +1217,12 @@ public final class SolarTime
         double elapsed = date.getDaysSinceEpochUTC() * 86400 + hourOfEvent * 3600 - longitude * 240;
         long secs = (long) Math.floor(elapsed);
         int nanos = (int) ((elapsed - secs) * 1_000_000_000);
-        Moment m1 = Moment.of(secs, nanos, TimeScale.UT);
+        TimeScale scale = TimeScale.UT;
+        if (!LeapSeconds.getInstance().isEnabled()) {
+            secs += (86400 * 730);
+            scale = TimeScale.POSIX;
+        }
+        Moment m1 = Moment.of(secs, nanos, scale);
         double eot = c.equationOfTime(JulianDay.getValue(m1, TimeScale.TT)); // first step
 
         secs = (long) Math.floor(eot);

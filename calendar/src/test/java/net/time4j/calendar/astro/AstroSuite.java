@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
         AstroTest.class,
         JulianDayTest.class,
         MoonTest.class,
+        NoLeapsecondsTest.class,
         SunSydneyTest.class,
         TwilightTest.class
     }
