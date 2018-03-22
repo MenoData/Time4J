@@ -54,15 +54,14 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>*</Import-Package>
-                        <Export-Package>
-                            net.time4j.format.expert,
-                            net.time4j.history
-                        </Export-Package>
+                        <Export-Package>*</Export-Package>
+                        <!--
                         <Private-Package>
                             net.time4j.format.internal
                             net.time4j.history.internal
                             net.time4j.i18n
                         </Private-Package>
+                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>

@@ -60,13 +60,12 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>*</Import-Package>
-                        <Export-Package>
-                            net.time4j.clock,
-                            net.time4j.tz.other
-                        </Export-Package>
+                        <Export-Package>*</Export-Package>
+                        <!--
                         <Private-Package>
                             net.time4j.tz.spi
                         </Private-Package>
+                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>

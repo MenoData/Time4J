@@ -60,14 +60,12 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>*</Import-Package>
-                        <Export-Package>
-                            net.time4j.calendar,
-                            net.time4j.calendar.astro,
-                            net.time4j.calendar.frenchrev
-                        </Export-Package>
+                        <Export-Package>*</Export-Package>
+                        <!--
                         <Private-Package>
                             net.time4j.calendar.service
                         </Private-Package>
+                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>

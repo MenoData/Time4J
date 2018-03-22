@@ -73,19 +73,13 @@
                     <instructions>
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>*</Import-Package>
-                        <Export-Package>
-                            net.time4j,
-                            net.time4j.base,
-                            net.time4j.engine,
-                            net.time4j.format,
-                            net.time4j.scale,
-                            net.time4j.sql,
-                            net.time4j.tz
-                        </Export-Package>
+                        <Export-Package>*</Export-Package>
+                        <!--
                         <Private-Package>
                             net.time4j.format.internal,
                             net.time4j.scale.spi
                         </Private-Package>
+                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>
@@ -93,6 +87,14 @@
                             osgi.serviceloader; osgi.serviceloader=net.time4j.scale.LeapSecondProvider
                         </Provide-Capability>
                     </instructions>
+                </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-compiler-plugin</artifactId>
+                <configuration>
+                    <source>1.8</source>
+                    <target>1.8</target>
                 </configuration>
             </plugin>
         </plugins>
