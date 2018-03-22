@@ -111,19 +111,23 @@ public enum AstronomicalSeason {
 	public Moment inYear(int year) {
 
 		double tt = (this.jdEphemerisDays(year) - 2441317.5) * 86400.0;
-		double utc;
+		boolean ls = LeapSeconds.getInstance().isEnabled();
 
-		if (year < 1972) {
-			utc = tt - TimeScale.deltaT(year, (this.ordinal() + 1) * 3);
+		double elapsed;
+		TimeScale scale;
+
+		if (!ls || (year < 1972)) {
+			elapsed = tt - TimeScale.deltaT(year, (this.ordinal() + 1) * 3);
+			scale = TimeScale.UT;
 		} else {
-			utc = tt - 42.184;
+			elapsed = tt - 42.184;
+			scale = TimeScale.UTC;
 		}
 
-		long seconds = (long) Math.floor(utc);
-		int nanos = (int) ((utc - seconds) * 1000000000);
-		TimeScale scale = TimeScale.UTC;
+		long seconds = (long) Math.floor(elapsed);
+		int nanos = (int) ((elapsed - seconds) * 1000000000);
 
-		if (!LeapSeconds.getInstance().isEnabled()) {
+		if (!ls) {
 			seconds += (86400 * 730);
 			scale = TimeScale.POSIX;
 		}
