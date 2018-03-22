@@ -6,6 +6,11 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 
 import java.text.ParseException;
+import java.text.ParsePosition;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeFormatterBuilder;
+import java.time.temporal.ChronoField;
 import java.util.Locale;
 
 import net.time4j.format.Attributes;
@@ -251,6 +256,9 @@ public class AdjacentDigitParsingTest {
     public void adjacentTimestampPatternWithOptionalTime()
         throws ParseException {
 
+        // pattern yyyyMMdd[HHmmss] would cause year parsing with effectively 9 digits
+        // because the optional section does not reserve any character in adjacent digit parsing
+        // so the chosen or-pattern is much more powerful and correct
         ChronoFormatter<PlainTimestamp> f =
             ChronoFormatter.ofTimestampPattern(
                 "yyyyMMddHHmmss|yyyyMMdd",
