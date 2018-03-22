@@ -43,7 +43,7 @@ public class NoLeapsecondsTest {
         Moment sunriseHH = PlainDate.of(2018, 3, 21).get(hh.sunrise()).get();
 
         if (LeapSeconds.getInstance().isEnabled()) {
-            assertThat(
+            assertThat( // without truncating: 2018-03-20T16:15:07,454302310Z
                 AstronomicalSeason.VERNAL_EQUINOX.inYear(2018).with(Moment.PRECISION, TimeUnit.SECONDS),
                 is(PlainTimestamp.of(2018, 3, 20, 16, 15, 7).atUTC()));
             assertThat(
@@ -51,9 +51,9 @@ public class NoLeapsecondsTest {
                 is(PlainTimestamp.of(2018, 3, 21, 6, 20, 23).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 1))));
             System.out.println("Leap seconds active.");
         } else {
-            assertThat(
+            assertThat( // without truncating: 2018-03-20T16:15:07,487834453Z
                 AstronomicalSeason.VERNAL_EQUINOX.inYear(2018).with(Moment.PRECISION, TimeUnit.SECONDS),
-                is(PlainTimestamp.of(2018, 3, 20, 16, 15, 34).atUTC()));
+                is(PlainTimestamp.of(2018, 3, 20, 16, 15, 7).atUTC()));
             assertThat(
                 sunriseHH, // without truncating: 2018-03-21T05:20:23,832059653Z
                 is(PlainTimestamp.of(2018, 3, 21, 6, 20, 23).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 1))));
