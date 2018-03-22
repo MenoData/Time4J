@@ -247,4 +247,23 @@ public class AdjacentDigitParsingTest {
             is(PlainDate.of(2011, 8, 30)));
     }
 
+    @Test
+    public void adjacentTimestampPatternWithOptionalTime()
+        throws ParseException {
+
+        ChronoFormatter<PlainTimestamp> f =
+            ChronoFormatter.ofTimestampPattern(
+                "yyyyMMddHHmmss|yyyyMMdd",
+                PatternType.CLDR,
+                Locale.ROOT
+            ).withDefault(PlainTime.DIGITAL_HOUR_OF_DAY, 0);
+
+        assertThat(
+            f.parse("19940513230000"),
+            is(PlainTimestamp.of(1994, 5, 13, 23, 0)));
+        assertThat(
+            f.parse("19940513"),
+            is(PlainTimestamp.of(1994, 5, 13, 0, 0)));
+    }
+
 }
