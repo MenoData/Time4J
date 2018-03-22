@@ -7,6 +7,9 @@
 - Support of Hebrew calendar in JavaFX-CalendarPicker [#759]
 - Support of Julian calendar in JavaFX-CalendarPicker [#760]
 
+### Fixed
+- Make astronomical calculations possible with leap seconds disabled [#761]
+
 ## [v4.35] published on 2018-03-07
 ### Added
 - Traditional Chinese calendar [#396]
