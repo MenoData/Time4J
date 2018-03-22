@@ -336,6 +336,11 @@ public enum PatternType
      * </table>
      * </div>
      *
+     * <p><strong>Special notes for the gregorian calendar (ISO-8601): </strong></p>
+     *
+     * <p>Four-digit-year patterns like &quot;yyyy&quot; do not indicate a fixed upper count of four digits.
+     * Instead, the parser processes years with maximum 9 digits. </p>
+     *
      * <p><strong>Special notes for the Vietnamese calendar: </strong></p>
      *
      * <p>There is no era so the symbols &quot;G&quot; and &quot;y&quot; are not supported. Use the cyclic year
@@ -625,6 +630,11 @@ public enum PatternType
      *  </tr>
      * </table>
      * </div>
+     *
+     * <p><strong>Anmerkungen f&uuml;r den gregorianischen Kalender (ISO-8601): </strong></p>
+     *
+     * <p>Vierstellige Jahresmuster wie &quot;yyyy&quot; symbolisieren KEINE feste Begrenzung auf 4-stellige
+     * Jahresangaben, sondern es werden maximal 9-stellige Jahresangaben interpretiert. </p>
      *
      * <p><strong>Anmerkungen f&uuml;r den vietnamesischen Kalender: </strong></p>
      *
