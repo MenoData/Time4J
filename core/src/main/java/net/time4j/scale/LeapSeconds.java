@@ -758,7 +758,7 @@ public final class LeapSeconds
             if (
                 (lse.utc() - lse.getShift() < utc)
                 || (snls && (lse.getShift() < 0) && (lse.utc() < utc))
-                ) {
+            ) {
                 utc = Math.addExact(utc, lse.raw() - lse.utc());
                 break;
             }
