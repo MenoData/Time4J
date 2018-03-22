@@ -5,6 +5,9 @@
 - Support Asturian language (ISO-639: ast) [#757]
 - Convenience week elements for Hebrew calendar [#758]
 
+### Fixed
+- Make astronomical calculations possible with leap seconds disabled [#761]
+
 ## [v3.40] published on 2018-03-05
 ### Added
 - Traditional Chinese calendar [#396]
