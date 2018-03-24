@@ -1,4 +1,6 @@
-## [v4.36] not yet released
+## [v4.37] not yet released
+
+## [v4.36] published on 2018-03-24
 ### Added
 - Reverse engineering of windows zone names [#756]
 - Normalization of timezone identifiers [#756]
