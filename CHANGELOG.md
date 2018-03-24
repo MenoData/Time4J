@@ -1,4 +1,4 @@
-## [v3.41] not yet published  (final version of level-6)
+## [v3.41] published on 2018-03-24  (final version of level-6)
 ### Added
 - Reverse engineering of windows zone names [#756]
 - Normalization of timezone identifiers [#756]
