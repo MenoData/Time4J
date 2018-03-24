@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2014-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2014-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NameStyle.java) is part of project Time4J.
  *
@@ -37,24 +37,28 @@ public enum NameStyle {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     /**
-     * <p>Abbreviation in winter time (standard time). </p>
+     * <p>Abbreviation in winter time
+     * (usually standard time, Ireland is an exception however). </p>
      *
      * <p>Example: CET </p>
      */
     /*[deutsch]
-     * <p>Abk&uuml;rzung in der Winterzeit (Normalzeit). </p>
+     * <p>Abk&uuml;rzung in der Winterzeit
+     * (meistens als Normalzeit bekannt, eine Ausnahme ist Irland). </p>
      *
      * <p>Beispiel: MEZ </p>
      */
     SHORT_STANDARD_TIME,
 
     /**
-     * <p>Long name in winter time (standard time). </p>
+     * <p>Long name in winter time
+     * (usually standard time, Ireland is an exception however). </p>
      *
      * <p>Example: Central European Time </p>
      */
     /*[deutsch]
-     * <p>Langer Name in der Winterzeit (Normalzeit). </p>
+     * <p>Langer Name in der Winterzeit
+     * (meistens als Normalzeit bekannt, eine Ausnahme ist Irland). </p>
      *
      * <p>Beispiel: Mitteleurop&auml;ische Zeit </p>
      */
