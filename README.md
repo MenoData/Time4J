@@ -10,4 +10,6 @@ Time4J is thought as a complete and high-end replacement for old java classes ar
 
 Although the new JSR-310 (built in Java 8) is certainly a very useful library for many business developers it also has some severe and intentional limitations. Time4J intends to fill all gaps in the future so justifying its co-existence.
 
-Please have a look at the version of this file on the master branch for gathering further informations.
+Please have a look at the version of this file on the master branch for gathering further informations. 
+
+Note: The version v3.41 is the last version of this level6-branch.
