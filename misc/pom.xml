@@ -12,6 +12,7 @@
     
     <groupId>net.time4j</groupId>
     <artifactId>time4j-misc</artifactId>
+    <version>3.41.1</version>
     <packaging>jar</packaging>
     <name>Time4J-Misc</name>
 

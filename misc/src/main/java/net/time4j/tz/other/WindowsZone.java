@@ -96,6 +96,7 @@ public final class WindowsZone
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final Locale WORLDWIDE = new Locale("", "001");
     private static final long serialVersionUID = -6071278077083785308L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -205,6 +206,7 @@ public final class WindowsZone
      * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
      * @param   locale  regional setting referring to a country
      * @return  name of windows zone, maybe empty if resolving fails
+     * @see     #toString(String, Locale)
      * @since   3.41/4.36
      */
     /*[deutsch]
@@ -213,6 +215,7 @@ public final class WindowsZone
      * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
      * @param   locale  regional setting referring to a country
      * @return  name of windows zone, maybe empty if resolving fails
+     * @see     #toString(String, Locale)
      * @since   3.41/4.36
      */
     public static String toString(
@@ -227,17 +230,27 @@ public final class WindowsZone
     /**
      * <p>Deduces the windows name of given timezone reference and region. </p>
      *
+     * <p>This method first tries all to automatically normalize given timezone identifier
+     * before resolving to the windows name. Normalizing works best if the tzdata-module
+     * is present. </p>
+     *
      * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
      * @param   locale  regional setting referring to a country
      * @return  name of windows zone, maybe empty if resolving fails
+     * @see     Timezone#normalize(String)
      * @since   3.41/4.36
      */
     /*[deutsch]
      * <p>Leitet den Windows-Namen aus der angegebenen Zeitzonenreferenz in der jeweiligen Region ab. </p>
      *
+     * <p>Diese Methode versucht zuerst das Beste, die angegebene Zeitzonenkennung zu normalisieren,
+     * bevor der Windows-Name ermittelt wird. Das funktioniert am ehesten, wenn das tzdata-Modul
+     * pr&auml;sent ist. </p>
+     *
      * @param   tzid    timezone identifier (usually a IANA/Olson-ID like &quot;America/New_York&quot;)
      * @param   locale  regional setting referring to a country
      * @return  name of windows zone, maybe empty if resolving fails
+     * @see     Timezone#normalize(String)
      * @since   3.41/4.36
      */
     public static String toString(
@@ -247,7 +260,13 @@ public final class WindowsZone
 
         String zoneID = Timezone.normalize(tzid).canonical();
         ZoneNameProvider znp = new WinZoneProviderSPI();
-        return znp.getDisplayName(zoneID, NameStyle.LONG_STANDARD_TIME, locale);
+        String name = znp.getDisplayName(zoneID, NameStyle.LONG_STANDARD_TIME, locale);
+
+        if (name.isEmpty()) {
+            name = znp.getDisplayName(zoneID, NameStyle.LONG_STANDARD_TIME, WORLDWIDE);
+        }
+
+        return name;
 
     }
 
