@@ -197,7 +197,14 @@ public class WindowsZoneTest {
         assertThat(
             WindowsZone.toString("Asia/Kolkata", new Locale("en", "IN")),
             is("India Standard Time"));
-        // CLDR uses "Asia/Calcutta", but Time4J adjusts it during compiling of winzone-data
+        assertThat(
+            WindowsZone.toString("Asia/Kolkata", new Locale("de", "DE")), // uses fallback-territory 001
+            is("India Standard Time"));
+        assertThat(
+            WindowsZone.toString("Asia/Kolkata", Locale.ROOT), // uses fallback-territory 001, too
+            is("India Standard Time"));
+        // CLDR uses "Asia/Calcutta",
+        // but Time4J adjusts it during compiling of winzone-data if tzdata-module is present
     }
 
     private static Object roundtrip(Object obj)
