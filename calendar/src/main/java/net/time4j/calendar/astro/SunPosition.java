@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SunPosition.java) is part of project Time4J.
  *
@@ -43,7 +43,7 @@ import java.io.Serializable;
  * @since   3.38/4.33
  */
 public class SunPosition
-    implements Serializable {
+    implements EquatorialCoordinates, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -152,32 +152,14 @@ public class SunPosition
 
     }
 
-    /**
-     * <p>Obtains the right ascension of sun in degrees. </p>
-     *
-     * @return  double
-     */
-    /*[deutsch]
-     * <p>Liefert die Rektaszension der Sonne in Grad. </p>
-     *
-     * @return  double
-     */
+    @Override
     public double getRightAscension() {
 
         return this.rightAscension;
 
     }
 
-    /**
-     * <p>Obtains the declination of sun in degrees. </p>
-     *
-     * @return  double
-     */
-    /*[deutsch]
-     * <p>Liefert die Deklination der Sonne in Grad. </p>
-     *
-     * @return  double
-     */
+    @Override
     public double getDeclination() {
 
         return this.declination;

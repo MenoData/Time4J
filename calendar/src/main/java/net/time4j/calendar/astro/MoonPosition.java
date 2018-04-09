@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MoonPosition.java) is part of project Time4J.
  *
@@ -43,7 +43,7 @@ import java.io.Serializable;
  * @since   3.38/4.33
  */
 public class MoonPosition
-    implements Serializable {
+    implements EquatorialCoordinates, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -211,32 +211,14 @@ public class MoonPosition
 
     }
 
-    /**
-     * <p>Obtains the right ascension of moon in degrees. </p>
-     *
-     * @return  double
-     */
-    /*[deutsch]
-     * <p>Liefert die Rektaszension des Mondes in Grad. </p>
-     *
-     * @return  double
-     */
+    @Override
     public double getRightAscension() {
 
         return this.rightAscension;
 
     }
 
-    /**
-     * <p>Obtains the declination of moon in degrees. </p>
-     *
-     * @return  double
-     */
-    /*[deutsch]
-     * <p>Liefert die Deklination des Mondes in Grad. </p>
-     *
-     * @return  double
-     */
+    @Override
     public double getDeclination() {
 
         return this.declination;
