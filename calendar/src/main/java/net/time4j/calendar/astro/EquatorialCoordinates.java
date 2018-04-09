@@ -33,7 +33,7 @@ package net.time4j.calendar.astro;
  * @author  Meno Hochschild
  * @since   4.37
  */
-/**
+/*[deutsch]
  * Beschreibt ein Himmelskoordinatensystem, das den Erd&auml;quator und die Erdpole auf die Himmelskugel
  * projiziert, indem die Rektaszension und die Deklination mit Hilfe der J2000-Epoche als Polarkoordinaten
  * benutzt werden.
