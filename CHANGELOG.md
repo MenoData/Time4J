@@ -1,4 +1,7 @@
-## [v5.0] not yet released
+## [v4.37] not yet released
+### Added
+- New interface describing equatorial coordinates [#764]
+
 ### Fixed
 - Use automatic fallback to worldwide locale in WindowsZone [#763]
 
