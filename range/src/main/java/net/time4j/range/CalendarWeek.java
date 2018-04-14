@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarWeek.java) is part of project Time4J.
  *
@@ -234,6 +234,7 @@ public final class CalendarWeek
      * @param   weekOfYear      week of year based on ISO-8601 in range {@code 1-52/53}
      * @return  new instance
      * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #isValid(int, int)
      * @see     #withLastWeekOfYear()
      */
     /*[deutsch]
@@ -251,6 +252,7 @@ public final class CalendarWeek
      * @param   weekOfYear      week of year based on ISO-8601 in range {@code 1-52/53}
      * @return  new instance
      * @throws  IllegalArgumentException if any argument is out of range
+     * @see     #isValid(int, int)
      * @see     #withLastWeekOfYear()
      */
     public static CalendarWeek of(
@@ -393,11 +395,42 @@ public final class CalendarWeek
     }
 
     /**
+     * <p>Validates given year-of-weekdate and week-of-year. </p>
+     *
+     * @param   yearOfWeekdate  the year of weekdate (can be different from calendar year near New Year)
+     * @param   weekOfYear      the week of weekbased year
+     * @return  {@code true} if valid else {@code false}
+     * @see     #of(int, int)
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Validiert das angegebene wochenbasierte Jahr und die Woche des Jahres. </p>
+     *
+     * @param   yearOfWeekdate  the year of weekdate (can be different from calendar year near New Year)
+     * @param   weekOfYear      the week of weekbased year
+     * @return  {@code true} if valid else {@code false}
+     * @see     #of(int, int)
+     * @since   4.37
+     */
+    public static boolean isValid(
+        int yearOfWeekdate,
+        int weekOfYear
+    ) {
+
+        if ((yearOfWeekdate < GregorianMath.MIN_YEAR) || (yearOfWeekdate > GregorianMath.MAX_YEAR)) {
+            return false;
+        }
+
+        return (weekOfYear >= 1) && (weekOfYear <= maximumOfWeek(yearOfWeekdate));
+
+    }
+
+    /**
      * <p>Calendar week always consist of seven days. </p>
      *
      * @return  {@code 7}
      */
-    /**
+    /*[deutsch]
      * <p>Eine Kalenderwoche hat immer 7 Tage. </p>
      *
      * @return  {@code 7}

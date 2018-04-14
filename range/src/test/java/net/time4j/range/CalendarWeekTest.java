@@ -226,6 +226,28 @@ public class CalendarWeekTest {
     }
 
     @Test
+    public void isValid() {
+        assertThat(
+            CalendarWeek.isValid(2015, 1),
+            is(true));
+        assertThat(
+            CalendarWeek.isValid(2015, 53),
+            is(true));
+        assertThat(
+            CalendarWeek.isValid(2015, 0),
+            is(false));
+        assertThat(
+            CalendarWeek.isValid(2015, 54),
+            is(false));
+        assertThat(
+            CalendarWeek.isValid(2016, 52),
+            is(true));
+        assertThat(
+            CalendarWeek.isValid(2016, 53),
+            is(false));
+    }
+
+    @Test
     public void nowInSystemTime() {
         assertThat(
             CalendarWeek.nowInSystemTime(),
