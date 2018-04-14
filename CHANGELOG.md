@@ -1,6 +1,7 @@
 ## [v4.37] not yet released
 ### Added
 - New interface describing equatorial coordinates [#764]
+- Static validation method for calendar weeks [#766]
 
 ### Fixed
 - Use automatic fallback to worldwide locale in WindowsZone [#763]
