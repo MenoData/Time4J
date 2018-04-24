@@ -152,6 +152,76 @@ public class SunPosition
 
     }
 
+    /**
+     * <p>Determines the event when the sun enters given zodiac constellation. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the sun enters the zodiac
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreissternbild betritt. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the sun enters the zodiac
+     * @since   4.37
+     */
+    public static Zodiac.Event atEntry(Zodiac zodiac) {
+
+        return Zodiac.Event.ofConstellation('S', zodiac.getEntryAngles());
+
+    }
+
+    /**
+     * <p>Determines the event when the sun exits given zodiac constellation. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the sun leaves the zodiac
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreissternbild verl&auml;sst. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the sun leaves the zodiac
+     * @since   4.37
+     */
+    public static Zodiac.Event atExit(Zodiac zodiac) {
+
+        return Zodiac.Event.ofConstellation('S', zodiac.getExitAngles());
+
+    }
+
+    /**
+     * <p>Determines the event when the sun enters given horoscopic sign. </p>
+     *
+     * @param   zodiac  the astrological zodiac sign
+     * @return  event when the sun is in the horoscopic sign
+     * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Ereignis, wenn die Sonne im angegebenen astrologischen Tierkreiszeichen steht. </p>
+     *
+     * @param   zodiac  the astrological zodiac sign
+     * @return  event when the sun is in the horoscopic sign
+     * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
+     * @since   4.37
+     */
+    public static Zodiac.Event atHoroscopeSign(Zodiac zodiac) {
+
+        int comp = zodiac.compareTo(Zodiac.OPHIUCHUS);
+
+        if (comp == 0) {
+            throw new IllegalArgumentException("Ophiuchus is not an astrological zodiac sign.");
+        } else if (comp < 0) {
+            return Zodiac.Event.ofHoroscopic(zodiac.ordinal() * 30.0);
+        } else {
+            return Zodiac.Event.ofHoroscopic((zodiac.ordinal() - 1) * 30.0);
+        }
+
+    }
+
     @Override
     public double getRightAscension() {
 

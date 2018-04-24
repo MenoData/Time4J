@@ -211,6 +211,46 @@ public class MoonPosition
 
     }
 
+    /**
+     * <p>Determines the event when the moon enters given zodiac constellation. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the moon enters the zodiac
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Ereignis, wenn der Mond das angegebene Tierkreissternbild betritt. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the moon enters the zodiac
+     * @since   4.37
+     */
+    public static Zodiac.Event atEntry(Zodiac zodiac) {
+
+        return Zodiac.Event.ofConstellation('L', zodiac.getEntryAngles());
+
+    }
+
+    /**
+     * <p>Determines the event when the moon exits given zodiac constellation. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the moon leaves the zodiac
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Ereignis, wenn der Mond das angegebene Tierkreissternbild verl&auml;sst. </p>
+     *
+     * @param   zodiac  the astronomical zodiac
+     * @return  event when the moon leaves the zodiac
+     * @since   4.37
+     */
+    public static Zodiac.Event atExit(Zodiac zodiac) {
+
+        return Zodiac.Event.ofConstellation('L', zodiac.getExitAngles());
+
+    }
+
     @Override
     public double getRightAscension() {
 
@@ -458,6 +498,80 @@ public class MoonPosition
         result[3] = Math.toDegrees(decl);
         result[4] = distance; // in km
         return result;
+
+    }
+
+    // max error given by J. Meeus: 10'' in longitude
+    static double lunarLongitude(double jde) { // apparent moon longitude in degrees
+
+        double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
+
+        // Meeus (47.1): L'
+        double meanLongitude =
+            normalize(
+                218.3164477
+                    + (481267.88123421 + (-0.0015786 + (1.0 / 538841 + (-1.0 / 65194000) * jct) * jct) * jct) * jct);
+
+        // Meeus (47.2): D
+        double meanElongation =
+            normalize(
+                297.8501921
+                    + (445267.1114034 + (-0.0018819 + (1.0 / 545868 + (1.0 / 113065000) * jct) * jct) * jct) * jct);
+
+        // Meeus (47.3): M
+        double meanAnomalySun =
+            normalize(
+                357.5291092 + (35999.0502909 + (-0.0001536 + (1.0 / 24490000) * jct) * jct) * jct);
+
+        // Meeus (47.4): M'
+        double meanAnomalyMoon =
+            normalize(
+                134.9633964
+                    + (477198.8675055 + (0.0087414 + (1.0 / 69699 + (1.0 / 14712000) * jct) * jct) * jct) * jct);
+
+        // Meeus (47.5): F
+        double meanDistance =
+            normalize(
+                93.272095
+                    + (483202.0175233 + (-0.0036539 + (-1.0 / 3526000 + (1.0 / 863310000) * jct) * jct) * jct) * jct);
+
+        // Meeus (47.6)
+        double e = 1 - (0.002516 + 0.0000074 * jct) * jct;
+        double ee = e * e;
+
+        double sumL = 0.0;
+
+        for (int i = A_D.length - 1; i >= 0; i--) {
+            double eFactor;
+            switch (A_M[i]) {
+                case -1:
+                case 1:
+                    eFactor = e;
+                    break;
+                case -2:
+                case 2:
+                    eFactor = ee;
+                    break;
+                default:
+                    eFactor = 1;
+            }
+            double arg = Math.toRadians(
+                A_D[i] * meanElongation + A_M[i] * meanAnomalySun + A_M2[i] * meanAnomalyMoon + A_F[i] * meanDistance);
+            sumL += (COEFF_L[i] * eFactor * Math.sin(arg));
+        }
+
+        double a1 = 119.75 + 131.849 * jct;
+        double a2 = 53.09 + 479264.29 * jct;
+
+        sumL += (
+            3958 * Math.sin(Math.toRadians(a1))
+                + 1962 * Math.sin(Math.toRadians(meanLongitude - meanDistance))
+                + 318 * Math.sin(Math.toRadians(a2))
+        );
+
+        double[] result = new double[5];
+        StdSolarCalculator.nutations(jct, result);
+        return meanLongitude + (sumL / MIO) + result[0];
 
     }
 

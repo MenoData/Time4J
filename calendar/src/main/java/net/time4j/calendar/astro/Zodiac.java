@@ -22,10 +22,14 @@
 package net.time4j.calendar.astro;
 
 
+import net.time4j.Moment;
+import net.time4j.PlainDate;
+
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
  * <p>Enumeration of the thirteen astronomical zodiac definitions. </p>
@@ -57,31 +61,31 @@ public enum Zodiac {
 
 	//~ Statische Felder/Initialisierungen --------------------------------
 
-	ARIES('\u2648'),
+	ARIES('\u2648', 28.8, 0.0),
 
-	TAURUS('\u2649'),
+	TAURUS('\u2649', 53.5, 0.0),
 
-	GEMINI('\u264A'),
+	GEMINI('\u264A', 90.2, 0.0),
 
-	CANCER('\u264B'),
+	CANCER('\u264B', 118.1, 0.0),
 
-	LEO('\u264C'),
+	LEO('\u264C', 138.2, 0.0),
 
-	VIRGO('\u264D'),
+	VIRGO('\u264D', 173.9, 0.0),
 
-	LIBRA('\u264E'),
+	LIBRA('\u264E', 218.0, 0.0),
 
-	SCORPIUS('\u264F'),
+	SCORPIUS('\u264F', 241.0, 0.0),
 
-	OPHIUCHUS('\u26CE'),
+	OPHIUCHUS('\u26CE', 247.7, 0.0),
 
-	SAGITTARIUS('\u2650'),
+	SAGITTARIUS('\u2650', 266.3, 0.0),
 
-	CAPRICORNUS('\u2651'),
+	CAPRICORNUS('\u2651', 299.7, 0.0),
 
-	AQUARIUS('\u2652'),
+	AQUARIUS('\u2652', 327.6, 0.0),
 
-	PISCES('\u2653');
+	PISCES('\u2653', 351.6, 0.0);
 
 	private static final Map<String, String[]> LANG_TO_NAMES;
 
@@ -140,14 +144,23 @@ public enum Zodiac {
 		LANG_TO_NAMES = Collections.unmodifiableMap(lang2names);
 	}
 
+	private static final double MEAN_TROPICAL_YEAR = 365.242189;
+	private static final double MEAN_SYNODIC_MONTH = 29.530588861;
+
 	//~ Instanzvariablen --------------------------------------------------
 
 	private transient final char symbol;
+	private transient final EquatorialCoordinates entry;
 
 	//~ Konstruktoren -----------------------------------------------------
 
-	private Zodiac(char symbol) {
+	private Zodiac(
+		char symbol,
+		double ra,
+		double dec
+	) {
 		this.symbol = symbol;
+		this.entry = new SkyPosition(ra, dec);
 	}
 
 	//~ Methoden ----------------------------------------------------------
@@ -155,7 +168,7 @@ public enum Zodiac {
 	/**
 	 * <p>Obtains the associated symbol character. </p>
 	 *
-	 * @return	char
+	 * @return char
 	 */
 	/*[deutsch]
 	 * <p>Liefert das assozierte Symbolzeichen. </p>
@@ -171,8 +184,8 @@ public enum Zodiac {
 	/**
 	 * <p>Obtains a localized name. </p>
 	 *
-	 * @param 	locale		language
-	 * @return	localized name or the Latin name if given language is not supported
+	 * @param locale language
+	 * @return localized name or the Latin name if given language is not supported
 	 */
 	/*[deutsch]
 	 * <p>Liefert einen sprachabh&auml;ngigen Namen. </p>
@@ -189,6 +202,155 @@ public enum Zodiac {
 		}
 
 		return names[this.ordinal()];
+
+	}
+
+	EquatorialCoordinates getEntryAngles() {
+		return this.entry;
+	}
+
+	EquatorialCoordinates getExitAngles() {
+		return Zodiac.values()[(this.ordinal() + 1) % 13].entry;
+	}
+
+	//~ Innere Klassen ----------------------------------------------------
+
+	/**
+	 * <p>Represents the event when the sun or moon enters or exits a zodiac. </p>
+	 *
+	 * @author 	Meno Hochschild
+	 * @see 	SunPosition#atEntry(Zodiac)
+	 * @see 	SunPosition#atExit(Zodiac)
+	 * @see 	MoonPosition#atEntry(Zodiac)
+	 * @see 	MoonPosition#atExit(Zodiac)
+	 * @see 	SunPosition#atHoroscopeSign(Zodiac)
+	 * @since	4.37
+	 */
+	/*[deutsch]
+	 * <p>Stellt das Ereignis dar, wenn die Sonne oder der Mond ein Tierkreissternbild
+	 * oder -zeichen betreten oder verlassen. </p>
+	 *
+	 * @author 	Meno Hochschild
+	 * @see 	SunPosition#atEntry(Zodiac)
+	 * @see 	SunPosition#atExit(Zodiac)
+	 * @see 	MoonPosition#atEntry(Zodiac)
+	 * @see 	MoonPosition#atExit(Zodiac)
+	 * @see 	SunPosition#atHoroscopeSign(Zodiac)
+	 * @since	4.37
+	 */
+	public static class Event {
+
+		//~ Instanzvariablen ----------------------------------------------
+
+		private final char body;
+		private final double c1;
+		private final double c2;
+		private final boolean ecliptic;
+
+		//~ Konstruktoren -------------------------------------------------
+
+		private Event(
+			char body,
+			double c1,
+			double c2,
+			boolean ecliptic
+		) {
+			super();
+
+			if ((body != 'S') && (body != 'L')) {
+				throw new IllegalArgumentException("Unsupported celestial body: " + body);
+			} else if (!Double.isFinite(c1) || !Double.isFinite(c2)) {
+				throw new IllegalArgumentException("Celestial coordinates must be finite.");
+			}
+
+			this.body = body;
+			this.c1 = c1;
+			this.c2 = c2;
+			this.ecliptic = ecliptic;
+		}
+
+		//~ Methoden ------------------------------------------------------
+
+		/**
+		 * <p>Calculates the moment when this event occurs in given year. </p>
+		 *
+		 * @param 	year	gregorian year
+		 * @return	moment of this event in given year
+		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+		 */
+		/*[deutsch]
+		 * <p>Berechnet den Moment, wann dieses Ereignis im angegebenen Jahr eintritt. </p>
+		 *
+		 * @param 	year	gregorian year
+		 * @return	moment of this event in given year
+		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+		 */
+		public Moment inYear(int year) {
+
+			double angle = this.getEclipticAngle(year);
+			Moment moment = PlainDate.of(year, 1, 1).atStartOfDay().atUTC();
+			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
+			double estimate = jd0;
+
+			if (this.body == 'S') {
+				estimate += modulo360(angle - getSolarLongitude(jd0)) * MEAN_TROPICAL_YEAR / 360.0;
+			} else if (this.body == 'L') {
+				estimate += modulo360(angle - getLunarLongitude(jd0)) * MEAN_SYNODIC_MONTH / 360.0;
+			} else {
+				throw new IllegalArgumentException("Unsupported celestial body: " + this.body);
+			}
+
+			double low = Math.max(jd0, estimate - 5);
+			double high = estimate + 5;
+
+			while (true) {
+				double x = (low + high) / 2;
+
+				if (high - low < 0.0001) { // < 9 seconds
+					return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.SECONDS);
+				}
+
+				double delta = ((this.body == 'S') ? getSolarLongitude(x) : getLunarLongitude(x)) - angle;
+
+				if (modulo360(delta) < 180.0) {
+					high = x;
+				} else {
+					low = x;
+				}
+			}
+
+		}
+
+		static Event ofHoroscopic(double angle) {
+			return new Event('S', angle, 0.0, true);
+		}
+
+		static Event ofConstellation(
+			char body,
+			EquatorialCoordinates angles
+		) {
+			return new Event(body, angles.getRightAscension(), angles.getDeclination(), false);
+		}
+
+		private static double getSolarLongitude(double jde) {
+			return StdSolarCalculator.TIME4J.getFeature(jde, "solar-longitude");
+		}
+
+		private static double getLunarLongitude(double jde) {
+			return MoonPosition.lunarLongitude(jde);
+		}
+
+		private static double modulo360(double angle) {
+			return angle - 360.0 * Math.floor(angle / 360.0); // always >= 0.0
+		}
+
+		private double getEclipticAngle(int year) {
+			if (this.ecliptic) {
+				return this.c1;
+			} else {
+				return this.c1; // TODO: calculate precession and then transform ra/decl to ecliptic longitude
+			}
+		}
 
 	}
 
