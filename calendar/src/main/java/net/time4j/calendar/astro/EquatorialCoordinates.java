@@ -52,12 +52,12 @@ public interface EquatorialCoordinates {
     /**
      * <p>Obtains the right ascension in degrees. </p>
      *
-     * @return  double
+     * @return  double in range 0-360
      */
     /*[deutsch]
      * <p>Liefert die Rektaszension in Grad. </p>
      *
-     * @return  double
+     * @return  double in range 0-360
      */
     double getRightAscension();
 

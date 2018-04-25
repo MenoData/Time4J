@@ -24,6 +24,7 @@ package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -61,31 +62,31 @@ public enum Zodiac {
 
 	//~ Statische Felder/Initialisierungen --------------------------------
 
-	ARIES('\u2648', 28.8, 0.0),
+	ARIES('\u2648', 26.766, 11.048), // longitude => 28.8
 
-	TAURUS('\u2649', 53.5, 0.0),
+	TAURUS('\u2649', 51.113, 18.648), // longitude => 53.5
 
-	GEMINI('\u264A', 90.2, 0.0),
+	GEMINI('\u264A', 90.218, 23.439), // longitude => 90.2
 
-	CANCER('\u264B', 118.1, 0.0),
+	CANCER('\u264B', 120.198, 20.542), // longitude => 118.1
 
-	LEO('\u264C', 138.2, 0.0),
+	LEO('\u264C', 140.637, 15.375), // longitude => 138.2
 
-	VIRGO('\u264D', 173.9, 0.0),
+	VIRGO('\u264D', 174.400, 2.423), // longitude => 173.9
 
-	LIBRA('\u264E', 218.0, 0.0),
+	LIBRA('\u264E', 215.634, -14.176), // longitude => 218.0
 
-	SCORPIUS('\u264F', 241.0, 0.0),
+	SCORPIUS('\u264F', 238.861, -20.359), // longitude => 241.0
 
-	OPHIUCHUS('\u26CE', 247.7, 0.0),
+	OPHIUCHUS('\u26CE', 245.915, -21.594), // longitude => 247.7
 
-	SAGITTARIUS('\u2650', 266.3, 0.0),
+	SAGITTARIUS('\u2650', 265.968, -23.388), // longitude => 266.3
 
-	CAPRICORNUS('\u2651', 299.7, 0.0),
+	CAPRICORNUS('\u2651', 301.869, -20.214), // longitude => 299.7
 
-	AQUARIUS('\u2652', 327.6, 0.0),
+	AQUARIUS('\u2652', 329.790, -12.306), // longitude => 327.6
 
-	PISCES('\u2653', 351.6, 0.0);
+	PISCES('\u2653', 352.284, -3.331); // longitude => 351.6
 
 	private static final Map<String, String[]> LANG_TO_NAMES;
 
@@ -160,7 +161,7 @@ public enum Zodiac {
 		double dec
 	) {
 		this.symbol = symbol;
-		this.entry = new SkyPosition(ra, dec);
+		this.entry = new SkyPosition(ra, dec); // using J2000
 	}
 
 	//~ Methoden ----------------------------------------------------------
@@ -348,7 +349,29 @@ public enum Zodiac {
 			if (this.ecliptic) {
 				return this.c1;
 			} else {
-				return this.c1; // TODO: calculate precession and then transform ra/decl to ecliptic longitude
+				double ra = Math.toRadians(this.c1);
+				double dec = Math.toRadians(this.c2);
+
+				// approximation, see also Meeus (p. 92) about obliquity
+				Moment newYear = PlainTimestamp.of(year, 1, 1, 0, 0).atUTC();
+				double jct = JulianDay.ofSimplifiedTime(newYear).getCenturyJ2000();
+				double meanObliquity = StdSolarCalculator.meanObliquity(jct);
+
+				// TODO: apply precession before following transformation to ecliptic longitude
+
+				double lng =
+					Math.toDegrees(
+						Math.atan2(
+							Math.sin(ra) * Math.cos(meanObliquity) + Math.tan(dec) * Math.sin(meanObliquity),
+							Math.cos(ra))
+					);
+				while (lng < 0) {
+					lng += 360;
+				}
+				while (lng >= 360) {
+					lng -= 360;
+				}
+				return lng;
 			}
 		}
 
