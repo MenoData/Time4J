@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Duration.java) is part of project Time4J.
  *
@@ -311,7 +311,7 @@ public final class Duration<U extends IsoUnit>
         super();
 
         this.items = duration.items;
-        this.negative = (inverse ? !duration.negative : duration.negative);
+        this.negative = (inverse != duration.negative);
 
     }
 
@@ -498,7 +498,21 @@ public final class Duration<U extends IsoUnit>
         int days
     ) {
 
-        return Duration.ofCalendarUnits(years, months, days, false);
+        List<Item<CalendarUnit>> items = new ArrayList<>(3);
+
+        if (years != 0) {
+            items.add(Item.of(years, YEARS));
+        }
+
+        if (months != 0) {
+            items.add(Item.of(months, MONTHS));
+        }
+
+        if (days != 0) {
+            items.add(Item.of(days, DAYS));
+        }
+
+        return new Duration<>(items, false);
 
     }
 
@@ -538,7 +552,21 @@ public final class Duration<U extends IsoUnit>
         int seconds
     ) {
 
-        return Duration.ofClockUnits(hours, minutes, seconds, 0, false);
+        List<Item<ClockUnit>> items = new ArrayList<>(3);
+
+        if (hours != 0) {
+            items.add(Item.of(hours, HOURS));
+        }
+
+        if (minutes != 0) {
+            items.add(Item.of(minutes, MINUTES));
+        }
+
+        if (seconds != 0) {
+            items.add(Item.of(seconds, SECONDS));
+        }
+
+        return new Duration<>(items, false);
 
     }
 
@@ -1593,7 +1621,7 @@ public final class Duration<U extends IsoUnit>
 
         return new Duration<>(
             newItems,
-            ((factor < 0) ? !this.isNegative() : this.isNegative())
+            ((factor < 0) != this.isNegative())
         );
 
     }
@@ -1888,8 +1916,8 @@ public final class Duration<U extends IsoUnit>
      *     <li>CalendarUnit.weekBasedYears()</li>
      * </ul>
      *
-     * <p>The resulting temporal amount can only be applied on the <i>local</i> types of JSR-310. The general
-     * mapping using this method looks like: </p>
+     * <p>The resulting temporal amount is preferred to be applied on the <i>local</i> types of JSR-310
+     * for the sake of conceptual clarity so the general mapping using this method looks like: </p>
      *
      * <ul>
      *     <li>{@code Duration<IsoUnit>} can be applied on {@code LocalDateTime}</li>
@@ -1897,11 +1925,12 @@ public final class Duration<U extends IsoUnit>
      *     <li>{@code Duration<ClockUnit>} can be applied on {@code LocalTime}</li>
      * </ul>
      *
-     * <p>Other temporal types of JSR-310 are not supported. Note also that using this method cannot be type-safe
-     * due to the design of JSR-310 and includes some performance penalty because of the costs of conversion.
-     * Users should rather use Time4J-types for achieving best results. </p>
+     * <p>Other temporal types of JSR-310 might be supported, too (like {@code YearMonth} or {@code ZonedDateTime}).
+     * Note that using this method cannot be type-safe due to the design of JSR-310 (possibly throwing an exception
+     * at runtime) and includes some performance penalty because of the costs of conversion. Users should rather use
+     * Time4J-types for achieving best results. </p>
      *
-     * @return  temporal amount applicable on the types {@code LocalDateTime}, {@code LocalDate} or {@code LocalTime}
+     * @return  temporal amount applicable on JSR-310-types if they support all units of this duration
      * @throws  UnsupportedOperationException if this duration contains any unit not listed above
      * @since   4.17
      */
@@ -1929,8 +1958,9 @@ public final class Duration<U extends IsoUnit>
      *     <li>CalendarUnit.weekBasedYears()</li>
      * </ul>
      *
-     * <p>Der resultierende {@code TemporalAmount} kann nur auf die <i>lokalen</i> Typen des JSR-310
-     * angewandt werden. Das allgemeine Schema unter Verwendung dieser Methode sieht so aus: </p>
+     * <p>Der resultierende {@code TemporalAmount} sollte aus Gr&uuml;nden der konzeptionellen Klarheit
+     * eher auf die <i>lokalen</i> Typen des JSR-310 angewandt werden. Das allgemeine Schema unter
+     * Verwendung dieser Methode sieht vorzugsweise so aus: </p>
      *
      * <ul>
      *     <li>{@code Duration<IsoUnit>} anwendbar auf {@code LocalDateTime}</li>
@@ -1938,12 +1968,13 @@ public final class Duration<U extends IsoUnit>
      *     <li>{@code Duration<ClockUnit>} anwendbar auf {@code LocalTime}</li>
      * </ul>
      *
-     * <p>Andere temporale Typen des JSR-310 werden nicht unterst&uuml;tzt. Zu beachten: Diese Methode ist weder
-     * typsicher (dem Design des JSR-310 geschuldet) noch besonders schnell, weil die Konversion mit einem
+     * <p>Andere temporale Typen des JSR-310 k&ouml;nnen unterst&uuml;tzt werden (wie {@code YearMonth} oder
+     * {@code ZonedDateTime}). Zu beachten: Diese Methode ist weder typsicher (dem Design des JSR-310 geschuldet,
+     * Laufzeitausnahmen sind m&ouml;glich) noch besonders schnell, weil die Konversion mit einem
      * gewissen Aufwand verbunden ist. F&uuml;r beste Ergebnisse ist eher die durchgehende Verwendung von
      * Time4J-Typen empfohlen. </p>
      *
-     * @return  temporal amount applicable on the types {@code LocalDateTime}, {@code LocalDate} or {@code LocalTime}
+     * @return  temporal amount applicable on JSR-310-types if they support all units of this duration
      * @throws  UnsupportedOperationException if this duration contains any unit not listed above
      * @since   4.17
      */
@@ -2851,61 +2882,6 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static Duration<CalendarUnit> ofCalendarUnits(
-        long years,
-        long months,
-        long days,
-        boolean negative
-    ) {
-
-        List<Item<CalendarUnit>> items = new ArrayList<>(3);
-
-        if (years != 0) {
-            items.add(Item.of(years, YEARS));
-        }
-
-        if (months != 0) {
-            items.add(Item.of(months, MONTHS));
-        }
-
-        if (days != 0) {
-            items.add(Item.of(days, DAYS));
-        }
-
-        return new Duration<>(items, negative);
-
-    }
-
-    private static Duration<ClockUnit> ofClockUnits(
-        long hours,
-        long minutes,
-        long seconds,
-        long nanos,
-        boolean negative
-    ) {
-
-        List<Item<ClockUnit>> items = new ArrayList<>(4);
-
-        if (hours != 0) {
-            items.add(Item.of(hours, HOURS));
-        }
-
-        if (minutes != 0) {
-            items.add(Item.of(minutes, MINUTES));
-        }
-
-        if (seconds != 0) {
-            items.add(Item.of(seconds, SECONDS));
-        }
-
-        if (nanos != 0) {
-            items.add(Item.of(nanos, NANOS));
-        }
-
-        return new Duration<>(items, negative);
-
-    }
-
     private static <U extends IsoUnit> Duration<U> create(
         Map<U, Long> map,
         boolean negative
@@ -3373,9 +3349,7 @@ public final class Duration<U extends IsoUnit>
                 } else {
                     endOfItem = true;
                     long amount = parseAmount(period, num.toString(), index);
-                    ChronoUnit unit = SECONDS;
-                    last =
-                        addParsedItem(unit, last, amount, period, i, items);
+                    last = addParsedItem(SECONDS, last, amount, period, i, items);
                     num = null;
                     decimal = true;
                 }
@@ -3384,11 +3358,9 @@ public final class Duration<U extends IsoUnit>
                     "Unexpected char \'" + c + "\' found: " + period, i);
             } else if (decimal) {
                 if (c != 'S') {
-                    throw new ParseException(
-                        "Second symbol expected: " + period, i);
+                    throw new ParseException("Second symbol expected: " + period, i);
                 } else if (num == null) {
-                    throw new ParseException(
-                        "Decimal separator misplaced: " + period, i - 1);
+                    throw new ParseException("Decimal separator misplaced: " + period, i - 1);
                 } else if (num.length() > 9) {
                     num.delete(9, num.length());
                 }
@@ -3397,9 +3369,8 @@ public final class Duration<U extends IsoUnit>
                 }
                 endOfItem = true;
                 long amount = parseAmount(period, num.toString(), index);
-                ChronoUnit unit = NANOS;
                 num = null;
-                last = addParsedItem(unit, last, amount, period, i, items);
+                last = addParsedItem(NANOS, last, amount, period, i, items);
             } else {
                 endOfItem = true;
                 long amount =
@@ -4064,15 +4035,14 @@ public final class Duration<U extends IsoUnit>
 
         }
 
-        private Builder set(
+        private void set(
             long amount,
             IsoUnit unit
         ) {
 
             for (int i = 0, n = this.items.size(); i < n; i++) {
                 if (this.items.get(i).getUnit() == unit) {
-                    throw new IllegalStateException(
-                        "Already registered: " + unit);
+                    throw new IllegalStateException("Already registered: " + unit);
                 }
             }
 
@@ -4080,8 +4050,6 @@ public final class Duration<U extends IsoUnit>
                 Item<IsoUnit> item = Item.of(amount, unit);
                 this.items.add(item);
             }
-
-            return this;
 
         }
 
@@ -4189,8 +4157,7 @@ public final class Duration<U extends IsoUnit>
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public <T extends TimePoint<? super IsoUnit, T>>
-        Duration<IsoUnit> between(
+        public <T extends TimePoint<? super IsoUnit, T>> Duration<IsoUnit> between(
             T start,
             T end
         ) {
@@ -4794,8 +4761,7 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static class LengthComparator
-        <U extends IsoUnit, T extends TimePoint<? super U, T>>
+    private static class LengthComparator<U extends IsoUnit, T extends TimePoint<? super U, T>>
         implements Comparator<Duration<U>> {
 
         //~ Instanzvariablen ----------------------------------------------
@@ -4957,8 +4923,7 @@ public final class Duration<U extends IsoUnit>
                     s = 0;
                 }
                 if (w > 0) {
-                    IsoUnit weekUnit = CalendarUnit.WEEKS;
-                    return Duration.of(dur.isNegative() ? -w : w, weekUnit);
+                    return Duration.of(dur.isNegative() ? -w : w, CalendarUnit.WEEKS);
                 }
             }
 

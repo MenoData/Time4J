@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JSR310DurationAdapter.java) is part of project Time4J.
  *
@@ -24,10 +24,6 @@ package net.time4j;
 import net.time4j.engine.TimeSpan;
 
 import java.io.Serializable;
-import java.time.DateTimeException;
-import java.time.LocalDate;
-import java.time.LocalDateTime;
-import java.time.LocalTime;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
 import java.time.temporal.Temporal;
@@ -158,14 +154,6 @@ final class JSR310DurationAdapter
         Temporal temporal,
         Duration<?> duration
     ) {
-
-        boolean supported =
-            (temporal instanceof LocalDateTime) || (temporal instanceof LocalDate) || (temporal instanceof LocalTime);
-
-        if (!supported) {
-            throw new DateTimeException(
-                "Duration is only applicable on LocalDate, LocalTime or LocalDateTime.");
-        }
 
         long wy = duration.getPartialAmount(CalendarUnit.weekBasedYears());
 
