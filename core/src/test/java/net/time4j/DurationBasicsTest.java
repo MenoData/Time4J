@@ -11,6 +11,7 @@ import org.junit.runners.JUnit4;
 import java.text.ParseException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.time.ZoneOffset;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
@@ -1461,6 +1462,12 @@ public class DurationBasicsTest {
         assertThat(
             LocalDateTime.of(2016, 12, 31, 17, 0).plus(ta1),
             is(LocalDateTime.of(2018, 3, 6, 3, 0, 0, 450_000_000)));
+        assertThat(
+            LocalDateTime.of(2016, 12, 31, 17, 0).atZone(ZoneOffset.UTC).minus(ta1),
+            is(LocalDateTime.of(2015, 10, 26, 6, 59, 59, 550_000_000).atZone(ZoneOffset.UTC)));
+        assertThat(
+            LocalDateTime.of(2016, 12, 31, 17, 0).atZone(ZoneOffset.UTC).plus(ta1),
+            is(LocalDateTime.of(2018, 3, 6, 3, 0, 0, 450_000_000).atZone(ZoneOffset.UTC)));
         assertThat(
             LocalDateTime.of(2016, 12, 31, 17, 0).minus(ta1),
             is(LocalDateTime.of(2015, 10, 26, 6, 59, 59, 550_000_000)));
