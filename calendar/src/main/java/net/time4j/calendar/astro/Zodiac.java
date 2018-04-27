@@ -349,16 +349,34 @@ public enum Zodiac {
 			if (this.ecliptic) {
 				return this.c1;
 			} else {
-				double ra = Math.toRadians(this.c1);
-				double dec = Math.toRadians(this.c2);
-
 				// approximation, see also Meeus (p. 92) about obliquity
 				Moment newYear = PlainTimestamp.of(year, 1, 1, 0, 0).atUTC();
 				double jct = JulianDay.ofSimplifiedTime(newYear).getCenturyJ2000();
 				double meanObliquity = StdSolarCalculator.meanObliquity(jct);
 
-				// TODO: apply precession before following transformation to ecliptic longitude
+				double raJ2000 = Math.toRadians(this.c1);
+				double decJ2000 = Math.toRadians(this.c2);
 
+				// apply precession (Meeus 21.3 + 21.4, verified with example 21.b)
+				double eta = (2306.2181 + (0.30188 + 0.017998 * jct) * jct) * jct / 3600;
+				double zeta = (2306.2181 + (1.09468 + 0.018203 * jct) * jct) * jct / 3600;
+				double theta = (2004.3109 - (0.42665 + 0.041833 * jct) * jct) * jct / 3600;
+
+				double aeRad = raJ2000 + Math.toRadians(eta);
+				double cosAE = Math.cos(aeRad);
+				double cosTheta = Math.cos(Math.toRadians(theta));
+				double sinTheta = Math.sin(Math.toRadians(theta));
+				double cosD0 = Math.cos(decJ2000);
+				double sinD0 = Math.sin(decJ2000);
+
+				double a = cosD0 * Math.sin(aeRad);
+				double b = cosTheta * cosD0 * cosAE - sinTheta * sinD0;
+				double c = sinTheta * cosD0 * cosAE + cosTheta * sinD0;
+
+				double ra = Math.toRadians(Math.toDegrees(Math.atan2(a, b)) + zeta); // in rad
+				double dec = Math.asin(c); // in rad
+
+				// transformation to ecliptic longitude
 				double lng =
 					Math.toDegrees(
 						Math.atan2(
