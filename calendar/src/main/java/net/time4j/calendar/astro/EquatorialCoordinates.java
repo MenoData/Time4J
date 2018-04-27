@@ -50,6 +50,40 @@ public interface EquatorialCoordinates {
     //~ Methoden ----------------------------------------------------------
 
     /**
+     * <p>Obtains the right ascension in HMS-format ##H:MM:SS where a fraction of second will be truncated. </p>
+     *
+     * @return  String
+     */
+    /*[deutsch]
+     * <p>Liefert die Rektaszension im HMS-Format ##H:MM:SS, wobei Sekundenbruchteile abgeschnitten werden. </p>
+     *
+     * @return  String
+     */
+    default String getRightAscensionHMS() {
+        StringBuilder sb = new StringBuilder();
+        double ra = this.getRightAscension();
+        double hours = ra / 15;
+        double hFloor = Math.floor(hours);
+        sb.append((int) hFloor);
+        sb.append(':');
+        double minutes = (hours - hFloor) * 60;
+        double mFloor = Math.floor(minutes);
+        int m = (int) mFloor;
+        if (m < 10) {
+            sb.append('0');
+        }
+        sb.append(m);
+        sb.append(':');
+        double seconds = (minutes - mFloor) * 60;
+        int s = (int) Math.floor(seconds);
+        if (s < 10) {
+            sb.append('0');
+        }
+        sb.append(s);
+        return sb.toString();
+    }
+
+    /**
      * <p>Obtains the right ascension in degrees. </p>
      *
      * @return  double in range 0-360

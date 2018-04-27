@@ -890,6 +890,9 @@ public class AstroTest {
             position.getRightAscension(),
             is(260.38484838292726));
         assertThat(
+            position.getRightAscensionHMS(),
+            is("17:21:32"));
+        assertThat(
             position.getDeclination(),
             is(-23.140561983747027));
         assertThat(
