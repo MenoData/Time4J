@@ -1,12 +1,16 @@
 ## [v4.37] not yet released
 ### Added
+- Empty date intervals [#771]
 - Allow more temporal types for use with Duration.toTemporalAmount() [#769]
 - New interface describing equatorial coordinates [#764]
 - Static validation method for calendar weeks [#766]
 
+### Deprecated
+- Replace/Remove `SolarTime.Calculator.declination(double)` [#772]
+
 ### Fixed
 - Right ascension of moon position should be in range 0-360 [#770]
-- Use automatic fallback to worldwide locale in WindowsZone [#763]
+- Use automatic fallback to worldwide locale in WindowsZone [#[763]]
 
 ## [v4.36] published on 2018-03-24
 ### Added
