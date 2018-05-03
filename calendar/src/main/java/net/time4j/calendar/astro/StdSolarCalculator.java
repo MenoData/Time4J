@@ -956,6 +956,35 @@ public enum StdSolarCalculator
         throw new AbstractMethodError(); // implemented in subclass
     }
 
+    /**
+     * <p>Supported features are at least &quot;declination&quot; and &quot;right-ascension&quot;. </p>
+     *
+     * @param   jde             julian day in ephemeris time
+     * @param   nameOfFeature   describes what kind of value shall be calculated
+     * @return  result value or {@code Double.NaN} if the feature is not supported
+     */
+    /*[deutsch]
+     * <p>Unterst&uuml;tzte Merkmale sind wenigstens &quot;declination&quot; and &quot;right-ascension&quot;. </p>
+     *
+     * @param   jde             julian day in ephemeris time
+     * @param   nameOfFeature   describes what kind of value shall be calculated
+     * @return  result value or {@code Double.NaN} if the feature is not supported
+     */
+    @Override
+    public double getFeature(
+        double jde,
+        String nameOfFeature
+    ) {
+        switch (nameOfFeature) {
+            case SolarTime.DECLINATION:
+                return this.declination(jde);
+            case SolarTime.RIGHT_ASCENSION:
+                return this.rightAscension(jde);
+            default:
+                return Double.NaN;
+        }
+    }
+
     // Meeus (22.2), in degrees
     static double meanObliquity(double jct) {
         return 23.0 + 26.0 / 60 + (21.448 + (-46.815 + (-0.00059 + 0.001813 * jct) * jct) * jct) / 3600;

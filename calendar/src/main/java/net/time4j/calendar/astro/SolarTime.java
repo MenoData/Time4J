@@ -748,6 +748,9 @@ public final class SolarTime
      * <p>The timezone parameter enables users to query for solar time data described in terms of a potentially
      * quite different zone of the earth. However, the parameter does not interprete the input calendar date. </p>
      *
+     * <p>The calculation is only possible if the underlying calculator supports the feature of solar declination.
+     * Otherwise an {@code UnsupportedOperationException} will be thrown. </p>
+     *
      * @param   tzid    the identifier of the timezone any local times of the result refer to
      * @return  function for obtaining sunshine data
      * @since   3.34/4.29
@@ -757,6 +760,9 @@ public final class SolarTime
      *
      * <p>Der Zeitzonenparameter erm&ouml;glicht es, die Sonnenzeitdaten im Kontext einer eventuell
      * ganz anderen Zeitzone zu beschreiben. Er dient jedoch nicht der Interpretation des Eingabedatums. </p>
+     *
+     * <p>Die Berechnung ist nur m&ouml;glich, wenn der zugrundeliegende Algorithmus das Merkmal der Sonnendeklination
+     * unterst&uuml;tzt, sonst wird eine {@code UnsupportedOperationException} geworfen. </p>
      *
      * @param   tzid    the identifier of the timezone any local times of the result refer to
      * @return  function for obtaining sunshine data
@@ -785,11 +791,17 @@ public final class SolarTime
     /**
      * <p>Determines if the sun is invisible all day on a given calendar date. </p>
      *
+     * <p>The calculation is only possible if the underlying calculator supports the feature of solar declination.
+     * Otherwise an {@code UnsupportedOperationException} will be thrown. </p>
+     *
      * @return  ChronoCondition
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Ermittelt, ob an einem gegebenen Kalenderdatum Polarnacht herrscht. </p>
+     *
+     * <p>Die Berechnung ist nur m&ouml;glich, wenn der zugrundeliegende Algorithmus das Merkmal der Sonnendeklination
+     * unterst&uuml;tzt, sonst wird eine {@code UnsupportedOperationException} geworfen. </p>
      *
      * @return  ChronoCondition
      * @since   3.34/4.29
@@ -817,11 +829,17 @@ public final class SolarTime
     /**
      * <p>Determines if the sun is visible all day on a given calendar date. </p>
      *
+     * <p>The calculation is only possible if the underlying calculator supports the feature of solar declination.
+     * Otherwise an {@code UnsupportedOperationException} will be thrown. </p>
+     *
      * @return  ChronoCondition
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Ermittelt, ob an einem gegebenen Kalenderdatum Mitternachtssonne herrscht. </p>
+     *
+     * <p>Die Berechnung ist nur m&ouml;glich, wenn der zugrundeliegende Algorithmus das Merkmal der Sonnendeklination
+     * unterst&uuml;tzt, sonst wird eine {@code UnsupportedOperationException} geworfen. </p>
      *
      * @return  ChronoCondition
      * @since   3.34/4.29
@@ -1191,7 +1209,14 @@ public final class SolarTime
         double latInRad = Math.toRadians(this.latitude);
         double sinElevation = // Extra term left out => Math.cos(Math.toRadians(trueNoon)) := 1.0 (per definition)
             Math.sin(latInRad) * Math.sin(decInRad) + Math.cos(latInRad) * Math.cos(decInRad); // Meeus (13.6)
-        return Math.toDegrees(Math.asin(sinElevation));
+        double result = Math.toDegrees(Math.asin(sinElevation));
+
+        if (Double.isNaN(result)) {
+            throw new UnsupportedOperationException(
+                "Solar declination not supported by: " + this.getCalculator().name());
+        }
+
+        return result;
 
     }
 
@@ -1877,7 +1902,8 @@ public final class SolarTime
         /**
          * <p>Calculates a value suitable for given time and feature. </p>
          *
-         * <p>Subclasses overriding this method document which features are supported. </p>
+         * <p>Subclasses overriding this method document which features are supported.
+         * At least the feature of &quot;declination&quot; should be supported. </p>
          *
          * @param   jde             julian day in ephemeris time
          * @param   nameOfFeature   describes what kind of value shall be calculated
@@ -1887,7 +1913,8 @@ public final class SolarTime
          * <p>Berechnet einen Wert passend zur angegebenen Zeit und zum angegebenen Merkmal. </p>
          *
          * <p>Subklassen, die diese Methode &uuml;berschreiben, dokumentieren, welche Merkmale
-         * unterst&uuml;tzt werden. </p>
+         * unterst&uuml;tzt werden. Wenigstens das Merkmal &quot;declination&quot; sollte
+         * dabei sein. </p>
          *
          * @param   jde             julian day in ephemeris time
          * @param   nameOfFeature   describes what kind of value shall be calculated
