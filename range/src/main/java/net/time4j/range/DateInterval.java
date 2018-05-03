@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateInterval.java) is part of project Time4J.
  *
@@ -69,6 +69,7 @@ import java.util.stream.StreamSupport;
 
 import static net.time4j.PlainDate.*;
 import static net.time4j.range.IntervalEdge.CLOSED;
+import static net.time4j.range.IntervalEdge.OPEN;
 
 
 /**
@@ -346,6 +347,58 @@ public final class DateInterval
     public static DateInterval atomic(LocalDate date) {
 
         return DateInterval.atomic(PlainDate.from(date));
+
+    }
+
+    /**
+     * <p>Creates an empty interval with an anchor date. </p>
+     *
+     * <p>An empty interval does not contain any date but the anchor can modifiy the behaviour
+     * of methods like {@link IsoInterval#meets(IsoInterval)}. The lower interval boundary is closed,
+     * and the upper interval boundary is open. </p>
+     *
+     * @param   anchor      the anchor date
+     * @return  new empty date interval with given anchor date
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein leeres Intervall mit einem Ankerdatum. </p>
+     *
+     * <p>Ein leeres Intervall enth&auml;lt kein Datum, aber der Anker kann das Verhalten von Methoden
+     * wie {@link IsoInterval#meets(IsoInterval)} modifizieren. Die untere Intervallgrenze ist geschlossen,
+     * aber die obere Intervallgrenze ist offen. </p>
+     *
+     * @param   anchor      the anchor date
+     * @return  new empty date interval with given anchor date
+     * @since   4.37
+     */
+    public static DateInterval emptyWithAnchor(PlainDate anchor) {
+
+        return new DateInterval(
+            Boundary.of(CLOSED, anchor),
+            Boundary.of(OPEN, anchor));
+
+    }
+
+    /**
+     * <p>Creates an empty interval with an anchor date. </p>
+     *
+     * @param   anchor      the anchor date
+     * @return  new empty date interval with given anchor date
+     * @see     #emptyWithAnchor(PlainDate)
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein leeres Intervall mit einem Ankerdatum. </p>
+     *
+     * @param   anchor      the anchor date
+     * @return  new empty date interval with given anchor date
+     * @see     #emptyWithAnchor(PlainDate)
+     * @since   4.37
+     */
+    public static DateInterval emptyWithAnchor(LocalDate anchor) {
+
+        return DateInterval.emptyWithAnchor(PlainDate.from(anchor));
 
     }
 

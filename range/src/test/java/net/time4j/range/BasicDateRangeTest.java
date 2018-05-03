@@ -209,6 +209,33 @@ public class BasicDateRangeTest {
     }
 
     @Test
+    public void emptyWithAnchor() {
+        LocalDate date = LocalDate.of(2014, 5, 14);
+        DateInterval interval = DateInterval.emptyWithAnchor(date);
+        assertThat(
+            interval.isEmpty(),
+            is(true));
+        assertThat(
+            DateInterval.until(PlainDate.of(2014, 5, 13)).abuts(interval),
+            is(false));
+        assertThat(
+            DateInterval.until(PlainDate.of(2014, 5, 14)).abuts(interval),
+            is(false));
+        assertThat(
+            DateInterval.since(PlainDate.of(2014, 5, 14)).abuts(interval),
+            is(false));
+        assertThat(
+            DateInterval.until(PlainDate.of(2014, 5, 13)).meets(interval),
+            is(true));
+        assertThat(
+            DateInterval.until(PlainDate.of(2014, 5, 14)).meets(interval),
+            is(false));
+        assertThat(
+            DateInterval.since(PlainDate.of(2014, 5, 14)).metBy(interval),
+            is(true));
+    }
+
+    @Test
     public void getStart() {
         PlainDate start = PlainDate.of(2014, 2, 27);
         PlainDate end = PlainDate.of(2014, 5, 14);
