@@ -486,10 +486,6 @@ public class MoonPosition
                 Math.sin(lngRad) * Math.cos(obliquityRad) - Math.tan(latRad) * Math.sin(obliquityRad),
                 Math.cos(lngRad)
             );
-        double raDeg = Math.toDegrees(ra);
-        if (raDeg < 0) {
-            raDeg += 360;
-        }
         double decl =
             Math.asin(
                 Math.sin(latRad) * Math.cos(obliquityRad)
@@ -498,7 +494,7 @@ public class MoonPosition
 
         // already set: result[0] = nutation-in-longitude
         result[1] = trueObliquity; // in degrees
-        result[2] = raDeg;
+        result[2] = AstroUtils.adjustRA(Math.toDegrees(ra));
         result[3] = Math.toDegrees(decl);
         result[4] = distance; // in km
         return result;

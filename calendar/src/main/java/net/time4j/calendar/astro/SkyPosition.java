@@ -44,6 +44,10 @@ final class SkyPosition
     ) {
         super();
 
+        if (Double.isNaN(ra) || Double.isInfinite(ra) || Double.isNaN(dec) || Double.isInfinite(dec)) {
+            throw new IllegalArgumentException("Not finite: " + ra + "/" + dec);
+        }
+
         this.ra = ra;
         this.dec = dec;
     }

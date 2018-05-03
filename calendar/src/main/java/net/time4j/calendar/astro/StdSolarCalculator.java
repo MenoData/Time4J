@@ -222,7 +222,7 @@ public enum StdSolarCalculator
             double L = trueLongitudeOfSunInDegrees(t0);
             double RA = // right ascension of sun in degrees
                 Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
-            RA = adjustRange(RA);
+            RA = AstroUtils.adjustRA(RA);
             double Lquadrant  = Math.floor(L / 90) * 90;
             double RAquadrant = Math.floor(RA / 90) * 90;
             return RA + Lquadrant - RAquadrant; // RA in same quadrant as L
@@ -236,7 +236,7 @@ public enum StdSolarCalculator
                 (0.9856 * t0) - 3.289;
             double L =
                 M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634;
-            return adjustRange(L);
+            return AstroUtils.adjustRA(L);
         }
         private Optional<Moment> event(
             CalendarDate date,
@@ -253,7 +253,7 @@ public enum StdSolarCalculator
             double L = trueLongitudeOfSunInDegrees(t0);
             double RA = // right ascension of sun in degrees
                 Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
-            RA = adjustRange(RA);
+            RA = AstroUtils.adjustRA(RA);
             double Lquadrant  = Math.floor(L / 90) * 90;
             double RAquadrant = Math.floor(RA / 90) * 90;
             RA = (RA + (Lquadrant - RAquadrant)) / 15; // RA in same quadrant as L
@@ -288,15 +288,6 @@ public enum StdSolarCalculator
             }
             Moment utc = Moment.of(Math.round(secs / 60.0) * 60, scale);
             return Optional.of(utc.with(Moment.PRECISION, TimeUnit.MINUTES));
-        }
-        private double adjustRange(double value) { // range [0.0, 360.0)
-            while (Double.compare(0.0, value) > 0) {
-                value += 360;
-            }
-            while (Double.compare(value, 360.0) >= 0) {
-                value -= 360;
-            }
-            return value;
         }
     },
 
@@ -397,10 +388,7 @@ public enum StdSolarCalculator
             double lRad = Math.toRadians(solarLongitude(jct));
             double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
             double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-            if (ra < 0) {
-                ra += 360;
-            }
-            return ra;
+            return AstroUtils.adjustRA(ra);
         }
         private Optional<Moment> event(
             boolean rise,
@@ -584,19 +572,11 @@ public enum StdSolarCalculator
         }
         @Override
         public double declination(double jde) {
-            double jct = toJulianCenturies(jde);
-            return Math.toDegrees(declinationRad(jct));
+            return this.getFeature(jde, SolarTime.DECLINATION);
         }
         @Override
         public double rightAscension(double jde) {
-            double jct = toJulianCenturies(jde);
-            double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
-            double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
-            double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-            if (ra < 0) {
-                ra += 360;
-            }
-            return ra;
+            return this.getFeature(jde, SolarTime.RIGHT_ASCENSION);
         }
         @Override
         public double getFeature(
@@ -608,18 +588,13 @@ public enum StdSolarCalculator
             switch (nameOfFeature) {
                 case SolarTime.DECLINATION:
                     return Math.toDegrees(declinationRad(jct));
-                case SolarTime.RIGHT_ASCENSION: {
+                case SolarTime.RIGHT_ASCENSION:
                     double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
                     double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-                    if (ra < 0) {
-                        ra += 360;
-                    }
-                    return ra;
-                }
-                case "nutation": {
+                    return AstroUtils.adjustRA(ra);
+                case "nutation":
                     return nutation(jct);
-                }
                 case "obliquity":
                     return obliquity(jct);
                 case "mean-anomaly":
@@ -784,8 +759,7 @@ public enum StdSolarCalculator
         }
         @Override
         public double declination(double jde) {
-            double jct = toJulianCenturies(jde);
-            return Math.toDegrees(declinationRad(jct));
+            return this.getFeature(jde, SolarTime.DECLINATION);
         }
         @Override
         public double rightAscension(double jde) {
@@ -807,10 +781,7 @@ public enum StdSolarCalculator
                     double lRad = Math.toRadians(apparentSolarLongitude(jct, result[0]));
                     double y = Math.cos(Math.toRadians(meanObliquity(jct) + result[1])) * Math.sin(lRad);
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-                    if (ra < 0) {
-                        ra += 360;
-                    }
-                    return ra;
+                    return AstroUtils.adjustRA(ra);
                 }
                 case "nutation": {
                     double[] result = new double[2];
@@ -963,7 +934,6 @@ public enum StdSolarCalculator
      * @return  declination of sun in degrees
      * @see     #rightAscension(double)
      */
-    @Override
     public double declination(double jde) {
         throw new AbstractMethodError(); // implemented in subclass
     }

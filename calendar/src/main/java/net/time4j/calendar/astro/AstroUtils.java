@@ -81,4 +81,23 @@ class AstroUtils {
 
     }
 
+    /**
+     * <p>Adjusts given right ascension to range {@code [0.0, 360.0)}. </p>
+     *
+     * @param   value   the value to be adjusted
+     * @return  the adjusted value
+     * @since   4.37
+     */
+    static double adjustRA(double value) {
+
+        while (Double.compare(0.0, value) > 0) {
+            value += 360;
+        }
+        while (Double.compare(value, 360.0) >= 0) {
+            value -= 360;
+        }
+        return value;
+
+    }
+
 }

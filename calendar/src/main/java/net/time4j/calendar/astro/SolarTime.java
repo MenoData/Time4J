@@ -1862,46 +1862,41 @@ public final class SolarTime
          *
          * @param   jde     julian day in ephemeris time
          * @return  declination of sun in degrees
+         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
          */
         /*[deutsch]
          * <p>Bestimmt die Deklination der Sonne. </p>
          *
          * @param   jde     julian day in ephemeris time
          * @return  declination of sun in degrees
+         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
          */
+        @Deprecated
         double declination(double jde);
 
         /**
          * <p>Calculates a value suitable for given time and feature. </p>
          *
-         * <p>Subclasses overriding this method document which features are supported.
-         * At least the feature &quot;declination&quot; must be supported by subclasses. </p>
+         * <p>Subclasses overriding this method document which features are supported. </p>
          *
          * @param   jde             julian day in ephemeris time
          * @param   nameOfFeature   describes what kind of value shall be calculated
          * @return  result value or {@code Double.NaN} if the feature is not supported
-         * @see     #declination(double)
          */
         /*[deutsch]
          * <p>Berechnet einen Wert passend zur angegebenen Zeit und zum angegebenen Merkmal. </p>
          *
          * <p>Subklassen, die diese Methode &uuml;berschreiben, dokumentieren, welche Merkmale
-         * unterst&uuml;tzt werden. Mindestens das Merkmal &quot;declination&quot; mu&szlig;
-         * von Subklassen unterst&uuml;tzt werden. </p>
+         * unterst&uuml;tzt werden. </p>
          *
          * @param   jde             julian day in ephemeris time
          * @param   nameOfFeature   describes what kind of value shall be calculated
          * @return  result value or {@code Double.NaN} if the feature is not supported
-         * @see     #declination(double)
          */
         default double getFeature(
             double jde,
             String nameOfFeature
         ) {
-
-            if (nameOfFeature.equals(DECLINATION)) {
-                return this.declination(jde);
-            }
 
             return Double.NaN;
 
