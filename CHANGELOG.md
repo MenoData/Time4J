@@ -10,7 +10,7 @@
 
 ### Fixed
 - Right ascension of moon position should be in range 0-360 [#770]
-- Use automatic fallback to worldwide locale in WindowsZone [#[763]]
+- Use automatic fallback to worldwide locale in WindowsZone [#763]
 
 ## [v4.36] published on 2018-03-24
 ### Added
