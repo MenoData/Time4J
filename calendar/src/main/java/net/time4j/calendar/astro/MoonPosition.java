@@ -22,6 +22,7 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
+import net.time4j.engine.ChronoCondition;
 
 import java.io.Serializable;
 
@@ -208,6 +209,26 @@ public class MoonPosition
             Math.toDegrees(Math.atan2(Math.sin(tau), Math.cos(tau) * sinLatitude - Math.tan(decl) * cosLatitude)) + 180;
 
         return new MoonPosition(data[2], data[3], azimuth, elevation, distance);
+
+    }
+
+    /**
+     * <p>Determines if the position of moon at given moment matches a given zodiac. </p>
+     *
+     * @param   moment      the time when the position of moon is to be determined
+     * @return  predicate expression
+     * @see     4.37
+     */
+    /*[deutsch]
+     * <p>Berechnet, ob zum angegebenen Moment der Mond in einem bestimmten Tierkreissternbild liegt. </p>
+     *
+     * @param   moment      the time when the position of moon is to be determined
+     * @return  predicate expression
+     * @see     4.37
+     */
+    public static ChronoCondition<Zodiac> at(Moment moment) {
+
+        return (Zodiac zodiac) -> zodiac.isMatched('L', moment);
 
     }
 
@@ -571,7 +592,7 @@ public class MoonPosition
 
         double[] result = new double[5];
         StdSolarCalculator.nutations(jct, result);
-        return meanLongitude + (sumL / MIO) + result[0];
+        return AstroUtils.adjustRA(meanLongitude + (sumL / MIO) + result[0]);
 
     }
 

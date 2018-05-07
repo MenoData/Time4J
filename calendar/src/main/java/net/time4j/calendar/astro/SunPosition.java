@@ -22,6 +22,7 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
+import net.time4j.engine.ChronoCondition;
 
 import java.io.Serializable;
 
@@ -149,6 +150,26 @@ public class SunPosition
             Math.toDegrees(Math.atan2(Math.sin(tau), Math.cos(tau) * sinLatitude - Math.tan(decl) * cosLatitude)) + 180;
 
         return new SunPosition(Math.toDegrees(ra), Math.toDegrees(decl), azimuth, elevation);
+
+    }
+
+    /**
+     * <p>Determines if the position of sun at given moment matches a given zodiac. </p>
+     *
+     * @param   moment      the time when the position of sun is to be determined
+     * @return  predicate expression
+     * @see     4.37
+     */
+    /*[deutsch]
+     * <p>Berechnet, ob zum angegebenen Moment die Sonne in einem bestimmten Tierkreissternbild liegt. </p>
+     *
+     * @param   moment      the time when the position of sun is to be determined
+     * @return  predicate expression
+     * @see     4.37
+     */
+    public static ChronoCondition<Zodiac> at(Moment moment) {
+
+        return (Zodiac zodiac) -> zodiac.isMatched('S', moment);
 
     }
 

@@ -24,7 +24,6 @@ package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
 import net.time4j.PlainDate;
-import net.time4j.PlainTimestamp;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -206,12 +205,100 @@ public enum Zodiac {
 
 	}
 
+	/**
+	 * <p>Obtains the zodiac which happens next after this zodiac. </p>
+	 *
+	 * @return	next zodiac
+	 */
+	/*[deutsch]
+	 * <p>Liefert das Tierkreissternbild, das von der Sonne am n&auml;chsten
+	 * nach diesem Tierkreissternbild erreicht wird. </p>
+	 *
+	 * @return	next zodiac
+	 */
+	public Zodiac next() {
+
+		return Zodiac.values()[(this.ordinal() + 1) % 13];
+
+	}
+
 	EquatorialCoordinates getEntryAngles() {
 		return this.entry;
 	}
 
 	EquatorialCoordinates getExitAngles() {
-		return Zodiac.values()[(this.ordinal() + 1) % 13].entry;
+		return this.next().entry;
+	}
+
+	boolean isMatched(
+		char body,
+		Moment moment
+	) {
+		Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
+		double jde = JulianDay.ofEphemerisTime(time).getValue();
+		double lng = (body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
+
+		EquatorialCoordinates exit = this.getExitAngles();
+		double start = toEclipticAngle(time, this.entry.getRightAscension(), this.entry.getDeclination());
+		double end = toEclipticAngle(time, exit.getRightAscension(), exit.getDeclination());
+
+		if (end < start) {
+			end += 360;
+			if (lng < 180) {
+				lng += 360;
+			}
+		}
+
+		return (lng >= start) && (lng < end);
+	}
+
+	private static double getSolarLongitude(double jde) {
+		return StdSolarCalculator.TIME4J.getFeature(jde, "solar-longitude");
+	}
+
+	private static double getLunarLongitude(double jde) {
+		return MoonPosition.lunarLongitude(jde);
+	}
+
+	private static double toEclipticAngle(
+		Moment moment,
+		double raJ2000,
+		double decJ2000
+	) {
+		// approximation, see also Meeus (p. 92) about obliquity
+		double jct = JulianDay.ofSimplifiedTime(moment).getCenturyJ2000();
+		double meanObliquity = Math.toRadians(StdSolarCalculator.meanObliquity(jct));
+
+		// apply precession (Meeus 21.3 + 21.4, verified with example 21.b)
+		double eta = (2306.2181 + (0.30188 + 0.017998 * jct) * jct) * jct / 3600;
+		double zeta = (2306.2181 + (1.09468 + 0.018203 * jct) * jct) * jct / 3600;
+		double theta = (2004.3109 - (0.42665 + 0.041833 * jct) * jct) * jct / 3600;
+
+		double aeRad = Math.toRadians(raJ2000 + eta);
+		double cosAE = Math.cos(aeRad);
+		double cosTheta = Math.cos(Math.toRadians(theta));
+		double sinTheta = Math.sin(Math.toRadians(theta));
+		double cosD0 = Math.cos(Math.toRadians(decJ2000));
+		double sinD0 = Math.sin(Math.toRadians(decJ2000));
+
+		double a = cosD0 * Math.sin(aeRad);
+		double b = cosTheta * cosD0 * cosAE - sinTheta * sinD0;
+		double c = sinTheta * cosD0 * cosAE + cosTheta * sinD0;
+
+		double ra = Math.toRadians(Math.toDegrees(Math.atan2(a, b)) + zeta); // in rad
+		double dec = Math.asin(c); // in rad
+
+		// transformation to ecliptic longitude (degrees in range 0-360)
+		double lng =
+			Math.toDegrees(
+				Math.atan2(
+					Math.sin(ra) * Math.cos(meanObliquity) + Math.tan(dec) * Math.sin(meanObliquity),
+					Math.cos(ra))
+			);
+		if (lng < 0.0) {
+			lng += 360;
+		}
+		return lng;
 	}
 
 	//~ Innere Klassen ----------------------------------------------------
@@ -288,17 +375,21 @@ public enum Zodiac {
 		 */
 		public Moment inYear(int year) {
 
-			double angle = this.getEclipticAngle(year);
 			Moment moment = PlainDate.of(year, 1, 1).atStartOfDay().atUTC();
 			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
 			double estimate = jd0;
+			final double angle;
+
+			if (this.ecliptic) {
+				angle = this.c1;
+			} else {
+				angle = toEclipticAngle(moment, this.c1, this.c2);
+			}
 
 			if (this.body == 'S') {
 				estimate += modulo360(angle - getSolarLongitude(jd0)) * MEAN_TROPICAL_YEAR / 360.0;
-			} else if (this.body == 'L') {
-				estimate += modulo360(angle - getLunarLongitude(jd0)) * MEAN_SYNODIC_MONTH / 360.0;
 			} else {
-				throw new IllegalArgumentException("Unsupported celestial body: " + this.body);
+				estimate += modulo360(angle - getLunarLongitude(jd0)) * MEAN_SYNODIC_MONTH / 360.0;
 			}
 
 			double low = Math.max(jd0, estimate - 5);
@@ -308,7 +399,7 @@ public enum Zodiac {
 				double x = (low + high) / 2;
 
 				if (high - low < 0.0001) { // < 9 seconds
-					return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.SECONDS);
+					return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.MINUTES);
 				}
 
 				double delta = ((this.body == 'S') ? getSolarLongitude(x) : getLunarLongitude(x)) - angle;
@@ -333,64 +424,8 @@ public enum Zodiac {
 			return new Event(body, angles.getRightAscension(), angles.getDeclination(), false);
 		}
 
-		private static double getSolarLongitude(double jde) {
-			return StdSolarCalculator.TIME4J.getFeature(jde, "solar-longitude");
-		}
-
-		private static double getLunarLongitude(double jde) {
-			return MoonPosition.lunarLongitude(jde);
-		}
-
 		private static double modulo360(double angle) {
 			return angle - 360.0 * Math.floor(angle / 360.0); // always >= 0.0
-		}
-
-		private double getEclipticAngle(int year) {
-			if (this.ecliptic) {
-				return this.c1;
-			} else {
-				// approximation, see also Meeus (p. 92) about obliquity
-				Moment newYear = PlainTimestamp.of(year, 1, 1, 0, 0).atUTC();
-				double jct = JulianDay.ofSimplifiedTime(newYear).getCenturyJ2000();
-				double meanObliquity = StdSolarCalculator.meanObliquity(jct);
-
-				double raJ2000 = Math.toRadians(this.c1);
-				double decJ2000 = Math.toRadians(this.c2);
-
-				// apply precession (Meeus 21.3 + 21.4, verified with example 21.b)
-				double eta = (2306.2181 + (0.30188 + 0.017998 * jct) * jct) * jct / 3600;
-				double zeta = (2306.2181 + (1.09468 + 0.018203 * jct) * jct) * jct / 3600;
-				double theta = (2004.3109 - (0.42665 + 0.041833 * jct) * jct) * jct / 3600;
-
-				double aeRad = raJ2000 + Math.toRadians(eta);
-				double cosAE = Math.cos(aeRad);
-				double cosTheta = Math.cos(Math.toRadians(theta));
-				double sinTheta = Math.sin(Math.toRadians(theta));
-				double cosD0 = Math.cos(decJ2000);
-				double sinD0 = Math.sin(decJ2000);
-
-				double a = cosD0 * Math.sin(aeRad);
-				double b = cosTheta * cosD0 * cosAE - sinTheta * sinD0;
-				double c = sinTheta * cosD0 * cosAE + cosTheta * sinD0;
-
-				double ra = Math.toRadians(Math.toDegrees(Math.atan2(a, b)) + zeta); // in rad
-				double dec = Math.asin(c); // in rad
-
-				// transformation to ecliptic longitude
-				double lng =
-					Math.toDegrees(
-						Math.atan2(
-							Math.sin(ra) * Math.cos(meanObliquity) + Math.tan(dec) * Math.sin(meanObliquity),
-							Math.cos(ra))
-					);
-				while (lng < 0) {
-					lng += 360;
-				}
-				while (lng >= 360) {
-					lng -= 360;
-				}
-				return lng;
-			}
 		}
 
 	}
