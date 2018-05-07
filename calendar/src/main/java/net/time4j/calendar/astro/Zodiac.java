@@ -206,6 +206,23 @@ public enum Zodiac {
 	}
 
 	/**
+	 * <p>Obtains the zodiac which happens previous before this zodiac. </p>
+	 *
+	 * @return	previous zodiac
+	 */
+	/*[deutsch]
+	 * <p>Liefert das Tierkreissternbild, das von der Sonne direkt
+	 * vor diesem Tierkreissternbild erreicht wird. </p>
+	 *
+	 * @return	previous zodiac
+	 */
+	public Zodiac previous() {
+
+		return Zodiac.values()[(this.ordinal() + 12) % 13];
+
+	}
+
+	/**
 	 * <p>Obtains the zodiac which happens next after this zodiac. </p>
 	 *
 	 * @return	next zodiac
@@ -362,20 +379,48 @@ public enum Zodiac {
 		/**
 		 * <p>Calculates the moment when this event occurs in given year. </p>
 		 *
-		 * @param 	year	gregorian year
-		 * @return	moment of this event in given year
-		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-		 */
-		/*[deutsch]
-		 * <p>Berechnet den Moment, wann dieses Ereignis im angegebenen Jahr eintritt. </p>
+		 * <p>The accuracy is limited to minute precision. </p>
 		 *
 		 * @param 	year	gregorian year
 		 * @return	moment of this event in given year
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+         * @see     SunPosition#atEntry(Zodiac)
+         * @see     SunPosition#atExit(Zodiac)
+         * @see     MoonPosition#atEntry(Zodiac)
+         * @see     MoonPosition#atExit(Zodiac)
+		 */
+		/*[deutsch]
+		 * <p>Berechnet den Moment, wann dieses Ereignis im angegebenen Jahr eintritt. </p>
+		 *
+		 * <p>Die Rechengenauigkeit ist auf eine Minute beschr&auml;nkt. </p>
+		 *
+		 * @param 	year	gregorian year
+		 * @return	moment of this event in given year
+		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+         * @see     SunPosition#atEntry(Zodiac)
+         * @see     SunPosition#atExit(Zodiac)
+         * @see     MoonPosition#atEntry(Zodiac)
+         * @see     MoonPosition#atExit(Zodiac)
 		 */
 		public Moment inYear(int year) {
 
-			Moment moment = PlainDate.of(year, 1, 1).atStartOfDay().atUTC();
+			Moment estimate = this.atTime(PlainDate.of(year, 1, 1).atStartOfDay().atUTC());
+			return this.atTime(estimate); // two-step-approximation
+
+		}
+
+		static Event ofHoroscopic(double angle) {
+			return new Event('S', angle, 0.0, true);
+		}
+
+		static Event ofConstellation(
+			char body,
+			EquatorialCoordinates angles
+		) {
+			return new Event(body, angles.getRightAscension(), angles.getDeclination(), false);
+		}
+
+		private Moment atTime(Moment moment) {
 			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
 			double estimate = jd0;
 			final double angle;
@@ -399,7 +444,7 @@ public enum Zodiac {
 				double x = (low + high) / 2;
 
 				if (high - low < 0.0001) { // < 9 seconds
-					return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.MINUTES);
+					return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.SECONDS);
 				}
 
 				double delta = ((this.body == 'S') ? getSolarLongitude(x) : getLunarLongitude(x)) - angle;
@@ -410,18 +455,6 @@ public enum Zodiac {
 					low = x;
 				}
 			}
-
-		}
-
-		static Event ofHoroscopic(double angle) {
-			return new Event('S', angle, 0.0, true);
-		}
-
-		static Event ofConstellation(
-			char body,
-			EquatorialCoordinates angles
-		) {
-			return new Event(body, angles.getRightAscension(), angles.getDeclination(), false);
 		}
 
 		private static double modulo360(double angle) {

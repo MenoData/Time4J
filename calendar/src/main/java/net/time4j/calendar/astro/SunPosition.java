@@ -157,14 +157,14 @@ public class SunPosition
      * <p>Determines if the position of sun at given moment matches a given zodiac. </p>
      *
      * @param   moment      the time when the position of sun is to be determined
-     * @return  predicate expression
+     * @return  predicate expression with accuracy in minute precision
      * @see     4.37
      */
     /*[deutsch]
      * <p>Berechnet, ob zum angegebenen Moment die Sonne in einem bestimmten Tierkreissternbild liegt. </p>
      *
      * @param   moment      the time when the position of sun is to be determined
-     * @return  predicate expression
+     * @return  predicate expression with accuracy in minute precision
      * @see     4.37
      */
     public static ChronoCondition<Zodiac> at(Moment moment) {
