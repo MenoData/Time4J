@@ -432,9 +432,17 @@ public enum Zodiac {
 			}
 
 			if (this.body == 'S') {
-				estimate += modulo360(angle - getSolarLongitude(jd0)) * MEAN_TROPICAL_YEAR / 360.0;
+			    double m360 = modulo360(angle - getSolarLongitude(jd0));
+			    if (m360 > 359.9) {
+			        m360 = 0.0; // correction for rounding error
+                }
+				estimate += m360 * MEAN_TROPICAL_YEAR / 360.0;
 			} else {
-				estimate += modulo360(angle - getLunarLongitude(jd0)) * MEAN_SYNODIC_MONTH / 360.0;
+                double m360 = modulo360(angle - getLunarLongitude(jd0));
+                if (m360 > 359.9) {
+                    m360 = 0.0; // correction for rounding error
+                }
+				estimate += m360 * MEAN_SYNODIC_MONTH / 360.0;
 			}
 
 			double low = Math.max(jd0, estimate - 5);

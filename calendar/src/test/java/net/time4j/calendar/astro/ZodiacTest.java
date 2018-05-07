@@ -1,6 +1,8 @@
 package net.time4j.calendar.astro;
 
+import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -120,6 +122,24 @@ public class ZodiacTest {
         assertThat(
             SunPosition.at(PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC()).test(Zodiac.ARIES),
             is(true));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void horoscopicOphiuchus() {
+        SunPosition.atHoroscopeSign(Zodiac.OPHIUCHUS);
+    }
+
+    @Test
+    public void horoscopicSigns() {
+        assertThat(
+            SunPosition.atHoroscopeSign(Zodiac.ARIES).inYear(0).toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(0, 3, 20)));
+        assertThat(
+            SunPosition.atHoroscopeSign(Zodiac.ARIES).inYear(2000).toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(2000, 3, 20))); // no precession shift!
+        assertThat(
+            SunPosition.atHoroscopeSign(Zodiac.VIRGO).inYear(2011).toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(2011, 8, 23))); // see Wikipedia
     }
 
 }
