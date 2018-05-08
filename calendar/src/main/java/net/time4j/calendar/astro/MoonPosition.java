@@ -22,7 +22,6 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
-import net.time4j.engine.ChronoCondition;
 
 import java.io.Serializable;
 
@@ -213,62 +212,45 @@ public class MoonPosition
     }
 
     /**
-     * <p>Determines the event when the moon enters given zodiac constellation. </p>
+     * <p>Determines the event when the moon enters or exits given zodiac constellation. </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the moon enters the zodiac
+     * @param   zodiac  the astronomical zodiac constellation defined by IAU
+     * @return  event when the moon enters or leaves the zodiac constellation
      * @since   4.37
      */
     /*[deutsch]
-     * <p>Bestimmt das Ereignis, wenn der Mond das angegebene Tierkreissternbild betritt. </p>
+     * <p>Bestimmt das Ereignis, wenn der Mond das angegebene Tierkreissternbild betritt oder verl&auml;sst. </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the moon enters the zodiac
+     * @param   zodiac  the astronomical zodiac constellation defined by IAU
+     * @return  event when the moon enters or leaves the zodiac constellation
      * @since   4.37
      */
-    public static Zodiac.Event atEntry(Zodiac zodiac) {
+    public static Zodiac.Event inConstellation(Zodiac zodiac) {
 
-        return Zodiac.Event.ofConstellation('L', zodiac.getEntryAngles());
+        return Zodiac.Event.ofConstellation('L', zodiac);
 
     }
 
     /**
-     * <p>Determines the event when the moon exits given zodiac constellation. </p>
+     * <p>Determines the event when the moon enters or exits given zodiac sign (for horoscope purpose). </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the moon leaves the zodiac
+     * @param   zodiac  the astronomical zodiac sign
+     * @return  event when the moon enters or leaves the zodiac sign
+     * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
      * @since   4.37
      */
     /*[deutsch]
-     * <p>Bestimmt das Ereignis, wenn der Mond das angegebene Tierkreissternbild verl&auml;sst. </p>
+     * <p>Bestimmt das Ereignis, wenn der Mond das angegebene Tierkreiszeichen betritt oder verl&auml;sst
+     * (f&uuml;r Horoskope). </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the moon leaves the zodiac
+     * @param   zodiac  the astronomical zodiac sign
+     * @return  event when the moon enters or leaves the zodiac sign
+     * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
      * @since   4.37
      */
-    public static Zodiac.Event atExit(Zodiac zodiac) {
+    public static Zodiac.Event inSign(Zodiac zodiac) {
 
-        return Zodiac.Event.ofConstellation('L', zodiac.getExitAngles());
-
-    }
-
-    /**
-     * <p>Determines if the position of moon at given moment matches a given zodiac constellation. </p>
-     *
-     * @param   moment      the time when the position of moon is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    /*[deutsch]
-     * <p>Berechnet, ob zum angegebenen Moment der Mond in einem bestimmten Tierkreissternbild liegt. </p>
-     *
-     * @param   moment      the time when the position of moon is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    public static ChronoCondition<Zodiac> inConstellationAt(Moment moment) {
-
-        return (Zodiac zodiac) -> zodiac.isConstellationMatched('L', moment);
+        return Zodiac.Event.ofSign('L', zodiac);
 
     }
 

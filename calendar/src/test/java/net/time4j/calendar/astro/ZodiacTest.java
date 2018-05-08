@@ -85,64 +85,82 @@ public class ZodiacTest {
     @Test
     public void precessionalShiftOfAries() {
         assertThat(
-            SunPosition.atEntry(Zodiac.ARIES).onOrAfter(PlainDate.of(0, 1, 1)),
+            SunPosition.inConstellation(Zodiac.ARIES).momentOfEntry(PlainDate.of(0, 1, 1).atStartOfDay().atUTC()),
             is(PlainTimestamp.of(0, 3, 21, 16, 14, 48).atUTC())); // ~ vernal equinox in year 0
         assertThat(
-            SunPosition.atEntry(Zodiac.ARIES).onOrAfter(PlainDate.of(2000, 1, 1)),
+            SunPosition.inConstellation(Zodiac.ARIES).momentOfEntry(PlainDate.of(2000, 1, 1).atStartOfDay().atUTC()),
             is(PlainTimestamp.of(2000, 4, 18, 13, 15, 33).atUTC())); // precessional shift of vernal equinox
     }
 
     @Test
     public void precessionalShiftOfPisces() {
         assertThat(
-            SunPosition.atEntry(Zodiac.PISCES).onOrAfter(PlainDate.of(0, 1, 1)),
+            SunPosition.inConstellation(Zodiac.PISCES).momentOfEntry(PlainDate.of(0, 1, 1).atStartOfDay().atUTC()),
             is(PlainTimestamp.of(0, 2, 12, 20, 50, 59).atUTC()));
         assertThat(
-            SunPosition.atEntry(Zodiac.PISCES).onOrAfter(PlainDate.of(2000, 1, 1)),
+            SunPosition.inConstellation(Zodiac.PISCES).momentOfEntry(PlainDate.of(2000, 1, 1).atStartOfDay().atUTC()),
             is(PlainTimestamp.of(2000, 3, 11, 21, 8, 41).atUTC())); // near vernal equinox in year 2000
     }
 
     @Test
-    public void sunPositionInConstellationAt() {
+    public void sunPositionInConstellation() {
         assertThat(
-            SunPosition.inConstellationAt(PlainTimestamp.of(0, 3, 21, 16, 14, 48).atUTC()).test(Zodiac.PISCES),
+            SunPosition.inConstellation(Zodiac.PISCES).test(PlainTimestamp.of(0, 3, 21, 16, 14, 48).atUTC()),
             is(true));
         assertThat(
-            SunPosition.inConstellationAt(PlainTimestamp.of(0, 3, 21, 16, 15).atUTC()).test(Zodiac.ARIES),
+            SunPosition.inConstellation(Zodiac.ARIES).test(PlainTimestamp.of(0, 3, 21, 16, 15).atUTC()),
             is(true));
         assertThat(
-            SunPosition.inConstellationAt(PlainTimestamp.of(2000, 3, 11, 21, 8).atUTC()).test(Zodiac.AQUARIUS),
+            SunPosition.inConstellation(Zodiac.AQUARIUS).test(PlainTimestamp.of(2000, 3, 11, 21, 8).atUTC()),
             is(true));
         assertThat(
-            SunPosition.inConstellationAt(PlainTimestamp.of(2000, 3, 11, 21, 9).atUTC()).test(Zodiac.PISCES),
+            SunPosition.inConstellation(Zodiac.PISCES).test(PlainTimestamp.of(2000, 3, 11, 21, 9).atUTC()),
             is(true));
         assertThat(
-            SunPosition.inConstellationAt(PlainTimestamp.of(2000, 4, 18, 13, 15).atUTC()).test(Zodiac.PISCES),
+            SunPosition.inConstellation(Zodiac.PISCES).test(PlainTimestamp.of(2000, 4, 18, 13, 15).atUTC()),
             is(true));
         assertThat(
-            SunPosition.inConstellationAt(PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC()).test(Zodiac.ARIES),
+            PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC().matches(SunPosition.inConstellation(Zodiac.ARIES)),
+            is(true));
+    }
+
+    @Test
+    public void sunPositionInSign() {
+        assertThat(
+            SunPosition.inSign(Zodiac.ARIES).momentOfEntry(PlainDate.of(0, 1, 1).atStartOfDay().atUTC())
+                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(0, 3, 20)));
+        assertThat(
+            SunPosition.inSign(Zodiac.ARIES).momentOfEntry(PlainDate.of(2000, 1, 1).atStartOfDay().atUTC())
+                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(2000, 3, 20))); // no precession shift!
+        assertThat(
+            SunPosition.inSign(Zodiac.LEO).momentOfExit(PlainDate.of(2011, 1, 1).atStartOfDay().atUTC())
+                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(2011, 8, 23))); // see Wikipedia
+        assertThat(
+            SunPosition.inSign(Zodiac.VIRGO).momentOfEntry(PlainDate.of(2011, 1, 1).atStartOfDay().atUTC())
+                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
+            is(PlainDate.of(2011, 8, 23))); // exit of LEO = entry of VIRGO
+    }
+
+    @Test
+    public void moonPositionInConstellation() {
+        assertThat(
+            PlainTimestamp.of(2018, 5, 8, 0, 0).atUTC().matches(MoonPosition.inConstellation(Zodiac.CAPRICORNUS)),
+            is(true));
+    }
+
+    @Test
+    public void moonPositionInSign() {
+        assertThat(
+            PlainTimestamp.of(2018, 5, 8, 19, 0).atUTC().matches(MoonPosition.inSign(Zodiac.AQUARIUS)),
             is(true));
     }
 
     @Test(expected=IllegalArgumentException.class)
     public void horoscopicOphiuchus() {
-        SunPosition.atHoroscopeSign(Zodiac.OPHIUCHUS);
-    }
-
-    @Test
-    public void horoscopicSigns() {
-        assertThat(
-            SunPosition.atHoroscopeSign(Zodiac.ARIES).onOrAfter(PlainDate.of(0, 1, 1))
-                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
-            is(PlainDate.of(0, 3, 20)));
-        assertThat(
-            SunPosition.atHoroscopeSign(Zodiac.ARIES).onOrAfter(PlainDate.of(2000, 1, 1))
-                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
-            is(PlainDate.of(2000, 3, 20))); // no precession shift!
-        assertThat(
-            SunPosition.atHoroscopeSign(Zodiac.VIRGO).onOrAfter(PlainDate.of(2011, 1, 1))
-                .toZonalTimestamp(ZonalOffset.UTC).toDate(),
-            is(PlainDate.of(2011, 8, 23))); // see Wikipedia
+        SunPosition.inSign(Zodiac.OPHIUCHUS);
     }
 
 }

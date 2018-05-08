@@ -22,7 +22,6 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
-import net.time4j.engine.ChronoCondition;
 
 import java.io.Serializable;
 
@@ -154,92 +153,45 @@ public class SunPosition
     }
 
     /**
-     * <p>Determines the event when the sun enters given zodiac constellation. </p>
+     * <p>Determines the event when the sun enters or exits given zodiac constellation. </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the sun enters the zodiac
+     * @param   zodiac  the astronomical zodiac constellation defined by IAU
+     * @return  event when the sun enters or leaves the zodiac constellation
      * @since   4.37
      */
     /*[deutsch]
-     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreissternbild betritt. </p>
+     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreissternbild betritt oder verl&auml;sst. </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the sun enters the zodiac
+     * @param   zodiac  the astronomical zodiac constellation defined by IAU
+     * @return  event when the sun enters or leaves the zodiac constellation
      * @since   4.37
      */
-    public static Zodiac.Event atEntry(Zodiac zodiac) {
+    public static Zodiac.Event inConstellation(Zodiac zodiac) {
 
-        return Zodiac.Event.ofConstellation('S', zodiac.getEntryAngles());
+        return Zodiac.Event.ofConstellation('S', zodiac);
 
     }
 
     /**
-     * <p>Determines the event when the sun exits given zodiac constellation. </p>
+     * <p>Determines the event when the sun enters or exits given zodiac sign (for horoscope purpose). </p>
      *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the sun leaves the zodiac
-     * @since   4.37
-     */
-    /*[deutsch]
-     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreissternbild verl&auml;sst. </p>
-     *
-     * @param   zodiac  the astronomical zodiac
-     * @return  event when the sun leaves the zodiac
-     * @since   4.37
-     */
-    public static Zodiac.Event atExit(Zodiac zodiac) {
-
-        return Zodiac.Event.ofConstellation('S', zodiac.getExitAngles());
-
-    }
-
-    /**
-     * <p>Determines the event when the sun enters given horoscopic sign. </p>
-     *
-     * @param   zodiac  the astrological zodiac sign
-     * @return  event when the sun is in the horoscopic sign
+     * @param   zodiac  the astronomical zodiac sign
+     * @return  event when the sun enters or leaves the zodiac sign
      * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
      * @since   4.37
      */
     /*[deutsch]
-     * <p>Bestimmt das Ereignis, wenn die Sonne im angegebenen astrologischen Tierkreiszeichen steht. </p>
+     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreiszeichen betritt oder verl&auml;sst
+     * (f&uuml;r Horoskope). </p>
      *
-     * @param   zodiac  the astrological zodiac sign
-     * @return  event when the sun is in the horoscopic sign
+     * @param   zodiac  the astronomical zodiac sign
+     * @return  event when the sun enters or leaves the zodiac sign
      * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
      * @since   4.37
      */
-    public static Zodiac.Event atHoroscopeSign(Zodiac zodiac) {
+    public static Zodiac.Event inSign(Zodiac zodiac) {
 
-        int comp = zodiac.compareTo(Zodiac.OPHIUCHUS);
-
-        if (comp == 0) {
-            throw new IllegalArgumentException("Ophiuchus is not an astrological zodiac sign.");
-        } else if (comp < 0) {
-            return Zodiac.Event.ofHoroscopic(zodiac.ordinal() * 30.0);
-        } else {
-            return Zodiac.Event.ofHoroscopic((zodiac.ordinal() - 1) * 30.0);
-        }
-
-    }
-
-    /**
-     * <p>Determines if the position of sun at given moment matches a given zodiac constellation. </p>
-     *
-     * @param   moment      the time when the position of sun is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    /*[deutsch]
-     * <p>Berechnet, ob zum angegebenen Moment die Sonne in einem bestimmten Tierkreissternbild liegt. </p>
-     *
-     * @param   moment      the time when the position of sun is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    public static ChronoCondition<Zodiac> inConstellationAt(Moment moment) {
-
-        return (Zodiac zodiac) -> zodiac.isConstellationMatched('S', moment);
+        return Zodiac.Event.ofSign('S', zodiac);
 
     }
 

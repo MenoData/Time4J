@@ -22,8 +22,7 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
-import net.time4j.PlainDate;
-import net.time4j.engine.CalendarDate;
+import net.time4j.engine.ChronoCondition;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -240,36 +239,6 @@ public enum Zodiac {
 
 	}
 
-	EquatorialCoordinates getEntryAngles() {
-		return this.entry;
-	}
-
-	EquatorialCoordinates getExitAngles() {
-		return this.next().entry;
-	}
-
-	boolean isConstellationMatched(
-		char body,
-		Moment moment
-	) {
-		Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
-		double jde = JulianDay.ofEphemerisTime(time).getValue();
-		double lng = (body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
-
-		EquatorialCoordinates exit = this.getExitAngles();
-		double start = toEclipticAngle(time, this.entry.getRightAscension(), this.entry.getDeclination());
-		double end = toEclipticAngle(time, exit.getRightAscension(), exit.getDeclination());
-
-		if (end < start) {
-			end += 360;
-			if (lng < 180) {
-				lng += 360;
-			}
-		}
-
-		return (lng >= start) && (lng < end);
-	}
-
 	private static double getSolarLongitude(double jde) {
 		return StdSolarCalculator.TIME4J.getFeature(jde, "solar-longitude");
 	}
@@ -325,11 +294,9 @@ public enum Zodiac {
 	 * <p>Represents the event when the sun or moon enters or exits a zodiac. </p>
 	 *
 	 * @author 	Meno Hochschild
-	 * @see 	SunPosition#atEntry(Zodiac)
-	 * @see 	SunPosition#atExit(Zodiac)
-	 * @see 	MoonPosition#atEntry(Zodiac)
-	 * @see 	MoonPosition#atExit(Zodiac)
-	 * @see 	SunPosition#atHoroscopeSign(Zodiac)
+	 * @see     SunPosition#inSign(Zodiac)
+	 * @see     SunPosition#inConstellation(Zodiac)
+	 * @see     MoonPosition#inConstellation(Zodiac)
 	 * @since	4.37
 	 */
 	/*[deutsch]
@@ -337,105 +304,169 @@ public enum Zodiac {
 	 * oder -zeichen betreten oder verlassen. </p>
 	 *
 	 * @author 	Meno Hochschild
-	 * @see 	SunPosition#atEntry(Zodiac)
-	 * @see 	SunPosition#atExit(Zodiac)
-	 * @see 	MoonPosition#atEntry(Zodiac)
-	 * @see 	MoonPosition#atExit(Zodiac)
-	 * @see 	SunPosition#atHoroscopeSign(Zodiac)
+	 * @see     SunPosition#inSign(Zodiac)
+	 * @see     SunPosition#inConstellation(Zodiac)
+	 * @see     MoonPosition#inConstellation(Zodiac)
 	 * @since	4.37
 	 */
-	public static class Event {
+	public static class Event
+		implements ChronoCondition<Moment> {
 
 		//~ Instanzvariablen ----------------------------------------------
 
 		private final char body;
-		private final double c1;
-		private final double c2;
-		private final boolean ecliptic;
+		private final Zodiac zodiac;
+		private final boolean horoscope;
 
 		//~ Konstruktoren -------------------------------------------------
 
 		private Event(
 			char body,
-			double c1,
-			double c2,
-			boolean ecliptic
+			Zodiac zodiac,
+			boolean horoscope
 		) {
 			super();
 
 			if ((body != 'S') && (body != 'L')) {
 				throw new IllegalArgumentException("Unsupported celestial body: " + body);
-			} else if (!Double.isFinite(c1) || !Double.isFinite(c2)) {
+			} else if (zodiac == null) {
 				throw new IllegalArgumentException("Celestial coordinates must be finite.");
+			} else if (horoscope && (zodiac == Zodiac.OPHIUCHUS)) {
+				throw new IllegalArgumentException("Ophiuchus is not an astrological zodiac sign.");
 			}
 
 			this.body = body;
-			this.c1 = c1;
-			this.c2 = c2;
-			this.ecliptic = ecliptic;
+			this.zodiac = zodiac;
+			this.horoscope = horoscope;
 		}
 
 		//~ Methoden ------------------------------------------------------
 
 		/**
-		 * <p>Calculates the moment when this event occurs. </p>
+		 * <p>Calculates the moment when the celestial body enters the associated zodiac. </p>
 		 *
 		 * <p>The accuracy is limited to minute precision. </p>
 		 *
-		 * @param 	date	the starting calendar date
-		 * @return	moment of this event on or after given date
+		 * @param 	start		the moment when to start the search
+		 * @return	moment of this event at or after given start
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-         * @see     SunPosition#atEntry(Zodiac)
-         * @see     SunPosition#atExit(Zodiac)
-         * @see     MoonPosition#atEntry(Zodiac)
-         * @see     MoonPosition#atExit(Zodiac)
 		 */
 		/*[deutsch]
-		 * <p>Berechnet den Moment, wann dieses Ereignis eintritt. </p>
+		 * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol erreicht. </p>
 		 *
 		 * <p>Die Rechengenauigkeit ist auf eine Minute beschr&auml;nkt. </p>
 		 *
-		 * @param 	date	the starting calendar date
-		 * @return	moment of this event on or after given date
+		 * @param 	start		the moment when to start the search
+		 * @return	moment of this event at or after given start
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-         * @see     SunPosition#atEntry(Zodiac)
-         * @see     SunPosition#atExit(Zodiac)
-         * @see     MoonPosition#atEntry(Zodiac)
-         * @see     MoonPosition#atExit(Zodiac)
 		 */
-		public Moment onOrAfter(CalendarDate date) {
+		public Moment momentOfEntry(Moment start) {
 
-			PlainDate d = date.transform(PlainDate.axis());
-			Moment estimate = this.atTime(d.atStartOfDay().atUTC(), true);
-			return this.atTime(estimate, false); // two-step-approximation
+			Moment estimate = this.atTime(start, false, true);
+			return this.atTime(estimate, false, false); // two-step-approximation
 
 		}
 
-		static Event ofHoroscopic(double angle) {
-			return new Event('S', angle, 0.0, true);
+		/**
+		 * <p>Calculates the moment when the celestial body leaves the associated zodiac. </p>
+		 *
+		 * <p>The accuracy is limited to minute precision. </p>
+		 *
+		 * @param 	start		the moment when to start the search
+		 * @return	moment of this event at or after given start
+		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+		 */
+		/*[deutsch]
+		 * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol verl&auml;sst. </p>
+		 *
+		 * <p>Die Rechengenauigkeit ist auf eine Minute beschr&auml;nkt. </p>
+		 *
+		 * @param 	start		the moment when to start the search
+		 * @return	moment of this event at or after given start
+		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+		 */
+		public Moment momentOfExit(Moment start) {
+
+			Moment estimate = this.atTime(start, true, true);
+			return this.atTime(estimate, true, false); // two-step-approximation
+
+		}
+
+		@Override
+		public boolean test(Moment moment) {
+
+			Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
+			double jde = JulianDay.ofEphemerisTime(time).getValue();
+			double lng = (this.body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
+
+			double start;
+			double end;
+
+			if (this.horoscope) {
+				start = this.getHoroscopeLongitude(false);
+				end = this.getHoroscopeLongitude(true);
+			} else {
+				Zodiac z1 = this.zodiac;
+				Zodiac z2 = z1.next();
+				start = toEclipticAngle(time, z1.entry.getRightAscension(), z1.entry.getDeclination());
+				end = toEclipticAngle(time, z2.entry.getRightAscension(), z2.entry.getDeclination());
+			}
+
+			if (end < start) {
+				end += 360;
+				if (lng < 180) {
+					lng += 360;
+				}
+			}
+
+			return (lng >= start) && (lng < end);
+
+		}
+
+		static Event ofSign(
+			char body,
+			Zodiac zodiac
+		) {
+			return new Event(body, zodiac, true);
 		}
 
 		static Event ofConstellation(
 			char body,
-			EquatorialCoordinates angles
+			Zodiac zodiac
 		) {
-			return new Event(body, angles.getRightAscension(), angles.getDeclination(), false);
+			return new Event(body, zodiac, false);
+		}
+
+		private Zodiac getZodiac(boolean exiting) {
+			Zodiac z = this.zodiac;
+			if (exiting) {
+				z = z.next();
+			}
+			return z;
+		}
+
+		private int getHoroscopeLongitude(boolean exiting) {
+			Zodiac z = this.getZodiac(exiting);
+			int offset = (z.compareTo(Zodiac.OPHIUCHUS) < 0) ? 0 : -1;
+			return (z.ordinal() + offset) * 30;
 		}
 
 		private Moment atTime(
 			Moment moment,
+			boolean exiting,
 			boolean after
 		) {
 			final double angle;
 
-			if (this.ecliptic) {
+			if (this.horoscope) {
 				if (after) {
-					angle = this.c1;
+					angle = this.getHoroscopeLongitude(exiting);
 				} else {
 					return moment; // no precession => reduce to one-step-calculation
 				}
 			} else {
-				angle = toEclipticAngle(moment, this.c1, this.c2);
+				Zodiac z = this.getZodiac(exiting);
+				angle = toEclipticAngle(moment, z.entry.getRightAscension(), z.entry.getDeclination());
 			}
 
 			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
