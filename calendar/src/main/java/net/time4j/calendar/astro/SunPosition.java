@@ -154,26 +154,6 @@ public class SunPosition
     }
 
     /**
-     * <p>Determines if the position of sun at given moment matches a given zodiac. </p>
-     *
-     * @param   moment      the time when the position of sun is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    /*[deutsch]
-     * <p>Berechnet, ob zum angegebenen Moment die Sonne in einem bestimmten Tierkreissternbild liegt. </p>
-     *
-     * @param   moment      the time when the position of sun is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    public static ChronoCondition<Zodiac> at(Moment moment) {
-
-        return (Zodiac zodiac) -> zodiac.isMatched('S', moment);
-
-    }
-
-    /**
      * <p>Determines the event when the sun enters given zodiac constellation. </p>
      *
      * @param   zodiac  the astronomical zodiac
@@ -240,6 +220,26 @@ public class SunPosition
         } else {
             return Zodiac.Event.ofHoroscopic((zodiac.ordinal() - 1) * 30.0);
         }
+
+    }
+
+    /**
+     * <p>Determines if the position of sun at given moment matches a given zodiac constellation. </p>
+     *
+     * @param   moment      the time when the position of sun is to be determined
+     * @return  predicate expression with accuracy in minute precision
+     * @see     4.37
+     */
+    /*[deutsch]
+     * <p>Berechnet, ob zum angegebenen Moment die Sonne in einem bestimmten Tierkreissternbild liegt. </p>
+     *
+     * @param   moment      the time when the position of sun is to be determined
+     * @return  predicate expression with accuracy in minute precision
+     * @see     4.37
+     */
+    public static ChronoCondition<Zodiac> inConstellationAt(Moment moment) {
+
+        return (Zodiac zodiac) -> zodiac.isConstellationMatched('S', moment);
 
     }
 

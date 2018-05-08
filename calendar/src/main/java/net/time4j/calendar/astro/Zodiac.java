@@ -21,15 +21,16 @@
 
 package net.time4j.calendar.astro;
 
-
 import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.engine.CalendarDate;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 
 /**
  * <p>Enumeration of the thirteen astronomical zodiac definitions. </p>
@@ -247,7 +248,7 @@ public enum Zodiac {
 		return this.next().entry;
 	}
 
-	boolean isMatched(
+	boolean isConstellationMatched(
 		char body,
 		Moment moment
 	) {
@@ -377,12 +378,12 @@ public enum Zodiac {
 		//~ Methoden ------------------------------------------------------
 
 		/**
-		 * <p>Calculates the moment when this event occurs in given year. </p>
+		 * <p>Calculates the moment when this event occurs. </p>
 		 *
 		 * <p>The accuracy is limited to minute precision. </p>
 		 *
-		 * @param 	year	gregorian year
-		 * @return	moment of this event in given year
+		 * @param 	date	the starting calendar date
+		 * @return	moment of this event on or after given date
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
          * @see     SunPosition#atEntry(Zodiac)
          * @see     SunPosition#atExit(Zodiac)
@@ -390,22 +391,23 @@ public enum Zodiac {
          * @see     MoonPosition#atExit(Zodiac)
 		 */
 		/*[deutsch]
-		 * <p>Berechnet den Moment, wann dieses Ereignis im angegebenen Jahr eintritt. </p>
+		 * <p>Berechnet den Moment, wann dieses Ereignis eintritt. </p>
 		 *
 		 * <p>Die Rechengenauigkeit ist auf eine Minute beschr&auml;nkt. </p>
 		 *
-		 * @param 	year	gregorian year
-		 * @return	moment of this event in given year
+		 * @param 	date	the starting calendar date
+		 * @return	moment of this event on or after given date
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
          * @see     SunPosition#atEntry(Zodiac)
          * @see     SunPosition#atExit(Zodiac)
          * @see     MoonPosition#atEntry(Zodiac)
          * @see     MoonPosition#atExit(Zodiac)
 		 */
-		public Moment inYear(int year) {
+		public Moment onOrAfter(CalendarDate date) {
 
-			Moment estimate = this.atTime(PlainDate.of(year, 1, 1).atStartOfDay().atUTC());
-			return this.atTime(estimate); // two-step-approximation
+			PlainDate d = date.transform(PlainDate.axis());
+			Moment estimate = this.atTime(d.atStartOfDay().atUTC(), true);
+			return this.atTime(estimate, false); // two-step-approximation
 
 		}
 
@@ -420,29 +422,37 @@ public enum Zodiac {
 			return new Event(body, angles.getRightAscension(), angles.getDeclination(), false);
 		}
 
-		private Moment atTime(Moment moment) {
-			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
-			double estimate = jd0;
+		private Moment atTime(
+			Moment moment,
+			boolean after
+		) {
 			final double angle;
 
 			if (this.ecliptic) {
-				angle = this.c1;
+				if (after) {
+					angle = this.c1;
+				} else {
+					return moment; // no precession => reduce to one-step-calculation
+				}
 			} else {
 				angle = toEclipticAngle(moment, this.c1, this.c2);
 			}
 
+			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
+			double estimate = jd0;
+
 			if (this.body == 'S') {
-			    double m360 = modulo360(angle - getSolarLongitude(jd0));
-			    if (m360 > 359.9) {
-			        m360 = 0.0; // correction for rounding error
-                }
-				estimate += m360 * MEAN_TROPICAL_YEAR / 360.0;
+				double delta = angle - getSolarLongitude(jd0);
+				if (after) {
+					delta = modulo360(delta);
+				}
+				estimate += (delta * MEAN_TROPICAL_YEAR / 360.0);
 			} else {
-                double m360 = modulo360(angle - getLunarLongitude(jd0));
-                if (m360 > 359.9) {
-                    m360 = 0.0; // correction for rounding error
-                }
-				estimate += m360 * MEAN_SYNODIC_MONTH / 360.0;
+				double delta = angle - getLunarLongitude(jd0);
+				if (after) {
+					delta = modulo360(delta);
+				}
+				estimate += (delta * MEAN_SYNODIC_MONTH / 360.0);
 			}
 
 			double low = Math.max(jd0, estimate - 5);

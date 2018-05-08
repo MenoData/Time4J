@@ -213,26 +213,6 @@ public class MoonPosition
     }
 
     /**
-     * <p>Determines if the position of moon at given moment matches a given zodiac. </p>
-     *
-     * @param   moment      the time when the position of moon is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    /*[deutsch]
-     * <p>Berechnet, ob zum angegebenen Moment der Mond in einem bestimmten Tierkreissternbild liegt. </p>
-     *
-     * @param   moment      the time when the position of moon is to be determined
-     * @return  predicate expression with accuracy in minute precision
-     * @see     4.37
-     */
-    public static ChronoCondition<Zodiac> at(Moment moment) {
-
-        return (Zodiac zodiac) -> zodiac.isMatched('L', moment);
-
-    }
-
-    /**
      * <p>Determines the event when the moon enters given zodiac constellation. </p>
      *
      * @param   zodiac  the astronomical zodiac
@@ -269,6 +249,26 @@ public class MoonPosition
     public static Zodiac.Event atExit(Zodiac zodiac) {
 
         return Zodiac.Event.ofConstellation('L', zodiac.getExitAngles());
+
+    }
+
+    /**
+     * <p>Determines if the position of moon at given moment matches a given zodiac constellation. </p>
+     *
+     * @param   moment      the time when the position of moon is to be determined
+     * @return  predicate expression with accuracy in minute precision
+     * @see     4.37
+     */
+    /*[deutsch]
+     * <p>Berechnet, ob zum angegebenen Moment der Mond in einem bestimmten Tierkreissternbild liegt. </p>
+     *
+     * @param   moment      the time when the position of moon is to be determined
+     * @return  predicate expression with accuracy in minute precision
+     * @see     4.37
+     */
+    public static ChronoCondition<Zodiac> inConstellationAt(Moment moment) {
+
+        return (Zodiac zodiac) -> zodiac.isConstellationMatched('L', moment);
 
     }
 
