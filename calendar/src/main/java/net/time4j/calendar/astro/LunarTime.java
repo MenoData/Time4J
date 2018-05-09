@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LunarTime.java) is part of project Time4J.
  *
@@ -50,8 +50,8 @@ import java.util.concurrent.TimeUnit;
  *     LunarTime munich = LunarTime.ofLocation(tz.getID(), 48.1, 11.6);
  *     LunarTime.Moonlight moonlight = munich.on(PlainDate.of(2000, 3, 25));
  *     assertThat(
- *       moonlight.moonrise(),
- *       nullValue());
+ *       moonlight.moonrise() != null,
+ *       is(false));
  *     assertThat(
  *       moonlight.moonset(),
  *       is(PlainTimestamp.of(2000, 3, 25, 8, 58, 33).in(tz)));
@@ -74,8 +74,8 @@ import java.util.concurrent.TimeUnit;
  *     LunarTime munich = LunarTime.ofLocation(tz.getID(), 48.1, 11.6);
  *     LunarTime.Moonlight moonlight = munich.on(PlainDate.of(2000, 3, 25));
  *     assertThat(
- *       moonlight.moonrise(),
- *       nullValue());
+ *       moonlight.moonrise() != null,
+ *       is(false));
  *     assertThat(
  *       moonlight.moonset(),
  *       is(PlainTimestamp.of(2000, 3, 25, 8, 58, 33).in(tz)));
@@ -284,7 +284,7 @@ public final class LunarTime
     @Override
     public int hashCode() {
 
-        return (7 * hashCode(this.latitude) + 31 * hashCode(this.longitude) + 37 * this.altitude);
+        return (7 * AstroUtils.hashCode(this.latitude) + 31 * AstroUtils.hashCode(this.longitude) + 37 * this.altitude);
 
     }
 
@@ -502,13 +502,6 @@ public final class LunarTime
     private static double getHorizontalParallax(double distance) {
 
         return Math.toDegrees(Math.asin(6378.14 / distance));
-
-    }
-
-    private static int hashCode(double value) {
-
-        long bits = Double.doubleToLongBits(value);
-        return (int)(bits ^ (bits >>> 32));
 
     }
 
@@ -884,12 +877,12 @@ public final class LunarTime
         /**
          * <p>Obtains the moment of moonrise if it exists. </p>
          *
-         * @return  moment of moonrise or {@code null}
+         * @return  moment of moonrise, maybe null
          */
         /*[deutsch]
          * <p>Liefert den Moment des Mondaufgangs wenn vorhanden. </p>
          *
-         * @return  moment of moonrise or {@code null}
+         * @return  moment of moonrise, maybe null
          */
         public Moment moonrise() {
 
@@ -900,12 +893,12 @@ public final class LunarTime
         /**
          * <p>Obtains the timestamp of moonrise in the local observer timezoone if it exists. </p>
          *
-         * @return  local timestamp of moonrise or {@code null}
+         * @return  local timestamp of moonrise, maybe null
          */
         /*[deutsch]
          * <p>Liefert den Zeitstempel des Mondaufgangs in der lokalen Zeitzone des Beobachters wenn vorhanden. </p>
          *
-         * @return  local timestamp of moonrise or {@code null}
+         * @return  local timestamp of moonrise, maybe null
          */
         public PlainTimestamp moonriseLocal() {
 
@@ -921,13 +914,13 @@ public final class LunarTime
          * <p>Obtains the timestamp of moonrise in given timezoone if it exists. </p>
          *
          * @param   tzid    timezone identifier (which maybe deviates from local observer timezone)
-         * @return  zonal timestamp of moonrise or {@code null}
+         * @return  zonal timestamp of moonrise, maybe null
          */
         /*[deutsch]
          * <p>Liefert den Zeitstempel des Mondaufgangs in der angegebenen Zeitzone wenn vorhanden. </p>
          *
          * @param   tzid    timezone identifier (which maybe deviates from local observer timezone)
-         * @return  zonal timestamp of moonrise or {@code null}
+         * @return  zonal timestamp of moonrise, maybe null
          */
         public PlainTimestamp moonrise(TZID tzid) {
 
@@ -942,12 +935,12 @@ public final class LunarTime
         /**
          * <p>Obtains the moment of moonset if it exists. </p>
          *
-         * @return  moment of moonset (exclusive) or {@code null}
+         * @return  moment of moonset (exclusive), maybe null
          */
         /*[deutsch]
          * <p>Liefert den Moment des Monduntergangs wenn vorhanden. </p>
          *
-         * @return  moment of moonset (exclusive) or {@code null}
+         * @return  moment of moonset (exclusive), maybe null
          */
         public Moment moonset() {
 
@@ -958,12 +951,12 @@ public final class LunarTime
         /**
          * <p>Obtains the timestamp of moonset in the local observer timezoone if it exists. </p>
          *
-         * @return  local timestamp of moonset or {@code null}
+         * @return  local timestamp of moonset, maybe null
          */
         /*[deutsch]
          * <p>Liefert den Zeitstempel des Monduntergangs in der lokalen Zeitzone des Beobachters wenn vorhanden. </p>
          *
-         * @return  local timestamp of moonset or {@code null}
+         * @return  local timestamp of moonset, maybe null
          */
         public PlainTimestamp moonsetLocal() {
 
@@ -979,13 +972,13 @@ public final class LunarTime
          * <p>Obtains the timestamp of moonset in given timezoone if it exists. </p>
          *
          * @param   tzid    timezone identifier (which maybe deviates from local observer timezone)
-         * @return  zonal timestamp of moonset or {@code null}
+         * @return  zonal timestamp of moonset, maybe null
          */
         /*[deutsch]
          * <p>Liefert den Zeitstempel des Monduntergangs in der angegebenen Zeitzone wenn vorhanden. </p>
          *
          * @param   tzid    timezone identifier (which maybe deviates from local observer timezone)
-         * @return  zonal timestamp of moonset or {@code null}
+         * @return  zonal timestamp of moonset, maybe null
          */
         public PlainTimestamp moonset(TZID tzid) {
 

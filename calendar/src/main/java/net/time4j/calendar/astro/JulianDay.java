@@ -493,9 +493,7 @@ public final class JulianDay
     @Override
     public int hashCode() {
 
-        long bits = Double.doubleToLongBits(this.value);
-        int h = (int) (bits ^ (bits >>> 32));
-        return h ^ this.scale.hashCode();
+        return AstroUtils.hashCode(this.value) ^ this.scale.hashCode();
 
     }
 
@@ -574,7 +572,7 @@ public final class JulianDay
         TimeScale scale
     ) {
 
-        if (Double.isInfinite(value) || Double.isNaN(value)) {
+        if (Double.isNaN(value) || Double.isInfinite(value)) {
             throw new IllegalArgumentException("Value is not finite: " + value);
         }
 
@@ -604,9 +602,9 @@ public final class JulianDay
         try {
             in.defaultReadObject();
             check(this.value, this.scale);
-        } catch (IllegalArgumentException ex) {
-            throw new StreamCorruptedException();
         } catch (ClassNotFoundException ex) {
+            throw new StreamCorruptedException();
+        } catch (IllegalArgumentException ex) {
             throw new StreamCorruptedException();
         }
 

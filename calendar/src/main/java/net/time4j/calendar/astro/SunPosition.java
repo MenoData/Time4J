@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SunPosition.java) is part of project Time4J.
  *
@@ -43,7 +43,7 @@ import java.io.Serializable;
  * @since   3.38/4.33
  */
 public class SunPosition
-    implements Serializable {
+    implements EquatorialCoordinates, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -153,31 +153,56 @@ public class SunPosition
     }
 
     /**
-     * <p>Obtains the right ascension of sun in degrees. </p>
+     * <p>Determines the event when the sun enters or exits given zodiac constellation. </p>
      *
-     * @return  double
+     * @param   zodiac  the astronomical zodiac constellation defined by IAU
+     * @return  event when the sun enters or leaves the zodiac constellation
+     * @since   4.37
      */
     /*[deutsch]
-     * <p>Liefert die Rektaszension der Sonne in Grad. </p>
+     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreissternbild betritt oder verl&auml;sst. </p>
      *
-     * @return  double
+     * @param   zodiac  the astronomical zodiac constellation defined by IAU
+     * @return  event when the sun enters or leaves the zodiac constellation
+     * @since   4.37
      */
+    public static Zodiac.Event inConstellationOf(Zodiac zodiac) {
+
+        return Zodiac.Event.ofConstellation('S', zodiac);
+
+    }
+
+    /**
+     * <p>Determines the event when the sun enters or exits given zodiac sign (for horoscope purpose). </p>
+     *
+     * @param   zodiac  the astronomical zodiac sign
+     * @return  event when the sun enters or leaves the zodiac sign
+     * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
+     * @since   4.37
+     */
+    /*[deutsch]
+     * <p>Bestimmt das Ereignis, wenn die Sonne das angegebene Tierkreiszeichen betritt oder verl&auml;sst
+     * (f&uuml;r Horoskope). </p>
+     *
+     * @param   zodiac  the astronomical zodiac sign
+     * @return  event when the sun enters or leaves the zodiac sign
+     * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
+     * @since   4.37
+     */
+    public static Zodiac.Event inSignOf(Zodiac zodiac) {
+
+        return Zodiac.Event.ofSign('S', zodiac);
+
+    }
+
+    @Override
     public double getRightAscension() {
 
         return this.rightAscension;
 
     }
 
-    /**
-     * <p>Obtains the declination of sun in degrees. </p>
-     *
-     * @return  double
-     */
-    /*[deutsch]
-     * <p>Liefert die Deklination der Sonne in Grad. </p>
-     *
-     * @return  double
-     */
+    @Override
     public double getDeclination() {
 
         return this.declination;
@@ -253,9 +278,7 @@ public class SunPosition
 
         final double e = this.getElevation();
 
-        if (Double.isInfinite(objectHeight) || Double.isNaN(objectHeight)) {
-            throw new IllegalArgumentException("Object height must be finite and positive: " + objectHeight);
-        } else {
+        if (!Double.isNaN(objectHeight) && !Double.isInfinite(objectHeight)) {
             if (objectHeight <= 0.0) {
                 throw new IllegalArgumentException("Object height must be greater than zero: " + objectHeight);
             } else if (e <= 0.0) {
@@ -265,6 +288,8 @@ public class SunPosition
             } else {
                 return objectHeight / Math.tan(Math.toRadians(e));
             }
+        } else {
+            throw new IllegalArgumentException("Object height must be finite and positive: " + objectHeight);
         }
 
     }
@@ -291,7 +316,7 @@ public class SunPosition
     @Override
     public int hashCode() {
 
-        return hashCode(this.rightAscension) + 31 * hashCode(this.declination);
+        return AstroUtils.hashCode(this.rightAscension) + 31 * AstroUtils.hashCode(this.declination);
 
     }
 
@@ -309,13 +334,6 @@ public class SunPosition
         sb.append(this.elevation);
         sb.append(']');
         return sb.toString();
-
-    }
-
-    private static int hashCode(double value) {
-
-        long bits = Double.doubleToLongBits(value);
-        return (int)(bits ^ (bits >>> 32));
 
     }
 

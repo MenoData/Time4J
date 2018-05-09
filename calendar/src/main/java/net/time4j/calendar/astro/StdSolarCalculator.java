@@ -209,6 +209,14 @@ public enum StdSolarCalculator
             ) * 60;
         }
         @Override
+        public double getGeodeticAngle(double latitude, int altitude) {
+            return 0.0;
+        }
+        @Override
+        public double getZenithAngle(double latitude, int altitude) {
+            return SolarTime.STD_ZENITH + this.getGeodeticAngle(latitude, altitude);
+        }
+        @Override
         public double declination(double jde) {
             double t0 = time0(jde);
             double L = trueLongitudeOfSunInDegrees(t0);
@@ -221,34 +229,10 @@ public enum StdSolarCalculator
             double L = trueLongitudeOfSunInDegrees(t0);
             double RA = // right ascension of sun in degrees
                 Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
-            RA = adjustRange(RA);
+            RA = AstroUtils.toRange_0_360(RA);
             double Lquadrant  = Math.floor(L / 90) * 90;
             double RAquadrant = Math.floor(RA / 90) * 90;
             return RA + Lquadrant - RAquadrant; // RA in same quadrant as L
-        }
-        @Override
-        public double getFeature(
-            double jde,
-            String nameOfFeature
-        ) {
-            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
-                return this.declination(jde);
-            }
-            return Double.NaN;
-        }
-        @Override
-        public double getGeodeticAngle(
-            double latitude,
-            int altitude
-        ) {
-            return 0.0;
-        }
-        @Override
-        public double getZenithAngle(
-            double latitude,
-            int altitude
-        ) {
-            return SolarTime.STD_ZENITH + this.getGeodeticAngle(latitude, altitude);
         }
         private double time0(double jde) {
             PlainTimestamp tsp = JulianDay.ofEphemerisTime(jde).toMoment().toZonalTimestamp(ZonalOffset.UTC);
@@ -259,7 +243,7 @@ public enum StdSolarCalculator
                 (0.9856 * t0) - 3.289;
             double L =
                 M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634;
-            return adjustRange(L);
+            return AstroUtils.toRange_0_360(L);
         }
         private Moment event(
             CalendarDate date,
@@ -276,7 +260,7 @@ public enum StdSolarCalculator
             double L = trueLongitudeOfSunInDegrees(t0);
             double RA = // right ascension of sun in degrees
                 Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
-            RA = adjustRange(RA);
+            RA = AstroUtils.toRange_0_360(RA);
             double Lquadrant  = Math.floor(L / 90) * 90;
             double RAquadrant = Math.floor(RA / 90) * 90;
             RA = (RA + (Lquadrant - RAquadrant)) / 15; // RA in same quadrant as L
@@ -311,15 +295,6 @@ public enum StdSolarCalculator
             }
             Moment utc = Moment.of(Math.round(secs / 60.0) * 60, scale);
             return utc.with(Moment.PRECISION, TimeUnit.MINUTES);
-        }
-        private double adjustRange(double value) { // range [0.0, 360.0)
-            while (Double.compare(0.0, value) > 0) {
-                value += 360;
-            }
-            while (Double.compare(value, 360.0) >= 0) {
-                value -= 360;
-            }
-            return value;
         }
     },
 
@@ -415,39 +390,20 @@ public enum StdSolarCalculator
             return Math.toDegrees(declinationRad(jct));
         }
         @Override
+        public double getGeodeticAngle(double latitude, int altitude) {
+            return 0.0;
+        }
+        @Override
+        public double getZenithAngle(double latitude, int altitude) {
+            return SolarTime.STD_ZENITH + this.getGeodeticAngle(latitude, altitude);
+        }
+        @Override
         public double rightAscension(double jde) {
             double jct = toJulianCenturies(jde);
             double lRad = Math.toRadians(solarLongitude(jct));
             double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
             double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-            if (ra < 0) {
-                ra += 360;
-            }
-            return ra;
-        }
-        @Override
-        public double getFeature(
-            double jde,
-            String nameOfFeature
-        ) {
-            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
-                return this.declination(jde);
-            }
-            return Double.NaN;
-        }
-        @Override
-        public double getGeodeticAngle(
-            double latitude,
-            int altitude
-        ) {
-            return 0.0;
-        }
-        @Override
-        public double getZenithAngle(
-            double latitude,
-            int altitude
-        ) {
-            return SolarTime.STD_ZENITH + this.getGeodeticAngle(latitude, altitude);
+            return AstroUtils.toRange_0_360(ra);
         }
         private Moment event(
             boolean rise,
@@ -631,19 +587,11 @@ public enum StdSolarCalculator
         }
         @Override
         public double declination(double jde) {
-            double jct = toJulianCenturies(jde);
-            return Math.toDegrees(declinationRad(jct));
+            return this.getFeature(jde, SolarTime.DECLINATION);
         }
         @Override
         public double rightAscension(double jde) {
-            double jct = toJulianCenturies(jde);
-            double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
-            double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
-            double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-            if (ra < 0) {
-                ra += 360;
-            }
-            return ra;
+            return this.getFeature(jde, SolarTime.RIGHT_ASCENSION);
         }
         @Override
         public double getFeature(
@@ -658,10 +606,7 @@ public enum StdSolarCalculator
                 double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
                 double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
                 double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-                if (ra < 0) {
-                    ra += 360;
-                }
-                return ra;
+                return AstroUtils.toRange_0_360(ra);
             } else if (nameOfFeature.equals("nutation")) {
                 return nutation(jct);
             } else if (nameOfFeature.equals("obliquity")) {
@@ -685,10 +630,7 @@ public enum StdSolarCalculator
             return Math.toDegrees(Math.acos(r / (r + altitude))) + (Math.sqrt(altitude) * (19.0 / 3600));
         }
         @Override
-        public double getZenithAngle(
-            double latitude,
-            int altitude
-        ) {
+        public double getZenithAngle(double latitude, int altitude) {
             return SolarTime.STD_ZENITH + this.getGeodeticAngle(latitude, altitude);
         }
         private double momentOfDepression(
@@ -835,8 +777,7 @@ public enum StdSolarCalculator
         }
         @Override
         public double declination(double jde) {
-            double jct = toJulianCenturies(jde);
-            return Math.toDegrees(declinationRad(jct));
+            return this.getFeature(jde, SolarTime.DECLINATION);
         }
         @Override
         public double rightAscension(double jde) {
@@ -849,11 +790,7 @@ public enum StdSolarCalculator
         ) {
             double jct = toJulianCenturies(jde);
 
-            if (nameOfFeature.equals("solar-longitude")) {
-                double[] result = new double[2];
-                nutations(jct, result);
-                return apparentSolarLongitude(jct, result[0]);
-            } else if (nameOfFeature.equals(SolarTime.DECLINATION)) {
+            if (nameOfFeature.equals(SolarTime.DECLINATION)) {
                 return Math.toDegrees(declinationRad(jct));
             } else if (nameOfFeature.equals(SolarTime.RIGHT_ASCENSION)) {
                 double[] result = new double[2];
@@ -861,10 +798,7 @@ public enum StdSolarCalculator
                 double lRad = Math.toRadians(apparentSolarLongitude(jct, result[0]));
                 double y = Math.cos(Math.toRadians(meanObliquity(jct) + result[1])) * Math.sin(lRad);
                 double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-                if (ra < 0) {
-                    ra += 360;
-                }
-                return ra;
+                return AstroUtils.toRange_0_360(ra);
             } else if (nameOfFeature.equals("nutation")) {
                 double[] result = new double[2];
                 nutations(jct, result);
@@ -875,6 +809,10 @@ public enum StdSolarCalculator
                 return meanObliquity(jct) + result[1];
             } else if (nameOfFeature.equals("mean-anomaly")) {
                 return meanAnomaly(jct);
+            } else if (nameOfFeature.equals("solar-longitude")) {
+                double[] result = new double[2];
+                nutations(jct, result);
+                return apparentSolarLongitude(jct, result[0]);
             } else if (nameOfFeature.equals("solar-latitude")) {
                 return 0.0; // approximation used in this algorithm
             } else {
@@ -1009,7 +947,6 @@ public enum StdSolarCalculator
      * @return  declination of sun in degrees
      * @see     #rightAscension(double)
      */
-    @Override
     public double declination(double jde) {
         throw new AbstractMethodError(); // implemented in subclass
     }
@@ -1030,6 +967,34 @@ public enum StdSolarCalculator
      */
     public double rightAscension(double jde) {
         throw new AbstractMethodError(); // implemented in subclass
+    }
+
+    /**
+     * <p>Supported features are at least &quot;declination&quot; and &quot;right-ascension&quot;. </p>
+     *
+     * @param   jde             julian day in ephemeris time
+     * @param   nameOfFeature   describes what kind of value shall be calculated
+     * @return  result value or {@code Double.NaN} if the feature is not supported
+     */
+    /*[deutsch]
+     * <p>Unterst&uuml;tzte Merkmale sind wenigstens &quot;declination&quot; and &quot;right-ascension&quot;. </p>
+     *
+     * @param   jde             julian day in ephemeris time
+     * @param   nameOfFeature   describes what kind of value shall be calculated
+     * @return  result value or {@code Double.NaN} if the feature is not supported
+     */
+    @Override
+    public double getFeature(
+        double jde,
+        String nameOfFeature
+    ) {
+        if (nameOfFeature.equals(SolarTime.DECLINATION)) {
+            return this.declination(jde);
+        } else if (nameOfFeature.equals(SolarTime.RIGHT_ASCENSION)) {
+            return this.rightAscension(jde);
+        } else {
+            return Double.NaN;
+        }
     }
 
     // Meeus (22.2), in degrees

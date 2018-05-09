@@ -197,7 +197,7 @@ public class MoonTest {
             is(207.6220337901229)); // usno => 207.6, mooncalc => 207.62
         assertThat(
             position.getElevation(),
-            is(19.34313658741523)); // usno => 19.4, mooncalc => 19.4
+            is(19.343136587415223)); // usno => 19.4, mooncalc => 19.4
     }
 
     @Test
@@ -259,13 +259,13 @@ public class MoonTest {
 
         assertThat(
             position.getRightAscension(),
-            is(-157.12821896197514));
+            is(202.87178103802486));
         assertThat(
             position.getDeclination(),
             is(-4.551668018004738));
         assertThat(
             position.getAzimuth(),
-            is(185.0553169644683)); // usno => 185.1, mooncalc => 186.28
+            is(185.05531696446835)); // usno => 185.1, mooncalc => 186.28
         assertThat(
             position.getElevation(),
             is(53.18921727502208)); // usno => 53.6, mooncalc => 53.5

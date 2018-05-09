@@ -430,8 +430,8 @@ public enum MoonPhase {
 	 *
 	 * <p>The accuracy is limited to percent values (two digits after decimal point)
 	 * if specified as {@code 0}. For promille values, specify {@code 1} etc. However,
-	 * an increased precision does not imply more accuracy but is only suitable to
-	 * show some vague tendencies. Percent precision is usually the best choice. </p>
+     * an increased precision does not imply more accuracy but is only suitable to
+     * show some vague tendencies. Percent precision is usually the best choice. </p>
 	 *
 	 * @param 	moment		universal time
 	 * @param 	precision	desired count of fractional digits of percent values (in range {@code 0-3})

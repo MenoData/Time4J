@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GeoLocation.java) is part of project Time4J.
  *
@@ -23,13 +23,13 @@ package net.time4j.calendar.astro;
 
 
 /**
- * Describes a geographical position with latitude and longitude.
+ * Describes a geographical position with latitude, longitude and optionally altitude.
  *
  * @author  Meno Hochschild
  * @since   3.38/4.33
  */
-/**
- * Beschreibt eine geographische Position mit Breiten- und L&auml;ngengrad.
+/*[deutsch]
+ * Beschreibt eine geographische Position mit Breiten- und L&auml;ngengrad sowie optional H&ouml;he.
  *
  * @author  Meno Hochschild
  * @since   3.38/4.33

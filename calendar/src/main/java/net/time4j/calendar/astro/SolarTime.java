@@ -546,8 +546,8 @@ public final class SolarTime
      *
      * <pre>
      *     SolarTime hamburg = SolarTime.ofLocation(53.55, 10.0);
-     *     Optional&lt;Moment&gt; result = PlainDate.nowInSystemTime().get(hamburg.sunrise());
-     *     System.out.println(result.get().toZonalTimestamp(() -&gt; &quot;Europe/Berlin&quot;));
+     *     Moment result = PlainDate.nowInSystemTime().get(hamburg.sunrise());
+     *     System.out.println(result.toZonalTimestamp(Timezone.of(&quot;Europe/Berlin&quot;)));
      * </pre>
      *
      * <p>Note: The precision is generally constrained to minutes. </p>
@@ -562,8 +562,8 @@ public final class SolarTime
      *
      * <pre>
      *     SolarTime hamburg = SolarTime.ofLocation(53.55, 10.0);
-     *     Optional&lt;Moment&gt; result = PlainDate.nowInSystemTime().get(hamburg.sunrise());
-     *     System.out.println(result.get().toZonalTimestamp(() -&gt; &quot;Europe/Berlin&quot;));
+     *     Moment result = PlainDate.nowInSystemTime().get(hamburg.sunrise());
+     *     System.out.println(result.toZonalTimestamp(Timezone.of(&quot;Europe/Berlin&quot;)));
      * </pre>
      *
      * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. </p>
@@ -767,9 +767,8 @@ public final class SolarTime
         return new ChronoFunction<CalendarDate, PlainTime>() {
             @Override
             public PlainTime apply(CalendarDate date) {
-                Moment m =
-                    SolarTime.this.getCalculator().sunset(
-                        toLMT(date), latitude, longitude, zenithAngle());
+                Moment m = SolarTime.this.getCalculator().sunset(
+                    toLMT(date), latitude, longitude, zenithAngle());
                 if (m == null) {
                     return null;
                 } else {
@@ -786,6 +785,9 @@ public final class SolarTime
      * <p>The timezone parameter enables users to query for solar time data described in terms of a potentially
      * quite different zone of the earth. However, the parameter does not interprete the input calendar date. </p>
      *
+     * <p>The calculation is only possible if the underlying calculator supports the feature of solar declination.
+     * Otherwise an {@code UnsupportedOperationException} will be thrown. </p>
+     *
      * @param   tzid    the identifier of the timezone any local times of the result refer to
      * @return  function for obtaining sunshine data
      * @since   3.34/4.29
@@ -796,6 +798,9 @@ public final class SolarTime
      * <p>Der Zeitzonenparameter erm&ouml;glicht es, die Sonnenzeitdaten im Kontext einer eventuell
      * ganz anderen Zeitzone zu beschreiben. Er dient jedoch nicht der Interpretation des Eingabedatums. </p>
      *
+     * <p>Die Berechnung ist nur m&ouml;glich, wenn der zugrundeliegende Algorithmus das Merkmal der Sonnendeklination
+     * unterst&uuml;tzt, sonst wird eine {@code UnsupportedOperationException} geworfen. </p>
+     *
      * @param   tzid    the identifier of the timezone any local times of the result refer to
      * @return  function for obtaining sunshine data
      * @since   3.34/4.29
@@ -805,14 +810,14 @@ public final class SolarTime
         return new ChronoFunction<CalendarDate, Sunshine>() {
             @Override
             public Sunshine apply(CalendarDate date) {
-                PlainDate d = toGregorian(SolarTime.this.toLMT(date));
-                Calculator c = SolarTime.this.getCalculator();
-                double zenith = SolarTime.this.zenithAngle();
-                Moment start = c.sunrise(date, SolarTime.this.latitude, SolarTime.this.longitude, zenith);
-                Moment end = c.sunset(date, SolarTime.this.latitude, SolarTime.this.longitude, zenith);
+                PlainDate d = toGregorian(toLMT(date));
+                Calculator c = getCalculator();
+                double zenith = zenithAngle();
+                Moment start = c.sunrise(date, latitude, longitude, zenith);
+                Moment end = c.sunset(date, latitude, longitude, zenith);
                 boolean absent = false;
                 if (start == null && end == null) {
-                    double elevation = SolarTime.this.getHighestElevationOfSun(d);
+                    double elevation = getHighestElevationOfSun(d);
                     if (Double.compare(elevation, 90 - zenith) < 0) {
                         absent = true;
                     }
@@ -826,11 +831,17 @@ public final class SolarTime
     /**
      * <p>Determines if the sun is invisible all day on a given calendar date. </p>
      *
+     * <p>The calculation is only possible if the underlying calculator supports the feature of solar declination.
+     * Otherwise an {@code UnsupportedOperationException} will be thrown. </p>
+     *
      * @return  ChronoCondition
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Ermittelt, ob an einem gegebenen Kalenderdatum Polarnacht herrscht. </p>
+     *
+     * <p>Die Berechnung ist nur m&ouml;glich, wenn der zugrundeliegende Algorithmus das Merkmal der Sonnendeklination
+     * unterst&uuml;tzt, sonst wird eine {@code UnsupportedOperationException} geworfen. </p>
      *
      * @return  ChronoCondition
      * @since   3.34/4.29
@@ -840,18 +851,18 @@ public final class SolarTime
         return new ChronoCondition<CalendarDate>() {
             @Override
             public boolean test(CalendarDate date) {
-                if (Double.compare(Math.abs(SolarTime.this.latitude), 66.0) < 0) {
+                if (Double.compare(Math.abs(latitude), 66.0) < 0) {
                     return false;
                 }
-                PlainDate d = toGregorian(SolarTime.this.toLMT(date));
-                Calculator c = SolarTime.this.getCalculator();
-                double zenith = SolarTime.this.zenithAngle();
-                Moment start = c.sunrise(date, SolarTime.this.latitude, SolarTime.this.longitude, zenith);
-                Moment end = c.sunset(date, SolarTime.this.latitude, SolarTime.this.longitude, zenith);
+                PlainDate d = toGregorian(toLMT(date));
+                Calculator c = getCalculator();
+                double zenith = zenithAngle();
+                Moment start = c.sunrise(date, latitude, longitude, zenith);
+                Moment end = c.sunset(date, latitude, longitude, zenith);
                 if (start != null || end != null) {
                     return false;
                 }
-                double elevation = SolarTime.this.getHighestElevationOfSun(d);
+                double elevation = getHighestElevationOfSun(d);
                 return (Double.compare(elevation, 90 - zenith) < 0);
             }
         };
@@ -861,11 +872,17 @@ public final class SolarTime
     /**
      * <p>Determines if the sun is visible all day on a given calendar date. </p>
      *
+     * <p>The calculation is only possible if the underlying calculator supports the feature of solar declination.
+     * Otherwise an {@code UnsupportedOperationException} will be thrown. </p>
+     *
      * @return  ChronoCondition
      * @since   3.34/4.29
      */
     /*[deutsch]
      * <p>Ermittelt, ob an einem gegebenen Kalenderdatum Mitternachtssonne herrscht. </p>
+     *
+     * <p>Die Berechnung ist nur m&ouml;glich, wenn der zugrundeliegende Algorithmus das Merkmal der Sonnendeklination
+     * unterst&uuml;tzt, sonst wird eine {@code UnsupportedOperationException} geworfen. </p>
      *
      * @return  ChronoCondition
      * @since   3.34/4.29
@@ -875,18 +892,18 @@ public final class SolarTime
         return new ChronoCondition<CalendarDate>() {
             @Override
             public boolean test(CalendarDate date) {
-                if (Double.compare(Math.abs(SolarTime.this.latitude), 66.0) < 0) {
+                if (Double.compare(Math.abs(latitude), 66.0) < 0) {
                     return false;
                 }
-                PlainDate d = toGregorian(SolarTime.this.toLMT(date));
-                Calculator c = SolarTime.this.getCalculator();
-                double zenith = SolarTime.this.zenithAngle();
-                Moment start = c.sunrise(date, SolarTime.this.latitude, SolarTime.this.longitude, zenith);
-                Moment end = c.sunset(date, SolarTime.this.latitude, SolarTime.this.longitude, zenith);
+                PlainDate d = toGregorian(toLMT(date));
+                Calculator c = getCalculator();
+                double zenith = zenithAngle();
+                Moment start = c.sunrise(date, latitude, longitude, zenith);
+                Moment end = c.sunset(date, latitude, longitude, zenith);
                 if (start != null || end != null) {
                     return false;
                 }
-                double elevation = SolarTime.this.getHighestElevationOfSun(d);
+                double elevation = getHighestElevationOfSun(d);
                 return (Double.compare(elevation, 90 - zenith) > 0);
             }
         };
@@ -914,7 +931,7 @@ public final class SolarTime
         return new ChronoFunction<CalendarDate, Moment>() {
             @Override
             public Moment apply(CalendarDate date) {
-                return transitAtNoon(toLMT(date), SolarTime.this.longitude, SolarTime.this.calculator);
+                return transitAtNoon(toLMT(date), longitude, calculator);
             }
         };
 
@@ -949,7 +966,7 @@ public final class SolarTime
         return new ChronoFunction<CalendarDate, PlainTime>() {
             @Override
             public PlainTime apply(CalendarDate date) {
-                Moment m = transitAtNoon(toLMT(date), SolarTime.this.longitude, SolarTime.this.calculator);
+                Moment m = transitAtNoon(toLMT(date), longitude, calculator);
                 return m.toZonalTimestamp(tzid).getWallTime();
             }
         };
@@ -977,7 +994,7 @@ public final class SolarTime
         return new ChronoFunction<CalendarDate, Moment>() {
             @Override
             public Moment apply(CalendarDate date) {
-                return transitAtMidnight(toLMT(date), SolarTime.this.longitude, SolarTime.this.calculator);
+                return transitAtMidnight(toLMT(date), longitude, calculator);
             }
         };
 
@@ -1012,7 +1029,7 @@ public final class SolarTime
         return new ChronoFunction<CalendarDate, PlainTime>() {
             @Override
             public PlainTime apply(CalendarDate date) {
-                Moment m = transitAtMidnight(toLMT(date), SolarTime.this.longitude, SolarTime.this.calculator);
+                Moment m = transitAtMidnight(toLMT(date), longitude, calculator);
                 return m.toZonalTimestamp(tzid).getWallTime();
             }
         };
@@ -1044,8 +1061,8 @@ public final class SolarTime
 
         return (
             this.calculator.hashCode()
-                + 7 * Double.valueOf(this.latitude).hashCode()
-                + 31 * Double.valueOf(this.longitude).hashCode()
+                + 7 * AstroUtils.hashCode(this.latitude)
+                + 31 * AstroUtils.hashCode(this.longitude)
                 + 37 * this.altitude
         );
 
@@ -1265,7 +1282,14 @@ public final class SolarTime
         double latInRad = Math.toRadians(this.latitude);
         double sinElevation = // Extra term left out => Math.cos(Math.toRadians(trueNoon)) := 1.0 (per definition)
             Math.sin(latInRad) * Math.sin(decInRad) + Math.cos(latInRad) * Math.cos(decInRad); // Meeus (13.6)
-        return Math.toDegrees(Math.asin(sinElevation));
+        double result = Math.toDegrees(Math.asin(sinElevation));
+
+        if (Double.isNaN(result)) {
+            throw new UnsupportedOperationException(
+                "Solar declination not supported by: " + this.getCalculator().name());
+        }
+
+        return result;
 
     }
 
@@ -1808,6 +1832,7 @@ public final class SolarTime
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
+     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     /*[deutsch]
      * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
@@ -1815,6 +1840,7 @@ public final class SolarTime
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
+     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     public interface Calculator {
 
@@ -1868,7 +1894,7 @@ public final class SolarTime
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
          * @param   longitude   geographical longitude in degrees, positive for East, negative for West
          * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
-         * @return  moment of sunrise if it exists for given parameters else {@code null} (polar day or night)
+         * @return  moment of sunrise if it exists for given parameters else null (polar day or night)
          * @throws  IllegalArgumentException if any parameter is out of range
          */
         /*[deutsch]
@@ -1878,7 +1904,7 @@ public final class SolarTime
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
          * @param   longitude   geographical longitude in degrees, positive for East, negative for West
          * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
-         * @return  moment of sunrise if it exists for given parameters else {@code null} (polar day or night)
+         * @return  moment of sunrise if it exists for given parameters else null (polar day or night)
          * @throws  IllegalArgumentException if any parameter is out of range
          */
         Moment sunrise(
@@ -1895,7 +1921,7 @@ public final class SolarTime
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
          * @param   longitude   geographical longitude in degrees, positive for East, negative for West
          * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
-         * @return  moment of sunset if it exists for given parameters else {@code null} (polar day or night)
+         * @return  moment of sunset if it exists for given parameters else null (polar day or night)
          * @throws  IllegalArgumentException if any parameter is out of range
          */
         /*[deutsch]
@@ -1905,7 +1931,7 @@ public final class SolarTime
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
          * @param   longitude   geographical longitude in degrees, positive for East, negative for West
          * @param   zenith      the distance of the center of the sun from geographical local zenith in degrees
-         * @return  moment of sunset if it exists for given parameters else {@code null} (polar day or night)
+         * @return  moment of sunset if it exists for given parameters else null (polar day or night)
          * @throws  IllegalArgumentException if any parameter is out of range
          */
         Moment sunset(
@@ -1934,37 +1960,38 @@ public final class SolarTime
          *
          * @param   jde     julian day in ephemeris time
          * @return  declination of sun in degrees
+         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
          */
         /*[deutsch]
          * <p>Bestimmt die Deklination der Sonne. </p>
          *
          * @param   jde     julian day in ephemeris time
          * @return  declination of sun in degrees
+         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
          */
+        @Deprecated
         double declination(double jde);
 
         /**
          * <p>Calculates a value suitable for given time and feature. </p>
          *
          * <p>Subclasses overriding this method document which features are supported.
-         * At least the feature &quot;declination&quot; must be supported by subclasses. </p>
+         * At least the feature of &quot;declination&quot; should be supported. </p>
          *
          * @param   jde             julian day in ephemeris time
          * @param   nameOfFeature   describes what kind of value shall be calculated
          * @return  result value or {@code Double.NaN} if the feature is not supported
-         * @see     #declination(double)
          */
         /*[deutsch]
          * <p>Berechnet einen Wert passend zur angegebenen Zeit und zum angegebenen Merkmal. </p>
          *
          * <p>Subklassen, die diese Methode &uuml;berschreiben, dokumentieren, welche Merkmale
-         * unterst&uuml;tzt werden. Mindestens das Merkmal &quot;declination&quot; mu&szlig;
-         * von Subklassen unterst&uuml;tzt werden. </p>
+         * unterst&uuml;tzt werden. Wenigstens das Merkmal &quot;declination&quot; sollte
+         * dabei sein. </p>
          *
          * @param   jde             julian day in ephemeris time
          * @param   nameOfFeature   describes what kind of value shall be calculated
          * @return  result value or {@code Double.NaN} if the feature is not supported
-         * @see     #declination(double)
          */
         double getFeature(
             double jde,

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AstroUtils.java) is part of project Time4J.
  *
@@ -78,6 +78,38 @@ class AstroUtils {
 
         // we neglect that the underlying bennett term is rather valid for T=10K and p = 1010hPa - Meeus p.107
         return Math.pow(temperature, 4.255);
+
+    }
+
+    /**
+     * <p>Adjusts given angle to circular range {@code [0.0, 360.0)}. </p>
+     *
+     * @param   value   the angle to be adjusted
+     * @return  the adjusted angle
+     * @since   4.37
+     */
+    static double toRange_0_360(double value) {
+
+        while (Double.compare(0.0, value) > 0) {
+            value += 360;
+        }
+        while (Double.compare(value, 360.0) >= 0) {
+            value -= 360;
+        }
+        return value;
+
+    }
+
+    /**
+     * <p>Corresponds to Java-8-implementation. </p>
+     *
+     * @param   value   double-value
+     * @return  hash value
+     */
+    static int hashCode(double value) {
+
+        long bits = Double.doubleToLongBits(value);
+        return (int)(bits ^ (bits >>> 32));
 
     }
 
