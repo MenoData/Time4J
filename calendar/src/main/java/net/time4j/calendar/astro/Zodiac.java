@@ -28,6 +28,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
+import java.util.NoSuchElementException;
 import java.util.concurrent.TimeUnit;
 
 
@@ -36,10 +37,10 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>See also <a href="https://en.wikipedia.org/wiki/Zodiac">Wikipedia</a>. The boundaries
  * of the associated <a href="https://www.iau.org/public/themes/constellations/">constellations</a>
- * have been defined by IAU. </p>
+ * have been defined by IAU (International Astronomical Union). </p>
  *
- * <p><strong>Attention</strong>: This enum does <strong>not</strong>
- * represent the twelve astrological (horoscopic) zodiacs. </p>
+ * <p><strong>Attention</strong>: Users are required to make a strict difference between constellations
+ * and the twelve astrological (horoscopic) zodiacs. Latter type is also supported by specialized methods. </p>
  *
  * @author 	Meno Hochschild
  * @since 	4.37
@@ -49,10 +50,11 @@ import java.util.concurrent.TimeUnit;
  *
  * <p>Siehe auch <a href="https://en.wikipedia.org/wiki/Zodiac">Wikipedia</a>. Die Grenzen
  * der damit verbundenen <a href="https://www.iau.org/public/themes/constellations/">Konstellationen</a>
- * sind von der IAU definiert worden. </p>
+ * sind von der IAU (Internationale Astronomische Union) definiert worden. </p>
  *
- * <p><strong>Achtung</strong>: Dieses Enum stellt <strong>nicht</strong> die
- * zw&ouml;lf astrologischen (horoskopischen) Tierkreiszeichen dar. </p>
+ * <p><strong>Achtung</strong>: Anwender m&uuml;ssen im Gebrauch streng zwischen Sternbildern und
+ * astrologischen (horoskopischen) Tierkreiszeichen unterscheiden. Letztere werden &uuml;ber spezielle
+ * Methoden ebenfalls unterst&uuml;tzt. </p>
  *
  * @author 	Meno Hochschild
  * @since 	4.37
@@ -166,6 +168,78 @@ public enum Zodiac {
 	//~ Methoden ----------------------------------------------------------
 
 	/**
+	 * <p>Determines the zodiac constellation passed by the sun at given moment. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac constellation
+	 */
+	/*[deutsch]
+	 * <p>Bestimmt das Tierkreissternbild, das von der Sonne zum angegebenen Zeitpunkt durchschritten wird. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac constellation
+	 */
+	public static Zodiac constellationPassedBySun(Moment moment) {
+
+		return Zodiac.of('S', moment, false);
+
+	}
+
+	/**
+	 * <p>Determines the zodiac constellation passed by the moon at given moment. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac constellation
+	 */
+	/*[deutsch]
+	 * <p>Bestimmt das Tierkreissternbild, das vom Mond zum angegebenen Zeitpunkt durchschritten wird. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac constellation
+	 */
+	public static Zodiac constellationPassedByMoon(Moment moment) {
+
+		return Zodiac.of('L', moment, false);
+
+	}
+
+	/**
+	 * <p>Determines the zodiac sign passed by the sun at given moment. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac sign
+	 */
+	/*[deutsch]
+	 * <p>Bestimmt das Tierkreiszeichen, das von der Sonne zum angegebenen Zeitpunkt durchschritten wird. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac sign
+	 */
+	public static Zodiac signPassedBySun(Moment moment) {
+
+		return Zodiac.of('S', moment, true);
+
+	}
+
+	/**
+	 * <p>Determines the zodiac sign passed by the moon at given moment. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac sign
+	 */
+	/*[deutsch]
+	 * <p>Bestimmt das Tierkreiszeichen, das vom Mond zum angegebenen Zeitpunkt durchschritten wird. </p>
+	 *
+	 * @param 	moment		the moment when any zodiac is passed
+	 * @return	Zodiac sign
+	 */
+	public static Zodiac signPassedByMoon(Moment moment) {
+
+		return Zodiac.of('L', moment, true);
+
+	}
+
+	/**
 	 * <p>Obtains the associated symbol character. </p>
 	 *
 	 * @return char
@@ -239,6 +313,51 @@ public enum Zodiac {
 
 	}
 
+	private static Zodiac of(
+		char body,
+		Moment moment,
+		boolean horoscope
+	) {
+		Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
+		double jde = JulianDay.ofEphemerisTime(time).getValue();
+		double lng = (body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
+
+		double start;
+		double end;
+
+		for (Zodiac zodiac : Zodiac.values()) {
+			Zodiac next = zodiac.next();
+
+			if (horoscope) {
+				if (zodiac == Zodiac.OPHIUCHUS) {
+					continue;
+				} else if (next == Zodiac.OPHIUCHUS) {
+					next = Zodiac.SAGITTARIUS;
+				}
+				int offset1 = (zodiac.compareTo(Zodiac.OPHIUCHUS) < 0) ? 0 : -1;
+				int offset2 = (next.compareTo(Zodiac.OPHIUCHUS) < 0) ? 0 : -1;
+				start = (zodiac.ordinal() + offset1) * 30;
+				end = (next.ordinal() + offset2) * 30;
+			} else {
+				start = toEclipticAngle(time, zodiac.entry.getRightAscension(), zodiac.entry.getDeclination());
+				end = toEclipticAngle(time, next.entry.getRightAscension(), next.entry.getDeclination());
+			}
+
+			if (end < start) {
+				end += 360;
+				if (lng < 180) {
+					lng += 360;
+				}
+			}
+
+			if ((lng >= start) && (lng < end)) {
+				return zodiac;
+			}
+		}
+
+		throw new NoSuchElementException("Unable to determine zodiac."); // should never happen
+	}
+
 	private static double getSolarLongitude(double jde) {
 		return StdSolarCalculator.TIME4J.getFeature(jde, "solar-longitude");
 	}
@@ -294,9 +413,10 @@ public enum Zodiac {
 	 * <p>Represents the event when the sun or moon enters or exits a zodiac. </p>
 	 *
 	 * @author 	Meno Hochschild
-	 * @see     SunPosition#inSign(Zodiac)
-	 * @see     SunPosition#inConstellation(Zodiac)
-	 * @see     MoonPosition#inConstellation(Zodiac)
+	 * @see     SunPosition#inSignOf(Zodiac)
+	 * @see     MoonPosition#inSignOf(Zodiac)
+	 * @see     SunPosition#inConstellationOf(Zodiac)
+	 * @see     MoonPosition#inConstellationOf(Zodiac)
 	 * @since	4.37
 	 */
 	/*[deutsch]
@@ -304,9 +424,10 @@ public enum Zodiac {
 	 * oder -zeichen betreten oder verlassen. </p>
 	 *
 	 * @author 	Meno Hochschild
-	 * @see     SunPosition#inSign(Zodiac)
-	 * @see     SunPosition#inConstellation(Zodiac)
-	 * @see     MoonPosition#inConstellation(Zodiac)
+	 * @see     SunPosition#inSignOf(Zodiac)
+	 * @see     MoonPosition#inSignOf(Zodiac)
+	 * @see     SunPosition#inConstellationOf(Zodiac)
+	 * @see     MoonPosition#inConstellationOf(Zodiac)
 	 * @since	4.37
 	 */
 	public static class Event
@@ -345,7 +466,7 @@ public enum Zodiac {
 		/**
 		 * <p>Calculates the moment when the celestial body enters the associated zodiac. </p>
 		 *
-		 * <p>The accuracy is limited to minute precision. </p>
+		 * <p>The accuracy is limited to roughly minute precision. </p>
 		 *
 		 * @param 	start		the moment when to start the search
 		 * @return	moment of this event at or after given start
@@ -354,13 +475,13 @@ public enum Zodiac {
 		/*[deutsch]
 		 * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol erreicht. </p>
 		 *
-		 * <p>Die Rechengenauigkeit ist auf eine Minute beschr&auml;nkt. </p>
+		 * <p>Die Rechengenauigkeit ist ungef&auml;hr auf eine Minute beschr&auml;nkt. </p>
 		 *
 		 * @param 	start		the moment when to start the search
 		 * @return	moment of this event at or after given start
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
 		 */
-		public Moment momentOfEntry(Moment start) {
+		public Moment atMomentOfEntry(Moment start) {
 
 			Moment estimate = this.atTime(start, false, true);
 			return this.atTime(estimate, false, false); // two-step-approximation
@@ -370,7 +491,7 @@ public enum Zodiac {
 		/**
 		 * <p>Calculates the moment when the celestial body leaves the associated zodiac. </p>
 		 *
-		 * <p>The accuracy is limited to minute precision. </p>
+		 * <p>The accuracy is limited to roughly minute precision. </p>
 		 *
 		 * @param 	start		the moment when to start the search
 		 * @return	moment of this event at or after given start
@@ -379,19 +500,51 @@ public enum Zodiac {
 		/*[deutsch]
 		 * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol verl&auml;sst. </p>
 		 *
-		 * <p>Die Rechengenauigkeit ist auf eine Minute beschr&auml;nkt. </p>
+		 * <p>Die Rechengenauigkeit ist ungef&auml;hr auf eine Minute beschr&auml;nkt. </p>
 		 *
 		 * @param 	start		the moment when to start the search
 		 * @return	moment of this event at or after given start
 		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
 		 */
-		public Moment momentOfExit(Moment start) {
+		public Moment atMomentOfExit(Moment start) {
 
 			Moment estimate = this.atTime(start, true, true);
 			return this.atTime(estimate, true, false); // two-step-approximation
 
 		}
 
+		/**
+		 * <p>Tests if this event happens at given moment. </p>
+		 *
+		 * <p>Example of usage: </p>
+		 *
+		 * <pre>
+		 *     Moment moment = PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC();
+		 *     System.out.println(moment.matches(SunPosition.inConstellationOf(Zodiac.ARIES))); // true
+		 * </pre>
+		 *
+		 * <p>Note: Due to precessional effects, Aries is nowadays passed by sun in April and not around
+		 * vernal equinox as 2000 years ago. </p>
+		 *
+		 * @param 	moment		the moment to be tested
+		 * @return	boolean
+		 */
+		/*[deutsch]
+		 * <p>Testet, ob dieses Ereignis zum angegebenen Moment auftritt. </p>
+		 *
+		 * <p>Anwendungsbeispiel: </p>
+		 *
+		 * <pre>
+		 *     Moment moment = PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC();
+		 *     System.out.println(moment.matches(SunPosition.inConstellationOf(Zodiac.ARIES))); // true
+		 * </pre>
+		 *
+		 * <p>Hinweis: Wegen des Effekts der Pr&auml;zession passiert die Sonne heutzutage das Sternbild Aries
+		 * im April statt um den Fr&uuml;hlingszeitpunkt (wie 2000 Jahre fr&uuml;her). </p>
+		 *
+		 * @param 	moment		the moment to be tested
+		 * @return	boolean
+		 */
 		@Override
 		public boolean test(Moment moment) {
 

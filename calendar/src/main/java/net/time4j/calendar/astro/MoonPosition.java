@@ -225,7 +225,7 @@ public class MoonPosition
      * @return  event when the moon enters or leaves the zodiac constellation
      * @since   4.37
      */
-    public static Zodiac.Event inConstellation(Zodiac zodiac) {
+    public static Zodiac.Event inConstellationOf(Zodiac zodiac) {
 
         return Zodiac.Event.ofConstellation('L', zodiac);
 
@@ -248,7 +248,7 @@ public class MoonPosition
      * @throws  IllegalArgumentException if the zodiac is {@link Zodiac#OPHIUCHUS}
      * @since   4.37
      */
-    public static Zodiac.Event inSign(Zodiac zodiac) {
+    public static Zodiac.Event inSignOf(Zodiac zodiac) {
 
         return Zodiac.Event.ofSign('L', zodiac);
 
