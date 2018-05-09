@@ -497,7 +497,7 @@ public class MoonPosition
 
         // already set: result[0] = nutation-in-longitude
         result[1] = trueObliquity; // in degrees
-        result[2] = AstroUtils.adjustRA(Math.toDegrees(ra));
+        result[2] = AstroUtils.toRange_0_360(Math.toDegrees(ra));
         result[3] = Math.toDegrees(decl);
         result[4] = distance; // in km
         return result;
@@ -574,7 +574,7 @@ public class MoonPosition
 
         double[] result = new double[5];
         StdSolarCalculator.nutations(jct, result);
-        return AstroUtils.adjustRA(meanLongitude + (sumL / MIO) + result[0]);
+        return AstroUtils.toRange_0_360(meanLongitude + (sumL / MIO) + result[0]);
 
     }
 

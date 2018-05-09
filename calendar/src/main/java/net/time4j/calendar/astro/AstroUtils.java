@@ -82,13 +82,13 @@ class AstroUtils {
     }
 
     /**
-     * <p>Adjusts given right ascension to range {@code [0.0, 360.0)}. </p>
+     * <p>Adjusts given angle to circular range {@code [0.0, 360.0)}. </p>
      *
-     * @param   value   the value to be adjusted
-     * @return  the adjusted value
+     * @param   value   the angle to be adjusted
+     * @return  the adjusted angle
      * @since   4.37
      */
-    static double adjustRA(double value) {
+    static double toRange_0_360(double value) {
 
         while (Double.compare(0.0, value) > 0) {
             value += 360;

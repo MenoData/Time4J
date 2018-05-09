@@ -222,7 +222,7 @@ public enum StdSolarCalculator
             double L = trueLongitudeOfSunInDegrees(t0);
             double RA = // right ascension of sun in degrees
                 Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
-            RA = AstroUtils.adjustRA(RA);
+            RA = AstroUtils.toRange_0_360(RA);
             double Lquadrant  = Math.floor(L / 90) * 90;
             double RAquadrant = Math.floor(RA / 90) * 90;
             return RA + Lquadrant - RAquadrant; // RA in same quadrant as L
@@ -236,7 +236,7 @@ public enum StdSolarCalculator
                 (0.9856 * t0) - 3.289;
             double L =
                 M + (1.916 * Math.sin(Math.toRadians(M))) + (0.020 * Math.sin(2 * Math.toRadians(M))) + 282.634;
-            return AstroUtils.adjustRA(L);
+            return AstroUtils.toRange_0_360(L);
         }
         private Optional<Moment> event(
             CalendarDate date,
@@ -253,7 +253,7 @@ public enum StdSolarCalculator
             double L = trueLongitudeOfSunInDegrees(t0);
             double RA = // right ascension of sun in degrees
                 Math.toDegrees(Math.atan(0.91764 * Math.tan(Math.toRadians(L))));
-            RA = AstroUtils.adjustRA(RA);
+            RA = AstroUtils.toRange_0_360(RA);
             double Lquadrant  = Math.floor(L / 90) * 90;
             double RAquadrant = Math.floor(RA / 90) * 90;
             RA = (RA + (Lquadrant - RAquadrant)) / 15; // RA in same quadrant as L
@@ -388,7 +388,7 @@ public enum StdSolarCalculator
             double lRad = Math.toRadians(solarLongitude(jct));
             double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
             double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-            return AstroUtils.adjustRA(ra);
+            return AstroUtils.toRange_0_360(ra);
         }
         private Optional<Moment> event(
             boolean rise,
@@ -592,7 +592,7 @@ public enum StdSolarCalculator
                     double lRad = Math.toRadians(apparentSolarLongitude(jct, nutation(jct)));
                     double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-                    return AstroUtils.adjustRA(ra);
+                    return AstroUtils.toRange_0_360(ra);
                 case "nutation":
                     return nutation(jct);
                 case "obliquity":
@@ -781,7 +781,7 @@ public enum StdSolarCalculator
                     double lRad = Math.toRadians(apparentSolarLongitude(jct, result[0]));
                     double y = Math.cos(Math.toRadians(meanObliquity(jct) + result[1])) * Math.sin(lRad);
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
-                    return AstroUtils.adjustRA(ra);
+                    return AstroUtils.toRange_0_360(ra);
                 }
                 case "nutation": {
                     double[] result = new double[2];
