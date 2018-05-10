@@ -61,7 +61,6 @@
                             net.time4j.history.internal
                             net.time4j.i18n
                         </Private-Package>
-                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>
@@ -76,6 +75,7 @@
                             osgi.serviceloader; osgi.serviceloader=net.time4j.format.UnitPatternProvider
                             osgi.serviceloader; osgi.serviceloader=net.time4j.format.WeekdataProvider
                         </Provide-Capability>
+                        -->
                     </instructions>
                 </configuration>
             </plugin>

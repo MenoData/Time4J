@@ -65,13 +65,13 @@
                         <Private-Package>
                             net.time4j.tz.spi
                         </Private-Package>
-                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>
                         <Provide-Capability>
                             osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneModelProvider
                         </Provide-Capability>
+                        -->
                     </instructions>
                 </configuration>
             </plugin>

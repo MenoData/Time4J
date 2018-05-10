@@ -66,7 +66,6 @@
                             net.time4j.tz.spi,
                             net.time4j.tz.threeten
                         </Private-Package>
-                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>
@@ -74,6 +73,7 @@
                             osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneModelProvider,
                             osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneNameProvider
                         </Provide-Capability>
+                        -->
                     </instructions>
                 </configuration>
             </plugin>

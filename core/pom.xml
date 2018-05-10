@@ -79,13 +79,13 @@
                             net.time4j.format.internal,
                             net.time4j.scale.spi
                         </Private-Package>
-                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>
                         <Provide-Capability>
                             osgi.serviceloader; osgi.serviceloader=net.time4j.scale.LeapSecondProvider
                         </Provide-Capability>
+                        -->
                     </instructions>
                 </configuration>
             </plugin>

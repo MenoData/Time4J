@@ -65,7 +65,6 @@
                         <Private-Package>
                             net.time4j.calendar.service
                         </Private-Package>
-                        -->
                         <Require-Capability>
                             osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
                         </Require-Capability>
@@ -74,6 +73,7 @@
                             osgi.serviceloader; osgi.serviceloader=net.time4j.engine.ChronoExtension,
                             osgi.serviceloader; osgi.serviceloader=net.time4j.format.TextProvider
                         </Provide-Capability>
+                        -->
                     </instructions>
                 </configuration>
             </plugin>
