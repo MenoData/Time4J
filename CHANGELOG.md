@@ -1,5 +1,6 @@
 ## [v4.37] not yet released
 ### Added
+- Zodiac constellations and signs [#765]
 - Empty date intervals [#771]
 - Allow more temporal types for use with Duration.toTemporalAmount() [#769]
 - New interface describing equatorial coordinates [#764]
