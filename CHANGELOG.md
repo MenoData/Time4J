@@ -4,7 +4,10 @@
 - Empty date intervals [#771]
 - Allow more temporal types for use with Duration.toTemporalAmount() [#769]
 - New interface describing equatorial coordinates [#764]
-- Static validation method for calendar weeks [#766]
+- Static validation method for calen some resourcesdar weeks [#[766]]
+
+### Changed
+- Update some resources to CLDR 33 [#774]
 
 ### Deprecated
 - Replace/Remove `SolarTime.Calculator.declination(double)` [#772]
