@@ -1,4 +1,6 @@
-## [v4.37] not yet released
+## [v4.38/v5.0] not yet released
+
+## [v4.37] published on 2018-05-11
 ### Added
 - Zodiac constellations and signs [#765]
 - Empty date intervals [#771]
