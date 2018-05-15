@@ -1,6 +1,7 @@
 ## [v4.38] not yet released
 ### Fixed
 - Arithmetic overflow of int-results in JulianCalendar.Unit.between(...) [#775]
+- Same exit and arrival of sun/moon in sign of Scorpius [#778]
 
 ## [v4.37] published on 2018-05-11
 ### Added
