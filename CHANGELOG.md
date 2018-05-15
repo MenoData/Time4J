@@ -1,4 +1,6 @@
-## [v4.38/v5.0] not yet released
+## [v4.38] not yet released
+### Fixed
+- Arithmetic overflow of int-results in JulianCalendar.Unit.between(...) [#775]
 
 ## [v4.37] published on 2018-05-11
 ### Added
