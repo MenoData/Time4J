@@ -1,12 +1,15 @@
 package net.time4j.calendar.astro;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.expert.Iso8601Format;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -193,6 +196,18 @@ public class ZodiacTest {
         assertThat(
             Zodiac.signPassedByMoon(PlainTimestamp.of(2018, 5, 8, 19, 0).atUTC()),
             is(Zodiac.AQUARIUS));
+    }
+
+    @Test
+    public void moonInSignOfScorpio() throws ParseException {
+        Moment moment = PlainTimestamp.of(2018, 4, 1, 0, 0).atUTC();
+        Zodiac.Event ze = MoonPosition.inSignOf(Zodiac.SCORPIUS);
+        assertThat(
+            ze.atMomentOfEntry(moment),
+            is(Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse("2018-04-01T22:57:14Z")));
+        assertThat(
+            ze.atMomentOfExit(moment),
+            is(Iso8601Format.EXTENDED_DATE_TIME_OFFSET.parse("2018-04-04T06:54:52Z")));
     }
 
 }

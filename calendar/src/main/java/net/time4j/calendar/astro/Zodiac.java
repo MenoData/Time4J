@@ -329,13 +329,13 @@ public enum Zodiac {
 			Zodiac next = zodiac.next();
 
 			if (horoscope) {
-				if (zodiac == Zodiac.OPHIUCHUS) {
+				if (zodiac == OPHIUCHUS) {
 					continue;
-				} else if (next == Zodiac.OPHIUCHUS) {
-					next = Zodiac.SAGITTARIUS;
+				} else if (next == OPHIUCHUS) {
+					next = SAGITTARIUS;
 				}
-				int offset1 = (zodiac.compareTo(Zodiac.OPHIUCHUS) < 0) ? 0 : -1;
-				int offset2 = (next.compareTo(Zodiac.OPHIUCHUS) < 0) ? 0 : -1;
+				int offset1 = (zodiac.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
+				int offset2 = (next.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
 				start = (zodiac.ordinal() + offset1) * 30;
 				end = (next.ordinal() + offset2) * 30;
 			} else {
@@ -452,7 +452,7 @@ public enum Zodiac {
 				throw new IllegalArgumentException("Unsupported celestial body: " + body);
 			} else if (zodiac == null) {
 				throw new IllegalArgumentException("Celestial coordinates must be finite.");
-			} else if (horoscope && (zodiac == Zodiac.OPHIUCHUS)) {
+			} else if (horoscope && (zodiac == OPHIUCHUS)) {
 				throw new IllegalArgumentException("Ophiuchus is not an astrological zodiac sign.");
 			}
 
@@ -595,12 +595,15 @@ public enum Zodiac {
 			if (exiting) {
 				z = z.next();
 			}
+			if (this.horoscope && (z == OPHIUCHUS)) {
+				z = SAGITTARIUS;
+			}
 			return z;
 		}
 
 		private int getHoroscopeLongitude(boolean exiting) {
 			Zodiac z = this.getZodiac(exiting);
-			int offset = (z.compareTo(Zodiac.OPHIUCHUS) < 0) ? 0 : -1;
+			int offset = (z.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
 			return (z.ordinal() + offset) * 30;
 		}
 
