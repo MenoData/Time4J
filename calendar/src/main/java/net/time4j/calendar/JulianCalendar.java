@@ -174,7 +174,7 @@ public final class JulianCalendar
     //~ Statische Felder/Initialisierungen --------------------------------
 
     // maximum of year-of-era
-    private static final int YMAX = 999999999;
+    private static final int YMAX = 999_999_999;
 
     // Tage zwischen [0000-03-01] und [1972-01-01] (julianische Datumsangaben)
     private static final int OFFSET = 719470 + 2 * 365;
@@ -971,17 +971,26 @@ public final class JulianCalendar
         /**
          * <p>Calculates the difference between given Julian dates in this unit. </p>
          *
+         * <p><strong>Note:</strong> Users can apply the alternative expression {@code start.until(end, unit)}
+         * for extreme ranges if the range of an int-primitive is not sufficient. </p>
+         *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)
          * @return  difference counted in this unit
+         * @throws  ArithmeticException if the calculated result does not fit into an int
          * @since   3.11/4.8
          */
         /*[deutsch]
          * <p>Berechnet die Differenz zwischen den angegebenen Datumsparametern in dieser Zeiteinheit. </p>
          *
+         * <p><strong>Hinweis:</strong> F&uuml;r extreme Bereiche kann ein Anwender alternativ den Ausdruck
+         * {@code start.until(end, unit)} verwenden, wenn der Wertebereich eines int-primitive nicht mehr
+         * ausreicht. </p>
+         *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)
          * @return  difference counted in this unit
+         * @throws  ArithmeticException if the calculated result does not fit into an int
          * @since   3.11/4.8
          */
         public int between(
@@ -989,7 +998,7 @@ public final class JulianCalendar
             JulianCalendar end
         ) {
 
-            return (int) start.until(end, this); // safe
+            return MathUtils.safeCast(start.until(end, this));
 
         }
 
@@ -1696,7 +1705,7 @@ public final class JulianCalendar
 
             switch (this.unit) {
                 case YEARS:
-                    return JulianCalendar.Unit.MONTHS.between(start, end) / 12;
+                    return start.until(end, JulianCalendar.Unit.MONTHS) / 12;
                 case MONTHS:
                     long delta = ymValue(end) - ymValue(start);
                     if ((delta > 0) && (end.dom < start.dom)) {
@@ -1706,7 +1715,7 @@ public final class JulianCalendar
                     }
                     return delta;
                 case WEEKS:
-                    return JulianCalendar.Unit.DAYS.between(start, end) / 7;
+                    return start.until(end, JulianCalendar.Unit.DAYS) / 7;
                 case DAYS:
                     return CALSYS.transform(end) - CALSYS.transform(start);
                 default:
@@ -1715,9 +1724,9 @@ public final class JulianCalendar
 
         }
 
-        private static int ymValue(JulianCalendar date) {
+        private static long ymValue(JulianCalendar date) {
 
-            return date.prolepticYear * 12 + date.month - 1;
+            return date.prolepticYear * 12L + date.month - 1;
 
         }
 
