@@ -7,6 +7,7 @@ import net.time4j.Weekmodel;
 import net.time4j.engine.CalendarDate;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -105,6 +106,43 @@ public class JulianMiscellaneousTest {
         assertThat(min.getMaximum(elementISO), is(Weekday.SUNDAY));
         assertThat(max.getMinimum(elementISO), is(Weekday.MONDAY));
         assertThat(max.getMaximum(elementISO), is(Weekday.SUNDAY));
+    }
+
+    @Test
+    public void monthFormat() {
+        JulianCalendar date = JulianCalendar.of(HistoricEra.AD, 2018, 4, 29);
+        ChronoFormatter<JulianCalendar> f1 =
+            ChronoFormatter.ofPattern("M", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f1.format(date), is("4"));
+        assertThat(f1.parseRaw("4").getInt(JulianCalendar.MONTH_OF_YEAR), is(4));
+        ChronoFormatter<JulianCalendar> f2 =
+            ChronoFormatter.ofPattern("MM", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f2.format(date), is("04"));
+        assertThat(f2.parseRaw("04").getInt(JulianCalendar.MONTH_OF_YEAR), is(4));
+        ChronoFormatter<JulianCalendar> f3 =
+            ChronoFormatter.ofPattern("MMM", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f3.format(date), is("Apr"));
+        assertThat(f3.parseRaw("Apr").getInt(JulianCalendar.MONTH_OF_YEAR), is(4));
+        ChronoFormatter<JulianCalendar> f4 =
+            ChronoFormatter.ofPattern("MMMM", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f4.format(date), is("April"));
+        assertThat(f4.parseRaw("April").getInt(JulianCalendar.MONTH_OF_YEAR), is(4));
+        ChronoFormatter<JulianCalendar> f5 =
+            ChronoFormatter.ofPattern("MMMMM", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f5.format(date), is("A")); // unambivalent parsing impossible
+    }
+
+    @Test
+    public void dayFormat() {
+        JulianCalendar date = JulianCalendar.of(HistoricEra.AD, 2018, 4, 7);
+        ChronoFormatter<JulianCalendar> f1 =
+            ChronoFormatter.ofPattern("d", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f1.format(date), is("7"));
+        assertThat(f1.parseRaw("7").getInt(JulianCalendar.DAY_OF_MONTH), is(7));
+        ChronoFormatter<JulianCalendar> f2 =
+            ChronoFormatter.ofPattern("dd", PatternType.CLDR, Locale.ENGLISH, JulianCalendar.axis());
+        assertThat(f2.format(date), is("07"));
+        assertThat(f2.parseRaw("07").getInt(JulianCalendar.DAY_OF_MONTH), is(7));
     }
 
 }

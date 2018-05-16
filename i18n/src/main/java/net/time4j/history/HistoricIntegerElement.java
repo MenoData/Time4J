@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricIntegerElement.java) is part of project Time4J.
  *
@@ -185,8 +185,18 @@ final class HistoricIntegerElement
                 buffer.append(text);
                 break;
             case MONTH_INDEX:
-                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-                buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(date.getMonth())));
+                int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
+                int m = date.getMonth();
+                if (count == 0) {
+                    OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+                    buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(m)));
+                } else {
+                    String digits = numsys.toNumeral(m);
+                    if (numsys.isDecimal()) {
+                        digits = pad(digits, count, zeroChar);
+                    }
+                    buffer.append(digits);
+                }
                 break;
             case DAY_OF_MONTH_INDEX:
                 buffer.append(String.valueOf(date.getDayOfMonth()));
@@ -218,18 +228,21 @@ final class HistoricIntegerElement
 
         if (this.index == MONTH_INDEX) {
             int index = status.getIndex();
-            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-            Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
-            if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
-                status.setErrorIndex(-1);
-                status.setIndex(index);
-                oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
-                month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
-            }
-            if (month == null) {
-                return null;
-            } else {
-                return Integer.valueOf(month.getValue());
+            int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
+            if (count == 0) { // textual parsing
+                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+                Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+                if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+                    status.setErrorIndex(-1);
+                    status.setIndex(index);
+                    oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+                    month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+                }
+                if (month == null) {
+                    return null;
+                } else {
+                    return Integer.valueOf(month.getValue());
+                }
             }
         } else if (
             (this.index == YEAR_AFTER_INDEX)
