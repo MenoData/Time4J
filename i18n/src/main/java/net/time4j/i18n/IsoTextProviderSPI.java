@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoTextProviderSPI.java) is part of project Time4J.
  *
@@ -333,7 +333,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-month.",
+                "Cannot find ISO-8601-month for locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -377,7 +377,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-quarter-of-year.",
+                "Cannot find ISO-8601-quarter-of-year for locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -419,7 +419,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-quarter-of-year.",
+                "Cannot find ISO-8601-day-of-week for locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -452,7 +452,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-resource for era.",
+                "Cannot find ISO-8601-resource for era and locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -497,7 +497,7 @@ public final class IsoTextProviderSPI
         }
 
         throw new MissingResourceException(
-            "Cannot find ISO-8601-resource for am/pm.",
+            "Cannot find ISO-8601-resource for am/pm and locale: " + locale,
             IsoTextProviderSPI.class.getName(),
             locale.toString());
 
