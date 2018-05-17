@@ -1,4 +1,7 @@
 ## [v4.38] not yet released
+### Added
+- Show tomorrow and yesterday words in PrettyTime [#781]
+
 ### Fixed
 - Arithmetic overflow of int-results in JulianCalendar.Unit.between(...) [#775]
 - Incorrect translation of "M" pattern in JulianCalendar formatter [#776]
