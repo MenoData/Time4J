@@ -108,6 +108,17 @@ public class CalendricalNamesTest {
     }
 
     @Test
+    public void printMonthsKAB() { // ISO-639-3
+        OutputContext oc = OutputContext.FORMAT;
+        TextWidth textWidth = TextWidth.WIDE;
+        CalendarText instance =
+            CalendarText.getInstance("iso8601", new Locale("kab"));
+        String result =
+            instance.getStdMonths(textWidth, oc).print(Month.JANUARY);
+        assertThat(result, is("Yennayer"));
+    }
+
+    @Test
     public void printMonthsRU() {
         OutputContext oc = OutputContext.FORMAT;
         TextWidth textWidth = TextWidth.NARROW;
