@@ -1,5 +1,8 @@
-## [v4.38] not yet released
+## [v5.0] not yet released
+
+## [v4.38] published on 2018-05-18
 ### Added
+- Support Kabyle language [#782]
 - Show tomorrow and yesterday words in PrettyTime [#781]
 
 ### Fixed
