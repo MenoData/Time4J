@@ -4,19 +4,15 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.time4j</groupId>
     <artifactId>time4j-parent</artifactId>
-    <version>4.38</version>
+    <version>4.99.0-beta</version>
     <packaging>pom</packaging>
     <name>Time4J</name>
     <description>Advanced Date, Time and Interval Library for Java</description>
     <url>http://www.time4j.net</url>
     
     <modules>
-        <module>core</module>
-        <module>i18n</module>
-        <module>calendar</module>
-        <module>range</module>
-        <module>misc</module>
-        <module>olson</module>
+        <module>base</module>
+        <module>sqlxml</module>
         <module>ui</module>
     </modules>
     
