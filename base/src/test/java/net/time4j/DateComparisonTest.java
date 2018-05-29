@@ -86,6 +86,19 @@ public class DateComparisonTest {
     }
 
     @Test
+    public void isOnOrBefore() {
+        assertThat(
+            PlainDate.of(2012, 2, 29).isOnOrBefore(PlainDate.of(2012, 3, 1)),
+            is(true));
+        assertThat(
+            PlainDate.of(2012, 2, 29).isOnOrBefore(PlainDate.of(2012, 2, 29)),
+            is(true));
+        assertThat(
+            PlainDate.of(2012, 2, 29).isOnOrBefore(PlainDate.of(2012, 2, 28)),
+            is(false));
+    }
+
+    @Test
     public void isSimultaneous() {
         assertThat(
             PlainDate.of(2012, 2, 29).isSimultaneous(PlainDate.of(2012, 3, 1)),
@@ -112,6 +125,19 @@ public class DateComparisonTest {
         assertThat(
             PlainDate.of(2012, 2, 29).isAfter(PlainDate.of(2013, 1, 1)),
             is(false));
+    }
+
+    @Test
+    public void isOnOrAfter() {
+        assertThat(
+            PlainDate.of(2012, 2, 29).isOnOrAfter(PlainDate.of(2012, 3, 1)),
+            is(false));
+        assertThat(
+            PlainDate.of(2012, 2, 29).isOnOrAfter(PlainDate.of(2012, 2, 29)),
+            is(true));
+        assertThat(
+            PlainDate.of(2012, 2, 29).isOnOrAfter(PlainDate.of(2012, 2, 28)),
+            is(true));
     }
 
     @Test

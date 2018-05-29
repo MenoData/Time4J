@@ -345,4 +345,39 @@ public interface CalendarDate
 
     }
 
+    /**
+     * <p>Queries if this object is after given object on a timeline. </p>
+     *
+     * @param   date    object this instance is compared to
+     * @return  {@code true} if this instance is temporally equal to or after {@code date} else {@code false}
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Objekt zeitlich nach dem angegebenen Argument? </p>
+     *
+     * @return  {@code true} if this instance is temporally equal to or after {@code date} else {@code false}
+     * @since   5.0
+     */
+    default boolean isOnOrAfter(CalendarDate date) {
+        return !this.isBefore(date);
+    }
+
+    /**
+     * <p>Queries if this object is before given object on a timeline. </p>
+     *
+     * @param   date    object this instance is compared to
+     * @return  {@code true} if this instance is temporally equal to or before {@code date} else {@code false}
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Objekt zeitlich vor dem angegebenen Argument? </p>
+     *
+     * @param   date    object this instance is compared to
+     * @return  {@code true} if this instance is temporally equal to or before {@code date} else {@code false}
+     * @since   5.0
+     */
+    default boolean isOnOrBefore(CalendarDate date) {
+        return !this.isAfter(date);
+    }
+
 }
