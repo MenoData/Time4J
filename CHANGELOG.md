@@ -1,4 +1,6 @@
 ## [v5.0] not yet released
+### Added
+- New comparison methods `isOnOrAfter(date)` and `isOnOrBefore(date)` [#783]
 
 ## [v4.38] published on 2018-05-18
 ### Added
