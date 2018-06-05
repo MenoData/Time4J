@@ -49,7 +49,8 @@ public class SystemClockTest {
         long delta = Math.abs(clock1.realTimeInMicros() - clock2.realTimeInMicros());
         System.out.println("=>" + delta);
         assertThat(
-            delta < 5000,
+            "Observed delta: " + delta,
+            delta < 10000,
             is(true));
         long utc = clock1.realTimeInMicros() / 1000000;
         long unix = clock1.currentTimeInMicros() / 1000000;
