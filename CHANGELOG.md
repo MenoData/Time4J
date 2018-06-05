@@ -2,6 +2,10 @@
 ### Added
 - New comparison methods `isOnOrAfter(date)` and `isOnOrBefore(date)` [#783]
 
+### Changed
+- Automatic module names (for Java-9) [#784]
+- New modular structure [#525]
+
 ## [v4.38] published on 2018-05-18
 ### Added
 - Support Kabyle language [#782]
