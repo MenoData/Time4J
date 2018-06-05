@@ -34,6 +34,9 @@
                 <configuration>
                     <archive>
                         <manifestFile>${project.build.outputDirectory}/META-INF/MANIFEST.MF</manifestFile>
+                        <manifestEntries>
+                            <Automatic-Module-Name>net.time4j.sqlxml</Automatic-Module-Name>
+                        </manifestEntries>
                     </archive>
                 </configuration>
             </plugin>
@@ -55,17 +58,6 @@
                         <Bundle-SymbolicName>${project.artifactId}</Bundle-SymbolicName>
                         <Import-Package>*</Import-Package>
                         <Export-Package>*</Export-Package>
-                        <!--
-                        <Private-Package>
-                            net.time4j.tz.spi
-                        </Private-Package>
-                        <Require-Capability>
-                            osgi.extender; filter:="(osgi.extender=osgi.serviceloader.registrar)"
-                        </Require-Capability>
-                        <Provide-Capability>
-                            osgi.serviceloader; osgi.serviceloader=net.time4j.tz.ZoneModelProvider
-                        </Provide-Capability>
-                        -->
                     </instructions>
                 </configuration>
             </plugin>
