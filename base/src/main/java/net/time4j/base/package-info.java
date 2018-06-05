@@ -1,4 +1,3 @@
-
 /**
  * <p>Abstract minimum interface of Time4J. </p>
  *

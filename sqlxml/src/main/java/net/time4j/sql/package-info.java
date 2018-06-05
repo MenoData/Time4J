@@ -1,4 +1,3 @@
-
 /**
  * <p>Bridge to JDBC. </p>
  */

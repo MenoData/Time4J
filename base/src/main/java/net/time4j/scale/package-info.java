@@ -1,4 +1,3 @@
-
 /**
  * <p>This package handles the UTC timeline (Corrected Universal Time) and
  * other time scales. </p>
