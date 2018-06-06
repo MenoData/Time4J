@@ -60,13 +60,7 @@ public final class GenericTextProviderSPI
     private static final ResourceBundle.Control CONTROL;
 
     static {
-        CONTROL =
-            new UTF8ResourceControl() {
-                @Override
-                protected Class<?> getModuleRef() {
-                    return GenericTextProviderSPI.class;
-                }
-            };
+        CONTROL = UTF8ResourceControl.SINGLETON;
 
         ResourceBundle rb =
             ResourceBundle.getBundle(

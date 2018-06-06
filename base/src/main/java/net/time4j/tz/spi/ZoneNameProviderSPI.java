@@ -103,13 +103,7 @@ public class ZoneNameProviderSPI
         addPrimary(primaries, "UZ", "Asia/Tashkent");
         PRIMARIES = Collections.unmodifiableMap(primaries);
 
-        CONTROL =
-            new UTF8ResourceControl() {
-                @Override
-                protected Class<?> getModuleRef() {
-                    return ZoneNameProviderSPI.class;
-                }
-            };
+        CONTROL = UTF8ResourceControl.SINGLETON;
     }
 
     //~ Methoden ----------------------------------------------------------

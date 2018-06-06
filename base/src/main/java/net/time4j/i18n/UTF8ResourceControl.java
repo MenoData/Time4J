@@ -51,13 +51,7 @@ public class UTF8ResourceControl
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * For subclasses only.
-     */
-    /*[deutsch]
-     * Nur f&uuml;r Subklassen.
-     */
-    protected UTF8ResourceControl() {
+    private UTF8ResourceControl() {
         super();
 
     }
@@ -103,12 +97,12 @@ public class UTF8ResourceControl
             String resourceName =
                 this.toResourceName(bundleName, "properties");
 
-            URI uri = ResourceLoader.getInstance().locate(getModuleName(), getModuleRef(), resourceName);
+            URI uri = ResourceLoader.getInstance().locate("base", UTF8ResourceControl.class, resourceName);
             InputStream stream = ResourceLoader.getInstance().load(uri, reload);
 
             if (stream == null) {
                 try {
-                    stream = ResourceLoader.getInstance().load(getModuleRef(), resourceName, reload);
+                    stream = ResourceLoader.getInstance().load(UTF8ResourceControl.class, resourceName, reload);
                 } catch (IOException ioe) {
                     // okay, maybe the resource is simply not there
                     return null;
@@ -169,18 +163,6 @@ public class UTF8ResourceControl
         }
 
         return sb.toString();
-
-    }
-
-    protected String getModuleName() {
-
-        return "base";
-
-    }
-
-    protected Class<?> getModuleRef() {
-
-        return UTF8ResourceControl.class;
 
     }
 
