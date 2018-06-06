@@ -62,9 +62,7 @@ public final class GenericTextProviderSPI
     static {
         CONTROL =
             new UTF8ResourceControl() {
-                protected String getModuleName() {
-                    return "calendar";
-                }
+                @Override
                 protected Class<?> getModuleRef() {
                     return GenericTextProviderSPI.class;
                 }

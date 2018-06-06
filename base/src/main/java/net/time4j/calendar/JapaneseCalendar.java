@@ -286,7 +286,7 @@ public final class JapaneseCalendar
 
     static {
         String path = "data/tsuchihashi.data";
-        URI uri = ResourceLoader.getInstance().locate("calendar", JapaneseCalendar.class, path);
+        URI uri = ResourceLoader.getInstance().locate("base", JapaneseCalendar.class, path);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         try {

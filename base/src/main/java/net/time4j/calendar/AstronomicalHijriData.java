@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AstronomicalHijriData.java) is part of project Time4J.
  *
@@ -90,7 +90,7 @@ final class AstronomicalHijriData
         String baseVariant = ha.getBaseVariant();
         this.adjustment = ha.getValue();
         String name = "data/" + baseVariant.replace('-', '_') + ".data";
-        URI uri = ResourceLoader.getInstance().locate("calendar", AstronomicalHijriData.class, name);
+        URI uri = ResourceLoader.getInstance().locate("base", AstronomicalHijriData.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {

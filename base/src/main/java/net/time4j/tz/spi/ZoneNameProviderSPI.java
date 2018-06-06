@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZoneNameProviderSPI.java) is part of project Time4J.
  *
@@ -105,9 +105,7 @@ public class ZoneNameProviderSPI
 
         CONTROL =
             new UTF8ResourceControl() {
-                protected String getModuleName() {
-                    return "olson";
-                }
+                @Override
                 protected Class<?> getModuleRef() {
                     return ZoneNameProviderSPI.class;
                 }
@@ -244,7 +242,7 @@ public class ZoneNameProviderSPI
         String name
     ) {
 
-        URI uri = ResourceLoader.getInstance().locate("olson", ZoneNameProviderSPI.class, name);
+        URI uri = ResourceLoader.getInstance().locate("base", ZoneNameProviderSPI.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {

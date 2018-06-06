@@ -92,7 +92,7 @@ public class UTF8ResourceControl
         String format,
         ClassLoader loader,
         boolean reload
-    ) throws IllegalAccessException, InstantiationException, IOException {
+    ) throws IOException {
 
         if (format.equals(FORMAT_ID)) {
 
@@ -174,7 +174,7 @@ public class UTF8ResourceControl
 
     protected String getModuleName() {
 
-        return "i18n";
+        return "base";
 
     }
 

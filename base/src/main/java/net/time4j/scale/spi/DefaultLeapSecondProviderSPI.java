@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DefaultLeapSecondProviderSPI.java) is part of project Time4J.
  *
@@ -64,7 +64,7 @@ public final class DefaultLeapSecondProviderSPI
         PlainDate tmpExpires = PlainDate.axis().getMinimum();
         this.table = new LinkedHashMap<>(50);
         String name = PATH_TO_LEAPSECONDS;
-        URI uri = ResourceLoader.getInstance().locate("core", LeapSecondProvider.class, name);
+        URI uri = ResourceLoader.getInstance().locate("base", LeapSecondProvider.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {

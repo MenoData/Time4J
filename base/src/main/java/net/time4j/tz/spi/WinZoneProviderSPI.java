@@ -203,7 +203,7 @@ public class WinZoneProviderSPI
 
         try {
             String source = "data/winzone.ser";
-            URI uri = ResourceLoader.getInstance().locate("misc", WindowsZone.class, source);
+            URI uri = ResourceLoader.getInstance().locate("base", WindowsZone.class, source);
             InputStream is = ResourceLoader.getInstance().load(uri, true);
             if (is == null) {
                 is = ResourceLoader.getInstance().load(WindowsZone.class, source, true);

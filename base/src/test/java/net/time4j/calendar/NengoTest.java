@@ -157,7 +157,7 @@ public class NengoTest {
     @Test
     public void sanityCheck() throws IOException, ParseException {
         String path = "data/nengo.txt";
-        URI uri = ResourceLoader.getInstance().locate("calendar", Nengo.class, path);
+        URI uri = ResourceLoader.getInstance().locate("base", Nengo.class, path);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {

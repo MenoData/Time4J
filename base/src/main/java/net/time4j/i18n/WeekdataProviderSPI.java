@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdataProviderSPI.java) is part of project Time4J.
  *
@@ -64,7 +64,7 @@ public class WeekdataProviderSPI
         super();
 
         String name = "data/week.data";
-        URI uri = ResourceLoader.getInstance().locate("i18n", WeekdataProviderSPI.class, name);
+        URI uri = ResourceLoader.getInstance().locate("base", WeekdataProviderSPI.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {
