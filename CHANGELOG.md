@@ -1,6 +1,7 @@
 ## [v5.0] not yet released
 ### Added
 - New comparison methods `isOnOrAfter(date)` and `isOnOrBefore(date)` [#783]
+- Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
 - Automatic module names (for Java-9) [#784]
