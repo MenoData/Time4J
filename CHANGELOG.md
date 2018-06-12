@@ -4,6 +4,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Replace `ResourceBundle` in module environment [#786]
 - Automatic module names (for Java-9) [#784]
 - New modular structure [#525]
 
