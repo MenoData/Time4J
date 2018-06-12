@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Tabot.java) is part of project Time4J.
  *
@@ -21,11 +21,11 @@
 
 package net.time4j.calendar;
 
-import net.time4j.calendar.service.GenericTextProviderSPI;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.format.Attributes;
 import net.time4j.format.TextElement;
+import net.time4j.format.internal.PropertyBundle;
 
 import java.io.IOException;
 import java.text.ParsePosition;
@@ -33,7 +33,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
-import java.util.ResourceBundle;
 
 
 /**
@@ -60,9 +59,8 @@ public final class Tabot
     private static final Tabot[] INSTANCES;
 
     static {
-        GenericTextProviderSPI spi = new GenericTextProviderSPI();
-        ResourceBundle rbRoot = getBundle(Locale.ROOT, spi.getControl());
-        ResourceBundle rbAmharic = getBundle(new Locale("am"), spi.getControl());
+        PropertyBundle rbRoot = PropertyBundle.load("names/ethiopic", Locale.ROOT);
+        PropertyBundle rbAmharic = PropertyBundle.load("names/ethiopic", new Locale("am"));
 
         String[] transscription = new String[30];
         String[] amharic = new String[30];
@@ -215,19 +213,6 @@ public final class Tabot
 
     }
 
-    private static ResourceBundle getBundle(
-        Locale locale,
-        ResourceBundle.Control control
-    ) {
-
-        return ResourceBundle.getBundle(
-            "names/ethiopic",
-            locale,
-            GenericTextProviderSPI.class.getClassLoader(),
-            control);
-
-    }
-
     //~ Innere Klassen ----------------------------------------------------
 
     static enum Element
@@ -325,7 +310,7 @@ public final class Tabot
 
                 if (
                     offset + len <= text.length()
-                    && test.equals(text.subSequence(offset, offset + len))
+                    && test.equals(text.subSequence(offset, offset + len).toString())
                 ) {
                     status.setIndex(offset + len);
                     return Tabot.of(i);

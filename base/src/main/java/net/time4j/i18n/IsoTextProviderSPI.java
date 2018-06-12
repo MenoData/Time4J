@@ -26,13 +26,14 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.ExtendedPatterns;
+import net.time4j.format.internal.LanguageMatch;
+import net.time4j.format.internal.PropertyBundle;
 import net.time4j.history.HistoricEra;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
@@ -57,13 +58,7 @@ public final class IsoTextProviderSPI
     private static final Set<Locale> LOCALES;
 
     static {
-        ResourceBundle rb =
-            ResourceBundle.getBundle(
-                "names/" + ISO_CALENDAR_TYPE,
-                Locale.ROOT,
-                getDefaultLoader(),
-                UTF8ResourceControl.SINGLETON);
-
+        PropertyBundle rb = PropertyBundle.load("names/" + ISO_CALENDAR_TYPE, Locale.ROOT);
         String[] languages = rb.getString("languages").split(" ");
         Set<String> tmp = new HashSet<>();
         Collections.addAll(tmp, languages);
@@ -270,13 +265,6 @@ public final class IsoTextProviderSPI
     }
 
     @Override
-    public ResourceBundle.Control getControl() {
-
-        return UTF8ResourceControl.SINGLETON;
-
-    }
-
-    @Override
     public String toString() {
 
         return "IsoTextProviderSPI";
@@ -305,7 +293,7 @@ public final class IsoTextProviderSPI
     ) throws MissingResourceException {
 
         String[] names = null;
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (rb != null) {
             if (tw == TextWidth.SHORT) {
@@ -349,7 +337,7 @@ public final class IsoTextProviderSPI
     ) throws MissingResourceException {
 
         String[] names = null;
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (rb != null) {
             if (tw == TextWidth.SHORT) {
@@ -393,7 +381,7 @@ public final class IsoTextProviderSPI
     ) throws MissingResourceException {
 
         String[] names = null;
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (rb != null) {
             String key = getKey(rb, "DAY_OF_WEEK");
@@ -434,7 +422,7 @@ public final class IsoTextProviderSPI
     ) throws MissingResourceException {
 
         String[] names = null;
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (rb != null) {
             if (tw == TextWidth.SHORT) {
@@ -467,7 +455,7 @@ public final class IsoTextProviderSPI
         OutputContext oc
     ) throws MissingResourceException {
 
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (rb != null) {
             if (tw == TextWidth.SHORT) {
@@ -503,14 +491,10 @@ public final class IsoTextProviderSPI
 
     }
 
-    private static ResourceBundle getBundle(Locale desired)
+    private static PropertyBundle getBundle(Locale desired)
         throws MissingResourceException {
 
-        return ResourceBundle.getBundle(
-            "names/" + ISO_CALENDAR_TYPE,
-            desired,
-            getDefaultLoader(),
-            UTF8ResourceControl.SINGLETON);
+        return PropertyBundle.load("names/" + ISO_CALENDAR_TYPE, desired);
 
     }
 
@@ -521,7 +505,7 @@ public final class IsoTextProviderSPI
     }
 
     private static String[] lookupBundle(
-        ResourceBundle rb,
+        PropertyBundle rb,
         int len,
         String elementName,
         TextWidth tw,
@@ -571,7 +555,7 @@ public final class IsoTextProviderSPI
     }
 
     private static String getKey(
-        ResourceBundle bundle,
+        PropertyBundle bundle,
         String elementName
     ) {
 
@@ -585,12 +569,6 @@ public final class IsoTextProviderSPI
         }
 
         return elementName;
-
-    }
-
-    private static ClassLoader getDefaultLoader() {
-
-        return IsoTextProviderSPI.class.getClassLoader();
 
     }
 

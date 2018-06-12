@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UnitPatternProviderSPI.java) is part of project Time4J.
  *
@@ -24,10 +24,10 @@ package net.time4j.i18n;
 import net.time4j.format.PluralCategory;
 import net.time4j.format.RelativeTimeProvider;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.PropertyBundle;
 
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 
 
 /**
@@ -376,10 +376,7 @@ public final class UnitPatternProviderSPI
             throw new IllegalArgumentException("Size must be greater than 1.");
         }
 
-		ClassLoader loader = this.getClass().getClassLoader();
-		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
-		ResourceBundle rb =
-            ResourceBundle.getBundle("units/upattern", desired, loader, control);
+        PropertyBundle rb = PropertyBundle.load("units/upattern", desired);
         String exact = buildListKey(width, String.valueOf(size));
 
         if (rb.containsKey(exact)) {
@@ -477,27 +474,23 @@ public final class UnitPatternProviderSPI
 		PluralCategory category
 	) {
 
-		ClassLoader loader = this.getClass().getClassLoader();
-		ResourceBundle.Control control = UTF8ResourceControl.SINGLETON;
 		boolean init = true;
-		ResourceBundle first = null;
+        PropertyBundle first = null;
 
-		for (Locale locale : control.getCandidateLocales(baseName, desired)) {
-			ResourceBundle rb = (
+		for (Locale locale : PropertyBundle.getCandidateLocales(desired)) {
+            PropertyBundle bundle = (
 				init && (first != null)
 				? first
-				: ResourceBundle.getBundle(baseName, locale, loader, control));
+				: PropertyBundle.load(baseName, locale));
 
 			if (init) {
-				if (locale.equals(rb.getLocale())) {
+				if (locale.equals(bundle.getLocale())) {
 					init = false;
 				} else {
-					first = rb;
+					first = bundle;
 					continue;
 				}
 			}
-
-			UTF8ResourceBundle bundle = UTF8ResourceBundle.class.cast(rb);
 
 			if (bundle.getInternalKeys().contains(key)) {
 				return bundle.getString(key);

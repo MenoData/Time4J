@@ -34,7 +34,7 @@ import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.FormatUtils;
-import net.time4j.i18n.LanguageMatch;
+import net.time4j.format.internal.LanguageMatch;
 import net.time4j.i18n.SymbolProviderSPI;
 
 import java.util.Collections;

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SymbolProviderSPI.java) is part of project Time4J.
  *
@@ -23,13 +23,14 @@ package net.time4j.i18n;
 
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.NumberSystem;
+import net.time4j.format.internal.LanguageMatch;
+import net.time4j.format.internal.PropertyBundle;
 
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 
@@ -48,21 +49,15 @@ public final class SymbolProviderSPI
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final Set<String> SUPPORTED_LOCALES;
     private static final Locale[] EMPTY_ARRAY = new Locale[0];
 
-    public static final Set<String> SUPPORTED_LOCALES;
     public static final SymbolProviderSPI INSTANCE;
 
     private static final Map<String, NumberSystem> CLDR_NAMES;
 
     static {
-        ResourceBundle rb =
-            ResourceBundle.getBundle(
-                "numbers/symbol",
-                Locale.ROOT,
-                getLoader(),
-                UTF8ResourceControl.SINGLETON);
-
+        PropertyBundle rb = PropertyBundle.load("numbers/symbol", Locale.ROOT);
         String[] languages = rb.getString("locales").split(" ");
         Set<String> set = new HashSet<>();
         Collections.addAll(set, languages);
@@ -156,7 +151,7 @@ public final class SymbolProviderSPI
         char standard
     ) {
 
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (
             (rb != null)
@@ -175,7 +170,7 @@ public final class SymbolProviderSPI
         String standard
     ) {
 
-        ResourceBundle rb = getBundle(locale);
+        PropertyBundle rb = getBundle(locale);
 
         if (
             (rb != null)
@@ -188,23 +183,13 @@ public final class SymbolProviderSPI
 
     }
 
-    private static ResourceBundle getBundle(Locale desired) {
+    private static PropertyBundle getBundle(Locale desired) {
 
         if (SUPPORTED_LOCALES.contains(LanguageMatch.getAlias(desired))) {
-            return ResourceBundle.getBundle(
-                "numbers/symbol",
-                desired,
-                getLoader(),
-                UTF8ResourceControl.SINGLETON);
+            return PropertyBundle.load("numbers/symbol", desired);
         }
 
         return null;
-
-    }
-
-    private static ClassLoader getLoader() {
-
-        return SymbolProviderSPI.class.getClassLoader();
 
     }
 

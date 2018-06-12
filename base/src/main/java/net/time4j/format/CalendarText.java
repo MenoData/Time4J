@@ -28,6 +28,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 import net.time4j.format.internal.ExtendedPatterns;
 import net.time4j.format.internal.FormatUtils;
+import net.time4j.format.internal.PropertyBundle;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -49,7 +50,6 @@ import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
@@ -242,8 +242,7 @@ public final class CalendarText {
 
         // Monate, Quartale, Wochentage, Äras und AM/PM
         this.stdMonths =
-            Collections.unmodifiableMap(
-                getMonths(calendarType, locale, p, false));
+            Collections.unmodifiableMap(getMonths(calendarType, locale, p, false));
 
         Map<TextWidth, Map<OutputContext, TextAccessor>> tmpLeapMonths =
             getMonths(calendarType, locale, p, true);
@@ -315,11 +314,8 @@ public final class CalendarText {
         MissingResourceException tmpMre = null;
 
         try {
-            ResourceBundle rb =
-                ResourceBundle.getBundle(
-                    "names/" + calendarType,
-                    locale,
-                    p.getControl());
+            PropertyBundle rb =
+                PropertyBundle.load("names/" + calendarType, locale);
             for (String key : rb.keySet()) {
                 map.put(key, rb.getString(key));
             }
@@ -1160,6 +1156,7 @@ public final class CalendarText {
      */
     public static void clearCache() {
 
+        PropertyBundle.clearCache();
         CACHE.clear();
 
     }
@@ -1524,13 +1521,6 @@ public final class CalendarText {
         }
 
         @Override
-        public ResourceBundle.Control getControl() {
-
-            return ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT);
-
-        }
-
-        @Override
         public String toString() {
 
             return "JDKTextProvider";
@@ -1665,13 +1655,6 @@ public final class CalendarText {
             } else {
                 return new String[] {"AM", "PM"};
             }
-
-        }
-
-        @Override
-        public ResourceBundle.Control getControl() {
-
-            return ResourceBundle.Control.getNoFallbackControl(ResourceBundle.Control.FORMAT_DEFAULT);
 
         }
 

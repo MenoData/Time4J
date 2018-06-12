@@ -25,15 +25,14 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
-import net.time4j.i18n.LanguageMatch;
-import net.time4j.i18n.UTF8ResourceControl;
+import net.time4j.format.internal.LanguageMatch;
+import net.time4j.format.internal.PropertyBundle;
 
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.MissingResourceException;
-import java.util.ResourceBundle;
 import java.util.Set;
 
 
@@ -57,18 +56,9 @@ public final class GenericTextProviderSPI
     private static final Set<String> TYPES;
     private static final Set<String> LANGUAGES;
     private static final Set<Locale> LOCALES;
-    private static final ResourceBundle.Control CONTROL;
 
     static {
-        CONTROL = UTF8ResourceControl.SINGLETON;
-
-        ResourceBundle rb =
-            ResourceBundle.getBundle(
-                "names/generic",
-                Locale.ROOT,
-                getDefaultLoader(),
-                CONTROL);
-
+        PropertyBundle rb = PropertyBundle.load("names/generic", Locale.ROOT);
         String[] languages = rb.getString("languages").split(" ");
         Set<String> tmp = new HashSet<>();
         Collections.addAll(tmp, languages);
@@ -164,7 +154,7 @@ public final class GenericTextProviderSPI
             return CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms().toArray(new String[12]);
         }
 
-        ResourceBundle rb = getBundle(calendarType, locale);
+        PropertyBundle rb = getBundle(calendarType, locale);
 
         if (tw == TextWidth.SHORT) {
             tw = TextWidth.ABBREVIATED;
@@ -248,7 +238,7 @@ public final class GenericTextProviderSPI
             return names;
         }
 
-        ResourceBundle rb = getBundle(calendarType, locale);
+        PropertyBundle rb = getBundle(calendarType, locale);
 
         if (tw == TextWidth.SHORT) {
             tw = TextWidth.ABBREVIATED;
@@ -293,13 +283,6 @@ public final class GenericTextProviderSPI
     }
 
     @Override
-    public ResourceBundle.Control getControl() {
-
-        return CONTROL;
-
-    }
-
-    @Override
     public String toString() {
 
         return "GenericTextProviderSPI";
@@ -314,21 +297,19 @@ public final class GenericTextProviderSPI
      * @return  {@code ResourceBundle}
      * @since   3.10/4.7
      */
-    static ResourceBundle getBundle(
+    static PropertyBundle getBundle(
         String calendarType,
         Locale desired
     ) {
 
-        return ResourceBundle.getBundle(
+        return PropertyBundle.load(
             "names/" + calendarType,
-            LANGUAGES.contains(LanguageMatch.getAlias(desired)) ? desired : Locale.ROOT,
-            getDefaultLoader(),
-            CONTROL);
+            LANGUAGES.contains(LanguageMatch.getAlias(desired)) ? desired : Locale.ROOT);
 
     }
 
     private static String[] lookupBundle(
-        ResourceBundle rb,
+        PropertyBundle rb,
         String calendarType,
         String language,
         int len,
@@ -444,7 +425,7 @@ public final class GenericTextProviderSPI
     }
 
     private static String getKey(
-        ResourceBundle bundle,
+        PropertyBundle bundle,
         String elementName
     ) {
 
@@ -458,12 +439,6 @@ public final class GenericTextProviderSPI
         }
 
         return elementName;
-
-    }
-
-    private static ClassLoader getDefaultLoader() {
-
-        return GenericTextProviderSPI.class.getClassLoader();
 
     }
 

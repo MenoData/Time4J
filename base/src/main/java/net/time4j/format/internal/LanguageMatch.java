@@ -19,9 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
-
-import net.time4j.format.internal.FormatUtils;
+package net.time4j.format.internal;
 
 import java.util.Locale;
 
