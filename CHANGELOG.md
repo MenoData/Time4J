@@ -6,7 +6,10 @@
 ### Changed
 - Replace `ResourceBundle` in module environment [#786]
 - Automatic module names (for Java-9) [#784]
-- New modular structure [#525]
+- New modular structure [#[525]]
+
+### Fixed
+- Wrong days-since-UTC after transform in Hijri adjustment [#789]
 
 ## [v4.38] published on 2018-05-18
 ### Added
