@@ -1,6 +1,7 @@
 package net.time4j.calendar;
 
 import net.time4j.PlainDate;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.expert.ChronoFormatter;
@@ -268,6 +269,20 @@ public class HijriAlgoTest {
         assertThat(h, is(today2.transform(HijriCalendar.class, HijriAlgorithm.HABASH_AL_HASIB_ASTRO)));
         s = formatter2.format(h);
         assertThat(s, is("Thu, 1. Safar 37"));
+    }
+
+    @Test
+    public void adjustmentTest() {
+        String basicVariant = HijriAlgorithm.WEST_ISLAMIC_CIVIL.getVariant();
+        String variant = HijriAdjustment.of(basicVariant, -1).getVariant();
+        CalendarSystem<HijriCalendar> calsys = HijriCalendar.family().getCalendarSystem(variant);
+        long maxSinceUTC = calsys.getMaximumSinceUTC();
+        assertThat(
+            maxSinceUTC,
+            is(74108L));
+        assertThat(
+            calsys.transform(maxSinceUTC).getDaysSinceEpochUTC(),
+            is(74108L));
     }
 
 }
