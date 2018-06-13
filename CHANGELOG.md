@@ -6,7 +6,8 @@
 ### Changed
 - Replace `ResourceBundle` in module environment [#786]
 - Automatic module names (for Java-9) [#784]
-- New modular structure [#[525]]
+- New modular structure [#525]
+- `StartOfDay` now uses `CalendarDate` in abstract method [#655]
 
 ### Fixed
 - Wrong days-since-UTC after transform in Hijri adjustment [#789]
@@ -27,7 +28,7 @@
 - Empty date intervals [#771]
 - Allow more temporal types for use with Duration.toTemporalAmount() [#769]
 - New interface describing equatorial coordinates [#764]
-- Static validation method for calen some resourcesdar weeks [#[766]]
+- Static validation method for calen some resourcesdar weeks [#766]
 
 ### Changed
 - Update some resources to CLDR 33 [#774]
