@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StartOfDay.java) is part of project Time4J.
  *
@@ -53,7 +53,7 @@ public abstract class StartOfDay {
     /*[deutsch]
      * Standardbeginn eines Kalendertages zu Mitternacht.
      */
-    public static final StartOfDay MIDNIGHT = new FixedStartOfDay(0);
+    public static final StartOfDay MIDNIGHT = fixed(0);
 
     /**
      * Start of calendar day at 18:00 on previous day.
@@ -61,7 +61,7 @@ public abstract class StartOfDay {
     /*[deutsch]
      * Beginn eines Kalendertages zu 18 Uhr am Vortag.
      */
-    public static final StartOfDay EVENING = new FixedStartOfDay(-21600);
+    public static final StartOfDay EVENING = fixed(-21600);
 
     /**
      * Start of calendar day at 06:00 in the morning.
@@ -69,7 +69,7 @@ public abstract class StartOfDay {
     /*[deutsch]
      * Beginn eines Kalendertages zu 6 Uhr morgens.
      */
-    public static final StartOfDay MORNING = new FixedStartOfDay(21600);
+    public static final StartOfDay MORNING = fixed(21600);
 
     //~ Konstruktoren -------------------------------------------------
 
@@ -186,9 +186,7 @@ public abstract class StartOfDay {
      * @param   calendarDay     calendar day
      * @param   tzid            timezone identifier, helps to resolve an UTC-event like sunset to a local time
      * @return  nominal deviation of start of day relative to midnight in seconds on the local timeline
-     * @since   3.5/4.3
-     * @deprecated  The signature will be changed in next major release such
-     *              that the type {@code CalendarDate} will be used instead of {@code Calendrical}
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Definiert den Start des angegebenen Kalendertages relativ zu Mitternacht in Sekunden. </p>
@@ -196,15 +194,16 @@ public abstract class StartOfDay {
      * @param   calendarDay     calendar day
      * @param   tzid            timezone identifier, helps to resolve an UTC-event like sunset to a local time
      * @return  nominal deviation of start of day relative to midnight in seconds on the local timeline
-     * @since   3.5/4.3
-     * @deprecated  The signature will be changed in next major release such
-     *              that the type {@code CalendarDate} will be used instead of {@code Calendrical}
+     * @since   5.0
      */
-    @Deprecated
     public abstract int getDeviation(
-        Calendrical<?, ?> calendarDay,
+        CalendarDate calendarDay,
         TZID tzid
     );
+
+    private static StartOfDay fixed(int deviation) {
+        return new FixedStartOfDay(deviation);
+    }
 
     //~ Innere Klassen ----------------------------------------------------
 
@@ -228,7 +227,7 @@ public abstract class StartOfDay {
 
         @Override
         public int getDeviation(
-            Calendrical<?, ?> calendarDay,
+            CalendarDate calendarDay,
             TZID tzid
         ) {
 
@@ -290,7 +289,7 @@ public abstract class StartOfDay {
 
         @Override
         public int getDeviation(
-            Calendrical<?, ?> calendarDay,
+            CalendarDate calendarDay,
             TZID tzid
         ) {
 
