@@ -876,6 +876,8 @@ public final class AnnualDate
 
             if (map.containsKey(key)) {
                 return map.get(key);
+            } else if (key == null) {
+                return null;
             }
 
             switch (key) {
