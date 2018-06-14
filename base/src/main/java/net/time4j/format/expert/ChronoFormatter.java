@@ -1662,12 +1662,14 @@ public final class ChronoFormatter<T>
      *
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while this instance remains unaffected
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Entspricht {@link #with(Timezone) with(Timezone.of(tzid))}. </p>
      *
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while this instance remains unaffected
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     @Override
     public ChronoFormatter<T> withTimezone(TZID tzid) {
