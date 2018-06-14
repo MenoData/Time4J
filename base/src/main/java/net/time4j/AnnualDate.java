@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AnnualDate.java) is part of project Time4J.
  *
@@ -19,12 +19,8 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.xml;
+package net.time4j;
 
-import net.time4j.Moment;
-import net.time4j.Month;
-import net.time4j.PlainDate;
-import net.time4j.SystemClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;

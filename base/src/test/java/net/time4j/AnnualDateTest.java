@@ -1,9 +1,5 @@
-package net.time4j.xml;
+package net.time4j;
 
-import net.time4j.Month;
-import net.time4j.PlainDate;
-import net.time4j.SystemClock;
-import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.format.DisplayMode;
