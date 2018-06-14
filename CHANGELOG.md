@@ -4,7 +4,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
-- Move class AnnualDate to main package [#787]
+- Move class `AnnualDate` to main package [#787]
 - Replace `ResourceBundle` in module environment [#786]
 - Automatic module names (for Java-9) [#784]
 - New modular structure [#525]
