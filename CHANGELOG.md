@@ -5,6 +5,7 @@
 
 ### Changed
 - Move class `AnnualDate` to main package [#787]
+- Move class `MachineTime` to main package [#609]
 - Replace `ResourceBundle` in module environment [#786]
 - Automatic module names (for Java-9) [#784]
 - New modular structure [#525]
