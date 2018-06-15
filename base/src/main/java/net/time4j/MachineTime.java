@@ -751,8 +751,7 @@ public final class MachineTime<U>
     public MachineTime<U> abs() {
 
         if (this.isNegative()) {
-            return new MachineTime<>(
-                Math.negateExact(this.seconds), -this.nanos, this.scale);
+            return new MachineTime<>(Math.negateExact(this.seconds), -this.nanos, this.scale);
         } else {
             return this;
         }
@@ -780,8 +779,7 @@ public final class MachineTime<U>
             return this;
         }
 
-        return new MachineTime<>(
-            Math.negateExact(this.seconds), -this.nanos, this.scale);
+        return new MachineTime<>(Math.negateExact(this.seconds), -this.nanos, this.scale);
 
     }
 

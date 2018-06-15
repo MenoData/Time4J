@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -164,6 +164,9 @@ final class SPX
             case MOMENT_TYPE:
                 this.writeMoment(out);
                 break;
+            case MACHINE_TIME_TYPE:
+                this.writeMachineTime(out);
+                break;
             case DURATION_TYPE:
                 this.writeDuration(out);
                 break;
@@ -172,9 +175,6 @@ final class SPX
                 break;
             case TIMESTAMP_TYPE:
                 this.writeTimestamp(out);
-                break;
-            case MACHINE_TIME_TYPE:
-                this.writeMachineTime(out);
                 break;
             default:
                 throw new InvalidClassException("Unknown serialized type.");
@@ -215,6 +215,9 @@ final class SPX
             case MOMENT_TYPE:
                 this.obj = this.readMoment(in, header);
                 break;
+            case MACHINE_TIME_TYPE:
+                this.obj = this.readMachineTime(in, header);
+                break;
             case DURATION_TYPE:
                 this.obj = this.readDuration(in, header);
                 break;
@@ -223,9 +226,6 @@ final class SPX
                 break;
             case TIMESTAMP_TYPE:
                 this.obj = this.readTimestamp(in, header);
-                break;
-            case MACHINE_TIME_TYPE:
-                this.obj = this.readMachineTime(in, header);
                 break;
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
