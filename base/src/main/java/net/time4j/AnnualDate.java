@@ -874,10 +874,10 @@ public final class AnnualDate
             String key
         ) {
 
-            if (map.containsKey(key)) {
-                return map.get(key);
-            } else if (key == null) {
+            if (key == null) {
                 return null;
+            } else if (map.containsKey(key)) {
+                return map.get(key);
             }
 
             switch (key) {
