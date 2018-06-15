@@ -19,12 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.range;
+package net.time4j;
 
-import net.time4j.SI;
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
-import net.time4j.engine.RealTime;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
@@ -65,7 +63,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   5.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -87,7 +85,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   5.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -95,7 +93,7 @@ import static net.time4j.scale.TimeScale.UTC;
  * @doctags.concurrency {immutable}
  */
 public final class MachineTime<U>
-    implements RealTime<U>, Comparable<MachineTime<U>>, Serializable {
+    implements TimeSpan<U>, Comparable<MachineTime<U>>, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -425,7 +423,26 @@ public final class MachineTime<U>
 
     }
 
-    @Override
+    /**
+     * <p>Yields the normalized seconds of this duration. </p>
+     *
+     * <p>The normalization happens in case of a negative duration such that any fraction part
+     * falls into the range {@code 0-999999999}. In this case, following expression is NOT true:
+     * {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
+     *
+     * @return  long
+     * @see     #getFraction()
+     */
+    /*[deutsch]
+     * <p>Liefert die normalisierten Sekunden dieser Dauer. </p>
+     *
+     * <p>Die Normalisierung geschieht im Fall einer negativen Dauer so, da&szlig; ein Sekundenbruchteil
+     * immer in den Bereich {@code 0-999999999} f&auml;llt. In diesem Fall ist folgender Ausdruck NICHT
+     * wahr: {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
+     *
+     * @return  long
+     * @see     #getFraction()
+     */
     public long getSeconds() {
 
         long secs = this.seconds;
@@ -438,7 +455,18 @@ public final class MachineTime<U>
 
     }
 
-    @Override
+    /**
+     * <p>Yields the normalized nanosecond fraction of this duration. </p>
+     *
+     * @return  nanosecond in range {@code 0-999999999}
+     * @see     #getSeconds()
+     */
+    /*[deutsch]
+     * <p>Liefert den normalisierten Nanosekundenteil dieser Dauer. </p>
+     *
+     * @return  nanosecond in range {@code 0-999999999}
+     * @see     #getSeconds()
+     */
     public int getFraction() {
 
         int n = this.nanos;
@@ -904,34 +932,36 @@ public final class MachineTime<U>
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TimePoint<? super U, T>> T addTo(T time) {
 
         U s, f;
 
         if (this.scale == POSIX) {
-            s = cast(TimeUnit.SECONDS);
-            f = cast(TimeUnit.NANOSECONDS);
+            s = (U) TimeUnit.SECONDS;
+            f = (U) TimeUnit.NANOSECONDS;
         } else {
-            s = cast(SI.SECONDS);
-            f = cast(SI.NANOSECONDS);
+            s = (U) SI.SECONDS;
+            f = (U) SI.NANOSECONDS;
         }
 
         return time.plus(this.seconds, s).plus(this.nanos, f);
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TimePoint<? super U, T>> T subtractFrom(T time) {
 
         U s, f;
 
         if (this.scale == POSIX) {
-            s = cast(TimeUnit.SECONDS);
-            f = cast(TimeUnit.NANOSECONDS);
+            s = (U) TimeUnit.SECONDS;
+            f = (U) TimeUnit.NANOSECONDS;
         } else {
-            s = cast(SI.SECONDS);
-            f = cast(SI.NANOSECONDS);
+            s = (U) SI.SECONDS;
+            f = (U) SI.NANOSECONDS;
         }
 
         return time.minus(this.seconds, s).minus(this.nanos, f);
@@ -1161,7 +1191,7 @@ public final class MachineTime<U>
     }
 
     @SuppressWarnings("unchecked")
-    static <T> T cast(Object obj) {
+    private static <T> T cast(Object obj) {
 
         return (T) obj;
 
@@ -1171,7 +1201,7 @@ public final class MachineTime<U>
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The layout
      *              is bit-compressed. The first byte contains within the
-     *              six most significant bits the type id {@code 7} and as
+     *              four most significant bits the type id {@code 5} and as
      *              least significant bit the value 1 if this instance uses
      *              the UTC-scale. Then the bytes for the seconds and fraction
      *              follow. The fraction bytes are only written if the fraction
@@ -1181,7 +1211,7 @@ public final class MachineTime<U>
      * Schematic algorithm:
      *
      * <pre>
-     *      byte header = (7 &lt;&lt; 2);
+     *      byte header = (5 &lt;&lt; 4);
      *      if (scale == TimeScale.UTC) header |= 1;
      *      if (this.getFraction() &gt; 0) header |= 2;
      *      out.writeByte(header);

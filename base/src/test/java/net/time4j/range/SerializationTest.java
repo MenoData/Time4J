@@ -230,20 +230,6 @@ public class SerializationTest {
     }
 
     @Test
-    public void roundTripOfMachineTimePOSIX()
-        throws IOException, ClassNotFoundException {
-
-        roundtrip(MachineTime.ofPosixSeconds(123.5));
-    }
-
-    @Test
-    public void roundTripOfMachineTimeUTC()
-        throws IOException, ClassNotFoundException {
-
-        roundtrip(MachineTime.ofSIUnits(123, 987654321));
-    }
-
-    @Test
     public void roundTripOfYears()
         throws IOException, ClassNotFoundException {
 

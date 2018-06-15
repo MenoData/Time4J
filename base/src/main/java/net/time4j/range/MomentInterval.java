@@ -24,6 +24,7 @@ package net.time4j.range;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
+import net.time4j.MachineTime;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -1000,9 +1001,9 @@ public final class MomentInterval
         } else if (comp == 0) {
             return Stream.empty();
         } else if (duration.getScale() == TimeScale.UTC) {
-            return streamUTC(MachineTime.cast(duration), start, end);
+            return streamUTC(cast(duration), start, end);
         } else {
-            return streamPOSIX(MachineTime.cast(duration), start, end);
+            return streamPOSIX(cast(duration), start, end);
         }
 
     }
@@ -1817,6 +1818,13 @@ public final class MomentInterval
         }
 
         return IntStream.range(0, size).mapToObj(index -> start.plus(duration.multipliedBy(index)));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T> T cast(Object obj) {
+
+        return (T) obj;
 
     }
 

@@ -1,7 +1,5 @@
-package net.time4j.range;
+package net.time4j;
 
-import net.time4j.Moment;
-import net.time4j.SI;
 import net.time4j.scale.TimeScale;
 import org.junit.Test;
 import org.junit.runner.RunWith;

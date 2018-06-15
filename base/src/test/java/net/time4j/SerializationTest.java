@@ -226,6 +226,20 @@ public class SerializationTest {
         roundtrip(DayPeriod.of(Locale.ENGLISH));
     }
 
+    @Test
+    public void roundTripOfMachineTimePOSIX()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(MachineTime.ofPosixSeconds(123.5));
+    }
+
+    @Test
+    public void roundTripOfMachineTimeUTC()
+        throws IOException, ClassNotFoundException {
+
+        roundtrip(MachineTime.ofSIUnits(123, 987654321));
+    }
+
     private Info analyze(String msg, Object[] sers)
         throws IOException, ClassNotFoundException {
 

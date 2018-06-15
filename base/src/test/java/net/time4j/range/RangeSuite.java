@@ -26,7 +26,6 @@ import org.junit.runners.Suite.SuiteClasses;
         IntervalCollectionTest.class,
         IntervalTreeTest.class,
         IsoRecurrenceTest.class,
-        MachineTimeTest.class,
         MomentIntervalFormatTest.class,
         RangeConversionTest.class,
         RangeDurationTest.class,

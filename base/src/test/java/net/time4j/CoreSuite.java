@@ -19,6 +19,7 @@ import org.junit.runners.Suite.SuiteClasses;
         ComponentElementTest.class,
         DateSuite.class,
         DurationSuite.class,
+        MachineTimeTest.class,
         MinMaxTest.class,
         NumberSuite.class,
         OperatorSuite.class,

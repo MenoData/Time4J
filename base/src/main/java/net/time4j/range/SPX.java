@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -28,7 +28,6 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Quarter;
 import net.time4j.engine.TimeLine;
-import net.time4j.scale.TimeScale;
 
 import java.io.Externalizable;
 import java.io.IOException;
@@ -38,7 +37,6 @@ import java.io.ObjectOutput;
 import java.io.ObjectStreamException;
 import java.io.StreamCorruptedException;
 import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 
 
@@ -94,9 +92,6 @@ final class SPX
 
     /** Serialisierungstyp von {@code Boundary}. */
     static final int BOUNDARY_TYPE = 57;
-
-    /** Serialisierungstyp von {@code MachineTime}. */
-    static final int MACHINE_TIME_TYPE = 7;
 
     private static final long serialVersionUID = 1L;
 
@@ -230,9 +225,6 @@ final class SPX
                         out.writeObject(part.getEnd().getTemporal());
                     }
                     break;
-                case MACHINE_TIME_TYPE:
-                    this.writeMachineTime(out);
-                    break;
                 default:
                     throw new InvalidClassException("Unknown serialized type.");
             }
@@ -304,10 +296,6 @@ final class SPX
             case BOUNDARY_TYPE:
                 this.obj = readBoundary(in, header);
                 break;
-            case MACHINE_TIME_TYPE:
-                this.obj = this.readMachineTime(in, header);
-                break;
-
             default:
                 throw new StreamCorruptedException("Unknown serialized type.");
         }
@@ -441,7 +429,7 @@ final class SPX
             intervals.add(readDateInterval(in));
         }
 
-        Collections.sort(intervals, DateInterval.comparator());
+        intervals.sort(DateInterval.comparator());
         return DateWindows.EMPTY.plus(intervals);
 
     }
@@ -462,7 +450,7 @@ final class SPX
             intervals.add(readClockInterval(in));
         }
 
-        Collections.sort(intervals, ClockInterval.comparator());
+        intervals.sort(ClockInterval.comparator());
         return ClockWindows.EMPTY.plus(intervals);
 
     }
@@ -483,7 +471,7 @@ final class SPX
             intervals.add(readTimestampInterval(in));
         }
 
-        Collections.sort(intervals, TimestampInterval.comparator());
+        intervals.sort(TimestampInterval.comparator());
         return TimestampWindows.EMPTY.plus(intervals);
 
     }
@@ -503,7 +491,7 @@ final class SPX
             intervals.add(readMomentInterval(in));
         }
 
-        Collections.sort(intervals, MomentInterval.comparator());
+        intervals.sort(MomentInterval.comparator());
         return MomentWindows.EMPTY.plus(intervals);
 
     }
@@ -524,7 +512,7 @@ final class SPX
             intervals.add(new SimpleInterval(s, e, timeLine));
         }
 
-        Collections.sort(intervals, new IntervalComparator(timeLine));
+        intervals.sort(new IntervalComparator(timeLine));
         return new GenericWindows(timeLine, intervals);
 
     }
@@ -633,47 +621,6 @@ final class SPX
         }
 
         return ret;
-
-    }
-
-    private void writeMachineTime(ObjectOutput out)
-        throws IOException {
-
-        MachineTime<?> mt = MachineTime.class.cast(this.obj);
-        int header = MACHINE_TIME_TYPE;
-        header <<= 2;
-
-        if (mt.getScale() == TimeScale.UTC) {
-            header |= 1;
-        }
-
-        if (mt.getFraction() == 0) {
-            out.writeByte(header);
-            out.writeLong(mt.getSeconds());
-        } else {
-            header |= 2;
-            out.writeByte(header);
-            out.writeLong(mt.getSeconds());
-            out.writeInt(mt.getFraction());
-        }
-
-    }
-
-    private Object readMachineTime(
-        ObjectInput in,
-        byte header
-    ) throws IOException, ClassNotFoundException {
-
-        TimeScale scale = (
-            ((header & 0x1) == 1) ? TimeScale.UTC : TimeScale.POSIX);
-        long secs = in.readLong();
-        int fraction = (((header & 0x2) == 2) ? in.readInt() : 0);
-
-        if (scale == TimeScale.UTC) {
-            return MachineTime.ofSIUnits(secs, fraction);
-        } else {
-            return MachineTime.ofPosixUnits(secs, fraction);
-        }
 
     }
 
