@@ -10,6 +10,7 @@
 - Automatic module names (for Java-9) [#784]
 - New modular structure [#525]
 - `StartOfDay` now uses `CalendarDate` in abstract method [#655]
+- Interface `ChronoPrinter` without checked exceptions [#526]
 
 ### Fixed
 - Wrong days-since-UTC after transform in Hijri adjustment [#789]
