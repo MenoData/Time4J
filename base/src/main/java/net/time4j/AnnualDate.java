@@ -150,7 +150,7 @@ public final class AnnualDate
     /**
      * <p>Element with the calendar month in numerical form and the value range
      * {@code 1-12}. </p>
-     * <p/>
+     *
      * <p>Normally the enum-variant is recommended due to clarity and
      * type-safety. The enum-form can also be formatted as text. </p>
      *
