@@ -43,7 +43,6 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
@@ -846,21 +845,6 @@ public final class ChronoFormatter<T>
 
         ChronoDisplay display = this.display(formattable, attributes);
         return this.print(display, buffer, attributes, true);
-
-    }
-
-    @Deprecated
-    @Override
-    public <R> R print(
-        T formattable,
-        Appendable buffer,
-        AttributeQuery attributes,
-        ChronoFunction<ChronoDisplay, R> query
-    ) throws IOException {
-
-        ChronoDisplay display = this.display(formattable, attributes);
-        this.print(display, buffer, attributes, false);
-        return query.apply(display);
 
     }
 
@@ -3282,17 +3266,7 @@ public final class ChronoFormatter<T>
         builder.addProcessor(
             new CustomizedProcessor<>(
                 TimezoneElement.TIMEZONE_OFFSET,
-                new ChronoPrinter<TZID>() {
-                    @Override
-                    public <R> R print(
-                        TZID formattable,
-                        Appendable buffer,
-                        AttributeQuery attributes,
-                        ChronoFunction<ChronoDisplay, R> query
-                    ) throws IOException {
-                        return null;
-                    }
-                },
+                (formattable, buffer, attributes) -> null,
                 (text, status, attributes) -> {
                     int offset = status.getPosition();
                     if (offset + 3 <= text.length()) {

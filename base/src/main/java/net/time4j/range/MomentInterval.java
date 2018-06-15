@@ -147,6 +147,9 @@ public final class MomentInterval
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
         new IntervalComparator<>(Moment.axis());
 
+    private static final ChronoPrinter<Integer> NOOP =
+        (formattable, buffer, attributes) -> Collections.emptySet();
+
     //~ Konstruktoren -----------------------------------------------------
 
     // package-private
@@ -1947,7 +1950,7 @@ public final class MomentInterval
                 builder.startSection(PROTECTED_CHARACTERS, p);
                 builder.addCustomized(
                     year,
-                    NoopPrinter.NOOP,
+                    NOOP,
                     (this.weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
             } else {
                 int p = (this.ordinalStyle ? 3 : 4) + this.protectedArea;
@@ -1960,7 +1963,7 @@ public final class MomentInterval
                 builder.startSection(PROTECTED_CHARACTERS, 1 + this.protectedArea);
                 builder.addCustomized(
                     Weekmodel.ISO.weekOfYear(),
-                    NoopPrinter.NOOP,
+                    NOOP,
                     this.extended
                         ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
                         : FixedNumParser.BASIC_WEEK_OF_YEAR);
@@ -1977,7 +1980,7 @@ public final class MomentInterval
                 if (this.extended) {
                     builder.addCustomized(
                         MONTH_AS_NUMBER,
-                        NoopPrinter.NOOP,
+                        NOOP,
                         FixedNumParser.CALENDAR_MONTH);
                 } else {
                     builder.addFixedInteger(MONTH_AS_NUMBER, 2);

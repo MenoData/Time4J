@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CustomizedProcessor.java) is part of project Time4J.
  *
@@ -27,7 +27,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.Chronology;
 
 import java.io.IOException;
@@ -46,10 +45,6 @@ import java.util.Set;
  */
 final class CustomizedProcessor<V>
     implements FormatProcessor<V> {
-
-    //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final ChronoFunction<ChronoDisplay, Void> NO_RESULT = (context -> null);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -152,7 +147,7 @@ final class CustomizedProcessor<V>
                 }
                 positions.addAll(set);
             } else {
-                this.printer.print(value, collector, attributes, NO_RESULT);
+                this.printer.print(value, collector, attributes);
             }
 
             positions.add(
@@ -161,7 +156,7 @@ final class CustomizedProcessor<V>
                     offset,
                     offset + collector.length()));
         } else {
-            this.printer.print(value, collector, attributes, NO_RESULT);
+            this.printer.print(value, collector, attributes);
         }
 
         buffer.append(collector);
@@ -354,7 +349,7 @@ final class CustomizedProcessor<V>
         Object value,
         StringBuilder collector,
         AttributeQuery attributes
-    ) throws IOException {
+    ) {
 
         return formatter.print(
             formatter.getChronology().getChronoType().cast(value),

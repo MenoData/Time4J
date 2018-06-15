@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Iso8601Format.java) is part of project Time4J.
  *
@@ -27,23 +27,19 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
-import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.tz.ZonalOffset;
 
-import java.io.IOException;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.Locale;
-import java.util.Set;
 
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
@@ -811,28 +807,9 @@ LOOP:
 
     private static ChronoPrinter<PlainDate> generalDatePrinter(final boolean extended) {
 
-        return new ChronoPrinter<PlainDate>() {
-            @Override
-            public Set<ElementPosition> print(
-                PlainDate formattable,
-                StringBuilder buffer,
-                AttributeQuery attributes
-            ) {
-                ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
-                return f.print(formattable, buffer); // attributes are ignored to ensure quick path evaluation
-            }
-            // TODO: remove with v5.0
-            @Override
-            public <R> R print(
-                PlainDate formattable,
-                Appendable buffer,
-                AttributeQuery attributes,
-                ChronoFunction<ChronoDisplay, R> query
-            ) throws IOException {
-                ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
-                f.formatToBuffer(formattable, buffer);
-                return null; // always ignored
-            }
+        return (formattable, buffer, attributes) -> {
+            ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
+            return f.print(formattable, buffer); // attributes are ignored to ensure quick path evaluation
         };
 
     }

@@ -8,11 +8,8 @@ import net.time4j.SI;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
-import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoFunction;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
@@ -852,17 +849,7 @@ public class MiscellaneousTest {
             ChronoFormatter.setUp(PlainTimestamp.axis(), Locale.ROOT)
                 .addCustomized(
                     PlainDate.COMPONENT,
-                    new ChronoPrinter<PlainDate>() {
-                        @Override
-                        public <R> R print(
-                            PlainDate formattable,
-                            Appendable buffer,
-                            AttributeQuery attributes,
-                            ChronoFunction<ChronoDisplay, R> query
-                        ) throws IOException {
-                            return null;
-                        }
-                    },
+                    (formattable, buffer, attributes) -> null,
                     embedded)
                 .build()
                 .withDefault(PlainDate.YEAR, 2016)

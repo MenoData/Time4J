@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimestampInterval.java) is part of project Time4J.
  *
@@ -55,6 +55,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.stream.IntStream;
@@ -103,6 +104,9 @@ public final class TimestampInterval
 
     private static final Comparator<ChronoInterval<PlainTimestamp>> COMPARATOR =
         new IntervalComparator<>(PlainTimestamp.axis());
+
+    private static final ChronoPrinter<Integer> NOOP =
+        (formattable, buffer, attributes) -> Collections.emptySet();
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -1579,7 +1583,7 @@ public final class TimestampInterval
                 builder.startSection(Attributes.PROTECTED_CHARACTERS, p);
                 builder.addCustomized(
                     year,
-                    NoopPrinter.NOOP,
+                    NOOP,
                     (this.weekStyle ? YearParser.YEAR_OF_WEEKDATE : YearParser.YEAR));
             } else {
                 int p = (this.ordinalStyle ? 3 : 4) + this.protectedArea;
@@ -1594,7 +1598,7 @@ public final class TimestampInterval
                     1 + this.protectedArea);
                 builder.addCustomized(
                     Weekmodel.ISO.weekOfYear(),
-                    NoopPrinter.NOOP,
+                    NOOP,
                     extended
                         ? FixedNumParser.EXTENDED_WEEK_OF_YEAR
                         : FixedNumParser.BASIC_WEEK_OF_YEAR);
@@ -1613,7 +1617,7 @@ public final class TimestampInterval
                 if (this.extended) {
                     builder.addCustomized(
                         MONTH_AS_NUMBER,
-                        NoopPrinter.NOOP,
+                        NOOP,
                         FixedNumParser.CALENDAR_MONTH);
                 } else {
                     builder.addFixedInteger(MONTH_AS_NUMBER, 2);
