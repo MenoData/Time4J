@@ -1519,7 +1519,10 @@ public abstract class Timezone
 
         // Ungültige ID?
         if (tz == null) {
-            if (wantsException) {
+            Timezone sys = Timezone.ofSystem();
+            if (sys.getID().canonical().equals(zoneID)) {
+                tz = sys; // edge case: system zone with customized id
+            } else if (wantsException) {
                 throw new IllegalArgumentException("Unknown timezone: " + zoneID);
             } else {
                 return null;
