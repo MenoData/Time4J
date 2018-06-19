@@ -32,7 +32,7 @@ import net.time4j.base.GregorianMath;
  * @author  Meno Hochschild
  */
 final class SimpleDate
-    implements GregorianDate, Comparable<SimpleDate> {
+    implements GregorianDate {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -128,21 +128,6 @@ final class SimpleDate
         }
         sb.append(this.dayOfMonth);
         return sb.toString();
-    }
-
-    @Override
-    public int compareTo(SimpleDate other) {
-        if (this.year < other.year) {
-            return -1;
-        } else if (this.year > other.year) {
-            return 1;
-        } else if (this.month < other.month) {
-            return -1;
-        } else if (this.month > other.month) {
-            return 1;
-        } else {
-            return (this.dayOfMonth - other.dayOfMonth);
-        }
     }
 
 }

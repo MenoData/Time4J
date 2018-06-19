@@ -35,7 +35,7 @@ import static net.time4j.format.PluralCategory.*;
  * plural rules. </p>
  *
  * @author  Meno Hochschild
- * @since   2.2
+ * @since   5.0
  */
 final class PluralProviderSPI
     implements PluralProvider {
