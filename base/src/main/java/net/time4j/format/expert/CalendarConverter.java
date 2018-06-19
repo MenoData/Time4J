@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarConverter.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.format.expert;
 
 import net.time4j.PlainDate;
+import net.time4j.base.ResourceLoader;
 import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarFamily;
@@ -34,7 +35,6 @@ import net.time4j.history.ChronoHistory;
 
 import java.util.Locale;
 import java.util.Optional;
-import java.util.ServiceLoader;
 
 
 /**
@@ -99,7 +99,7 @@ final class CalendarConverter<T extends ChronoEntity<T> & CalendarDate>
             name = "islamic-icu4j"; // later: astro-variant
         }
 
-        for (CalendarProvider provider : ServiceLoader.load(CalendarProvider.class)) {
+        for (CalendarProvider provider : ResourceLoader.getInstance().services(CalendarProvider.class)) {
             Optional<Chronology<? extends CalendarDate>> c = provider.findChronology(name);
 
             if (c.isPresent()) {

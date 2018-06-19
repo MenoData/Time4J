@@ -19,14 +19,11 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.scale.spi;
+package net.time4j.scale;
 
-import net.time4j.PlainDate;
-import net.time4j.Platform;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.base.ResourceLoader;
-import net.time4j.format.TemporalFormatter;
-import net.time4j.scale.LeapSecondProvider;
 
 import java.io.BufferedReader;
 import java.io.IOException;
@@ -42,26 +39,26 @@ import static net.time4j.scale.LeapSeconds.PATH_TO_LEAPSECONDS;
 
 
 /**
- * <p>{@code ServiceProvider}-implementation for accessing the file
- * &quot;leapseconds.data&quot; in class path. </p>
+ * <p>Helps to access the file &quot;leapseconds.data&quot; in class path. </p>
  *
  * @author  Meno Hochschild
+ * @since   5.0
  */
-public final class DefaultLeapSecondProviderSPI
+final class DefaultLeapSecondProviderSPI
     implements LeapSecondProvider {
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final String source;
-    private final PlainDate expires;
+    private final SimpleDate expires;
     private final Map<GregorianDate, Integer> table;
 
     //~ Konstruktoren -----------------------------------------------------
 
-    public DefaultLeapSecondProviderSPI() {
+    DefaultLeapSecondProviderSPI() {
         super();
 
-        PlainDate tmpExpires = PlainDate.axis().getMinimum();
+        SimpleDate tmpExpires = new SimpleDate(GregorianMath.MIN_YEAR, 1, 1);
         this.table = new LinkedHashMap<>(50);
         String name = PATH_TO_LEAPSECONDS;
         URI uri = ResourceLoader.getInstance().locate("base", LeapSecondProvider.class, name);
@@ -74,7 +71,6 @@ public final class DefaultLeapSecondProviderSPI
         if (is != null) {
 
             this.source = uri.toString();
-            TemporalFormatter<PlainDate> f = PlainDate.localFormatter("yyyy-MM-dd", Platform.PATTERN);
 
             try {
 
@@ -90,7 +86,10 @@ public final class DefaultLeapSecondProviderSPI
                         continue; // Kommentarzeile überspringen
                     } else if (line.startsWith("@expires=")) {
                         String date = line.substring(9);
-                        tmpExpires = f.parse(date);
+                        int y = Integer.parseInt(date.substring(0, 4));
+                        int m = Integer.parseInt(date.substring(5, 7));
+                        int d = Integer.parseInt(date.substring(8, 10));
+                        tmpExpires = new SimpleDate(y, m, d);
                         continue;
                     }
 
@@ -126,7 +125,7 @@ public final class DefaultLeapSecondProviderSPI
 
                     Object old =
                         this.table.put(
-                            PlainDate.of(year, month, dom),
+                            new SimpleDate(year, month, dom),
                             Integer.valueOf(sign.booleanValue() ? 1 : -1)
                         );
 
@@ -183,7 +182,7 @@ public final class DefaultLeapSecondProviderSPI
         int dayOfMonth
     ) {
 
-        return PlainDate.of(year, month, dayOfMonth);
+        return new SimpleDate(year, month, dayOfMonth);
 
     }
 

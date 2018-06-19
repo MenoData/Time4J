@@ -4,7 +4,6 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.base.GregorianDate;
-
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -298,9 +297,16 @@ public class LeapSecondTest {
     @Test
     public void getDateOfExpiration() {
         GregorianDate expected = PlainDate.of(2017, 12, 28);
+        GregorianDate date = LeapSeconds.getInstance().getDateOfExpiration();
         assertThat(
-            LeapSeconds.getInstance().getDateOfExpiration(),
-            is(expected));
+            date.getDayOfMonth(),
+            is(expected.getDayOfMonth()));
+        assertThat(
+            date.getMonth(),
+            is(expected.getMonth()));
+        assertThat(
+            date.getYear(),
+            is(expected.getYear()));
     }
 
     private static PlainDate toPlainDate(GregorianDate date) {

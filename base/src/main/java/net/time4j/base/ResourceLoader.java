@@ -21,6 +21,33 @@
 
 package net.time4j.base;
 
+import net.time4j.calendar.service.GenericCalendarProviderSPI;
+import net.time4j.calendar.service.GenericTextProviderSPI;
+import net.time4j.calendar.service.KoreanExtension;
+import net.time4j.engine.CalendarProvider;
+import net.time4j.engine.ChronoExtension;
+import net.time4j.format.FormatEngine;
+import net.time4j.format.FormatPatternProvider;
+import net.time4j.format.NumberSymbolProvider;
+import net.time4j.format.PluralProvider;
+import net.time4j.format.TextProvider;
+import net.time4j.format.UnitPatternProvider;
+import net.time4j.format.WeekdataProvider;
+import net.time4j.i18n.HistoricExtension;
+import net.time4j.i18n.IsoCalendarProviderSPI;
+import net.time4j.i18n.IsoTextProviderSPI;
+import net.time4j.i18n.PluralProviderSPI;
+import net.time4j.i18n.SymbolProviderSPI;
+import net.time4j.i18n.UltimateFormatEngine;
+import net.time4j.i18n.UnitPatternProviderSPI;
+import net.time4j.i18n.WeekdataProviderSPI;
+import net.time4j.tz.ZoneModelProvider;
+import net.time4j.tz.ZoneNameProvider;
+import net.time4j.tz.spi.MilZoneProviderSPI;
+import net.time4j.tz.spi.WinZoneProviderSPI;
+import net.time4j.tz.spi.ZoneNameProviderSPI;
+import net.time4j.tz.threeten.JdkZoneProviderSPI;
+
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
@@ -30,7 +57,16 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.security.CodeSource;
 import java.security.ProtectionDomain;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.Map;
 import java.util.ServiceLoader;
+import java.util.Set;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 
 /**
@@ -91,10 +127,12 @@ public abstract class ResourceLoader {
     private static final boolean ANDROID;
     private static final ResourceLoader INSTANCE;
     private static final boolean ENFORCE_USE_OF_CLASSLOADER;
+    private static final Map<Class<?>, List<Object>> REGISTERED_SERVICES;
 
     static {
         ANDROID = "Dalvik".equalsIgnoreCase(System.getProperty("java.vm.name"));
         ENFORCE_USE_OF_CLASSLOADER = !ANDROID && Boolean.getBoolean(USE_OF_CLASSLOADER_ONLY);
+        REGISTERED_SERVICES = new ConcurrentHashMap<>();
         String rl = System.getProperty(EXTERNAL_RESOURCE_LOADER);
 
         if (rl == null) {
@@ -267,6 +305,54 @@ public abstract class ResourceLoader {
      */
     public abstract <S> Iterable<S> services(Class<S> serviceInterface);
 
+    /**
+     * <p>Registers an external service provider. </p>
+     *
+     * <p>This method is mainly intended to register an extra time zone repository in the context of OSGi
+     * where the service loader mechanism does not work. </p>
+     *
+     * @param   <S> generic service type
+     * @param   serviceInterface    service interface
+     * @param   implementation      service provider
+     * @throws  IllegalStateException if already registered or called on a non-standard resource loader like on Android
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Registriert einen externen <i>Service Provider</i>. </p>
+     *
+     * <p>Diese Methode dient haupts&auml;chlich der Registrierung eines extra Zeitzonen-Repositoriums, wenn
+     * der <i>service loader</i>-Mechanismus im Kontext von OSGi nicht funktioniert. </p>
+     *
+     * @param   <S> generic service type
+     * @param   serviceInterface    service interface
+     * @param   implementation      service provider
+     * @throws  IllegalStateException if already registered or called on a non-standard resource loader like on Android
+     * @since   5.0
+     */
+    public synchronized <S> void registerService(
+        Class<S> serviceInterface,
+        S implementation
+    ) {
+
+        if (this.getClass() != StdResourceLoader.class) {
+            throw new IllegalStateException("Can only be called on standard resource loader.");
+        }
+
+        List<Object> list = REGISTERED_SERVICES.get(serviceInterface);
+
+        if (list == null) {
+            list = new CopyOnWriteArrayList<>();
+        }
+
+        if (list.contains(implementation)) {
+            throw new IllegalStateException("Service already registered: " + implementation);
+        }
+
+        list.add(implementation);
+        REGISTERED_SERVICES.put(serviceInterface, list);
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class StdResourceLoader
@@ -280,7 +366,6 @@ public abstract class ResourceLoader {
             if (ANDROID) {
                 throw new IllegalStateException("The module time4j-android is not active. Check your configuration.");
             }
-
         }
 
         //~ Methoden ------------------------------------------------------
@@ -354,8 +439,76 @@ public abstract class ResourceLoader {
         @Override
         public <S> Iterable<S> services(Class<S> serviceInterface) {
 
-            return ServiceLoader.load(serviceInterface, serviceInterface.getClassLoader());
+            Set<S> set = new LinkedHashSet<>();
+            List<?> ext = REGISTERED_SERVICES.get(serviceInterface);
 
+            if (ext != null) {
+                for (Object obj : ext) {
+                    set.add(serviceInterface.cast(obj));
+                }
+            }
+
+            for (S sl : ServiceLoader.load(serviceInterface, serviceInterface.getClassLoader())) {
+                set.add(sl);
+            }
+
+            List<?> predefined = InternalServices.MAP.get(serviceInterface);
+
+            if (predefined != null) {
+                for (Object obj : predefined) {
+                    set.add(serviceInterface.cast(obj));
+                }
+            }
+
+            return set;
+
+        }
+
+    }
+
+    private static class InternalServices {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final Map<Class<?>, List<?>> MAP;
+
+        static {
+            IsoTextProviderSPI iso = new IsoTextProviderSPI();
+            Map<Class<?>, List<?>> map = new HashMap<>();
+            map.put(
+                CalendarProvider.class,
+                Arrays.asList(new IsoCalendarProviderSPI(), new GenericCalendarProviderSPI()));
+            map.put(
+                ChronoExtension.class,
+                Arrays.asList(new HistoricExtension(), new KoreanExtension()));
+            map.put(
+                FormatEngine.class,
+                Collections.singletonList(new UltimateFormatEngine()));
+            map.put(
+                FormatPatternProvider.class,
+                Collections.singletonList(iso));
+            map.put(
+                NumberSymbolProvider.class,
+                Collections.singletonList(new SymbolProviderSPI()));
+            map.put(
+                PluralProvider.class,
+                Collections.singletonList(new PluralProviderSPI()));
+            map.put(
+                TextProvider.class,
+                Arrays.asList(iso, new GenericTextProviderSPI()));
+            map.put(
+                UnitPatternProvider.class,
+                Collections.singletonList(new UnitPatternProviderSPI()));
+            map.put(
+                WeekdataProvider.class,
+                Collections.singletonList(new WeekdataProviderSPI()));
+            map.put(
+                ZoneModelProvider.class,
+                Arrays.asList(new JdkZoneProviderSPI(), new WinZoneProviderSPI(), new MilZoneProviderSPI()));
+            map.put(
+                ZoneNameProvider.class,
+                Collections.singletonList(new ZoneNameProviderSPI()));
+            MAP = Collections.unmodifiableMap(map);
         }
 
     }

@@ -206,12 +206,14 @@ public final class LeapSeconds
                     leapCount = currentCount;
                 }
             }
+            // sonst Standard-Provider initialisieren
+            if (loaded == null) {
+                loaded = new DefaultLeapSecondProviderSPI();
+                leapCount = loaded.getLeapSecondTable().size();
+            }
         }
 
-        if (
-            (loaded == null)
-            || (leapCount == 0)
-        ) {
+        if ((loaded == null) || (leapCount == 0)) {
             this.provider = null;
             this.list = Collections.emptyList();
             this.reverseFinal = EMPTY_ARRAY;
@@ -220,10 +222,7 @@ public final class LeapSeconds
         } else {
             SortedSet<ExtendedLSE> sortedLS = new TreeSet<>(this);
 
-            for (
-                Map.Entry<GregorianDate, Integer> entry
-                : loaded.getLeapSecondTable().entrySet()
-            ) {
+            for (Map.Entry<GregorianDate, Integer> entry : loaded.getLeapSecondTable().entrySet()) {
                 GregorianDate date = entry.getKey();
                 long unixTime = toPosix(date);
 

@@ -1,3 +1,0 @@
-net.time4j.tz.threeten.JdkZoneProviderSPI
-net.time4j.tz.spi.WinZoneProviderSPI
-net.time4j.tz.spi.MilZoneProviderSPI
