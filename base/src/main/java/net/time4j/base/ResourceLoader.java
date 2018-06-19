@@ -29,14 +29,12 @@ import net.time4j.engine.ChronoExtension;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.NumberSymbolProvider;
-import net.time4j.format.PluralProvider;
 import net.time4j.format.TextProvider;
 import net.time4j.format.UnitPatternProvider;
 import net.time4j.format.WeekdataProvider;
 import net.time4j.i18n.HistoricExtension;
 import net.time4j.i18n.IsoCalendarProviderSPI;
 import net.time4j.i18n.IsoTextProviderSPI;
-import net.time4j.i18n.PluralProviderSPI;
 import net.time4j.i18n.SymbolProviderSPI;
 import net.time4j.i18n.UltimateFormatEngine;
 import net.time4j.i18n.UnitPatternProviderSPI;
@@ -490,9 +488,6 @@ public abstract class ResourceLoader {
             map.put(
                 NumberSymbolProvider.class,
                 Collections.singletonList(new SymbolProviderSPI()));
-            map.put(
-                PluralProvider.class,
-                Collections.singletonList(new PluralProviderSPI()));
             map.put(
                 TextProvider.class,
                 Arrays.asList(iso, new GenericTextProviderSPI()));

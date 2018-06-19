@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PluralProviderSPI.java) is part of project Time4J.
  *
@@ -19,24 +19,15 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
+package net.time4j.format;
 
-import net.time4j.format.NumberType;
-import net.time4j.format.PluralCategory;
-import net.time4j.format.PluralProvider;
-import net.time4j.format.PluralRules;
 import net.time4j.format.internal.FormatUtils;
 
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 
-import static net.time4j.format.PluralCategory.FEW;
-import static net.time4j.format.PluralCategory.MANY;
-import static net.time4j.format.PluralCategory.ONE;
-import static net.time4j.format.PluralCategory.OTHER;
-import static net.time4j.format.PluralCategory.TWO;
-import static net.time4j.format.PluralCategory.ZERO;
+import static net.time4j.format.PluralCategory.*;
 
 
 /**
@@ -46,7 +37,7 @@ import static net.time4j.format.PluralCategory.ZERO;
  * @author  Meno Hochschild
  * @since   2.2
  */
-public final class PluralProviderSPI
+final class PluralProviderSPI
     implements PluralProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------

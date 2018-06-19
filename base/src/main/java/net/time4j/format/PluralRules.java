@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PluralRules.java) is part of project Time4J.
  *
@@ -27,11 +27,6 @@ import net.time4j.format.internal.FormatUtils;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
-
-import static net.time4j.format.PluralCategory.FEW;
-import static net.time4j.format.PluralCategory.ONE;
-import static net.time4j.format.PluralCategory.OTHER;
-import static net.time4j.format.PluralCategory.TWO;
 
 
 /**
@@ -67,15 +62,6 @@ import static net.time4j.format.PluralCategory.TWO;
 public abstract class PluralRules {
 
     //~ Statische Felder/Initialisierungen --------------------------------
-
-    private static final PluralRules FALLBACK_CARDINAL_ENGLISH =
-        new FallbackRules(NumberType.CARDINALS, true);
-    private static final PluralRules FALLBACK_CARDINAL_OTHER =
-        new FallbackRules(NumberType.CARDINALS, false);
-    private static final PluralRules FALLBACK_ORDINAL_ENGLISH =
-        new FallbackRules(NumberType.ORDINALS, true);
-    private static final PluralRules FALLBACK_ORDINAL_OTHER =
-        new FallbackRules(NumberType.ORDINALS, false);
 
     private static final Map<String, PluralRules> CARDINAL_MAP = new ConcurrentHashMap<>();
     private static final Map<String, PluralRules> ORDINAL_MAP = new ConcurrentHashMap<>();
@@ -224,96 +210,6 @@ public abstract class PluralRules {
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class FallbackRules
-        extends PluralRules {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final NumberType numType;
-        private final boolean english;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private FallbackRules(
-            NumberType numType,
-            boolean english
-        ) {
-            super();
-
-            this.numType = numType;
-            this.english = english;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public PluralCategory getCategory(long count) {
-
-            switch (this.numType) {
-                case CARDINALS:
-                    return (count == 1 ? ONE : OTHER);
-                case ORDINALS:
-                    if (this.english) {
-                        long mod10 = count % 10;
-                        long mod100 = count % 100;
-                        if ((mod10 == 1) && (mod100 != 11)) {
-                            return ONE;
-                        } else if ((mod10 == 2) && (mod100 != 12)) {
-                            return TWO;
-                        } else if ((mod10 == 3) && (mod100 != 13)) {
-                            return FEW;
-                        }
-                    }
-                    return OTHER;
-                default:
-                    throw new UnsupportedOperationException(
-                        this.numType.name());
-            }
-
-        }
-
-        @Override
-        public NumberType getNumberType() {
-
-            return this.numType;
-
-        }
-
-    }
-
-    private static class FallbackProvider
-        implements PluralProvider {
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public PluralRules load(
-            Locale country,
-            NumberType numType
-        ) {
-
-            boolean english = country.getLanguage().equals("en");
-
-            switch (numType) {
-                case CARDINALS:
-                    return (
-                        english
-                        ? FALLBACK_CARDINAL_ENGLISH
-                        : FALLBACK_CARDINAL_OTHER);
-                case ORDINALS:
-                    return (
-                        english
-                        ? FALLBACK_ORDINAL_ENGLISH
-                        : FALLBACK_ORDINAL_OTHER);
-                default:
-                    throw new UnsupportedOperationException(numType.name());
-            }
-
-        }
-
-    }
-
     private static class Holder { // lazy class loading
 
         //~ Statische Felder/Initialisierungen ----------------------------
@@ -329,7 +225,7 @@ public abstract class PluralRules {
             }
 
             if (p == null) {
-                p = new FallbackProvider();
+                p = new PluralProviderSPI(); // fallback
             }
 
             PROVIDER = p;
