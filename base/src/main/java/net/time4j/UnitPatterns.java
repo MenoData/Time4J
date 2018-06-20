@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UnitPatterns.java) is part of project Time4J.
  *
@@ -75,11 +75,11 @@ final class UnitPatterns {
 
         for (UnitPatternProvider tmp : ResourceLoader.getInstance().services(UnitPatternProvider.class)) {
             p = tmp;
-            break;
+            break; // use first
         }
 
         if (p == null) {
-            p = FALLBACK;
+            p = new DefaultUnitPatternProviderSPI();
         }
 
         PROVIDER = p;

@@ -497,9 +497,8 @@ public class DayPeriodTest {
         mKey.setAccessible(true);
         Field field = DayPeriod.class.getDeclaredField("codeMap");
         field.setAccessible(true);
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
 
-        for (Locale locale : spi.getAvailableLocales()) {
+        for (Locale locale : IsoTextProviderSPI.SINGLETON.getAvailableLocales()) {
             Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
             DayPeriod dp = DayPeriod.of(locale);
             Map<?, ?> m = Map.class.cast(field.get(dp));

@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (UnitPatternProviderSPI.java) is part of project Time4J.
+ * This file (DefaultUnitPatternProviderSPI.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
+package net.time4j;
 
 import net.time4j.format.PluralCategory;
 import net.time4j.format.RelativeTimeProvider;
@@ -48,7 +48,7 @@ import java.util.MissingResourceException;
  * @author  Meno Hochschild
  * @since   1.2
  */
-public final class UnitPatternProviderSPI
+final class DefaultUnitPatternProviderSPI
     implements RelativeTimeProvider {
 
     //~ Methoden ----------------------------------------------------------

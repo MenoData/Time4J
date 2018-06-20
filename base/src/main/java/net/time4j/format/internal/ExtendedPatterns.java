@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ExtendedPatterns.java) is part of project Time4J.
  *
@@ -35,7 +35,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
- * @see     java.util.ServiceLoader
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> dient nur internen Zwecken und ist nicht Teil
@@ -43,7 +42,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
- * @see     java.util.ServiceLoader
  */
 public interface ExtendedPatterns
     extends FormatPatternProvider {

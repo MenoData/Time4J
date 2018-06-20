@@ -21,7 +21,7 @@ public class IsoSanityTest {
     @Test
     public void checkLanguages() {
 
-        IsoTextProviderSPI spi = new IsoTextProviderSPI();
+        IsoTextProviderSPI spi = IsoTextProviderSPI.SINGLETON;
 
         try {
             for (String s : IsoTextProviderSPI.getPrimaryLanguages()) {

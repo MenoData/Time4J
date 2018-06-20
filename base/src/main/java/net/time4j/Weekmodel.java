@@ -50,7 +50,6 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.text.ParsePosition;
 import java.util.Collections;
-import java.util.GregorianCalendar;
 import java.util.HashSet;
 import java.util.Locale;
 import java.util.Map;
@@ -135,7 +134,11 @@ public final class Weekmodel
 
         for (WeekdataProvider p : ResourceLoader.getInstance().services(WeekdataProvider.class)) {
             tmp = p;
-            break;
+            break; // use first
+        }
+
+        if (tmp == null) {
+            tmp = new DefaultWeekdataProviderSPI();
         }
 
         LOCALIZED_WEEKDATA = tmp;
@@ -401,15 +404,6 @@ public final class Weekmodel
         }
 
         WeekdataProvider p = LOCALIZED_WEEKDATA;
-
-        if (p == null) { // fallback
-            GregorianCalendar gc = new GregorianCalendar(locale);
-            int fd = gc.getFirstDayOfWeek();
-            int firstDayOfWeek = ((fd == 1) ? 7 : (fd - 1));
-            return Weekmodel.of(
-                Weekday.valueOf(firstDayOfWeek),
-                gc.getMinimalDaysInFirstWeek());
-        }
 
         model =
             new Weekmodel(

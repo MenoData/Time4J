@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (WeekdataProviderSPI.java) is part of project Time4J.
+ * This file (DefaultWeekdataProviderSPI.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -19,9 +19,8 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
+package net.time4j;
 
-import net.time4j.Weekday;
 import net.time4j.base.ResourceLoader;
 import net.time4j.format.WeekdataProvider;
 import net.time4j.format.internal.FormatUtils;
@@ -45,9 +44,9 @@ import java.util.Set;
  * <p>Standard-SPI-Implementierung eines {@code WeekdataProvider}. </p>
  *
  * @author  Meno Hochschild
- * @since   2.2
+ * @since   5.0
  */
-public class WeekdataProviderSPI
+final class DefaultWeekdataProviderSPI
     implements WeekdataProvider {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -60,16 +59,16 @@ public class WeekdataProviderSPI
 
     //~ Konstruktoren -----------------------------------------------------
 
-    public WeekdataProviderSPI() {
+    DefaultWeekdataProviderSPI() {
         super();
 
         String name = "data/week.data";
-        URI uri = ResourceLoader.getInstance().locate("base", WeekdataProviderSPI.class, name);
+        URI uri = ResourceLoader.getInstance().locate("base", DefaultWeekdataProviderSPI.class, name);
         InputStream is = ResourceLoader.getInstance().load(uri, true);
 
         if (is == null) {
             try {
-                is = ResourceLoader.getInstance().load(WeekdataProviderSPI.class, name, true);
+                is = ResourceLoader.getInstance().load(DefaultWeekdataProviderSPI.class, name, true);
             } catch (IOException ioe) {
                 // we print a warning on System.err (see below)
             }

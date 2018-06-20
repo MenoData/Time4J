@@ -221,11 +221,11 @@ public abstract class PluralRules {
 
             for (PluralProvider tmp : ResourceLoader.getInstance().services(PluralProvider.class)) {
                 p = tmp;
-                break;
+                break; // use first
             }
 
             if (p == null) {
-                p = new PluralProviderSPI(); // fallback
+                p = new DefaultPluralProviderSPI(); // fallback
             }
 
             PROVIDER = p;

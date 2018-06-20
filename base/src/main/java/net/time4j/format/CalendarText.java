@@ -29,6 +29,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.format.internal.ExtendedPatterns;
 import net.time4j.format.internal.FormatUtils;
 import net.time4j.format.internal.PropertyBundle;
+import net.time4j.i18n.IsoTextProviderSPI;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -185,13 +186,11 @@ public final class CalendarText {
     private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
 
     static {
-        FormatPatternProvider provider = new FormatPatterns(null);
+        FormatPatternProvider provider = new FormatPatterns(IsoTextProviderSPI.SINGLETON);
 
         for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
             provider = new FormatPatterns(fpp);
-            if (!fpp.getClass().getName().startsWith("net.time4j.")) {
-                break;
-            }
+            break; // use first
         }
 
         FORMAT_PATTERN_PROVIDER = provider;
@@ -434,6 +433,14 @@ public final class CalendarText {
                     if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
                         p = tmp;
                         break;
+                    }
+                }
+
+                if (p == null) {
+                    TextProvider tmp = IsoTextProviderSPI.SINGLETON;
+
+                    if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
+                        p = tmp;
                     }
                 }
 
@@ -1679,6 +1686,10 @@ public final class CalendarText {
         FormatPatterns(FormatPatternProvider delegate) {
             super();
 
+            if (delegate == null) {
+                throw new NullPointerException("Missing format pattern delegate.");
+            }
+
             this.delegate = delegate;
 
         }
@@ -1691,13 +1702,13 @@ public final class CalendarText {
             Locale locale
         ) {
 
-            if (this.delegate == null) {
+            try {
+                return this.delegate.getDatePattern(mode, locale);
+            } catch (MissingResourceException mre) {
                 int style = getFormatStyle(mode);
                 DateFormat df = DateFormat.getDateInstance(style, locale);
                 return getFormatPattern(df);
             }
-
-            return this.delegate.getDatePattern(mode, locale);
 
         }
 
@@ -1709,14 +1720,16 @@ public final class CalendarText {
 
             String pattern;
 
-            if (this.delegate == null) {
+            try {
+                if (this.delegate instanceof ExtendedPatterns) {
+                    pattern = ExtendedPatterns.class.cast(this.delegate).getTimePattern(mode, locale, true);
+                } else {
+                    pattern = this.delegate.getTimePattern(mode, locale);
+                }
+            } catch (MissingResourceException mre) {
                 int style = getFormatStyle(mode);
                 DateFormat df = DateFormat.getTimeInstance(style, locale);
                 pattern = getFormatPattern(df);
-            } else if (this.delegate instanceof ExtendedPatterns) {
-                pattern = ExtendedPatterns.class.cast(this.delegate).getTimePattern(mode, locale, true);
-            } else {
-                pattern = this.delegate.getTimePattern(mode, locale);
             }
 
             return removeZones(pattern);
@@ -1730,24 +1743,26 @@ public final class CalendarText {
             Locale locale
         ) {
 
-            if (this.delegate == null) {
+            try {
+                String time = this.delegate.getTimePattern(timeMode, locale);
+                String date = this.delegate.getDatePattern(dateMode, locale);
+                String pattern = this.delegate.getDateTimePattern(dateMode, timeMode, locale);
+                return pattern.replace("{1}", date).replace("{0}", time);
+            } catch (MissingResourceException mre) {
                 int dateStyle = getFormatStyle(dateMode);
                 int timeStyle = getFormatStyle(timeMode);
                 DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
                 return getFormatPattern(df);
             }
 
-            String time = this.delegate.getTimePattern(timeMode, locale);
-            String date = this.delegate.getDatePattern(dateMode, locale);
-            String pattern = this.delegate.getDateTimePattern(dateMode, timeMode, locale);
-            return pattern.replace("{1}", date).replace("{0}", time);
-
         }
 
         @Override
         public String getIntervalPattern(Locale locale) {
 
-            if (this.delegate == null) {
+            try {
+                return this.delegate.getIntervalPattern(locale);
+            } catch (MissingResourceException mre) {
                 if (locale.getLanguage().isEmpty() && FormatUtils.getRegion(locale).isEmpty()) {
                     return "{0}/{1}"; // ISO-8601-style
 //                } else if (isRTL(locale)) {
@@ -1756,8 +1771,6 @@ public final class CalendarText {
                     return "{0} - {1}"; // default
                 }
             }
-
-            return this.delegate.getIntervalPattern(locale);
 
         }
 

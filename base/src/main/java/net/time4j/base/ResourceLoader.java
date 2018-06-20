@@ -27,18 +27,12 @@ import net.time4j.calendar.service.KoreanExtension;
 import net.time4j.engine.CalendarProvider;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.format.FormatEngine;
-import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.TextProvider;
-import net.time4j.format.UnitPatternProvider;
-import net.time4j.format.WeekdataProvider;
 import net.time4j.i18n.HistoricExtension;
 import net.time4j.i18n.IsoCalendarProviderSPI;
-import net.time4j.i18n.IsoTextProviderSPI;
 import net.time4j.i18n.SymbolProviderSPI;
 import net.time4j.i18n.UltimateFormatEngine;
-import net.time4j.i18n.UnitPatternProviderSPI;
-import net.time4j.i18n.WeekdataProviderSPI;
 import net.time4j.tz.ZoneModelProvider;
 import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.spi.MilZoneProviderSPI;
@@ -471,7 +465,6 @@ public abstract class ResourceLoader {
         private static final Map<Class<?>, List<?>> MAP;
 
         static {
-            IsoTextProviderSPI iso = new IsoTextProviderSPI();
             Map<Class<?>, List<?>> map = new HashMap<>();
             map.put(
                 CalendarProvider.class,
@@ -483,20 +476,11 @@ public abstract class ResourceLoader {
                 FormatEngine.class,
                 Collections.singletonList(new UltimateFormatEngine()));
             map.put(
-                FormatPatternProvider.class,
-                Collections.singletonList(iso));
-            map.put(
                 NumberSymbolProvider.class,
                 Collections.singletonList(new SymbolProviderSPI()));
             map.put(
                 TextProvider.class,
-                Arrays.asList(iso, new GenericTextProviderSPI()));
-            map.put(
-                UnitPatternProvider.class,
-                Collections.singletonList(new UnitPatternProviderSPI()));
-            map.put(
-                WeekdataProvider.class,
-                Collections.singletonList(new WeekdataProviderSPI()));
+                Collections.singletonList(new GenericTextProviderSPI()));
             map.put(
                 ZoneModelProvider.class,
                 Arrays.asList(new JdkZoneProviderSPI(), new WinZoneProviderSPI(), new MilZoneProviderSPI()));

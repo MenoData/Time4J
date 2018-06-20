@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (PluralProviderSPI.java) is part of project Time4J.
+ * This file (DefaultPluralProviderSPI.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -37,7 +37,7 @@ import static net.time4j.format.PluralCategory.*;
  * @author  Meno Hochschild
  * @since   5.0
  */
-final class PluralProviderSPI
+final class DefaultPluralProviderSPI
     implements PluralProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -113,7 +113,7 @@ final class PluralProviderSPI
     //~ Konstruktoren -----------------------------------------------------
 
     /** For {@code java.util.ServiceLoader}. */
-    public PluralProviderSPI() {
+    public DefaultPluralProviderSPI() {
         super();
 
     }

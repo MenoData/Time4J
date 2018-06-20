@@ -49,10 +49,12 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  *
  * @author  Meno Hochschild
  */
-public final class IsoTextProviderSPI
+public class IsoTextProviderSPI
     implements TextProvider, ExtendedPatterns {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    public static final IsoTextProviderSPI SINGLETON;
 
     private static final Set<String> LANGUAGES;
     private static final Set<Locale> LOCALES;
@@ -76,14 +78,13 @@ public final class IsoTextProviderSPI
         }
 
         LOCALES = Collections.unmodifiableSet(locs);
+        SINGLETON = new IsoTextProviderSPI();
     }
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /** For {@code java.util.ServiceLoader}. */
-    public IsoTextProviderSPI() {
-        super();
-
+    private IsoTextProviderSPI() {
+        // singleton constructor
     }
 
     //~ Methoden ----------------------------------------------------------
