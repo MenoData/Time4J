@@ -436,14 +436,6 @@ public final class CalendarText {
                     }
                 }
 
-                if (p == null) {
-                    TextProvider tmp = IsoTextProviderSPI.SINGLETON;
-
-                    if (tmp.supportsCalendarType(calendarType) && tmp.supportsLanguage(locale)) {
-                        p = tmp;
-                    }
-                }
-
                 // Java-Ressourcen
                 if (p == null) {
                     TextProvider tmp = JDK_PROVIDER;

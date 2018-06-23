@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatEngine.java) is part of project Time4J.
  *
@@ -28,21 +28,19 @@ import java.util.Locale;
 
 
 /**
- * <p>This <strong>SPI-interface</strong> allows the creation of temporal formats via a builder-approach. </p>
+ * <p>Abstract facade for the creation of temporal formats via a builder-approach. </p>
  *
  * @param   <P> generic type of applicable format patterns
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
- * <p>Dieses <strong>SPI-Interface</strong> erlaubt die Erzeugung von temporalen Formatobjekten
+ * <p>Abstrakte Fassade f&uuml;r die Erzeugung von temporalen Formatobjekten
  * via Builder-Entwurfsmuster. </p>
  *
  * @param   <P> generic type of applicable format patterns
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface FormatEngine<P extends ChronoPattern<P>> {
 

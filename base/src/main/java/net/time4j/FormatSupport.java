@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatSupport.java) is part of project Time4J.
  *
@@ -21,11 +21,11 @@
 
 package net.time4j;
 
-import net.time4j.base.ResourceLoader;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.ChronoPattern;
 import net.time4j.format.FormatEngine;
 import net.time4j.format.TemporalFormatter;
+import net.time4j.i18n.UltimateFormatEngine;
 import net.time4j.tz.TZID;
 
 import java.util.Locale;
@@ -41,31 +41,7 @@ class FormatSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final FormatEngine<?> DEFAULT_FORMAT_ENGINE;
-
-    static {
-        FormatEngine<?> last = null;
-        FormatEngine<?> best = null;
-
-        for (FormatEngine<?> tmp : ResourceLoader.getInstance().services(FormatEngine.class)) {
-            if (tmp.isSupported(ChronoEntity.class)) {
-                best = tmp;
-                break;
-            } else {
-                last = tmp;
-            }
-        }
-
-        if (best == null) {
-            if (last == null) {
-                best = Platform.PATTERN.getFormatEngine();
-            } else {
-                best = last;
-            }
-        }
-
-        DEFAULT_FORMAT_ENGINE = best;
-    }
+    private static final FormatEngine<?> DEFAULT_FORMAT_ENGINE = new UltimateFormatEngine(); // with CLDR-support
 
     //~ Konstruktoren -----------------------------------------------------
 
