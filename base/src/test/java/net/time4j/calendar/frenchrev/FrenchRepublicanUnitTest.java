@@ -1,5 +1,6 @@
 package net.time4j.calendar.frenchrev;
 
+import net.time4j.engine.CalendarSystem;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -10,6 +11,18 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class FrenchRepublicanUnitTest {
+
+    @Test(expected=IllegalArgumentException.class)
+    public void frenchrevMin() {
+        CalendarSystem<FrenchRepublicanCalendar> calsys = FrenchRepublicanCalendar.axis().getCalendarSystem();
+        calsys.transform(Long.MIN_VALUE);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void frenchrevMax() {
+        CalendarSystem<FrenchRepublicanCalendar> calsys = FrenchRepublicanCalendar.axis().getCalendarSystem();
+        calsys.transform(Long.MAX_VALUE);
+    }
 
     @Test
     public void plusYears() {

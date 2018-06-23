@@ -1087,36 +1087,40 @@ public final class JulianCalendar
         @Override
         public JulianCalendar transform(long utcDays) {
 
-            long y;
-            int m;
-            int d;
+            try {
+                long y;
+                int m;
+                int d;
 
-            long days = MathUtils.safeAdd(utcDays, OFFSET);
+                long days = MathUtils.safeAdd(utcDays, OFFSET);
 
-            long q4 = MathUtils.floorDivide(days, 1461);
-            int r4 =  MathUtils.floorModulo(days, 1461);
+                long q4 = MathUtils.floorDivide(days, 1461);
+                int r4 = MathUtils.floorModulo(days, 1461);
 
-            if (r4 == 1460) {
-                y = (q4 + 1) * 4;
-                m = 2;
-                d = 29;
-            } else {
-                int q1 = (r4 / 365);
-                int r1 = (r4 % 365);
+                if (r4 == 1460) {
+                    y = (q4 + 1) * 4;
+                    m = 2;
+                    d = 29;
+                } else {
+                    int q1 = (r4 / 365);
+                    int r1 = (r4 % 365);
 
-                y = q4 * 4 + q1;
-                m = (((r1 + 31) * 5) / 153) + 2;
-                d = r1 - (((m + 1) * 153) / 5) + 123;
+                    y = q4 * 4 + q1;
+                    m = (((r1 + 31) * 5) / 153) + 2;
+                    d = r1 - (((m + 1) * 153) / 5) + 123;
 
-                if (m > 12) {
-                    y++;
-                    m -= 12;
+                    if (m > 12) {
+                        y++;
+                        m -= 12;
+                    }
                 }
-            }
 
-            HistoricEra era = ((y >= 1) ? HistoricEra.AD : HistoricEra.BC);
-            int yearOfEra = MathUtils.safeCast((y >= 1) ? y : MathUtils.safeSubtract(1, y));
-            return JulianCalendar.of(era, yearOfEra, m, d);
+                HistoricEra era = ((y >= 1) ? HistoricEra.AD : HistoricEra.BC);
+                int yearOfEra = MathUtils.safeCast((y >= 1) ? y : MathUtils.safeSubtract(1, y));
+                return JulianCalendar.of(era, yearOfEra, m, d);
+            } catch (ArithmeticException ex) {
+                throw new IllegalArgumentException(ex);
+            }
 
         }
 

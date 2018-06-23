@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Chronology.java) is part of project Time4J.
  *
@@ -394,6 +394,28 @@ public class Chronology<T>
     public CalendarSystem<T> getCalendarSystem(String variant) {
 
         throw new ChronoException("Calendar variant is not available: " + variant);
+
+    }
+
+    /**
+     * <p>Returns the calendar system for given calendar variant if available. </p>
+     *
+     * @param   variant     name of calendar variant
+     * @return  calendar system, not {@code null}
+     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant name)
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert das Kalendersystem zur angegebenen Kalendervariante, wenn verf&uuml;gbar. </p>
+     *
+     * @param   variant     name of calendar variant
+     * @return  calendar system, not {@code null}
+     * @throws  ChronoException if a calendar system is unavailable for given variant (invalid variant name)
+     * @since   5.0
+     */
+    public final CalendarSystem<T> getCalendarSystem(VariantSource variant) {
+
+        return this.getCalendarSystem(variant.getVariant());
 
     }
 

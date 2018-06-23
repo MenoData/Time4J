@@ -58,6 +58,7 @@ import org.junit.runners.Suite.SuiteClasses;
         MinguoMiscellaneousTest.class,
         MonthNameTest.class,
         NengoTest.class,
+        OutOfRangeTest.class,
         PersianCalendarTest.class,
         PersianMiscellaneousTest.class,
         PersianOperatorTest.class,

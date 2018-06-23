@@ -1019,22 +1019,25 @@ public final class CopticCalendar
         @Override
         public CopticCalendar transform(long utcDays) {
 
-            int cyear =
-                MathUtils.safeCast(
-                    MathUtils.floorDivide(
-                        MathUtils.safeAdd(
-                            MathUtils.safeMultiply(
-                                4,
-                                MathUtils.safeSubtract(utcDays, DIOCLETIAN)),
-                            1463),
-                        1461));
+            try {
+                int cyear =
+                    MathUtils.safeCast(
+                        MathUtils.floorDivide(
+                            MathUtils.safeAdd(
+                                MathUtils.safeMultiply(
+                                    4,
+                                    MathUtils.safeSubtract(utcDays, DIOCLETIAN)),
+                                1463),
+                            1461));
 
-            int startOfYear =  MathUtils.safeCast(this.transform(new CopticCalendar(cyear, 1, 1)));
-            int cmonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
-            int startOfMonth = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, cmonth, 1)));
-            int cdom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
-
-            return CopticCalendar.of(cyear, cmonth, cdom);
+                int startOfYear = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, 1, 1)));
+                int cmonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
+                int startOfMonth = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, cmonth, 1)));
+                int cdom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
+                return CopticCalendar.of(cyear, cmonth, cdom);
+            } catch (ArithmeticException ex) {
+                throw new IllegalArgumentException(ex);
+            }
 
         }
 
