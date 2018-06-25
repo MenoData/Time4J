@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ThaiSolarEra.java) is part of project Time4J.
  *
@@ -58,7 +58,8 @@ public enum ThaiSolarEra
      *
      * According to <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a>
      * this era started/starts years on first of April (even after 1940). Time4J always converts the
-     * Rattanakosin era to Buddhist era in any thai-date-input.
+     * Rattanakosin era to Buddhist era in any thai-date-input. Users should mainly use this era
+     * for the years 1888-1912.
      */
     /*[deutsch]
      * Die Rattanakosin-&Auml;ra begann am sechsten April 1782, wurde von K&ouml;nig Rama V im Jahre
@@ -66,8 +67,9 @@ public enum ThaiSolarEra
      *
      * Laut <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a> begann/beginnt 
      * diese &Auml;ra Jahre am ersten April, was sogar nach 1940 angewandt wird. Time4J konvertiert die
-     * Rattankosin-&Auml;ra immer zur buddhistischen &Auml;ra, wenn Thai-Datumsangaben als
-     * Eingabe verarbeitet werden.
+     * Rattankosin-&Auml;ra immer zur buddhistischen &Auml;ra, wenn Thai-Datumsangaben als Eingabe
+     * verarbeitet werden. Anwender solltend diese &Auml;ra vor allem f&uuml;r die Jahre 1888-1912
+     * verwenden.
      */
     RATTANAKOSIN,
 
