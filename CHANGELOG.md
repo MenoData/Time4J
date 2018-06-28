@@ -1,5 +1,6 @@
 ## [v5.0] not yet released
 ### Added
+- Extend formattability of extreme integer element values [#797]
 - New comparison methods `isOnOrAfter(date)` and `isOnOrBefore(date)` [#783]
 - Resolve locale no-NO-NY to nynorsk [#788]
 
