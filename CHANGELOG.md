@@ -5,6 +5,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Improve conversion of Windows zones to IANA [#785]
 - Move class `AnnualDate` to main package [#787]
 - Move class `MachineTime` to main package [#609]
 - Replace `ResourceBundle` in module environment [#786]
