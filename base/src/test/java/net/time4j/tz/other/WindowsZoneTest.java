@@ -9,6 +9,9 @@ import net.time4j.tz.NameStyle;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -18,12 +21,8 @@ import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.util.Locale;
 import java.util.Set;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.nullValue;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -81,33 +80,41 @@ public class WindowsZoneTest {
     }
 
     @Test
-    public void resolveSmartUS() {
+    public void resolveSmartUS1() {
         WindowsZone wzn = WindowsZone.of("Eastern Standard Time");
         assertThat(
-            wzn.resolveSmart(Locale.US).canonical(),
+            wzn.resolveSmart(Locale.US).get().canonical(),
             is("WINDOWS~America/New_York"));
+    }
+
+    @Test
+    public void resolveSmartUS2() {
+        WindowsZone wzn = WindowsZone.of("Romance Standard Time");
+        assertThat(
+            wzn.resolveSmart(Locale.US).get().canonical(),
+            is("WINDOWS~Europe/Paris"));
     }
 
     @Test
     public void resolveSmartFrance1() {
         WindowsZone wzn = WindowsZone.of("Eastern Standard Time");
-        TZID tzid = wzn.resolveSmart(Locale.FRANCE);
-        assertThat(tzid, nullValue());
+        assertThat(
+            wzn.resolveSmart(Locale.FRANCE).get().canonical(),
+            is("WINDOWS~America/New_York"));
     }
 
     @Test
     public void resolveSmartFrance2() {
         WindowsZone wzn = WindowsZone.of("Romance Standard Time");
         assertThat(
-            wzn.resolveSmart(Locale.FRANCE).canonical(),
+            wzn.resolveSmart(Locale.FRANCE).get().canonical(),
             is("WINDOWS~Europe/Paris"));
     }
 
     @Test
     public void resolveSmartEnglish() {
         WindowsZone wzn = WindowsZone.of("Eastern Standard Time");
-        TZID tzid = wzn.resolveSmart(Locale.ENGLISH);
-        assertThat(tzid, nullValue());
+        assertThat(wzn.resolveSmart(Locale.ENGLISH).isPresent(), is(false));
     }
 
     @Test
@@ -119,10 +126,37 @@ public class WindowsZoneTest {
     }
 
     @Test
+    public void resolveArabicStandardTime1() {
+        WindowsZone wzn = WindowsZone.of("Arabic Standard Time");
+        TZID winzone = wzn.resolveSmart(new Locale("en", "IQ")).get();
+        assertThat(
+            winzone.canonical(),
+            is("WINDOWS~Asia/Baghdad"));
+    }
+
+    @Test
+    public void resolveArabicStandardTime2() {
+        WindowsZone wzn = WindowsZone.of("Arabic Standard Time");
+        TZID winzone = wzn.resolveSmart(new Locale("en", "US")).get();
+        assertThat(
+            winzone.canonical(),
+            is("WINDOWS~Asia/Baghdad"));
+    }
+
+    @Test
+    public void resolveFLE() {
+        WindowsZone wzn = WindowsZone.of("FLE Standard Time");
+        TZID winzone = wzn.resolveSmart(new Locale("en", "US")).get();
+        assertThat(
+            winzone.canonical(),
+            is("WINDOWS~Europe/Kiev"));
+    }
+
+    @Test
     public void getDisplayNameUS() {
         String name = "Eastern Standard Time";
         WindowsZone wzn = WindowsZone.of(name);
-        TZID tzid = wzn.resolveSmart(Locale.US);
+        TZID tzid = wzn.resolveSmart(Locale.US).get();
 
         for (NameStyle style : NameStyle.values()) {
             assertThat(
@@ -135,7 +169,7 @@ public class WindowsZoneTest {
     public void getDisplayNameFrance() {
         String name = "Romance Standard Time";
         WindowsZone wzn = WindowsZone.of(name);
-        TZID tzid = wzn.resolveSmart(Locale.FRANCE);
+        TZID tzid = wzn.resolveSmart(Locale.FRANCE).get();
 
         for (NameStyle style : NameStyle.values()) {
             assertThat(
@@ -147,7 +181,7 @@ public class WindowsZoneTest {
     @Test
     public void getOffset() {
         WindowsZone wzn = WindowsZone.of("Eastern Standard Time");
-        TZID winzone = wzn.resolveSmart(Locale.US);
+        TZID winzone = wzn.resolveSmart(Locale.US).get();
         Moment now = SystemClock.INSTANCE.currentTime();
         ZonalOffset offset = Timezone.of(winzone).getOffset(now);
         ZonalOffset expected = Timezone.of("America/New_York").getOffset(now);
@@ -177,7 +211,7 @@ public class WindowsZoneTest {
     @Test
     public void serializeTimezone() throws IOException, ClassNotFoundException {
         WindowsZone wzn = WindowsZone.of("Eastern Standard Time");
-        TZID winzone = wzn.resolveSmart(Locale.US);
+        TZID winzone = wzn.resolveSmart(Locale.US).get();
         Timezone tz = Timezone.of(winzone);
         assertThat(tz, is(roundtrip(tz)));
     }
@@ -185,7 +219,7 @@ public class WindowsZoneTest {
     @Test
     public void normalize() {
         assertThat(
-            Timezone.normalize(WindowsZone.of("Eastern Standard Time").resolveSmart(Locale.US)).canonical(),
+            Timezone.normalize(WindowsZone.of("Eastern Standard Time").resolveSmart(Locale.US).get()).canonical(),
             is("America/New_York"));
     }
 

@@ -33,6 +33,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Collections;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.Set;
 
 
@@ -331,12 +332,16 @@ public final class WindowsZone
      * the daylight saving rules for this name and given country are often
      * the same for all belonging zone ids in the recent past. This method
      * tries its best to yield a result but applications have to check if
-     * the result is {@code null}. </p>
+     * a result is available. </p>
+     *
+     * <p><strong>Important:</strong> The country reference must be given, that is,
+     * {@code country.getCountry()} must not be empty otherwise this method
+     * will not return any result. </p>
      *
      * @param   country     country reference
      * @return  preferred zone id belonging to this windows zone
-     *          or {@code null} if given country is not related to this name
-     * @since   2.2
+     *          or not present if given country is not related to this name
+     * @since   5.0
      */
     /*[deutsch]
      * <p>L&ouml;st diese Namensreferenz zu maximal einer Zonen-ID zum
@@ -348,29 +353,33 @@ public final class WindowsZone
      * Vergangenheit oft nicht von denen anderer Zeitzonen-IDs der gleichen
      * Windows-Zeitzone unterscheiden. Diese Methode versucht das Beste, um
      * eine solche bevorzugte Zeitzone zu ermitteln, aber Anwendungen sind
-     * verpflichtet zu pr&uuml;fen, ob das Ergebnis {@code null} ist. </p>
+     * verpflichtet zu pr&uuml;fen, ob ein Ergebnis existiert. </p>
+     *
+     * <p><strong>Wichtig:</strong> Die Landesreferenz mu&szlig; angegeben sein,
+     * das hei&szlig;t, {@code country.getCountry()} darf nicht leer sein, sonst
+     * wird diese Methoden kein Ergebnis liefern. </p>
      *
      * @param   country     country reference
      * @return  preferred zone id belonging to this windows zone
-     *          or {@code null} if given country is not related to this name
-     * @since   2.2
+     *          or not present if given country is not related to this name
+     * @since   5.0
      */
-    public TZID resolveSmart(Locale country) {
+    public Optional<TZID> resolveSmart(Locale country) {
 
         Set<TZID> ids = this.resolve(country);
 
-        if (ids.size() > 1) {
-            ids = WinZoneProviderSPI.NAME_BASED_MAP.get(this.name).get("001");
+        if (ids.size() != 1) {
+            String region = country.getCountry();
+            if (!region.isEmpty() && !region.equals("001")) {
+                // in case of ambivalence, the 001-region uses a reasonable fallback and preferred default
+                ids = WinZoneProviderSPI.NAME_BASED_MAP.get(this.name).get("001");
+            }
         }
 
-        switch (ids.size()) {
-            case 0:
-                return null;
-            case 1:
-                return ids.iterator().next();
-            default:
-                throw new AssertionError(
-                    "Ambivalent windows zone: " + this.name);
+        if (ids.isEmpty()) {
+            return Optional.empty();
+        } else {
+            return Optional.of(ids.iterator().next()); // assume first entry as most relevant
         }
 
     }
