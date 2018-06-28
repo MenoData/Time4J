@@ -167,10 +167,7 @@ public abstract class DualYearOfEraElement<T extends ChronoEntity<T>>
             }
         }
 
-        if (pos == start) {
-            status.setErrorIndex(start);
-            return null;
-        } else if (value > Integer.MAX_VALUE) {
+        if ((pos == start) || (value > Integer.MAX_VALUE)) {
             status.setErrorIndex(start);
             return null;
         } else {
