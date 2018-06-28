@@ -45,6 +45,7 @@ import org.junit.runners.Suite.SuiteClasses;
         IndianCalendarTest.class,
         IndianMiscellaneousTest.class,
         IndianOperatorTest.class,
+        IntRangeFormattabilityTest.class,
         JapaneseCalendarTest.class,
         JapaneseElementTest.class,
         JapaneseTransitionTest.class,

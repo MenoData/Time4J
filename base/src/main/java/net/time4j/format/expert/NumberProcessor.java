@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberProcessor.java) is part of project Time4J.
  *
@@ -399,7 +399,7 @@ class NumberProcessor<V>
             }
             int minPos = start + this.minDigits;
             int maxPos = Math.min(len, minPos); // maxDigits == minDigits
-            int total = 0;
+            long total = 0;
             int pos = start;
             while (pos < maxPos) {
                 int digit = text.charAt(pos) - '0';
@@ -410,7 +410,10 @@ class NumberProcessor<V>
                     break;
                 }
             }
-            if (pos < minPos) {
+            if (total > Integer.MAX_VALUE) {
+                status.setError(start, "Parsed number does not fit into an integer: " + total);
+                return;
+            } else if (pos < minPos) {
                 if (pos == start) {
                     status.setError(start, "Digit expected.");
                 } else {
@@ -420,7 +423,7 @@ class NumberProcessor<V>
                 }
                 return;
             }
-            parsedResult.put(this.element, total);
+            parsedResult.put(this.element, (int) total);
             status.setPosition(pos);
             return;
         }
@@ -587,7 +590,12 @@ class NumberProcessor<V>
             }
         }
 
-        if (pos < minPos) {
+        Class<V> type = this.element.getType();
+
+        if ((total > Integer.MAX_VALUE) && (type == Integer.class)) {
+            status.setError(start, "Parsed number does not fit into an integer: " + total);
+            return;
+        } else if (pos < minPos) {
             if (pos == start) {
                 status.setError(start, "Digit expected.");
                 return;
@@ -620,8 +628,6 @@ class NumberProcessor<V>
                     "Positive sign must be present for big number.");
             }
         }
-
-        Class<V> type = this.element.getType();
 
         if (type == Integer.class) {
             parsedResult.put(this.element, (int) total);
@@ -782,7 +788,14 @@ class NumberProcessor<V>
     private int getScale(NumberSystem numsys) {
 
         if (numsys.isDecimal()) {
-            return ((this.element.getType() == Long.class) ? 18 : 9);
+            Class<?> type = this.element.getType();
+            if (type == Integer.class) {
+                return 10;
+            } else if (type == Long.class) {
+                return 18;
+            } else {
+                return 9;
+            }
         } else {
             return 100; // sufficiently large
         }

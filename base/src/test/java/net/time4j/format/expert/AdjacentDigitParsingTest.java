@@ -4,20 +4,14 @@ import net.time4j.ClockUnit;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-
-import java.text.ParseException;
-import java.text.ParsePosition;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeFormatterBuilder;
-import java.time.temporal.ChronoField;
-import java.util.Locale;
-
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -167,14 +161,14 @@ public class AdjacentDigitParsingTest {
                 .addFraction(PlainTime.NANO_OF_SECOND, 3, 6, true)
                 .build(); // lenient mode
         try {
-            formatter.parse("20000229174521123456");
+            formatter.parse("200000229174521123456");
         } catch (ParseException pe) {
             assertThat(
                 pe.getMessage(),
-                is("Cannot parse: \"20000229174521123456\" (expected: [.], found: [6])"));
+                is("Cannot parse: \"200000229174521123456\" (expected: [.], found: [6])"));
             assertThat(
                 pe.getErrorOffset(),
-                is(19));
+                is(20));
             throw pe;
         }
     }

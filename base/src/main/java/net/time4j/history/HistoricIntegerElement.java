@@ -115,7 +115,7 @@ final class HistoricIntegerElement
             attributes.contains(Attributes.ZERO_DIGIT)
             ? attributes.get(Attributes.ZERO_DIGIT).charValue()
             : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
-        this.print(context, buffer, attributes, numsys, zeroChar, 1, 9);
+        this.print(context, buffer, attributes, numsys, zeroChar, 1, 10);
 
     }
 
@@ -446,7 +446,7 @@ final class HistoricIntegerElement
         Leniency leniency
     ) {
 
-        int value = 0;
+        long value = 0;
         int pos = offset;
 
         if (numsys.isDecimal()) {
@@ -478,7 +478,10 @@ final class HistoricIntegerElement
                 }
             }
 
-            if (negative) {
+            if (value > Integer.MAX_VALUE) {
+                status.setErrorIndex(offset);
+                return Integer.MIN_VALUE;
+            } else if (negative) {
                 if (pos == offset + 1) {
                     pos = offset;
                 } else {
@@ -503,7 +506,7 @@ final class HistoricIntegerElement
         }
 
         status.setIndex(pos);
-        return value;
+        return (int) value;
 
     }
 
