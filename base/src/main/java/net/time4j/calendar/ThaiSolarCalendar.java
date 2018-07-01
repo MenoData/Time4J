@@ -94,6 +94,8 @@ import java.util.Set;
  *
  * <h4>Anomaly in year 1940</h4>
  *
+ * <p style="text-align:center;"><img src="doc-files/thai-anomaly.png" alt="Anomaly of 1940/41"></p>
+ *
  * <p>This class supports the calendar reform of 1940/41 after that the begin of year moved from 1st of April
  * to 1st of January. See also: <a href="https://en.wikipedia.org/wiki/Thai_solar_calendar">Wikipedia</a>. </p>
  *
@@ -141,6 +143,8 @@ import java.util.Set;
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
  * <h4>Anomalie im Jahr 1940</h4>
+ *
+ * <p style="text-align:center;"><img src="doc-files/thai-anomaly.png" alt="Anomalie von 1940/41"></p>
  *
  * <p>Diese Klasse unterst&uuml;tzt die Kalenderreform von 1940/41, als der Beginn des Jahres vom ersten
  * April auf den ersten Januar vorverlegt wurde. Siehe auch:
