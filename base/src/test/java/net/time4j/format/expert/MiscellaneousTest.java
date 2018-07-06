@@ -672,6 +672,18 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void printIndividualFormat3() throws ParseException {
+        ChronoFormatter<PlainDate> formatter =
+            ChronoFormatter.setUp(PlainDate.class, Locale.US)
+                .addText(PlainDate.DAY_OF_WEEK, Enum::name)
+                .build();
+        assertThat(
+            formatter.format(PlainDate.of(2015, 1, 3)),
+            is("SATURDAY") // upper case style
+        );
+    }
+
+    @Test
     public void toJavaTextFormat() throws ParseException {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.US)

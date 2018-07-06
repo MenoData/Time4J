@@ -90,6 +90,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -97,6 +98,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.NoSuchElementException;
 import java.util.Set;
+import java.util.function.Function;
 import java.util.function.IntPredicate;
 import java.util.function.Supplier;
 
@@ -5656,6 +5658,73 @@ public final class ChronoFormatter<T>
                 this.addProcessor(new LookupProcessor<>(element, simpleMap));
             }
 
+            return this;
+
+        }
+
+        /**
+         * <p>Defines a text format for given chronological element with
+         * a user-defined string conversion. </p>
+         *
+         * <p>Example for upper-case-conversion (here in English): </p>
+         *
+         * <pre>
+         *     ChronoFormatter&lt;PlainDate&gt; formatter =
+         *          ChronoFormatter.setUp(PlainDate.class, Locale.US)
+         *              .addText(PlainDate.DAY_OF_WEEK, Enum::name)
+         *              .build();
+         *     assertThat(
+         *          formatter.format(PlainDate.of(2015, 1, 3)),
+         *          is(&quot;SATURDAY&quot;));
+         * </pre>
+         *
+         * @param   <V> generic type of enum element values
+         * @param   element         chronological element
+         * @param   converter       text converter
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not supported by chronology or its preparser
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addText(ChronoElement, Map)
+         * @since   5.0
+         */
+        /*[deutsch]
+         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit einem
+         * benutzerdefinierten Textwandler. </p>
+         *
+         * <p>Beispiel f&uuml;r die Gro&szlig;schreibung (hier in Englisch): </p>
+         *
+         * <pre>
+         *     ChronoFormatter&lt;PlainDate&gt; formatter =
+         *          ChronoFormatter.setUp(PlainDate.class, Locale.US)
+         *              .addText(PlainDate.DAY_OF_WEEK, Enum::name)
+         *              .build();
+         *     assertThat(
+         *          formatter.format(PlainDate.of(2015, 1, 3)),
+         *          is(&quot;SATURDAY&quot;));
+         * </pre>
+         *
+         * @param   <V> generic type of enum element values
+         * @param   element         chronological element
+         * @param   converter       text converter
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if given element is not supported by chronology or its preparser
+         * @see     Chronology#isSupported(ChronoElement)
+         * @see     #addText(ChronoElement, Map)
+         * @since   5.0
+         */
+        public <V extends Enum<V>> Builder<T> addText(
+            ChronoElement<V> element,
+            Function<V, String> converter
+        ) {
+
+            this.checkElement(element);
+            Map<V, String> lookup = new LinkedHashMap<>();
+
+            for (V value : element.getType().getEnumConstants()) {
+                lookup.put(value, converter.apply(value));
+            }
+
+            this.addProcessor(new LookupProcessor<>(element, lookup));
             return this;
 
         }
