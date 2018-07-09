@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LookupProcessor.java) is part of project Time4J.
  *
@@ -33,6 +33,7 @@ import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Function;
 
 
 /**
@@ -58,34 +59,14 @@ final class LookupProcessor<V>
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * <p>Konstruiert eine neue Instanz. </p>
-     *
-     * @param   element     element to be formatted
-     * @param   resources   text resources
-     * @throws  IllegalArgumentException if there not enough text resources to match all values of an enum element type
-     */
-    LookupProcessor(
+    private LookupProcessor(
         ChronoElement<V> element,
         Map<V, String> resources
     ) {
         super();
 
-        Map<V, String> tmp;
-        Class<V> keyType = element.getType();
-
-        if (keyType.isEnum()) {
-            if (resources.size() < keyType.getEnumConstants().length) {
-                throw new IllegalArgumentException("Not enough text resources defined for enum: " + keyType.getName());
-            }
-            tmp = createMap(keyType);
-        } else {
-            tmp = new HashMap<>(resources.size());
-        }
-
-        tmp.putAll(resources);
         this.element = element;
-        this.resources = Collections.unmodifiableMap(tmp);
+        this.resources = Collections.unmodifiableMap(resources);
 
         this.protectedLength = 0;
         this.caseInsensitive = true;
@@ -113,6 +94,57 @@ final class LookupProcessor<V>
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Konstruiert eine neue Instanz mit Hilfe einer {@code Map}. </p>
+     *
+     * @param   element     element to be formatted
+     * @param   resources   text resources
+     * @throws  IllegalArgumentException if there not enough text resources to match all values of an enum element type
+     */
+    static <V> LookupProcessor create(
+        ChronoElement<V> element,
+        Map<V, String> resources
+    ) {
+
+        Map<V, String> map;
+        Class<V> keyType = element.getType();
+
+        if (keyType.isEnum()) {
+            if (resources.size() < keyType.getEnumConstants().length) {
+                throw new IllegalArgumentException("Not enough text resources defined for enum: " + keyType.getName());
+            }
+            map = createMap(keyType);
+        } else {
+            map = new HashMap<>(resources.size());
+        }
+
+        map.putAll(resources);
+        return new LookupProcessor<>(element, map);
+
+    }
+
+    /**
+     * <p>Konstruiert eine neue Instanz mit Hilfe einer Konvertierfunktion. </p>
+     *
+     * @param   element     element to be formatted
+     * @param   converter   text converter
+     * @since   5.0
+     */
+    static <V extends Enum<V>> LookupProcessor create(
+        ChronoElement<V> element,
+        Function<V, String> converter
+    ) {
+
+        Map<V, String> map = new EnumMap<>(element.getType());
+
+        for (V value : element.getType().getEnumConstants()) {
+            map.put(value, converter.apply(value));
+        }
+
+        return new LookupProcessor<>(element, map);
+
+    }
 
     @Override
     public int print(

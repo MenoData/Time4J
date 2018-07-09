@@ -5655,7 +5655,7 @@ public final class ChronoFormatter<T>
                 for (V value : element.getType().getEnumConstants()) {
                     simpleMap.put(value, value.toString());
                 }
-                this.addProcessor(new LookupProcessor<>(element, simpleMap));
+                this.addProcessor(LookupProcessor.create(element, simpleMap));
             }
 
             return this;
@@ -5718,13 +5718,7 @@ public final class ChronoFormatter<T>
         ) {
 
             this.checkElement(element);
-            Map<V, String> lookup = new LinkedHashMap<>();
-
-            for (V value : element.getType().getEnumConstants()) {
-                lookup.put(value, converter.apply(value));
-            }
-
-            this.addProcessor(new LookupProcessor<>(element, lookup));
+            this.addProcessor(LookupProcessor.create(element, converter));
             return this;
 
         }
@@ -5742,7 +5736,7 @@ public final class ChronoFormatter<T>
          * @see     Chronology#isSupported(ChronoElement)
          */
         /*[deutsch]
-         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
+s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
          * benutzerdefinierten String-Ressourcen. </p>
          *
          * @param   <V> generic type of element values
@@ -5759,7 +5753,7 @@ public final class ChronoFormatter<T>
         ) {
 
             this.checkElement(element);
-            this.addProcessor(new LookupProcessor<>(element, lookup));
+            this.addProcessor(LookupProcessor.create(element, lookup));
             return this;
 
         }
