@@ -29,7 +29,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.format.internal.ExtendedPatterns;
 import net.time4j.format.internal.FormatUtils;
 import net.time4j.format.internal.PropertyBundle;
-import net.time4j.i18n.IsoTextProviderSPI;
+import net.time4j.format.internal.IsoTextProviderSPI;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;

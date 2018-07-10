@@ -8,7 +8,7 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.Leniency;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
-import net.time4j.i18n.IsoTextProviderSPI;
+import net.time4j.format.internal.IsoTextProviderSPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

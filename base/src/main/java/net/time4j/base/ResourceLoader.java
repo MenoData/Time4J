@@ -29,7 +29,7 @@ import net.time4j.engine.ChronoExtension;
 import net.time4j.format.TextProvider;
 import net.time4j.i18n.HistoricExtension;
 import net.time4j.i18n.IsoCalendarProviderSPI;
-import net.time4j.i18n.IsoTextProviderSPI;
+import net.time4j.format.internal.IsoTextProviderSPI;
 import net.time4j.tz.ZoneModelProvider;
 import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.spi.MilZoneProviderSPI;

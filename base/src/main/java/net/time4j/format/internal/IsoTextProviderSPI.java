@@ -19,16 +19,12 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
+package net.time4j.format.internal;
 
 import net.time4j.format.DisplayMode;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
-import net.time4j.format.internal.ExtendedPatterns;
-import net.time4j.format.internal.LanguageMatch;
-import net.time4j.format.internal.PropertyBundle;
-import net.time4j.history.HistoricEra;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -281,7 +277,7 @@ public class IsoTextProviderSPI
      * @return  unmodifiable {@code Set} of ISO-639-1-language codes
      * @since   2.1.2
      */
-    static Set<String> getPrimaryLanguages() {
+    public static Set<String> getPrimaryLanguages() {
 
         return LANGUAGES;
 
@@ -431,7 +427,7 @@ public class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "ERA");
-            names = lookupBundle(rb, HistoricEra.values().length, key, tw, OutputContext.FORMAT, 0);
+            names = lookupBundle(rb, 5, key, tw, OutputContext.FORMAT, 0);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
