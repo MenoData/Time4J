@@ -19,12 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
+package net.time4j.format.internal;
 
 import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.NumberSystem;
-import net.time4j.format.internal.LanguageMatch;
-import net.time4j.format.internal.PropertyBundle;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -52,6 +50,9 @@ public final class SymbolProviderSPI
     private static final Set<String> SUPPORTED_LOCALES;
     private static final Locale[] EMPTY_ARRAY = new Locale[0];
 
+    /**
+     * Singleton.
+     */
     public static final SymbolProviderSPI INSTANCE;
 
     private static final Map<String, NumberSystem> CLDR_NAMES;
@@ -73,12 +74,8 @@ public final class SymbolProviderSPI
 
     //~ Konstruktoren -----------------------------------------------------
 
-    /**
-     * For service loader only.
-     */
-    public SymbolProviderSPI() {
-        super();
-
+    private SymbolProviderSPI() {
+        // singleton constructor
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -86,7 +83,7 @@ public final class SymbolProviderSPI
     @Override
     public Locale[] getAvailableLocales() {
 
-        return EMPTY_ARRAY; // ok because this class only serves as fallback in SPI-mechanism
+        return EMPTY_ARRAY; // ok because this class only serves as fallback
 
     }
 

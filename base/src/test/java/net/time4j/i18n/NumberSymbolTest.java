@@ -3,6 +3,8 @@ package net.time4j.i18n;
 import net.time4j.format.NumberSymbolProvider;
 
 import java.util.Locale;
+
+import net.time4j.format.internal.SymbolProviderSPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

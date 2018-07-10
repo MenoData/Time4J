@@ -33,6 +33,7 @@ import net.time4j.format.PluralCategory;
 import net.time4j.format.PluralRules;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.format.TextWidth;
+import net.time4j.format.internal.SymbolProviderSPI;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -93,14 +94,14 @@ public final class PrettyTime {
 
         for (NumberSymbolProvider tmp : ResourceLoader.getInstance().services(NumberSymbolProvider.class)) {
             int size = tmp.getAvailableLocales().length;
-            if (size >= count) { // includes SymbolProviderSPI if available
+            if (size >= count) {
                 p = tmp;
                 count = size;
             }
         }
 
         if (p == null) {
-            p = NumberSymbolProvider.DEFAULT;
+            p = SymbolProviderSPI.INSTANCE;
         }
 
         NUMBER_SYMBOLS = p;

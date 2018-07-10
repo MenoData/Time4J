@@ -26,12 +26,10 @@ import net.time4j.calendar.service.GenericTextProviderSPI;
 import net.time4j.calendar.service.KoreanExtension;
 import net.time4j.engine.CalendarProvider;
 import net.time4j.engine.ChronoExtension;
-import net.time4j.format.NumberSymbolProvider;
 import net.time4j.format.TextProvider;
 import net.time4j.i18n.HistoricExtension;
 import net.time4j.i18n.IsoCalendarProviderSPI;
 import net.time4j.i18n.IsoTextProviderSPI;
-import net.time4j.i18n.SymbolProviderSPI;
 import net.time4j.tz.ZoneModelProvider;
 import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.spi.MilZoneProviderSPI;
@@ -471,9 +469,6 @@ public abstract class ResourceLoader {
             map.put(
                 ChronoExtension.class,
                 Arrays.asList(new HistoricExtension(), new KoreanExtension()));
-            map.put(
-                NumberSymbolProvider.class,
-                Collections.singletonList(new SymbolProviderSPI()));
             map.put(
                 TextProvider.class,
                 Arrays.asList(IsoTextProviderSPI.SINGLETON, new GenericTextProviderSPI()));
