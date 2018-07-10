@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.i18n;
+package net.time4j.history.internal;
 
 import net.time4j.PlainDate;
 import net.time4j.engine.AttributeQuery;
@@ -33,8 +33,6 @@ import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
 import net.time4j.history.YearDefinition;
-import net.time4j.history.internal.HistoricAttribute;
-import net.time4j.history.internal.StdHistoricalElement;
 
 import java.util.Locale;
 import java.util.Set;

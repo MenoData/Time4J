@@ -72,7 +72,7 @@ import net.time4j.history.HistoricEra;
 import net.time4j.history.NewYearStrategy;
 import net.time4j.history.YearDefinition;
 import net.time4j.history.internal.HistoricAttribute;
-import net.time4j.i18n.HistoricExtension;
+import net.time4j.history.internal.HistoricExtension;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 

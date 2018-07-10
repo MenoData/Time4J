@@ -27,7 +27,7 @@ import net.time4j.calendar.service.KoreanExtension;
 import net.time4j.engine.CalendarProvider;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.format.TextProvider;
-import net.time4j.i18n.HistoricExtension;
+import net.time4j.history.internal.HistoricExtension;
 import net.time4j.i18n.IsoCalendarProviderSPI;
 import net.time4j.format.internal.IsoTextProviderSPI;
 import net.time4j.tz.ZoneModelProvider;
