@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StyleProcessor.java) is part of project Time4J.
  *
@@ -31,7 +31,6 @@ import net.time4j.engine.CalendarDate;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.DisplayMode;
@@ -58,14 +57,14 @@ final class StyleProcessor<T>
     //~ Instanzvariablen ----------------------------------------------
 
     private final ChronoFormatter<T> formatter;
-    private final DisplayStyle dateStyle;
-    private final DisplayStyle timeStyle;
+    private final DisplayMode dateStyle;
+    private final DisplayMode timeStyle;
 
     //~ Konstruktoren -----------------------------------------------------
 
     StyleProcessor(
-        DisplayStyle dateStyle,
-        DisplayStyle timeStyle
+        DisplayMode dateStyle,
+        DisplayMode timeStyle
     ) {
         this(
             null, // will be later set in quickPath()-method
@@ -77,8 +76,8 @@ final class StyleProcessor<T>
 
     private StyleProcessor(
         ChronoFormatter<T> formatter,
-        DisplayStyle dateStyle,
-        DisplayStyle timeStyle
+        DisplayMode dateStyle,
+        DisplayMode timeStyle
     ) {
         super();
 
@@ -227,7 +226,7 @@ final class StyleProcessor<T>
      * @return  date style
      * @since   4.27
      */
-    DisplayStyle getDateStyle() {
+    DisplayMode getDateStyle() {
 
         return this.dateStyle;
 
@@ -269,8 +268,8 @@ final class StyleProcessor<T>
     @SuppressWarnings("unchecked")
     private static <T> ChronoFormatter<T> createFormatter(
         Chronology<?> chronology,
-        DisplayStyle dateStyle,
-        DisplayStyle timeStyle,
+        DisplayMode dateStyle,
+        DisplayMode timeStyle,
         Locale locale,
         boolean fourDigitYear,
         Timezone tz // optional
@@ -279,13 +278,13 @@ final class StyleProcessor<T>
         String pattern;
 
         if (chronology.equals(PlainDate.axis())) {
-            pattern = CalendarText.patternForDate((DisplayMode) dateStyle, locale);
+            pattern = CalendarText.patternForDate(dateStyle, locale);
         } else if (chronology.equals(PlainTime.axis())) {
-            pattern = CalendarText.patternForTime((DisplayMode) timeStyle, locale);
+            pattern = CalendarText.patternForTime(timeStyle, locale);
         } else if (chronology.equals(PlainTimestamp.axis())) {
-            pattern = CalendarText.patternForTimestamp((DisplayMode) dateStyle, (DisplayMode) timeStyle, locale);
+            pattern = CalendarText.patternForTimestamp(dateStyle, timeStyle, locale);
         } else if (chronology.equals(Moment.axis())) {
-            pattern = CalendarText.patternForMoment((DisplayMode) dateStyle, (DisplayMode) timeStyle, locale);
+            pattern = CalendarText.patternForMoment(dateStyle, timeStyle, locale);
         } else if (chronology.getChronoType() == CalendarDate.class) {
             Chronology<?> c = chronology;
             while (c instanceof BridgeChronology) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DisplayStyle.java) is part of project Time4J.
  *
@@ -25,11 +25,18 @@ package net.time4j.engine;
 /**
  * <p>Describes a generic format style. </p>
  *
+ * <p>Users have usually no need to apply directly this low-level-interface
+ * but should work with the enum {@code net.time4j.format.DisplayMode}. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.10/4.7
  */
 /*[deutsch]
  * <p>Beschreibt einen allgemeinen Formatstil. </p>
+ *
+ * <p>Anwender haben gew&ouml;hnlich keinen Nutzen davon, direkt dieses Interface
+ * anzuwenden und sollten stattdess mit dem Enum-Type {@code net.time4j.format.DisplayMode}
+ * arbeiten. </p>
  *
  * @author  Meno Hochschild
  * @since   3.10/4.7

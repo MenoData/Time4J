@@ -45,7 +45,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.FlagElement;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
@@ -90,7 +89,6 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.LinkedList;
 import java.util.List;
@@ -2765,7 +2763,7 @@ public final class ChronoFormatter<T>
      * @since   3.10/4.7
      */
     public static <T extends LocalizedPatternSupport> ChronoFormatter<T> ofStyle(
-        DisplayStyle style,
+        DisplayMode style,
         Locale locale,
         Chronology<T> chronology
     ) {
@@ -7886,32 +7884,11 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
         }
 
         @Override
-        public ChronoDisplay preformat(
-            GeneralTimestamp<C> context,
-            AttributeQuery attributes
-        ) {
-            throw new UnsupportedOperationException("Not used.");
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-            throw new UnsupportedOperationException("Not used.");
-        }
-
-        @Override
         public GeneralTimestamp<C> createFrom(
             TimeSource<?> clock,
             AttributeQuery attributes
         ) {
-            throw new UnsupportedOperationException("Not used.");
-        }
-
-        @Override
-        public String getFormatPattern(
-            DisplayStyle style,
-            Locale locale
-        ) {
-            throw new UnsupportedOperationException("Not used.");
+            return null; // not used
         }
 
     }
