@@ -218,4 +218,18 @@ public class HebrewOperatorTest {
             is(HebrewTime.ofDay(4, 1079)));
     }
 
+    @Test
+    public void withStartOfYear() {
+        HebrewCalendar hc = HebrewCalendar.axis().getMaximum();
+        HebrewCalendar expected = HebrewCalendar.of(9999, HebrewMonth.TISHRI, 1);
+
+        assertThat(hc.with(HebrewCalendar.DAY_OF_YEAR.minimized()), is(expected));
+        assertThat(hc.with(HebrewCalendar.DAY_OF_YEAR, 1), is(expected));
+        assertThat(hc.getDayOfYear(), is(353));
+        assertThat(hc.getDayOfYear(), is(hc.lengthOfYear()));
+        assertThat(expected.getDayOfYear(), is(1));
+        assertThat(hc.getMinimum(HebrewCalendar.DAY_OF_YEAR), is(1));
+        assertThat(expected.getMaximum(HebrewCalendar.DAY_OF_YEAR), is(353));
+    }
+
 }

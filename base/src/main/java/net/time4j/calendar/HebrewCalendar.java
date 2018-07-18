@@ -1554,8 +1554,11 @@ public final class HebrewCalendar
                     return context.dom;
                 case DAY_OF_YEAR_INDEX:
                     int doy = 0;
+                    boolean leap = isLeapYear(context.year);
                     for (int m = 1; m < context.month.getValue(); m++) {
-                        doy += CALSYS.getLengthOfMonth(HebrewEra.ANNO_MUNDI, context.year, m);
+                        if (leap || (m != 6)) {
+                            doy += CALSYS.getLengthOfMonth(HebrewEra.ANNO_MUNDI, context.year, m);
+                        }
                     }
                     return doy + context.dom;
                 default:
