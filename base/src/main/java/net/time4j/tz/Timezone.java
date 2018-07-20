@@ -1386,7 +1386,8 @@ public abstract class Timezone
         Timezone ret = Timezone.getTZ(null, zoneID, false);
 
         if (ret == null) {
-            ret = new PlatformTimezone(new NamedID(zoneID)); // exception case if the tzid cannot be resolved
+            // exception case if the tzid cannot be resolved
+            ret = new PlatformTimezone(new NamedID(zoneID));
         }
 
         return ret;
@@ -1519,13 +1520,10 @@ public abstract class Timezone
 
         // Ungültige ID?
         if (tz == null) {
-            Timezone sys = Timezone.ofSystem();
-            if (sys.getID().canonical().equals(zoneID)) {
-                tz = sys; // edge case: system zone with customized id
-            } else if (wantsException) {
-                throw new IllegalArgumentException("Unknown timezone: " + zoneID);
+            if (!wantsException || java.util.TimeZone.getDefault().getID().equals(zoneID)) {
+                return null; // edge case: platform zone with customized id
             } else {
-                return null;
+                throw new IllegalArgumentException("Unknown timezone: " + zoneID);
             }
         }
 
