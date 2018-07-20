@@ -16,6 +16,7 @@
 - Interface `ChronoPrinter` without checked exceptions [#526]
 
 ### Fixed
+- NPE-Fix for premature assignment of system time zone [#802]
 - Wrong day-of-year in HebrewCalendar [#800]
 - Rethrow undocumented ArithmeticException as IllegalArgumentException [#791]
 - Wrong days-since-UTC after transform in Hijri adjustment [#789]
