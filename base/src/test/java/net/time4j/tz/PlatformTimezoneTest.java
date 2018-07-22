@@ -323,6 +323,7 @@ public class PlatformTimezoneTest {
         Timezone.Cache.refresh();
         assertThat(Timezone.ofSystem().getID().canonical(), is(zoneID));
         assertThat(Timezone.ofSystem() instanceof PlatformTimezone, is(true));
+        assertThat(Timezone.of(zoneID) instanceof PlatformTimezone, is(true));
         Timezone.ofSystem().dump(System.out);
         java.util.TimeZone.setDefault(oldTZ);
         Timezone.Cache.refresh();

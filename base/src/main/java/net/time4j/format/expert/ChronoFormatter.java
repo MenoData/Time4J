@@ -2499,7 +2499,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @param   tzid        timezone id
      * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
-     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @throws  IllegalArgumentException if resolving of pattern fails or the timezone cannot be loaded
      * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
@@ -2514,7 +2514,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @param   tzid        timezone id
      * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
-     * @throws  IllegalArgumentException if resolving of pattern fails
+     * @throws  IllegalArgumentException if resolving of pattern fails or the timezone cannot be loaded
      * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
@@ -2711,6 +2711,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @param   tzid        timezone identifier
      * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
@@ -2722,6 +2723,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @param   tzid        timezone identifier
      * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
