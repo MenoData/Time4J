@@ -25,6 +25,7 @@ import net.time4j.base.GregorianDate;
 import net.time4j.base.ResourceLoader;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
+import net.time4j.tz.threeten.JdkZoneProviderSPI;
 
 import java.io.IOException;
 import java.io.Serializable;
@@ -542,7 +543,12 @@ public abstract class Timezone
      */
     public static Timezone ofPlatform() {
 
-        return new PlatformTimezone();
+        ZoneId threeten = ZoneId.systemDefault();
+
+        return new HistorizedTimezone(
+            threeten::getId,
+            JdkZoneProviderSPI.load(threeten)
+        );
 
     }
 

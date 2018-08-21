@@ -273,7 +273,6 @@ public final class SystemClock
      * @see     ZonalClock#now()
      * @see     ZonalClock#currentMoment()
      * @see     #INSTANCE
-     * @see     java.util.TimeZone
      */
     /*[deutsch]
      * <p>Erzeugt eine lokale Uhr in der Plattform-Zeitzone. </p>
@@ -300,7 +299,6 @@ public final class SystemClock
      * @see     ZonalClock#now()
      * @see     ZonalClock#currentMoment()
      * @see     #INSTANCE
-     * @see     java.util.TimeZone
      */
     public static ZonalClock inPlatformView() {
 

@@ -29,8 +29,12 @@ public class PlatformTimezoneTest {
 
     @Test
     public void ofPlatform() {
+        Timezone platformTZ = Timezone.ofPlatform();
         assertThat(
-            Timezone.ofPlatform().getID().canonical().equals(Timezone.ofSystem().getID().canonical()),
+            platformTZ.getID().canonical().equals(Timezone.ofSystem().getID().canonical()),
+            is(true));
+        assertThat(
+            platformTZ.getHistory() != null,
             is(true));
     }
 

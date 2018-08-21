@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractClock.java) is part of project Time4J.
  *
@@ -52,7 +52,6 @@ public abstract class AbstractClock
      *
      * @return  local clock in system timezone (using the platform timezone data)
      * @since   3.3/4.2
-     * @see     java.util.TimeZone
      * @see     Timezone#ofPlatform()
      */
     /*[deutsch]
@@ -60,7 +59,6 @@ public abstract class AbstractClock
      *
      * @return  local clock in system timezone (using the platform timezone data)
      * @since   3.3/4.2
-     * @see     java.util.TimeZone
      * @see     Timezone#ofPlatform()
      */
     public ZonalClock inPlatformView() {

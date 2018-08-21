@@ -120,7 +120,25 @@ public class JdkZoneProviderSPI
     public TransitionHistory load(String zoneID) {
 
         try {
-            ZoneRules zoneRules = ZoneId.of(zoneID).getRules();
+            return load(ZoneId.of(zoneID));
+        } catch (DateTimeException ex) {
+            throw new IllegalArgumentException(ex);
+        }
+
+    }
+
+    /**
+     * The real implementation using a wrapper around {@code ZoneRules} derived from given {@code ZoneId}.
+     *
+     * @param   zoneId      threeten-zone-identifier
+     * @return  timezone history
+     * @throws  IllegalArgumentException if given id is wrong
+     * @since   5.0
+     */
+    public static TransitionHistory load(ZoneId zoneId) {
+
+        try {
+            ZoneRules zoneRules = zoneId.getRules();
             ZonalOffset initialOffset = ZonalOffset.ofTotalSeconds(zoneRules.getOffset(Instant.MIN).getTotalSeconds());
             List<ZonalTransition> transitions = new ArrayList<>();
             List<DaylightSavingRule> rules = new ArrayList<>();
@@ -144,8 +162,8 @@ public class JdkZoneProviderSPI
 
                 PlainTime timeOfDay = (
                     zotr.isMidnightEndOfDay()
-                    ? PlainTime.midnightAtEndOfDay()
-                    : TemporalType.LOCAL_TIME.translate(zotr.getLocalTime()));
+                        ? PlainTime.midnightAtEndOfDay()
+                        : TemporalType.LOCAL_TIME.translate(zotr.getLocalTime()));
 
                 OffsetIndicator indicator;
                 switch (zotr.getTimeDefinition()) {
