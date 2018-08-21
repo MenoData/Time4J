@@ -232,6 +232,12 @@ public class PlatformTimezoneTest {
             is(PlainTimestamp.of(2014, 10, 19, 1, 0)));
     }
 
+    @Test(expected=UnsupportedOperationException.class)
+    public void withSpecificTransitionStrategy() {
+        Timezone.of("java.util.TimeZone~Europe/Berlin")
+            .with(GapResolver.NEXT_VALID_TIME.and(OverlapResolver.EARLIER_OFFSET));
+    }
+
     @Test
     public void getAvailableIDs() {
         List<TZID> zoneIDs = Timezone.getAvailableIDs();
