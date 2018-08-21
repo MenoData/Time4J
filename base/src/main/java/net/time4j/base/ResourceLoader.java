@@ -374,7 +374,7 @@ public abstract class ResourceLoader {
                 CodeSource cs = ((pd == null) ? null : pd.getCodeSource());
 
                 if (cs != null) {
-                    constructedUri = cs.getLocation().toExternalForm();
+                    constructedUri = cs.getLocation().toExternalForm().replace('\\', '/');
                     if (constructedUri.endsWith(".jar")) {
                         constructedUri = "jar:" + constructedUri + "!/";
                     }
