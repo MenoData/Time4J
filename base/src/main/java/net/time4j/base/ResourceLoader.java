@@ -374,12 +374,12 @@ public abstract class ResourceLoader {
                 CodeSource cs = ((pd == null) ? null : pd.getCodeSource());
 
                 if (cs != null) {
-                    constructedUri = cs.getLocation().toExternalForm().replace('\\', '/');
+                    constructedUri = cs.getLocation().toExternalForm();
                     if (constructedUri.endsWith(".jar")) {
                         constructedUri = "jar:" + constructedUri + "!/";
                     }
                     constructedUri += path;
-                    return new URI(constructedUri);
+                    return new URI(constructedUri.replace('\\', '/'));
                 }
             } catch (SecurityException se) {
                 // use fallback via class loader later
