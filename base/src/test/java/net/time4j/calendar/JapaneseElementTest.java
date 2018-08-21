@@ -124,7 +124,7 @@ public class JapaneseElementTest {
     }
 
     @Test
-    public void monthAsOrdinalElement() {
+    public void monthAsOrdinalElementInLeapYear() {
         Nengo kaei = Nengo.ofRelatedGregorianYear(1848);
         JapaneseCalendar jcal = JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(9), 2);
         assertThat(jcal.getMinimum(JapaneseCalendar.MONTH_AS_ORDINAL), is(1));
@@ -154,6 +154,29 @@ public class JapaneseElementTest {
         assertThat(
             jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL.atCeiling()),
             is(JapaneseCalendar.of(kaei, 7, EastAsianMonth.valueOf(9), 29)));
+    }
+
+    @Test
+    public void monthAsOrdinalElementNonLeap1() {
+        Nengo taiho = Nengo.list().get(0);
+        JapaneseCalendar date = JapaneseCalendar.of(taiho, 1, EastAsianMonth.valueOf(1), 1);
+        assertThat(
+            date.with(JapaneseCalendar.MONTH_AS_ORDINAL, 1),
+            is(date));
+    }
+
+    @Test
+    public void monthAsOrdinalElementNonLeap2() {
+        Nengo keiun = Nengo.list().get(1);
+        JapaneseCalendar jcal =
+            JapaneseCalendar.of(keiun, 1, EastAsianMonth.valueOf(1), 1).with(JapaneseCalendar.MONTH_AS_ORDINAL, 9);
+        assertThat(jcal.getMinimum(JapaneseCalendar.MONTH_AS_ORDINAL), is(1));
+        assertThat(jcal.getMaximum(JapaneseCalendar.MONTH_AS_ORDINAL), is(12));
+        assertThat(jcal.get(JapaneseCalendar.MONTH_AS_ORDINAL), is(9));
+        assertThat(jcal.isValid(JapaneseCalendar.MONTH_AS_ORDINAL, 13), is(false));
+        assertThat(
+            jcal.with(JapaneseCalendar.MONTH_AS_ORDINAL, 12),
+            is(JapaneseCalendar.of(keiun, 1, EastAsianMonth.valueOf(12), 1)));
     }
 
     @Test
