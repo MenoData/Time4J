@@ -16,6 +16,7 @@
 - Interface `ChronoPrinter` without checked exceptions [#526]
 
 ### Fixed
+- Fix for changing `JapaneseCalendar.MONTH_AS_ORDINAL` [#807]
 - NPE-Fix for loading time zone based on system time zone identifier [#803]
 - NPE-Fix for premature assignment of system time zone [#802]
 - Wrong day-of-year in HebrewCalendar [#800]
