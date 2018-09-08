@@ -27,9 +27,8 @@ import net.time4j.calendar.service.KoreanExtension;
 import net.time4j.engine.CalendarProvider;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.format.TextProvider;
-import net.time4j.history.internal.HistoricExtension;
-import net.time4j.i18n.IsoCalendarProviderSPI;
 import net.time4j.format.internal.IsoTextProviderSPI;
+import net.time4j.history.internal.HistoricExtension;
 import net.time4j.tz.ZoneModelProvider;
 import net.time4j.tz.ZoneNameProvider;
 import net.time4j.tz.spi.MilZoneProviderSPI;
@@ -298,7 +297,18 @@ public abstract class ResourceLoader {
      * <p>Registers an external service provider. </p>
      *
      * <p>This method is mainly intended to register an extra time zone repository in the context of OSGi
-     * where the service loader mechanism does not work. </p>
+     * where the service loader mechanism does not work. <strong>Important: </strong> Calling this method
+     * must be done before executing any other Time4J-code. Example for registering the tzdata-module
+     * (v3.0 or later): </p>
+     *
+     * <pre>
+     *     ResourceLoader.getInstance().registerService(
+     *       ZoneModelProvider.class,
+     *       new net.time4j.tz.repo.TimezoneRepositoryProviderSPI());
+     * </pre>
+     *
+     * <p>Note: The example can be shortened by the expression {@code net.time4j.tz.repo.TZDATA.init()}
+     * which also provides actual leap second support. </p>
      *
      * @param   <S> generic service type
      * @param   serviceInterface    service interface
@@ -310,7 +320,18 @@ public abstract class ResourceLoader {
      * <p>Registriert einen externen <i>Service Provider</i>. </p>
      *
      * <p>Diese Methode dient haupts&auml;chlich der Registrierung eines extra Zeitzonen-Repositoriums, wenn
-     * der <i>service loader</i>-Mechanismus im Kontext von OSGi nicht funktioniert. </p>
+     * der <i>service loader</i>-Mechanismus im Kontext von OSGi nicht funktioniert. <strong>Wichtig:</strong>
+     * Der Aufruf dieser Methode mu&szlig; vor der Verwendung von jedem anderen Time4J-Code geschehen.
+     * Beispiel zur Registrierung des tzdata-Moduls (v3.0 oder sp&auml;ter): </p>
+     *
+     * <pre>
+     *     ResourceLoader.getInstance().registerService(
+     *       ZoneModelProvider.class,
+     *       new net.time4j.tz.repo.TimezoneRepositoryProviderSPI());
+     * </pre>
+     *
+     * <p>Hinweis: Das Beispiel kann mit dem Ausdruck {@code net.time4j.tz.repo.TZDATA.init()} abgek&uuml;rzt werden,
+     * der auch aktuelle Schaltsekundendaten liefert. </p>
      *
      * @param   <S> generic service type
      * @param   serviceInterface    service interface
@@ -432,11 +453,13 @@ public abstract class ResourceLoader {
             List<?> ext = REGISTERED_SERVICES.get(serviceInterface);
 
             if (ext != null) {
+                // generic external services (works also in OSGi)
                 for (Object obj : ext) {
                     set.add(serviceInterface.cast(obj));
                 }
             }
 
+            // works only in simple environments without OSGi
             for (S sl : ServiceLoader.load(serviceInterface, serviceInterface.getClassLoader())) {
                 set.add(sl);
             }
@@ -444,6 +467,7 @@ public abstract class ResourceLoader {
             List<?> predefined = InternalServices.MAP.get(serviceInterface);
 
             if (predefined != null) {
+                // predefined internal services
                 for (Object obj : predefined) {
                     set.add(serviceInterface.cast(obj));
                 }
@@ -465,7 +489,7 @@ public abstract class ResourceLoader {
             Map<Class<?>, List<?>> map = new HashMap<>();
             map.put(
                 CalendarProvider.class,
-                Arrays.asList(new IsoCalendarProviderSPI(), new GenericCalendarProviderSPI()));
+                Collections.singletonList(new GenericCalendarProviderSPI()));
             map.put(
                 ChronoExtension.class,
                 Arrays.asList(new HistoricExtension(), new KoreanExtension()));
