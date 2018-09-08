@@ -22,6 +22,9 @@ public class EraNameTest {
         assertThat(
             HistoricEra.AD.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
             is("Anno Domini"));
+        assertThat(
+            HistoricEra.HISPANIC.getDisplayName(Locale.ENGLISH, TextWidth.WIDE),
+            is("era of Caesar"));
     }
 
     @Test
@@ -32,6 +35,9 @@ public class EraNameTest {
         assertThat(
             HistoricEra.AD.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
             is("AD"));
+        assertThat(
+            HistoricEra.HISPANIC.getDisplayName(Locale.ENGLISH, TextWidth.SHORT),
+            is("era of Caesar"));
     }
 
     @Test
