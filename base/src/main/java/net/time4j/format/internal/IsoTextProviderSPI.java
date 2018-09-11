@@ -298,7 +298,7 @@ public class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "MONTH_OF_YEAR");
-            names = lookupBundle(rb, 12, key, tw, oc, 1);
+            names = lookupBundle(rb, 12, key, tw, null, oc, 1);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
@@ -342,7 +342,7 @@ public class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "QUARTER_OF_YEAR");
-            names = lookupBundle(rb, 4, key, tw, oc, 1);
+            names = lookupBundle(rb, 4, key, tw, null, oc, 1);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
@@ -382,7 +382,7 @@ public class IsoTextProviderSPI
 
         if (rb != null) {
             String key = getKey(rb, "DAY_OF_WEEK");
-            names = lookupBundle(rb, 7, key, tw, oc, 1);
+            names = lookupBundle(rb, 7, key, tw, null, oc, 1);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
@@ -427,7 +427,8 @@ public class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "ERA");
-            names = lookupBundle(rb, 5, key, tw, OutputContext.FORMAT, 0);
+            TextWidth fallback = ((tw == TextWidth.NARROW) ? TextWidth.ABBREVIATED : null);
+            names = lookupBundle(rb, 5, key, tw, fallback, OutputContext.FORMAT, 0);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
@@ -506,6 +507,7 @@ public class IsoTextProviderSPI
         int len,
         String elementName,
         TextWidth tw,
+        TextWidth fallback,
         OutputContext oc,
         int baseIndex
     ) {
@@ -542,6 +544,13 @@ public class IsoTextProviderSPI
 
             if (rb.containsKey(key)) {
                 names[i] = rb.getString(key);
+            } else if (fallback != null) {
+                String[] arr = lookupBundle(rb, len, elementName, fallback, null, oc, baseIndex);
+                if (arr != null) {
+                    names[i] = arr[i];
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }
