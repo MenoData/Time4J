@@ -1065,14 +1065,18 @@ public final class HistoricCalendar
         @Override
         public long getMinimumSinceUTC() {
 
-            return PlainDate.axis().getMinimum().getDaysSinceEpochUTC();
+            PlainDate prototype = PlainDate.of(2000, 1, 1);
+            HistoricDate hd = prototype.getMinimum(this.history.date());
+            return this.history.convert(hd).getDaysSinceEpochUTC();
 
         }
 
         @Override
         public long getMaximumSinceUTC() {
 
-            return PlainDate.axis().getMaximum().getDaysSinceEpochUTC();
+            PlainDate prototype = PlainDate.of(2000, 1, 1);
+            HistoricDate hd = prototype.getMaximum(this.history.date());
+            return this.history.convert(hd).getDaysSinceEpochUTC();
 
         }
 
@@ -1098,12 +1102,10 @@ public final class HistoricCalendar
             if (calsys == null) {
                 String variant = key.toString();
 
-                if (calsys == null) {
-                    try {
-                        calsys = new Transformer(ChronoHistory.from(variant));
-                    } catch (IllegalArgumentException ex) {
-                        return null;
-                    }
+                try {
+                    calsys = new Transformer(ChronoHistory.from(variant));
+                } catch (IllegalArgumentException ex) {
+                    return null;
                 }
 
                 CalendarSystem<HistoricCalendar> old = this.putIfAbsent(variant, calsys);

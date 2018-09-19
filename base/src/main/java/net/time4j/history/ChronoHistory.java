@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoHistory.java) is part of project Time4J.
  *
@@ -53,12 +53,17 @@ import java.util.Set;
 /**
  * <p>Represents the chronological history of calendar reforms in a given region. </p>
  *
+ * <p>All non-proleptic history objects are limited to the range BC 45 until the year AD 9999. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Geschichte der Kalenderreformen in einer gegebenen Region. </p>
+ *
+ * <p>Alle nicht-proleptischen {@code ChronoHistory}-Objekte sind auf den Jahresbereich
+ * BC 45 bis AD 9999 beschr&auml;nkt. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
@@ -747,7 +752,7 @@ public final class ChronoHistory
      */
     public boolean isValid(HistoricDate date) {
 
-        if (date == null) {
+        if ((date == null) || !this.isWithinSupportedRange(date)) {
             return false;
         }
 
@@ -775,6 +780,10 @@ public final class ChronoHistory
      * @since   3.0
      */
     public PlainDate convert(HistoricDate date) {
+
+        if (!this.isWithinSupportedRange(date)) {
+            throw new IllegalArgumentException("Out of supported range: " + date);
+        }
 
         Calculus algorithm = this.getAlgorithm(date);
 
@@ -825,6 +834,10 @@ public final class ChronoHistory
         if (era != hd.getEra()) {
             int yoe = era.yearOfEra(hd.getEra(), hd.getYearOfEra());
             hd = HistoricDate.of(era, yoe, hd.getMonth(), hd.getDayOfMonth());
+        }
+
+        if (!this.isWithinSupportedRange(hd)) {
+            throw new IllegalArgumentException("Out of supported range: " + hd);
         }
 
         return hd;
@@ -1827,6 +1840,26 @@ public final class ChronoHistory
     EraPreference getEraPreference() {
 
         return this.eraPreference;
+
+    }
+
+    /**
+     * Range check for the year.
+     *
+     * @param   hd  historic date to be checked
+     * @return  boolean
+     */
+    boolean isWithinSupportedRange(HistoricDate hd) {
+
+        int ad = hd.getEra().annoDomini(hd.getYearOfEra());
+
+        if (this == PROLEPTIC_BYZANTINE) {
+            return (ad > -5508) || ((ad == -5508) && (hd.getMonth() >= 9));
+        } else if ((this == PROLEPTIC_GREGORIAN) || (this == PROLEPTIC_JULIAN)) {
+            return true;
+        } else {
+            return ((ad >= -44) && (ad <= 9999));
+        }
 
     }
 
