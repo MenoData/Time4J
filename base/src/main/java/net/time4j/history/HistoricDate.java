@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricDate.java) is part of project Time4J.
  *
@@ -20,8 +20,6 @@
  */
 
 package net.time4j.history;
-
-import net.time4j.base.GregorianMath;
 
 
 /**
@@ -88,30 +86,26 @@ public final class HistoricDate
      * YearDefinition.DUAL_DATING, NewYearRule.BEGIN_OF_JANUARY.until(Integer.MAX_VALUE))}. </p>
      *
      * @param   era         historic era
-     * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
+     * @param   yearOfEra   year of related era ({@code 1 <= yearOfEra <= 999,999,999}) starting on January the first
      * @param   month       historic month (1-12)
      * @param   dom         historic day of month (1-31)
      * @return  new historic date (not yet validated)
      * @throws  IllegalArgumentException if any argument is out of required maximum range
      * @since   3.0
      * @see     ChronoHistory#isValid(HistoricDate)
-     * @see     GregorianMath#MIN_YEAR
-     * @see     GregorianMath#MAX_YEAR
      */
     /*[deutsch]
      * <p>&Auml;quivalent zu {@code HistoricDate.of(era, yearOfEra, month, dom,
      * YearDefinition.DUAL_DATING, NewYearRule.BEGIN_OF_JANUARY.until(Integer.MAX_VALUE))}. </p>
      *
      * @param   era         historic era
-     * @param   yearOfEra   year of related era ({@code >= 1}) starting on January the first
+     * @param   yearOfEra   year of related era ({@code 1 <= yearOfEra <= 999,999,999}) starting on January the first
      * @param   month       historic month (1-12)
      * @param   dom         historic day of month (1-31)
      * @return  new historic date (not yet validated)
      * @throws  IllegalArgumentException if any argument is out of required maximum range
      * @since   3.0
      * @see     ChronoHistory#isValid(HistoricDate)
-     * @see     GregorianMath#MIN_YEAR
-     * @see     GregorianMath#MAX_YEAR
      */
     public static HistoricDate of(
         HistoricEra era,
@@ -128,11 +122,12 @@ public final class HistoricDate
      * <p>Constructs a new tuple of given historic chronological components. </p>
      *
      * <p>Note: A detailed validation is not done. Such a validation is the responsibility
-     * of any {@code ChronoHistory}, however. The converted AD-year must not be beyond the
-     * defined range of the class {@code PlainDate}. </p>
+     * of any {@code ChronoHistory}, however. The parameter year-of-era must not have
+     * more than 9 digits. </p>
      *
      * @param   era             historic era
-     * @param   yearOfEra       year of era which will be interpreted according to given year definition ({@code >= 1})
+     * @param   yearOfEra       year of era which will be interpreted according to given year definition,
+     *                          usually ({@code 1 <= yearOfEra <= 999,999,999})
      * @param   month           historic month (1-12)
      * @param   dom             historic day of month (1-31)
      * @param   yearDefinition  defines a strategy how to interprete year of era
@@ -141,18 +136,16 @@ public final class HistoricDate
      * @throws  IllegalArgumentException if any argument is out of required maximum range or inconsistent
      * @since   3.18/4.14
      * @see     ChronoHistory#isValid(HistoricDate)
-     * @see     GregorianMath#MIN_YEAR
-     * @see     GregorianMath#MAX_YEAR
      */
     /*[deutsch]
      * <p>Konstruiert ein neues Tupel aus den angegebenen historischen Zeitkomponenten. </p>
      *
      * <p>Hinweis: Eine detaillierte Validierung wird nicht gemacht. Das ist stattdessen Aufgabe
-     * der {@code ChronoHistory}. Das umgerechnete AD-Jahr darf nicht au&szlig;erhalb des
-     * Definitionsbereichs der Klasse {@code PlainDate} liegen. </p>
+     * der {@code ChronoHistory}. Der Parameter year-of-era darf nicht mehr als 9 Ziffern haben. </p>
      *
      * @param   era             historic era
-     * @param   yearOfEra       year of era which will be interpreted according to given year definition ({@code >= 1})
+     * @param   yearOfEra       year of era which will be interpreted according to given year definition,
+     *                          usually ({@code 1 <= yearOfEra <= 999,999,999})
      * @param   month           historic month (1-12)
      * @param   dom             historic day of month (1-31)
      * @param   yearDefinition  defines a strategy how to interprete year of era
@@ -161,8 +154,6 @@ public final class HistoricDate
      * @throws  IllegalArgumentException if any argument is out of required maximum range or inconsistent
      * @since   3.18/4.14
      * @see     ChronoHistory#isValid(HistoricDate)
-     * @see     GregorianMath#MIN_YEAR
-     * @see     GregorianMath#MAX_YEAR
      */
     public static HistoricDate of(
         HistoricEra era,
@@ -175,13 +166,12 @@ public final class HistoricDate
 
         if (era == null) {
             throw new NullPointerException("Missing historic era.");
-        } else if (
-            (dom < 1 || dom > 31)
-            || (month < 1 || month > 12)
-            || (Math.abs(era.annoDomini(yearOfEra)) > GregorianMath.MAX_YEAR)
-        ) {
+        } else if (dom < 1 || dom > 31) {
             throw new IllegalArgumentException(
-                "Out of range: " + toString(era, yearOfEra, month, dom));
+                "Day of month out of range: " + toString(era, yearOfEra, month, dom));
+        } else if (month < 1 || month > 12) {
+            throw new IllegalArgumentException(
+                "Month out of range: " + toString(era, yearOfEra, month, dom));
         } else if (era == HistoricEra.BYZANTINE) {
             if ((yearOfEra < 0) || ((yearOfEra == 0) && (month < 9))) {
                 throw new IllegalArgumentException(
@@ -190,6 +180,11 @@ public final class HistoricDate
         } else if (yearOfEra < 1) {
             throw new IllegalArgumentException(
                 "Year of era must be positive: " + toString(era, yearOfEra, month, dom));
+        }
+
+        if (yearOfEra > 999_999_999) {
+            throw new IllegalArgumentException(
+                "Year of era must not have more than 9 digits: " + toString(era, yearOfEra, month, dom));
         }
 
         if (!yearDefinition.equals(YearDefinition.DUAL_DATING)) {
@@ -225,7 +220,7 @@ public final class HistoricDate
     /**
      * <p>Yields the year of the historic era starting on January the first. </p>
      *
-     * @return  year of era ({@code >= 1})
+     * @return  year of era
      * @see     #getYearOfEra(NewYearStrategy)
      * @see     NewYearRule#BEGIN_OF_JANUARY
      * @since   3.0
@@ -233,7 +228,7 @@ public final class HistoricDate
     /*[deutsch]
      * <p>Liefert das Jahr der historischen &Auml;ra beginnend am ersten Tag des Januar. </p>
      *
-     * @return  year of era ({@code >= 1})
+     * @return  year of era
      * @see     #getYearOfEra(NewYearStrategy)
      * @see     NewYearRule#BEGIN_OF_JANUARY
      * @since   3.0

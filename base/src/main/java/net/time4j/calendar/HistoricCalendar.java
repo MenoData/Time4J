@@ -1392,14 +1392,14 @@ public final class HistoricCalendar
         @Override
         public PlainDate getMinimum(HistoricCalendar context) {
 
-            return PlainDate.axis().getMinimum();
+            return context.history.convert(context.gregorian.getMinimum(context.history.date()));
 
         }
 
         @Override
         public PlainDate getMaximum(HistoricCalendar context) {
 
-            return PlainDate.axis().getMaximum();
+            return context.history.convert(context.gregorian.getMaximum(context.history.date()));
 
         }
 
@@ -1409,7 +1409,16 @@ public final class HistoricCalendar
             PlainDate value
         ) {
 
-            return (value != null);
+            if (value == null) {
+                return false;
+            }
+
+            try {
+                context.history.convert(value);
+                return true;
+            } catch (IllegalArgumentException iae) {
+                return false;
+            }
 
         }
 

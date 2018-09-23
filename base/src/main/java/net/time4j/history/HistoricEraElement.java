@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricEraElement.java) is part of project Time4J.
  *
@@ -314,7 +314,9 @@ final class HistoricEraElement
             boolean lenient
         ) {
 
-            if (value != null) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing era value.");
+            } else {
                 HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
 
                 if (hd.getEra() == value) {
