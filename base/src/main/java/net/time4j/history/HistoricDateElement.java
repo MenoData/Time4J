@@ -164,9 +164,9 @@ final class HistoricDateElement
 
             if (this.history == ChronoHistory.PROLEPTIC_BYZANTINE) {
                 return HistoricDate.of(HistoricEra.BYZANTINE, 0, 9, 1);
-            } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
-                return this.history.convert(PlainDate.axis().getMinimum());
             } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
+                return HistoricDate.of(HistoricEra.BC, ChronoHistory.JULIAN_YMAX + 1, 1, 1);
+            } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
                 return HistoricDate.of(HistoricEra.BC, YMAX, 1, 1);
             } else {
                 return HistoricDate.of(HistoricEra.BC, 45, 1, 1);
@@ -178,10 +178,10 @@ final class HistoricDateElement
         public HistoricDate getMaximum(C context) {
 
             if (this.history == ChronoHistory.PROLEPTIC_BYZANTINE) {
-                return HistoricDate.of(HistoricEra.BYZANTINE, YMAX, 8, 31);
-            } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
-                return this.history.convert(PlainDate.axis().getMaximum());
+                return HistoricDate.of(HistoricEra.BYZANTINE, ChronoHistory.BYZANTINE_YMAX, 8, 31);
             } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
+                return HistoricDate.of(HistoricEra.AD, ChronoHistory.JULIAN_YMAX, 12, 31);
+            } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
                 return HistoricDate.of(HistoricEra.AD, YMAX, 12, 31);
             } else {
                 return HistoricDate.of(HistoricEra.AD, 9999, 12, 31);

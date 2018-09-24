@@ -1,5 +1,6 @@
 package net.time4j.history;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.format.expert.ChronoFormatter;
@@ -21,22 +22,10 @@ public class HistoryTest {
     public void isValidFirstGregorianReform() {
         ChronoHistory history = ChronoHistory.ofFirstGregorianReform();
         assertThat(
-            history.isValid(new HistoricDate(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1)),
+            history.isValid(new HistoricDate(HistoricEra.BC, 46, 12, 31)),
             is(false));
         assertThat(
-            history.isValid(new HistoricDate(HistoricEra.BC, 999979468, 1, 1)),
-            is(false));
-        assertThat(
-            history.isValid(new HistoricDate(HistoricEra.BC, 999979467, 10, 31)),
-            is(false));
-        assertThat(
-            history.isValid(new HistoricDate(HistoricEra.BC, 999979467, 11, 20)),
-            is(false));
-        assertThat(
-            history.isValid(new HistoricDate(HistoricEra.BC, 999979467, 11, 21)),
-            is(true));
-        assertThat(
-            history.isValid(new HistoricDate(HistoricEra.AD, GregorianMath.MAX_YEAR, 12, 31)),
+            history.isValid(new HistoricDate(HistoricEra.BC, 45, 1, 1)),
             is(true));
         assertThat(
             history.isValid(new HistoricDate(HistoricEra.AD, 1582, 10, 4)),
@@ -51,19 +40,22 @@ public class HistoryTest {
             history.isValid(new HistoricDate(HistoricEra.AD, 1582, 10, 15)),
             is(true));
         assertThat(
-            history.isValid(new HistoricDate(HistoricEra.AD, GregorianMath.MAX_YEAR, 12, 31)),
+            history.isValid(new HistoricDate(HistoricEra.AD, 9999, 12, 31)),
             is(true));
+        assertThat(
+            history.isValid(new HistoricDate(HistoricEra.AD, 10_000, 1, 1)),
+            is(false));
     }
 
     @Test
     public void convertToISOAtFirstGregorianReform() {
         ChronoHistory history = ChronoHistory.ofFirstGregorianReform();
         assertThat(
-            history.convert(new HistoricDate(HistoricEra.BC, 999979467, 11, 21)),
-            is(PlainDate.axis().getMinimum()));
+            history.convert(new HistoricDate(HistoricEra.BC, 45, 1, 1)),
+            is(PlainDate.of(-45, 12, 30)));
         assertThat(
-            history.convert(new HistoricDate(HistoricEra.AD, GregorianMath.MAX_YEAR, 12, 31)),
-            is(PlainDate.axis().getMaximum()));
+            history.convert(new HistoricDate(HistoricEra.AD, 9999, 12, 31)),
+            is(PlainDate.of(9999, 12, 31)));
         assertThat(
             history.convert(new HistoricDate(HistoricEra.AD, 1582, 10, 4)),
             is(PlainDate.of(1582, 10, 14)));
@@ -76,11 +68,11 @@ public class HistoryTest {
     public void convertToHistoricAtFirstGregorianReform() {
         ChronoHistory history = ChronoHistory.ofFirstGregorianReform();
         assertThat(
-            history.convert(PlainDate.axis().getMinimum()),
-            is(new HistoricDate(HistoricEra.BC, 999979467, 11, 21)));
+            history.convert(PlainDate.of(-45, 12, 30)),
+            is(new HistoricDate(HistoricEra.BC, 45, 1, 1)));
         assertThat(
-            history.convert(PlainDate.axis().getMaximum()),
-            is(new HistoricDate(HistoricEra.AD, GregorianMath.MAX_YEAR, 12, 31)));
+            history.convert(PlainDate.of(9999, 12, 31)),
+            is(new HistoricDate(HistoricEra.AD, 9999, 12, 31)));
         assertThat(
             history.convert(PlainDate.of(1582, 10, 14)),
             is(new HistoricDate(HistoricEra.AD, 1582, 10, 4)));
@@ -254,12 +246,13 @@ public class HistoryTest {
     @Test
     public void handleProlepticGregorianInFarPast() {
         ChronoHistory gregorian = ChronoHistory.PROLEPTIC_GREGORIAN;
+        PlainDate date = PlainDate.axis().getMinimum().plus(1, CalendarUnit.YEARS);
         assertThat(
-            gregorian.convert(PlainDate.axis().getMinimum()),
-            is(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1)));
+            gregorian.convert(date),
+            is(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR, 1, 1)));
         assertThat(
-            gregorian.convert(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1)),
-            is(PlainDate.axis().getMinimum()));
+            gregorian.convert(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR, 1, 1)),
+            is(date));
     }
 
     @Test

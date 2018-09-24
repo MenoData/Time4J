@@ -3,12 +3,13 @@ package net.time4j.calendar;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
-import net.time4j.base.GregorianMath;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.history.ChronoHistory;
+import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
 import net.time4j.history.YearDefinition;
 import org.junit.Test;
@@ -73,8 +74,8 @@ public class HistoricCalendarTest {
         assertThat(cal.getMinimum(HistoricCalendar.WEEKDAY_IN_MONTH), is(1));
 
         assertThat(cal.getMaximum(HistoricCalendar.ERA), is(HistoricEra.AD));
-        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(10000000));
-        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(GregorianMath.MAX_YEAR));
+        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(100));
+        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(9999));
         assertThat(cal.getMaximum(HistoricCalendar.MONTH_OF_YEAR), is(Month.DECEMBER));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_MONTH), is(31));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_YEAR), is(355));
@@ -146,8 +147,8 @@ public class HistoricCalendarTest {
         assertThat(cal.getMinimum(HistoricCalendar.WEEKDAY_IN_MONTH), is(1));
 
         assertThat(cal.getMaximum(HistoricCalendar.ERA), is(HistoricEra.AD));
-        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(10000000));
-        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(GregorianMath.MAX_YEAR));
+        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(100));
+        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(9999));
         assertThat(cal.getMaximum(HistoricCalendar.MONTH_OF_YEAR), is(Month.DECEMBER));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_MONTH), is(31));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_YEAR), is(365));
@@ -228,8 +229,8 @@ public class HistoricCalendarTest {
         assertThat(cal.getMinimum(HistoricCalendar.WEEKDAY_IN_MONTH), is(1));
 
         assertThat(cal.getMaximum(HistoricCalendar.ERA), is(HistoricEra.AD));
-        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(10000000));
-        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(GregorianMath.MAX_YEAR));
+        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(100));
+        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(9999));
         assertThat(cal.getMaximum(HistoricCalendar.MONTH_OF_YEAR), is(Month.DECEMBER));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_MONTH), is(30));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_YEAR), is(355));
@@ -354,7 +355,96 @@ public class HistoricCalendarTest {
     }
 
     @Test
-    public void caSupport() throws ParseException {
+    public void prolepticByzantine() {
+        ChronoHistory h = ChronoHistory.PROLEPTIC_BYZANTINE;
+        CalendarSystem<HistoricCalendar> cs =
+            HistoricCalendar.family().getCalendarSystem(h);
+        HistoricCalendar min = cs.transform(cs.getMinimumSinceUTC());
+        HistoricCalendar max = cs.transform(cs.getMaximumSinceUTC());
+        System.out.println(min); // BYZANTINE-0000-09-01
+        System.out.println(max); // BYZANTINE-999984973-08-31
+
+        assertThat(min.getEra(), is(HistoricEra.BYZANTINE));
+        assertThat(min.getYear(), is(1));
+        assertThat(min.getMonth().getValue(), is(9));
+        assertThat(min.getDayOfMonth(), is(1));
+        assertThat(min.getDayOfYear(), is(1));
+
+        assertThat(max.getEra(), is(HistoricEra.BYZANTINE));
+        assertThat(max.getYear(), is(999984973));
+        assertThat(max.getMonth().getValue(), is(8));
+        assertThat(max.getDayOfMonth(), is(31));
+        assertThat(max.getDayOfYear(), is(365));
+
+        assertThat(h.isValid(max.get(h.date())), is(true));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.BYZANTINE, 999_984_973, 8, 31)), is(true));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.BYZANTINE, 999_984_974, 9, 1)), is(false));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.BYZANTINE, 0, 9, 1)), is(true));
+
+        assertThat(min.getMaximum(h.yearOfEra()), is(999984973));
+        assertThat(max.getMaximum(h.yearOfEra()), is(999984973));
+    }
+
+    @Test
+    public void prolepticJulian() {
+        ChronoHistory h = ChronoHistory.PROLEPTIC_JULIAN;
+        CalendarSystem<HistoricCalendar> cs =
+            HistoricCalendar.family().getCalendarSystem(h);
+        HistoricCalendar min = cs.transform(cs.getMinimumSinceUTC());
+        HistoricCalendar max = cs.transform(cs.getMaximumSinceUTC());
+        System.out.println(min); // BC-999979466-01-01
+        System.out.println(max); // AD-999979465-12-31
+
+        assertThat(min.getEra(), is(HistoricEra.BC));
+        assertThat(min.getYear(), is(999_979_466));
+        assertThat(min.getMonth().getValue(), is(1));
+        assertThat(min.getDayOfMonth(), is(1));
+        assertThat(min.getDayOfYear(), is(1));
+
+        assertThat(max.getEra(), is(HistoricEra.AD));
+        assertThat(max.getYear(), is(999_979_465));
+        assertThat(max.getMonth().getValue(), is(12));
+        assertThat(max.getDayOfMonth(), is(31));
+        assertThat(max.getDayOfYear(), is(365));
+
+        assertThat(h.isValid(max.get(h.date())), is(true));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.AD, 999_979_465, 12, 31)), is(true));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.AD, 999_979_466, 1, 1)), is(false));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.BC, 999_979_467, 12, 31)), is(false));
+        assertThat(h.isValid(HistoricDate.of(HistoricEra.BC, 999_979_466, 1, 1)), is(true));
+
+        assertThat(min.getMaximum(h.yearOfEra()), is(999_979_466));
+        assertThat(max.getMaximum(h.yearOfEra()), is(999_979_465));
+    }
+
+    @Test
+    public void transformMin() {
+        ChronoHistory[] histories = {
+            ChronoHistory.PROLEPTIC_BYZANTINE,
+            ChronoHistory.of(new Locale("", "ES")), // Spain
+            ChronoHistory.of(new Locale("", "PT")) // Portugal
+        };
+        for (ChronoHistory history : histories) {
+            CalendarSystem<HistoricCalendar> calsys =
+                HistoricCalendar.family().getCalendarSystem(history.getVariant());
+            try {
+                calsys.transform(calsys.getMinimumSinceUTC());
+            } catch (Exception e) {
+                fail(e.getMessage());
+            }
+        }
+
+        ChronoHistory history = ChronoHistory.of(new Locale("", "IT", ""));
+        CalendarSystem<HistoricCalendar> calsys = HistoricCalendar.family().getCalendarSystem(history.getVariant());
+        HistoricCalendar date = calsys.transform(calsys.getMinimumSinceUTC());
+        System.out.println(date); // BC-0045-01-01
+        assertThat(date.getDayOfYear(), is(1));
+        assertThat(date.lengthOfMonth(), is(31));
+        assertThat(date.lengthOfYear(), is(366));
+    }
+
+    @Test
+    public void caSupport() {
         Locale locale = Locale.forLanguageTag("de-DE-PREUSSEN-u-ca-historic");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(

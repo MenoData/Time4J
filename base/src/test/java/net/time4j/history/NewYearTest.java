@@ -293,13 +293,13 @@ public class NewYearTest {
     }
 
     @Test
-    public void russiaAtOrBeforeCreationOfTheWorld() {
+    public void russiaInFarPast() {
         assertThat(
-            ChronoHistory.of(new Locale("en", "RU")).getBeginOfYear(HistoricEra.BC, 9999),
-            is(HistoricDate.of(HistoricEra.BC, 9999, 1, 1)));
+            ChronoHistory.of(new Locale("en", "RU")).getBeginOfYear(HistoricEra.BC, 45),
+            is(HistoricDate.of(HistoricEra.BC, 45, 1, 1)));
         assertThat(
-            ChronoHistory.of(new Locale("en", "RU")).getBeginOfYear(HistoricEra.BC, 5508),
-            is(HistoricDate.of(HistoricEra.BC, 5508, 1, 1)));
+            ChronoHistory.PROLEPTIC_BYZANTINE.getBeginOfYear(HistoricEra.BC, 5509),
+            is(HistoricDate.of(HistoricEra.BYZANTINE, 1, 9, 1)));
     }
 
     @Test

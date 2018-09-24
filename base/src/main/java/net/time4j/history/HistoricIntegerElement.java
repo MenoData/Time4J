@@ -684,17 +684,31 @@ final class HistoricIntegerElement
                     case YEAR_AFTER_INDEX:
                     case YEAR_BEFORE_INDEX:
                     case CENTURY_INDEX:
-                        if (current.getEra() == HistoricEra.BC) {
-                            max = this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
+                        if (this.history == ChronoHistory.PROLEPTIC_BYZANTINE) {
+                            max = ChronoHistory.BYZANTINE_YMAX;
+                        } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
+                            max = ChronoHistory.JULIAN_YMAX;
+                            if (current.getEra() == HistoricEra.BC) {
+                                max++;
+                            }
+                        } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
+                            max = 999_999_999;
                         } else {
-                            max = this.history.convert(PlainDate.axis().getMaximum()).getYearOfEra();
+                            max = 9999;
                         }
                         if (this.index == CENTURY_INDEX) {
                             max = ((max - 1) / 100) + 1;
                         }
                         return Integer.valueOf(max);
                     case MONTH_INDEX:
-                        max = 12;
+                        if (
+                            (current.getEra() == HistoricEra.BYZANTINE)
+                            && (current.getYearOfEra() == ChronoHistory.BYZANTINE_YMAX)
+                        ) {
+                            max = 8;
+                        } else {
+                            max = 12;
+                        }
                         hd = this.adjust(context, max);
                         break;
                     case DAY_OF_MONTH_INDEX:
@@ -731,8 +745,8 @@ final class HistoricIntegerElement
 
                 max = ((this.index == MONTH_INDEX) ? hd.getMonth() : hd.getDayOfMonth());
                 return Integer.valueOf(max);
-            } catch (IllegalArgumentException iae) {
-                throw new ChronoException(iae.getMessage(), iae);
+            } catch (RuntimeException re) {
+                throw new ChronoException(re.getMessage(), re);
             }
 
         }
