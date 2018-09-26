@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GregorianMath.java) is part of project Time4J.
  *
@@ -43,7 +43,7 @@ public final class GregorianMath {
     /*[deutsch]
      * Minimal unterst&uuml;tze Jahreszahl (-999999999).
      */
-    public static final int MIN_YEAR = -999999999;
+    public static final int MIN_YEAR = -999_999_999;
 
     /**
      * Maximum of supported year range (999999999).
@@ -51,7 +51,7 @@ public final class GregorianMath {
     /*[deutsch]
      * Maximal unterst&uuml;tze Jahreszahl (999999999).
      */
-    public static final int MAX_YEAR = 999999999;
+    public static final int MAX_YEAR = 999_999_999;
 
     // Tage zwischen [0000-03-01] und [1970-01-01] minus MJD-Epoche
     private static final int OFFSET = 719468 - 40587;
@@ -82,7 +82,7 @@ public final class GregorianMath {
             return ((year & 3) == 0);
         }
 
-        return ((year & 3) == 0) && ((year % 100) != 0) || ((year % 400) == 0);
+        return ((year & 3) == 0) && (((year % 100) != 0) || ((year % 400) == 0));
 
     }
 
@@ -332,8 +332,7 @@ public final class GregorianMath {
      * @see     #toPackedDate(long)
      */
     /*[deutsch]
-     * <p>Liefert den Tag des Monats im angegebenen bin&auml;r gepackten
-     * Datum. </p>
+     * <p>Liefert den Tag des Monats im angegebenen bin&auml;r gepackten Datum. </p>
      *
      * @param   packedDate  packed date in binary format
      * @return  day of month (1-31)
@@ -353,7 +352,7 @@ public final class GregorianMath {
      * of this method by mean of {@code readYear()}, {@code readMonth()} and
      * {@code readDayOfMonth()}. </p>
      *
-     * @param   mjd         days since [1858-11-17] (modified julian date)
+     * @param   mjd         days since [1858-11-17] (modified Julian date)
      * @return  packed date in binary format
      * @throws  IllegalArgumentException if the calculated year is not in
      *          range [(-999999999)-999999999)]
@@ -369,7 +368,7 @@ public final class GregorianMath {
      * {@code readDayOfMonth()} k&ouml;nnen aus dem Ergebnis die einzelnen
      * Datumselemente extrahiert werden. </p>
      *
-     * @param   mjd         days since [1858-11-17] (modified julian date)
+     * @param   mjd         days since [1858-11-17] (modified Julian date)
      * @return  packed date in binary format
      * @throws  IllegalArgumentException if the calculated year is not in
      *          range [(-999999999)-999999999)]
@@ -385,33 +384,20 @@ public final class GregorianMath {
 
         long days = Math.addExact(mjd, OFFSET);
 
-        // TODO: Optimierung der Performance im Jahresbereich 1901-2099
-        //       mit vereinfachtem Schaltjahresalgorithmus
-        // if (days >= year1901 && days < year2100) { ... }
-
-        long q400 = Math.floorDiv(days, 146097);
-        int r400 = (int) Math.floorMod(days, 146097);
-
-        if (r400 == 146096) {
-            y = (q400 + 1) * 400;
-            m = 2;
-            d = 29;
-        } else {
-            int q100 = (r400 / 36524);
-            int r100 = (r400 % 36524);
-
-            int q4 = (r100 / 1461);
-            int r4 = (r100 % 1461);
+        if (days >= 694266 && days < 766950) { // year range 1901-2099
+            days += 15;
+            long q4 = Math.floorDiv(days, 1461);
+            int r4 = (int) Math.floorMod(days, 1461);
 
             if (r4 == 1460) {
-                y = (q400 * 400 + q100 * 100 + (q4 + 1) * 4);
+                y = (q4 + 1) * 4;
                 m = 2;
                 d = 29;
             } else {
                 int q1 = (r4 / 365);
                 int r1 = (r4 % 365);
 
-                y = (q400 * 400 + q100 * 100 + q4 * 4 + q1);
+                y = q4 * 4 + q1;
                 m = (((r1 + 31) * 5) / 153) + 2;
                 d = r1 - (((m + 1) * 153) / 5) + 123;
 
@@ -420,11 +406,43 @@ public final class GregorianMath {
                     m -= 12;
                 }
             }
-        }
+        } else {
+            long q400 = Math.floorDiv(days, 146097);
+            int r400 = (int) Math.floorMod(days, 146097);
 
-        if (y < GregorianMath.MIN_YEAR || y > GregorianMath.MAX_YEAR) {
-            throw new IllegalArgumentException(
-                "Year out of range: " + y);
+            if (r400 == 146096) {
+                y = (q400 + 1) * 400;
+                m = 2;
+                d = 29;
+            } else {
+                int q100 = (r400 / 36524);
+                int r100 = (r400 % 36524);
+
+                int q4 = (r100 / 1461);
+                int r4 = (r100 % 1461);
+
+                if (r4 == 1460) {
+                    y = (q400 * 400 + q100 * 100 + (q4 + 1) * 4);
+                    m = 2;
+                    d = 29;
+                } else {
+                    int q1 = (r4 / 365);
+                    int r1 = (r4 % 365);
+
+                    y = (q400 * 400 + q100 * 100 + q4 * 4 + q1);
+                    m = (((r1 + 31) * 5) / 153) + 2;
+                    d = r1 - (((m + 1) * 153) / 5) + 123;
+
+                    if (m > 12) {
+                        y++;
+                        m -= 12;
+                    }
+                }
+            }
+
+            if (y < GregorianMath.MIN_YEAR || y > GregorianMath.MAX_YEAR) {
+                throw new IllegalArgumentException("Year out of range: " + y);
+            }
         }
 
         long result = (y << 32);
@@ -435,10 +453,10 @@ public final class GregorianMath {
     }
 
     /**
-     * <p>Calculates the modified julian date. </p>
+     * <p>Calculates the modified Julian date. </p>
      *
      * @param   date    gregorian date
-     * @return  days since [1858-11-17] (modified julian date)
+     * @return  days since [1858-11-17] (modified Julian date)
      * @throws  IllegalArgumentException if the argument is out of range
      * @see     #toMJD(int, int, int)
      */
@@ -446,7 +464,7 @@ public final class GregorianMath {
      * <p>Ermittelt das modifizierte julianische Datum. </p>
      *
      * @param   date    gregorian date
-     * @return  days since [1858-11-17] (modified julian date)
+     * @return  days since [1858-11-17] (modified Julian date)
      * @throws  IllegalArgumentException if the argument is out of range
      * @see     #toMJD(int, int, int)
      */
@@ -457,12 +475,12 @@ public final class GregorianMath {
     }
 
     /**
-     * <p>Calculates the modified julian date. </p>
+     * <p>Calculates the modified Julian date. </p>
      *
      * @param   year        proleptic iso year [(-999999999) - 999999999]
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
-     * @return  days since [1858-11-17] (modified julian date)
+     * @return  days since [1858-11-17] (modified Julian date)
      * @throws  IllegalArgumentException if any argument is out of range
      */
     /*[deutsch]
@@ -471,10 +489,9 @@ public final class GregorianMath {
      * @param   year        proleptic iso year [(-999999999) - 999999999]
      * @param   month       gregorian month (1-12)
      * @param   dayOfMonth  day of month in range (1-31)
-     * @return  days since [1858-11-17] (modified julian date)
+     * @return  days since [1858-11-17] (modified Julian date)
      * @throws  IllegalArgumentException if any argument is out of range
      */
-    // TODO: Optimierung der Performance mit Jahres-Array im Bereich 1901-2099
     public static long toMJD(
         int year,
         int month,
@@ -494,25 +511,22 @@ public final class GregorianMath {
         long days = (
             (y * 365)
             + Math.floorDiv(y, 4)
-            - Math.floorDiv(y, 100)
-            + Math.floorDiv(y, 400)
             + (((m + 1) * 153) / 5) - 123
             + dayOfMonth
         );
+
+        if ((year >= 1901) && (year < 2100)) {
+            days -= 15;
+        } else {
+            days = days - Math.floorDiv(y, 100) + Math.floorDiv(y, 400);
+        }
 
         return days - OFFSET;
 
     }
 
-    /**
-     * <p>Liefert eine ISO-konforme Standard-Darstellung eines Datums. </p>
-     *
-     * @param   year    proleptic iso year
-     * @param   month   gregorian month
-     * @param   dom     day of month
-     * @return  String in iso format YYYY-MM-DD
-     */
-    static String toString(int year, int month, int dom) {
+    // liefert eine ISO-konforme Standard-Darstellung eines Datums
+    private static String toString(int year, int month, int dom) {
 
         StringBuilder calendar = new StringBuilder();
         calendar.append(year);
