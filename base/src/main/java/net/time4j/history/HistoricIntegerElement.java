@@ -24,6 +24,7 @@ package net.time4j.history;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
@@ -692,7 +693,7 @@ final class HistoricIntegerElement
                                 max++;
                             }
                         } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
-                            max = 999_999_999;
+                            max = GregorianMath.MAX_YEAR;
                         } else {
                             max = 9999;
                         }

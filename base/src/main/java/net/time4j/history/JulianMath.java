@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JulianMath.java) is part of project Time4J.
  *
@@ -46,7 +46,7 @@ class JulianMath {
     /*[deutsch]
      * Minimal unterst&uuml;tze Jahreszahl (-999999999).
      */
-    public static final int MIN_YEAR = -999999999;
+    public static final int MIN_YEAR = -999_999_999;
 
     /**
      * Maximum of supported year range (999999999).
@@ -54,7 +54,7 @@ class JulianMath {
     /*[deutsch]
      * Maximal unterst&uuml;tze Jahreszahl (999999999).
      */
-    public static final int MAX_YEAR = 999999999;
+    public static final int MAX_YEAR = 999_999_999;
 
     // Tage zwischen [0000-03-01] und [1970-01-01] (julianische Datumsangaben) minus MJD-Epoche
     private static final int OFFSET = 719470 - 40587;
@@ -167,46 +167,6 @@ class JulianMath {
             && (month <= 12)
             && (dayOfMonth >= 1)
             && (dayOfMonth <= getLengthOfMonth(year, month)));
-
-    }
-
-    /**
-     * <p>Checks the range limits of date values according to the rules
-     * of julian calendar. </p>
-     *
-     * @param   year        proleptic julian year [(-999999999) - 999999999]
-     * @param   month       julian month (1-12)
-     * @param   dayOfMonth  day of month (1-31)
-     * @throws  IllegalArgumentException if any argument is out of range
-     * @see     #isValid(int, int, int)
-     */
-    /*[deutsch]
-     * <p>&Uuml;berpr&uuml;ft die Bereichsgrenzen der Datumswerte nach
-     * den julianischen Kalenderregeln. </p>
-     *
-     * @param   year        proleptic julian year [(-999999999) - 999999999]
-     * @param   month       julian month (1-12)
-     * @param   dayOfMonth  day of month (1-31)
-     * @throws  IllegalArgumentException if any argument is out of range
-     * @see     #isValid(int, int, int)
-     */
-    public static void checkDate(
-        int year,
-        int month,
-        int dayOfMonth
-    ) {
-
-        if (year < MIN_YEAR || year > MAX_YEAR) {
-            throw new IllegalArgumentException("YEAR out of range: " + year);
-        } else if ((month < 1) || (month > 12)) {
-            throw new IllegalArgumentException("MONTH out of range: " + month);
-        } else if ((dayOfMonth < 1) || (dayOfMonth > 31)) {
-            throw new IllegalArgumentException("DAY_OF_MONTH out of range: " + dayOfMonth);
-        } else if (dayOfMonth > getLengthOfMonth(year, month)) {
-            throw new IllegalArgumentException(
-                "DAY_OF_MONTH exceeds month length in given year: "
-                + toString(year, month, dayOfMonth));
-        }
 
     }
 
@@ -333,8 +293,7 @@ class JulianMath {
         }
 
         if (y < JulianMath.MIN_YEAR || y > JulianMath.MAX_YEAR) {
-            throw new IllegalArgumentException(
-                    "Year out of range: " + y);
+            throw new IllegalArgumentException("Year out of range: " + y);
         }
 
         long result = (y << 32);
@@ -385,6 +344,27 @@ class JulianMath {
             + dayOfMonth);
 
         return days - OFFSET;
+
+    }
+
+    // checks the range limits of date values according to the rules of julian calendar
+    private static void checkDate(
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+
+        if (year < MIN_YEAR || year > MAX_YEAR) {
+            throw new IllegalArgumentException("YEAR out of range: " + year);
+        } else if ((month < 1) || (month > 12)) {
+            throw new IllegalArgumentException("MONTH out of range: " + month);
+        } else if ((dayOfMonth < 1) || (dayOfMonth > 31)) {
+            throw new IllegalArgumentException("DAY_OF_MONTH out of range: " + dayOfMonth);
+        } else if (dayOfMonth > getLengthOfMonth(year, month)) {
+            throw new IllegalArgumentException(
+                "DAY_OF_MONTH exceeds month length in given year: "
+                    + toString(year, month, dayOfMonth));
+        }
 
     }
 
