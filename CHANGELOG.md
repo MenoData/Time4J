@@ -17,6 +17,7 @@
 - Interface `ChronoPrinter` without checked exceptions [#526]
 
 ### Fixed
+- Mismatch between getMinimumSinceUTC and transform for some historic calendars [#808]
 - Fix for narrow era names which had been incomplete [#809]
 - Fix for changing `JapaneseCalendar.MONTH_AS_ORDINAL` [#807]
 - NPE-Fix for loading time zone based on system time zone identifier [#803]
