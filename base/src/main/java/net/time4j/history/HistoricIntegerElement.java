@@ -694,8 +694,11 @@ final class HistoricIntegerElement
                             }
                         } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
                             max = GregorianMath.MAX_YEAR;
+                            if (current.getEra() == HistoricEra.BC) {
+                                max++;
+                            }
                         } else {
-                            max = 9999;
+                            max = ((current.getEra() == HistoricEra.BC) ? 45 : 9999);
                         }
                         if (this.index == CENTURY_INDEX) {
                             max = ((max - 1) / 100) + 1;

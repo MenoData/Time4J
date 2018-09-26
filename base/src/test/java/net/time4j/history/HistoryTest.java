@@ -1,6 +1,5 @@
 package net.time4j.history;
 
-import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.format.expert.ChronoFormatter;
@@ -233,25 +232,34 @@ public class HistoryTest {
     }
 
     @Test
+    public void prolepticGregorianRanges() {
+        ChronoHistory gregorian = ChronoHistory.PROLEPTIC_GREGORIAN;
+        PlainDate date = PlainDate.of(2000, 2, 29);
+        assertThat(gregorian.convert(date.getMinimum(gregorian.date())), is(PlainDate.axis().getMinimum()));
+        assertThat(gregorian.convert(date.getMaximum(gregorian.date())), is(PlainDate.axis().getMaximum()));
+    }
+
+    @Test
     public void handleProlepticGregorianPresence() {
         ChronoHistory gregorian = ChronoHistory.PROLEPTIC_GREGORIAN;
+        PlainDate date = PlainDate.of(2000, 2, 29);
         assertThat(
-            gregorian.convert(PlainDate.of(2000, 2, 29)),
+            gregorian.convert(date),
             is(HistoricDate.of(HistoricEra.AD, 2000, 2, 29)));
         assertThat(
             gregorian.convert(HistoricDate.of(HistoricEra.AD, 2000, 2, 29)),
-            is(PlainDate.of(2000, 2, 29)));
+            is(date));
     }
 
     @Test
     public void handleProlepticGregorianInFarPast() {
         ChronoHistory gregorian = ChronoHistory.PROLEPTIC_GREGORIAN;
-        PlainDate date = PlainDate.axis().getMinimum().plus(1, CalendarUnit.YEARS);
+        PlainDate date = PlainDate.axis().getMinimum();
         assertThat(
             gregorian.convert(date),
-            is(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR, 1, 1)));
+            is(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1)));
         assertThat(
-            gregorian.convert(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR, 1, 1)),
+            gregorian.convert(HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1)),
             is(date));
     }
 

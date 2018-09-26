@@ -1857,7 +1857,7 @@ public final class ChronoHistory
         } else if (this == PROLEPTIC_JULIAN) {
             return (Math.abs(ad) > JULIAN_YMAX);
         } else if (this == PROLEPTIC_GREGORIAN) {
-            return false;
+            return (Math.abs(ad) > GregorianMath.MAX_YEAR);
         } else {
             return ((ad < -44) || (ad > 9999));
         }

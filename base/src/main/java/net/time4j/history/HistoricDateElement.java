@@ -22,6 +22,7 @@
 package net.time4j.history;
 
 import net.time4j.PlainDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -43,7 +44,6 @@ final class HistoricDateElement
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int YMAX = 999_999_999;
     private static final long serialVersionUID = -5386613740709845550L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -167,7 +167,7 @@ final class HistoricDateElement
             } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
                 return HistoricDate.of(HistoricEra.BC, ChronoHistory.JULIAN_YMAX + 1, 1, 1);
             } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
-                return HistoricDate.of(HistoricEra.BC, YMAX, 1, 1);
+                return HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1);
             } else {
                 return HistoricDate.of(HistoricEra.BC, 45, 1, 1);
             }
@@ -182,7 +182,7 @@ final class HistoricDateElement
             } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
                 return HistoricDate.of(HistoricEra.AD, ChronoHistory.JULIAN_YMAX, 12, 31);
             } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
-                return HistoricDate.of(HistoricEra.AD, YMAX, 12, 31);
+                return HistoricDate.of(HistoricEra.AD, GregorianMath.MAX_YEAR, 12, 31);
             } else {
                 return HistoricDate.of(HistoricEra.AD, 9999, 12, 31);
             }
