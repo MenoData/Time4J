@@ -87,7 +87,7 @@ public enum EpochDays
      * counts in days based on the relation &quot;1 day = 86400 seconds&quot;.
      * </p>
      */
-    /**
+    /*[deutsch]
      * <p>Bezugspunkt ist der erste Januar 1970 Mitternacht als Tag 0. </p>
      *
      * <p>Beispiel: </p>

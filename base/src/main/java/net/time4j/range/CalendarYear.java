@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarYear.java) is part of project Time4J.
  *
@@ -400,7 +400,7 @@ public final class CalendarYear
      * @return  int
      * @see     #isLeap()
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt die Anzahl der Tage, die zu diesem Kalenderjahr geh&ouml;ren. </p>
      *
      * @return  int

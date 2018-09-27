@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatUtils.java) is part of project Time4J.
  *
@@ -79,7 +79,7 @@ public class FormatUtils {
      * @param   locale      localization info
      * @return  boolean
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt, ob die angegebene Lokalisierungsinformation die Verwendung des standardm&auml;&szlig;igen
      * Wochenmodells eines Kalenders anzeigt oder nicht. </p>
      *

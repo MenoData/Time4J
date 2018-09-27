@@ -213,7 +213,7 @@ public abstract class DaylightSavingRule {
      * @return  boolean
      * @since   3.39/4.34
      */
-    /**
+    /*[deutsch]
      * Zeigt diese Regel eine Umschaltung zu einem Sommerzeitmodus an?
      *
      * @return  boolean

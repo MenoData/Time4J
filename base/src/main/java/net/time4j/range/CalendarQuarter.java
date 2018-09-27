@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarQuarter.java) is part of project Time4J.
  *
@@ -341,7 +341,7 @@ public final class CalendarQuarter
      *
      * @return  int
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt die Anzahl der Tage, die zu diesem Kalenderquartal geh&ouml;ren. </p>
      *
      * @return  int

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WallTime.java) is part of project Time4J.
  *
@@ -66,7 +66,7 @@ public interface WallTime {
      *
      * @return  minute in range {@code 0 - 59}
      */
-    /**
+    /*[deutsch]
      * <p>Liefert die Minute (der aktuellen Stunde). </p>
      *
      * @return  minute in range {@code 0 - 59}

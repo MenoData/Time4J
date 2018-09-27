@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoRecurrence.java) is part of project Time4J.
  *
@@ -510,7 +510,7 @@ public class IsoRecurrence<I>
      *
      * @return  boolean
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt, ob die Anzahl der Intervalle null ist. </p>
      *
      * @return  boolean
@@ -526,7 +526,7 @@ public class IsoRecurrence<I>
      *
      * @return  boolean
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt, ob die Anzahl der Intervalle unbegrenzt ist. </p>
      *
      * @return  boolean

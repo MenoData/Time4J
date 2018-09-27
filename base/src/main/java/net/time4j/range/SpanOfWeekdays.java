@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SpanOfWeekdays.java) is part of project Time4J.
  *
@@ -263,7 +263,7 @@ public final class SpanOfWeekdays
      *
      * @return  count of days in range {@code 1-7}
      */
-    /**
+    /*[deutsch]
      * <p>Ermittelt die Anzahl der Tage, die zu dieser Wochentagsspanne geh&ouml;ren. </p>
      *
      * @return  count of days in range {@code 1-7}
