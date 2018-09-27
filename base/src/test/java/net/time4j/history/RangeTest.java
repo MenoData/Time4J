@@ -1,8 +1,12 @@
 package net.time4j.history;
 
+import net.time4j.PlainDate;
+import net.time4j.engine.CalendarDays;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -83,6 +87,18 @@ public class RangeTest {
         assertThat(
             HistoricDate.of(HistoricEra.HISPANIC, 899, 12, 31).getYearOfEra(NewYearRule.CHRISTMAS_STYLE.until(ad)),
             is(899)); // effective rule: BEGIN_OF_JANUARY
+    }
+
+    @Test
+    public void startOfSpanishEra() {
+        ChronoHistory h = ChronoHistory.of(new Locale("", "ES"));
+        HistoricDate bc38 = HistoricDate.of(HistoricEra.HISPANIC, 1, 1, 1);
+        PlainDate d = h.convert(bc38);
+        assertThat(d, is(PlainDate.of(-38, 12, 30))); // Julian calendar => 2 days delta
+        assertThat(h.convert(d), is(bc38));
+        assertThat(
+            h.convert(d.minus(CalendarDays.ONE)),
+            is(HistoricDate.of(HistoricEra.BC, 39, 12, 31))); // fallback to era BC
     }
 
 }

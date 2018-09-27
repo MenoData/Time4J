@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricEra.java) is part of project Time4J.
  *
@@ -88,7 +88,7 @@ public enum HistoricEra
      * <p>Years are reckoned from 38 BC onwards (Era of Caesars or Spanish Era). </p>
      *
      * <p>This overlapping alternative to {@link #AD} was used in Spain (until 1383), Portugal (until 1422)
-     * and southern part of France. </p>
+     * and southern part of France. Historic dates before 38 BC use the era {@link #BC} as fallback, however. </p>
      *
      * <p>Links: </p>
      * <ul>
@@ -100,7 +100,8 @@ public enum HistoricEra
      * <p>Jahre werden seit 38 BC (&Auml;ra der C&auml;saren oder spanische &Auml;ra) gez&auml;hlt. </p>
      *
      * <p>Diese mit {@link #AD} &uuml;berlappende Alternative wurde in Spanien (bis 1383), Portugal (bis 1422)
-     * und dem s&uuml;dlichen Frankreich verwendet. </p>
+     * und dem s&uuml;dlichen Frankreich verwendet. Historische Datumsangaben vor 38 v.u.Z. verwenden
+     * jedoch die &Auml;ra {@link #BC} als Ersatz. </p>
      *
      * <p>Links: </p>
      * <ul>
@@ -139,7 +140,7 @@ public enum HistoricEra
     /*[deutsch]
      * <p>Diese mit {@link #AD} &uuml;berlappende Alternative wurde von Chronisten verwendet,
      * um die Jahre seit der angenommenen Gr&uuml;ndung der Stadt Rom zu z&auml;hlen
-     * (753 BC - version of Varro). </p>
+     * (753 BC - Version von Varro). </p>
      *
      * <p>Siehe auch: <a href="https://en.wikipedia.org/wiki/Ab_urbe_condita">Wikipedia</a>. </p>
      */
