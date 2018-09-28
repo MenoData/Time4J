@@ -802,18 +802,6 @@ public final class CalendarWeek
         public CalendarWeek createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
-        public CalendarWeek createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
             boolean lenient,
             boolean preparsing
         ) {

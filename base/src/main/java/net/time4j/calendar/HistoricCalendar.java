@@ -63,7 +63,6 @@ import net.time4j.format.DisplayElement;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.NumberSystem;
-import net.time4j.format.NumericalElement;
 import net.time4j.format.TextElement;
 import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
@@ -1514,7 +1513,7 @@ public final class HistoricCalendar
                 }
             }
 
-            throw new IllegalArgumentException(value.name());
+            throw new IllegalArgumentException(value == null ? "Missing historic era." : value.name());
 
         }
 
@@ -1536,7 +1535,7 @@ public final class HistoricCalendar
 
     private static class EraElement
         extends DisplayElement<HistoricEra>
-        implements NumericalElement<HistoricEra>, TextElement<HistoricEra> {
+        implements TextElement<HistoricEra> {
 
         //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1600,8 +1599,12 @@ public final class HistoricCalendar
             AttributeQuery attributes
         ) throws IOException, ChronoException {
 
-            ChronoHistory history = getHistory(attributes);
-            TextElement.class.cast(history.era()).print(context, buffer, attributes);
+            if (context instanceof HistoricCalendar) {
+                HistoricCalendar hc = HistoricCalendar.class.cast(context);
+                TextElement.class.cast(hc.history.era()).print(hc, buffer, attributes);
+            } else {
+                throw new ChronoException("Cannot cast to historic calendar: " + context);
+            }
 
         }
 
@@ -1613,40 +1616,12 @@ public final class HistoricCalendar
         ) {
 
             ChronoHistory history = getHistory(attributes);
-            Object result = TextElement.class.cast(history.era()).parse(text, status, attributes);
-            return HistoricEra.class.cast(result);
 
-        }
-
-        @Override
-        public int numerical(HistoricEra value) {
-
-            return value.getValue();
-
-        }
-
-        @Override
-        public int printToInt(
-            HistoricEra value,
-            ChronoDisplay context,
-            AttributeQuery attributes
-        ) {
-
-            return value.ordinal();
-
-        }
-
-        @Override
-        public boolean parseFromInt(
-            ChronoEntity<?> entity,
-            int value
-        ) {
-
-            try {
-                entity.with(this, HistoricEra.values()[value]);
-                return true;
-            } catch (RuntimeException re) {
-                return false;
+            if (history == null) {
+                return null;
+            } else {
+                Object result = TextElement.class.cast(history.era()).parse(text, status, attributes);
+                return HistoricEra.class.cast(result);
             }
 
         }
@@ -1796,8 +1771,13 @@ public final class HistoricCalendar
         ) {
 
             ChronoHistory history = getHistory(attributes);
-            TextElement<Integer> element = history.yearOfEra();
-            return element.parse(text, status, attributes);
+
+            if (history == null) {
+                return null;
+            } else {
+                TextElement<Integer> element = history.yearOfEra();
+                return element.parse(text, status, attributes);
+            }
 
         }
 
@@ -1831,8 +1811,13 @@ public final class HistoricCalendar
         ) {
 
             ChronoHistory history = getHistory(attributes);
-            DualFormatElement element = DualFormatElement.class.cast(history.yearOfEra());
-            return element.parse(text, status, attributes, parsedResult);
+
+            if (history == null) {
+                return null;
+            } else {
+                DualFormatElement element = DualFormatElement.class.cast(history.yearOfEra());
+                return element.parse(text, status, attributes, parsedResult);
+            }
 
         }
 
@@ -1955,19 +1940,6 @@ public final class HistoricCalendar
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, variant, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public HistoricCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

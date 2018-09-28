@@ -589,6 +589,7 @@ public final class SpanOfWeekdays
         public SpanOfWeekdays createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
+            boolean lenient,
             boolean preparsing
         ) {
             if (entity.contains(START) && entity.contains(END)) {

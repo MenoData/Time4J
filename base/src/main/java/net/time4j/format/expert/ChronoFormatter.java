@@ -81,9 +81,6 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
-import java.time.ZoneId;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -780,33 +777,6 @@ public final class ChronoFormatter<T>
 
         ChronoDisplay display = this.display(formattable, attributes);
         return this.print(display, buffer, attributes, true);
-
-    }
-
-    @Deprecated
-    private T toEntity(TemporalAccessor formattable) {
-
-        T entity = this.chronology.createFrom(formattable, this.globalAttributes);
-
-        if (entity == null) {
-            throw new IllegalArgumentException("Insufficient data to convert temporal accessor: " + formattable);
-        }
-
-        return entity;
-
-    }
-
-    private ChronoFormatter<T> toZonedFormatter(TemporalAccessor formattable) {
-
-        if (!this.getAttributes().contains(Attributes.TIMEZONE_ID)) {
-            ZoneId zoneId = formattable.query(TemporalQueries.zone());
-
-            if (zoneId != null) {
-                return this.withTimezone(zoneId.getId());
-            }
-        }
-
-        return this;
 
     }
 
@@ -7725,19 +7695,6 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
         ) {
 
             return new OverrideHandler<>(override, generic);
-
-        }
-
-        @Override
-        @Deprecated
-        public GeneralTimestamp<C> createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

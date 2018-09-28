@@ -1398,8 +1398,7 @@ public final class PersianCalendar
             }
 
             if (
-                (era == PersianEra.ANNO_PERSICO)
-                && (yearOfEra >= 1)
+                (yearOfEra >= 1)
                 && (yearOfEra <= 3000)
                 && (monthOfYear >= 1)
                 && (monthOfYear <= 12)
@@ -1777,19 +1776,6 @@ public final class PersianCalendar
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, StartOfDay.MIDNIGHT);
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public PersianCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

@@ -60,11 +60,6 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.time.chrono.Chronology;
-import java.time.chrono.HijrahDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -2004,19 +1999,6 @@ public final class HijriCalendar
         }
 
         @Override
-        @Deprecated
-        public HijriCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public HijriCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
@@ -2074,27 +2056,6 @@ public final class HijriCalendar
                     }
                     entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hijri date.");
                 }
-            }
-
-            return null;
-
-        }
-
-        @Override
-        @Deprecated
-        public HijriCalendar createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            Chronology c = threeten.query(TemporalQueries.chronology());
-
-            if (c != null && c.getId().equals("Hijrah-umalqura")) {
-                HijrahDate hd = HijrahDate.from(threeten);
-                return HijriCalendar.ofUmalqura(
-                    hd.get(ChronoField.YEAR_OF_ERA),
-                    hd.get(ChronoField.MONTH_OF_YEAR),
-                    hd.get(ChronoField.DAY_OF_MONTH));
             }
 
             return null;

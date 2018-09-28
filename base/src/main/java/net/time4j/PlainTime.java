@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTime.java) is part of project Time4J.
  *
@@ -61,10 +61,6 @@ import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.time.LocalTime;
-import java.time.Period;
-import java.time.format.DateTimeFormatter;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -159,7 +155,7 @@ public final class PlainTime
     /**
      * System-Property f&uuml;r die Darstellung des Dezimaltrennzeichens.
      */
-    static final char ISO_DECIMAL_SEPARATOR = (
+    private static final char ISO_DECIMAL_SEPARATOR = (
         Boolean.getBoolean("net.time4j.format.iso.decimal.dot")
         ? '.'
         : ',' // Empfehlung des ISO-Standards
@@ -568,20 +564,6 @@ public final class PlainTime
             0,
             23,
             'H');
-
-    /**
-     * <p>Synonym for {@code HOUR_FROM_0_TO_24}. </p>
-     *
-     * @deprecated  Use {@link #HOUR_FROM_0_TO_24} instead, will be removed in next major release
-     */
-    /*[deutsch]
-     * <p>Synonym f&uuml;r {@code HOUR_FROM_0_TO_24}. </p>
-     *
-     * @deprecated  Use {@link #HOUR_FROM_0_TO_24} instead, will be removed in next major release
-     */
-    @FormattableElement(format = "H")
-    @Deprecated
-    public static final ProportionalElement<Integer, PlainTime> ISO_HOUR = HOUR_FROM_0_TO_24;
 
     /**
      * <p>Element with the minute of hour in the value range {@code 0-59}. </p>
@@ -3439,43 +3421,6 @@ public final class PlainTime
 
             final UnixTime ut = clock.currentTime();
             return PlainTime.from(ut, zone.getOffset(ut));
-
-        }
-
-        @Override
-        public PlainTime createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            // lax mode not supported, we only look for existing complete types like OffsetTime etc.
-            LocalTime localTime = threeten.query(TemporalQueries.localTime());
-
-            if (localTime != null) {
-                if (
-                    localTime.equals(LocalTime.MIDNIGHT)
-                    && threeten.query(DateTimeFormatter.parsedExcessDays()).equals(Period.ofDays(1))
-                ) {
-                    return PlainTime.midnightAtEndOfDay();
-                } else {
-                    return TemporalType.LOCAL_TIME.translate(localTime);
-                }
-            }
-
-            return null;
-
-        }
-
-        @Override
-        @Deprecated
-        public PlainTime createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

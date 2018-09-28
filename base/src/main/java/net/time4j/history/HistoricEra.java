@@ -148,13 +148,6 @@ public enum HistoricEra
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    public int getValue() {
-
-        return ((this == BC) ? 0 : 1);
-
-    }
-
     /**
      * <p>Gets the description text dependent on the locale and text width. </p>
      *

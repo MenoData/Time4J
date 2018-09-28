@@ -1633,35 +1633,6 @@ public final class SolarTime
      */
     public interface Calculator {
 
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        /**
-         * Follows closely the algorithms published by NOAA (National Oceanic and Atmospheric Administration).
-         *
-         * <p>See {@link StdSolarCalculator#NOAA}. </p>
-         */
-        /*[deutsch]
-         * Folgt nahe den Algorithmen, die von der NOAA (National Oceanic and Atmospheric Administration)
-         * ver&ouml;ffentlicht wurden.
-         *
-         * <p>Siehe {@link StdSolarCalculator#NOAA}. </p>
-         */
-        @Deprecated
-        String NOAA = "NOAA";
-
-        /**
-         * Simple and relatively fast but rather imprecise calculator.
-         *
-         * <p>See {@link StdSolarCalculator#SIMPLE}. </p>
-         */
-        /*[deutsch]
-         * Einfache und relativ schnelle aber eher ungenaue Berechnungsmethode.
-         *
-         * <p>Siehe {@link StdSolarCalculator#SIMPLE}. </p>
-         */
-        @Deprecated
-        String SIMPLE = "SIMPLE";
-
         //~ Methoden ------------------------------------------------------
 
         /**
@@ -1743,23 +1714,6 @@ public final class SolarTime
          * @return  value in seconds
          */
         double equationOfTime(double jde);
-
-        /**
-         * <p>Determines the declination of sun. </p>
-         *
-         * @param   jde     julian day in ephemeris time
-         * @return  declination of sun in degrees
-         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
-         */
-        /*[deutsch]
-         * <p>Bestimmt die Deklination der Sonne. </p>
-         *
-         * @param   jde     julian day in ephemeris time
-         * @return  declination of sun in degrees
-         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
-         */
-        @Deprecated
-        double declination(double jde);
 
         /**
          * <p>Calculates a value suitable for given time and feature. </p>

@@ -54,10 +54,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.time.Year;
-import java.time.chrono.IsoChronology;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -686,18 +682,6 @@ public final class CalendarYear
         public CalendarYear createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
-        public CalendarYear createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
             boolean lenient,
             boolean preparsing
         ) {
@@ -722,24 +706,7 @@ public final class CalendarYear
 
             Map<String, String> map = CalendarText.getIsoInstance(locale).getTextForms();
             String key = "F_y";
-            return (map.containsKey(key) ? map.get(key) : "uuuu");
-
-        }
-
-        @Override
-        public CalendarYear createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            if (threeten.query(TemporalQueries.chronology()) == IsoChronology.INSTANCE) {
-                if (threeten.isSupported(ChronoField.YEAR)) {
-                    int year = threeten.get(ChronoField.YEAR);
-                    return CalendarYear.of(year);
-                }
-            }
-
-            return null;
+            return map.getOrDefault(key, "uuuu");
 
         }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FrenchRepublicanEra.java) is part of project Time4J.
  *
@@ -56,14 +56,6 @@ public enum FrenchRepublicanEra
     REPUBLICAN;
 
     //~ Methoden ----------------------------------------------------------
-
-    @Override
-    @Deprecated
-    public int getValue() {
-
-        return 1;
-
-    }
 
     /**
      * <p>Gets the description text dependent on the locale. </p>

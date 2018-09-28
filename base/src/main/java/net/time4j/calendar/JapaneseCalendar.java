@@ -2790,19 +2790,6 @@ public final class JapaneseCalendar
         }
 
         @Override
-        @Deprecated
-        public JapaneseCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public JapaneseCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarEra.java) is part of project Time4J.
  *
@@ -63,30 +63,5 @@ public interface CalendarEra {
      * @return  String
      */
     String name();
-
-    /**
-     * <p>Yields an ordinal number which is scaled such that every era
-     * which contains the ISO-date of UTC-epoch [1972-01-01] will have
-     * the associated value {@code 1}. </p>
-     *
-     * <p>Attention: This number is neither necessarily unique nor
-     * does it imply any chronological order. </p>
-     *
-     * @return  int
-     * @deprecated  no replacement in next major release because it is not useful
-     */
-    /*[deutsch]
-     * <p>Liefert eine Ordnungsnummer, die so skaliert ist, da&szlig;
-     * jede &Auml;ra, die das ISO-Datum der UTC-Epoche [1972-01-01]
-     * enth&auml;lt, den Wert {@code 1} ergibt. </p>
-     *
-     * <p>Achtung: Die so definierte Ordnungsnummer ist weder zwingend eindeutig
-     * noch legt sie irgendeine zeitliche Ordnung fest. </p>
-     *
-     * @return  int
-     * @deprecated  no replacement in next major release because it is not useful
-     */
-    @Deprecated
-    int getValue();
 
 }

@@ -1387,19 +1387,6 @@ public final class CopticCalendar
         }
 
         @Override
-        @Deprecated
-        public CopticCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public CopticCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,

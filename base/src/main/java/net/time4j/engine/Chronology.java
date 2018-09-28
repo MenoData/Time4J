@@ -25,7 +25,6 @@ import net.time4j.base.TimeSource;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
-import java.time.temporal.TemporalAccessor;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -233,29 +232,6 @@ public class Chronology<T>
     ) {
 
         return this.merger.createFrom(clock, attributes);
-
-    }
-
-    @Override
-    @Deprecated
-    public T createFrom(
-        TemporalAccessor threeten,
-        AttributeQuery attributes
-    ) {
-
-        return this.merger.createFrom(threeten, attributes);
-
-    }
-
-    @Override
-    @Deprecated
-    public T createFrom(
-        ChronoEntity<?> entity,
-        AttributeQuery attributes,
-        boolean preparsing
-    ) {
-
-        return this.merger.createFrom(entity, attributes, preparsing);
 
     }
 

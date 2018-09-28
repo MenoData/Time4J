@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTimestamp.java) is part of project Time4J.
  *
@@ -67,7 +67,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.time.LocalDateTime;
-import java.time.temporal.TemporalAccessor;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -1639,36 +1638,6 @@ public final class PlainTimestamp
 
             final UnixTime ut = clock.currentTime();
             return PlainTimestamp.from(ut, zone.getOffset(ut));
-
-        }
-
-        @Override
-        public PlainTimestamp createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            PlainDate date = PlainDate.axis().createFrom(threeten, attributes);
-            PlainTime time = PlainTime.axis().createFrom(threeten, attributes);
-
-            if ((date != null) && (time != null)) {
-                return PlainTimestamp.of(date, time);
-            }
-
-            return null;
-
-        }
-
-        @Override
-        @Deprecated
-        public PlainTimestamp createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

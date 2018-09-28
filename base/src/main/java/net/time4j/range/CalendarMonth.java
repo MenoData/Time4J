@@ -58,10 +58,6 @@ import java.io.ObjectInputStream;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.YearMonth;
-import java.time.chrono.IsoChronology;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -817,18 +813,6 @@ public final class CalendarMonth
         public CalendarMonth createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
-        public CalendarMonth createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
             boolean lenient,
             boolean preparsing
         ) {
@@ -897,33 +881,6 @@ public final class CalendarMonth
                 default:
                     return null;
             }
-
-        }
-
-        @Override
-        public CalendarMonth createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            if (threeten.query(TemporalQueries.chronology()) == IsoChronology.INSTANCE) {
-                if (threeten.isSupported(ChronoField.YEAR)) {
-                    if (threeten.isSupported(ChronoField.MONTH_OF_YEAR)) {
-                        Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
-                        int year = threeten.get(ChronoField.YEAR);
-                        int month = threeten.get(ChronoField.MONTH_OF_YEAR);
-                        if (leniency.isLax()) {
-                            PlainDate date = PlainDate.of(year, 1, 1);
-                            date = date.with(PlainDate.MONTH_AS_NUMBER.setLenient(month));
-                            return CalendarMonth.of(date.getYear(), date.getMonth());
-                        } else {
-                            return CalendarMonth.of(year, month);
-                        }
-                    }
-                }
-            }
-
-            return null;
 
         }
 

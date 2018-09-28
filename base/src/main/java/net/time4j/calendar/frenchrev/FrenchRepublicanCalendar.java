@@ -2258,9 +2258,7 @@ public final class FrenchRepublicanCalendar
         ) {
 
             if (value != null) {
-                if (context.isLeapYear() || (value != Sansculottides.LEAP_DAY)) {
-                    return true;
-                }
+                return (context.isLeapYear() || (value != Sansculottides.LEAP_DAY));
             }
 
             return false;
@@ -2495,19 +2493,6 @@ public final class FrenchRepublicanCalendar
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public FrenchRepublicanCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

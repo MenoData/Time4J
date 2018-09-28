@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianTime.java) is part of project Time4J.
  *
@@ -22,7 +22,6 @@
 package net.time4j.calendar;
 
 import net.time4j.Meridiem;
-import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.base.MathUtils;
@@ -47,7 +46,6 @@ import net.time4j.engine.TimePoint;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
-import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 
 import java.io.IOException;
@@ -1579,19 +1577,6 @@ public final class EthiopianTime
             AttributeQuery attributes
         ) {
             return EthiopianTime.from(PlainTime.axis().createFrom(clock, attributes));
-        }
-
-        @Override
-        @Deprecated
-        public EthiopianTime createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
         }
 
         @Override

@@ -964,17 +964,6 @@ public final class Nengo
     }
 
     @Override
-    public int getValue() {
-
-        if (this.matches(Selector.NORTHERN_COURT)) {
-            return (this.index - NORTHERN_NENGOS.length + NENGO_OEI.index - Nengo.SHOWA.index + 1);
-        }
-
-        return (this.index - Nengo.SHOWA.index + 1);
-
-    }
-
-    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {
@@ -1023,6 +1012,17 @@ public final class Nengo
             sb.append(')');
         }
         return sb.toString();
+
+    }
+
+    // verwendet in JapaneseCalendar
+    int getValue() {
+
+        if (this.matches(Selector.NORTHERN_COURT)) {
+            return (this.index - NORTHERN_NENGOS.length + NENGO_OEI.index - Nengo.SHOWA.index + 1);
+        }
+
+        return (this.index - Nengo.SHOWA.index + 1);
 
     }
 

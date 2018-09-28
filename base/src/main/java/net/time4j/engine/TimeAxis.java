@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -106,11 +106,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
 
         if (timeline == null) {
             List<U> registeredUnits = new ArrayList<>(unitRules.keySet());
-            Collections.sort(
-                registeredUnits,
-                (unit1, unit2) -> Double.compare(
-                    getLength(unitLengths, unit1),
-                    getLength(unitLengths, unit2)));
+            registeredUnits.sort(Comparator.comparingDouble(unit -> getLength(unitLengths, unit)));
             U step = registeredUnits.get(0);
             this.timeline = new DefaultTimeLine<>(step, min, max);
         } else {
@@ -503,22 +499,6 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
     }
 
     @Override
-    @Deprecated
-    public T createFrom(
-        ChronoEntity<?> entity,
-        AttributeQuery attributes,
-        boolean preparsing
-    ) {
-
-        if (entity.contains(this.self)) {
-            return entity.get(this.self);
-        }
-
-        return super.createFrom(entity, attributes, preparsing);
-
-    }
-
-    @Override
     public T createFrom(
         ChronoEntity<?> entity,
         AttributeQuery attributes,
@@ -658,7 +638,7 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         private final T min;
         private final T max;
         private final CalendarSystem<T> calendarSystem;
-        private TimeLine<T> timeline = null;
+        private TimeLine<T> timeline;
         private boolean useEnumUnits = true;
 
         //~ Konstruktoren -------------------------------------------------

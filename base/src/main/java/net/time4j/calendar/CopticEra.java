@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CopticEra.java) is part of project Time4J.
  *
@@ -60,13 +60,6 @@ public enum CopticEra
     ANNO_MARTYRUM;
 
     //~ Methoden ----------------------------------------------------------
-
-    @Override
-    public int getValue() {
-
-        return 1;
-
-    }
 
     /**
      * <p>Equivalent to the expression {@code getDisplayName(locale, TextWidth.WIDE)}. </p>

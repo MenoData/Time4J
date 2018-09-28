@@ -867,31 +867,6 @@ public final class MachineTime<U>
     }
 
     /**
-     * <p>Divides this duration by given divisor using rounding
-     * mode {@code HALF_UP}. </p>
-     *
-     * @param   divisor     divisor
-     * @return  changed copy of this duration
-     * @see     RoundingMode#HALF_UP
-     * @deprecated Use {@link #dividedBy(long, RoundingMode) dividedBy(long, RoundingMode.HALF_UP} instead
-     */
-    /*[deutsch]
-     * <p>Dividiert diese Dauer durch den angegebenen Teiler und
-     * benutzt die kaufm&auml;nnische Rundung. </p>
-     *
-     * @param   divisor     Teiler
-     * @return  ge&auml;nderte Kopie dieser Dauer
-     * @see     RoundingMode#HALF_UP
-     * @deprecated Use {@link #dividedBy(long, RoundingMode) dividedBy(long, RoundingMode.HALF_UP} instead
-     */
-    @Deprecated
-    public MachineTime<U> dividedBy(long divisor) {
-
-        return this.dividedBy(divisor, RoundingMode.HALF_UP);
-
-    }
-
-    /**
      * <p>Divides this duration by given divisor using given rounding mode. </p>
      *
      * @param   divisor         divisor

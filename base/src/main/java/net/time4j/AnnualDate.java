@@ -53,10 +53,6 @@ import java.io.Serializable;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.MonthDay;
-import java.time.chrono.IsoChronology;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Locale;
 import java.util.Map;
 
@@ -785,18 +781,6 @@ public final class AnnualDate
         public AnnualDate createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
-        public AnnualDate createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
             boolean lenient,
             boolean preparsing
         ) {
@@ -817,26 +801,6 @@ public final class AnnualDate
                         }
                     } else {
                         entity.with(ValidationElement.ERROR_MESSAGE, "Day-of-month out of bounds: " + dom);
-                    }
-                }
-            }
-
-            return null;
-
-        }
-
-        @Override
-        public AnnualDate createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            if (threeten.query(TemporalQueries.chronology()) == IsoChronology.INSTANCE) {
-                if (threeten.isSupported(ChronoField.MONTH_OF_YEAR)) {
-                    if (threeten.isSupported(ChronoField.DAY_OF_MONTH)) {
-                        int month = threeten.get(ChronoField.MONTH_OF_YEAR);
-                        int dom = threeten.get(ChronoField.DAY_OF_MONTH);
-                        return AnnualDate.of(month, dom);
                     }
                 }
             }

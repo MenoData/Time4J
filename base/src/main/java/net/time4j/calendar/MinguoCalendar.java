@@ -62,11 +62,6 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.time.chrono.Chronology;
-import java.time.chrono.MinguoDate;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -1160,42 +1155,6 @@ public final class MinguoCalendar
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public MinguoCalendar createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            Chronology c = threeten.query(TemporalQueries.chronology());
-
-            if (c != null && c.getId().equals("Minguo")) {
-                MinguoDate md = MinguoDate.from(threeten);
-                int era = md.get(ChronoField.ERA);
-                return MinguoCalendar.of(
-                    MinguoEra.values()[era],
-                    md.get(ChronoField.YEAR_OF_ERA),
-                    md.get(ChronoField.MONTH_OF_YEAR),
-                    md.get(ChronoField.DAY_OF_MONTH));
-            }
-
-            return null;
-
-        }
-
-        @Override
-        @Deprecated
-        public MinguoCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

@@ -69,10 +69,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.time.LocalDate;
-import java.time.chrono.IsoChronology;
-import java.time.temporal.ChronoField;
-import java.time.temporal.TemporalAccessor;
-import java.time.temporal.TemporalQueries;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -2449,70 +2445,6 @@ public final class PlainDate
         }
 
         @Override
-        @Deprecated
-        public PlainDate createFrom(
-            TemporalAccessor threeten,
-            AttributeQuery attributes
-        ) {
-
-            Leniency leniency = attributes.get(Attributes.LENIENCY, Leniency.SMART);
-
-            if (threeten.query(TemporalQueries.chronology()) == IsoChronology.INSTANCE) {
-                if (threeten.isSupported(ChronoField.YEAR)) {
-                    int year = threeten.get(ChronoField.YEAR);
-
-                    if (
-                        threeten.isSupported(ChronoField.MONTH_OF_YEAR)
-                        && threeten.isSupported(ChronoField.DAY_OF_MONTH)
-                    ) {
-                        int month = threeten.get(ChronoField.MONTH_OF_YEAR);
-                        int dayOfMonth = threeten.get(ChronoField.DAY_OF_MONTH);
-                        if (leniency.isLax()) {
-                            PlainDate date = PlainDate.of(year, 1, 1);
-                            date = date.with(MONTH_AS_NUMBER.setLenient(month));
-                            return date.with(DAY_OF_MONTH.setLenient(dayOfMonth));
-                        } else {
-                            return PlainDate.of(year, month, dayOfMonth);
-                        }
-                    } else if (threeten.isSupported(ChronoField.DAY_OF_YEAR)) {
-                        int dayOfYear = threeten.get(ChronoField.DAY_OF_YEAR);
-                        if (leniency.isLax()) {
-                            PlainDate date = PlainDate.of(year, 1);
-                            return date.with(DAY_OF_YEAR.setLenient(dayOfYear));
-                        } else {
-                            return PlainDate.of(year, dayOfYear);
-                        }
-                    }
-                }
-            }
-
-            if (
-                threeten.isSupported(ChronoField.EPOCH_DAY)
-                && !leniency.isStrict()
-            ) {
-                return PlainDate.of(
-                    threeten.getLong(ChronoField.EPOCH_DAY),
-                    EpochDays.UNIX);
-            }
-
-            return null;
-
-        }
-
-        @Override
-        @Deprecated
-        public PlainDate createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public PlainDate createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
@@ -3003,7 +2935,7 @@ public final class PlainDate
                         throw new IllegalArgumentException("Out of range: " + value);
                     }
                 case WIM_INDEX:
-                    if (lenient || ((value >= 1) && (value <= this.getMaximumOfWIM(context)))) {
+                    if ((value >= 1) && (value <= this.getMaximumOfWIM(context))) {
                         int old = ((context.dayOfMonth - 1) / 7) + 1;
                         return context.plus(value - old, CalendarUnit.WEEKS);
                     } else {
