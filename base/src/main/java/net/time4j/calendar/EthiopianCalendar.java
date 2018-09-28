@@ -621,27 +621,6 @@ public final class EthiopianCalendar
      * <p>Yields the Ethiopian year. </p>
      *
      * @return  int
-     * @since   3.11/4.8
-     * @deprecated  Use {@link #getYear()} instead
-     */
-    /*[deutsch]
-     * <p>Liefert das &auml;thiopische Jahr. </p>
-     *
-     * @return  int
-     * @since   3.11/4.8
-     * @deprecated  Use {@link #getYear()} instead
-     */
-    @Deprecated
-    public int getYearOfEra() {
-
-        return this.getYear();
-
-    }
-
-    /**
-     * <p>Yields the Ethiopian year. </p>
-     *
-     * @return  int
      * @since   3.13/4.10
      */
     /*[deutsch]

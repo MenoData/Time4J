@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionModel.java) is part of project Time4J.
  *
@@ -25,7 +25,6 @@ import net.time4j.Moment;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
-import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
@@ -38,7 +37,6 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -174,14 +172,6 @@ public abstract class TransitionModel
     public boolean isEmpty() {
 
         return false;
-
-    }
-
-    @Override
-    public final ZonalTransition getNextTransition(UnixTime ut) {
-
-        Optional<ZonalTransition> opt = this.findNextTransition(ut);
-        return (opt.isPresent() ? opt.get() : null);
 
     }
 

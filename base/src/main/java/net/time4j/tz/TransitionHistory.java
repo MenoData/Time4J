@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionHistory.java) is part of project Time4J.
  *
@@ -147,26 +147,6 @@ public interface TransitionHistory {
         GregorianDate localDate,
         WallTime localTime
     );
-
-    /**
-     * <p>Queries the next transition after given global timestamp. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  {@code ZonalTransition} or {@code null} if given reference time
-     *          is after any defined transition
-     * @deprecated  Use the equivalent {@link #findNextTransition(UnixTime)}
-     */
-    /*[deutsch]
-     * <p>Ermittelt den n&auml;chsten &Uuml;bergang nach der angegebenen
-     * Referenzzeit. </p>
-     *
-     * @param   ut      unix reference time
-     * @return  {@code ZonalTransition} or {@code null} if given reference time
-     *          is after any defined transition
-     * @deprecated  Use the equivalent {@link #findNextTransition(UnixTime)}
-     */
-    @Deprecated
-    ZonalTransition getNextTransition(UnixTime ut);
 
     /**
      * <p>Determines the suitable offsets at given local timestamp.. </p>
@@ -385,9 +365,7 @@ public interface TransitionHistory {
      * @return  {@code ZonalTransition}, not present if given reference time is after any defined transition
      * @since   4.18
      */
-    default Optional<ZonalTransition> findNextTransition(UnixTime ut) {
-        throw new UnsupportedOperationException("Not yet implemented.");
-    }
+    Optional<ZonalTransition> findNextTransition(UnixTime ut);
 
     /**
      * <p>Queries the previous transition which defines the offset

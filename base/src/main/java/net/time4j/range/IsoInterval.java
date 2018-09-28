@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoInterval.java) is part of project Time4J.
  *
@@ -1024,56 +1024,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
     /**
      * <p>Prints this interval in a technical format using given formatters and separator. </p>
      *
-     * <p>Note: Infinite boundaries are printed either as &quot;-&#x221E;&quot; or &quot;+&#x221E;&quot;.
-     * If given bracket policy is specified as {@code SHOW_NEVER} then the canonical form of this
-     * interval will be printed. </p>
-     *
-     * @param   startFormat format object for printing start component
-     * @param   separator   char separating start and end component
-     * @param   endFormat   format object for printing end component
-     * @param   policy      strategy for printing interval boundaries
-     * @param   buffer      writing buffer
-     * @throws  IllegalStateException if the canonicalization of this interval fails
-     * @throws  IllegalArgumentException if an interval boundary is not formattable
-     * @throws  IOException if writing to the buffer fails
-     * @since   3.9/4.6
-     * @deprecated  Use the variant with explicit infinity style argument instead
-     */
-    /*[deutsch]
-     * <p>Formatiert dieses Intervall in einem technischen Format unter Benutzung der angegebenen Formatierer
-     * und des angegebenen Trennzeichens. </p>
-     *
-     * <p>Hinweis: Unendliche Intervallgrenzen werden entweder als &quot;-&#x221E;&quot; oder
-     * &quot;+&#x221E;&quot; ausgegeben. Wenn die angegebene {@code BracketPolicy} gleich {@code SHOW_NEVER}
-     * ist, dann wird die kanonische Form dieses Intervalls ausgegeben. </p>
-     *
-     * @param   startFormat format object for printing start component
-     * @param   separator   char separating start and end component
-     * @param   endFormat   format object for printing end component
-     * @param   policy      strategy for printing interval boundaries
-     * @param   buffer      writing buffer
-     * @throws  IllegalStateException if the canonicalization of this interval fails
-     * @throws  IllegalArgumentException if an interval boundary is not formattable
-     * @throws  IOException if writing to the buffer fails
-     * @since   3.9/4.6
-     * @deprecated  Use the variant with explicit infinity style argument instead
-     */
-    @Deprecated
-    public void print(
-        ChronoPrinter<T> startFormat,
-        char separator,
-        ChronoPrinter<T> endFormat,
-        BracketPolicy policy,
-        Appendable buffer
-    ) throws IOException {
-
-        this.print(startFormat, separator, endFormat, policy, InfinityStyle.SYMBOL, buffer);
-
-    }
-
-    /**
-     * <p>Prints this interval in a technical format using given formatters and separator. </p>
-     *
      * <p>Note: If given bracket policy is specified as {@code SHOW_NEVER} then the canonical form of this
      * interval will be printed. </p>
      *
@@ -1608,7 +1558,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             return (endA == null);
         }
         if (endA == null) {
-            return (endB == null);
+            return false;
         }
 
         if (this.getFactory().isCalendrical()) {
@@ -1724,11 +1674,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             if (startA != null) {
                 return false;
             }
-        } else if (startA == null) {
-            if (startB != null) {
-                return false;
-            }
-        } else if (!startA.isSimultaneous(startB)) {
+        } else if ((startA == null) || !startA.isSimultaneous(startB)) {
             return false;
         }
 
@@ -2076,7 +2022,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
             if (t1 == null) {
                 e = ((t2 == null) ? Boundary.infiniteFuture() : Boundary.ofOpen(t2));
             } else if (t2 == null) {
-                e = ((t1 == null) ? Boundary.infiniteFuture() : Boundary.ofOpen(t1));
+                e = Boundary.ofOpen(t1);
             } else {
                 e = (t1.isBefore(t2) ? Boundary.ofOpen(t1) : Boundary.ofOpen(t2));
             }
@@ -2296,7 +2242,7 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
      * @return  &auml;quivalenter Zeitpunkt bei offener oberer Grenze oder
      *          {@code null} wenn angewandt auf das geschlossene Maximum
      */
-    T getOpenFiniteEnd() {
+    private T getOpenFiniteEnd() {
 
         T temporal = this.end.getTemporal();
 
