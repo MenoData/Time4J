@@ -165,17 +165,6 @@ public class IsoTextProviderSPI
     public String[] meridiems(
         String calendarType,
         Locale locale,
-        TextWidth tw
-    ) {
-
-        return meridiems(locale, tw, OutputContext.FORMAT);
-
-    }
-
-    @Override
-    public String[] meridiems(
-        String calendarType,
-        Locale locale,
         TextWidth tw,
         OutputContext oc
     ) {

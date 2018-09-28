@@ -275,7 +275,8 @@ public final class GenericTextProviderSPI
     public String[] meridiems(
         String calendarType,
         Locale locale,
-        TextWidth tw
+        TextWidth tw,
+        OutputContext oc
     ) {
 
         return EMPTY_STRINGS;

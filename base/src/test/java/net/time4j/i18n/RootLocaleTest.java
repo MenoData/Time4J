@@ -82,7 +82,7 @@ public class RootLocaleTest {
     public void meridiemsWide() {
         CalendarText ct = CalendarText.getInstance(CalendarText.ISO_CALENDAR_TYPE, Locale.ROOT);
         assertThat(
-            ct.getMeridiems(TextWidth.WIDE).print(Meridiem.AM),
+            ct.getMeridiems(TextWidth.WIDE, OutputContext.FORMAT).print(Meridiem.AM),
             is("AM"));
     }
 

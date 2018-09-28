@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockInterval.java) is part of project Time4J.
  *
@@ -778,54 +778,6 @@ public final class ClockInterval
         } else {
             return interval;
         }
-
-    }
-
-    /**
-     * <p>Interpretes given text as interval. </p>
-     *
-     * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
-     * between start and end component unless the start component is a period. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
-     *
-     * <p>&Auml;hnlich wie {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Seit der Version v3.9/4.6 kann diese Methode auch einen Bindestrich als Alternative zum Schr&auml;gstrich
-     * als Trennzeichen zwischen Start- und Endkomponente, es sei denn, die Startkomponente ist eine Periode. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    @Deprecated
-    public static ClockInterval parse(
-        CharSequence text,
-        ChronoParser<PlainTime> parser,
-        BracketPolicy policy,
-        ParseLog status
-    ) {
-
-        return IntervalParser.of(
-            ClockIntervalFactory.INSTANCE,
-            parser,
-            policy
-        ).parse(text, status, parser.getAttributes());
 
     }
 

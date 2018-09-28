@@ -246,7 +246,7 @@ public final class CalendarText {
         Map<TextWidth, Map<OutputContext, TextAccessor>> tmpLeapMonths =
             getMonths(calendarType, locale, p, true);
 
-        if (tmpLeapMonths == null) {
+        if (tmpLeapMonths.isEmpty()) {
             this.leapMonths = this.stdMonths;
         } else {
             this.leapMonths = Collections.unmodifiableMap(tmpLeapMonths);
@@ -677,37 +677,6 @@ public final class CalendarText {
      * The order of element value enums must be the same. </p>
      *
      * @param   textWidth       text width of displayed AM/PM name
-     * @return  accessor for AM/PM names
-     * @see     #getMeridiems(TextWidth, OutputContext)
-     * @deprecated  Use {@code getMeridiems(textWidth, OutputContext.FORMAT)}
-     */
-    /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
-     * Tagesabschnittsnamen. </p>
-     *
-     * <p>Die Liste ist in AM/PM-Reihenfolge sortiert. Die Reihenfolge der
-     * Elementwert-Enums mu&szlig; mit der Reihenfolge der hier enthaltenen
-     * Textformen &uuml;bereinstimmen. </p>
-     *
-     * @param   textWidth       text width of displayed AM/PM name
-     * @return  accessor for AM/PM names
-     * @see     #getMeridiems(TextWidth, OutputContext)
-     * @deprecated  Use {@code getMeridiems(textWidth, OutputContext.FORMAT)}
-     */
-    @Deprecated
-    public TextAccessor getMeridiems(TextWidth textWidth) {
-
-        return this.getMeridiems(textWidth, OutputContext.FORMAT);
-
-    }
-
-    /**
-     * <p>Yields an {@code Accessor} for all am/pm-names. </p>
-     *
-     * <p>The underlying list of text forms is sorted in AM-PM-order.
-     * The order of element value enums must be the same. </p>
-     *
-     * @param   textWidth       text width of displayed AM/PM name
      * @param   outputContext   output context (stand-alone?)
      * @return  accessor for AM/PM names
      * @see     net.time4j.Meridiem
@@ -907,74 +876,6 @@ public final class CalendarText {
         }
 
         return new TextAccessor(tfs);
-
-    }
-
-    /**
-     * <p>Yields the localized GMT-prefix which is used in the
-     * <i>localized GMT format</i> of CLDR. </p>
-     *
-     * @param 	    locale 	language and country configuration
-     * @return      localized GMT-String defaults to &quot;GMT&quot;
-     * @deprecated  Use {@link net.time4j.tz.ZonalOffset#getStdFormatPattern(Locale)} instead
-     */
-    @Deprecated
-    public static String getGMTPrefix(Locale locale) {
-
-        return "GMT";
-
-    }
-
-    /**
-     * <p>Yields the best available format patterns. </p>
-     *
-     * @return  format pattern provider
-     * @since   3.10/4.7
-     * @deprecated  Use one of methods {@code patternForXYZ} instead
-     */
-    /*[deutsch]
-     * <p>Liefert die am besten verf&uuml;gbaren Formatmuster. </p>
-     *
-     * @return  format pattern provider
-     * @since   3.10/4.7
-     * @deprecated  Use one of methods {@code patternForXYZ} instead
-     */
-    @Deprecated
-    public static FormatPatternProvider getFormatPatterns() {
-
-        return FORMAT_PATTERN_PROVIDER;
-
-    }
-
-    /**
-     * <p>Yields a format pattern without any timezone symbols for plain timestamps. </p>
-     *
-     * @param   dateMode    display mode of date part
-     * @param   timeMode    display mode of time part
-     * @param   locale      language and country setting
-     * @return  format pattern for plain timestamps without timezone symbols
-     * @since   3.10/4.7
-     * @deprecated  Use {@code patternForTimestamp} instead
-     */
-    /*[deutsch]
-     * <p>Liefert ein Formatmuster ohne Zeitzonensymbole f&uuml;r reine Zeitstempel. </p>
-     *
-     * @param   dateMode    display mode of date part
-     * @param   timeMode    display mode of time part
-     * @param   locale      language and country setting
-     * @return  format pattern for plain timestamps without timezone symbols
-     * @since   3.10/4.7
-     * @deprecated  Use {@code patternForTimestamp} instead
-     */
-    @Deprecated
-    public static String getTimestampPattern(
-        DisplayMode dateMode,
-        DisplayMode timeMode,
-        Locale locale
-    ) {
-
-        String pattern = FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
-        return removeZones(pattern);
 
     }
 
@@ -1240,7 +1141,7 @@ public final class CalendarText {
             mt.put(tw, mo);
         }
 
-        return ((!leapForm || usesDifferentLeapForm) ? mt : null);
+        return ((!leapForm || usesDifferentLeapForm) ? mt : Collections.emptyMap());
 
     }
 
@@ -1250,17 +1151,18 @@ public final class CalendarText {
             this.textForms.containsKey("useShortKeys")
             && "true".equals(this.textForms.get("useShortKeys"))
         ) {
-            if (
-                (elementName.equals("MONTH_OF_YEAR") || elementName.equals("DAY_OF_WEEK")
-                || elementName.equals("QUARTER_OF_YEAR") || elementName.equals("ERA"))
-            ) {
-                return elementName.substring(0, 1);
-            } else if (elementName.equals("EVANGELIST")) { // special case: Ethiopian calendar
-                return "EV";
-            } else if (elementName.equals("SANSCULOTTIDES")) { // special case: French revolutionary calendar
-                return "S";
-            } else if (elementName.equals("DAY_OF_DECADE")) { // special case: French revolutionary calendar
-                return "D";
+            switch (elementName) {
+                case "MONTH_OF_YEAR":
+                case "DAY_OF_WEEK":
+                case "QUARTER_OF_YEAR":
+                case "ERA":
+                    return elementName.substring(0, 1);
+                case "EVANGELIST":  // special case: Ethiopian calendar
+                    return "EV";
+                case "SANSCULOTTIDES":  // special case: French revolutionary calendar
+                    return "S";
+                case "DAY_OF_DECADE":  // special case: French revolutionary calendar
+                    return "D";
             }
         }
 
@@ -1500,10 +1402,11 @@ public final class CalendarText {
         public String[] meridiems(
             String calendarType,
             Locale locale,
-            TextWidth textWidth
+            TextWidth textWidth,
+            OutputContext outputContext
         ) {
 
-            TextStyle style = getStyle(textWidth, OutputContext.FORMAT);
+            TextStyle style = getStyle(textWidth, outputContext);
             String[] meridiems = new String[2];
 
             for (int i = 0; i < 2; i++) {
@@ -1646,7 +1549,8 @@ public final class CalendarText {
         public String[] meridiems(
             String calendarType,
             Locale locale,
-            TextWidth textWidth
+            TextWidth textWidth,
+            OutputContext outputContext
         ) {
 
             if (textWidth == TextWidth.NARROW) {

@@ -265,7 +265,6 @@ public final class HebrewCalendar
                     case CIVIL:
                         return value.getCivilValue(this.hasLeapMonth(context));
                     case BIBLICAL:
-                    case BIBILICAL:
                         return value.getBiblicalValue(this.hasLeapMonth(context));
                     default:
                         return this.numerical(value);
@@ -1884,7 +1883,6 @@ public final class HebrewCalendar
                         month = HebrewMonth.valueOfCivil(m, isLeapYear(year));
                         break;
                     case BIBLICAL:
-                    case BIBILICAL:
                         month = HebrewMonth.valueOfBiblical(m, isLeapYear(year));
                         break;
                     default:

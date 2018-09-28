@@ -606,42 +606,6 @@ public final class SolarTime
     }
 
     /**
-     * <p>Calculates the local time of sunrise at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
-     * that the calculated clock time is related to the previous day. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunrise function applicable on any calendar date
-     * @see     #sunrise()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunrise()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit des Sonnenaufgangs an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Es ist in seltenen F&auml;llen
-     * m&ouml;glich, da&szlig; die ermittelte Uhrzeit zum vorherigen Tag geh&ouml;rt. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunrise function applicable on any calendar date
-     * @see     #sunrise()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunrise()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, Optional<PlainTime>> sunrise(TZID tzid) {
-
-        return date -> {
-            Optional<Moment> m = this.getCalculator().sunrise(
-                toLMT(date), this.latitude, this.longitude, this.zenithAngle());
-            return m.map(moment -> moment.toZonalTimestamp(tzid).getWallTime());
-        };
-
-    }
-
-    /**
      * <p>Calculates the moment of sunset at the location of this instance. </p>
      *
      * <p>Example: </p>
@@ -703,42 +667,6 @@ public final class SolarTime
 
         double effAngle = 90.0 + this.geodeticAngle() + twilight.getAngle();
         return date -> this.getCalculator().sunset(toLMT(date), this.latitude, this.longitude, effAngle);
-
-    }
-
-    /**
-     * <p>Calculates the local time of sunset at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
-     * that the calculated clock time is related to the next day. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunset function applicable on any calendar date
-     * @see     #sunset()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunset()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit des Sonnenuntergangs an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Es ist in seltenen F&auml;llen
-     * m&ouml;glich, da&szlig; die ermittelte Uhrzeit zum n&auml;chsten Tag geh&ouml;rt. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunset function applicable on any calendar date
-     * @see     #sunset()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunset()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, Optional<PlainTime>> sunset(TZID tzid) {
-
-        return date -> {
-            Optional<Moment> m = this.getCalculator().sunset(
-                toLMT(date), this.latitude, this.longitude, this.zenithAngle());
-            return m.map(moment -> moment.toZonalTimestamp(tzid).getWallTime());
-        };
 
     }
 
@@ -887,39 +815,6 @@ public final class SolarTime
     }
 
     /**
-     * <p>Calculates the local time of noon at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  noon function applicable on any calendar date
-     * @see     #transitAtNoon()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code transitAtNoon()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit des Mittags an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  noon function applicable on any calendar date
-     * @see     #transitAtNoon()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code transitAtNoon()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, PlainTime> transitAtNoon(TZID tzid) {
-
-        return date -> {
-            Moment m = transitAtNoon(toLMT(date), this.longitude, this.calculator);
-            return m.toZonalTimestamp(tzid).getWallTime();
-        };
-
-    }
-
-    /**
      * <p>Calculates the moment of midnight at the location of this instance (lowest position of sun). </p>
      *
      * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
@@ -938,39 +833,6 @@ public final class SolarTime
     public ChronoFunction<CalendarDate, Moment> transitAtMidnight() {
 
         return date -> transitAtMidnight(toLMT(date), this.longitude, this.calculator);
-
-    }
-
-    /**
-     * <p>Calculates the local time of midnight at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  midnight function applicable on any calendar date
-     * @see     #transitAtMidnight()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users ought to use {@code transitAtMidnight()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit von Mitternacht an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  midnight function applicable on any calendar date
-     * @see     #transitAtMidnight()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users ought to use {@code transitAtMidnight()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, PlainTime> transitAtMidnight(TZID tzid) {
-
-        return date -> {
-            Moment m = transitAtMidnight(toLMT(date), this.longitude, this.calculator);
-            return m.toZonalTimestamp(tzid).getWallTime();
-        };
 
     }
 

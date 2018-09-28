@@ -712,32 +712,6 @@ public final class ChronoFormatter<T>
 
     }
 
-    /**
-     * <p>Prints the given Threeten-object. </p>
-     *
-     * @param   formattable     temporal accessor
-     * @return  formatted text
-     * @throws  IllegalArgumentException if given argument cannot be formatted
-     * @since   4.0
-     * @deprecated Use alternative approach based on static factory methods and bridge chronology
-     */
-    /*[deutsch]
-     * <p>Formatiert das angegebene Threeten-Objekt. </p>
-     *
-     * @param   formattable     temporal accessor
-     * @return  formatted text
-     * @throws  IllegalArgumentException if given argument cannot be formatted
-     * @since   4.0
-     * @deprecated Use alternative approach based on static factory methods and bridge chronology
-     */
-    @Deprecated
-    public String formatThreeten(TemporalAccessor formattable) {
-
-        T entity = this.toEntity(formattable);
-        return this.toZonedFormatter(formattable).format(entity);
-
-    }
-
     @Override
     public void formatToBuffer(
         T formattable,
@@ -763,45 +737,6 @@ public final class ChronoFormatter<T>
         } catch (IOException ioe) {
             throw new AssertionError(ioe);
         }
-
-    }
-
-    /**
-     * <p>Prints given Threeten-object as formatted text and writes
-     * the text into given buffer. </p>
-     *
-     * <p>Similar to {@code print(formattable, buffer, getAttributes())}. </p>
-     *
-     * @param   formattable     object to be formatted
-     * @param   buffer          text output buffer
-     * @return  unmodifiable set of element positions in formatted text
-     * @throws  IllegalArgumentException if given object is not formattable
-     * @throws  IOException if writing to buffer fails
-     * @since   4.0
-     * @deprecated Use alternative approach based on static factory methods and bridge chronology
-     */
-    /*[deutsch]
-     * <p>Formatiert das angegebene Threeten-Objekt als Text und schreibt ihn in
-     * den Puffer. </p>
-     *
-     * <p>&Auml;hnlich zu {@code print(formattable, buffer, getAttributes())}. </p>
-     *
-     * @param   formattable     object to be formatted
-     * @param   buffer          text output buffer
-     * @return  unmodifiable set of element positions in formatted text
-     * @throws  IllegalArgumentException if given object is not formattable
-     * @throws  IOException if writing to buffer fails
-     * @since   4.0
-     * @deprecated Use alternative approach based on static factory methods and bridge chronology
-     */
-    @Deprecated
-    public Set<ElementPosition> printThreeten(
-        TemporalAccessor formattable,
-        Appendable buffer
-    ) throws IOException {
-
-        T entity = this.toEntity(formattable);
-        return this.toZonedFormatter(formattable).print(entity, buffer, this.globalAttributes);
 
     }
 
@@ -3648,7 +3583,6 @@ public final class ChronoFormatter<T>
             case CLDR_DATE:
             case SIMPLE_DATE_FORMAT:
             case THREETEN:
-            case NON_ISO_DATE:
                 if (p.contains("h") || p.contains("K")) {
                     if (!p.contains("a") && !p.contains("b") && !p.contains("B")) {
                         throw new IllegalArgumentException(
@@ -4575,7 +4509,7 @@ public final class ChronoFormatter<T>
          *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     NumericalElement#numerical(java.lang.Object) NumericalElement.numerical(V)
+         * @see     NumericalElement#numerical(Enum) NumericalElement.numerical(V)
          * @see     SignPolicy#SHOW_NEVER
          */
         /*[deutsch]
@@ -4608,7 +4542,7 @@ public final class ChronoFormatter<T>
          *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added multiple times in a row
          * @see     Chronology#isSupported(ChronoElement)
-         * @see     NumericalElement#numerical(java.lang.Object) NumericalElement.numerical(V)
+         * @see     NumericalElement#numerical(Enum) NumericalElement.numerical(V)
          * @see     SignPolicy#SHOW_NEVER
          */
         public <V extends Enum<V>> Builder<T> addNumerical(

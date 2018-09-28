@@ -434,41 +434,6 @@ public final class MomentInterval
     }
 
     /**
-     * <p>Creates an interval surrounding given instant. </p>
-     *
-     * @param   instant     embedded instant at focus of alignment
-     * @param   duration    machine time duration
-     * @param   alignment   determines how to align the interval around instant (in range {@code 0.0 <= x <= 1.0})
-     * @return  new moment interval
-     * @throws  IllegalArgumentException if the duration is negative or the alignment is not finite or out of range
-     * @deprecated  Use {@link #surrounding(Moment, MachineTime, double)}
-     *              or {@link #surrounding(Instant, java.time.Duration, double)}
-     * @since   4.29
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein Intervall, das den angegebenen Zeitpunkt umgibt. </p>
-     *
-     * @param   instant     embedded instant at focus of alignment
-     * @param   duration    machine time duration
-     * @param   alignment   determines how to align the interval around instant (in range {@code 0.0 <= x <= 1.0})
-     * @return  new moment interval
-     * @throws  IllegalArgumentException if the duration is negative or the alignment is not finite or out of range
-     * @deprecated  Use {@link #surrounding(Moment, MachineTime, double)}
-     *              or {@link #surrounding(Instant, java.time.Duration, double)}
-     * @since   4.29
-     */
-    @Deprecated
-    public static MomentInterval surrounding(
-        Instant instant,
-        MachineTime<TimeUnit> duration,
-        double alignment
-    ) {
-
-        return MomentInterval.surrounding(Moment.from(instant), duration, alignment);
-
-    }
-
-    /**
      * <p>Converts an arbitrary moment interval to an interval of this type. </p>
      *
      * @param   interval    any kind of moment interval
@@ -1330,54 +1295,6 @@ public final class MomentInterval
         } else {
             return interval;
         }
-
-    }
-
-    /**
-     * <p>Interpretes given text as interval. </p>
-     *
-     * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
-     * between start and end component unless the start component is a period. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
-     *
-     * <p>&Auml;hnlich wie {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Seit der Version v3.9/4.6 kann diese Methode auch einen Bindestrich als Alternative zum Schr&auml;gstrich
-     * als Trennzeichen zwischen Start- und Endkomponente, es sei denn, die Startkomponente ist eine Periode. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    @Deprecated
-    public static MomentInterval parse(
-        CharSequence text,
-        ChronoParser<Moment> parser,
-        BracketPolicy policy,
-        ParseLog status
-    ) {
-
-        return IntervalParser.of(
-            MomentIntervalFactory.INSTANCE,
-            parser,
-            policy
-        ).parse(text, status, parser.getAttributes());
 
     }
 

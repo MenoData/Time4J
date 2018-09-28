@@ -572,44 +572,6 @@ public final class DateInterval
      *
      * <p>The resulting interval is half-open if this interval is finite. Note that sometimes
      * the moments of result intervals can deviate from midnight if midnight does not exist
-     * due to daylight saving effects. The exact behaviour can be controlled by a suitable
-     * transition strategy. </p>
-     *
-     * @param   tz      timezone
-     * @return  global timestamp intervall interpreted in given timezone
-     * @see     Timezone#with(TransitionStrategy)
-     * @since   3.22/4.18
-     * @deprecated  Use {@link #inTimezone(TZID)} instead
-     */
-    /*[deutsch]
-     * <p>Kombiniert dieses Datumsintervall mit der angegebenen
-     * Zeitzone zu einem globalen UTC-Intervall, indem die Momente
-     * den Mitternachtszyklus abbilden. </p>
-     *
-     * <p>Das Ergebnisintervall ist halb-offen, wenn dieses Intervall endlich ist. Hinweis:
-     * Manchmal sind die Momentgrenzen von Mitternacht verschieden, n&auml;mlich dann, wenn
-     * wegen Sommerzeitumstellungen Mitternacht nicht vorhanden ist. Das exakte Verhalten
-     * kann durch eine geeignete {@code TransitionStrategy} gesteuert werden. </p>
-     *
-     * @param   tz      timezone
-     * @return  global timestamp intervall interpreted in given timezone
-     * @see     Timezone#with(TransitionStrategy)
-     * @since   3.22/4.18
-     * @deprecated  Use {@link #inTimezone(TZID)} instead
-     */
-    @Deprecated
-    public MomentInterval in(Timezone tz) {
-
-        return this.toFullDays().in(tz);
-
-    }
-
-    /**
-     * <p>Converts this instance to a moment interval with date boundaries mapped
-     * to the midnight cycle in given time zone. </p>
-     *
-     * <p>The resulting interval is half-open if this interval is finite. Note that sometimes
-     * the moments of result intervals can deviate from midnight if midnight does not exist
      * due to daylight saving effects. </p>
      *
      * @param   tzid        timezone identifier
@@ -1547,54 +1509,6 @@ public final class DateInterval
         } else {
             return interval;
         }
-
-    }
-
-    /**
-     * <p>Interpretes given text as interval. </p>
-     *
-     * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
-     * between start and end component unless the start component is a period. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
-     *
-     * <p>&Auml;hnlich wie {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Seit der Version v3.9/4.6 kann diese Methode auch einen Bindestrich als Alternative zum Schr&auml;gstrich
-     * als Trennzeichen zwischen Start- und Endkomponente, es sei denn, die Startkomponente ist eine Periode. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    @Deprecated
-    public static DateInterval parse(
-        CharSequence text,
-        ChronoParser<PlainDate> parser,
-        BracketPolicy policy,
-        ParseLog status
-    ) {
-
-        return IntervalParser.of(
-            DateIntervalFactory.INSTANCE,
-            parser,
-            policy
-        ).parse(text, status, parser.getAttributes());
 
     }
 

@@ -1088,54 +1088,6 @@ public final class TimestampInterval
     /**
      * <p>Interpretes given text as interval. </p>
      *
-     * <p>Similar to {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Since version v3.9/4.6 this method can also accept a hyphen as alternative to solidus as separator
-     * between start and end component unless the start component is a period. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als Intervall. </p>
-     *
-     * <p>&Auml;hnlich wie {@link #parse(CharSequence, ChronoParser, char, ChronoParser, BracketPolicy, ParseLog)}.
-     * Seit der Version v3.9/4.6 kann diese Methode auch einen Bindestrich als Alternative zum Schr&auml;gstrich
-     * als Trennzeichen zwischen Start- und Endkomponente, es sei denn, die Startkomponente ist eine Periode. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      format object for parsing start and end components
-     * @param   policy      strategy for parsing interval boundaries
-     * @param   status      parser information (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   2.0
-     * @deprecated  Use one of other parse methods accepting a bracket policy instead
-     */
-    @Deprecated
-    public static TimestampInterval parse(
-        CharSequence text,
-        ChronoParser<PlainTimestamp> parser,
-        BracketPolicy policy,
-        ParseLog status
-    ) {
-
-        return IntervalParser.of(
-            TimestampIntervalFactory.INSTANCE,
-            parser,
-            policy
-        ).parse(text, status, parser.getAttributes());
-
-    }
-
-    /**
-     * <p>Interpretes given text as interval. </p>
-     *
      * <p>This method is mainly intended for parsing technical interval formats similar to ISO-8601
      * which are not localized. Infinity symbols are understood. </p>
      *
