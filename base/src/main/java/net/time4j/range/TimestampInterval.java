@@ -523,49 +523,6 @@ public final class TimestampInterval
     }
 
     /**
-     * <p>Combines this local timestamp interval with given timezone
-     * to a global UTC-interval. </p>
-     *
-     * @param   tz      timezone
-     * @return  global timestamp intervall interpreted in given timezone
-     * @since   2.0
-     * @deprecated  Will become an internal private method starting with v5.0, use {@link #inTimezone(TZID)} instead
-     */
-    /*[deutsch]
-     * <p>Kombiniert dieses lokale Zeitstempelintervall mit der angegebenen
-     * Zeitzone zu einem globalen UTC-Intervall. </p>
-     *
-     * @param   tz      timezone
-     * @return  global timestamp intervall interpreted in given timezone
-     * @since   2.0
-     * @deprecated  Will become an internal private method starting with v5.0, use {@link #inTimezone(TZID)} instead
-     */
-    @Deprecated
-    // TODO: make the method package-private in v5.0
-    public MomentInterval in(Timezone tz) {
-
-        Boundary<Moment> b1;
-        Boundary<Moment> b2;
-
-        if (this.getStart().isInfinite()) {
-            b1 = Boundary.infinitePast();
-        } else {
-            Moment m1 = this.getStart().getTemporal().in(tz);
-            b1 = Boundary.of(this.getStart().getEdge(), m1);
-        }
-
-        if (this.getEnd().isInfinite()) {
-            b2 = Boundary.infiniteFuture();
-        } else {
-            Moment m2 = this.getEnd().getTemporal().in(tz);
-            b2 = Boundary.of(this.getEnd().getEdge(), m2);
-        }
-
-        return new MomentInterval(b1, b2);
-
-    }
-
-    /**
      * <p>Yields the length of this interval in given units. </p>
      *
      * @param   <U> generic unit type
@@ -1447,6 +1404,30 @@ public final class TimestampInterval
         // create interval
         Parser parser = new Parser(startFormat, endFormat, extended, weekStyle, ordinalStyle, timeLength, hasT);
         return parser.parse(text);
+
+    }
+
+    // combines this local timestamp interval with given timezone to a global UTC-interval
+    MomentInterval in(Timezone tz) {
+
+        Boundary<Moment> b1;
+        Boundary<Moment> b2;
+
+        if (this.getStart().isInfinite()) {
+            b1 = Boundary.infinitePast();
+        } else {
+            Moment m1 = this.getStart().getTemporal().in(tz);
+            b1 = Boundary.of(this.getStart().getEdge(), m1);
+        }
+
+        if (this.getEnd().isInfinite()) {
+            b2 = Boundary.infiniteFuture();
+        } else {
+            Moment m2 = this.getEnd().getTemporal().in(tz);
+            b2 = Boundary.of(this.getEnd().getEdge(), m2);
+        }
+
+        return new MomentInterval(b1, b2);
 
     }
 

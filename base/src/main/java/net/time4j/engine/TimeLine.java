@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeLine.java) is part of project Time4J.
  *
@@ -103,11 +103,7 @@ public interface TimeLine<T>
      * @return  earliest possible time point
      * @since   4.18
      */
-    default T getMinimum() {
-
-        throw new UnsupportedOperationException("Not implemented."); // TODO: v5.0 => keine default-Methode
-
-    }
+    T getMinimum();
 
     /**
      * <p>Yields the maximum of this time axis. </p>
@@ -124,11 +120,7 @@ public interface TimeLine<T>
      * @return  latest possible time point
      * @since   4.18
      */
-    default T getMaximum() {
-
-        throw new UnsupportedOperationException("Not implemented."); // TODO: v5.0 => keine default-Methode
-
-    }
+    T getMaximum();
 
     /**
      * Determines if this timeline is calendrical or not.

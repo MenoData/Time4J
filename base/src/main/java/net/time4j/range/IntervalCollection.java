@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalCollection.java) is part of project Time4J.
  *
@@ -29,6 +29,7 @@ import net.time4j.engine.TimeLine;
 
 import java.io.Serializable;
 import java.time.Instant;
+import java.util.AbstractCollection;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
@@ -82,9 +83,8 @@ import java.util.NoSuchElementException;
  * @see     MomentInterval#comparator()
  */
 public abstract class IntervalCollection<T>
-    // TODO: activate in next major release (and remove explicit Iterable-reference)
-    // extends AbstractCollection<ChronoInterval<T>>
-    implements Iterable<ChronoInterval<T>>, Serializable {
+    extends AbstractCollection<ChronoInterval<T>>
+    implements Serializable {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -310,7 +310,7 @@ public abstract class IntervalCollection<T>
      * @return  int
      * @since   3.35/4.30
      */
-//    @Override (TODO: activate annotation as soon as the super class is AbstractCollection)
+    @Override
     public int size() {
 
         return this.intervals.size();
@@ -329,7 +329,7 @@ public abstract class IntervalCollection<T>
      * @return  {@code true} if there are no intervals else {@code false}
      * @since   2.0
      */
-//    @Override (TODO: activate annotation as soon as the super class is AbstractCollection)
+    @Override
     public boolean isEmpty() {
 
         return this.intervals.isEmpty();
@@ -365,29 +365,6 @@ public abstract class IntervalCollection<T>
         }
 
         return true;
-
-    }
-
-    /**
-     * <p>Queries if any interval of this collection contains given temporal. </p>
-     *
-     * @param   temporal    time point to be queried
-     * @return  {@code true} if given time point belongs to any interval of this collection else {@code false}
-     * @since   3.24/4.20
-     * @deprecated  Use {@link #encloses(Object) encloses(T)} instead, will be removed in next major release
-     */
-    /*[deutsch]
-     * <p>Fragt ab, ob irgendein Intervall dieser Menge den angegebenen Zeitpunkt enth&auml;lt. </p>
-     *
-     * @param   temporal    time point to be queried
-     * @return  {@code true} if given time point belongs to any interval of this collection else {@code false}
-     * @since   3.24/4.20
-     * @deprecated  Use {@link #encloses(Object) encloses(T)} instead, will be removed in next major release
-     */
-    @Deprecated
-    public boolean contains(T temporal) {
-
-        return this.encloses(temporal);
 
     }
 
@@ -651,44 +628,8 @@ public abstract class IntervalCollection<T>
 
         List<ChronoInterval<T>> windows = new ArrayList<>(this.intervals);
         windows.add(this.adjust(interval));
-        Collections.sort(windows, this.getComparator());
+        windows.sort(this.getComparator());
         return this.create(windows);
-
-    }
-
-    /**
-     * <p>Delegates to {@link #plus(Collection)}. </p>
-     *
-     * <p><strong>Will be removed in next major release.</strong></p>
-     *
-     * @param   intervals       the new intervals to be added
-     * @return  new IntervalCollection-instance containing a sum of
-     *          the own intervals and the given one while this instance
-     *          remains unaffected
-     * @throws  IllegalArgumentException if given list contains a finite
-     *          interval with open start which cannot be adjusted to one
-     *          with closed start
-     * @since   2.0
-     */
-    /*[deutsch]
-     * <p>Delegiert an {@link #plus(Collection)}. </p>
-     *
-     * <p><strong>Wird im n&auml;chsten Haupt-Release entfernt.</strong></p>
-     *
-     * @param   intervals       the new intervals to be added
-     * @return  new IntervalCollection-instance containing a sum of
-     *          the own intervals and the given one while this instance
-     *          remains unaffected
-     * @throws  IllegalArgumentException if given list contains a finite
-     *          interval with open start which cannot be adjusted to one
-     *          with closed start
-     * @since   2.0
-     */
-    // TODO: remove this method in next major release v5.0
-    public IntervalCollection<T> plus(List<? extends ChronoInterval<T>> intervals) {
-
-        Collection<? extends ChronoInterval<T>> collection = intervals;
-        return this.plus(collection);
 
     }
 
@@ -730,7 +671,7 @@ public abstract class IntervalCollection<T>
             }
         }
 
-        Collections.sort(windows, this.getComparator());
+        windows.sort(this.getComparator());
         return this.create(windows);
 
     }
@@ -828,42 +769,8 @@ public abstract class IntervalCollection<T>
             }
         }
 
-        Collections.sort(parts, this.getComparator());
+        parts.sort(this.getComparator());
         return this.create(parts);
-
-    }
-
-    /**
-     * <p>Delegates to {@link #minus(Collection)}. </p>
-     *
-     * <p><strong>Will be removed in next major release.</strong></p>
-     *
-     * @param   intervals   list of intervals to be subtracted
-     * @return  new interval collection containing all timepoints of
-     *          this instance excluding those of given intervals
-     * @throws  IllegalArgumentException if given list contains a finite
-     *          interval with open start which cannot be adjusted to one
-     *          with closed start
-     * @since   2.2
-     */
-    /*[deutsch]
-     * <p>Delegiert an {@link #minus(Collection)}. </p>
-     *
-     * <p><strong>Wird im n&auml;chsten Haupt-Release entfernt.</strong></p>
-     *
-     * @param   intervals   list of intervals to be subtracted
-     * @return  new interval collection containing all timepoints of
-     *          this instance excluding those of given intervals
-     * @throws  IllegalArgumentException if given list contains a finite
-     *          interval with open start which cannot be adjusted to one
-     *          with closed start
-     * @since   2.2
-     */
-    // TODO: remove this method in next major release v5.0
-    public IntervalCollection<T> minus(List<? extends ChronoInterval<T>> intervals) {
-
-        Collection<? extends ChronoInterval<T>> collection = intervals;
-        return this.minus(collection);
 
     }
 
@@ -906,7 +813,7 @@ public abstract class IntervalCollection<T>
             }
         }
 
-        Collections.sort(list, this.getComparator());
+        list.sort(this.getComparator());
         IntervalCollection<T> subtrahend = this.create(list);
 
         for (int i = 0, n = this.intervals.size(); i < n; i++) {
@@ -918,7 +825,7 @@ public abstract class IntervalCollection<T>
             }
         }
 
-        Collections.sort(parts, this.getComparator());
+        parts.sort(this.getComparator());
         return this.create(parts);
 
     }
@@ -1438,7 +1345,7 @@ public abstract class IntervalCollection<T>
                 List<ChronoInterval<T>> candidates = new ArrayList<>(2);
                 candidates.add(a);
                 candidates.add(b);
-                Collections.sort(candidates, this.getComparator());
+                candidates.sort(this.getComparator());
                 candidates = this.intersect(candidates);
                 if (!candidates.isEmpty()) {
                     list.addAll(candidates);
@@ -1446,7 +1353,7 @@ public abstract class IntervalCollection<T>
             }
         }
 
-        Collections.sort(list, this.getComparator());
+        list.sort(this.getComparator());
         return this.create(list).withBlocks();
 
     }
@@ -1517,7 +1424,7 @@ public abstract class IntervalCollection<T>
         IntervalCollection<T> ic2 = other.withComplement(window).intersect(this);
         list.addAll(ic1.getIntervals());
         list.addAll(ic2.getIntervals());
-        Collections.sort(list, this.getComparator());
+        list.sort(this.getComparator());
         return this.create(list).withBlocks();
 
     }
@@ -1693,7 +1600,7 @@ public abstract class IntervalCollection<T>
             List<ChronoInterval<T>> pair = new ArrayList<>(2);
             pair.add(window);
             pair.add(interval);
-            Collections.sort(pair, this.getComparator());
+            pair.sort(this.getComparator());
             IntervalCollection<T> is = this.create(pair).withIntersection();
 
             if (!is.isEmpty()) {

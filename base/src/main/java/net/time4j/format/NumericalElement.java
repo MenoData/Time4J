@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumericalElement.java) is part of project Time4J.
  *
@@ -44,7 +44,7 @@ import net.time4j.engine.ChronoEntity;
  * @param   <V> generic type of element values (will be adjusted to enum-supertype in next major release)
  * @author  Meno Hochschild
  */
-public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in next major release
+public interface NumericalElement<V extends Enum<V>>
     extends ChronoElement<V> {
 
     //~ Methoden ----------------------------------------------------------
@@ -53,7 +53,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Translates given element value to a numerical integer. </p>
      *
      * <p>Will be called by the default methods {@link #parseFromInt(ChronoEntity, int)}
-     * or {@link #printToInt(Object, ChronoDisplay, AttributeQuery)}. The integer {@code Integer.MIN_VALUE}
+     * or {@link #printToInt(Enum, ChronoDisplay, AttributeQuery)}. The integer {@code Integer.MIN_VALUE}
      * must be avoided in this conversion. </p>
      *
      * @param   value       value to be converted to int
@@ -63,7 +63,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Ermittelt eine numerische Darstellung des angegebenen Werts. </p>
      *
      * <p>Wird von den Standardimplementierungen der Methoden {@link #parseFromInt(ChronoEntity, int)}
-     * oder {@link #printToInt(Object, ChronoDisplay, AttributeQuery)} aufgerufen. Der Integerwert
+     * oder {@link #printToInt(Enum, ChronoDisplay, AttributeQuery)} aufgerufen. Der Integerwert
      * {@code Integer.MIN_VALUE} mu&szlig; vermieden werden. </p>
      *
      * @param   value       value to be converted to int
@@ -75,7 +75,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Translates given element value to a numerical integer. </p>
      *
      * <p>Will be called when element values need to be printed as numbers. The default
-     * implementation just delegates to {@link #numerical(Object) numerical(V)}. </p>
+     * implementation just delegates to {@link #numerical(Enum) numerical(V)}. </p>
      *
      * @param   value       value to be converted to int
      * @param   context     the object to be formatted
@@ -87,7 +87,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Ermittelt eine numerische Darstellung des angegebenen Werts. </p>
      *
      * <p>Wird aufgerufen, wenn Elementwerte als Zahlen ausgegeben werden m&uuml;ssen. Die
-     * Standardimplementierung delegiert einfach an {@link #numerical(Object) numerical(V)}. </p>
+     * Standardimplementierung delegiert einfach an {@link #numerical(Enum) numerical(V)}. </p>
      *
      * @param   value       value to be converted to int
      * @param   context     the object to be formatted
@@ -107,7 +107,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Converts and stores given integer into the result buffer. </p>
      *
      * <p>Will be called when int values need to be interpreted as enums. The default
-     * implementation just delegates to {@link #numerical(Object) numerical(V)}. </p>
+     * implementation just delegates to {@link #numerical(Enum) numerical(V)}. </p>
      *
      * @param   entity  mutable result buffer for parsed values
      * @param   value   parsed integer
@@ -118,7 +118,7 @@ public interface NumericalElement<V> // TODO: change V to V extends Enum<V> in n
      * <p>Konvertiert und speichert den angegebenen Integerwert in den Ergebnispuffer. </p>
      *
      * <p>Wird aufgerufen, wenn int-Werte als Enums interpretiert werden m&uuml;ssen. Die
-     * Standardimplementierung delegiert einfach an {@link #numerical(Object) numerical(V)}. </p>
+     * Standardimplementierung delegiert einfach an {@link #numerical(Enum) numerical(V)}. </p>
      *
      * @param   entity  mutable result buffer for parsed values
      * @param   value   parsed integer

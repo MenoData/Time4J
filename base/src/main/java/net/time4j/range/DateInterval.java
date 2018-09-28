@@ -765,26 +765,6 @@ public final class DateInterval
     /**
      * <p>Moves this interval along the time axis by given units. </p>
      *
-     * <p>Note: This method will be removed in next major release in favor of alternative
-     * overloaded method {@link #move(long, IsoDateUnit)}. </p>
-     *
-     * @param   amount  amount of units
-     * @param   unit    time unit for moving
-     * @return  moved copy of this interval
-     */
-    // TODO: remove this method (in favor of overloaded method) in next major release
-    public DateInterval move(
-        long amount,
-        CalendarUnit unit
-    ) {
-
-        return this.move(amount, IsoDateUnit.class.cast(unit));
-
-    }
-
-    /**
-     * <p>Moves this interval along the time axis by given units. </p>
-     *
      * @param   amount  amount of units
      * @param   unit    time unit for moving
      * @return  moved copy of this interval

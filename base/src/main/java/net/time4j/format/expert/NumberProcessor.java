@@ -264,8 +264,7 @@ class NumberProcessor<V>
             } else if (Enum.class.isAssignableFrom(type)) {
                 int v = Integer.MIN_VALUE;
                 if (this.element instanceof NumericalElement) {
-                    V value = formattable.get(this.element);
-                    v = ((NumericalElement<V>) this.element).printToInt(value, formattable, attributes);
+                    v = enumToInt(element, formattable, attributes);
                     negative = (v < 0);
                 }
                 if (v == Integer.MIN_VALUE) {
@@ -639,7 +638,7 @@ class NumberProcessor<V>
         } else if (Enum.class.isAssignableFrom(type)) {
             boolean ok = false;
             if (this.element instanceof NumericalElement) {
-                NumericalElement<V> ne = (NumericalElement<V>) this.element;
+                NumericalElement<?> ne = (NumericalElement<?>) this.element;
                 ok = ne.parseFromInt(parsedResult, (int) (total));
             }
             if (!ok) {
@@ -825,6 +824,18 @@ class NumberProcessor<V>
         int r = dd - ((q << 3) + (q << 1)); // r = dd - (q * 10);
         buffer.append((char) (q + zeroDigit));
         buffer.append((char) (r + zeroDigit));
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <V extends Enum<V>> int enumToInt(
+        ChronoElement<?> element,
+        ChronoDisplay formattable,
+        AttributeQuery attributes
+    ) {
+
+        V value = (V) formattable.get(element);
+        return ((NumericalElement<V>) element).printToInt(value, formattable, attributes);
 
     }
 
