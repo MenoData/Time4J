@@ -7,6 +7,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Remove all deprecated stuff [#524]
 - Improve conversion of Windows zones to IANA [#785]
 - Move class `AnnualDate` to main package [#787]
 - Move class `MachineTime` to main package [#609]
