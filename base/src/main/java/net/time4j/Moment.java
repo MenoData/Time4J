@@ -523,6 +523,7 @@ public final class Moment
     public static final ChronoElement<TimeUnit> PRECISION = PrecisionElement.TIME_PRECISION;
 
     private static final ChronoOperator<Moment> NEXT_LS = new NextLS();
+    private static final Chronology<Instant> THREETEN = new BridgeChronology<>(TemporalType.INSTANT, ENGINE);
     private static final long serialVersionUID = -3192884724477742274L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -1949,7 +1950,7 @@ public final class Moment
      * @param   <S> foreign temporal type
      * @param   converter       type converter
      * @return  chronological system for foreign type
-     * @see     TemporalType#INSTANT
+     * @see     #threeten()
      * @see     TemporalType#JAVA_UTIL_DATE
      * @since   3.24/4.20
      */
@@ -1959,13 +1960,33 @@ public final class Moment
      * @param   <S> foreign temporal type
      * @param   converter       type converter
      * @return  chronological system for foreign type
-     * @see     TemporalType#INSTANT
+     * @see     #threeten()
      * @see     TemporalType#JAVA_UTIL_DATE
      * @since   3.24/4.20
      */
     public static <S> Chronology<S> axis(Converter<S, Moment> converter) {
 
         return new BridgeChronology<>(converter, ENGINE);
+
+    }
+
+    /**
+     * <p>Obtains a bridge chronology for the type {@code java.time.Instant}. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.Instant}
+     * @see     #axis()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert eine an den Typ {@code java.time.Instant} angepasste Chronologie. </p>
+     *
+     * @return  rule engine adapted for the type {@code java.time.Instant}
+     * @see     #axis()
+     * @since   5.0
+     */
+    public static Chronology<Instant> threeten() {
+
+        return THREETEN;
 
     }
 

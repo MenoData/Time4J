@@ -34,7 +34,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -382,6 +381,8 @@ public final class PlainTimestamp
         STD_METRIC = Duration.in(units);
     }
 
+    private static final Chronology<LocalDateTime> THREETEN =
+        new BridgeChronology<>(TemporalType.LOCAL_DATE_TIME, ENGINE);
     private static final long serialVersionUID = 7458380065762437714L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -954,26 +955,22 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Provides a static access to the associated time axis using the foreign type S. </p>
+     * <p>Obtains a bridge chronology for the type {@code java.time.LocalDateTime}. </p>
      *
-     * @param   <S> foreign temporal type
-     * @param   converter       type converter
-     * @return  chronological system for foreign type
-     * @see     TemporalType#LOCAL_DATE_TIME
-     * @since   3.24/4.20
+     * @return  rule engine adapted for the type {@code java.time.LocalDateTime}
+     * @see     #axis()
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Liefert die zugeh&ouml;rige Zeitachse angepasst f&uuml;r den Fremdtyp S. </p>
+     * <p>Liefert eine an den Typ {@code java.time.LocalDateTime} angepasste Chronologie. </p>
      *
-     * @param   <S> foreign temporal type
-     * @param   converter       type converter
-     * @return  chronological system for foreign type
-     * @see     TemporalType#LOCAL_DATE_TIME
-     * @since   3.24/4.20
+     * @return  rule engine adapted for the type {@code java.time.LocalDateTime}
+     * @see     #axis()
+     * @since   5.0
      */
-    public static <S> Chronology<S> axis(Converter<S, PlainTimestamp> converter) {
+    public static Chronology<LocalDateTime> threeten() {
 
-        return new BridgeChronology<>(converter, ENGINE);
+        return THREETEN;
 
     }
 
@@ -2096,6 +2093,7 @@ public final class PlainTimestamp
                 delta = -between(end, start);
             } else {
                 long days = start.date.until(end.date, DAYS);
+                assert (this.clockUnit != null);
 
                 if (days == 0) {
                     return this.clockUnit.between(start.time, end.time);

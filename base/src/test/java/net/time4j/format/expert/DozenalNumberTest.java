@@ -65,7 +65,7 @@ public class DozenalNumberTest {
                 "yyyy-ppM-ppd",
                 PatternType.THREETEN,
                 Locale.forLanguageTag("fr-u-nu-dozenal"), // set the number system to DOZENAL
-                PlainDate.axis(TemporalType.LOCAL_DATE)
+                PlainDate.threeten()
             ).with(Attributes.PAD_CHAR, '0');
         assertThat(
             f.format(LocalDate.of(2017, 10, 11)),
@@ -78,7 +78,7 @@ public class DozenalNumberTest {
             "yyyy-ppM-ppd",
             PatternType.THREETEN,
             Locale.forLanguageTag("fr-u-nu-dozl"), // wrong extension code
-            PlainDate.axis(TemporalType.LOCAL_DATE)
+            PlainDate.threeten()
         );
     }
 

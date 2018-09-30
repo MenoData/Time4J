@@ -39,7 +39,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.Converter;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
@@ -712,6 +711,8 @@ public final class PlainDate
         registerExtensions(builder);
         ENGINE = builder.build();
     }
+
+    private static final Chronology<LocalDate> THREETEN = new BridgeChronology<>(TemporalType.LOCAL_DATE, ENGINE);
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -1659,26 +1660,22 @@ public final class PlainDate
     }
 
     /**
-     * <p>Provides a static access to the associated time axis using the foreign type S. </p>
+     * <p>Obtains a bridge chronology for the type {@code java.time.LocalDate}. </p>
      *
-     * @param   <S> foreign temporal type
-     * @param   converter       type converter
-     * @return  chronological system for foreign type
-     * @see     TemporalType#LOCAL_DATE
-     * @since   3.24/4.20
+     * @return  rule engine adapted for the type {@code java.time.LocalDate}
+     * @see     #axis()
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Liefert die zugeh&ouml;rige Zeitachse angepasst f&uuml;r den Fremdtyp S. </p>
+     * <p>Liefert eine an den Typ {@code java.time.LocalDate} angepasste Chronologie. </p>
      *
-     * @param   <S> foreign temporal type
-     * @param   converter       type converter
-     * @return  chronological system for foreign type
-     * @see     TemporalType#LOCAL_DATE
-     * @since   3.24/4.20
+     * @return  rule engine adapted for the type {@code java.time.LocalDate}
+     * @see     #axis()
+     * @since   5.0
      */
-    public static <S> Chronology<S> axis(Converter<S, PlainDate> converter) {
+    public static Chronology<LocalDate> threeten() {
 
-        return new BridgeChronology<>(converter, ENGINE);
+        return THREETEN;
 
     }
 

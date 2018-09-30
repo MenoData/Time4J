@@ -1028,6 +1028,8 @@ public final class PlainTime
         ENGINE = builder.build();
     }
 
+    private static final Chronology<LocalTime> THREETEN = new BridgeChronology<>(TemporalType.LOCAL_TIME, ENGINE);
+
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final byte hour;
@@ -1807,26 +1809,22 @@ public final class PlainTime
     }
 
     /**
-     * <p>Provides a static access to the associated time axis using the foreign type S. </p>
+     * <p>Obtains a bridge chronology for the type {@code java.time.LocalTime}. </p>
      *
-     * @param   <S> foreign temporal type
-     * @param   converter       type converter
-     * @return  chronological system for foreign type
-     * @see     TemporalType#LOCAL_TIME
-     * @since   3.24/4.20
+     * @return  rule engine adapted for the type {@code java.time.LocalTime}
+     * @see     #axis()
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Liefert die zugeh&ouml;rige Zeitachse angepasst f&uuml;r den Fremdtyp S. </p>
+     * <p>Liefert eine an den Typ {@code java.time.LocalTime} angepasste Chronologie. </p>
      *
-     * @param   <S> foreign temporal type
-     * @param   converter       type converter
-     * @return  chronological system for foreign type
-     * @see     TemporalType#LOCAL_TIME
-     * @since   3.24/4.20
+     * @return  rule engine adapted for the type {@code java.time.LocalTime}
+     * @see     #axis()
+     * @since   5.0
      */
-    public static <S> Chronology<S> axis(Converter<S, PlainTime> converter) {
+    public static Chronology<LocalTime> threeten() {
 
-        return new BridgeChronology<>(converter, ENGINE);
+        return THREETEN;
 
     }
 

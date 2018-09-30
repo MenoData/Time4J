@@ -26,7 +26,7 @@ public class ChronoHierarchyTest {
     @Test
     public void historicExtension1() throws ParseException {
         ChronoFormatter<LocalDate> cf =
-            ChronoFormatter.setUp(PlainDate.axis(TemporalType.LOCAL_DATE), new Locale("de", "SE"))
+            ChronoFormatter.setUp(PlainDate.threeten(), new Locale("de", "SE"))
                 .addPattern("d. MMMM, G yyyy", PatternType.CLDR).build().withLatinEraNames();
         assertThat(
             cf.parse("30. Februar, AD 1712"),
@@ -102,7 +102,7 @@ public class ChronoHierarchyTest {
                 "yyyy-MM-dd h:mm B",
                 PatternType.CLDR,
                 Locale.ENGLISH,
-                PlainTimestamp.axis(TemporalType.LOCAL_DATE_TIME));
+                PlainTimestamp.threeten());
         assertThat(
             cf1.format(ldt),
             is(expected));
