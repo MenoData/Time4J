@@ -1,5 +1,6 @@
 ## [v5.0] not yet released
 ### Added
+- Easy summing up a stream of durations [#812]
 - Simplify bridge chronology accessors in basic types [#811]
 - Platform-Timezone now delegates to `ZoneId.systemDefault()` [#805]
 - Text elements formattable by help of string converter [#799]
