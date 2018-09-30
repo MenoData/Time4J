@@ -43,6 +43,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static net.time4j.scale.TimeScale.POSIX;
 import static net.time4j.scale.TimeScale.UTC;
@@ -938,6 +940,58 @@ public final class MachineTime<U>
         }
 
         return time.minus(this.seconds, s).minus(this.nanos, f);
+
+    }
+
+    /**
+     * <p>Helps to sum up durations of a stream. </p>
+     *
+     * <p>A final normalization is automatically done. </p>
+     *
+     * @return  Collector for summing up durations in a stream
+     * @see     Duration#summingUp()
+     * @see     #summingUpReal()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Hilft, Dauer-Objekte in einem {@code Stream} aufzusummieren. </p>
+     *
+     * <p>Eine abschlie&szlig;ende Normalisierung wird automatisch gemacht. </p>
+     *
+     * @return  Collector for summing up durations in a stream
+     * @see     Duration#summingUp()
+     * @see     #summingUpReal()
+     * @since   5.0
+     */
+    public static Collector<MachineTime<TimeUnit>, ?, MachineTime<TimeUnit>> summingUpPosix() {
+
+        return Collectors.reducing(MachineTime.of(0, TimeUnit.SECONDS), MachineTime::plus);
+
+    }
+
+    /**
+     * <p>Helps to sum up durations of a stream. </p>
+     *
+     * <p>A final normalization is automatically done. </p>
+     *
+     * @return  Collector for summing up durations in a stream
+     * @see     Duration#summingUp()
+     * @see     #summingUpPosix()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Hilft, Dauer-Objekte in einem {@code Stream} aufzusummieren. </p>
+     *
+     * <p>Eine abschlie&szlig;ende Normalisierung wird automatisch gemacht. </p>
+     *
+     * @return  Collector for summing up durations in a stream
+     * @see     Duration#summingUp()
+     * @see     #summingUpPosix()
+     * @since   5.0
+     */
+    public static Collector<MachineTime<SI>, ?, MachineTime<SI>> summingUpReal() {
+
+        return Collectors.reducing(MachineTime.of(0, SI.SECONDS), MachineTime::plus);
 
     }
 

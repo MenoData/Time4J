@@ -48,6 +48,8 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.stream.Collector;
+import java.util.stream.Collectors;
 
 import static net.time4j.CalendarUnit.*;
 import static net.time4j.ClockUnit.*;
@@ -2185,6 +2187,60 @@ public final class Duration<U extends IsoUnit>
     public static Normalizer<IsoUnit> approximateMaxUnitOrWeeks() {
 
         return new ApproximateNormalizer(true);
+
+    }
+
+    /**
+     * <p>Helps to sum up durations of a stream. </p>
+     *
+     * <p>Note: A normalization of the result is not yet done. </p>
+     *
+     * <p>Example for summing up a list of durations and final normalization: </p>
+     *
+     * <pre>
+     *     List&lt;Duration&lt;ClockUnit&gt;&gt; list = new ArrayList&lt;&gt;();
+     *     list.add(Duration.of(11, ClockUnit.HOURS));
+     *     list.add(Duration.ofClockUnits(4, 35, 121));
+     *     list.add(Duration.of(10, ClockUnit.MINUTES));
+     *
+     *     Duration&lt;ClockUnit&gt; expected = Duration.ofClockUnits(15, 47, 1);
+     *
+     *     assertThat(
+     *          list.stream().collect(Duration.summingUp()).with(Duration.STD_CLOCK_PERIOD),
+     *          is(expected));
+     * </pre>
+     *
+     * @param   <U> generic type of time units
+     * @return  Collector for summing up durations in a stream
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Hilft, Dauer-Objekte in einem {@code Stream} aufzusummieren. </p>
+     *
+     * <p>Hinweis: Eine Normalisierung des Ergebnis wird noch nicht gemacht. </p>
+     *
+     * <p>Beispiel f&uuml;r die Aufsummierung einer Dauerliste und abschlie&szlig;enden Normalisierung: </p>
+     *
+     * <pre>
+     *     List&lt;Duration&lt;ClockUnit&gt;&gt; list = new ArrayList&lt;&gt;();
+     *     list.add(Duration.of(11, ClockUnit.HOURS));
+     *     list.add(Duration.ofClockUnits(4, 35, 121));
+     *     list.add(Duration.of(10, ClockUnit.MINUTES));
+     *
+     *     Duration&lt;ClockUnit&gt; expected = Duration.ofClockUnits(15, 47, 1);
+     *
+     *     assertThat(
+     *          list.stream().collect(Duration.summingUp()).with(Duration.STD_CLOCK_PERIOD),
+     *          is(expected));
+     * </pre>
+     *
+     * @param   <U> generic type of time units
+     * @return  Collector for summing up durations in a stream
+     * @since   5.0
+     */
+    public static <U extends IsoUnit> Collector<Duration<U>, ?, Duration<U>> summingUp() {
+
+        return Collectors.reducing(Duration.ofZero(), Duration::plus);
 
     }
 

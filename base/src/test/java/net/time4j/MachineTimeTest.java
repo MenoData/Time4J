@@ -9,6 +9,8 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.Duration;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -578,6 +580,26 @@ public class MachineTimeTest {
     @Test(expected=NullPointerException.class)
     public void threetenConversionNull() {
         MachineTime.from(null);
+    }
+
+    @Test
+    public void summingUpPosix() {
+        List<MachineTime<TimeUnit>> list = new ArrayList<>();
+        list.add(MachineTime.of(2, TimeUnit.HOURS));
+        list.add(MachineTime.of(65, TimeUnit.MINUTES));
+        assertThat(
+            list.stream().collect(MachineTime.summingUpPosix()),
+            is(MachineTime.ofPosixSeconds(2 * 3600 + 65 * 60)));
+    }
+
+    @Test
+    public void summingUpReal() {
+        List<MachineTime<SI>> list = new ArrayList<>();
+        list.add(MachineTime.of(2, SI.SECONDS));
+        list.add(MachineTime.of(1_000_000_001, SI.NANOSECONDS));
+        assertThat(
+            list.stream().collect(MachineTime.summingUpReal()),
+            is(MachineTime.ofSIUnits(3, 1)));
     }
 
 }

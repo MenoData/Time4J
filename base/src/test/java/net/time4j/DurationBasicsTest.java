@@ -1243,7 +1243,7 @@ public class DurationBasicsTest {
     }
 
     @Test
-    public void testEqualsWithSpecialUnits() throws ParseException {
+    public void testEqualsWithSpecialUnits() {
         assertThat(
             Duration.of(1, YEARS)
                 .equals(Duration.of(1, CalendarUnit.weekBasedYears())),
@@ -1500,6 +1500,18 @@ public class DurationBasicsTest {
         assertThat(
             ld.plus(d.toTemporalAmount()),
             is(PlainDate.of(2017, 11, 12).toTemporalAccessor()));
+    }
+
+    @Test
+    public void summingUp() {
+        List<Duration<ClockUnit>> list = new ArrayList<>();
+        list.add(Duration.of(11, ClockUnit.HOURS));
+        list.add(Duration.ofClockUnits(4, 35, 121));
+        list.add(Duration.of(10, ClockUnit.MINUTES));
+        Duration<ClockUnit> expected = Duration.ofClockUnits(15, 47, 1);
+        assertThat(
+            list.stream().collect(Duration.summingUp()).with(Duration.STD_CLOCK_PERIOD),
+            is(expected));
     }
 
 }
