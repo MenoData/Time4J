@@ -55,7 +55,7 @@ public class ChronoHierarchyTest {
         String expected = cf2.format(moment);
         System.out.println(expected);
         ChronoFormatter<Instant> cf1 =
-            ChronoFormatter.setUp(Moment.axis(TemporalType.INSTANT), Locale.ROOT).addPattern(
+            ChronoFormatter.setUp(Moment.threeten(), Locale.ROOT).addPattern(
                 "yyyy-MM-dd HH:mm VV",
                 PatternType.CLDR
             ).build().withTimezone("Europe/Moscow");
@@ -76,7 +76,7 @@ public class ChronoHierarchyTest {
         String expected = cf2.format(moment);
         System.out.println(expected);
         ChronoFormatter<Instant> cf1 =
-            ChronoFormatter.setUp(Moment.axis(TemporalType.INSTANT), Locale.ENGLISH).addPattern(
+            ChronoFormatter.setUp(Moment.threeten(), Locale.ENGLISH).addPattern(
                 "yyyy-MM-dd HH:mm zzzz",
                 PatternType.CLDR
             ).build().withTimezone("Europe/Moscow");
@@ -112,7 +112,7 @@ public class ChronoHierarchyTest {
     public void weekOfYear() {
         ChronoFormatter<Instant> cf =
             ChronoFormatter.ofPattern(
-                "ww, yyyy-MM-dd HH:mm", PatternType.CLDR, Locale.GERMANY, Moment.axis(TemporalType.INSTANT))
+                "ww, yyyy-MM-dd HH:mm", PatternType.CLDR, Locale.GERMANY, Moment.threeten())
             .withTimezone(ZonalOffset.UTC);
         Moment moment = PlainTimestamp.of(2016, 1, 1, 0, 0).atUTC();
         Instant instant = TemporalType.INSTANT.from(moment);

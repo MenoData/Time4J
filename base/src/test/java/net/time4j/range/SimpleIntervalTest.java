@@ -1,7 +1,6 @@
 package net.time4j.range;
 
 import net.time4j.Moment;
-import net.time4j.TemporalType;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
@@ -225,7 +224,7 @@ public class SimpleIntervalTest {
                 "uuuu-MM-dd HH:mm:ssXXX",
                 PatternType.CLDR,
                 Locale.ROOT,
-                Moment.axis(TemporalType.INSTANT)
+                Moment.threeten()
             ).withTimezone(ZonalOffset.UTC);
         assertThat(i.print(printer, "from {0} to {1}"), is("from 1970-01-01 00:00:00Z to 2016-11-02 00:00:00Z"));
         System.out.println(i.print(printer)); // 1970-01-01 00:00:00Z – 2016-11-02 00:00:00Z
@@ -240,7 +239,7 @@ public class SimpleIntervalTest {
                 "uuuu-MM-dd HH:mm:ssXXX",
                 PatternType.CLDR,
                 Locale.ROOT,
-                Moment.axis(TemporalType.INSTANT)
+                Moment.threeten()
             ).withTimezone(ZonalOffset.UTC);
         assertThat(
             SimpleInterval.onInstantTimeLine().parse(

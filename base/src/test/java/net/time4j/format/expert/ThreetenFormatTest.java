@@ -5,7 +5,6 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.TemporalType;
 import org.junit.Test;
 
 import java.text.ParseException;
@@ -23,7 +22,7 @@ public class ThreetenFormatTest {
     @Test
     public void formatAndParseInstant1() throws ParseException {
         ChronoFormatter<Instant> formatter =
-            ChronoFormatter.setUp(Moment.axis(TemporalType.INSTANT), Locale.ROOT)
+            ChronoFormatter.setUp(Moment.threeten(), Locale.ROOT)
                 .addPattern("uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR).build().withTimezone("Europe/Berlin");
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
         assertThat(
@@ -40,7 +39,7 @@ public class ThreetenFormatTest {
     public void formatAndParseInstant2() throws ParseException {
         ChronoFormatter<Instant> formatter =
             ChronoFormatter.ofPattern(
-                "uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR, Locale.ROOT, Moment.axis(TemporalType.INSTANT)
+                "uuuu-MM-dd'T'HH:mmXXX", PatternType.CLDR, Locale.ROOT, Moment.threeten()
             ).withTimezone("Europe/Berlin");
         ZonedDateTime zdt = LocalDateTime.of(2015, 3, 29, 2, 30).atZone(ZoneId.of("Europe/Berlin"));
         assertThat(

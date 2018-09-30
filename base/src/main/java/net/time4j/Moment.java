@@ -523,7 +523,7 @@ public final class Moment
     public static final ChronoElement<TimeUnit> PRECISION = PrecisionElement.TIME_PRECISION;
 
     private static final ChronoOperator<Moment> NEXT_LS = new NextLS();
-    private static final Chronology<Instant> THREETEN = new BridgeChronology<>(TemporalType.INSTANT, ENGINE);
+    private static final Chronology<Instant> THREETEN = axis(TemporalType.INSTANT);
     private static final long serialVersionUID = -3192884724477742274L;
 
     //~ Instanzvariablen --------------------------------------------------
