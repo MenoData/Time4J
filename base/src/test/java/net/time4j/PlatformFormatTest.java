@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.format.platform.SimpleFormatter;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -22,7 +23,7 @@ public class PlatformFormatTest {
     public void printStdDate() {
         PlainDate date = PlainDate.of(2014, 5, 31);
         assertThat(
-            PlainDate.formatter("MM/dd/yyyy", Platform.PATTERN, Locale.US).format(date),
+            SimpleFormatter.ofDatePattern("MM/dd/yyyy", Locale.US).format(date),
             is("05/31/2014"));
     }
 
@@ -30,7 +31,7 @@ public class PlatformFormatTest {
     public void parseStdDate() throws ParseException {
         PlainDate date = PlainDate.of(2014, 5, 31);
         assertThat(
-            PlainDate.formatter("MM/dd/yyyy", Platform.PATTERN, Locale.US).parse("05/31/2014"),
+            SimpleFormatter.ofDatePattern("MM/dd/yyyy", Locale.US).parse("05/31/2014"),
             is(date));
     }
 
@@ -38,7 +39,7 @@ public class PlatformFormatTest {
     public void printOldDate() {
         PlainDate date = PlainDate.of(1425, 5, 31);
         assertThat(
-            PlainDate.formatter("MM/dd/yyyy", Platform.PATTERN, Locale.US).format(date),
+            SimpleFormatter.ofDatePattern("MM/dd/yyyy", Locale.US).format(date),
             is("05/31/1425"));
     }
 
@@ -46,7 +47,7 @@ public class PlatformFormatTest {
     public void parseOldDate() throws ParseException {
         PlainDate date = PlainDate.of(1425, 5, 31);
         assertThat(
-            PlainDate.formatter("MM/dd/yyyy", Platform.PATTERN, Locale.US).parse("05/31/1425"),
+            SimpleFormatter.ofDatePattern("MM/dd/yyyy", Locale.US).parse("05/31/1425"),
             is(date));
     }
 
@@ -55,7 +56,7 @@ public class PlatformFormatTest {
         TZID tzid = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30);
         String expected = "01.01.1970 05:30 AM GMT+05:30";
         assertThat(
-            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).format(Moment.UNIX_EPOCH),
+            SimpleFormatter.ofMomentPattern("dd.MM.yyyy hh:mm a z", Locale.ENGLISH, tzid).format(Moment.UNIX_EPOCH),
             is(expected)
         );
     }
@@ -67,7 +68,7 @@ public class PlatformFormatTest {
         String name = (timezone.isDaylightSaving(Moment.UNIX_EPOCH) ? "BST" : "GMT");
         String expected = "01.01.1970 01:00 AM " + name;
         assertThat(
-            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.UK, tzid).format(Moment.UNIX_EPOCH),
+            SimpleFormatter.ofMomentPattern("dd.MM.yyyy hh:mm a z", Locale.UK, tzid).format(Moment.UNIX_EPOCH),
             is(expected)
         );
     }
@@ -77,7 +78,7 @@ public class PlatformFormatTest {
         TZID tzid = ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30);
         String text = "01.01.1970 05:30 AM GMT+05:30";
         assertThat(
-            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).parse(text),
+            SimpleFormatter.ofMomentPattern("dd.MM.yyyy hh:mm a z", Locale.ENGLISH, tzid).parse(text),
             is(Moment.UNIX_EPOCH)
         );
     }
@@ -87,7 +88,7 @@ public class PlatformFormatTest {
         TZID tzid = Timezone.of("Europe/London").getID();
         String text = "01.01.1970 12:00 AM GMT";
         assertThat(
-            Moment.formatter("dd.MM.yyyy hh:mm a z", Platform.PATTERN, Locale.ENGLISH, tzid).parse(text),
+            SimpleFormatter.ofMomentPattern("dd.MM.yyyy hh:mm a z", Locale.ENGLISH, tzid).parse(text),
             is(Moment.UNIX_EPOCH)
         );
     }
@@ -97,7 +98,7 @@ public class PlatformFormatTest {
         TZID tzid = Timezone.of("Europe/Berlin").getID();
         Moment moment = PlainDate.of(2015, 7, 1).atTime(15, 0, 0).inTimezone(tzid);
         assertThat(
-            Moment.formatter("dd.MM.yyyy HH:mm (zzzz)", Platform.PATTERN, Locale.GERMANY, tzid).format(moment),
+            SimpleFormatter.ofMomentPattern("dd.MM.yyyy HH:mm (zzzz)", Locale.GERMANY, tzid).format(moment),
             is("01.07.2015 15:00 (Mitteleuropäische Sommerzeit)")
         );
     }
@@ -107,7 +108,7 @@ public class PlatformFormatTest {
         TZID tzid = Timezone.of("Europe/Berlin").getID();
         String text = "01.07.2015 15:00 (Mitteleuropäische Sommerzeit)";
         assertThat(
-            Moment.formatter("dd.MM.yyyy HH:mm (zzzz)", Platform.PATTERN, Locale.GERMANY, tzid).parse(text),
+            SimpleFormatter.ofMomentPattern("dd.MM.yyyy HH:mm (zzzz)", Locale.GERMANY, tzid).parse(text),
             is(PlainDate.of(2015, 7, 1).atTime(15, 0, 0).inTimezone(tzid))
         );
     }

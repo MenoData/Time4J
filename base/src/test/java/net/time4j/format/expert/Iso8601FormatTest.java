@@ -27,7 +27,7 @@ public class Iso8601FormatTest {
     @Test
     public void printBasicCalendarDate() {
         assertThat(
-            Iso8601Format.BASIC_CALENDAR_DATE.format(
+            Iso8601Format.BASIC_CALENDAR_DATE.print(
                 PlainDate.of(2012, 2, 29)),
             is("20120229"));
     }
@@ -42,7 +42,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedCalendarDate() {
         assertThat(
-            Iso8601Format.EXTENDED_CALENDAR_DATE.format(
+            Iso8601Format.EXTENDED_CALENDAR_DATE.print(
                 PlainDate.of(2012, 2, 29)),
             is("2012-02-29"));
     }
@@ -57,7 +57,7 @@ public class Iso8601FormatTest {
     @Test
     public void printBasicOrdinalDate() {
         assertThat(
-            Iso8601Format.BASIC_ORDINAL_DATE.format(
+            Iso8601Format.BASIC_ORDINAL_DATE.print(
                 PlainDate.of(2014, 365)),
             is("2014365"));
     }
@@ -72,7 +72,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedOrdinalDate32() {
         assertThat(
-            Iso8601Format.EXTENDED_ORDINAL_DATE.format(
+            Iso8601Format.EXTENDED_ORDINAL_DATE.print(
                 PlainDate.of(2014, 32)),
             is("2014-032"));
     }
@@ -87,7 +87,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedOrdinalDate365() {
         assertThat(
-            Iso8601Format.EXTENDED_ORDINAL_DATE.format(
+            Iso8601Format.EXTENDED_ORDINAL_DATE.print(
                 PlainDate.of(2014, 365)),
             is("2014-365"));
     }
@@ -102,7 +102,7 @@ public class Iso8601FormatTest {
     @Test
     public void printBasicWeekDate() {
         assertThat(
-            Iso8601Format.BASIC_WEEK_DATE.format(
+            Iso8601Format.BASIC_WEEK_DATE.print(
                 PlainDate.of(2014, 4, Weekday.MONDAY)),
             is("2014W041"));
     }
@@ -117,7 +117,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedWeekDate() {
         assertThat(
-            Iso8601Format.EXTENDED_WEEK_DATE.format(
+            Iso8601Format.EXTENDED_WEEK_DATE.print(
                 PlainDate.of(2014, 4, Weekday.MONDAY)),
             is("2014-W04-1"));
     }
@@ -132,7 +132,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedWeekDateKW53() {
         assertThat(
-            Iso8601Format.EXTENDED_WEEK_DATE.format(
+            Iso8601Format.EXTENDED_WEEK_DATE.print(
                 PlainDate.of(2009, 12, 28)),
             is("2009-W53-1"));
     }
@@ -152,7 +152,7 @@ public class Iso8601FormatTest {
     @Test
     public void printBasicTime() {
         assertThat(
-            Iso8601Format.BASIC_WALL_TIME.format(
+            Iso8601Format.BASIC_WALL_TIME.print(
                 PlainTime.of(23, 59, 28)),
             is("235928"));
     }
@@ -170,7 +170,7 @@ public class Iso8601FormatTest {
     @Test
     public void printBasicTimeHHMMSSffffff() {
         assertThat(
-            Iso8601Format.BASIC_WALL_TIME.format(
+            Iso8601Format.BASIC_WALL_TIME.print(
                 PlainTime.of(23, 59, 28, 123456000)),
             is("235928,123456"));
     }
@@ -188,7 +188,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTime24() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.midnightAtEndOfDay()),
             is("24:00"));
     }
@@ -206,7 +206,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHH() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.of(23)),
             is("23:00"));
     }
@@ -224,7 +224,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMM() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.of(23, 59)),
             is("23:59"));
     }
@@ -242,7 +242,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMMSS() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.of(23, 59, 28)),
             is("23:59:28"));
     }
@@ -260,7 +260,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMMSSff() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.of(23, 59, 28, 120000000)),
             is("23:59:28,12"));
     }
@@ -278,7 +278,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMMSSfff() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.of(23, 59, 28, 123000000)),
             is("23:59:28,123"));
     }
@@ -296,7 +296,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMMSSffffff() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(
+            Iso8601Format.EXTENDED_WALL_TIME.print(
                 PlainTime.of(23, 59, 28, 123456000)),
             is("23:59:28,123456"));
     }
@@ -314,7 +314,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedTimeHHMMSSfffffffff() {
         assertThat(
-            Iso8601Format.EXTENDED_WALL_TIME.format(PlainTime.of(23, 59, 28, 123456789)),
+            Iso8601Format.EXTENDED_WALL_TIME.print(PlainTime.of(23, 59, 28, 123456789)),
             is("23:59:28,123456789"));
     }
 
@@ -341,7 +341,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedDateTimeOffsetZ() {
         assertThat(
-            Iso8601Format.EXTENDED_DATE_TIME_OFFSET.format(
+            Iso8601Format.EXTENDED_DATE_TIME_OFFSET.print(
                 PlainDate.of(2012, 6, 30)
                     .at(PlainTime.of(23, 59, 59))
                     .atUTC()
@@ -365,7 +365,7 @@ public class Iso8601FormatTest {
     public void printExtendedDateTimeOffsetPlus02() {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET
-                .withTimezone(ZonalOffset.ofTotalSeconds(7200)).format(
+                .withTimezone(ZonalOffset.ofTotalSeconds(7200)).print(
                 PlainDate.of(2012, 6, 30)
                     .at(PlainTime.of(23, 59, 59))
                     .atUTC()
@@ -390,7 +390,7 @@ public class Iso8601FormatTest {
         assertThat(
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET
                 .withTimezone(ZonalOffset.ofHoursMinutes(OffsetSign.BEHIND_UTC, 5, 30))
-                .format(PlainDate.of(2012, 6, 30).at(PlainTime.of(23, 59, 59)).atUTC().plus(1, SI.SECONDS)),
+                .print(PlainDate.of(2012, 6, 30).at(PlainTime.of(23, 59, 59)).atUTC().plus(1, SI.SECONDS)),
             is("2012-06-30T18:29:60-05:30"));
     }
 
@@ -410,7 +410,7 @@ public class Iso8601FormatTest {
     public void printExtendedDateTimeOffsetInvalid() {
         Iso8601Format.EXTENDED_DATE_TIME_OFFSET
                 .withTimezone(ZonalOffset.ofTotalSeconds(-1))
-                .format(
+                .print(
                     PlainDate.of(2012, 6, 30)
                         .at(PlainTime.of(23, 59, 59))
                         .atUTC()
@@ -425,7 +425,7 @@ public class Iso8601FormatTest {
     @Test
     public void printExtendedDateTime() {
         assertThat(
-            Iso8601Format.EXTENDED_DATE_TIME.format(
+            Iso8601Format.EXTENDED_DATE_TIME.print(
                 PlainDate.of(2012, 6, 30).at(PlainTime.of(23, 59, 59))),
             is("2012-06-30T23:59:59"));
     }
@@ -523,40 +523,40 @@ public class Iso8601FormatTest {
     public void ofBasicTimeT24() {
         PlainTime time = PlainTime.midnightAtEndOfDay();
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("24"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("2400"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("240000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("240000,000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("240000,000000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("240000,000000000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("24"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("2400"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("240000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("240000.000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("240000.000000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("240000.000000000"));
     }
 
@@ -564,40 +564,40 @@ public class Iso8601FormatTest {
     public void ofBasicTimeWithMillis120() {
         PlainTime time = PlainTime.of(7, 45, 8, 120_000_000);
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("0745"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("074508"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("074508,120"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("074508,120000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("074508,120000000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("0745"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("074508"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("074508.120"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("074508.120000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("074508.120000000"));
     }
 
@@ -605,40 +605,40 @@ public class Iso8601FormatTest {
     public void ofBasicTimeWithMicros400() {
         PlainTime time = PlainTime.of(7, 45, 8, 123_400_000);
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("0745"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("074508"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("074508,123"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("074508,123400"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("074508,123400000"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("0745"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("074508"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("074508.123"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("074508.123400"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("074508.123400000"));
     }
 
@@ -646,40 +646,40 @@ public class Iso8601FormatTest {
     public void ofBasicTimeWithNanos() {
         PlainTime time = PlainTime.of(7, 45, 8, 123_456_789);
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("0745"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("074508"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("074508,123"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("074508,123456"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("074508,123456789"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("0745"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("074508"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("074508.123"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("074508.123456"));
         assertThat(
-            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofBasicTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("074508.123456789"));
     }
 
@@ -687,40 +687,40 @@ public class Iso8601FormatTest {
     public void ofExtendedTimeT24() {
         PlainTime time = PlainTime.midnightAtEndOfDay();
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("24"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("24:00"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("24:00:00"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("24:00:00,000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("24:00:00,000000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("24:00:00,000000000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("24"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("24:00"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("24:00:00"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("24:00:00.000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("24:00:00.000000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("24:00:00.000000000"));
     }
 
@@ -728,40 +728,40 @@ public class Iso8601FormatTest {
     public void ofExtendedTimeWithMillis120() {
         PlainTime time = PlainTime.of(7, 45, 8, 120_000_000);
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("07:45"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("07:45:08"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("07:45:08,120"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("07:45:08,120000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("07:45:08,120000000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("07:45"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("07:45:08"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("07:45:08.120"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("07:45:08.120000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("07:45:08.120000000"));
     }
 
@@ -769,40 +769,40 @@ public class Iso8601FormatTest {
     public void ofExtendedTimeWithMicros400() {
         PlainTime time = PlainTime.of(7, 45, 8, 123_400_000);
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("07:45"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("07:45:08"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("07:45:08,123"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("07:45:08,123400"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("07:45:08,123400000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("07:45"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("07:45:08"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("07:45:08.123"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("07:45:08.123400"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("07:45:08.123400000"));
     }
 
@@ -810,40 +810,40 @@ public class Iso8601FormatTest {
     public void ofExtendedTimeWithNanos() {
         PlainTime time = PlainTime.of(7, 45, 8, 123_456_000);
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MINUTES).print(time),
             is("07:45"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.SECONDS).print(time),
             is("07:45:08"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MILLIS).print(time),
             is("07:45:08,123"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.MICROS).print(time),
             is("07:45:08,123456"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.COMMA, ClockUnit.NANOS).print(time),
             is("07:45:08,123456000"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.HOURS).print(time),
             is("07"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MINUTES).print(time),
             is("07:45"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.SECONDS).print(time),
             is("07:45:08"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MILLIS).print(time),
             is("07:45:08.123"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.MICROS).print(time),
             is("07:45:08.123456"));
         assertThat(
-            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).format(time),
+            Iso8601Format.ofExtendedTime(IsoDecimalStyle.DOT, ClockUnit.NANOS).print(time),
             is("07:45:08.123456000"));
     }
 
@@ -855,42 +855,42 @@ public class Iso8601FormatTest {
                 IsoDateStyle.BASIC_CALENDAR_DATE,
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MICROS
-            ).format(tsp),
+            ).print(tsp),
             is("20160229T174530,123450"));
         assertThat(
             Iso8601Format.ofTimestamp(
                 IsoDateStyle.BASIC_ORDINAL_DATE,
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MICROS
-            ).format(tsp),
+            ).print(tsp),
             is("2016060T174530,123450"));
         assertThat(
             Iso8601Format.ofTimestamp(
                 IsoDateStyle.BASIC_WEEK_DATE,
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MICROS
-            ).format(tsp),
+            ).print(tsp),
             is("2016W091T174530,123450"));
         assertThat(
             Iso8601Format.ofTimestamp(
                 IsoDateStyle.EXTENDED_CALENDAR_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MICROS
-            ).format(tsp),
+            ).print(tsp),
             is("2016-02-29T17:45:30.123450"));
         assertThat(
             Iso8601Format.ofTimestamp(
                 IsoDateStyle.EXTENDED_ORDINAL_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MICROS
-            ).format(tsp),
+            ).print(tsp),
             is("2016-060T17:45:30.123450"));
         assertThat(
             Iso8601Format.ofTimestamp(
                 IsoDateStyle.EXTENDED_WEEK_DATE,
                 IsoDecimalStyle.DOT,
                 ClockUnit.MICROS
-            ).format(tsp),
+            ).print(tsp),
             is("2016-W09-1T17:45:30.123450"));
     }
 
@@ -903,7 +903,7 @@ public class Iso8601FormatTest {
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MILLIS,
                 ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 5, 30)
-            ).format(ls),
+            ).print(ls),
             is("2012-07-01T05:29:60,000+05:30"));
         assertThat(
             Iso8601Format.ofMoment(
@@ -911,7 +911,7 @@ public class Iso8601FormatTest {
                 IsoDecimalStyle.COMMA,
                 ClockUnit.MILLIS,
                 ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 4)
-            ).format(ls),
+            ).print(ls),
             is("2012-06-30T19:59:60,000-04:00"));
         assertThat(
             Iso8601Format.ofMoment(
@@ -919,7 +919,7 @@ public class Iso8601FormatTest {
                 IsoDecimalStyle.DOT,
                 ClockUnit.MILLIS,
                 ZonalOffset.UTC
-            ).format(ls),
+            ).print(ls),
             is("2012-06-30T23:59:60.000Z"));
     }
 

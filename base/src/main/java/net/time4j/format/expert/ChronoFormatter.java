@@ -680,7 +680,7 @@ public final class ChronoFormatter<T>
     }
 
     @Override
-    public String format(T formattable) {
+    public String print(T formattable) {
 
         ChronoDisplay display = this.display(formattable, this.globalAttributes);
         return this.format0(display);
@@ -706,17 +706,6 @@ public final class ChronoFormatter<T>
     public String format(GeneralTimestamp<?> tsp) {
 
         return this.format0(tsp);
-
-    }
-
-    @Override
-    public void formatToBuffer(
-        T formattable,
-        Appendable buffer
-    ) throws IOException {
-
-        ChronoDisplay display = this.display(formattable, this.globalAttributes);
-        this.print(display, buffer, this.globalAttributes, false);
 
     }
 
@@ -991,43 +980,23 @@ public final class ChronoFormatter<T>
 
     }
 
-    /**
-     * <p>For maximum information use {@link #parse(CharSequence, ParseLog)} instead. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     */
-    /*[deutsch]
-     * <p>F&uuml;r maximale Information stattdessen {@link #parse(CharSequence, ParseLog)} nutzen. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     */
     @Override
     public T parse(
         CharSequence text,
-        ParsePosition position
-    ) {
-
-        return this.parse(text, new ParseLog(position));
-
-    }
-
-    @Override
-    public T parse(
-        CharSequence text,
-        ParsePosition position,
         RawValues rawValues
-    ) {
+    ) throws ParseException {
 
-        ParseLog plog = new ParseLog(position);
+        ParseLog plog = new ParseLog();
         T result = this.parse(text, plog);
         rawValues.accept(plog.getRawValues());
-        return result;
+
+        if (plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (result == null) {
+            throw new ParseException("Cannot parse: \"" + text + "\"", 0);
+        } else {
+            return result;
+        }
 
     }
 
@@ -1087,7 +1056,7 @@ public final class ChronoFormatter<T>
             GeneralTimestamp<?> tsp =
                 parse(this, merger, extensions, text, status, attrs, leniency, true, quickPath);
 
-            if (status.isError()) {
+            if (status.isError() || (tsp == null)) {
                 return null;
             }
 
@@ -5354,8 +5323,7 @@ public final class ChronoFormatter<T>
          * then it must be escaped by the apostroph &quot;'&quot;. The apostroph itself can be
          * treated as literal by double apostroph. </p>
          *
-         * <p>For exact interpretation and description of format symbols
-         * see the implementations of interface {@code ChronoPattern}. </p>
+         * <p>For exact interpretation and description of format symbols see the enum {@code PatternType}. </p>
          *
          * @param   formatPattern   pattern of symbols to be used in formatting
          * @param   patternType     type of pattern how to interprete symbols
@@ -5375,8 +5343,7 @@ public final class ChronoFormatter<T>
          * Apostrophs &quot;'&quot; gekennzeichnet werden (ESCAPE). Das Apostroph selbst wird durch
          * Verdoppelung als Literal interpretiert. </p>
          *
-         * <p>Zur genauen Interpretation der Formatsymbole sei auf die
-         * Implementierungen des Interface {@code ChronoPattern} verwiesen. </p>
+         * <p>Zur genauen Interpretation der Formatsymbole sei auf das Enum {@code PatternType} verwiesen. </p>
          *
          * @param   formatPattern   pattern of symbols to be used in formatting
          * @param   patternType     type of pattern how to interprete symbols

@@ -52,7 +52,6 @@ import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
@@ -67,6 +66,7 @@ import net.time4j.tz.ZonalTransition;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.text.ParseException;
 import java.time.LocalDate;
 import java.util.Collections;
 import java.util.EnumSet;
@@ -1441,133 +1441,77 @@ public final class PlainDate
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern in the
-     * default locale for formatting and parsing plain dates. </p>
+     * <p>Creates a formatted output of this instance. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   5.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainDate> localFormatter(
-        String formatPattern,
-        P patternType
-    ) {
+    public String print(TemporalFormatter<PlainDate> printer) {
 
-        return FormatSupport.createFormatter(PlainDate.class, formatPattern, patternType, Locale.getDefault());
+        return printer.print(this);
 
     }
 
     /**
-     * <p>Creates a new formatter which uses the given display mode in the
-     * default locale for formatting and parsing plain dates. </p>
+     * <p>Parses given text to an instance of this class. </p>
      *
-     * @param   mode        formatting style
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using system locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Interpretiert den angegebenen Text zu einer Instanz dieser Klasse. </p>
      *
-     * @param   mode        formatting style
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using system locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   5.0
      */
-    public static TemporalFormatter<PlainDate> localFormatter(DisplayMode mode) {
+    public static PlainDate parse(
+        String text,
+        TemporalFormatter<PlainDate> parser
+    ) {
 
-        return formatter(mode, Locale.getDefault());
+        try {
+            return parser.parse(text);
+        } catch (ParseException pe) {
+            throw new ChronoException(pe.getMessage(), pe);
+        }
 
     }
 
-    /**
-     * <p>Creates a new formatter which uses the given pattern and locale
-     * for formatting and parsing plain dates. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
-     */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainDate> formatter(
-        String formatPattern,
-        P patternType,
-        Locale locale
-    ) {
+    @Override
+    public boolean equals(Object obj) {
 
-        return FormatSupport.createFormatter(PlainDate.class, formatPattern, patternType, locale);
+        if (this == obj) {
+            return true;
+        } else if (obj instanceof PlainDate) {
+            PlainDate that = (PlainDate) obj;
+            return (this.dayOfMonth == that.dayOfMonth) && (this.month == that.month) && (this.year == that.year);
+        } else {
+            return false;
+        }
 
     }
 
-    /**
-     * <p>Creates a new formatter which uses the given display mode and locale
-     * for formatting and parsing plain dates. </p>
-     *
-     * @param   mode        formatting style
-     * @param   locale      locale setting
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using given locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     * @see     #localFormatter(DisplayMode)
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * @param   mode        formatting style
-     * @param   locale      locale setting
-     * @return  format object for formatting {@code PlainDate}-objects
-     *          using given locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     * @see     #localFormatter(DisplayMode)
-     */
-    public static TemporalFormatter<PlainDate> formatter(
-        DisplayMode mode,
-        Locale locale
-    ) {
+    @Override
+    public int hashCode() {
 
-        String formatPattern = CalendarText.patternForDate(mode, locale);
-        return FormatSupport.createFormatter(PlainDate.class, formatPattern, locale);
+        int y = this.year;
+        return (y & 0xFFFFF800) ^ ((y << 11) + (this.month << 6) + (this.dayOfMonth));
 
     }
 

@@ -98,6 +98,56 @@ public class FormatUtils {
 
     }
 
+    /**
+     * Strips off any timezone symbols in clock time patterns.
+     */
+    public static String removeZones(String pattern) {
+
+        boolean literal = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, n = pattern.length(); i < n; i++) {
+            char c = pattern.charAt(i);
+
+            if (c == '\'') {
+                if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
+                    sb.append(c);
+                    i++;
+                } else {
+                    literal = !literal;
+                }
+                sb.append(c);
+            } else if (literal) {
+                sb.append(c);
+            } else if (c != 'z' && c != 'Z' && c != 'v' && c != 'V' && c != 'x' && c != 'X') {
+                sb.append(c);
+            }
+        }
+
+        for (int j = 0; j < sb.length(); j++) {
+            char c = sb.charAt(j);
+
+            if (c == ' ' && j + 1 < sb.length() && sb.charAt(j + 1) == ' ') {
+                sb.deleteCharAt(j);
+                j--;
+            } else if (c == '[' || c == ']' || c == '(' || c == ')') { // check locales es, fa, ps, uz
+                sb.deleteCharAt(j);
+                j--;
+            }
+        }
+
+        String result = sb.toString().trim();
+
+        if (result.endsWith(" '")) { // special case for de, fr_BE
+            result = result.substring(0, result.length() - 2) + "'";
+        } else if (result.endsWith(",")) { // special case for hy
+            result = result.substring(0, result.length() - 1);
+        }
+
+        return result;
+
+    }
+
     private static int getWeekdayISO(String weekday) {
 
         switch (weekday) {

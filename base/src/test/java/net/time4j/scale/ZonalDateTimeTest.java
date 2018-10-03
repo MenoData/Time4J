@@ -4,17 +4,16 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.Platform;
 import net.time4j.SI;
 import net.time4j.ZonalDateTime;
 import net.time4j.format.TemporalFormatter;
+import net.time4j.format.platform.SimpleFormatter;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -112,7 +111,7 @@ public class ZonalDateTimeTest {
         Moment moment = Moment.of(1278028825, TimeScale.UTC);
         Timezone tz = Timezone.of("Asia/Tokyo");
         TemporalFormatter<Moment> formatter =
-            Moment.formatter("yyyy-MM-dd'T'HH:mmZ", Platform.PATTERN, Locale.ROOT, tz.getID());
+            SimpleFormatter.ofMomentPattern("yyyy-MM-dd'T'HH:mmZ", Locale.ROOT, tz.getID());
         System.out.println("ZonalDateTime-Formatter-INFO: " + formatter.getClass().getName());
         assertThat(
             moment.inZonalView(tz.getID()).print(formatter),
@@ -120,11 +119,11 @@ public class ZonalDateTimeTest {
     }
 
     @Test
-    public void parseZDT() throws ParseException {
+    public void parseZDT() {
         Moment moment = Moment.of(1278028825, TimeScale.UTC);
         Timezone tz = Timezone.of("Asia/Tokyo");
         TemporalFormatter<Moment> formatter =
-            Moment.formatter("yyyy-MM-dd'T'HH:mmZ", Platform.PATTERN, Locale.ROOT, tz.getID());
+            SimpleFormatter.ofMomentPattern("yyyy-MM-dd'T'HH:mmZ", Locale.ROOT, tz.getID());
         assertThat(
             ZonalDateTime.parse("2012-07-01T09:00+0900", formatter),
             is(moment.inZonalView(tz.getID())));

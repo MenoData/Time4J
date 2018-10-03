@@ -36,16 +36,13 @@ import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
-import net.time4j.format.FormatEngine;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
-import net.time4j.i18n.UltimateFormatEngine;
 import net.time4j.tz.NameStyle;
 
 import java.util.Collections;
@@ -69,8 +66,7 @@ import java.util.Set;
  * @see     net.time4j.format.expert.ChronoFormatter.Builder#addPattern(String, PatternType)
  * @since   3.0
  */
-public enum PatternType
-    implements ChronoPattern<PatternType> {
+public enum PatternType {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -1496,13 +1492,6 @@ public enum PatternType
     DYNAMIC;
 
     //~ Methoden ----------------------------------------------------------
-
-    @Override
-    public FormatEngine<PatternType> getFormatEngine() {
-
-        return UltimateFormatEngine.INSTANCE;
-
-    }
 
     /**
      * <p>Registers a format symbol. </p>

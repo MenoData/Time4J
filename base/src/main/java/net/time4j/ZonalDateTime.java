@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalDateTime.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ThreetenAdapter;
 import net.time4j.format.RawValues;
 import net.time4j.format.TemporalFormatter;
@@ -36,7 +37,6 @@ import java.io.IOException;
 import java.io.ObjectInput;
 import java.io.ObjectOutput;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.time.ZonedDateTime;
 
 import static net.time4j.PlainTime.SECOND_OF_MINUTE;
@@ -520,55 +520,7 @@ public final class ZonalDateTime
      */
     public String print(TemporalFormatter<Moment> printer) {
 
-        return printer.withTimezone(this.getTimezone()).format(this.moment);
-
-    }
-
-    /**
-     * <p>Parses given text to a {@code ZonalDateTime}. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      helps to parse given text
-     * @return  parsed result
-     * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  ParseException if the text is not parseable
-     * @since   3.0
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text als {@code ZonalDateTime}. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   parser      helps to parse given text
-     * @return  parsed result
-     * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  ParseException if the text is not parseable
-     * @since   3.0
-     */
-    public static ZonalDateTime parse(
-        String text,
-        TemporalFormatter<Moment> parser
-    ) throws ParseException {
-
-        ParsePosition pos = new ParsePosition(0);
-        RawValues rawValues = new RawValues();
-        Moment moment = parser.parse(text, pos, rawValues);
-        Timezone tz;
-
-        if (moment == null) {
-            moment = parser.parse(text); // will throw an exception with better error message
-        }
-
-        if (moment == null) {
-            throw new ParseException("Cannot parse: " + text, pos.getErrorIndex());
-        } else if (rawValues.get().hasTimezone()) {
-            tz = toTimezone(rawValues.get().getTimezone(), text);
-        } else if (parser.getAttributes().contains(TIMEZONE_ID)) {
-            tz = toTimezone(parser.getAttributes().get(TIMEZONE_ID), text);
-        } else {
-            throw new ParseException("Missing timezone: " + text, 0);
-        }
-
-        return ZonalDateTime.of(moment, tz);
+        return printer.withTimezone(this.getTimezone()).print(this.moment);
 
     }
 
@@ -579,11 +531,10 @@ public final class ZonalDateTime
      *
      * @param   text        text to be parsed
      * @param   parser      helps to parse given text
-     * @param   position    parse position (always as new instance)
-     * @return  parsed result or {@code null} if parsing does not work (for example missing timezone information)
+     * @return  parsed result
      * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  IllegalArgumentException if timezone data cannot be loaded
-     * @since   3.16/4.13
+     * @throws  ChronoException if parsing does not work (for example missing timezone information)
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Text als {@code ZonalDateTime}. </p>
@@ -593,34 +544,33 @@ public final class ZonalDateTime
      *
      * @param   text        text to be parsed
      * @param   parser      helps to parse given text
-     * @param   position    parse position (always as new instance)
-     * @return  parsed result or {@code null} if parsing does not work (for example missing timezone information)
+     * @return  parsed result
      * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  IllegalArgumentException if timezone data cannot be loaded
-     * @since   3.16/4.13
+     * @throws  ChronoException if parsing does not work (for example missing timezone information)
+     * @since   5.0
      */
     public static ZonalDateTime parse(
         String text,
-        TemporalFormatter<Moment> parser,
-        ParsePosition position
+        TemporalFormatter<Moment> parser
     ) {
 
-        RawValues rawValues = new RawValues();
-        Moment moment = parser.parse(text, position, rawValues);
-        Timezone tz;
+        try {
+            RawValues rawValues = new RawValues();
+            Moment moment = parser.parse(text, rawValues);
+            Timezone tz;
 
-        if (moment == null) {
-            return null;
-        } else if (rawValues.get().hasTimezone()) {
-            tz = Timezone.of(rawValues.get().getTimezone());
-        } else if (parser.getAttributes().contains(TIMEZONE_ID)) {
-            tz = Timezone.of(parser.getAttributes().get(TIMEZONE_ID));
-        } else {
-            position.setErrorIndex(0);
-            return null;
+            if (rawValues.get().hasTimezone()) {
+                tz = toTimezone(rawValues.get().getTimezone(), text);
+            } else if (parser.getAttributes().contains(TIMEZONE_ID)) {
+                tz = toTimezone(parser.getAttributes().get(TIMEZONE_ID), text);
+            } else {
+                throw new ChronoException("Missing timezone: " + text);
+            }
+
+            return ZonalDateTime.of(moment, tz);
+        } catch (ParseException pe) {
+            throw new ChronoException(pe.getMessage(), pe);
         }
-
-        return ZonalDateTime.of(moment, tz);
 
     }
 
@@ -777,15 +727,12 @@ public final class ZonalDateTime
     private static Timezone toTimezone(
         TZID tzid,
         String text
-    ) throws ParseException {
+    ) {
 
         try {
             return Timezone.of(tzid);
         } catch (IllegalArgumentException iae) {
-            ParseException pe =
-                new ParseException("Timezone error: " + text, 0);
-            pe.initCause(iae);
-            throw pe;
+            throw new ChronoException("Timezone error: " + text);
         }
 
     }

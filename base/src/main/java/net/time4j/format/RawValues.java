@@ -78,6 +78,7 @@ public class RawValues
      * @param   rawValues   raw chronological values
      * @since   3.0
      */
+    @Override
     public void accept(ChronoDisplay rawValues) {
 
         if (rawValues == null) {
@@ -100,6 +101,7 @@ public class RawValues
      * @return  raw chronological values, never {@code null}
      * @since   3.0
      */
+    @Override
     public ChronoDisplay get() {
 
         return this.rawValues;

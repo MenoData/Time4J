@@ -53,7 +53,7 @@ public interface ChronoPrinter<T> {
      * @param   formattable     object to be formatted
      * @return  formatted text
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   4.18
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Formatiert das angegebene Objekt als Text. </p>
@@ -61,9 +61,9 @@ public interface ChronoPrinter<T> {
      * @param   formattable     object to be formatted
      * @return  formatted text
      * @throws  IllegalArgumentException if given object is not formattable
-     * @since   4.18
+     * @since   5.0
      */
-    default String format(T formattable) {
+    default String print(T formattable) {
 
         StringBuilder buffer = new StringBuilder();
         this.print(formattable, buffer, this.getAttributes());

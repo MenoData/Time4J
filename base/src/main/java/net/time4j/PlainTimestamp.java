@@ -50,7 +50,6 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
@@ -65,6 +64,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -861,71 +861,55 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern in the
-     * default locale for formatting and parsing plain timestamps. </p>
+     * <p>Creates a formatted output of this instance. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainTimestamp}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainTimestamp}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   5.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTimestamp> localFormatter(
-        String formatPattern,
-        P patternType
-    ) {
+    public String print(TemporalFormatter<PlainTimestamp> printer) {
 
-        return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, Locale.getDefault());
+        return printer.print(this);
 
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern and locale
-     * for formatting and parsing plain timestamps. </p>
+     * <p>Parses given text to an instance of this class. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTimestamp}-objects using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Interpretiert den angegebenen Text zu einer Instanz dieser Klasse. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTimestamp}-objects using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   5.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTimestamp> formatter(
-        String formatPattern,
-        P patternType,
-        Locale locale
+    public static PlainTimestamp parse(
+        String text,
+        TemporalFormatter<PlainTimestamp> parser
     ) {
 
-        return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, locale);
+        try {
+            return parser.parse(text);
+        } catch (ParseException pe) {
+            throw new ChronoException(pe.getMessage(), pe);
+        }
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (InfinityStyle.java) is part of project Time4J.
  *
@@ -21,7 +21,6 @@
 
 package net.time4j.range;
 
-import net.time4j.engine.ChronoException;
 import net.time4j.engine.TimeLine;
 import net.time4j.format.expert.ChronoPrinter;
 
@@ -122,14 +121,14 @@ public enum InfinityStyle {
             ChronoPrinter<T> printer,
             TimeLine<T> timeLine
         ) {
-            return printer.format(timeLine.getMinimum());
+            return printer.print(timeLine.getMinimum());
         }
         @Override
         <T> String displayFuture(
             ChronoPrinter<T> printer,
             TimeLine<T> timeLine
         ) {
-            return printer.format(timeLine.getMaximum());
+            return printer.print(timeLine.getMaximum());
         }
     };
 

@@ -34,40 +34,34 @@ public class FormatPatternTest {
     public void datePattern() {
         PlainDate date = PlainDate.of(2015, 9, 8);
         assertThat(
-            PlainDate.formatter(DisplayMode.FULL, Locale.GERMANY).format(date),
+            ChronoFormatter.ofDateStyle(DisplayMode.FULL, Locale.GERMANY).format(date),
             is("Dienstag, 8. September 2015"));
         assertThat(
-            PlainDate.formatter(DisplayMode.LONG, Locale.GERMANY).format(date),
+            ChronoFormatter.ofDateStyle(DisplayMode.LONG, Locale.GERMANY).format(date),
             is("8. September 2015"));
-        assertThat(
-            PlainDate.formatter(DisplayMode.MEDIUM, Locale.GERMANY).format(date),
-            is("08.09.2015"));
-        assertThat(
-            PlainDate.formatter(DisplayMode.SHORT, Locale.GERMANY).format(date),
-            is("08.09.15"));
         assertThat(
             ChronoFormatter.ofDateStyle(DisplayMode.MEDIUM, Locale.GERMANY).format(date),
             is("08.09.2015"));
+        assertThat(
+            ChronoFormatter.ofDateStyle(DisplayMode.SHORT, Locale.GERMANY).format(date),
+            is("08.09.15"));
     }
 
     @Test
     public void timePattern() {
         PlainTime time = PlainTime.of(17, 45, 30);
         assertThat(
-            PlainTime.formatter(DisplayMode.FULL, Locale.GERMANY).format(time),
+            ChronoFormatter.ofTimeStyle(DisplayMode.FULL, Locale.GERMANY).print(time),
             is("17:45 Uhr")); // ohne Offset!!!
         assertThat(
-            PlainTime.formatter(DisplayMode.LONG, Locale.GERMANY).format(time),
+            ChronoFormatter.ofTimeStyle(DisplayMode.LONG, Locale.GERMANY).print(time),
             is("17:45:30")); // ohne Offset!!!
         assertThat(
-            PlainTime.formatter(DisplayMode.MEDIUM, Locale.GERMANY).format(time),
+            ChronoFormatter.ofTimeStyle(DisplayMode.MEDIUM, Locale.GERMANY).print(time),
             is("17:45:30")); // ohne Offset!!!
         assertThat(
-            PlainTime.formatter(DisplayMode.SHORT, Locale.GERMANY).format(time),
+            ChronoFormatter.ofTimeStyle(DisplayMode.SHORT, Locale.GERMANY).print(time),
             is("17:45")); // ohne Offset!!!
-        assertThat(
-            ChronoFormatter.ofTimeStyle(DisplayMode.MEDIUM, Locale.GERMANY).format(time),
-            is("17:45:30")); // ohne Offset!!!
     }
 
     @Test
@@ -94,21 +88,21 @@ public class FormatPatternTest {
     public void dateTimePattern() {
         Moment m = Moment.UNIX_EPOCH;
         assertThat(
-            Moment.formatter(DisplayMode.FULL, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
+            ChronoFormatter.ofMomentStyle(
+                DisplayMode.FULL, DisplayMode.FULL, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
             is("Donnerstag, 1. Januar 1970 um 01:00:00 Mitteleuropäische Zeit"));
         assertThat(
-            Moment.formatter(DisplayMode.LONG, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
+            ChronoFormatter.ofMomentStyle(
+                DisplayMode.LONG, DisplayMode.LONG, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
             is("1. Januar 1970 um 01:00:00 MEZ"));
         assertThat(
-            Moment.formatter(DisplayMode.MEDIUM, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
+            ChronoFormatter.ofMomentStyle(
+                DisplayMode.MEDIUM, DisplayMode.MEDIUM, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
             is("01.01.1970, 01:00:00"));
-        assertThat(
-            Moment.formatter(DisplayMode.SHORT, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
-            is("01.01.70, 01:00"));
         assertThat(
             ChronoFormatter.ofMomentStyle(
-                DisplayMode.MEDIUM, DisplayMode.MEDIUM, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).format(m),
-            is("01.01.1970, 01:00:00"));
+                DisplayMode.SHORT, DisplayMode.SHORT, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
+            is("01.01.70, 01:00"));
     }
 
 }

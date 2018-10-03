@@ -1,6 +1,7 @@
 package net.time4j;
 
 import net.time4j.format.TemporalFormatter;
+import net.time4j.format.platform.SimpleFormatter;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
@@ -8,8 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
-import java.text.ParsePosition;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -70,13 +69,13 @@ public class CompareZonalDateTimeTest {
     }
 
     @Test
-    public void streamMax() throws ParseException {
+    public void streamMax() {
         List<String> dates = Arrays.asList("Tue, 29 Feb 2016 17:45:00 CET", "Tue, 29 Feb 2016 16:00:00 EST");
         TemporalFormatter<Moment> formatter =
-            Moment.formatter("EEE, dd MMM yyyy HH:mm:ss z", Platform.PATTERN, Locale.ENGLISH, ZonalOffset.UTC);
+            SimpleFormatter.ofMomentPattern("EEE, dd MMM yyyy HH:mm:ss z", Locale.ENGLISH, ZonalOffset.UTC);
 
         ZonalDateTime maxDate = dates.stream()
-            .map(s -> ZonalDateTime.parse(s, formatter, new ParsePosition(0)))
+            .map(s -> ZonalDateTime.parse(s, formatter))
             .max(ZonalDateTime::compareByMoment)
             .get();
         ZonalOffset offsetNewYork = ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 5);

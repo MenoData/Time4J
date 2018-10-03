@@ -51,7 +51,6 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondEvent;
@@ -71,6 +70,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.time.Instant;
 import java.util.Collections;
 import java.util.EnumMap;
@@ -1538,205 +1538,55 @@ public final class Moment
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern in the
-     * default locale for formatting and parsing UTC-timestamps. </p>
+     * <p>Creates a formatted output of this instance. </p>
      *
-     * <p>Note: The formatter can be adjusted to other locales and timezones however. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   5.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der Standard-Sprach- und L&auml;ndereinstellung und in der
-     * System-Zeitzone. </p>
+     * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
-     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen angepasst werden. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   5.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<Moment> localFormatter(
-        String formatPattern,
-        P patternType
+    public String print(TemporalFormatter<Moment> printer) {
+
+        return printer.print(this);
+
+    }
+
+    /**
+     * <p>Parses given text to an instance of this class. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Interpretiert den angegebenen Text zu einer Instanz dieser Klasse. </p>
+     *
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   5.0
+     */
+    public static Moment parse(
+        String text,
+        TemporalFormatter<Moment> parser
     ) {
 
-        return FormatSupport.createFormatter(
-            Moment.class, formatPattern, patternType, Locale.getDefault(), Timezone.ofSystem().getID());
-
-    }
-
-    /**
-     * <p>Creates a new formatter which uses the given display mode in the
-     * default locale for formatting and parsing UTC-timestamps. </p>
-     *
-     * <p>Note: The formatter can be adjusted to other locales and timezones however. </p>
-     *
-     * @param   mode        common formatting style for date part and time part
-     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * in der Standard-Sprach- und L&auml;ndereinstellung und in der
-     * System-Zeitzone. </p>
-     *
-     * <p>Das Format-Objekt kann an andere Sprachen oder Zeitzonen angepasst werden. </p>
-     *
-     * @param   mode        common formatting style for date part and time part
-     * @return  format object for formatting {@code Moment}-objects using system locale and system timezone
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     */
-    public static TemporalFormatter<Moment> localFormatter(DisplayMode mode) {
-
-        return formatter(mode, Locale.getDefault(), Timezone.ofSystem().getID());
-
-    }
-
-    /**
-     * <p>Creates a new formatter which uses the given pattern and locale
-     * for formatting and parsing moments in given timezone. </p>
-     *
-     * <p>Note: The given timezone will be used in printing while it serves
-     * as replacement value during parsing (if the text is missing a timezone
-     * information). The formatter can be adjusted to other locales and
-     * timezones however. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @param   tzid            timezone id
-     * @return  format object for formatting {@code Moment}-objects using given locale and timezone
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters in
-     * der angegebenen Sprach- und L&auml;ndereinstellung sowie Zeitzone. </p>
-     *
-     * <p>Hinweis: Das Format-Objekt kann an andere Sprachen oder Zeitzonen
-     * angepasst werden. Die angegebene Zeitzone dient beim Parsen als
-     * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
-     * existiert). </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @param   tzid            timezone id
-     * @return  format object for formatting {@code Moment}-objects using given locale and timezone
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
-     */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<Moment> formatter(
-        String formatPattern,
-        P patternType,
-        Locale locale,
-        TZID tzid
-    ) {
-
-        return FormatSupport.createFormatter(Moment.class, formatPattern, patternType, locale, tzid);
-
-    }
-
-    /**
-     * <p>Creates a new formatter which uses the given display mode and locale
-     * for formatting and parsing moments in given timezone. </p>
-     *
-     * <p>Note: The given timezone will be used in printing while it serves
-     * as replacement value during parsing (if the text is missing a timezone
-     * information). The formatter can be adjusted to other locales and
-     * timezones however. </p>
-     *
-     * @param   mode        common formatting style for date part and time part
-     * @param   locale      locale setting
-     * @param   tzid        timezone id
-     * @return  format object for formatting {@code Moment}-objects using given locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     * @see     #localFormatter(DisplayMode)
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * und in der angegebenen Sprach- und L&auml;ndereinstellung und
-     * Zeitzone. </p>
-     *
-     * <p>Hinweis: Das Format-Objekt kann an andere Sprachen oder Zeitzonen
-     * angepasst werden. Die angegebene Zeitzone dient beim Parsen als
-     * Ersatzwert (wenn im zu interpretierenden Text keine Zeitzoneninformation
-     * existiert). </p>
-     *
-     * @param   mode        common formatting style for date part and time part
-     * @param   locale      locale setting
-     * @param   tzid        timezone id
-     * @return  format object for formatting {@code Moment}-objects using given locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     * @see     #localFormatter(DisplayMode)
-     */
-    public static TemporalFormatter<Moment> formatter(
-        DisplayMode mode,
-        Locale locale,
-        TZID tzid
-    ) {
-
-        String formatPattern = CalendarText.patternForMoment(mode, mode, locale);
-        return FormatSupport.createFormatter(Moment.class, formatPattern, locale, tzid);
-
-    }
-
-    /**
-     * <p>Defines the RFC-1123-format which is for example used in mail
-     * headers. </p>
-     *
-     * <p>Equivalent to the pattern &quot;[EEE, ]d MMM yyyy HH:mm[:ss] XX&quot;
-     * where the timezone offset XX is modified such that in case of zero
-     * offset the expression &quot;GMT&quot; is preferred. &quot;UT&quot; or &quot;Z&quot;
-     * will be accepted as zero offset, too. The text elements will always be interpreted
-     * in English and are case-insensitive. If no extra timezone is specified then this
-     * formatter will use the timezone UTC as default for printing. </p>
-     *
-     * <p>Note: In contrast to the RFC-1123-standard this method does not
-     * support military timezone abbreviations (A-Y) or north-american
-     * timezone names (EST, EDT, CST, CDT, MST, MDT, PST, PDT). </p>
-     *
-     * @return  formatter object for RFC-1123 (technical internet-timestamp)
-     */
-    /*[deutsch]
-     * <p>Definiert das RFC-1123-Format, das zum Beispiel in Mail-Headers
-     * verwendet wird. </p>
-     *
-     * <p>Entspricht &quot;[EEE, ]d MMM yyyy HH:mm[:ss] XX&quot;, wobei
-     * der Zeitzonen-Offset XX so modifiziert ist, da&szlig; im Fall eines
-     * Null-Offsets bevorzugt der Ausdruck &quot;GMT&quot; benutzt wird. Als
-     * Null-Offset werden auch &quot;UT&quot; oder &quot;Z&quot; akzeptiert.
-     * Die Textelemente werden ohne Beachtung der Gro&szlig;- oder
-     * Kleinschreibung in Englisch interpretiert. Wird keine extra Zeitzone
-     * angegeben, wird dieser Formatierer die UTC-Zeitzone als Vorgabe zum
-     * Formatieren verwenden. </p>
-     *
-     * <p>Zu beachten: Im Gegensatz zum RFC-1123-Standard unterst&uuml;tzt die
-     * Methode keine milit&auml;rischen Zeitzonen (A-Y) oder nordamerikanischen
-     * Zeitzonennamen (EST, EDT, CST, CDT, MST, MDT, PST, PDT). </p>
-     *
-     * @return  formatter object for RFC-1123 (technical internet-timestamp)
-     */
-    public static TemporalFormatter<Moment> formatterRFC1123() {
-
-        return RFC1123.FORMATTER; // lazy initialization
+        try {
+            return parser.parse(text);
+        } catch (ParseException pe) {
+            throw new ChronoException(pe.getMessage(), pe);
+        }
 
     }
 
@@ -3528,15 +3378,6 @@ public final class Moment
             return null;
 
         }
-
-    }
-
-    @SuppressWarnings("unchecked")
-    private static class RFC1123 {
-
-        // Typecast is okay because the type Moment is required per specification.
-        static final TemporalFormatter<Moment> FORMATTER =
-            (TemporalFormatter<Moment>) FormatSupport.getDefaultFormatEngine().createRFC1123();
 
     }
 

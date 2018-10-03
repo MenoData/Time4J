@@ -10,6 +10,7 @@ import net.time4j.Weekmodel;
 import net.time4j.ZonalDateTime;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
@@ -133,7 +134,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void testTagalog() throws ParseException {
+    public void testTagalog() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("MMMM", PatternType.CLDR, new Locale("tl"));
         assertThat(
@@ -175,7 +176,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseLocalDayOfWeekAsText() throws IOException {
+    public void parseLocalDayOfWeekAsText() {
         TextElement<?> te =
             TextElement.class.cast(Weekmodel.of(Locale.US).localDayOfWeek());
         Attributes attributes =
@@ -191,7 +192,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void changeOfWeekmodelExtensionElement() throws IOException {
+    public void changeOfWeekmodelExtensionElement() {
         PlainDate wednesday = PlainDate.of(2015, 4, 8);
         ChronoFormatter<PlainDate> f =
             ChronoFormatter.setUp(PlainDate.class, Locale.GERMANY)
@@ -208,7 +209,7 @@ public class MiscellaneousTest {
         PlainTime time = PlainTime.of(22, 40);
         for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
             try {
-                PlainTime.formatter(DisplayMode.FULL, loc).format(time);
+                ChronoFormatter.ofTimeStyle(DisplayMode.FULL, loc).print(time);
             } catch (RuntimeException re){
                 DateFormat df = DateFormat.getTimeInstance(DateFormat.FULL, loc);
                 String pattern = SimpleDateFormat.class.cast(df).toPattern();
@@ -222,7 +223,7 @@ public class MiscellaneousTest {
         PlainTime time = PlainTime.of(22, 40);
         for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
             try {
-                PlainTime.formatter(DisplayMode.LONG, loc).format(time);
+                ChronoFormatter.ofTimeStyle(DisplayMode.LONG, loc).print(time);
             } catch (RuntimeException re){
                 DateFormat df = DateFormat.getTimeInstance(DateFormat.LONG, loc);
                 String pattern = SimpleDateFormat.class.cast(df).toPattern();
@@ -232,7 +233,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseTime24Smart() throws ParseException {
+    public void parseTime24Smart() {
         ParseLog plog = new ParseLog();
         assertThat(
             ChronoFormatter.setUp(PlainTime.class, Locale.ENGLISH)
@@ -352,12 +353,12 @@ public class MiscellaneousTest {
 
     @Test(expected=NullPointerException.class)
     public void momentFormatterWithoutTimezone1() {
-        Moment.formatter(DisplayMode.FULL, Locale.FRENCH, null);
+        ChronoFormatter.ofMomentStyle(DisplayMode.FULL, DisplayMode.FULL, Locale.FRENCH, null);
     }
 
     @Test(expected=NullPointerException.class)
     public void momentFormatterWithoutTimezone2() {
-        Moment.formatter("HH:mm:ss", PatternType.CLDR, Locale.US, null);
+        ChronoFormatter.ofMomentPattern("HH:mm:ss", PatternType.CLDR, Locale.US, null);
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -372,19 +373,19 @@ public class MiscellaneousTest {
     @Test
     public void momentFormatterRFC1123() throws ParseException {
         assertThat(
-            Moment.formatterRFC1123().format(Moment.UNIX_EPOCH),
+            ChronoFormatter.RFC_1123.format(Moment.UNIX_EPOCH),
             is("Thu, 1 Jan 1970 00:00:00 GMT"));
         assertThat(
-            Moment.formatterRFC1123().parse("Thu, 1 Jan 1970 00:00:00 GMT"),
+            ChronoFormatter.RFC_1123.parse("Thu, 1 Jan 1970 00:00:00 GMT"),
             is(Moment.UNIX_EPOCH));
         assertThat(
-            Moment.formatterRFC1123().parse("Thu, 1 Jan 1970 00:00:00 UT"),
+            ChronoFormatter.RFC_1123.parse("Thu, 1 Jan 1970 00:00:00 UT"),
             is(Moment.UNIX_EPOCH));
         assertThat(
-            Moment.formatterRFC1123().parse("Thu, 1 Jan 1970 00:00:00 Z"),
+            ChronoFormatter.RFC_1123.parse("Thu, 1 Jan 1970 00:00:00 Z"),
             is(Moment.UNIX_EPOCH));
         assertThat(
-            Moment.formatterRFC1123().parse("Wed, 31 Dec 1969 19:00:00 EST"),
+            ChronoFormatter.RFC_1123.parse("Wed, 31 Dec 1969 19:00:00 EST"),
             is(Moment.UNIX_EPOCH));
     }
 
@@ -425,7 +426,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseIsoCalendarDateInvalidMonth() throws ParseException {
+    public void parseIsoCalendarDateInvalidMonth() {
         ParseLog plog = new ParseLog();
         assertThat(
             Iso8601Format.EXTENDED_CALENDAR_DATE.parse("2015-13-10", plog),
@@ -541,7 +542,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseQuarterDateQ4Invalid() throws ParseException {
+    public void parseQuarterDateQ4Invalid() {
         ParseLog plog = new ParseLog();
         assertThat(
             getQuarterDateFormatter().parse("2015-Q4-93", plog),
@@ -554,7 +555,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseQuarterDateBefore1() throws ParseException {
+    public void parseQuarterDateBefore1() {
         ParseLog plog = new ParseLog();
         assertThat(
             getQuarterDateFormatter().parse("2015-Q1-00", plog),
@@ -608,7 +609,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void printIndividualFormat1() throws ParseException {
+    public void printIndividualFormat1() {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.US)
                 .startSection(Attributes.PAD_CHAR, '#')
@@ -627,7 +628,7 @@ public class MiscellaneousTest {
         ZonalOffset offset = Timezone.ofSystem().getOffset(moment);
         String displayedOffset = (offset.equals(ZonalOffset.UTC) ? "Z" : offset.toString());
         tsp = moment.toZonalTimestamp(offset);
-        String s = PlainTimestamp.formatter("MM/dd/yyyy hh:mm a ", PatternType.CLDR, Locale.US).format(tsp);
+        String s = ChronoFormatter.ofTimestampPattern("MM/dd/yyyy hh:mm a ", PatternType.CLDR, Locale.US).print(tsp);
         assertThat(
             formatter.format(moment),
             is("#" + s.substring(1)
@@ -639,7 +640,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void printIndividualFormat2() throws ParseException {
+    public void printIndividualFormat2() {
         // using partially mad settings, not a real-world-test
         Map<Weekday, String> lookup = new HashMap<>();
         lookup.put(Weekday.MONDAY, "Montag");
@@ -672,7 +673,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void printIndividualFormat3() throws ParseException {
+    public void printIndividualFormat3() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.setUp(PlainDate.class, Locale.US)
                 .addText(PlainDate.DAY_OF_WEEK, Enum::name)
@@ -684,7 +685,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void toJavaTextFormat() throws ParseException {
+    public void toJavaTextFormat() {
         ChronoFormatter<Moment> formatter =
             ChronoFormatter.setUp(Moment.class, Locale.US)
                 .addPattern("M/dd/yyyy hh:mm a ", PatternType.CLDR)
@@ -714,7 +715,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseZDT() throws ParseException {
+    public void parseZDT() {
         Moment moment = Moment.of(1278028824, TimeScale.UTC);
         ChronoFormatter<Moment> formatter =
             Iso8601Format.EXTENDED_DATE_TIME_OFFSET;
@@ -797,8 +798,7 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void iteratorOverParsedValues()
-        throws IOException, ClassNotFoundException {
+    public void iteratorOverParsedValues() {
 
         ParseLog plog = new ParseLog();
         ChronoFormatter<PlainTime> formatter = ChronoFormatter.ofTimePattern("h:mm B", PatternType.CLDR, Locale.US);
@@ -818,20 +818,20 @@ public class MiscellaneousTest {
     }
 
     @Test
-    public void parseZDTWithException() throws ParseException {
+    public void parseZDTWithException() {
         Timezone tz = Timezone.of("Asia/Tokyo");
         TemporalFormatter<Moment> formatter =
-            Moment.formatter("yyyy-MM-dd HH:mmZ", PatternType.CLDR, Locale.ROOT, tz.getID());
+            ChronoFormatter.ofMomentPattern("yyyy-MM-dd HH:mmZ", PatternType.CLDR, Locale.ROOT, tz.getID());
         try {
             ZonalDateTime zdt = ZonalDateTime.parse("2012-07-01T09:00+0900", formatter);
             fail("Parsed successfully to: " + zdt + ", but expected exception.");
-        } catch (ParseException pe) {
-            assertThat(pe.getMessage(), is("Cannot parse: \"2012-07-01T09:00+0900\" (expected: [ ], found: [T])"));
+        } catch (ChronoException ex) {
+            assertThat(ex.getMessage(), is("Cannot parse: \"2012-07-01T09:00+0900\" (expected: [ ], found: [T])"));
         }
     }
 
     @Test
-    public void simplifiedMomentParser() throws ParseException {
+    public void simplifiedMomentParser() {
         String pattern = "yyyy-MM-dd HH:mm XXX";
         ChronoParser<Moment> f = ChronoFormatter.ofMomentPattern(pattern, PatternType.CLDR, Locale.ROOT);
         Object expected = ChronoFormatter.ofMomentPattern(pattern, PatternType.CLDR, Locale.ROOT, ZonalOffset.UTC);
