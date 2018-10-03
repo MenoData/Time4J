@@ -297,7 +297,7 @@ public final class Duration<U extends IsoUnit>
         if (empty) {
             this.items = Collections.emptyList();
         } else {
-            Collections.sort(items, ITEM_COMPARATOR);
+            items.sort(ITEM_COMPARATOR);
             this.items = Collections.unmodifiableList(items);
         }
 
