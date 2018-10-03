@@ -732,7 +732,7 @@ public final class ZonalDateTime
         try {
             return Timezone.of(tzid);
         } catch (IllegalArgumentException iae) {
-            throw new ChronoException("Timezone error: " + text);
+            throw new ChronoException("Timezone error: " + text, iae);
         }
 
     }
