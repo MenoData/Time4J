@@ -9,6 +9,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Simplify generic formatter API [#813]
 - Remove all deprecated stuff [#524]
 - Improve conversion of Windows zones to IANA [#785]
 - Move class `AnnualDate` to main package [#787]
