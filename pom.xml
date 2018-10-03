@@ -4,7 +4,7 @@
     <modelVersion>4.0.0</modelVersion>
     <groupId>net.time4j</groupId>
     <artifactId>time4j-parent</artifactId>
-    <version>4.99.0-beta</version>
+    <version>5.0</version>
     <packaging>pom</packaging>
     <name>Time4J</name>
     <description>Advanced Date, Time and Interval Library for Java</description>
@@ -127,7 +127,7 @@
                         <version>2.0</version>
                     </tagletArtifact>
                     <show>public</show>
-                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.format.internal:net.time4j.i18n:net.time4j.history.internal:net.time4j.tz.threeten:net.time4j.calendar.service</excludePackageNames>
+                    <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.format.internal:net.time4j.history.internal:net.time4j.tz.threeten:net.time4j.calendar.service</excludePackageNames>
                 </configuration>
             </plugin>
             <plugin>
