@@ -1,5 +1,6 @@
 ## [v5.0] not yet released
 ### Added
+- Partitioned streams in TimestampInterval [#814]
 - Easy summing up a stream of durations [#812]
 - Simplify bridge chronology accessors in basic types [#811]
 - Platform-Timezone now delegates to `ZoneId.systemDefault()` [#805]
@@ -19,6 +20,7 @@
 - New modular structure [#525]
 - `StartOfDay` now uses `CalendarDate` in abstract method [#655]
 - Interface `ChronoPrinter` without checked exceptions [#526]
+- Renaming of abstract method in `DayPartitionRule` [#815]
 
 ### Fixed
 - Mismatch between getMinimumSinceUTC and transform for some historic calendars [#808]
