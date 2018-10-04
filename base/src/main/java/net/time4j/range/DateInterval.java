@@ -50,7 +50,6 @@ import net.time4j.tz.GapResolver;
 import net.time4j.tz.OverlapResolver;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.TransitionStrategy;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -1148,6 +1147,7 @@ public final class DateInterval
      *
      * @param   rule        day partition rule
      * @return  stream of timestamp intervals
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @see     #streamPartitioned(DayPartitionRule, TZID)
      * @since   4.18
      */
@@ -1160,6 +1160,7 @@ public final class DateInterval
      *
      * @param   rule        day partition rule
      * @return  stream of timestamp intervals
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @see     #streamPartitioned(DayPartitionRule, TZID)
      * @since   4.18
      */
@@ -1167,7 +1168,7 @@ public final class DateInterval
 
         return this.streamDaily().flatMap(
             date ->
-                rule.getPartition(date).stream().map(
+                rule.getPartitions(date).stream().map(
                     partition ->
                         TimestampInterval.between(
                             date.at(partition.getStart().getTemporal()),
@@ -1187,6 +1188,7 @@ public final class DateInterval
      * @param   rule        day partition rule
      * @param   tzid        timezone identifier
      * @return  stream of moment intervals
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #streamPartitioned(DayPartitionRule)
      * @see     GapResolver#NEXT_VALID_TIME
@@ -1203,6 +1205,7 @@ public final class DateInterval
      * @param   rule        day partition rule
      * @param   tzid        timezone identifier
      * @return  stream of moment intervals
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     #streamPartitioned(DayPartitionRule)
      * @see     GapResolver#NEXT_VALID_TIME

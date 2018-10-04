@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPartitionRule.java) is part of project Time4J.
  *
@@ -56,6 +56,7 @@ public interface DayPartitionRule {
      * @param   date    the calendar date to be queried
      * @return  unmodifiable sorted list of day partitions, maybe empty
      * @see     ClockInterval#comparator()
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Liefert die Tagesabschnitte zum angegebenen Datum, wenn definiert. </p>
@@ -63,8 +64,9 @@ public interface DayPartitionRule {
      * @param   date    the calendar date to be queried
      * @return  unmodifiable sorted list of day partitions, maybe empty
      * @see     ClockInterval#comparator()
+     * @since   5.0
      */
-    List<ChronoInterval<PlainTime>> getPartition(PlainDate date);
+    List<ChronoInterval<PlainTime>> getPartitions(PlainDate date);
 
     /**
      * <p>Combines this rule with another one. </p>
@@ -90,8 +92,8 @@ public interface DayPartitionRule {
             this.isExcluded(date) || rule.isExcluded(date)
             ? Collections.emptyList()
             : IntervalCollection.onClockAxis()
-                .plus(this.getPartition(date))
-                .plus(rule.getPartition(date))
+                .plus(this.getPartitions(date))
+                .plus(rule.getPartitions(date))
                 .withBlocks()
                 .getIntervals();
     }
@@ -113,7 +115,7 @@ public interface DayPartitionRule {
      * @return  boolean
      */
     default boolean isExcluded(PlainDate date) {
-        return this.getPartition(date).isEmpty();
+        return this.getPartitions(date).isEmpty();
     }
 
     /**
@@ -137,7 +139,7 @@ public interface DayPartitionRule {
      * @since   4.20
      */
     default boolean matches(PlainTimestamp timestamp) {
-        for (ChronoInterval<PlainTime> interval : this.getPartition(timestamp.toDate())) {
+        for (ChronoInterval<PlainTime> interval : this.getPartitions(timestamp.toDate())) {
             if (interval.contains(timestamp.toTime())) {
                 return true;
             }

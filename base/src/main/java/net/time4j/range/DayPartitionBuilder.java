@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPartitionBuilder.java) is part of project Time4J.
  *
@@ -450,7 +450,7 @@ public class DayPartitionBuilder {
 
         return new DayPartitionRule() {
             @Override
-            public List<ChronoInterval<PlainTime>> getPartition(PlainDate date) {
+            public List<ChronoInterval<PlainTime>> getPartitions(PlainDate date) {
                 if (!this.isExcluded(date) && activeFilter.test(date)) {
                     List<ChronoInterval<PlainTime>> partitions = eRules.get(date);
                     if (partitions == null) {
