@@ -23,6 +23,7 @@ package net.time4j.range;
 
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
+import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
@@ -297,6 +298,28 @@ public final class ClockInterval
         } else {
             return new ClockInterval(interval.getStart(), interval.getEnd());
         }
+
+    }
+
+    /**
+     * <p>Creates a timestamp interval for given calendar date based on this clock interval. </p>
+     *
+     * @param   date    gregorian calendar date
+     * @return  new timestamp interval
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues Zeitstempelintervall zum angegebenen Datum basierend auf diesem Uhrzeitintervall. </p>
+     *
+     * @param   date    gregorian calendar date
+     * @return  new timestamp interval
+     * @since   5.0
+     */
+    public TimestampInterval on(PlainDate date) {
+
+        return TimestampInterval.between(
+            date.at(this.getStartAsClockTime()),
+            date.at(this.getEndAsClockTime()));
 
     }
 

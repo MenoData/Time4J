@@ -275,4 +275,82 @@ public class DayPartitionTest {
         assertThat(intervals, is(expected));
     }
 
+    @Test
+    public void timestampPartitionsOnSingleDay() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
+                .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(SATURDAY, ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(12, 0)))
+                .build();
+
+        List<TimestampInterval> intervals =
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 9, 15), PlainTimestamp.of(2018, 10, 25, 15, 30))
+                .streamPartitioned(rule)
+                .collect(Collectors.toList());
+
+        List<ChronoInterval<PlainTimestamp>> expected = new ArrayList<>();
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 9, 15), PlainTimestamp.of(2018, 10, 25, 12, 30)));
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 14, 0), PlainTimestamp.of(2018, 10, 25, 15, 30)));
+
+        assertThat(intervals, is(expected));
+    }
+
+    @Test
+    public void timestampPartitionsOnTwoDays() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
+                .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(SATURDAY, ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(12, 0)))
+                .build();
+
+        List<TimestampInterval> intervals =
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 9, 15), PlainTimestamp.of(2018, 10, 26, 15, 30))
+                .streamPartitioned(rule)
+                .collect(Collectors.toList());
+
+        List<ChronoInterval<PlainTimestamp>> expected = new ArrayList<>();
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 9, 15), PlainTimestamp.of(2018, 10, 25, 12, 30)));
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 14, 0), PlainTimestamp.of(2018, 10, 25, 19, 0)));
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 26, 9, 0), PlainTimestamp.of(2018, 10, 26, 12, 30)));
+
+        assertThat(intervals, is(expected));
+    }
+
+    @Test
+    public void timestampPartitionsOnThreeDays() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(THURSDAY, ClockInterval.between(PlainTime.of(14, 0), PlainTime.of(19, 0)))
+                .addWeekdayRule(FRIDAY, ClockInterval.between(PlainTime.of(9, 0), PlainTime.of(12, 30)))
+                .addWeekdayRule(SATURDAY, ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(12, 0)))
+                .build();
+
+        List<TimestampInterval> intervals =
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 9, 15), PlainTimestamp.of(2018, 10, 27, 11, 30))
+                .streamPartitioned(rule)
+                .collect(Collectors.toList());
+
+        List<ChronoInterval<PlainTimestamp>> expected = new ArrayList<>();
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 9, 15), PlainTimestamp.of(2018, 10, 25, 12, 30)));
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 25, 14, 0), PlainTimestamp.of(2018, 10, 25, 19, 0)));
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 26, 9, 0), PlainTimestamp.of(2018, 10, 26, 12, 30)));
+        expected.add(
+            TimestampInterval.between(PlainTimestamp.of(2018, 10, 27, 10, 0), PlainTimestamp.of(2018, 10, 27, 11, 30)));
+
+        assertThat(intervals, is(expected));
+    }
+
 }

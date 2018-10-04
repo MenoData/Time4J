@@ -21,6 +21,7 @@
 
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.ClockUnit;
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
@@ -30,6 +31,7 @@ import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekmodel;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -55,8 +57,10 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
+import java.util.List;
 import java.util.Locale;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -792,6 +796,66 @@ public final class TimestampInterval
     }
 
     /**
+     * <p>Creates a partitioning stream of timestamp intervals where every day of this interval is partitioned
+     * according to given partitioning rule. </p>
+     *
+     * <p>If a day of this interval is not fully defined (concerns only start and end) then it will be intersected
+     * with given day partition rule. </p>
+     *
+     * @param   rule        day partition rule
+     * @return  stream of timestamp intervals
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen {@code Stream}, der jeden Tag dieses Intervalls entsprechend der angegebenen Regel
+     * in einzelne Tagesabschnitte zerlegt. </p>
+     *
+     * <p>Falls ein Tag dieses Intervalls nicht von Mitternacht zu Mitternacht reicht (betrifft nur Start und Ende),
+     * dann wird f&uuml;r einen solchen Tag eine gemeinsame Schnittmenge mit der angegebenen {@code DayPartitionRule}
+     * gebildet. </p>
+     *
+     * @param   rule        day partition rule
+     * @return  stream of timestamp intervals
+     * @throws  IllegalStateException if this interval is infinite or if there is no canonical form
+     * @since   5.0
+     */
+    public Stream<TimestampInterval> streamPartitioned(DayPartitionRule rule) {
+
+        TimestampInterval interval = this.toCanonical();
+        PlainTimestamp start = interval.getStartAsTimestamp();
+        PlainTimestamp end = interval.getEndAsTimestamp();
+
+        if ((start == null) || (end == null)) {
+            throw new IllegalStateException("Streaming is not supported for infinite intervals.");
+        }
+
+        PlainDate d1 = start.getCalendarDate();
+        PlainDate d2 = end.getCalendarDate();
+        long days = CalendarUnit.DAYS.between(d1, d2);
+
+        if (days == 0) {
+            ClockInterval w = ClockInterval.between(start.getWallTime(), end.getWallTime());
+            return getPartitions(d1, w, rule).stream();
+        }
+
+        ClockInterval w1 = ClockInterval.between(start.getWallTime(), PlainTime.midnightAtEndOfDay());
+        ClockInterval w2 = ClockInterval.between(PlainTime.midnightAtStartOfDay(), end.getWallTime());
+
+        Stream<TimestampInterval> a = getPartitions(d1, w1, rule).stream();
+        Stream<TimestampInterval> c = getPartitions(d2, w2, rule).stream();
+
+        if (days > 1) {
+            Stream<TimestampInterval> b =
+                DateInterval.between(d1.plus(CalendarDays.ONE), d2.minus(CalendarDays.ONE)).streamPartitioned(rule);
+            a = Stream.concat(a, b);
+        }
+
+        return Stream.concat(a, c);
+
+    }
+
+    /**
      * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
      *
      * @param   dateStyle       iso-compatible date style
@@ -1394,6 +1458,27 @@ public final class TimestampInterval
     TimestampInterval getContext() {
 
         return this;
+
+    }
+
+    private static List<TimestampInterval> getPartitions(
+        PlainDate date,
+        ClockInterval window,
+        DayPartitionRule rule
+    ) {
+
+        List<TimestampInterval> intervals = new ArrayList<>();
+        TimestampInterval outer = window.on(date);
+
+        for (ChronoInterval<PlainTime> partition : rule.getPartitions(date)) {
+            TimestampInterval ti =
+                TimestampInterval.between(
+                    date.at(partition.getStart().getTemporal()),
+                    date.at(partition.getEnd().getTemporal()));
+            outer.findIntersection(ti).ifPresent(intervals::add);
+        }
+
+        return intervals;
 
     }
 
