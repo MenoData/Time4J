@@ -277,6 +277,19 @@ final class RuleBasedTransitionModel
     }
 
     @Override
+    public boolean hasNegativeDST() {
+
+        for (DaylightSavingRule rule : this.rules) {
+            if (rule.getSavings() < 0) {
+                return true;
+            }
+        }
+
+        return false;
+
+    }
+
+    @Override
     public boolean equals(Object obj) {
 
         if (this == obj) {

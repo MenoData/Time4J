@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ArrayTransitionModel.java) is part of project Time4J.
  *
@@ -58,6 +58,7 @@ final class ArrayTransitionModel
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final ZonalTransition[] transitions;
+    private transient final boolean negativeDST;
 
     // Cache
     private transient final List<ZonalTransition> stdTransitions;
@@ -85,6 +86,13 @@ final class ArrayTransitionModel
         int n = transitions.size();
         ZonalTransition[] tmp = new ZonalTransition[n];
         tmp = transitions.toArray(tmp);
+        boolean negativeDST = false;
+
+        for (ZonalTransition zt : tmp) {
+            negativeDST = (negativeDST || (zt.getDaylightSavingOffset() < 0));
+        }
+
+        this.negativeDST = negativeDST;
 
         if (create) {
             Arrays.sort(tmp);
@@ -180,6 +188,13 @@ final class ArrayTransitionModel
     public void dump(Appendable buffer) throws IOException {
 
         this.dump(this.transitions.length, buffer);
+
+    }
+
+    @Override
+    public boolean hasNegativeDST() {
+
+        return this.negativeDST;
 
     }
 

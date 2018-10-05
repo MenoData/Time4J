@@ -24,6 +24,7 @@ package net.time4j.tz;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.UnixTime;
 import net.time4j.base.WallTime;
+import net.time4j.tz.model.TransitionModel;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -199,18 +200,28 @@ final class HistorizedTimezone
             return true;
         } else if (dst < 0) {
             return false;
-        } else { // dst = 0
-            UnixTime previousTime = SimpleUT.previousTime(start.getPosixTime(), 0);
-            Optional<ZonalTransition> previousTransition = this.history.findStartTransition(previousTime);
-            if (previousTransition.isPresent()) {
-                if (previousTransition.get().getStandardOffset() == start.getStandardOffset()) {
-                    return (previousTransition.get().getDaylightSavingOffset() < 0);
-                } else {
-                    return this.isDaylightSaving(previousTime);
-                }
-            } else {
-                return false;
+        }
+
+        // dst = 0
+        if (this.history instanceof TransitionModel) {
+            TransitionModel model = (TransitionModel) this.history;
+            if (!model.hasNegativeDST()) {
+                return false; // short-cut
             }
+        }
+
+        // compare with previous transition
+        UnixTime previousTime = SimpleUT.previousTime(start.getPosixTime(), 0);
+        Optional<ZonalTransition> previousTransition = this.history.findStartTransition(previousTime);
+
+        if (previousTransition.isPresent()) {
+            if (previousTransition.get().getStandardOffset() == start.getStandardOffset()) {
+                return (previousTransition.get().getDaylightSavingOffset() < 0);
+            } else {
+                return this.isDaylightSaving(previousTime);
+            }
+        } else {
+            return false;
         }
 
     }
