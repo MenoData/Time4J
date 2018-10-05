@@ -386,29 +386,6 @@ final class ArrayTransitionModel
 
     }
 
-    // Called by CompositeTransitionModel
-    static void checkSanity(
-        ZonalTransition[] transitions,
-        List<ZonalTransition> original
-    ) {
-
-        int previous = transitions[0].getTotalOffset();
-
-        for (int i = 1; i < transitions.length; i++) {
-            if (previous != transitions[i].getPreviousOffset()) {
-                Moment m =
-                    Moment.of(transitions[i].getPosixTime(), TimeScale.POSIX);
-                throw new IllegalArgumentException(
-                    "Model inconsistency detected at: " + m
-                    + " (" + transitions[i].getPosixTime() + ") "
-                    + " in transitions: " + original);
-            } else {
-                previous = transitions[i].getTotalOffset();
-            }
-        }
-
-    }
-
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *
@@ -432,6 +409,28 @@ final class ArrayTransitionModel
     ) throws IOException {
 
         SPX.writeTransitions(this.transitions, size, out);
+
+    }
+
+    private static void checkSanity(
+        ZonalTransition[] transitions,
+        List<ZonalTransition> original
+    ) {
+
+        int previous = transitions[0].getTotalOffset();
+
+        for (int i = 1; i < transitions.length; i++) {
+            if (previous != transitions[i].getPreviousOffset()) {
+                Moment m =
+                    Moment.of(transitions[i].getPosixTime(), TimeScale.POSIX);
+                throw new IllegalArgumentException(
+                    "Model inconsistency detected at: " + m
+                        + " (" + transitions[i].getPosixTime() + ") "
+                        + " in transitions: " + original);
+            } else {
+                previous = transitions[i].getTotalOffset();
+            }
+        }
 
     }
 

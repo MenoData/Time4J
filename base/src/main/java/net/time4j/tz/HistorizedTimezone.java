@@ -30,7 +30,6 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.util.List;
-import java.util.Optional;
 
 
 /**
@@ -212,16 +211,16 @@ final class HistorizedTimezone
 
         // compare with previous transition
         UnixTime previousTime = SimpleUT.previousTime(start.getPosixTime(), 0);
-        Optional<ZonalTransition> previousTransition = this.history.findStartTransition(previousTime);
+        ZonalTransition previousTransition = this.history.getStartTransition(previousTime);
 
-        if (previousTransition.isPresent()) {
-            if (previousTransition.get().getStandardOffset() == start.getStandardOffset()) {
-                return (previousTransition.get().getDaylightSavingOffset() < 0);
+        if (previousTransition == null) {
+            return false;
+        } else {
+            if (previousTransition.getStandardOffset() == start.getStandardOffset()) {
+                return (previousTransition.getDaylightSavingOffset() < 0);
             } else {
                 return this.isDaylightSaving(previousTime);
             }
-        } else {
-            return false;
         }
 
     }
