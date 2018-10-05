@@ -10,6 +10,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Improved handling of negative DST-offsets [#742]
 - Simplify generic formatter API [#813]
 - Remove all deprecated stuff [#524]
 - Improve conversion of Windows zones to IANA [#785]
