@@ -318,7 +318,7 @@ public class GregorianTimezoneRule
         return (
             this.getTimeOfDay().equals(rule.getTimeOfDay())
             && (this.getIndicator() == rule.getIndicator())
-            && (this.getSavings0() == rule.getSavings0())
+            && (this.getSavings() == rule.getSavings())
             && (this.month == rule.month));
 
     }

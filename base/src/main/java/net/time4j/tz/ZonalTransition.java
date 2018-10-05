@@ -226,7 +226,6 @@ public final class ZonalTransition
      * @see     #getPreviousOffset()
      * @see     #getStandardOffset()
      * @see     #getDaylightSavingOffset()
-     * @see     #isDaylightSaving()
      * @see     ZonalOffset#getIntegralAmount()
      */
     /*[deutsch]
@@ -236,7 +235,6 @@ public final class ZonalTransition
      * @see     #getPreviousOffset()
      * @see     #getStandardOffset()
      * @see     #getDaylightSavingOffset()
-     * @see     #isDaylightSaving()
      * @see     ZonalOffset#getIntegralAmount()
      */
     public int getTotalOffset() {
@@ -257,7 +255,6 @@ public final class ZonalTransition
      * @return  raw shift in seconds after transition
      * @see     #getTotalOffset()
      * @see     #getDaylightSavingOffset()
-     * @see     #isDaylightSaving()
      */
     /*[deutsch]
      * <p>Liefert die aktuelle Standardverschiebung nach diesem &Uuml;bergang
@@ -271,7 +268,6 @@ public final class ZonalTransition
      * @return  raw shift in seconds after transition
      * @see     #getTotalOffset()
      * @see     #getDaylightSavingOffset()
-     * @see     #isDaylightSaving()
      */
     public int getStandardOffset() {
 
@@ -283,41 +279,29 @@ public final class ZonalTransition
      * <p>Returns the DST-shift (daylight savings) after this transition that is
      * the shift normally induced by change to summer time. </p>
      *
-     * @return  daylight-saving-shift in seconds after transition
+     * <p>This offset defines a deviation from the standard offset. The only legitimate method
+     * to determine if a time zone is actually in daylight saving mode is the method
+     * {@link Timezone#isDaylightSaving Timezone.isDaylightSaving(moment)}. </p>
+     *
+     * @return  daylight-saving-shift in seconds after transition, can also be negative
      * @see     #getTotalOffset()
      * @see     #getStandardOffset()
-     * @see     #isDaylightSaving()
      */
     /*[deutsch]
      * <p>Liefert die DST-Verschiebung nach dem &Uuml;bergang, also
      * normalerweise den durch die Sommerzeit induzierten Versatz. </p>
      *
-     * @return  daylight-saving-shift in seconds after transition
+     * <p>Hiermit wird eine Abweichung vom Standard-Offset definiert. Ob aber &uuml;berhaupt ein
+     * &Uuml;bergang als <i>daylightSaving</i> interpretiert werden darf, kann nur mittels
+     * {@link Timezone#isDaylightSaving Timezone.isDaylightSaving(moment)} entschieden werden. </p>
+     *
+     * @return  daylight-saving-shift in seconds after transition, can also be negative
      * @see     #getTotalOffset()
      * @see     #getStandardOffset()
-     * @see     #isDaylightSaving()
      */
     public int getDaylightSavingOffset() {
 
-        return ((this.dst == Integer.MAX_VALUE) ? 0 : this.dst);
-
-    }
-
-    /**
-     * <p>Queries if there is any positive daylight savings after this transition. </p>
-     *
-     * @return  boolean
-     * @see     #getDaylightSavingOffset()
-     */
-    /*[deutsch]
-     * <p>Liegt nach diesem &Uuml;bergang Sommerzeit vor? </p>
-     *
-     * @return  boolean
-     * @see     #getDaylightSavingOffset()
-     */
-    public boolean isDaylightSaving() {
-
-        return (this.dst > 0);
+        return ((this.dst == Integer.MAX_VALUE) ? 0 : this.dst); // for backwards compatibility
 
     }
 
@@ -407,7 +391,7 @@ public final class ZonalTransition
             if (delta == 0) {
                 delta = (this.total - other.total);
                 if (delta == 0) {
-                    delta = (this.dst - other.dst);
+                    delta = (this.getDaylightSavingOffset() - other.getDaylightSavingOffset());
                     if (delta == 0) {
                         return 0;
                     }
@@ -434,14 +418,11 @@ public final class ZonalTransition
         } else if (obj instanceof ZonalTransition) {
             ZonalTransition that = (ZonalTransition) obj;
 
-            if (
+            return (
                 (this.posix == that.posix)
                 && (this.previous == that.previous)
                 && (this.total == that.total)
-                && (this.dst == that.dst)
-            ) {
-                return true;
-            }
+                && (this.getDaylightSavingOffset() == that.getDaylightSavingOffset()));
         }
 
         return false;
@@ -482,7 +463,7 @@ public final class ZonalTransition
         sb.append(", total-offset=");
         sb.append(this.total);
         sb.append(", dst-offset=");
-        sb.append(this.dst);
+        sb.append(this.getDaylightSavingOffset());
         sb.append(']');
         return sb.toString();
 

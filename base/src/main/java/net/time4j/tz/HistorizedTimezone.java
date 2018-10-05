@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistorizedTimezone.java) is part of project Time4J.
  *
@@ -29,6 +29,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.util.List;
+import java.util.Optional;
 
 
 /**
@@ -186,8 +187,31 @@ final class HistorizedTimezone
     @Override
     public boolean isDaylightSaving(UnixTime ut) {
 
-        ZonalTransition t = this.history.getStartTransition(ut);
-        return ((t != null) && t.isDaylightSaving());
+        ZonalTransition start = this.history.getStartTransition(ut);
+
+        if (start == null) {
+            return false;
+        }
+
+        int dst = start.getDaylightSavingOffset();
+
+        if (dst > 0) {
+            return true;
+        } else if (dst < 0) {
+            return false;
+        } else { // dst = 0
+            UnixTime previousTime = SimpleUT.previousTime(start.getPosixTime(), 0);
+            Optional<ZonalTransition> previousTransition = this.history.findStartTransition(previousTime);
+            if (previousTransition.isPresent()) {
+                if (previousTransition.get().getStandardOffset() == start.getStandardOffset()) {
+                    return (previousTransition.get().getDaylightSavingOffset() < 0);
+                } else {
+                    return this.isDaylightSaving(previousTime);
+                }
+            } else {
+                return false;
+            }
+        }
 
     }
 

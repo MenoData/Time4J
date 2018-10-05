@@ -59,7 +59,7 @@ public class ZoneConversionTest {
         ZonalTransition first =
             new ZonalTransition(7L, 1800, 7200, 3600);
         ZonalTransition second =
-            new ZonalTransition(365 * 86400L, 7200, 3600, 3600);
+            new ZonalTransition(365 * 86400L, 7200, 7200, 0);
         TransitionHistory customHistory =
             TransitionModel.of(Arrays.asList(first, second));
         Timezone time4j = Timezone.of("customized-tz", customHistory);
@@ -81,10 +81,10 @@ public class ZoneConversionTest {
             is(7_200_000));
         assertThat(
             wrapped.getOffset(365 * 86_400_000L),
-            is(3_600_000));
+            is(7_200_000));
         assertThat(
             wrapped.getRawOffset(),
-            is(0)); // total=dst in second transition
+            is(7_200_000));
         assertThat(
             wrapped.getDSTSavings(),
             is(3_600_000));

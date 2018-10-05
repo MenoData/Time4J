@@ -111,8 +111,6 @@ final class FixedDayPattern
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");
         sb.append(this.getIndicator());
-        sb.append(",dst-active=");
-        sb.append(this.isSaving());
         sb.append(",dst-offset=");
         sb.append(this.getSavings());
         sb.append(']');

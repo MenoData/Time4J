@@ -407,7 +407,7 @@ final class SPX
 
     }
 
-    private static int readSavings(int offsetInfo) throws IOException {
+    private static int readSavings(int offsetInfo) {
 
         switch (offsetInfo / 3) {
             case 0:
@@ -438,7 +438,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings0());
+            writeOffset(out, pattern.getSavings());
         }
 
         if (timeIndex == NO_COMPRESSION) {
@@ -448,7 +448,7 @@ final class SPX
     }
 
     private static DaylightSavingRule readFixedDayPattern(DataInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int first = (in.readByte() & 0xFF);
         int month = (first >>> 4);
@@ -503,7 +503,7 @@ final class SPX
         out.writeByte(third & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings0());
+            writeOffset(out, pattern.getSavings());
         }
 
         if (!timeWritten) {
@@ -513,7 +513,7 @@ final class SPX
     }
 
     private static DaylightSavingRule readDayOfWeekInMonthPattern(DataInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int first = (in.readByte() & 0xFF);
         Month month = Month.valueOf(first >>> 4);
@@ -572,7 +572,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings0());
+            writeOffset(out, pattern.getSavings());
         }
 
         if (!timeWritten) {
@@ -582,7 +582,7 @@ final class SPX
     }
 
     private static DaylightSavingRule readLastDayOfWeekPattern(DataInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int first = (in.readByte() & 0xFF);
         Month month = Month.valueOf(first >>> 4);
@@ -641,9 +641,6 @@ final class SPX
         writeOffset(out, initial.getPreviousOffset());
         writeOffset(out, initial.getTotalOffset());
         int dst = initial.getDaylightSavingOffset();
-        if (initial.isDaylightSaving() && (dst == 0)) {
-            dst = Integer.MAX_VALUE;
-        }
         writeOffset(out, dst);
         writeRules(model.getRules(), out);
 
@@ -689,7 +686,7 @@ final class SPX
     }
 
     private static Object readArrayTransitionModel(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         return new ArrayTransitionModel(
             readTransitions(in),
@@ -738,11 +735,6 @@ final class SPX
         }
 
         int dstOffset = transition.getDaylightSavingOffset();
-
-        if (transition.isDaylightSaving() && (dstOffset == 0)) {
-            dstOffset = Integer.MAX_VALUE;
-        }
-
         int dstIndex;
 
         switch (dstOffset) {
@@ -851,7 +843,7 @@ final class SPX
 
         int first = (rule.getMonthValue() << 4);
         int indicator = rule.getIndicator().ordinal();
-        int dst = rule.getSavings0();
+        int dst = rule.getSavings();
         boolean offsetWritten = true;
 
         switch (dst) {

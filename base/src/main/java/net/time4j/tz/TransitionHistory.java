@@ -384,18 +384,7 @@ public interface TransitionHistory {
      * @since   4.18
      */
     default Optional<ZonalTransition> findPreviousTransition(final UnixTime ut) {
-        return this.findStartTransition(
-            new UnixTime() {
-                @Override
-                public long getPosixTime() {
-                    return ((ut.getNanosecond() == 0) ? (ut.getPosixTime() - 1) : ut.getPosixTime());
-                }
-                @Override
-                public int getNanosecond() {
-                    return ((ut.getNanosecond() == 0) ? 999_999_999 : (ut.getNanosecond() - 1));
-                }
-            }
-        );
+        return this.findStartTransition(SimpleUT.previousTime(ut));
     }
 
 }

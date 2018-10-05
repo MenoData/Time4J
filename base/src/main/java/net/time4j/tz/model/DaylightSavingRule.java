@@ -111,7 +111,7 @@ public abstract class DaylightSavingRule {
 
         this.timeOfDay = timeOfDay.with(PlainTime.PRECISION, ClockUnit.SECONDS);
         this.indicator = indicator;
-        this.savings = savings;
+        this.savings = (savings == Integer.MAX_VALUE) ? 0 : savings; // for backwards compatibility
 
     }
 
@@ -189,8 +189,9 @@ public abstract class DaylightSavingRule {
     }
 
     /**
-     * <p>Yields the daylight saving amount after the time switch
-     * in seconds. </p>
+     * <p>Yields the daylight saving amount after the time switch in seconds. </p>
+     *
+     * <p><strong>Important: </strong> This offset is not always positive but can also be zero or even negative. </p>
      *
      * @return  DST-Offset in seconds (without standard offset)
      * @since   2.2
@@ -198,30 +199,15 @@ public abstract class DaylightSavingRule {
     /*[deutsch]
      * <p>Liefert den DST-Offset nach der Umstellung in Sekunden. </p>
      *
+     * <p><strong>Wichtig: </strong> Dieser Versatz ist nicht immer positiv, sondern kann auch null oder sogar
+     * negativ sein. </p>
+     *
      * @return  reiner DST-Offset in Sekunden (ohne Standard-Offset)
      * @since   2.2
      */
     public int getSavings() {
 
-        return ((this.savings == Integer.MAX_VALUE) ? 0 : this.savings);
-
-    }
-
-    /**
-     * Does this rule indicate a switch to daylight-saving-mode?
-     *
-     * @return  boolean
-     * @since   3.39/4.34
-     */
-    /*[deutsch]
-     * Zeigt diese Regel eine Umschaltung zu einem Sommerzeitmodus an?
-     *
-     * @return  boolean
-     * @since   3.39/4.34
-     */
-    public boolean isSaving() {
-
-        return (this.savings > 0);
+        return this.savings;
 
     }
 
@@ -285,13 +271,6 @@ public abstract class DaylightSavingRule {
         }
 
         return ct.value();
-
-    }
-
-    // for internal use only
-    int getSavings0() {
-
-        return this.savings;
 
     }
 

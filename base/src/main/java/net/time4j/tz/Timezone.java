@@ -874,6 +874,7 @@ public abstract class Timezone
      *
      * @param   ut      unix time
      * @return  DST-shift in seconds which yields local wall time if added to standard local time
+     * @see     #isDaylightSaving(UnixTime)
      * @since   3.2/4.1
      */
     /*[deutsch]
@@ -893,6 +894,7 @@ public abstract class Timezone
      *
      * @param   ut      unix time
      * @return  DST-shift in seconds which yields local wall time if added to standard local time
+     * @see     #isDaylightSaving(UnixTime)
      * @since   3.2/4.1
      */
     public abstract ZonalOffset getDaylightSavingOffset(UnixTime ut);
