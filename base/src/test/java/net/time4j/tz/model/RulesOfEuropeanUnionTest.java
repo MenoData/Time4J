@@ -75,6 +75,11 @@ public class RulesOfEuropeanUnionTest {
     }
 
     @Test
+    public void hasNegativeDST() {
+        assertThat(MODEL.hasNegativeDST(), is(false));
+    }
+
+    @Test
     public void getStdTransitions() {
         ZonalTransition spring1970 = // here proleptic (historically after 1981)
             new ZonalTransition(

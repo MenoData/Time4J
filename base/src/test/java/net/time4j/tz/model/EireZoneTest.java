@@ -11,6 +11,11 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -23,14 +28,16 @@ import static org.junit.Assert.assertThat;
 public class EireZoneTest {
 
     @Test
-    public void handlingNegativeDST() {
+    public void handlingNegativeDST() throws IOException, ClassNotFoundException {
 
         CompositeTransitionModel model = createCompositeModel();
         String tzid = "eire-model";
-        Timezone tz = Timezone.of(tzid, model);
+        Timezone tz = serialized(Timezone.of(tzid, model));
 
         assertThat(
             tz.getID().canonical(), is(tzid));
+        assertThat(
+            model.hasNegativeDST(), is(true));
         assertThat(
             tz.getStandardOffset(PlainTimestamp.of(1968, 1, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
         assertThat(
@@ -78,7 +85,7 @@ public class EireZoneTest {
                 Weekday.SUNDAY,
                 PlainTime.of(2),
                 OffsetIndicator.UTC_TIME,
-                Integer.MAX_VALUE);
+                0);
         DaylightSavingRule autumn =
             GregorianTimezoneRule.ofFixedDay(
                 Month.OCTOBER,
@@ -102,6 +109,21 @@ public class EireZoneTest {
             rules,
             true,
             true);
+    }
+
+    private static Timezone serialized(Object obj)
+        throws IOException, ClassNotFoundException {
+
+        ByteArrayOutputStream baos = new ByteArrayOutputStream();
+        ObjectOutputStream oos = new ObjectOutputStream(baos);
+        oos.writeObject(obj);
+        byte[] data = baos.toByteArray();
+        oos.close();
+        ByteArrayInputStream bais = new ByteArrayInputStream(data);
+        ObjectInputStream ois = new ObjectInputStream(bais);
+        Object ser = ois.readObject();
+        ois.close();
+        return (Timezone) ser;
     }
 
 }

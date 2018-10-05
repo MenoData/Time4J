@@ -1,18 +1,23 @@
 package net.time4j.tz.model;
 
-import net.time4j.*;
-import net.time4j.engine.ChronoUnit;
+import net.time4j.CalendarUnit;
+import net.time4j.Month;
+import net.time4j.PlainDate;
+import net.time4j.PlainTime;
+import net.time4j.PlainTimestamp;
+import net.time4j.SystemClock;
+import net.time4j.Weekday;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -23,7 +28,7 @@ public class CustomZoneTest {
 
     @Test
     public void customizedRuleBasedTransitionModel()
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         RuleBasedTransitionModel model = createModelOfEuropeanUnion();
         String tzid = "custom~rule-model";
@@ -34,7 +39,7 @@ public class CustomZoneTest {
 
     @Test
     public void customizedArrayTransitionModel()
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         ArrayTransitionModel model = createArrayModel();
         String tzid = "custom~array-model";
@@ -45,18 +50,19 @@ public class CustomZoneTest {
 
     @Test
     public void customizedCompositeTransitionModel()
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         CompositeTransitionModel model = createCompositeModel();
         String tzid = "custom~composite-model";
         Timezone tz = Timezone.of(tzid, model);
         assertThat(tz.getID().canonical(), is(tzid));
+        assertThat(model.hasNegativeDST(), is(false));
+        assertThat(tz.isDaylightSaving(PlainTimestamp.of(1971, 1, 1, 0, 0).atUTC()), is(false));
         tz.dump(System.out);
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void customizedOffsetModel_GMT()
-        throws IOException, ClassNotFoundException {
+    public void customizedOffsetModel_GMT() {
 
         // combination of fixed offset and variable zone
         RuleBasedTransitionModel model = createModelOfEuropeanUnion();
@@ -65,8 +71,7 @@ public class CustomZoneTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void customizedOffsetModel_GMT_02()
-        throws IOException, ClassNotFoundException {
+    public void customizedOffsetModel_GMT_02() {
 
         // combination of fixed offset and variable zone
         RuleBasedTransitionModel model = createModelOfEuropeanUnion();
@@ -75,8 +80,7 @@ public class CustomZoneTest {
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void customizedOffsetModel_UTC_05_30()
-        throws IOException, ClassNotFoundException {
+    public void customizedOffsetModel_UTC_05_30() {
 
         // combination of fixed offset and variable zone
         RuleBasedTransitionModel model = createModelOfEuropeanUnion();
@@ -101,7 +105,7 @@ public class CustomZoneTest {
                 OffsetIndicator.UTC_TIME,
                 0);
 
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
+        List<DaylightSavingRule> rules = new ArrayList<>();
         rules.add(autumn);
         rules.add(spring);
 
@@ -145,7 +149,7 @@ public class CustomZoneTest {
                 PlainTime.of(1),
                 OffsetIndicator.UTC_TIME,
                 0);
-        List<DaylightSavingRule> rules = new ArrayList<DaylightSavingRule>();
+        List<DaylightSavingRule> rules = new ArrayList<>();
         rules.add(autumn);
         rules.add(spring);
 
