@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NavigationOperator.java) is part of project Time4J.
  *
@@ -32,7 +32,7 @@ import net.time4j.engine.ChronoOperator;
  *
  * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class NavigationOperator<V extends Enum<V>>
     extends ElementOperator<PlainDate> {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FractionOperator.java) is part of project Time4J.
  *
@@ -32,7 +32,7 @@ import static net.time4j.PlainTime.NANO_OF_SECOND;
  *
  * @param       <T> generic target type of this operator
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class FractionOperator<T extends ChronoEntity<T>>
     implements ChronoOperator<T> {

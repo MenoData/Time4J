@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ProportionalFunction.java) is part of project Time4J.
  *
@@ -33,7 +33,7 @@ import java.math.RoundingMode;
  * <p>Ermittelt eine Verh&auml;ltniszahl. </p>
  *
  * @author      Meno Hochschild
- * @concurrency <immutable>
+ * @doctags.concurrency <immutable>
  */
 final class ProportionalFunction
     implements ChronoFunction<ChronoEntity<?>, BigDecimal> {
@@ -90,7 +90,7 @@ final class ProportionalFunction
             max--;
         }
 
-        BigDecimal count = new BigDecimal(value - min).setScale(15);
+        BigDecimal count = new BigDecimal(value - min).setScale(15, RoundingMode.UNNECESSARY);
         BigDecimal divisor = new BigDecimal(max - min + 1);
 
         return count.divide(divisor, RoundingMode.HALF_UP).stripTrailingZeros();
