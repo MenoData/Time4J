@@ -1144,10 +1144,68 @@ public final class Duration<U extends IsoUnit>
      * @return  {@code Comparator} for plain durations
      * @see     TimePoint#compareTo(TimePoint) TimePoint.compareTo(T)
      */
-    public static <U extends IsoUnit, T extends TimePoint<? super U, T>>
-    Comparator<Duration<U>> comparator(T base) {
+    public static <U extends IsoUnit, T extends TimePoint<U, T>> Comparator<Duration<? extends U>> comparator(T base) {
 
         return new LengthComparator<>(base);
+
+    }
+
+    /**
+     * <p>Obtains a comparator suitable for Durations based on clock units. </p>
+     *
+     * <p>A negative duration is always smaller than a positive one. Example: </p>
+     *
+     * <pre>
+     *     Duration&lt;ClockUnit&gt; d1 = Duration.parseClockPeriod(&quot;PT22M2.666S&quot;);
+     *     Duration&lt;ClockUnit&gt; d2 = Duration.parseClockPeriod(&quot;-PT21M&quot;);
+     *     Duration&lt;ClockUnit&gt; d3 = Duration.parseClockPeriod(&quot;PT21M62.667S&quot;);
+     *     Duration&lt;ClockUnit&gt; d4 = Duration.parseClockPeriod(&quot;PT22M2.667S&quot;);
+     *     Stream&lt;Duration&lt;ClockUnit&gt;&gt; s = Stream.of(d1, d2, d3, d4);
+     *     assertThat(s.max(Duration.comparatorOnClock()).get(), is(d3));
+     * </pre>
+     *
+     * @return  Comparator for clock-based durations
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Comparator} geeignet f&uuml;r uhrzeitbasierte Dauerobjekte. </p>
+     *
+     * <p>Eine negative Dauer ist immer kleiner als eine positive. Beispiel: </p>
+     *
+     * <pre>
+     *     Duration&lt;ClockUnit&gt; d1 = Duration.parseClockPeriod(&quot;PT22M2.666S&quot;);
+     *     Duration&lt;ClockUnit&gt; d2 = Duration.parseClockPeriod(&quot;-PT21M&quot;);
+     *     Duration&lt;ClockUnit&gt; d3 = Duration.parseClockPeriod(&quot;PT21M62.667S&quot;);
+     *     Duration&lt;ClockUnit&gt; d4 = Duration.parseClockPeriod(&quot;PT22M2.667S&quot;);
+     *     Stream&lt;Duration&lt;ClockUnit&gt;&gt; s = Stream.of(d1, d2, d3, d4);
+     *     assertThat(s.max(Duration.comparatorOnClock()).get(), is(d3));
+     * </pre>
+     *
+     * @return  Comparator for clock-based durations
+     * @since   5.0
+     */
+    public static Comparator<Duration<ClockUnit>> comparatorOnClock() {
+
+        return (d1, d2) -> {
+            long s1 = lengthInSeconds(d1);
+            long s2 = lengthInSeconds(d2);
+
+            if (s1 < s2) {
+                return -1;
+            } else if (s1 > s2) {
+                return 1;
+            } else {
+                long n1 = d1.getPartialAmount(NANOS) % MRD;
+                long n2 = d2.getPartialAmount(NANOS) % MRD;
+                if (d1.isNegative()) {
+                    n1 = Math.negateExact(n1);
+                }
+                if (d2.isNegative()) {
+                    n2 = Math.negateExact(n2);
+                }
+                return ((n1 < n2) ? -1 : ((n1 > n2) ? 1: 0));
+            }
+        };
 
     }
 
@@ -3257,6 +3315,21 @@ public final class Duration<U extends IsoUnit>
 
     }
 
+    private static long lengthInSeconds(Duration<ClockUnit> duration) {
+
+        long total = Math.multiplyExact(duration.getPartialAmount(HOURS), 3600);
+        total = Math.addExact(total, Math.multiplyExact(duration.getPartialAmount(MINUTES), 60));
+        total = Math.addExact(total, duration.getPartialAmount(SECONDS));
+        total = Math.addExact(total, duration.getPartialAmount(NANOS) / MRD);
+
+        if (duration.isNegative()) {
+            total = Math.negateExact(total);
+        }
+
+        return total;
+
+    }
+
     private static <U extends IsoUnit> Duration<U> convert(
         TimeSpan<U> timespan
     ) {
@@ -4817,8 +4890,8 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static class LengthComparator<U extends IsoUnit, T extends TimePoint<? super U, T>>
-        implements Comparator<Duration<U>> {
+    private static class LengthComparator<U extends IsoUnit, T extends TimePoint<U, T>>
+        implements Comparator<Duration<? extends U>> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -4841,8 +4914,8 @@ public final class Duration<U extends IsoUnit>
 
         @Override
         public int compare(
-            Duration<U> d1,
-            Duration<U> d2
+            Duration<? extends U> d1,
+            Duration<? extends U> d2
         ) {
 
             boolean sign1 = d1.isNegative();

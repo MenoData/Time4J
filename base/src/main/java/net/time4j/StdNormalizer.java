@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdNormalizer.java) is part of project Time4J.
  *
@@ -45,8 +45,8 @@ class StdNormalizer<U extends IsoUnit>
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int MIO = 1000000;
-    private static final int MRD = 1000000000;
+    private static final int MIO = 1_000_000;
+    private static final int MRD = 1_000_000_000;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -269,10 +269,7 @@ class StdNormalizer<U extends IsoUnit>
 
         int result = Double.compare(u2.getLength(), u1.getLength());
 
-        if (
-            (result == 0)
-                && !u1.equals(u2)
-            ) {
+        if ((result == 0) && !u1.equals(u2)) {
             throw new IllegalArgumentException(
                 "Mixing different units of same length not allowed.");
         }

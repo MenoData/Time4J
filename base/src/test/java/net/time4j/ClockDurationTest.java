@@ -1,6 +1,8 @@
 package net.time4j;
 
 import java.text.ParseException;
+import java.util.stream.Stream;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -114,6 +116,74 @@ public class ClockDurationTest {
     public void convertToMillis() throws ParseException {
         Duration<ClockUnit> duration = Duration.parseClockPeriod("PT21M12.667S");
         assertThat(ClockUnit.MILLIS.convert(duration), is(1272667L));
+    }
+
+    @Test
+    public void comparatorBase() throws ParseException {
+        Duration<ClockUnit> d1 = Duration.parseClockPeriod("PT21M12.667S");
+        Duration<ClockUnit> d2 = Duration.parseClockPeriod("PT21M12.100S");
+        assertThat(Duration.comparator(PlainTime.MIN).compare(d1, d2) > 0, is(true));
+        assertThat(Duration.comparator(PlainTime.MIN).compare(d2, d1) < 0, is(true));
+    }
+
+    @Test
+    public void comparatorOnClock() throws ParseException {
+        Duration<ClockUnit> d1 = Duration.parseClockPeriod("PT21M12.667S");
+        Duration<ClockUnit> d2 = Duration.parseClockPeriod("PT21M12.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) > 0, is(true));
+
+        d1 = Duration.parseClockPeriod("PT21M61.667S");
+        d2 = Duration.parseClockPeriod("PT22M1.666S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) > 0, is(true));
+
+        d1 = Duration.parseClockPeriod("PT21M61.667S");
+        d2 = Duration.parseClockPeriod("PT22M2.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) < 0, is(true));
+
+        d1 = Duration.parseClockPeriod("-PT21M61.667S");
+        d2 = Duration.parseClockPeriod("PT22M0.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) < 0, is(true));
+
+        d1 = Duration.parseClockPeriod("PT21M61.667S");
+        d2 = Duration.parseClockPeriod("-PT22M2.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) > 0, is(true));
+
+        d1 = Duration.parseClockPeriod("-PT23H");
+        d2 = Duration.parseClockPeriod("-PT22H");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) < 0, is(true));
+
+        d1 = Duration.parseClockPeriod("-PT23H");
+        d2 = Duration.parseClockPeriod("-PT22H60M");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) == 0, is(true));
+
+        d1 = Duration.parseClockPeriod("PT0.667S");
+        d2 = Duration.parseClockPeriod("PT0.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) > 0, is(true));
+
+        d1 = Duration.parseClockPeriod("-PT0.667S");
+        d2 = Duration.parseClockPeriod("PT0.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) < 0, is(true));
+
+        d1 = Duration.parseClockPeriod("PT0.667S");
+        d2 = Duration.parseClockPeriod("-PT0.700S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) > 0, is(true));
+
+        d1 = Duration.parseClockPeriod("-PT0.667S");
+        d2 = Duration.parseClockPeriod("-PT0.100S");
+        assertThat(Duration.comparatorOnClock().compare(d1, d2) < 0, is(true));
+    }
+
+    @Test
+    public void streamMax() throws ParseException {
+        Duration<ClockUnit> d1 = Duration.parseClockPeriod("PT22M2.666S");
+        Duration<ClockUnit> d2 = Duration.parseClockPeriod("-PT1000M");
+        Duration<ClockUnit> d3 = Duration.parseClockPeriod("PT21M62.667S");
+        Duration<ClockUnit> d4 = Duration.parseClockPeriod("PT22M2.667S");
+        Stream<Duration<ClockUnit>> s = Stream.of(d1, d2, d3, d4);
+        assertThat(s.max(Duration.comparatorOnClock()).get(), is(d3));
+
+        Stream<Duration<ClockUnit>> e = Stream.empty();
+        assertThat(e.max(Duration.comparatorOnClock()).isPresent(), is(false));
     }
 
 }
