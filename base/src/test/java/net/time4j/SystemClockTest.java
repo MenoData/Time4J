@@ -115,11 +115,11 @@ public class SystemClockTest {
 
     @Test
     public void nowMoment() {
-        Moment now = SystemClock.inLocalView().currentMoment();
+        Moment now = SystemClock.inLocalView().now().inStdTimezone();
         Moment expected = Moment.nowInSystemTime();
         assertThat(
-            now.minus(1, TimeUnit.NANOSECONDS).isBefore(expected)
-                && now.plus(2, TimeUnit.MILLISECONDS).isAfter(expected),
+            now.minus(1, TimeUnit.SECONDS).isBefore(expected)
+                && now.plus(2, TimeUnit.SECONDS).isAfter(expected),
             is(true));
     }
 
