@@ -1669,9 +1669,9 @@ public final class ChronoFormatter<T>
      *
      * <pre>
      *  ChronoFormatter&lt;PlainDate&gt; fmt =
-     *      PlainDate.localFormatter(&quot;MM-dd&quot;, PatternType.CLDR)
+     *      ChronoFormatter.ofDatePattern(&quot;MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
      *          .withDefault(PlainDate.YEAR, 2012);
-     *  PlainDate date = fmt.parse("05-21");
+     *  PlainDate date = fmt.parse(&quot;05-21&quot;);
      *  System.out.println(date); // 2012-05-21
      * </pre>
      *
@@ -1699,9 +1699,9 @@ public final class ChronoFormatter<T>
      *
      * <pre>
      *  ChronoFormatter&lt;PlainDate&gt; fmt =
-     *      PlainDate.localFormatter(&quot;MM-dd&quot;, PatternType.CLDR)
+     *      ChronoFormatter.ofDatePattern(&quot;MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
      *          .withDefault(PlainDate.YEAR, 2012);
-     *  PlainDate date = fmt.parse("05-21");
+     *  PlainDate date = fmt.parse(&quot;05-21&quot;);
      *  System.out.println(date); // 2012-05-21
      * </pre>
      *

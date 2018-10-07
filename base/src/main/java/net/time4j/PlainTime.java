@@ -203,11 +203,11 @@ public final class PlainTime
      *
      * <pre>
      *  PlainTimestamp tsp =
-     *      PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
+     *      ChronoFormatter.ofTimestampPattern(&quot;uuuu-MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
      *          .withDefault(
      *              PlainTime.COMPONENT,
      *              PlainTime.midnightAtStartOfDay())
-     *          .parse("2014-08-20");
+     *          .parse(&quot;2014-08-20&quot;);
      *  System.out.println(tsp); // output: 2014-08-20T00
      * </pre>
      *
@@ -224,12 +224,12 @@ public final class PlainTime
      *
      * <pre>
      *  PlainTimestamp tsp =
-     *      PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
+     *      ChronoFormatter.ofTimestampPattern(&quot;uuuu-MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
      *          .withDefault(
      *              PlainTime.COMPONENT,
      *              PlainTime.midnightAtStartOfDay())
-     *          .parse("2014-08-20");
-     *  System.out.println(tsp); // output: 2014-08-20T00
+     *          .parse(&quot;2014-08-20&quot;);
+     *  System.out.println(tsp); // Ausgabe: 2014-08-20T00
      * </pre>
      *
      * <p>Hinweis: Dieses Element definiert keine Basiseinheit. </p>

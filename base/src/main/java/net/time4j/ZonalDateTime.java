@@ -200,11 +200,11 @@ public final class ZonalDateTime
      *  List&lt;String&gt; dates =
      *      Arrays.asList(&quot;Tue, 29 Feb 2016 17:45:00 CET&quot;, &quot;Tue, 29 Feb 2016 16:00:00 EST&quot;);
      *  TemporalFormatter&lt;Moment&gt; formatter =
-     *      Moment.formatter(
+     *      ChronoFormatter.ofMomentPattern(
      *          &quot;EEE, dd MMM yyyy HH:mm:ss z&quot;, PatternType.CLDR, Locale.ENGLISH, ZonalOffset.UTC);
      *  ZonalDateTime maxDate =
      *      dates.stream()
-     *      .map(s -&gt; ZonalDateTime.parse(s, formatter, new ParsePosition(0)))
+     *      .map(s -&gt; ZonalDateTime.parse(s, formatter))
      *      .max(ZonalDateTime::compareByMoment)
      *      .get();
      *  System.out.println(maxDate); // 2016-02-29T16UTC-05:00[America/New_York]
@@ -225,11 +225,11 @@ public final class ZonalDateTime
      *  List&lt;String&gt; dates =
      *      Arrays.asList(&quot;Tue, 29 Feb 2016 17:45:00 CET&quot;, &quot;Tue, 29 Feb 2016 16:00:00 EST&quot;);
      *  TemporalFormatter&lt;Moment&gt; formatter =
-     *      Moment.formatter(
+     *      ChronoFormatter.ofMomentPattern(
      *          &quot;EEE, dd MMM yyyy HH:mm:ss z&quot;, PatternType.CLDR, Locale.ENGLISH, ZonalOffset.UTC);
      *  ZonalDateTime maxDate =
      *      dates.stream()
-     *      .map(s -&gt; ZonalDateTime.parse(s, formatter, new ParsePosition(0)))
+     *      .map(s -&gt; ZonalDateTime.parse(s, formatter))
      *      .max(ZonalDateTime::compareByMoment)
      *      .get();
      *  System.out.println(maxDate); // 2016-02-29T16UTC-05:00[America/New_York]
