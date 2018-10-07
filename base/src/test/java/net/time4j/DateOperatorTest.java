@@ -530,4 +530,25 @@ public class DateOperatorTest {
             is(PlainDate.of(2015, 6, 29)));
     }
 
+    @Test
+    public void setToApril() {
+        assertThat(
+            PlainDate.of(2018, 10, 31).with(Month.APRIL),
+            is(PlainDate.of(2018, 4, 30)));
+    }
+
+    @Test
+    public void setToTuesday() {
+        assertThat(
+            PlainDate.of(2018, 10, 7).with(Weekday.TUESDAY),
+            is(PlainDate.of(2018, 10, 2)));
+    }
+
+    @Test
+    public void setToSecondQuarter() {
+        assertThat(
+            PlainDate.of(2018, 10, 31).with(Quarter.Q2),
+            is(PlainDate.of(2018, 4, 30)));
+    }
+
 }

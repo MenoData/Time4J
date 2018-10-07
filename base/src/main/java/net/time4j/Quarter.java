@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Quarter.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
@@ -43,7 +44,7 @@ import java.util.Locale;
  * @author  Meno Hochschild
  */
 public enum Quarter
-    implements ChronoCondition<GregorianDate> {
+    implements ChronoCondition<GregorianDate>, ChronoOperator<PlainDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -297,6 +298,13 @@ public enum Quarter
 
         int month = context.getMonth();
         return (this.getValue() == ((month - 1) / 3) + 1);
+
+    }
+
+    @Override
+    public PlainDate apply(PlainDate date) {
+
+        return date.with(PlainDate.QUARTER_OF_YEAR, this);
 
     }
 

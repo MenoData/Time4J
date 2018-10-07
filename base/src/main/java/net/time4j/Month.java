@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Month.java) is part of project Time4J.
  *
@@ -24,6 +24,8 @@ package net.time4j;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoOperator;
+import net.time4j.engine.ThreetenAdapter;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
@@ -32,10 +34,7 @@ import java.text.ParseException;
 import java.text.ParsePosition;
 import java.util.Locale;
 
-import static net.time4j.Quarter.Q1;
-import static net.time4j.Quarter.Q2;
-import static net.time4j.Quarter.Q3;
-import static net.time4j.Quarter.Q4;
+import static net.time4j.Quarter.*;
 
 
 /**
@@ -49,7 +48,7 @@ import static net.time4j.Quarter.Q4;
  * @author  Meno Hochschild
  */
 public enum Month
-    implements ChronoCondition<GregorianDate> {
+    implements ChronoCondition<GregorianDate>, ChronoOperator<PlainDate>, ThreetenAdapter {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -438,6 +437,7 @@ public enum Month
      * @see     #from(java.time.Month)
      * @since   4.28
      */
+    @Override
     public java.time.Month toTemporalAccessor() {
 
         return java.time.Month.of(this.getValue());
@@ -463,6 +463,13 @@ public enum Month
     public static Month from(java.time.Month threetenMonth) {
 
         return Month.valueOf(threetenMonth.getValue());
+
+    }
+
+    @Override
+    public PlainDate apply(PlainDate date) {
+
+        return date.with(PlainDate.MONTH_OF_YEAR, this);
 
     }
 
