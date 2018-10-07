@@ -1157,7 +1157,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *     Duration&lt;ClockUnit&gt; d1 = Duration.parseClockPeriod(&quot;PT22M2.666S&quot;);
-     *     Duration&lt;ClockUnit&gt; d2 = Duration.parseClockPeriod(&quot;-PT21M&quot;);
+     *     Duration&lt;ClockUnit&gt; d2 = Duration.parseClockPeriod(&quot;-PT25M&quot;);
      *     Duration&lt;ClockUnit&gt; d3 = Duration.parseClockPeriod(&quot;PT21M62.667S&quot;);
      *     Duration&lt;ClockUnit&gt; d4 = Duration.parseClockPeriod(&quot;PT22M2.667S&quot;);
      *     Stream&lt;Duration&lt;ClockUnit&gt;&gt; s = Stream.of(d1, d2, d3, d4);
@@ -1174,7 +1174,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *     Duration&lt;ClockUnit&gt; d1 = Duration.parseClockPeriod(&quot;PT22M2.666S&quot;);
-     *     Duration&lt;ClockUnit&gt; d2 = Duration.parseClockPeriod(&quot;-PT21M&quot;);
+     *     Duration&lt;ClockUnit&gt; d2 = Duration.parseClockPeriod(&quot;-PT25M&quot;);
      *     Duration&lt;ClockUnit&gt; d3 = Duration.parseClockPeriod(&quot;PT21M62.667S&quot;);
      *     Duration&lt;ClockUnit&gt; d4 = Duration.parseClockPeriod(&quot;PT22M2.667S&quot;);
      *     Stream&lt;Duration&lt;ClockUnit&gt;&gt; s = Stream.of(d1, d2, d3, d4);

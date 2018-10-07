@@ -1193,7 +1193,7 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Normalized given timespan using years, months, days and
+     * <p>Normalizes given timespan using years, months, days and
      * all clock units. </p>
      *
      * <p>This normalizer can also convert from days to months. Example: </p>

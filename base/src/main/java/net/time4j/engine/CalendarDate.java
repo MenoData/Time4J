@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarDate.java) is part of project Time4J.
  *
@@ -346,14 +346,14 @@ public interface CalendarDate
     }
 
     /**
-     * <p>Queries if this object is after given object on a timeline. </p>
+     * <p>Queries if this object is on or after given object on a timeline. </p>
      *
      * @param   date    object this instance is compared to
      * @return  {@code true} if this instance is temporally equal to or after {@code date} else {@code false}
      * @since   5.0
      */
     /*[deutsch]
-     * <p>Liegt dieses Objekt zeitlich nach dem angegebenen Argument? </p>
+     * <p>Liegt dieses Objekt zeitlich gleich oder nach dem angegebenen Argument? </p>
      *
      * @return  {@code true} if this instance is temporally equal to or after {@code date} else {@code false}
      * @since   5.0
@@ -363,14 +363,14 @@ public interface CalendarDate
     }
 
     /**
-     * <p>Queries if this object is before given object on a timeline. </p>
+     * <p>Queries if this object is on or before given object on a timeline. </p>
      *
      * @param   date    object this instance is compared to
      * @return  {@code true} if this instance is temporally equal to or before {@code date} else {@code false}
      * @since   5.0
      */
     /*[deutsch]
-     * <p>Liegt dieses Objekt zeitlich vor dem angegebenen Argument? </p>
+     * <p>Liegt dieses Objekt zeitlich gleich oder vor dem angegebenen Argument? </p>
      *
      * @param   date    object this instance is compared to
      * @return  {@code true} if this instance is temporally equal to or before {@code date} else {@code false}
