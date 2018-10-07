@@ -1,5 +1,6 @@
 ## [v5.0] not yet released
 ### Added
+- Make enums Month, Weekday and Quarter to operators for PlainDate [#819]
 - Enhance duration comparators [#816]
 - Partitioned streams in TimestampInterval [#814]
 - Easy summing up a stream of durations [#812]
