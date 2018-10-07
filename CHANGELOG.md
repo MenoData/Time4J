@@ -11,6 +11,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Remove confusing method `ZonalClock.currentMoment()` [#817]
 - Improved handling of negative DST-offsets [#742]
 - Simplify generic formatter API [#813]
 - Remove all deprecated stuff [#524]
