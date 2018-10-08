@@ -27,6 +27,7 @@
 - Renaming of abstract method in `DayPartitionRule` [#815]
 
 ### Fixed
+- CalendarWeek.of(GregorianMath.MAX_YEAR, 52) aborts [#820]
 - Mismatch between getMinimumSinceUTC and transform for some historic calendars [#808]
 - Fix for narrow era names which had been incomplete [#809]
 - Fix for changing `JapaneseCalendar.MONTH_AS_ORDINAL` [#807]
