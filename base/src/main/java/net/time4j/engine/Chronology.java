@@ -409,7 +409,7 @@ public class Chronology<T>
      * @param   chronoType  chronological type
      * @return  chronology or {@code null} if not found
      */
-    public static <T extends ChronoEntity<T>> Chronology<T> lookup(Class<T> chronoType) {
+    public static <T> Chronology<T> lookup(Class<T> chronoType) {
 
         try {
             // Initialisierung der Klasse anstoßen, wenn noch nicht erfolgt
