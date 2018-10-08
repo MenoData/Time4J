@@ -202,7 +202,7 @@ public abstract class IntervalCollection<T>
      */
     public static IntervalCollection<Date> onTraditionalTimeLine() {
 
-        return onTimeLine(SimpleInterval.onTraditionalTimeLine().getTimeLine());
+        return on(SimpleInterval.onTraditionalTimeLine().getTimeLine());
 
     }
 
@@ -220,7 +220,7 @@ public abstract class IntervalCollection<T>
      */
     public static IntervalCollection<Instant> onInstantTimeLine() {
 
-        return onTimeLine(SimpleInterval.onInstantTimeLine().getTimeLine());
+        return on(SimpleInterval.onInstantTimeLine().getTimeLine());
 
     }
 
@@ -230,7 +230,7 @@ public abstract class IntervalCollection<T>
      * @return  empty generic {@code IntervalCollection}
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
-     * @since   3.25/4.21
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Liefert eine leere Instanz f&uuml;r Intervalle auf dem angegebenen Zeitstrahl. </p>
@@ -238,10 +238,10 @@ public abstract class IntervalCollection<T>
      * @return  empty generic {@code IntervalCollection}
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
-     * @since   3.25/4.21
+     * @since   5.0
      */
     @SuppressWarnings("unchecked")
-    public static <T> IntervalCollection<T> onTimeLine(TimeLine<T> timeLine) {
+    public static <T> IntervalCollection<T> on(TimeLine<T> timeLine) {
 
         if (timeLine.equals(PlainDate.axis())) {
             return (IntervalCollection<T>) onDateAxis();

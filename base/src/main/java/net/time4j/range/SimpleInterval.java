@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SimpleInterval.java) is part of project Time4J.
  *
@@ -27,7 +27,7 @@ import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeLine;
-import net.time4j.engine.TimePoint;
+import net.time4j.engine.VariantSource;
 import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
@@ -124,10 +124,10 @@ public final class SimpleInterval<T>
             throw new IllegalArgumentException("Start after end: " + start + "/" + end);
         }
 
-        this.start = ((start == null) ? Boundary.<T>infinitePast() : Boundary.ofClosed(start));
+        this.start = ((start == null) ? Boundary.infinitePast() : Boundary.ofClosed(start));
         this.end = (
             (end == null)
-                ? Boundary.<T>infiniteFuture()
+                ? Boundary.infiniteFuture()
                 : (timeLine.isCalendrical() ? Boundary.ofClosed(end) : Boundary.ofOpen(end)));
         this.timeLine = timeLine;
 
@@ -309,34 +309,6 @@ public final class SimpleInterval<T>
     /**
      * <p>Defines a timeline on which new generic intervals can be created. </p>
      *
-     * <p>Note that the given timeline must be serializable to make the produced simple intervals
-     * serializable, too. </p>
-     *
-     * @param   <T> generic type of timepoints on the underlying timeline
-     * @param   timeLine    the timeline definition
-     * @return  new interval factory
-     * @see     #on(TimeAxis)
-     */
-    /*[deutsch]
-     * <p>Definiert einen Zeitstrahl, auf dem neue generische Intervalle erzeugt werden k&ouml;nnen. </p>
-     *
-     * <p>Hinweis: Der angegebene Zeitstrahl mu&szlig; serialisierbar sein, damit alle darauf erzeugten
-     * Intervalle serialisierbar sind. </p>
-     *
-     * @param   <T> generic type of timepoints on the underlying timeline
-     * @param   timeLine    the timeline definition
-     * @return  new interval factory
-     * @see     #on(TimeAxis)
-     */
-    public static <T> Factory<T> onTimeLine(TimeLine<T> timeLine) {
-
-        return new Factory<>(timeLine);
-
-    }
-
-    /**
-     * <p>Defines a timeline on which new generic intervals can be created. </p>
-     *
      * <p>Note that calendar intervals are usually closed. Example: </p>
      *
      * <pre>
@@ -357,12 +329,10 @@ public final class SimpleInterval<T>
      *         // [AP-1393-01-05/AP-1393-01-06]
      * </pre>
      *
-     * @param   <U> generic type of time units
-     * @param   <T> generic type of time context compatible to {@link TimePoint}
-     * @param   axis    the underlying time axis
+     * @param   <T> generic type of timepoints on the underlying timeline
+     * @param   timeLine    the timeline definition
      * @return  new interval factory
-     * @see     #on(CalendarFamily, String)
-     * @since   3.36/4.31
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Definiert einen Zeitstrahl, auf dem neue generische Intervalle erzeugt werden k&ouml;nnen. </p>
@@ -387,16 +357,19 @@ public final class SimpleInterval<T>
      *         // [AP-1393-01-05/AP-1393-01-06]
      * </pre>
      *
-     * @param   <U> generic type of time units
-     * @param   <T> generic type of time context compatible to {@link TimePoint}
-     * @param   axis    the underlying time axis
+     * @param   <T> generic type of timepoints on the underlying timeline
+     * @param   timeLine    the timeline definition
      * @return  new interval factory
-     * @see     #on(CalendarFamily, String)
-     * @since   3.36/4.31
+     * @since   5.0
      */
-    public static <U, T extends TimePoint<U, T>> Factory<T> on(TimeAxis<U, T> axis) {
+    public static <T> Factory<T> on(TimeLine<T> timeLine) {
 
-        return new Factory<>(SerializableTimeLine.wrap(axis));
+        if (timeLine instanceof TimeAxis) {
+            Class<?> chronoType = TimeAxis.class.cast(timeLine).getChronoType();
+            return new Factory<>(new SerializableTimeLine<>(timeLine, chronoType));
+        }
+
+        return new Factory<>(timeLine);
 
     }
 
@@ -409,7 +382,8 @@ public final class SimpleInterval<T>
      * @param   family  calendar family
      * @param   variant calendar variant
      * @return  new interval factory
-     * @see     #on(TimeAxis)
+     * @see     #on(TimeLine)
+     * @see     #on(CalendarFamily, VariantSource)
      * @since   3.36/4.31
      */
     /*[deutsch]
@@ -421,12 +395,48 @@ public final class SimpleInterval<T>
      * @param   family  calendar family
      * @param   variant calendar variant
      * @return  new interval factory
-     * @see     #on(TimeAxis)
+     * @see     #on(TimeLine)
+     * @see     #on(CalendarFamily, VariantSource)
      * @since   3.36/4.31
      */
     public static <D extends CalendarVariant<D>> Factory<D> on(
         CalendarFamily<D> family,
         String variant
+    ) {
+
+        return new Factory<>(family.getTimeLine(variant));
+
+    }
+
+    /**
+     * <p>Defines a timeline on which new generic calendar intervals can be created. </p>
+     *
+     * <p>Note that calendar intervals are usually closed. </p>
+     *
+     * @param   <D> generic type of timepoints on the underlying timeline
+     * @param   family  calendar family
+     * @param   variant calendar variant
+     * @return  new interval factory
+     * @see     #on(TimeLine)
+     * @see     #on(CalendarFamily, String)
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Definiert einen Zeitstrahl, auf dem neue generische Kalenderintervalle erzeugt werden k&ouml;nnen. </p>
+     *
+     * <p>Hinweis: Kalenderintervalle sind normal geschlossen. </p>
+     *
+     * @param   <D> generic type of timepoints on the underlying timeline
+     * @param   family  calendar family
+     * @param   variant calendar variant
+     * @return  new interval factory
+     * @see     #on(TimeLine)
+     * @see     #on(CalendarFamily, String)
+     * @since   5.0
+     */
+    public static <D extends CalendarVariant<D>> Factory<D> on(
+        CalendarFamily<D> family,
+        VariantSource variant
     ) {
 
         return new Factory<>(family.getTimeLine(variant));
@@ -506,20 +516,12 @@ public final class SimpleInterval<T>
             if (this.end.isOpen()) {
                 endA = this.timeLine.stepBackwards(endA);
             }
-            if ((endA == null) || (this.timeLine.compare(startB, endA) > 0)) {
-                return false;
-            }
+            return (endA != null) && (this.timeLine.compare(startB, endA) <= 0);
         } else if (this.timeLine.isCalendrical()) {
             if (other.getEnd().isOpen()) {
                 endB = this.timeLine.stepBackwards(endB);
             }
-            if (
-                (endA == null)
-                || (endB == null) // dann startB = infinite_past
-                || this.timeLine.compare(endA, endB) < 0
-            ) {
-                return false;
-            }
+            return (endB != null) && this.timeLine.compare(endA, endB) >= 0;
         } else {
             if (other.getEnd().isClosed()) {
                 endB = this.timeLine.stepForward(endB);
@@ -529,8 +531,6 @@ public final class SimpleInterval<T>
             }
             return (this.timeLine.compare(endA, endB) >= 0);
         }
-
-        return true;
 
     }
 
@@ -694,9 +694,9 @@ public final class SimpleInterval<T>
                     t2 = this.timeLine.stepForward(t2);
                 }
                 if (t1 == null) {
-                    e = ((t2 == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(t2));
+                    e = ((t2 == null) ? Boundary.infiniteFuture() : Boundary.ofOpen(t2));
                 } else if (t2 == null) {
-                    e = ((t1 == null) ? Boundary.<T>infiniteFuture() : Boundary.ofOpen(t1));
+                    e = Boundary.ofOpen(t1);
                 } else {
                     e = ((this.timeLine.compare(t1, t2) < 0) ? Boundary.ofOpen(t1) : Boundary.ofOpen(t2));
                 }
@@ -1147,28 +1147,27 @@ public final class SimpleInterval<T>
 
     }
 
-    private static class SerializableTimeLine<T extends TimePoint<?, T>>
+    private static class SerializableTimeLine<T>
         implements TimeLine<T>, Serializable {
 
         //~ Instanzvariablen ----------------------------------------------
 
-        private transient final TimeAxis<?, T> axis;
-        private final Class<T> chronoType;
+        private transient final TimeLine<T> axis;
+        private final Class<?> chronoType;
 
         //~ Konstruktoren -------------------------------------------------
 
-        private SerializableTimeLine(TimeAxis<?, T> axis) {
+        private SerializableTimeLine(
+            TimeLine<T> axis,
+            Class<?> chronoType
+        ) {
             super();
 
             this.axis = axis;
-            this.chronoType = axis.getChronoType();
+            this.chronoType = chronoType;
         }
 
         //~ Methoden ------------------------------------------------------
-
-        static <T extends TimePoint<?, T>> TimeLine<T> wrap(TimeAxis<?, T> axis) {
-            return new SerializableTimeLine<>(axis);
-        }
 
         @Override
         public T stepForward(T timepoint) {
@@ -1206,7 +1205,7 @@ public final class SimpleInterval<T>
                 return true;
             } else if (obj instanceof SerializableTimeLine) {
                 SerializableTimeLine<?> that = (SerializableTimeLine<?>) obj;
-                return this.chronoType == that.chronoType;
+                return (this.chronoType == that.chronoType);
             } else {
                 return false;
             }
@@ -1217,10 +1216,10 @@ public final class SimpleInterval<T>
             return this.chronoType.hashCode();
         }
 
-        @SuppressWarnings("unchecked")
         private Object readResolve() throws ObjectStreamException {
             Chronology<?> c = Chronology.lookup(this.chronoType);
-            return wrap(TimeAxis.class.cast(c));
+            TimeAxis<?, ?> axis = TimeAxis.class.cast(c);
+            return new SerializableTimeLine<>(axis, c.getChronoType());
         }
 
     }

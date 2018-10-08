@@ -55,7 +55,7 @@ public class SimpleIntervalTest {
 
     @Test(expected=NullPointerException.class)
     public void nullTimeLine() {
-        SimpleInterval.onTimeLine(null);
+        SimpleInterval.on(null);
     }
 
     @Test

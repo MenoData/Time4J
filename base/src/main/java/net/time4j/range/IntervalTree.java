@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalTree.java) is part of project Time4J.
  *
@@ -125,7 +125,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
         Collection<I> intervals
     ) {
 
-        return IntervalTree.onTimeLine(PlainDate.axis(), intervals);
+        return IntervalTree.on(PlainDate.axis(), intervals);
 
     }
 
@@ -149,7 +149,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
         Collection<I> intervals
     ) {
 
-        return IntervalTree.onTimeLine(PlainTime.axis(), intervals);
+        return IntervalTree.on(PlainTime.axis(), intervals);
 
     }
 
@@ -174,7 +174,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
         Collection<I> intervals
     ) {
 
-        return IntervalTree.onTimeLine(PlainTimestamp.axis(), intervals);
+        return IntervalTree.on(PlainTimestamp.axis(), intervals);
 
     }
 
@@ -198,7 +198,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
         Collection<I> intervals
     ) {
 
-        return IntervalTree.onTimeLine(Moment.axis(), intervals);
+        return IntervalTree.on(Moment.axis(), intervals);
 
     }
 
@@ -221,7 +221,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
         Collection<SimpleInterval<Date>> intervals
     ) {
 
-        return IntervalTree.onTimeLine(SimpleInterval.onTraditionalTimeLine().getTimeLine(), intervals);
+        return IntervalTree.on(SimpleInterval.onTraditionalTimeLine().getTimeLine(), intervals);
 
     }
 
@@ -244,7 +244,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
         Collection<SimpleInterval<Instant>> intervals
     ) {
 
-        return IntervalTree.onTimeLine(SimpleInterval.onInstantTimeLine().getTimeLine(), intervals);
+        return IntervalTree.on(SimpleInterval.onInstantTimeLine().getTimeLine(), intervals);
 
     }
 
@@ -255,9 +255,10 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
      * @param   timeLine    the underlying timeline
      * @param   intervals   collection of intervals
      * @return  new interval tree
+     * @throws  ArithmeticException if the count of intervals overflows an int
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
-     * @throws  ArithmeticException if the count of intervals overflows an int
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Erzeugt einen Intervallbaum auf einem Zeitstrahl gef&uuml;llt mit den angegebenen Momentintervallen. </p>
@@ -266,11 +267,12 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
      * @param   timeLine    the underlying timeline
      * @param   intervals   collection of intervals
      * @return  new interval tree
+     * @throws  ArithmeticException if the count of intervals overflows an int
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
-     * @throws  ArithmeticException if the count of intervals overflows an int
+     * @since   5.0
      */
-    public static <T, I extends ChronoInterval<T>> IntervalTree<T, I> onTimeLine(
+    public static <T, I extends ChronoInterval<T>> IntervalTree<T, I> on(
         TimeLine<T> timeLine,
         Collection<I> intervals
     ) {

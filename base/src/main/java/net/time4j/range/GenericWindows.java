@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericWindows.java) is part of project Time4J.
  *
@@ -68,7 +68,7 @@ final class GenericWindows<T>
         Boundary<T> end
     ) {
 
-        SimpleInterval.Factory<T> factory =  SimpleInterval.onTimeLine(this.timeLine);
+        SimpleInterval.Factory<T> factory =  SimpleInterval.on(this.timeLine);
 
         if (start.isInfinite()) {
             T e = end.getTemporal();
