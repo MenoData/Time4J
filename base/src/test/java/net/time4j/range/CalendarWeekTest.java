@@ -1,10 +1,12 @@
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -23,6 +25,28 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class CalendarWeekTest {
+
+    @Test
+    public void min() {
+        CalendarWeek cw = CalendarWeek.of(GregorianMath.MIN_YEAR, 1);
+        assertThat(cw.getYear(), is(GregorianMath.MIN_YEAR));
+        assertThat(cw.getWeek(), is(1));
+        assertThat(cw.at(Weekday.MONDAY), is(PlainDate.axis().getMinimum()));
+    }
+
+    @Test
+    public void max1() {
+        CalendarWeek cw = CalendarWeek.of(GregorianMath.MAX_YEAR, 52);
+        assertThat(cw.getYear(), is(GregorianMath.MAX_YEAR));
+        assertThat(cw.getWeek(), is(52));
+        assertThat(cw.getEnd().getTemporal(), is(PlainDate.axis().getMaximum()));
+        assertThat(cw.at(Weekday.FRIDAY), is(PlainDate.axis().getMaximum()));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void max2() {
+        CalendarWeek.of(GregorianMath.MAX_YEAR, 52).at(Weekday.SATURDAY);
+    }
 
     @Test(expected=IllegalArgumentException.class)
     public void invalidWeek() {

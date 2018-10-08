@@ -37,6 +37,7 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.ValidationElement;
@@ -212,7 +213,10 @@ public final class CalendarWeek
 
         PlainDate date = PlainDate.of(this.year, week, Weekday.MONDAY);
         this.start = Boundary.ofClosed(date);
-        this.end = Boundary.ofClosed(date.plus(6, CalendarUnit.DAYS));
+        this.end = (
+            (year == GregorianMath.MAX_YEAR)
+                ? Boundary.ofClosed(PlainDate.axis().getMaximum())
+                : Boundary.ofClosed(date.plus(6, CalendarUnit.DAYS)));
 
     }
 
@@ -295,19 +299,19 @@ public final class CalendarWeek
      *
      * @param   dayOfWeek       day of week in range MONDAY - SUNDAY
      * @return  calendar date
+     * @throws  IllegalArgumentException if the result is beyond the maximum of date axis (exotic edge case)
      */
     /*[deutsch]
      * <p>Kombiniert diese Kalenderwoche mit dem angegebenen Wochentag zu einem Kalenderdatum. </p>
      *
      * @param   dayOfWeek       day of week in range MONDAY - SUNDAY
      * @return  calendar date
+     * @throws  IllegalArgumentException if the result is beyond the maximum of date axis (exotic edge case)
      */
     public PlainDate at(Weekday dayOfWeek) {
 
         if (dayOfWeek == Weekday.MONDAY) {
-            return this.start.getTemporal();
-        } else if (dayOfWeek == Weekday.SUNDAY) {
-            return this.end.getTemporal();
+            return this.start.getTemporal(); // short cut
         }
 
         return PlainDate.of(this.year, this.week, dayOfWeek);
