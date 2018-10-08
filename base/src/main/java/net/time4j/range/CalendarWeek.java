@@ -432,16 +432,22 @@ public final class CalendarWeek
     /**
      * <p>Calendar week always consist of seven days. </p>
      *
+     * <p>The only exception is if the length is limited to five days in the last week of year
+     * {@code 999,999,999} due to arithmetical reasons. </p>
+     *
      * @return  {@code 7}
      */
     /*[deutsch]
      * <p>Eine Kalenderwoche hat immer 7 Tage. </p>
      *
+     * <p>Einzige Ausnahme ist, wenn aus arithmetischen Gr&uuml;nden die L&auml;nge in der letzten Woche
+     * des Jahres {@code 999.999.999} auf 5 beschr&auml;nkt ist. </p>
+     *
      * @return  {@code 7}
      */
     public int length() {
 
-        return 7;
+        return ((this.year == GregorianMath.MAX_YEAR) && (this.week == 52)) ? 5 : 7;
 
     }
 
@@ -1051,17 +1057,18 @@ public final class CalendarWeek
         //~ Instanzvariablen ----------------------------------------------
 
         private int count = 0;
+        private int max = CalendarWeek.this.length();
 
         //~ Methoden ------------------------------------------------------
 
         @Override
         public boolean hasNext() {
-            return (this.count < 7);
+            return (this.count < this.max);
         }
 
         @Override
         public PlainDate next() {
-            if (this.count >= 7) {
+            if (this.count >= this.max) {
                 throw new NoSuchElementException();
             } else {
                 PlainDate result = CalendarWeek.this.start.getTemporal().plus(this.count, CalendarUnit.DAYS);
