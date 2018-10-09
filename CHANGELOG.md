@@ -12,6 +12,7 @@
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
+- Simplify/Rename some interval factory methods [#821]
 - Remove confusing method `ZonalClock.currentMoment()` [#817]
 - Improved handling of negative DST-offsets [#742]
 - Simplify generic formatter API [#813]
