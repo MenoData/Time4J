@@ -571,6 +571,21 @@ public final class CalendarQuarter
 
     }
 
+    @Override
+    long toProlepticNumber() {
+
+        return this.year * 4 + (this.quarter.getValue() - 1);
+
+    }
+
+    static CalendarQuarter from(long prolepticNumber) {
+
+        int y = MathUtils.safeCast(Math.floorDiv(prolepticNumber, 4));
+        int q = MathUtils.floorModulo(prolepticNumber, 4) + 1;
+        return CalendarQuarter.of(y, Quarter.valueOf(q));
+
+    }
+
     /**
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The format

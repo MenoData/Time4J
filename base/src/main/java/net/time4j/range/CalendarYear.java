@@ -614,6 +614,20 @@ public final class CalendarYear
 
     }
 
+    @Override
+    long toProlepticNumber() {
+
+        return this.year;
+
+    }
+
+    static CalendarYear from(long prolepticNumber) {
+
+        int y = MathUtils.safeCast(prolepticNumber);
+        return CalendarYear.of(y);
+
+    }
+
     /**
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The format

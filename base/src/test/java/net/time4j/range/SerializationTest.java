@@ -297,6 +297,33 @@ public class SerializationTest {
         assertThat(interval, is(ser));
     }
 
+    @Test
+    public void roundtripOfFixedCalendarIntervalTimeLine()
+        throws IOException, ClassNotFoundException {
+
+        Object intervalY = FixedCalendarTimeLine.forYears();
+        assertThat(roundtrip(intervalY), is(intervalY));
+
+        Object intervalQ = FixedCalendarTimeLine.forQuarters();
+        assertThat(roundtrip(intervalQ), is(intervalQ));
+
+        Object intervalM = FixedCalendarTimeLine.forMonths();
+        assertThat(roundtrip(intervalM), is(intervalM));
+
+        Object intervalW = FixedCalendarTimeLine.forWeeks();
+        assertThat(roundtrip(intervalW), is(intervalW));
+
+    }
+
+    @Test
+    public void roundtripOfCalendarPeriod()
+        throws IOException, ClassNotFoundException {
+
+        Object cp = CalendarPeriod.between(CalendarWeek.of(2018, 1), CalendarWeek.of(2018, 37));
+        assertThat(roundtrip(cp), is(cp));
+
+    }
+
     private static Object roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 

@@ -15,6 +15,8 @@ import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.stream.Collectors;
@@ -41,6 +43,15 @@ public class CalendarWeekTest {
         assertThat(cw.getWeek(), is(52));
         assertThat(cw.getEnd().getTemporal(), is(PlainDate.axis().getMaximum()));
         assertThat(cw.at(Weekday.FRIDAY), is(PlainDate.axis().getMaximum()));
+        assertThat(cw.length(), is(5));
+
+        int count = 0;
+        for (PlainDate d : cw) {
+            count++;
+            assertThat(d.getDayOfWeek(), is(Weekday.valueOf(count)));
+        }
+        assertThat(count, is(5));
+
     }
 
     @Test(expected=IllegalArgumentException.class)
@@ -289,6 +300,61 @@ public class CalendarWeekTest {
         expected.add(PlainDate.of(2016, 1, 30));
         expected.add(PlainDate.of(2016, 1, 31));
         assertThat(CalendarWeek.of(2016, 4).streamDaily().collect(Collectors.toList()), is(expected));
+    }
+
+    @Test
+    public void prolepticNumber() {
+        PlainDate start = PlainDate.of(2018, 10, 7);
+        for (int i = 0; i < 9; i++) {
+            PlainDate d = start.plus(i, CalendarUnit.DAYS);
+            CalendarWeek cw = CalendarWeek.from(d);
+            assertThat(CalendarWeek.from(cw.toProlepticNumber()), is(cw));
+        }
+    }
+
+    @Test
+    public void stream() {
+        CalendarWeek start = CalendarWeek.of(2017, 52);
+        CalendarWeek end = CalendarWeek.of(2018, 3);
+        List<CalendarWeek> expected =
+            Arrays.asList(
+                start,
+                CalendarWeek.of(2018, 1),
+                CalendarWeek.of(2018, 2),
+                end);
+        assertThat(
+            CalendarPeriod.between(start, end).stream().collect(Collectors.toList()),
+            is(expected));
+        assertThat(
+            CalendarPeriod.between(start, start).stream().collect(Collectors.toList()),
+            is(Collections.singletonList(start)));
+    }
+
+    @Test
+    public void delta() {
+        CalendarWeek start = CalendarWeek.of(2017, 52);
+        CalendarWeek end = CalendarWeek.of(2018, 3);
+        assertThat(
+            CalendarPeriod.between(start, end).delta(),
+            is(3L));
+        assertThat(
+            CalendarPeriod.between(start, start).delta(),
+            is(0L));
+    }
+
+    @Test
+    public void abuts() {
+        CalendarWeek cw1 = CalendarWeek.of(2017, 52);
+        CalendarWeek cw2 = CalendarWeek.of(2018, 3);
+        CalendarWeek cw3 = CalendarWeek.of(2018, 4);
+        CalendarWeek cw4 = CalendarWeek.of(2018, 45);
+        assertThat(
+            CalendarPeriod.between(cw1, cw2).abuts(CalendarPeriod.between(cw3, cw4)),
+            is(true));
+        cw3 = cw3.plus(Weeks.ONE);
+        assertThat(
+            CalendarPeriod.between(cw1, cw2).abuts(CalendarPeriod.between(cw3, cw4)),
+            is(false));
     }
 
 }

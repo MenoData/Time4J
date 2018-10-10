@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.Quarter;
 import net.time4j.SystemClock;
@@ -244,6 +245,16 @@ public class CalendarYearTest {
         assertThat(
             CalendarYear.nowInSystemTime(),
             is(SystemClock.inLocalView().now(CalendarYear.chronology())));
+    }
+
+    @Test
+    public void prolepticNumber() {
+        PlainDate start = PlainDate.of(2017, 1, 1);
+        for (int i = 0; i < 10; i++) {
+            PlainDate d = start.plus(i, CalendarUnit.YEARS);
+            CalendarYear cy = CalendarYear.from(d);
+            assertThat(CalendarYear.from(cy.toProlepticNumber()), is(cy));
+        }
     }
 
 }

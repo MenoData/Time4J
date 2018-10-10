@@ -621,7 +621,7 @@ public final class CalendarWeek
      * @return  Iterator
      */
     /*[deutsch]
-     * <p>Iteratiert &uuml;ber alle sieben Tage von Montag bis Sonntag. </p>
+     * <p>Iteriert &uuml;ber alle sieben Tage von Montag bis Sonntag. </p>
      *
      * @return  Iterator
      */
@@ -734,6 +734,20 @@ public final class CalendarWeek
     protected CalendarWeek getContext() {
 
         return this;
+
+    }
+
+    @Override
+    long toProlepticNumber() {
+
+        return ((this.at(Weekday.MONDAY).getDaysSinceEpochUTC() / 7) + 1);
+
+    }
+
+    static CalendarWeek from(long prolepticNumber) {
+
+        PlainDate iso = PlainDate.of(Math.multiplyExact(prolepticNumber, 7), EpochDays.UTC);
+        return CalendarWeek.of(iso.getInt(PlainDate.YEAR_OF_WEEKDATE), iso.getInt(Weekmodel.ISO.weekOfYear()));
 
     }
 

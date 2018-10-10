@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.CalendarUnit;
 import net.time4j.PlainDate;
 import net.time4j.Month;
 import net.time4j.SystemClock;
@@ -305,6 +306,16 @@ public class CalendarMonthTest {
         assertThat(
             CalendarMonth.of(2016, 11).abuts(DateInterval.since(PlainDate.of(2016, 12, 1)).collapse()),
             is(false));
+    }
+
+    @Test
+    public void prolepticNumber() {
+        PlainDate start = PlainDate.of(2017, 12, 1);
+        for (int i = 0; i < 14; i++) {
+            PlainDate d = start.plus(i, CalendarUnit.MONTHS);
+            CalendarMonth cm = CalendarMonth.from(d);
+            assertThat(CalendarMonth.from(cm.toProlepticNumber()), is(cm));
+        }
     }
 
 }

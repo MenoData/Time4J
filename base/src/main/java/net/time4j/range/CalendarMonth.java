@@ -744,6 +744,21 @@ public final class CalendarMonth
 
     }
 
+    @Override
+    long toProlepticNumber() {
+
+        return this.year * 12 + (this.month.getValue() - 1);
+
+    }
+
+    static CalendarMonth from(long prolepticNumber) {
+
+        int y = MathUtils.safeCast(Math.floorDiv(prolepticNumber, 12));
+        int m = MathUtils.floorModulo(prolepticNumber, 12) + 1;
+        return CalendarMonth.of(y, m);
+
+    }
+
     /**
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The format
