@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentIntervalFactory.java) is part of project Time4J.
  *
@@ -108,13 +108,6 @@ final class MomentIntervalFactory
     public Set<ChronoElement<?>> stdElements(ChronoEntity<?> rawData) {
 
         return TimestampIntervalFactory.INSTANCE.stdElements(rawData);
-
-    }
-
-    @Override
-    public boolean isCalendrical() {
-
-        return false;
 
     }
 

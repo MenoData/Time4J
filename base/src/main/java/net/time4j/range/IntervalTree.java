@@ -251,6 +251,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
     /**
      * <p>Creates an interval tree on a timeline filled with given intervals. </p>
      *
+     * @param   <T> the temporal type of time points in intervals
      * @param   <I> the type of intervals stored in the tree
      * @param   timeLine    the underlying timeline
      * @param   intervals   collection of intervals
@@ -263,6 +264,7 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
     /*[deutsch]
      * <p>Erzeugt einen Intervallbaum auf einem Zeitstrahl gef&uuml;llt mit den angegebenen Momentintervallen. </p>
      *
+     * @param   <T> the temporal type of time points in intervals
      * @param   <I> the type of intervals stored in the tree
      * @param   timeLine    the underlying timeline
      * @param   intervals   collection of intervals

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimestampIntervalFactory.java) is part of project Time4J.
  *
@@ -131,13 +131,6 @@ final class TimestampIntervalFactory
         }
 
         return Collections.emptySet();
-
-    }
-
-    @Override
-    public boolean isCalendrical() {
-
-        return false;
 
     }
 
