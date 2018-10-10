@@ -899,16 +899,16 @@ public final class SimpleInterval<T>
         /**
          * <p>Creates a new interval between given boundaries. </p>
          *
-         * @param   start   the start of interval (inclusive)
-         * @param   end     the end of interval (exclusive)
-         * @return  new interval (half-open)
+         * @param   start   the start of interval (always inclusive)
+         * @param   end     the end of interval (inclusive if calendrical else exclusive)
+         * @return  new interval (closed if calendrical else half-open)
          */
         /*[deutsch]
          * <p>Erzeugt ein neues Intervall mit den angegebenen Grenzen. </p>
          *
-         * @param   start   the start of interval (inclusive)
-         * @param   end     the end of interval (exclusive)
-         * @return  new interval (half-open)
+         * @param   start   the start of interval (always inclusive)
+         * @param   end     the end of interval (inclusive if calendrical else exclusive)
+         * @return  new interval (closed if calendrical else half-open)
          */
         public SimpleInterval<T> between(
             T start,
@@ -950,14 +950,14 @@ public final class SimpleInterval<T>
         /**
          * <p>Creates a new interval until given end. </p>
          *
-         * @param   end     the end of interval (exclusive)
-         * @return  new interval (open and infinite)
+         * @param   end     the end of interval (inclusive if calendrical else exclusive)
+         * @return  new infinite interval
          */
         /*[deutsch]
          * <p>Erzeugt ein neues Intervall bis zum angegebenen Ende. </p>
          *
-         * @param   end     the end of interval (exclusive)
-         * @return  new interval (open and infinite)
+         * @param   end     the end of interval (inclusive if calendrical else exclusive)
+         * @return  new infinite interval
          */
         public SimpleInterval<T> until(T end) {
 
@@ -977,7 +977,7 @@ public final class SimpleInterval<T>
          *
          * @param   text        text to be parsed
          * @param   parser      format object for parsing start and end components
-         * @return  parsed interval
+         * @return  parsed interval (closed if calendrical else half-open)
          * @throws  IndexOutOfBoundsException if given text is empty
          * @throws  ParseException if the text is not parseable
          * @see     #parse(CharSequence, ChronoParser, String)
@@ -991,7 +991,7 @@ public final class SimpleInterval<T>
          *
          * @param   text        text to be parsed
          * @param   parser      format object for parsing start and end components
-         * @return  parsed interval
+         * @return  parsed interval (closed if calendrical else half-open)
          * @throws  IndexOutOfBoundsException if given text is empty
          * @throws  ParseException if the text is not parseable
          * @see     #parse(CharSequence, ChronoParser, String)
@@ -1014,7 +1014,7 @@ public final class SimpleInterval<T>
          * @param   text                text to be parsed
          * @param   parser              format object for parsing start and end components
          * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
-         * @return  parsed interval
+         * @return  parsed interval (closed if calendrical else half-open)
          * @throws  IndexOutOfBoundsException if given text is empty
          * @throws  ParseException if the text is not parseable
          */
@@ -1028,7 +1028,7 @@ public final class SimpleInterval<T>
          * @param   text                text to be parsed
          * @param   parser              format object for parsing start and end components
          * @param   intervalPattern     interval pattern containing placeholders {0} and {1} (for start and end)
-         * @return  parsed interval
+         * @return  parsed interval (closed if calendrical else half-open)
          * @throws  IndexOutOfBoundsException if given text is empty
          * @throws  ParseException if the text is not parseable
          */
@@ -1038,7 +1038,17 @@ public final class SimpleInterval<T>
             String intervalPattern
         ) throws ParseException {
 
-            IntervalCreator<T, SimpleInterval<T>> icreator = (start, end) -> new SimpleInterval<>(start, end, timeLine);
+            IntervalCreator<T, SimpleInterval<T>> icreator =
+                new IntervalCreator<T, SimpleInterval<T>>() {
+                    @Override
+                    public SimpleInterval<T> between(Boundary<T> start, Boundary<T> end) {
+                        return new SimpleInterval<>(start, end, timeLine);
+                    }
+                    @Override
+                    public boolean isCalendrical() {
+                        return timeLine.isCalendrical();
+                    }
+                };
 
             return IntervalParser.parsePattern(
                 text,

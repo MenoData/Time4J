@@ -1,6 +1,9 @@
 package net.time4j.range;
 
 import net.time4j.Moment;
+import net.time4j.calendar.PersianCalendar;
+import net.time4j.calendar.PersianMonth;
+import net.time4j.engine.CalendarDays;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
@@ -247,6 +250,23 @@ public class SimpleIntervalTest {
                 parser,
                 "from {0} to {1}"),
             is(i));
+    }
+
+    @Test
+    public void parseCalendrical() throws ParseException {
+        PersianCalendar start = PersianCalendar.of(1392, PersianMonth.ESFAND, 27);
+        PersianCalendar end = PersianCalendar.of(1393, PersianMonth.FARVARDIN, 6);
+
+        ChronoFormatter<PersianCalendar> cf =
+            ChronoFormatter.ofPattern("dd.MM.yyyy", PatternType.CLDR, Locale.ROOT, PersianCalendar.axis());
+        SimpleInterval<PersianCalendar> interval =
+            SimpleInterval.on(PersianCalendar.axis()).parse("27.12.1392 – 06.01.1393", cf);
+        SimpleInterval<PersianCalendar> expected =
+            SimpleInterval.on(PersianCalendar.axis()).between(start, end);
+
+        assertThat(interval, is(expected));
+        assertThat(interval.getStart().isClosed(), is(true));
+        assertThat(interval.getEnd().isClosed(), is(true));
     }
 
 }
