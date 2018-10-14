@@ -15,6 +15,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BasicTimestampRangeTest.class,
         BoundaryTest.class,
         CalendarMonthTest.class,
+        CalendarPeriodTest.class,
         CalendarQuarterTest.class,
         CalendarWeekTest.class,
         CalendarYearTest.class,

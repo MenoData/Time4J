@@ -40,6 +40,7 @@ import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
+import net.time4j.engine.TimeLine;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
@@ -720,6 +721,24 @@ public final class CalendarWeek
     public static Chronology<CalendarWeek> chronology() {
 
         return ENGINE;
+
+    }
+
+    /**
+     * <p>Obtains a timeline for this type. </p>
+     *
+     * @return  singleton timeline
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen Zeitstrahl f&uuml;r diesen Typ. </p>
+     *
+     * @return  singleton timeline
+     * @since   5.0
+     */
+    public static TimeLine<CalendarWeek> timeline() {
+
+        return FixedCalendarTimeLine.forWeeks();
 
     }
 

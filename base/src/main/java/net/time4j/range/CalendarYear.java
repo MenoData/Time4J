@@ -42,6 +42,7 @@ import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.ThreetenAdapter;
+import net.time4j.engine.TimeLine;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
@@ -597,6 +598,24 @@ public final class CalendarYear
     public static Chronology<Year> threeten() {
 
         return THREETEN;
+
+    }
+
+    /**
+     * <p>Obtains a timeline for this type. </p>
+     *
+     * @return  singleton timeline
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen Zeitstrahl f&uuml;r diesen Typ. </p>
+     *
+     * @return  singleton timeline
+     * @since   5.0
+     */
+    public static TimeLine<CalendarYear> timeline() {
+
+        return FixedCalendarTimeLine.forYears();
 
     }
 

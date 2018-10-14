@@ -259,6 +259,11 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
      * @throws  ArithmeticException if the count of intervals overflows an int
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(net.time4j.engine.VariantSource)
+     * @see     CalendarYear#timeline()
+     * @see     CalendarQuarter#timeline()
+     * @see     CalendarMonth#timeline()
+     * @see     CalendarWeek#timeline()
      * @since   5.0
      */
     /*[deutsch]
@@ -272,6 +277,11 @@ public class IntervalTree<T, I extends ChronoInterval<T>>
      * @throws  ArithmeticException if the count of intervals overflows an int
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(net.time4j.engine.VariantSource)
+     * @see     CalendarYear#timeline()
+     * @see     CalendarQuarter#timeline()
+     * @see     CalendarMonth#timeline()
+     * @see     CalendarWeek#timeline()
      * @since   5.0
      */
     public static <T, I extends ChronoInterval<T>> IntervalTree<T, I> on(

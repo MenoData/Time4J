@@ -29,8 +29,6 @@ import java.io.ObjectStreamException;
 import java.io.Serializable;
 import java.io.StreamCorruptedException;
 import java.util.function.LongFunction;
-import java.util.stream.LongStream;
-import java.util.stream.Stream;
 
 
 /**
@@ -81,6 +79,9 @@ final class FixedCalendarTimeLine<T extends FixedCalendarInterval<T>>
 
     //~ Instanzvariablen --------------------------------------------------
 
+    /**
+     * @serial  denotes the type of timeline (Y, Q, M or W)
+     */
     private final char type; // used in deserialization
 
     private transient final LongFunction<T> from;
@@ -222,9 +223,10 @@ final class FixedCalendarTimeLine<T extends FixedCalendarInterval<T>>
 
     }
 
-    Stream<T> stream(T t1, T t2) {
+    // used in FixedCalendarPeriod
+    LongFunction<T> mapper() {
 
-        return LongStream.rangeClosed(t1.toProlepticNumber(), t2.toProlepticNumber()).mapToObj(this.from);
+        return this.from;
 
     }
 

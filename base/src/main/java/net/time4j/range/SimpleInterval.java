@@ -22,12 +22,9 @@
 package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
-import net.time4j.engine.CalendarFamily;
-import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.TimeLine;
-import net.time4j.engine.VariantSource;
 import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
@@ -54,8 +51,8 @@ import java.util.Optional;
  *     <li>Can be used in conjunction with {@code IntervalCollection} and {@code IntervalTree}. </li>
  * </ul>
  *
- * <p>This class is mainly intended to adapt foreign types like {@code java.util.Date} but also for calendar
- * intervals which are not based on ISO-8601. </p>
+ * <p>This class is mainly intended to adapt foreign types like {@code java.util.Date}. It is serializable
+ * as long as the underlying timeline is serializable. </p>
  *
  * @param   <T> generic type of timepoints on the underlying timeline
  * @author  Meno Hochschild
@@ -74,7 +71,8 @@ import java.util.Optional;
  * </ul>
  *
  * <p>Diese Klasse dient haupts&auml;chlich zur Verwendung mit Fremdtypen wie {@code java.util.Date}
- * oder {@code java.time.Instant}, aber auch f&uuml;r Kalenderintervalle, die nicht auf ISO-8601 beruhen. </p>
+ * oder {@code java.time.Instant}. Sie ist serialisierbar, wenn die zugrundeliegende {@code TimeLine}
+ * serialisierbar ist. </p>
  *
  * @param   <T> generic type of timepoints on the underlying timeline
  * @author  Meno Hochschild
@@ -309,26 +307,6 @@ public final class SimpleInterval<T>
     /**
      * <p>Defines a timeline on which new generic intervals can be created. </p>
      *
-     * <p>Note that calendar intervals are usually closed. Example: </p>
-     *
-     * <pre>
-     *         PersianCalendar start = PersianCalendar.of(1392, PersianMonth.ESFAND, 27);
-     *         PersianCalendar end = PersianCalendar.of(1393, PersianMonth.FARVARDIN, 6);
-     *
-     *         SimpleInterval&lt;PersianCalendar&gt; i1 =
-     *           SimpleInterval.on(PersianCalendar.axis()).between(start, end);
-     *         SimpleInterval&lt;PersianCalendar&gt; i2 =
-     *           SimpleInterval.on(PersianCalendar.axis()).between(
-     *             end.minus(CalendarDays.ONE),
-     *             end.plus(CalendarDays.ONE));
-     *
-     *         System.out.println(
-     *           interval.findIntersection(
-     *             SimpleInterval.on(PersianCalendar.axis()).between(
-     *               end.minus(CalendarDays.ONE), end.plus(CalendarDays.ONE))).get());
-     *         // [AP-1393-01-05/AP-1393-01-06]
-     * </pre>
-     *
      * @param   <T> generic type of timepoints on the underlying timeline
      * @param   timeLine    the timeline definition
      * @return  new interval factory
@@ -336,26 +314,6 @@ public final class SimpleInterval<T>
      */
     /*[deutsch]
      * <p>Definiert einen Zeitstrahl, auf dem neue generische Intervalle erzeugt werden k&ouml;nnen. </p>
-     *
-     * <p>Hinweis: Kalenderintervalle sind normal geschlossen. Beispiel: </p>
-     *
-     * <pre>
-     *         PersianCalendar start = PersianCalendar.of(1392, PersianMonth.ESFAND, 27);
-     *         PersianCalendar end = PersianCalendar.of(1393, PersianMonth.FARVARDIN, 6);
-     *
-     *         SimpleInterval&lt;PersianCalendar&gt; i1 =
-     *           SimpleInterval.on(PersianCalendar.axis()).between(start, end);
-     *         SimpleInterval&lt;PersianCalendar&gt; i2 =
-     *           SimpleInterval.on(PersianCalendar.axis()).between(
-     *             end.minus(CalendarDays.ONE),
-     *             end.plus(CalendarDays.ONE));
-     *
-     *         System.out.println(
-     *           interval.findIntersection(
-     *             SimpleInterval.on(PersianCalendar.axis()).between(
-     *               end.minus(CalendarDays.ONE), end.plus(CalendarDays.ONE))).get());
-     *         // [AP-1393-01-05/AP-1393-01-06]
-     * </pre>
      *
      * @param   <T> generic type of timepoints on the underlying timeline
      * @param   timeLine    the timeline definition
@@ -370,76 +328,6 @@ public final class SimpleInterval<T>
         }
 
         return new Factory<>(timeLine);
-
-    }
-
-    /**
-     * <p>Defines a timeline on which new generic calendar intervals can be created. </p>
-     *
-     * <p>Note that calendar intervals are usually closed. </p>
-     *
-     * @param   <D> generic type of timepoints on the underlying timeline
-     * @param   family  calendar family
-     * @param   variant calendar variant
-     * @return  new interval factory
-     * @see     #on(TimeLine)
-     * @see     #on(CalendarFamily, VariantSource)
-     * @since   3.36/4.31
-     */
-    /*[deutsch]
-     * <p>Definiert einen Zeitstrahl, auf dem neue generische Kalenderintervalle erzeugt werden k&ouml;nnen. </p>
-     *
-     * <p>Hinweis: Kalenderintervalle sind normal geschlossen. </p>
-     *
-     * @param   <D> generic type of timepoints on the underlying timeline
-     * @param   family  calendar family
-     * @param   variant calendar variant
-     * @return  new interval factory
-     * @see     #on(TimeLine)
-     * @see     #on(CalendarFamily, VariantSource)
-     * @since   3.36/4.31
-     */
-    public static <D extends CalendarVariant<D>> Factory<D> on(
-        CalendarFamily<D> family,
-        String variant
-    ) {
-
-        return new Factory<>(family.getTimeLine(variant));
-
-    }
-
-    /**
-     * <p>Defines a timeline on which new generic calendar intervals can be created. </p>
-     *
-     * <p>Note that calendar intervals are usually closed. </p>
-     *
-     * @param   <D> generic type of timepoints on the underlying timeline
-     * @param   family  calendar family
-     * @param   variant calendar variant
-     * @return  new interval factory
-     * @see     #on(TimeLine)
-     * @see     #on(CalendarFamily, String)
-     * @since   5.0
-     */
-    /*[deutsch]
-     * <p>Definiert einen Zeitstrahl, auf dem neue generische Kalenderintervalle erzeugt werden k&ouml;nnen. </p>
-     *
-     * <p>Hinweis: Kalenderintervalle sind normal geschlossen. </p>
-     *
-     * @param   <D> generic type of timepoints on the underlying timeline
-     * @param   family  calendar family
-     * @param   variant calendar variant
-     * @return  new interval factory
-     * @see     #on(TimeLine)
-     * @see     #on(CalendarFamily, String)
-     * @since   5.0
-     */
-    public static <D extends CalendarVariant<D>> Factory<D> on(
-        CalendarFamily<D> family,
-        VariantSource variant
-    ) {
-
-        return new Factory<>(family.getTimeLine(variant));
 
     }
 

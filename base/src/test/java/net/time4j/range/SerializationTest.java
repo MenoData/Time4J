@@ -316,10 +316,21 @@ public class SerializationTest {
     }
 
     @Test
-    public void roundtripOfCalendarPeriod()
+    public void roundtripOfFixedCalendarPeriod()
         throws IOException, ClassNotFoundException {
 
         Object cp = CalendarPeriod.between(CalendarWeek.of(2018, 1), CalendarWeek.of(2018, 37));
+        assertThat(roundtrip(cp), is(cp));
+
+    }
+
+    @Test
+    public void roundtripOfGenericCalendarPeriod()
+        throws IOException, ClassNotFoundException {
+
+        PlainDate d1 = PlainDate.of(2018, 1, 1);
+        PlainDate d2 = PlainDate.of(2018, 12, 31);
+        Object cp = CalendarPeriod.on(PlainDate.axis()).between(d1, d2);
         assertThat(roundtrip(cp), is(cp));
 
     }

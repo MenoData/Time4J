@@ -87,7 +87,7 @@ final class SPX
     /** Serialisierungstyp von {@code MomentWindows}. */
     static final int MOMENT_WINDOW_ID = 43;
 
-    /** Serialisierungstyp von {@code GenerictWindows}. */
+    /** Serialisierungstyp von {@code GenericWindows}. */
     static final int GENERIC_WINDOW_ID = 44;
 
     /** Serialisierungstyp von {@code Boundary}. */

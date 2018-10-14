@@ -230,6 +230,11 @@ public abstract class IntervalCollection<T>
      * @return  empty generic {@code IntervalCollection}
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(net.time4j.engine.VariantSource)
+     * @see     CalendarYear#timeline()
+     * @see     CalendarQuarter#timeline()
+     * @see     CalendarMonth#timeline()
+     * @see     CalendarWeek#timeline()
      * @since   5.0
      */
     /*[deutsch]
@@ -238,6 +243,11 @@ public abstract class IntervalCollection<T>
      * @return  empty generic {@code IntervalCollection}
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
+     * @see     net.time4j.engine.CalendarFamily#getTimeLine(net.time4j.engine.VariantSource)
+     * @see     CalendarYear#timeline()
+     * @see     CalendarQuarter#timeline()
+     * @see     CalendarMonth#timeline()
+     * @see     CalendarWeek#timeline()
      * @since   5.0
      */
     @SuppressWarnings("unchecked")
