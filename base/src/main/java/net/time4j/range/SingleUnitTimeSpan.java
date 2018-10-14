@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SingleUnitTimeSpan.java) is part of project Time4J.
  *
@@ -23,9 +23,11 @@ package net.time4j.range;
 
 import net.time4j.Duration;
 import net.time4j.IsoDateUnit;
+import net.time4j.PrettyTime;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
+import net.time4j.format.TextWidth;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -34,6 +36,7 @@ import java.io.Serializable;
 import java.text.ParseException;
 import java.util.Collections;
 import java.util.List;
+import java.util.Locale;
 
 
 /**
@@ -243,6 +246,31 @@ public abstract class SingleUnitTimeSpan<U extends IsoDateUnit, D extends Single
         sb.append(Math.abs(value));
         sb.append(this.unit.getSymbol());
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Prints this duration in a localized way with given text width. </p>
+     *
+     * @param   locale  the locale to be applied
+     * @param   width   the text width to be applied
+     * @return  formatted localized representation of this duration
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert eine formatierte und lokalisierte Darstellung dieser Dauer mit der angegebenen Textbreite aus. </p>
+     *
+     * @param   locale  the locale to be applied
+     * @param   width   the text width to be applied
+     * @return  formatted localized representation of this duration
+     * @since   5.0
+     */
+    public String toString(
+        Locale locale,
+        TextWidth width
+    ) {
+
+        return PrettyTime.of(locale).print(this.toStdDuration(), width);
 
     }
 

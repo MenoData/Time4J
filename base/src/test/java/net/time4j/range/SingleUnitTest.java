@@ -4,11 +4,13 @@ import net.time4j.CalendarUnit;
 import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
+import net.time4j.format.TextWidth;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -175,6 +177,11 @@ public class SingleUnitTest {
         assertThat(Months.of(-15).toStdDuration(), is(Duration.of(-15, CalendarUnit.MONTHS)));
         assertThat(Quarters.of(5).toStdDuration(), is(Duration.of(5, CalendarUnit.QUARTERS)));
         assertThat(Weeks.of(4).toStdDuration(), is(Duration.of(4, CalendarUnit.WEEKS)));
+    }
+
+    @Test
+    public void toFormattedString() {
+        assertThat(Weeks.of(3).toString(Locale.GERMAN, TextWidth.WIDE), is("3 Wochen"));
     }
 
 }
