@@ -1,6 +1,7 @@
 ## [v5.0] not yet released
 ### Added
 - New interval class for calendar years, quarters, months or weeks [#822]
+- Formatted representation of Years, Quarters, Months and weeks [#824]
 - Make enums Month, Weekday and Quarter to operators for PlainDate [#819]
 - Enhance duration comparators [#816]
 - Partitioned streams in TimestampInterval [#814]
