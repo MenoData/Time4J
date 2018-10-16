@@ -30,6 +30,7 @@
 - Renaming of abstract method in `DayPartitionRule` [#815]
 
 ### Fixed
+- Ensure that big year numbers with 10 digits can be printed [#792]
 - SimpleInterval.Factory is wrong about open or closed interval boundaries [#823]
 - CalendarWeek.of(GregorianMath.MAX_YEAR, 52) aborts [#820]
 - Mismatch between getMinimumSinceUTC and transform for some historic calendars [#808]
