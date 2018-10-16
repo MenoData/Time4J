@@ -206,7 +206,7 @@ public class CalendarPeriod<T>
      */
     public static Parser<CalendarYear> onYears() {
 
-        return new FixedFactory<>(FixedCalendarTimeLine.forYears());
+        return new FixedParser<>(FixedCalendarTimeLine.forYears());
 
     }
 
@@ -223,7 +223,7 @@ public class CalendarPeriod<T>
      */
     public static Parser<CalendarQuarter> onQuarters() {
 
-        return new FixedFactory<>(FixedCalendarTimeLine.forQuarters());
+        return new FixedParser<>(FixedCalendarTimeLine.forQuarters());
 
     }
 
@@ -240,7 +240,7 @@ public class CalendarPeriod<T>
      */
     public static Parser<CalendarMonth> onMonths() {
 
-        return new FixedFactory<>(FixedCalendarTimeLine.forMonths());
+        return new FixedParser<>(FixedCalendarTimeLine.forMonths());
 
     }
 
@@ -287,7 +287,7 @@ public class CalendarPeriod<T>
      */
     public static Parser<CalendarWeek> onWeeks() {
 
-        return new FixedFactory<>(FixedCalendarTimeLine.forWeeks());
+        return new FixedParser<>(FixedCalendarTimeLine.forWeeks());
 
     }
 
@@ -349,7 +349,7 @@ public class CalendarPeriod<T>
 
         Class<D> chronoType = axis.getChronoType();
         CalendarSystem<D> calsys = axis.getCalendarSystem();
-        return new GenericFactory<>(chronoType, "", axis, calsys);
+        return new Factory<>(chronoType, "", axis, calsys);
 
     }
 
@@ -379,7 +379,7 @@ public class CalendarPeriod<T>
         Class<D> chronoType = family.getChronoType();
         TimeLine<D> timeLine = family.getTimeLine(variant);
         CalendarSystem<D> calsys = family.getCalendarSystem(variant);
-        return new GenericFactory<>(chronoType, variant, timeLine, calsys);
+        return new Factory<>(chronoType, variant, timeLine, calsys);
 
     }
 
@@ -410,7 +410,7 @@ public class CalendarPeriod<T>
         Class<D> chronoType = family.getChronoType();
         TimeLine<D> timeLine = family.getTimeLine(v);
         CalendarSystem<D> calsys = family.getCalendarSystem(v);
-        return new GenericFactory<>(chronoType, v, timeLine, calsys);
+        return new Factory<>(chronoType, v, timeLine, calsys);
 
     }
 
@@ -931,96 +931,6 @@ public class CalendarPeriod<T>
     public static class Factory<T>
         extends Parser<T> {
 
-        //~ Konstruktoren -------------------------------------------------
-
-        Factory() {
-            super();
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        /**
-         * <p>Creates a new closed interval between given boundaries. </p>
-         *
-         * @param   start   the start of interval (inclusive)
-         * @param   end     the end of interval (inclusive)
-         * @return  new closed and finite interval
-         */
-        /*[deutsch]
-         * <p>Erzeugt ein neues geschlossenes Intervall mit den angegebenen Grenzen. </p>
-         *
-         * @param   start   the start of interval (inclusive)
-         * @param   end     the end of interval (inclusive)
-         * @return  new closed and finite interval
-         */
-        public CalendarPeriod<T> between(
-            T start,
-            T end
-        ) {
-
-            throw new AbstractMethodError();
-
-        }
-
-    }
-
-    private static class FixedFactory<T extends FixedCalendarInterval<T>>
-        extends Parser<T> {
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        private final FixedCalendarTimeLine<T> timeLine;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        private FixedFactory(FixedCalendarTimeLine<T> timeLine) {
-            super();
-
-            this.timeLine = timeLine;
-
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public CalendarPeriod<T> parse(
-            CharSequence text,
-            ChronoParser<T> parser,
-            String intervalPattern
-        ) throws ParseException {
-
-            IntervalCreator<T, CalendarPeriod<T>> icreator =
-                new IntervalCreator<T, CalendarPeriod<T>>() {
-                    @Override
-                    public CalendarPeriod<T> between(Boundary<T> start, Boundary<T> end) {
-                        if (start.isInfinite() || end.isInfinite()) {
-                            throw new IllegalArgumentException("Infinite calendar periods are not supported.");
-                        } else if (start.isOpen() || end.isOpen()) {
-                            throw new IllegalArgumentException("Calendar periods must be closed.");
-                        } else {
-                            return new FixedCalendarPeriod<>(start.getTemporal(), end.getTemporal(), timeLine);
-                        }
-                    }
-                    @Override
-                    public boolean isCalendrical() {
-                        return true;
-                    }
-                };
-
-            return IntervalParser.parsePattern(
-                text,
-                icreator,
-                parser,
-                intervalPattern
-            );
-
-        }
-
-    }
-
-    private static class GenericFactory<T>
-        extends Factory<T> {
-
         //~ Instanzvariablen ----------------------------------------------
 
         private final Class<T> chronoType;
@@ -1030,7 +940,7 @@ public class CalendarPeriod<T>
 
         //~ Konstruktoren -------------------------------------------------
 
-        private GenericFactory(
+        private Factory(
             Class<T> chronoType,
             String variant,
             TimeLine<T> timeLine,
@@ -1047,7 +957,20 @@ public class CalendarPeriod<T>
 
         //~ Methoden ------------------------------------------------------
 
-        @Override
+        /**
+         * Creates a closed interval between given calendrical timepoints. </p>
+         *
+         * @param   start   the start of interval
+         * @param   end     the end of interval (inclusive)
+         * @return  new calendrical interval
+         */
+        /*[deutsch]
+         * Erzeugt ein kalendarisches geschlossenes Interval zwischen den angegebenen Grenzen. </p>
+         *
+         * @param   start   the start of interval
+         * @param   end     the end of interval (inclusive)
+         * @return  new calendrical interval
+         */
         public CalendarPeriod<T> between(
             T start,
             T end
@@ -1079,7 +1002,61 @@ public class CalendarPeriod<T>
                         } else if (start.isOpen() || end.isOpen()) {
                             throw new IllegalArgumentException("Calendar periods must be closed.");
                         } else {
-                            return GenericFactory.this.between(start.getTemporal(), end.getTemporal());
+                            return Factory.this.between(start.getTemporal(), end.getTemporal());
+                        }
+                    }
+                    @Override
+                    public boolean isCalendrical() {
+                        return true;
+                    }
+                };
+
+            return IntervalParser.parsePattern(
+                text,
+                icreator,
+                parser,
+                intervalPattern
+            );
+
+        }
+
+    }
+
+    private static class FixedParser<T extends FixedCalendarInterval<T>>
+        extends Parser<T> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final FixedCalendarTimeLine<T> timeLine;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private FixedParser(FixedCalendarTimeLine<T> timeLine) {
+            super();
+
+            this.timeLine = timeLine;
+
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public CalendarPeriod<T> parse(
+            CharSequence text,
+            ChronoParser<T> parser,
+            String intervalPattern
+        ) throws ParseException {
+
+            IntervalCreator<T, CalendarPeriod<T>> icreator =
+                new IntervalCreator<T, CalendarPeriod<T>>() {
+                    @Override
+                    public CalendarPeriod<T> between(Boundary<T> start, Boundary<T> end) {
+                        if (start.isInfinite() || end.isInfinite()) {
+                            throw new IllegalArgumentException("Infinite calendar periods are not supported.");
+                        } else if (start.isOpen() || end.isOpen()) {
+                            throw new IllegalArgumentException("Calendar periods must be closed.");
+                        } else {
+                            return new FixedCalendarPeriod<>(start.getTemporal(), end.getTemporal(), timeLine);
                         }
                     }
                     @Override
