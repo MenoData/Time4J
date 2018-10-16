@@ -5,8 +5,10 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.engine.CalendarDate;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -183,6 +185,16 @@ public class MinguoMiscellaneousTest {
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, October 1, 106 Minguo"));
+    }
+
+    @Test
+    public void printMinimum() {
+        CalendarSystem<MinguoCalendar> calsys = MinguoCalendar.axis().getCalendarSystem();
+        MinguoCalendar minDate = calsys.transform(calsys.getMinimumSinceUTC());
+        assertThat(minDate, is(MinguoCalendar.axis().getMinimum()));
+        ChronoFormatter<MinguoCalendar> f =
+            ChronoFormatter.ofPattern("yyyy", PatternType.CLDR, Locale.ENGLISH, MinguoCalendar.axis());
+        assertThat(f.format(minDate), is("1000001911"));
     }
 
 }

@@ -1848,7 +1848,7 @@ public enum PatternType {
                     PlainTime.NANO_OF_SECOND, count, count, false);
                 break;
             case 'A':
-                builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
+                builder.addInteger(PlainTime.MILLI_OF_DAY, count, 8);
                 break;
             case 'z':
                 try {

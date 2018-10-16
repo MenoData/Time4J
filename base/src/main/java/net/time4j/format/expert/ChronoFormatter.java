@@ -7093,7 +7093,7 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
             ) {
                 SignPolicy signPolicy = (
                     (count < 4 || !threeten) ? SignPolicy.SHOW_WHEN_NEGATIVE : SignPolicy.SHOW_WHEN_BIG_NUMBER);
-                return this.addNumber(element, false, count, 9, signPolicy, protectedMode);
+                return this.addNumber(element, false, count, 10, signPolicy, protectedMode);
             }
 
             // adjacent digit parsing
