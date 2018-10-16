@@ -281,7 +281,7 @@ public enum PatternType {
      *  <tr>
      *      <td>{@link PlainTime#MILLI_OF_DAY}</td>
      *      <td>A</td>
-     *      <td>The count of symbols (1-9) controls the minimum
+     *      <td>The count of symbols (1-8) controls the minimum
      *      count of digits to be printed. </td>
      *  </tr>
      *  <tr>
@@ -583,7 +583,7 @@ public enum PatternType {
      *  <tr>
      *      <td>{@link PlainTime#MILLI_OF_DAY}</td>
      *      <td>A</td>
-     *      <td>Die Anzahl der Symbole (1-9) regelt die minimale Anzahl der
+     *      <td>Die Anzahl der Symbole (1-8) regelt die minimale Anzahl der
      *      zu formatierenden Ziffern. </td>
      *  </tr>
      *  <tr>
