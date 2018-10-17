@@ -86,15 +86,15 @@ public class DateComparisonTest {
     }
 
     @Test
-    public void isOnOrBefore() {
+    public void isBeforeOrEqual() {
         assertThat(
-            PlainDate.of(2012, 2, 29).isOnOrBefore(PlainDate.of(2012, 3, 1)),
+            PlainDate.of(2012, 2, 29).isBeforeOrEqual(PlainDate.of(2012, 3, 1)),
             is(true));
         assertThat(
-            PlainDate.of(2012, 2, 29).isOnOrBefore(PlainDate.of(2012, 2, 29)),
+            PlainDate.of(2012, 2, 29).isBeforeOrEqual(PlainDate.of(2012, 2, 29)),
             is(true));
         assertThat(
-            PlainDate.of(2012, 2, 29).isOnOrBefore(PlainDate.of(2012, 2, 28)),
+            PlainDate.of(2012, 2, 29).isBeforeOrEqual(PlainDate.of(2012, 2, 28)),
             is(false));
     }
 
@@ -128,15 +128,15 @@ public class DateComparisonTest {
     }
 
     @Test
-    public void isOnOrAfter() {
+    public void isAfterOrEqual() {
         assertThat(
-            PlainDate.of(2012, 2, 29).isOnOrAfter(PlainDate.of(2012, 3, 1)),
+            PlainDate.of(2012, 2, 29).isAfterOrEqual(PlainDate.of(2012, 3, 1)),
             is(false));
         assertThat(
-            PlainDate.of(2012, 2, 29).isOnOrAfter(PlainDate.of(2012, 2, 29)),
+            PlainDate.of(2012, 2, 29).isAfterOrEqual(PlainDate.of(2012, 2, 29)),
             is(true));
         assertThat(
-            PlainDate.of(2012, 2, 29).isOnOrAfter(PlainDate.of(2012, 2, 28)),
+            PlainDate.of(2012, 2, 29).isAfterOrEqual(PlainDate.of(2012, 2, 28)),
             is(true));
     }
 
