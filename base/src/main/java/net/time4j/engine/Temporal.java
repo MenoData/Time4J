@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Temporal.java) is part of project Time4J.
  *
@@ -102,7 +102,49 @@ public interface Temporal<C> {
     boolean isSimultaneous(C temporal);
 
     /**
+     * <p>Queries if this object is after or simultaneous to given parameter. </p>
+     *
+     * @param   temporal    object this instance is compared to
+     * @return  {@code true} if this instance is temporally after or equal to {@code temporal} else {@code false}
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Objekt zeitlich nach oder gleich dem angegebenen Argument? </p>
+     *
+     * @param   temporal    object this instance is compared to
+     * @return  {@code true} if this instance is temporally after or equal to {@code temporal} else {@code false}
+     * @since   5.0
+     */
+    default boolean isAfterOrEqual(C temporal) {
+
+        return !this.isBefore(temporal);
+
+    }
+
+    /**
+     * <p>Queries if this object is before or simultaneous to given parameter. </p>
+     *
+     * @param   temporal    object this instance is compared to
+     * @return  {@code true} if this instance is temporally before or equal to {@code temporal} else {@code false}
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liegt dieses Objekt zeitlich vor oder gleich dem angegebenen Argument? </p>
+     *
+     * @param   temporal    object this instance is compared to
+     * @return  {@code true} if this instance is temporally before or equal to {@code temporal} else {@code false}
+     * @since   5.0
+     */
+    default boolean isBeforeOrEqual(C temporal) {
+
+        return !this.isAfter(temporal);
+
+    }
+
+    /**
      * <p>Queries if this object is after all given objects on a timeline. </p>
+     *
+     * <p>Note: This method should be considered as final and not be overridden. </p>
      *
      * @param   temporals    array of objects this instance is compared to
      * @return  {@code true} if this instance is temporally after every object
@@ -110,6 +152,8 @@ public interface Temporal<C> {
      */
     /*[deutsch]
      * <p>Liegt dieses Objekt zeitlich nach allen angegebenen Argumenten? </p>
+     *
+     * <p>Hinweis: Diese Methode ist als final zu betrachten und sollte nicht &uuml;berschrieben werden. </p>
      *
      * @param   temporals    array of objects this instance is compared to
      * @return  {@code true} if this instance is temporally after every object
@@ -124,12 +168,16 @@ public interface Temporal<C> {
     /**
      * <p>Queries if this object is before all given objects on a timeline. </p>
      *
+     * <p>Note: This method should be considered as final and not be overridden. </p>
+     *
      * @param   temporals    array of objects this instance is compared to
      * @return  {@code true} if this instance is temporally before every object
      *          in {@code temporals} else {@code false}
      */
     /*[deutsch]
      * <p>Liegt dieses Objekt zeitlich vor allen angegebenen Argumenten? </p>
+     *
+     * <p>Hinweis: Diese Methode ist als final zu betrachten und sollte nicht &uuml;berschrieben werden. </p>
      *
      * @param   temporals    array of objects this instance is compared to
      * @return  {@code true} if this instance is temporally before every object
