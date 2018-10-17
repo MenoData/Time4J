@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockUnit.java) is part of project Time4J.
  *
@@ -107,7 +107,7 @@ public enum ClockUnit
         }
         @Override
         public double getLength() {
-            return 1.0 / 1000;
+            return 1.0 / 1_000;
         }
     },
 
@@ -120,7 +120,7 @@ public enum ClockUnit
         }
         @Override
         public double getLength() {
-            return 1.0 / 1000000;
+            return 1.0 / 1_000_000;
         }
     },
 
@@ -133,13 +133,13 @@ public enum ClockUnit
         }
         @Override
         public double getLength() {
-            return 1.0 / 1000000000;
+            return 1.0 / 1_000_000_000;
         }
     };
 
     // Standard-Umrechnungsfaktoren
     private static final long[] FACTORS = {
-        1L, 60L, 3600L, 3600000L, 3600000000L, 3600000000000L
+        1L, 60L, 3_600L, 3_600_000L, 3_600_000_000L, 3_600_000_000_000L
     };
 
     //~ Methoden ----------------------------------------------------------
