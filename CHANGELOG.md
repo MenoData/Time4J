@@ -1,5 +1,7 @@
 ## [v5.0] not yet released
 ### Added
+- New random()-methods in IsoInterval-subclasses [#827]
+- New methods Temporal.isBeforeOrEqual() and Temporal.isAfterOrEqual() [#826]
 - New interval class for calendar years, quarters, months or weeks [#822]
 - Formatted representation of Years, Quarters, Months and weeks [#824]
 - Make enums Month, Weekday and Quarter to operators for PlainDate [#819]
