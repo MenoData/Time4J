@@ -12,7 +12,6 @@
 - Platform-Timezone now delegates to `ZoneId.systemDefault()` [#805]
 - Text elements formattable by help of string converter [#799]
 - Extend formattability of extreme integer element values [#797]
-- New comparison methods `isOnOrAfter(date)` and `isOnOrBefore(date)` [#783]
 - Resolve locale no-NO-NY to nynorsk [#788]
 
 ### Changed
