@@ -35,6 +35,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
@@ -61,6 +62,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Spliterator;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.LongStream;
@@ -1222,6 +1224,38 @@ public final class DateInterval
         return this.streamPartitioned(rule)
             .map(interval -> interval.in(tz))
             .filter(interval -> !interval.isEmpty());
+
+    }
+
+    /**
+     * Obtains a random date within this interval. </p>
+     *
+     * @return  random date within this interval
+     * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * Liefert ein Zufallsdatum innerhalb dieses Intervalls. </p>
+     *
+     * @return  random date within this interval
+     * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    public PlainDate random() {
+
+        DateInterval interval = this.toCanonical();
+
+        if (interval.isFinite() && !interval.isEmpty()) {
+            long randomNum =
+                ThreadLocalRandom.current().nextLong(
+                    interval.getStartAsCalendarDate().getDaysSinceEpochUTC(),
+                    interval.getEndAsCalendarDate().getDaysSinceEpochUTC() + 1);
+            return PlainDate.of(randomNum, EpochDays.UTC);
+        } else {
+            throw new IllegalStateException("Cannot get random date in an empty or infinite interval: " + this);
+        }
 
     }
 

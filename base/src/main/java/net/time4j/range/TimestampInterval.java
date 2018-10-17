@@ -856,6 +856,36 @@ public final class TimestampInterval
     }
 
     /**
+     * Obtains a random timestamp within this interval. </p>
+     *
+     * @return  random timestamp within this interval
+     * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * Liefert einen Zufallszeitstempel innerhalb dieses Intervalls. </p>
+     *
+     * @return  random timestamp within this interval
+     * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    public PlainTimestamp random() {
+
+        try {
+            // use UTC-offset for internal conversion only
+            MomentInterval interval = this.toCanonical().atUTC();
+            return interval.random().toZonalTimestamp(ZonalOffset.UTC);
+        } catch (IllegalStateException ise){
+            throw new IllegalStateException(
+                "Cannot get random timestamp in an empty or infinite interval: " + this,
+                ise);
+        }
+
+    }
+
+    /**
      * <p>Prints the canonical form of this interval in given ISO-8601 style. </p>
      *
      * @param   dateStyle       iso-compatible date style

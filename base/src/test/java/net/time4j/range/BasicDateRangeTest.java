@@ -678,4 +678,16 @@ public class BasicDateRangeTest {
         assertThat(dates, is(expected));
     }
 
+    @Test
+    public void random() {
+        DateInterval interval =
+            DateInterval.between(
+                PlainDate.of(2018, 10, 25),
+                PlainDate.of(2018, 11, 2));
+        for (int i = 0; i < 100; i++) {
+            PlainDate random = interval.random();
+            assertThat(interval.contains(random), is(true));
+        }
+    }
+
 }

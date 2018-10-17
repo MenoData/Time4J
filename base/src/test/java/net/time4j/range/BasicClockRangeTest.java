@@ -461,4 +461,16 @@ public class BasicClockRangeTest {
         interval.stream(Duration.of(1, ClockUnit.NANOS));
     }
 
+    @Test
+    public void random() {
+        ClockInterval interval =
+            ClockInterval.between(
+                PlainTime.of(23, 59, 59),
+                PlainTime.midnightAtEndOfDay());
+        for (int i = 0; i < 100; i++) {
+            PlainTime random = interval.random();
+            assertThat(interval.contains(random), is(true));
+        }
+    }
+
 }

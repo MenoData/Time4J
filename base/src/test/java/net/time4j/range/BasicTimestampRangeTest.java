@@ -461,4 +461,31 @@ public class BasicTimestampRangeTest {
         assertThat(TimestampInterval.ALWAYS.getEnd().isInfinite(), is(true));
     }
 
+    @Test
+    public void random() {
+        PlainTimestamp start = PlainTimestamp.of(2014, 5, 1, 23, 59, 59);
+        PlainTimestamp end = PlainTimestamp.of(2014, 5, 2, 0, 0, 0);
+        TimestampInterval interval = TimestampInterval.between(start, end);
+        for (int i = 0; i < 10; i++) {
+            PlainTimestamp random = interval.random();
+            assertThat(interval.contains(random), is(true));
+        }
+        interval = interval.withEnd(PlainTimestamp.of(2014, 5, 2, 1, 0, 0));
+        for (int i = 0; i < 10; i++) {
+            PlainTimestamp random = interval.random();
+            assertThat(interval.contains(random), is(true));
+        }
+        interval = interval.withEnd(PlainTimestamp.of(2014, 5, 3, 1, 0, 0));
+        for (int i = 0; i < 10; i++) {
+            PlainTimestamp random = interval.random();
+            assertThat(interval.contains(random), is(true));
+        }
+        interval = interval.withStart(PlainTimestamp.axis().getMinimum());
+        interval = interval.withEnd(PlainTimestamp.axis().getMaximum());
+        for (int i = 0; i < 10; i++) {
+            PlainTimestamp random = interval.random();
+            assertThat(interval.contains(random), is(true));
+        }
+    }
+
 }

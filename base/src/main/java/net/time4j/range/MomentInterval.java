@@ -62,6 +62,7 @@ import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
 import java.util.Set;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
@@ -142,6 +143,7 @@ public final class MomentInterval
      */
     public static double RIGHT_ALIGNED = 0.0;
 
+    private static final int MRD = 1_000_000_000;
     private static final long serialVersionUID = -5403584519478162113L;
 
     private static final Comparator<ChronoInterval<Moment>> COMPARATOR =
@@ -972,6 +974,48 @@ public final class MomentInterval
             return streamUTC(cast(duration), start, end);
         } else {
             return streamPOSIX(cast(duration), start, end);
+        }
+
+    }
+
+    /**
+     * Obtains a random moment within this interval. </p>
+     *
+     * @return  random moment within this interval
+     * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * Liefert einen Zufallsmoment innerhalb dieses Intervalls. </p>
+     *
+     * @return  random moment within this interval
+     * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    public Moment random() {
+
+        MomentInterval interval = this.toCanonical();
+
+        if (interval.isFinite() && !interval.isEmpty()) {
+            Moment m1 = interval.getStartAsMoment();
+            Moment m2 = interval.getEndAsMoment();
+            double factor = MRD;
+            double d1 = m1.getPosixTime() + m1.getNanosecond() / factor;
+            double d2 = m2.getPosixTime() + m2.getNanosecond() / factor;
+            double randomNum = ThreadLocalRandom.current().nextDouble(d1, d2);
+            long posix = (long) Math.floor(randomNum);
+            int fraction = (int) (MRD * (randomNum - posix));
+            Moment random = Moment.of(posix, fraction, TimeScale.POSIX);
+            if (random.isBefore(m1)) {
+                random = m1;
+            } else if (random.isAfterOrEqual(m2)) {
+                random = m2.minus(1, TimeUnit.NANOSECONDS);
+            }
+            return random;
+        } else {
+            throw new IllegalStateException("Cannot get random moment in an empty or infinite interval: " + this);
         }
 
     }

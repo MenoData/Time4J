@@ -41,6 +41,7 @@ import java.text.ParseException;
 import java.time.LocalTime;
 import java.util.Comparator;
 import java.util.Locale;
+import java.util.concurrent.ThreadLocalRandom;
 import java.util.stream.IntStream;
 import java.util.stream.Stream;
 
@@ -599,6 +600,37 @@ public final class ClockInterval
         }
 
         return IntStream.range(0, size).mapToObj(index -> start.plus(duration.multipliedBy(index)));
+
+    }
+
+    /**
+     * Obtains a random time within this interval. </p>
+     *
+     * @return  random time within this interval
+     * @throws  IllegalStateException if this interval is empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    /*[deutsch]
+     * Liefert eine Zufallszeit innerhalb dieses Intervalls. </p>
+     *
+     * @return  random time within this interval
+     * @throws  IllegalStateException if this interval is empty or if there is no canonical form
+     * @see     #toCanonical()
+     * @since   5.0
+     */
+    public PlainTime random() {
+
+        ClockInterval interval = this.toCanonical();
+
+        if (interval.isEmpty()) {
+            throw new IllegalStateException("Cannot get random time in an empty interval: " + this);
+        } else {
+            long s = interval.getStartAsClockTime().get(PlainTime.NANO_OF_DAY).longValue();
+            long e = interval.getEndAsClockTime().get(PlainTime.NANO_OF_DAY).longValue();
+            long randomNum = ThreadLocalRandom.current().nextLong(s, e);
+            return PlainTime.midnightAtStartOfDay().plus(randomNum, ClockUnit.NANOS);
+        }
 
     }
 
