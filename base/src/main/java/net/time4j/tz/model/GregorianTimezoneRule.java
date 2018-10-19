@@ -21,6 +21,7 @@
 
 package net.time4j.tz.model;
 
+import net.time4j.CalendarUnit;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
@@ -68,23 +69,23 @@ public class GregorianTimezoneRule
      * <p>Constructor for subclasses only. </p>
      *
      * @param   month       gregorian month
-     * @param   timeOfDay   time of day
+     * @param   timeOfDay   time of day in seconds after midnight
      * @param   indicator   offset indicator
      * @param   savings     daylight saving amount
-     * @since   4.0
+     * @since   5.0
      */
     /*[deutsch]
      * <p>Konstruktor nur f&uuml;r Subklassen. </p>
      *
      * @param   month       gregorian month
-     * @param   timeOfDay   time of day
+     * @param   timeOfDay   time of day in seconds after midnight
      * @param   indicator   offset indicator
      * @param   savings     daylight saving amount
-     * @since   4.0
+     * @since   5.0
      */
     protected GregorianTimezoneRule(
         Month month,
-        PlainTime timeOfDay,
+        int timeOfDay,
         OffsetIndicator indicator,
         int savings
     ) {
@@ -131,8 +132,46 @@ public class GregorianTimezoneRule
         int savings
     ) {
 
-        return new FixedDayPattern(
-            month, dayOfMonth, timeOfDay, indicator, savings);
+        return ofFixedDay(month, dayOfMonth, timeOfDay.getInt(PlainTime.SECOND_OF_DAY), indicator, savings);
+
+    }
+
+    /**
+     * <p>Creates a rule for a fixed day in given month. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfMonth  day of month (1 - 31)
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range or
+     *          if the day of month is not valid in context of given month
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Muster f&uuml;r einen festen Tag im angegebenen
+     * Monat. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfMonth  day of month (1 - 31)
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range or
+     *          if the day of month is not valid in context of given month
+     * @since   5.0
+     */
+    public static GregorianTimezoneRule ofFixedDay(
+        Month month,
+        int dayOfMonth,
+        int timeOfDay,
+        OffsetIndicator indicator,
+        int savings
+    ) {
+
+        return new FixedDayPattern(month, dayOfMonth, timeOfDay, indicator, savings);
 
     }
 
@@ -141,7 +180,7 @@ public class GregorianTimezoneRule
      *
      * @param   month       calendar month
      * @param   dayOfWeek   last day of week
-     * @param   timeOfDay   clock time when time switch happens
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
      * @param   indicator   offset indicator
      * @param   savings     fixed DST-offset in seconds
      * @return  new daylight saving rule
@@ -169,8 +208,44 @@ public class GregorianTimezoneRule
         int savings
     ) {
 
-        return new LastWeekdayPattern(
-            month, dayOfWeek, timeOfDay, indicator, savings);
+        return ofLastWeekday(month, dayOfWeek, timeOfDay.getInt(PlainTime.SECOND_OF_DAY), indicator, savings);
+
+    }
+
+    /**
+     * <p>Creates a rule for the last day of week in given month. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfWeek   last day of week
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Muster f&uuml;r den letzten Wochentag im angegebenen
+     * Monat. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfWeek   last day of week
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range
+     * @since   5.0
+     */
+    public static GregorianTimezoneRule ofLastWeekday(
+        Month month,
+        Weekday dayOfWeek,
+        int timeOfDay,
+        OffsetIndicator indicator,
+        int savings
+    ) {
+
+        return new LastWeekdayPattern(month, dayOfWeek, timeOfDay, indicator, savings);
 
     }
 
@@ -218,8 +293,56 @@ public class GregorianTimezoneRule
         int savings
     ) {
 
-        return new DayOfWeekInMonthPattern(
-            month, dayOfMonth, dayOfWeek, timeOfDay, indicator, savings, true);
+        return ofWeekdayAfterDate(
+            month, dayOfMonth, dayOfWeek, timeOfDay.getInt(PlainTime.SECOND_OF_DAY), indicator, savings);
+
+    }
+
+    /**
+     * <p>Creates a rule for a day of week after the given reference date. </p>
+     *
+     * <p>Example =&gt; You have to set for the second Sunday in April:
+     * {@code month=APRIL, dayOfMonth=8, dayOfWeek=SUNDAY}. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfMonth  reference day of month (1 - 31)
+     * @param   dayOfWeek   day of week when time switch happens
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range or
+     *          if the day of month is not valid in context of given month
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Muster f&uuml;r einen Wochentag nach einem
+     * festen Monatstag im angegebenen Monat. </p>
+     *
+     * <p>Beispiel =&gt; F&uuml;r den zweiten Sonntag im April sei zu setzen:
+     * {@code month=APRIL, dayOfMonth=8, dayOfWeek=SUNDAY}. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfMonth  reference day of month (1 - 31)
+     * @param   dayOfWeek   day of week when time switch happens
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range or
+     *          if the day of month is not valid in context of given month
+     * @since   5.0
+     */
+    public static GregorianTimezoneRule ofWeekdayAfterDate(
+        Month month,
+        int dayOfMonth,
+        Weekday dayOfWeek,
+        int timeOfDay,
+        OffsetIndicator indicator,
+        int savings
+    ) {
+
+        return new DayOfWeekInMonthPattern(month, dayOfMonth, dayOfWeek, timeOfDay, indicator, savings, true);
 
     }
 
@@ -261,15 +384,57 @@ public class GregorianTimezoneRule
         int savings
     ) {
 
-        return new DayOfWeekInMonthPattern(
-            month, dayOfMonth, dayOfWeek, timeOfDay, indicator, savings, false);
+        return ofWeekdayBeforeDate(
+            month, dayOfMonth, dayOfWeek, timeOfDay.getInt(PlainTime.SECOND_OF_DAY), indicator, savings);
+
+    }
+
+    /**
+     * <p>Creates a rule for a day of week before the given reference date. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfMonth  reference day of month (1 - 31)
+     * @param   dayOfWeek   day of week when time switch happens
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range or
+     *          if the day of month is not valid in context of given month
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Konstruiert ein Muster f&uuml;r einen Wochentag vor einem
+     * festen Monatstag im angegebenen Monat. </p>
+     *
+     * @param   month       calendar month
+     * @param   dayOfMonth  reference day of month (1 - 31)
+     * @param   dayOfWeek   day of week when time switch happens
+     * @param   timeOfDay   clock time in seconds after midnight when time switch happens
+     * @param   indicator   offset indicator
+     * @param   savings     fixed DST-offset in seconds
+     * @return  new daylight saving rule
+     * @throws  IllegalArgumentException if the last argument is out of range or
+     *          if the day of month is not valid in context of given month
+     * @since   5.0
+     */
+    public static GregorianTimezoneRule ofWeekdayBeforeDate(
+        Month month,
+        int dayOfMonth,
+        Weekday dayOfWeek,
+        int timeOfDay,
+        OffsetIndicator indicator,
+        int savings
+    ) {
+
+        return new DayOfWeekInMonthPattern(month, dayOfMonth, dayOfWeek, timeOfDay, indicator, savings, false);
 
     }
 
     @Override
-    public PlainDate getDate(int year) {
+    public final PlainDate getDate(int year) {
 
-        throw new AbstractMethodError("Implemented by subclasses.");
+        return this.getDate0(year).plus(this.getDayOverflow(), CalendarUnit.DAYS);
 
     }
 
@@ -288,6 +453,13 @@ public class GregorianTimezoneRule
     public Month getMonth() {
 
         return Month.valueOf(this.month);
+
+    }
+
+    // Must be overridden by subclasses.
+    protected PlainDate getDate0(int year) {
+
+        throw new AbstractMethodError("Implemented by subclasses.");
 
     }
 
@@ -317,6 +489,7 @@ public class GregorianTimezoneRule
 
         return (
             this.getTimeOfDay().equals(rule.getTimeOfDay())
+            && (this.getDayOverflow() == rule.getDayOverflow())
             && (this.getIndicator() == rule.getIndicator())
             && (this.getSavings() == rule.getSavings())
             && (this.month == rule.month));

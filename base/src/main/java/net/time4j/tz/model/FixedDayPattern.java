@@ -23,7 +23,6 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.base.GregorianMath;
 
 import java.io.IOException;
@@ -55,7 +54,7 @@ final class FixedDayPattern
     FixedDayPattern(
         Month month,
         int dayOfMonth,
-        PlainTime timeOfDay,
+        int timeOfDay,
         OffsetIndicator indicator,
         int savings
     ) {
@@ -69,7 +68,7 @@ final class FixedDayPattern
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public PlainDate getDate(int year) {
+    protected PlainDate getDate0(int year) {
 
         return PlainDate.of(year, this.getMonthValue(), this.dayOfMonth);
 
@@ -107,6 +106,8 @@ final class FixedDayPattern
         sb.append(this.getMonthValue());
         sb.append(",day-of-month=");
         sb.append(this.dayOfMonth);
+        sb.append(",day-overflow=");
+        sb.append(this.getDayOverflow());
         sb.append(",time-of-day=");
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");

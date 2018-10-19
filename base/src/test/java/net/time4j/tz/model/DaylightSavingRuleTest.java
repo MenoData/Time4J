@@ -111,4 +111,21 @@ public class DaylightSavingRuleTest { // more tests see SerializationTest
             is(3600));
     }
 
+    @Test // see Asia/Tokyo in TZDB-version 2018f
+    public void switchAtTimeT25() {
+        DaylightSavingRule rule =
+            GregorianTimezoneRule.ofWeekdayAfterDate(
+                Month.SEPTEMBER,
+                8,
+                Weekday.SATURDAY,
+                25 * 3600,
+                OffsetIndicator.UTC_TIME,
+                0);
+        assertThat(rule.getDayOverflow(), is(1L));
+        assertThat(rule.getTimeOfDay(), is(PlainTime.of(1)));
+        assertThat(rule.getDate(1950), is(PlainDate.of(1950, 9, 10)));
+        assertThat(rule.getIndicator(), is(OffsetIndicator.UTC_TIME));
+        assertThat(rule.getSavings(), is(0));
+    }
+
 }

@@ -23,7 +23,6 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
 
@@ -56,7 +55,7 @@ final class LastWeekdayPattern
     LastWeekdayPattern(
         Month month,
         Weekday dayOfWeek,
-        PlainTime timeOfDay,
+        int timeOfDay,
         OffsetIndicator indicator,
         int savings
     ) {
@@ -69,7 +68,7 @@ final class LastWeekdayPattern
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public PlainDate getDate(int year) {
+    protected PlainDate getDate0(int year) {
 
         int month = this.getMonthValue();
         int lastDay = GregorianMath.getLengthOfMonth(year, month);
@@ -116,6 +115,8 @@ final class LastWeekdayPattern
         sb.append(this.getMonthValue());
         sb.append(",day-of-week=");
         sb.append(Weekday.valueOf(this.dayOfWeek));
+        sb.append(",day-overflow=");
+        sb.append(this.getDayOverflow());
         sb.append(",time-of-day=");
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");

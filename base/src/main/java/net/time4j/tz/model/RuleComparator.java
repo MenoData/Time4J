@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleComparator.java) is part of project Time4J.
  *
@@ -41,7 +41,7 @@ enum RuleComparator
     @Override
     public int compare(DaylightSavingRule o1, DaylightSavingRule o2) {
 
-        int result = o1.getDate(2000).compareTo(o2.getDate(2000)); // leap year
+        int result = o1.getDate(2000).compareTo(o2.getDate(2000)); // leap year (as prototype)
 
         if (result == 0) {
             result = o1.getTimeOfDay().compareTo(o2.getTimeOfDay());

@@ -2293,7 +2293,7 @@ public final class PlainTime
             if (returnType == PlainTime.class) {
                 return returnType.cast(time);
             } else {
-                long cycles = MathUtils.floorDivide(hours, 24);
+                long cycles = Math.floorDiv(hours, 24);
                 return returnType.cast(new DayCycles(cycles, time));
             }
 

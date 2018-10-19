@@ -22,7 +22,6 @@
 package net.time4j.tz.model;
 
 import net.time4j.Month;
-import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
 import net.time4j.tz.ZonalOffset;
@@ -424,6 +423,12 @@ final class SPX
 
     }
 
+    private static int toTimeOfDay(GregorianTimezoneRule rule) {
+
+        return rule.getTimeOfDay().getInt(SECOND_OF_DAY) + MathUtils.safeCast(rule.getDayOverflow() * 86400);
+
+    }
+
     private static void writeFixedDayPattern(
         Object rule,
         DataOutput out
@@ -432,7 +437,7 @@ final class SPX
         FixedDayPattern pattern = (FixedDayPattern) rule;
         boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
         int second = (pattern.getDayOfMonth() << 3);
-        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int tod = toTimeOfDay(pattern);
         int timeIndex = toTimeIndexR(tod);
         second |= timeIndex;
         out.writeByte(second & 0xFF);
@@ -467,13 +472,10 @@ final class SPX
             tod = in.readInt();
         }
 
-        PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
-
         return new FixedDayPattern(
             Month.valueOf(month),
             dayOfMonth,
-            timeOfDay,
+            tod,
             indicator,
             dst);
 
@@ -490,7 +492,7 @@ final class SPX
         second |= pattern.getDayOfWeek();
         out.writeByte(second & 0xFF);
         int third = (pattern.isAfter() ? (1 << 7) : 0);
-        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int tod = toTimeOfDay(pattern);
         boolean timeWritten = false;
 
         if ((tod % 1800) == 0) {
@@ -537,14 +539,11 @@ final class SPX
             tod *= 1800;
         }
 
-        PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
-
         return new DayOfWeekInMonthPattern(
             month,
             dayOfMonth,
             dayOfWeek,
-            timeOfDay,
+            tod,
             indicator,
             dst,
             after);
@@ -559,7 +558,7 @@ final class SPX
         LastWeekdayPattern pattern = (LastWeekdayPattern) rule;
         boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
         int second = (pattern.getDayOfWeek() << 5);
-        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int tod = toTimeOfDay(pattern);
         boolean timeWritten = false;
 
         if ((tod % 3600) == 0) {
@@ -603,13 +602,10 @@ final class SPX
             tod *= 3600;
         }
 
-        PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
-
         return new LastWeekdayPattern(
             month,
             dayOfWeek,
-            timeOfDay,
+            tod,
             indicator,
             dst);
 

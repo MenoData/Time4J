@@ -69,7 +69,7 @@ final class NegativeDayOfMonthPattern
         OffsetIndicator indicator,
         int savings
     ) {
-        super(month, timeOfDay, indicator, savings);
+        super(month, timeOfDay.getInt(PlainTime.SECOND_OF_DAY), indicator, savings);
 
         if (domIndicator < -28 || domIndicator > -2) {
             throw new IllegalArgumentException("Day-of-month-indicator out of range: " + domIndicator);
@@ -83,7 +83,7 @@ final class NegativeDayOfMonthPattern
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public PlainDate getDate(int year) {
+    protected PlainDate getDate0(int year) {
 
         int month = this.getMonth().getValue();
         int dayOfMonth = GregorianMath.getLengthOfMonth(year, month) + 1 + this.domIndicator;
