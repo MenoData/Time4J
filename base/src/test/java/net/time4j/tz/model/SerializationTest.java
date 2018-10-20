@@ -236,6 +236,26 @@ public class SerializationTest {
     }
 
     @Test
+    public void roundTripOfFixedDayTMinus6Pattern()
+        throws IOException, ClassNotFoundException {
+
+        DaylightSavingRule rule =
+            GregorianTimezoneRule.ofFixedDay(
+                Month.OCTOBER,
+                15,
+                -6 * 3600,
+                OffsetIndicator.UTC_TIME,
+                0);
+        DaylightSavingRule copy = (DaylightSavingRule) roundtrip(rule);
+        assertThat(rule, is(copy));
+        assertThat(copy.getSavings(), is(0));
+        assertThat(copy.getDayOverflow(), is(-1L));
+        assertThat(copy.getTimeOfDay(), is(PlainTime.of(18)));
+        assertThat(copy.getIndicator(), is(OffsetIndicator.UTC_TIME));
+        assertThat(copy.getDate(1980), is(PlainDate.of(1980, 10, 14)));
+    }
+
+    @Test
     public void roundTripOfDayOfWeekInMonthT0230s3600BeforePattern()
         throws IOException, ClassNotFoundException {
 
