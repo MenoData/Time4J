@@ -12,4 +12,4 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 
 Please have a look at the version of this file on the master branch for gathering further informations. 
 
-Note: The version v3.41 is the last version of this level6-branch.
+Note: The version v3.43 is the last version of this level6-branch (unless future tzdb-syntax-changes might require an update).
