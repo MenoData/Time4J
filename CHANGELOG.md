@@ -1,4 +1,46 @@
-## [v3.41] published on 2018-03-24  (final version of level-6)
+## [v3.50] published on 2018-10-21  (final version of level-6)
+### Added
+- Support tzdb-time-switches out of range T00:00/T24:00 [#825]
+- Make enums Month, Weekday and Quarter to operators for PlainDate [#819]
+- Enhance duration comparators [#816]
+- New class `AnnualDate` in main package [#787]
+- New class `MachineTime` in main package [#609]
+- Extend formattability of extreme integer element values [#797]
+- Resolve locale no-NO-NY to nynorsk [#788]
+- Support Kabyle language [#782]
+- Show tomorrow and yesterday words in PrettyTime [#781]
+- Zodiac constellations and signs [#765]
+- New interface describing equatorial coordinates [#764]
+
+### Changed
+- Remove confusing method `ZonalClock.currentMoment()` [#817]
+- Improved handling of negative DST-offsets [#742]
+- Simplify generic formatter API [#813]
+- Remove deprecated stuff in ChronoMerger [#524]
+- StartOfDay now uses CalendarDate in abstract method [#655]
+- Update to TZDB-version 2018e [#773]
+- Update some resources to CLDR 33 [#774]
+
+### Deprecated
+- Replace/Remove `SolarTime.Calculator.declination(double)` [#772]
+
+### Fixed
+- Ensure that big year numbers with 10 digits can be printed [#792]
+- Mismatch between getMinimumSinceUTC and transform for some historic calendars [#808]
+- Fix for narrow era names which had been incomplete [#809]
+- Fix for changing `JapaneseCalendar.MONTH_AS_ORDINAL` [#807]
+- NPE-Fix for loading time zone based on system time zone identifier [#803]
+- NPE-Fix for premature assignment of system time zone [#802]
+- Wrong day-of-year in HebrewCalendar [#800]
+- Rethrow undocumented ArithmeticException as IllegalArgumentException [#791]
+- Wrong days-since-UTC after transform in Hijri adjustment [#789]
+- `java.util.Locale.getScript()` unknown for Java-API-level 6 [#780]
+- Arithmetic overflow of int-results in JulianCalendar.Unit.between(...) [#775]
+- Incorrect translation of "M" pattern in JulianCalendar formatter [#776]
+- Same exit and arrival of sun/moon in sign of Scorpius [#778]
+- Right ascension of moon position should be in range 0-360 [#770]
+
+## [v3.41] published on 2018-03-24
 ### Added
 - Reverse engineering of windows zone names [#756]
 - Normalization of timezone identifiers [#756]
