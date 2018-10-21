@@ -97,7 +97,7 @@ final class CompositeTransitionModel
             return this.arrayModel.getStartTransition(ut);
         } else {
             ZonalTransition result = this.ruleModel.getStartTransition(ut);
-            return ((result == null) ?  this.last : result);
+            return ((result == null) ? this.last : result);
         }
 
     }
