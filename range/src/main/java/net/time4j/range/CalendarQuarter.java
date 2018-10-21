@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarQuarter.java) is part of project Time4J.
  *
@@ -623,18 +623,6 @@ public final class CalendarQuarter
 
             PlainDate date = Moment.from(clock.currentTime()).toZonalTimestamp(zone.getID()).toDate();
             return CalendarQuarter.of(date.getYear(), date.get(QUARTER_OF_YEAR));
-
-        }
-
-        @Override
-        public CalendarQuarter createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

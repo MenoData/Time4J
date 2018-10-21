@@ -1961,19 +1961,6 @@ public final class HijriCalendar
         }
 
         @Override
-        @Deprecated
-        public HijriCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public HijriCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,

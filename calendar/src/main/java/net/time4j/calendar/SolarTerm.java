@@ -498,11 +498,7 @@ public enum SolarTerm {
 
     private static String[] getTextForms(Locale locale) {
         if (locale.getLanguage().equals("zh")) {
-            return (
-                (locale.getCountry().equals("TW") || locale.getScript().equals("Hant"))
-                    ? CHINESE_TRADITIONAL
-                    : CHINESE_SIMPLIFIED
-            );
+            return locale.getCountry().equals("TW") ? CHINESE_TRADITIONAL : CHINESE_SIMPLIFIED;
         } else if (locale.getLanguage().equals("ko")) {
             return KOREAN;
         } else if (locale.getLanguage().equals("vi")) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LanguageMatch.java) is part of project Time4J.
  *
@@ -61,6 +61,10 @@ public enum LanguageMatch {
     public static String getAlias(Locale desired) {
 
         String key = desired.getLanguage();
+
+        if (key.equals("no") && desired.getVariant().equals("NY") && desired.getCountry().equals("NO")) {
+            return "nn";
+        }
 
         for (LanguageMatch lm : ALIASES) {
             if (key.equals(lm.name())) {

@@ -236,53 +236,6 @@ public final class ZonalOffset
      * and {@code Moment}. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
-     * @param   degrees     geographical length in degreed, defined in
-     *                      range {@code 0 <= degrees <= 180}
-     * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
-     * @param   arcSeconds  arc second part ({@code 0 <= arcSeconds <= 59})
-     * @return  zonal offset in decimal precision
-     * @throws  IllegalArgumentException if range check fails (also if total
-     *          absolute offset goes beyond 180 degrees)
-     * @deprecated  Use {@link #atLongitude(OffsetSign, int, int, double)} instead
-     */
-    /*[deutsch]
-     * <p>Konstruiert eine neue Verschiebung auf Basis einer geographischen
-     * L&auml;ngenangabe. </p>
-     *
-     * <p>Hinweis: Fraktionale Verschiebungen werden im Zeitzonenkontext
-     * nicht verwendet, sondern nur dann, wenn ein {@code PlainTimestamp}
-     * zu einem {@code Moment} oder zur&uuml;ck konvertiert wird. </p>
-     *
-     * @param   sign        sign of shift relative to zero meridian
-     * @param   degrees     geographical length in degreed, defined in
-     *                      range {@code 0 <= degrees <= 180}
-     * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})
-     * @param   arcSeconds  arc second part ({@code 0 <= arcSeconds <= 59})
-     * @return  zonal offset in decimal precision
-     * @throws  IllegalArgumentException if range check fails (also if total
-     *          absolute offset goes beyond 180 degrees)
-     * @deprecated  Use {@link #atLongitude(OffsetSign, int, int, double)} instead
-     */
-    @Deprecated
-    public static ZonalOffset atLongitude(
-        OffsetSign sign,
-        int degrees,
-        int arcMinutes,
-        int arcSeconds
-    ) {
-
-        return atLongitude(sign, degrees, arcMinutes, (double) arcSeconds);
-
-    }
-
-    /**
-     * <p>Creates a new shift based on a geographical longitude. </p>
-     *
-     * <p>Note that fractional offsets are not used in context of timezones,
-     * but can only be applied to conversions between {@code PlainTimestamp}
-     * and {@code Moment}. </p>
-     *
-     * @param   sign        sign of shift relative to zero meridian
      * @param   degrees     geographical length in degrees, defined in
      *                      range {@code 0 <= degrees <= 180}
      * @param   arcMinutes  arc minute part ({@code 0 <= arcMinutes <= 59})

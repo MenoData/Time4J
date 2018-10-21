@@ -51,6 +51,7 @@ import org.junit.runners.Suite.SuiteClasses;
         JapaneseUnitTest.class,
         JucheMiscellaneousTest.class,
         JulianCalendarTest.class,
+        JulianRangeTest.class,
         JulianMiscellaneousTest.class,
         KoreanMiscellaneousTest.class,
         MinguoCalendarTest.class,

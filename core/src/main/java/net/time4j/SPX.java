@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j;
 
 import net.time4j.engine.TimeSpan;
+import net.time4j.scale.TimeScale;
 
 import java.io.DataInput;
 import java.io.DataOutput;
@@ -71,6 +72,9 @@ final class SPX
 
     /** Serialisierungstyp von {@code Moment}. */
     static final int MOMENT_TYPE = 4;
+
+    /** Serialisierungstyp von {@code MachineTime}. */
+    static final int MACHINE_TIME_TYPE = 5;
 
     /** Serialisierungstyp von {@code Duration}. */
     static final int DURATION_TYPE = 6;
@@ -159,6 +163,9 @@ final class SPX
             case MOMENT_TYPE:
                 this.writeMoment(out);
                 break;
+            case MACHINE_TIME_TYPE:
+                this.writeMachineTime(out);
+                break;
             case DURATION_TYPE:
                 this.writeDuration(out);
                 break;
@@ -206,6 +213,9 @@ final class SPX
                 break;
             case MOMENT_TYPE:
                 this.obj = this.readMoment(in, header);
+                break;
+            case MACHINE_TIME_TYPE:
+                this.obj = this.readMachineTime(in, header);
                 break;
             case DURATION_TYPE:
                 this.obj = this.readDuration(in, header);
@@ -467,7 +477,7 @@ final class SPX
     private Object readTimestamp(
         DataInput in,
         byte header
-    ) throws IOException, ClassNotFoundException {
+    ) throws IOException {
 
         PlainDate date = readDate(in, header);
         PlainTime time = readTime(in);
@@ -592,6 +602,46 @@ final class SPX
         }
 
         return new DayPeriod.Element(fixed, locale, calendarType);
+
+    }
+
+    private void writeMachineTime(ObjectOutput out)
+        throws IOException {
+
+        MachineTime<?> mt = MachineTime.class.cast(this.obj);
+        int header = MACHINE_TIME_TYPE;
+        header <<= 4;
+
+        if (mt.getScale() == TimeScale.UTC) {
+            header |= 1;
+        }
+
+        if (mt.getFraction() == 0) {
+            out.writeByte(header);
+            out.writeLong(mt.getSeconds());
+        } else {
+            header |= 2;
+            out.writeByte(header);
+            out.writeLong(mt.getSeconds());
+            out.writeInt(mt.getFraction());
+        }
+
+    }
+
+    private Object readMachineTime(
+        ObjectInput in,
+        byte header
+    ) throws IOException {
+
+        TimeScale scale = (((header & 0x1) == 1) ? TimeScale.UTC : TimeScale.POSIX);
+        long secs = in.readLong();
+        int fraction = (((header & 0x2) == 2) ? in.readInt() : 0);
+
+        if (scale == TimeScale.UTC) {
+            return MachineTime.ofSIUnits(secs, fraction);
+        } else {
+            return MachineTime.ofPosixUnits(secs, fraction);
+        }
 
     }
 

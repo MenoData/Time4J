@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTimestamp.java) is part of project Time4J.
  *
@@ -51,7 +51,6 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
@@ -66,6 +65,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -73,11 +73,50 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 
-import static net.time4j.CalendarUnit.*;
+import static net.time4j.CalendarUnit.DAYS;
+import static net.time4j.CalendarUnit.MILLENNIA;
+import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.QUARTERS;
+import static net.time4j.CalendarUnit.WEEKS;
+import static net.time4j.CalendarUnit.YEARS;
 import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.*;
-import static net.time4j.PlainDate.*;
-import static net.time4j.PlainTime.*;
+import static net.time4j.ClockUnit.MICROS;
+import static net.time4j.ClockUnit.MILLIS;
+import static net.time4j.ClockUnit.MINUTES;
+import static net.time4j.ClockUnit.NANOS;
+import static net.time4j.ClockUnit.SECONDS;
+import static net.time4j.PlainDate.CALENDAR_DATE;
+import static net.time4j.PlainDate.DAY_OF_MONTH;
+import static net.time4j.PlainDate.DAY_OF_QUARTER;
+import static net.time4j.PlainDate.DAY_OF_WEEK;
+import static net.time4j.PlainDate.DAY_OF_YEAR;
+import static net.time4j.PlainDate.MONTH_AS_NUMBER;
+import static net.time4j.PlainDate.MONTH_OF_YEAR;
+import static net.time4j.PlainDate.QUARTER_OF_YEAR;
+import static net.time4j.PlainDate.WEEKDAY_IN_MONTH;
+import static net.time4j.PlainDate.YEAR;
+import static net.time4j.PlainDate.YEAR_OF_WEEKDATE;
+import static net.time4j.PlainTime.AM_PM_OF_DAY;
+import static net.time4j.PlainTime.CLOCK_HOUR_OF_AMPM;
+import static net.time4j.PlainTime.CLOCK_HOUR_OF_DAY;
+import static net.time4j.PlainTime.DECIMAL_HOUR;
+import static net.time4j.PlainTime.DECIMAL_MINUTE;
+import static net.time4j.PlainTime.DECIMAL_SECOND;
+import static net.time4j.PlainTime.DIGITAL_HOUR_OF_AMPM;
+import static net.time4j.PlainTime.DIGITAL_HOUR_OF_DAY;
+import static net.time4j.PlainTime.HOUR_FROM_0_TO_24;
+import static net.time4j.PlainTime.MICRO_OF_DAY;
+import static net.time4j.PlainTime.MICRO_OF_SECOND;
+import static net.time4j.PlainTime.MILLI_OF_DAY;
+import static net.time4j.PlainTime.MILLI_OF_SECOND;
+import static net.time4j.PlainTime.MINUTE_OF_DAY;
+import static net.time4j.PlainTime.MINUTE_OF_HOUR;
+import static net.time4j.PlainTime.NANO_OF_DAY;
+import static net.time4j.PlainTime.NANO_OF_SECOND;
+import static net.time4j.PlainTime.PRECISION;
+import static net.time4j.PlainTime.SECOND_OF_DAY;
+import static net.time4j.PlainTime.SECOND_OF_MINUTE;
+import static net.time4j.PlainTime.WALL_TIME;
 
 
 /**
@@ -821,71 +860,55 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern in the
-     * default locale for formatting and parsing plain timestamps. </p>
+     * <p>Creates a formatted output of this instance. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainTimestamp}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   4.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainTimestamp}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   4.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTimestamp> localFormatter(
-        String formatPattern,
-        P patternType
-    ) {
+    public String print(TemporalFormatter<PlainTimestamp> printer) {
 
-        return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, Locale.getDefault());
+        return printer.print(this);
 
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern and locale
-     * for formatting and parsing plain timestamps. </p>
+     * <p>Parses given text to an instance of this class. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTimestamp}-objects using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   4.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Interpretiert den angegebenen Text zu einer Instanz dieser Klasse. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTimestamp}-objects using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String,ChronoPattern)
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   4.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTimestamp> formatter(
-        String formatPattern,
-        P patternType,
-        Locale locale
+    public static PlainTimestamp parse(
+        String text,
+        TemporalFormatter<PlainTimestamp> parser
     ) {
 
-        return FormatSupport.createFormatter(PlainTimestamp.class, formatPattern, patternType, locale);
+        try {
+            return parser.parse(text);
+        } catch (ParseException pe) {
+            throw new ChronoException(pe.getMessage(), pe);
+        }
 
     }
 
@@ -1164,7 +1187,7 @@ public final class PlainTimestamp
     }
 
     /**
-     * <p>Normalized given timespan using years, months, days and
+     * <p>Normalizes given timespan using years, months, days and
      * all clock units. </p>
      *
      * <p>This normalizer can also convert from days to months. Example: </p>
@@ -1440,19 +1463,6 @@ public final class PlainTimestamp
 
             final UnixTime ut = clock.currentTime();
             return PlainTimestamp.from(ut, zone.getOffset(ut));
-
-        }
-
-        @Override
-        @Deprecated
-        public PlainTimestamp createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

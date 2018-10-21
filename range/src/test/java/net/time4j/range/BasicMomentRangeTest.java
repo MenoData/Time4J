@@ -1,5 +1,6 @@
 package net.time4j.range;
 
+import net.time4j.MachineTime;
 import net.time4j.Moment;
 import net.time4j.PlainTimestamp;
 

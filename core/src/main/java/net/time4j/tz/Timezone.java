@@ -273,51 +273,6 @@ public abstract class Timezone
         PROVIDERS.put(NAME_JUT, PLATFORM_PROVIDER);
 
         if (zp == null) {
-            // for backward compatibility (old version of tzdata-module)
-            // TODO: remove in next major release
-            for (ZoneProvider provider : ResourceLoader.getInstance().services(ZoneProvider.class)) {
-                if (provider.getName().equals(NAME_TZDB)) {
-                    final ZoneProvider p = provider;
-                    zp = new ZoneModelProvider() {
-                        @Override
-                        public Set<String> getAvailableIDs() {
-                            return p.getAvailableIDs();
-                        }
-                        @Override
-                        public Map<String, String> getAliases() {
-                            return p.getAliases();
-                        }
-                        @Override
-                        public TransitionHistory load(String zoneID) {
-                            return p.load(zoneID);
-                        }
-                        @Override
-                        public String getFallback() {
-                            return p.getFallback();
-                        }
-                        @Override
-                        public String getName() {
-                            return p.getName();
-                        }
-                        @Override
-                        public String getLocation() {
-                            return p.getLocation();
-                        }
-                        @Override
-                        public String getVersion() {
-                            return p.getVersion();
-                        }
-                        @Override
-                        public ZoneNameProvider getSpecificZoneNameRepository() {
-                            return null;
-                        }
-                    };
-                    break;
-                }
-            }
-        }
-
-        if (zp == null) {
             DEFAULT_PROVIDER = PLATFORM_PROVIDER;
         } else {
             PROVIDERS.put(NAME_TZDB, zp);
@@ -755,10 +710,11 @@ public abstract class Timezone
      * <p>Tries to normalize given timezone identifier on the base of best efforts. </p>
      *
      * <p>This method is only capable of resolving old aliases like &quot;Asia/Calcutta&quot;
-     * to modern identifiers (like &quot;Asia/Kolkata&quot;) if the underlying {@code ZoneModelProvider}
-     * supports resolving of aliases. This is true if the tzdata-module is present on the class-path.
-     * However, the standard platform zone data do not support such a feature. But fixed offsets like
-     * &quot;UTC+01&quot; or the outdated form &quot;Etc/GMT+4&quot; can always be resolved to instances
+     * to modern identifiers (like &quot;Asia/Kolkata&quot;) if the underlying
+     * {@code ZoneModelProvider} supports resolving of aliases. This is true if
+     * the tzdata-module is present on the class-path. However, the standard platform
+     * zone data do not support such a feature. But fixed offsets like &quot;UTC+01&quot;
+     * or the outdated form &quot;Etc/GMT+4&quot; can always be resolved to instances
      * of {@code ZonalOffset}. </p>
      *
      * @param   tzid        timezone id which might need normalization
@@ -777,8 +733,8 @@ public abstract class Timezone
      * das unterst&uuml;tzt. Das ist der Fall, wenn das tzdata-Modul im Klassenpfad vorhanden ist.
      * Allerdings wird diese F&auml;higkeit von den Standard-Zeitzonendaten von Java nicht in diesem
      * Ausma&szlig; unterst&uuml;tzt. Aber feste Zeitzonenverschiebungen wie &quot;UTC+01&quot;
-     * oder die veraltete Form &quot;Etc/GMT+4&quot; k&ouml;nnen immer zu Instanzen von {@code ZonalOffset}
-     * aufgel&ouml;st werden. </p>
+     * oder die veraltete Form &quot;Etc/GMT+4&quot; k&ouml;nnen immer zu Instanzen von
+     * {@code ZonalOffset} aufgel&ouml;st werden. </p>
      *
      * @param   tzid        timezone id which might need normalization
      * @return  normalized identifier
@@ -918,6 +874,7 @@ public abstract class Timezone
      *
      * @param   ut      unix time
      * @return  DST-shift in seconds which yields local wall time if added to standard local time
+     * @see     #isDaylightSaving(UnixTime)
      * @since   3.2/4.1
      */
     /*[deutsch]
@@ -937,6 +894,7 @@ public abstract class Timezone
      *
      * @param   ut      unix time
      * @return  DST-shift in seconds which yields local wall time if added to standard local time
+     * @see     #isDaylightSaving(UnixTime)
      * @since   3.2/4.1
      */
     public abstract ZonalOffset getDaylightSavingOffset(UnixTime ut);
@@ -1030,7 +988,8 @@ public abstract class Timezone
      *
      * @param   ut      unix time
      * @return  {@code true} if the argument represents any kind of summer time else {@code false}
-     * @see     java.util.TimeZone#inDaylightTime(java.util.Date) java.util.TimeZone.inDaylightTime(java.util.Date)
+     * @see     java.util.TimeZone#inDaylightTime(java.util.Date)
+     *          java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     /*[deutsch]
      * <p>Herrscht zum angegebenen Zeitpunkt Sommerzeit in der Zeitzone? </p>
@@ -1046,7 +1005,8 @@ public abstract class Timezone
      *
      * @param   ut      unix time
      * @return  {@code true} if the argument represents any kind of summer time else {@code false}
-     * @see     java.util.TimeZone#inDaylightTime(java.util.Date) java.util.TimeZone.inDaylightTime(java.util.Date)
+     * @see     java.util.TimeZone#inDaylightTime(java.util.Date)
+     *          java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     public abstract boolean isDaylightSaving(UnixTime ut);
 
@@ -1436,7 +1396,8 @@ public abstract class Timezone
         Timezone ret = Timezone.getTZ(null, zoneID, false);
 
         if (ret == null) {
-            ret = new PlatformTimezone(new NamedID(zoneID)); // exception case if the tzid cannot be resolved
+            // exception case if the zoneID cannot be resolved
+            ret = new PlatformTimezone(new NamedID(zoneID));
         }
 
         return ret;
@@ -1563,10 +1524,13 @@ public abstract class Timezone
 
         // Ungültige ID?
         if (tz == null) {
-            if (wantsException) {
-                throw new IllegalArgumentException("Unknown timezone: " + zoneID);
-            } else {
+            if (!wantsException) {
                 return null;
+            } else if (java.util.TimeZone.getDefault().getID().equals(zoneID)) {
+                // edge case: platform zone with customized id
+                return new PlatformTimezone(new NamedID(zoneID));
+            } else {
+                throw new IllegalArgumentException("Unknown timezone: " + zoneID);
             }
         }
 

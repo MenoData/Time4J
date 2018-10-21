@@ -125,14 +125,10 @@ final class RuleBasedTransitionModel
 
         List<DaylightSavingRule> sortedRules = rules;
         Collections.sort(sortedRules, RuleComparator.INSTANCE);
-        boolean hasRuleWithoutDST = false;
         String calendarType = null;
 
         if (sortedRules.size() > 1) {
             for (DaylightSavingRule rule : sortedRules) {
-                if (!rule.isSaving()) {
-                    hasRuleWithoutDST = true;
-                }
                 if (calendarType == null) {
                     calendarType = rule.getCalendarType();
                 } else if (!calendarType.equals(rule.getCalendarType())) {
@@ -140,22 +136,15 @@ final class RuleBasedTransitionModel
                         "Rules with different calendar systems not permitted.");
                 }
             }
-
-            if (!hasRuleWithoutDST) {
-                throw new IllegalArgumentException(
-                    "No daylight saving rule with standard offset found: "
-                    + rules);
-            }
         }
 
         this.gregorian = CalendarText.ISO_CALENDAR_TYPE.equals(calendarType);
         ZonalTransition zt = initial;
 
         if (initial.getPosixTime() == Long.MIN_VALUE) {
-            if (initial.isDaylightSaving()) {
+            if (initial.getDaylightSavingOffset() != 0) {
                 throw new IllegalArgumentException(
-                    "Initial transition must not have any dst-offset: "
-                    + initial);
+                    "Initial transition must not have any dst-offset: " + initial);
             }
 
             zt = new ZonalTransition(
@@ -247,6 +236,13 @@ final class RuleBasedTransitionModel
     }
 
     @Override
+    public ZonalTransition getNextTransition(UnixTime ut) {
+
+        return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
+
+    }
+
+    @Override
     public List<ZonalOffset> getValidOffsets(
         GregorianDate localDate,
         WallTime localTime
@@ -279,9 +275,15 @@ final class RuleBasedTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
+    public boolean hasNegativeDST() {
 
-        return getNextTransition(ut.getPosixTime(), this.initial, this.rules);
+        for (DaylightSavingRule rule : this.rules) {
+            if (rule.getSavings() < 0) {
+                return true;
+            }
+        }
+
+        return false;
 
     }
 
@@ -479,7 +481,7 @@ final class RuleBasedTransitionModel
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings0()));
+                        rule.getSavings()));
             }
         }
 
@@ -517,7 +519,7 @@ final class RuleBasedTransitionModel
                         tt,
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings0());
+                        rule.getSavings());
             }
         }
 
@@ -582,7 +584,7 @@ final class RuleBasedTransitionModel
                         getTransitionTime(rule, year, shift),
                         stdOffset + previous.getSavings(),
                         stdOffset + rule.getSavings(),
-                        rule.getSavings0()));
+                        rule.getSavings()));
             }
 
             transitions = Collections.unmodifiableList(list);

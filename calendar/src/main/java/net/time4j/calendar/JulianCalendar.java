@@ -956,17 +956,26 @@ public final class JulianCalendar
         /**
          * <p>Calculates the difference between given Julian dates in this unit. </p>
          *
+         * <p><strong>Note:</strong> Users can apply the alternative expression {@code start.until(end, unit)}
+         * for extreme ranges if the range of an int-primitive is not sufficient. </p>
+         *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)
          * @return  difference counted in this unit
+         * @throws  ArithmeticException if the calculated result does not fit into an int
          * @since   3.11/4.8
          */
         /*[deutsch]
          * <p>Berechnet die Differenz zwischen den angegebenen Datumsparametern in dieser Zeiteinheit. </p>
          *
+         * <p><strong>Hinweis:</strong> F&uuml;r extreme Bereiche kann ein Anwender alternativ den Ausdruck
+         * {@code start.until(end, unit)} verwenden, wenn der Wertebereich eines int-primitive nicht mehr
+         * ausreicht. </p>
+         *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)
          * @return  difference counted in this unit
+         * @throws  ArithmeticException if the calculated result does not fit into an int
          * @since   3.11/4.8
          */
         public int between(
@@ -974,7 +983,7 @@ public final class JulianCalendar
             JulianCalendar end
         ) {
 
-            return (int) start.until(end, this); // safe
+            return MathUtils.safeCast(start.until(end, this));
 
         }
 
@@ -1063,36 +1072,40 @@ public final class JulianCalendar
         @Override
         public JulianCalendar transform(long utcDays) {
 
-            long y;
-            int m;
-            int d;
+            try {
+                long y;
+                int m;
+                int d;
 
-            long days = MathUtils.safeAdd(utcDays, OFFSET);
+                long days = MathUtils.safeAdd(utcDays, OFFSET);
 
-            long q4 = MathUtils.floorDivide(days, 1461);
-            int r4 =  MathUtils.floorModulo(days, 1461);
+                long q4 = MathUtils.floorDivide(days, 1461);
+                int r4 =  MathUtils.floorModulo(days, 1461);
 
-            if (r4 == 1460) {
-                y = (q4 + 1) * 4;
-                m = 2;
-                d = 29;
-            } else {
-                int q1 = (r4 / 365);
-                int r1 = (r4 % 365);
+                if (r4 == 1460) {
+                    y = (q4 + 1) * 4;
+                    m = 2;
+                    d = 29;
+                } else {
+                    int q1 = (r4 / 365);
+                    int r1 = (r4 % 365);
 
-                y = q4 * 4 + q1;
-                m = (((r1 + 31) * 5) / 153) + 2;
-                d = r1 - (((m + 1) * 153) / 5) + 123;
+                    y = q4 * 4 + q1;
+                    m = (((r1 + 31) * 5) / 153) + 2;
+                    d = r1 - (((m + 1) * 153) / 5) + 123;
 
-                if (m > 12) {
-                    y++;
-                    m -= 12;
+                    if (m > 12) {
+                        y++;
+                        m -= 12;
+                    }
                 }
-            }
 
-            HistoricEra era = ((y >= 1) ? HistoricEra.AD : HistoricEra.BC);
-            int yearOfEra = MathUtils.safeCast((y >= 1) ? y : MathUtils.safeSubtract(1, y));
-            return JulianCalendar.of(era, yearOfEra, m, d);
+                HistoricEra era = ((y >= 1) ? HistoricEra.AD : HistoricEra.BC);
+                int yearOfEra = MathUtils.safeCast((y >= 1) ? y : MathUtils.safeSubtract(1, y));
+                return JulianCalendar.of(era, yearOfEra, m, d);
+            } catch (ArithmeticException ex) {
+                throw new IllegalArgumentException(ex);
+            }
 
         }
 
@@ -1536,19 +1549,6 @@ public final class JulianCalendar
         }
 
         @Override
-        @Deprecated
-        public JulianCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public JulianCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
@@ -1688,7 +1688,7 @@ public final class JulianCalendar
 
             switch (this.unit) {
                 case YEARS:
-                    return JulianCalendar.Unit.MONTHS.between(start, end) / 12;
+                    return start.until(end, JulianCalendar.Unit.MONTHS) / 12;
                 case MONTHS:
                     long delta = ymValue(end) - ymValue(start);
                     if ((delta > 0) && (end.dom < start.dom)) {
@@ -1698,7 +1698,7 @@ public final class JulianCalendar
                     }
                     return delta;
                 case WEEKS:
-                    return JulianCalendar.Unit.DAYS.between(start, end) / 7;
+                    return start.until(end, JulianCalendar.Unit.DAYS) / 7;
                 case DAYS:
                     return CALSYS.transform(end) - CALSYS.transform(start);
                 default:
@@ -1707,9 +1707,9 @@ public final class JulianCalendar
 
         }
 
-        private static int ymValue(JulianCalendar date) {
+        private static long ymValue(JulianCalendar date) {
 
-            return date.prolepticYear * 12 + date.month - 1;
+            return date.prolepticYear * 12L + date.month - 1;
 
         }
 

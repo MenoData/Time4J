@@ -113,7 +113,7 @@ class EastAsianST<D extends EastAsianCalendar<?, D>>
         String lang = locale.getLanguage();
 
         if (lang.equals("zh")) {
-            return (locale.getCountry().equals("TW") || locale.getScript().equals("Hant")) ? "節氣" : "节气";
+            return locale.getCountry().equals("TW") ? "節氣" : "节气";
         } else if (lang.equals("ko")) {
             return "절기";
         } else if (lang.equals("vi")) {

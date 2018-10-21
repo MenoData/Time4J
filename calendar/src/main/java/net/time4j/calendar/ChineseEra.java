@@ -161,14 +161,6 @@ public enum ChineseEra
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    @Deprecated
-    public int getValue() {
-
-        return this.isQingDynasty() ? this.ordinal() - 9 : 1;
-
-    }
-
     /**
      * <p>Equivalent to the expression {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
      *

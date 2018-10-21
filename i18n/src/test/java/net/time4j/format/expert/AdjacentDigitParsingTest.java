@@ -154,7 +154,7 @@ public class AdjacentDigitParsingTest {
                 .startSection(Attributes.LENIENCY, Leniency.LAX)
                 .addInteger(PlainDate.YEAR, 4, 4) // no fixed-width!
                 .endSection()
-                .addFixedNumerical(PlainDate.MONTH_OF_YEAR, 2)
+                .addFixedInteger(PlainDate.MONTH_AS_NUMBER, 2)
                 .addFixedInteger(PlainDate.DAY_OF_MONTH, 2)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
                 .addFixedInteger(PlainTime.MINUTE_OF_HOUR, 2)
@@ -162,14 +162,14 @@ public class AdjacentDigitParsingTest {
                 .addFraction(PlainTime.NANO_OF_SECOND, 3, 6, true)
                 .build(); // lenient mode
         try {
-            formatter.parse("20000229174521123456");
+            formatter.parse("200000229174521123456");
         } catch (ParseException pe) {
             assertThat(
                 pe.getMessage(),
-                is("Cannot parse: \"20000229174521123456\" (expected: [.], found: [6])"));
+                is("Cannot parse: \"200000229174521123456\" (expected: [.], found: [6])"));
             assertThat(
                 pe.getErrorOffset(),
-                is(19));
+                is(20));
             throw pe;
         }
     }

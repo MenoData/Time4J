@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BasicElement.java) is part of project Time4J.
  *
@@ -437,7 +437,7 @@ public abstract class BasicElement<V extends Comparable<V>>
      * @return  boolean (default value is {@code true})
      * @since   3.15/4.12
      */
-    /**
+    /*[deutsch]
      * <p>Wird von {@code equals(Object)} aufgerufen. </p>
      *
      * <p>Subklassen sollten diese Methode &uuml;berschreiben, wenn anderer Zustandsattribute als nur

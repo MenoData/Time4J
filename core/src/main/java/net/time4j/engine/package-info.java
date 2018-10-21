@@ -1,4 +1,3 @@
-
 /**
  * <p>Defines the common generic schemes and interfaces of chronological
  * systems. Users which only need an entry point to standard chronologies

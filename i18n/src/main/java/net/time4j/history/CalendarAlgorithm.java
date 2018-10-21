@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarAlgorithm.java) is part of project Time4J.
  *
@@ -91,12 +91,6 @@ enum CalendarAlgorithm
             int year = getProlepticYear(date);
             int month = date.getMonth();
             int dom = date.getDayOfMonth();
-            if (
-                (year < -999979466) // value limit of PlainDate.axis().getMinimum()
-                || ((year == -999979466) && ((month < 11) || ((month == 11) && (dom < 21))))
-            ) {
-                return false;
-            }
             return JulianMath.isValid(year, month, dom);
         }
 

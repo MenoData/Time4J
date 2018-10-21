@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewTime.java) is part of project Time4J.
  *
@@ -117,7 +117,7 @@ import java.util.concurrent.TimeUnit;
  * (<em>halakim</em>) unterteilt. Siehe auch:
  * <a href="http://torahcalendar.com/hour.asp">www.torahcalendar.com</a>. </p>
  *
- * <p style="text-align:center;"><img src="doc-files/hebrewclock.png" alt="Hebr&auml;ische Uhrk"></p>
+ * <p style="text-align:center;"><img src="doc-files/hebrewclock.png" alt="Hebr&auml;ische Uhr"></p>
  *
  * <p>Registriert sind folgende als Konstanten deklarierte Elemente: </p>
  *
@@ -1287,17 +1287,6 @@ public final class HebrewTime
             }
 
             return HebrewTime.at(tzid).apply(Moment.from(clock.currentTime()));
-        }
-
-        @Override
-        @Deprecated
-        public HebrewTime createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
         }
 
         @Override

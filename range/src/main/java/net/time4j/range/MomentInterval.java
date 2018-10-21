@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentInterval.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j.range;
 
 import net.time4j.Duration;
 import net.time4j.IsoUnit;
+import net.time4j.MachineTime;
 import net.time4j.Moment;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;

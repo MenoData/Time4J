@@ -930,10 +930,54 @@ public final class Duration<U extends IsoUnit>
      * @return  {@code Comparator} for plain durations
      * @see     TimePoint#compareTo(TimePoint) TimePoint.compareTo(T)
      */
-    public static <U extends IsoUnit, T extends TimePoint<? super U, T>>
-    Comparator<Duration<U>> comparator(T base) {
+    public static <U extends IsoUnit, T extends TimePoint<U, T>>
+        Comparator<Duration<? extends U>> comparator(T base) {
 
         return new LengthComparator<U, T>(base);
+
+    }
+
+    /**
+     * <p>Obtains a comparator suitable for Durations based on clock units. </p>
+     *
+     * <p>A negative duration is always smaller than a positive one. </p>
+     *
+     * @return  Comparator for clock-based durations
+     * @since   4.0
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Comparator} geeignet f&uuml;r uhrzeitbasierte Dauerobjekte. </p>
+     *
+     * <p>Eine negative Dauer ist immer kleiner als eine positive. </p>
+     *
+     * @return  Comparator for clock-based durations
+     * @since   4.0
+     */
+    public static Comparator<Duration<ClockUnit>> comparatorOnClock() {
+
+        return new Comparator<Duration<ClockUnit>>() {
+            @Override
+            public int compare(Duration<ClockUnit> d1, Duration<ClockUnit> d2) {
+                long s1 = lengthInSeconds(d1);
+                long s2 = lengthInSeconds(d2);
+
+                if (s1 < s2) {
+                    return -1;
+                } else if (s1 > s2) {
+                    return 1;
+                } else {
+                    long n1 = d1.getPartialAmount(NANOS) % MRD;
+                    long n2 = d2.getPartialAmount(NANOS) % MRD;
+                    if (d1.isNegative()) {
+                        n1 = MathUtils.safeNegate(n1);
+                    }
+                    if (d2.isNegative()) {
+                        n2 = MathUtils.safeNegate(n2);
+                    }
+                    return ((n1 < n2) ? -1 : ((n1 > n2) ? 1: 0));
+                }
+            }
+        };
 
     }
 
@@ -2578,6 +2622,21 @@ public final class Duration<U extends IsoUnit>
         }
 
         return true;
+
+    }
+
+    private static long lengthInSeconds(Duration<ClockUnit> duration) {
+
+        long total = MathUtils.safeMultiply(duration.getPartialAmount(HOURS), 3600);
+        total = MathUtils.safeAdd(total, MathUtils.safeMultiply(duration.getPartialAmount(MINUTES), 60));
+        total = MathUtils.safeAdd(total, duration.getPartialAmount(SECONDS));
+        total = MathUtils.safeAdd(total, duration.getPartialAmount(NANOS) / MRD);
+
+        if (duration.isNegative()) {
+            total = MathUtils.safeNegate(total);
+        }
+
+        return total;
 
     }
 
@@ -4464,9 +4523,8 @@ public final class Duration<U extends IsoUnit>
 
     }
 
-    private static class LengthComparator
-        <U extends IsoUnit, T extends TimePoint<? super U, T>>
-        implements Comparator<Duration<U>> {
+    private static class LengthComparator<U extends IsoUnit, T extends TimePoint<U, T>>
+        implements Comparator<Duration<? extends U>> {
 
         //~ Instanzvariablen ----------------------------------------------
 
@@ -4489,8 +4547,8 @@ public final class Duration<U extends IsoUnit>
 
         @Override
         public int compare(
-            Duration<U> d1,
-            Duration<U> d2
+            Duration<? extends U> d1,
+            Duration<? extends U> d2
         ) {
 
             boolean sign1 = d1.isNegative();

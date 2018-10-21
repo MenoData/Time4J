@@ -23,7 +23,6 @@ package net.time4j.tz.model;
 
 import net.time4j.Month;
 import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.GregorianMath;
 
@@ -61,7 +60,7 @@ final class DayOfWeekInMonthPattern
         Month month,
         int dayOfMonth,
         Weekday dayOfWeek,
-        PlainTime timeOfDay,
+        int timeOfDay,
         OffsetIndicator indicator,
         int savings,
         boolean after
@@ -78,7 +77,7 @@ final class DayOfWeekInMonthPattern
     //~ Methoden ----------------------------------------------------------
 
     @Override
-    public PlainDate getDate(int year) {
+    protected PlainDate getDate0(int year) {
 
         int month = this.getMonthValue();
         int ref = GregorianMath.getDayOfWeek(year, month, this.dayOfMonth);
@@ -142,12 +141,12 @@ final class DayOfWeekInMonthPattern
         sb.append(this.dayOfMonth);
         sb.append(",dayOfWeek=");
         sb.append(Weekday.valueOf(this.dayOfWeek));
+        sb.append(",day-overflow=");
+        sb.append(this.getDayOverflow());
         sb.append(",time-of-day=");
         sb.append(this.getTimeOfDay());
         sb.append(",offset-indicator=");
         sb.append(this.getIndicator());
-        sb.append(",dst-active=");
-        sb.append(this.isSaving());
         sb.append(",dst-offset=");
         sb.append(this.getSavings());
         sb.append(",after=");

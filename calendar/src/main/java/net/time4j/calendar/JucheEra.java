@@ -59,14 +59,6 @@ public enum JucheEra
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    @Deprecated
-    public int getValue() {
-
-        return 1;
-
-    }
-
     /**
      * <p>Equivalent to the expression {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
      *

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriAlgorithm.java) is part of project Time4J.
  *
@@ -421,7 +421,8 @@ public enum HijriAlgorithm
 			}
 
 			days += hdom;
-			return MathUtils.safeSubtract(this.getMinimumSinceUTC() + days - 1, this.adjustment);
+			long min = this.civil ? START_622_07_16 : START_622_07_15;
+			return MathUtils.safeSubtract(min + days - 1, this.adjustment);
 
 		}
 

@@ -73,13 +73,6 @@ public enum EthiopianEra
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    public int getValue() {
-
-        return this.ordinal();
-
-    }
-
     /**
      * <p>Equivalent to the expression {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
      *

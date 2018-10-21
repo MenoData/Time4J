@@ -113,21 +113,21 @@ final class OldApiTimezone
     public int getDSTSavings() {
 
         TransitionHistory history = this.tz.getHistory();
+        int previousDST = Integer.MIN_VALUE;
 
         if (history != null) {
             List<ZonalTransition> transitions = history.getStdTransitions();
-            int dst = 0;
             for (int i = transitions.size() - 1; i >= 0; i--) {
-                ZonalTransition t = transitions.get(i);
-                if (t.isDaylightSaving()) {
-                    dst = t.getDaylightSavingOffset() * 1000;
-                    break;
+                int currentDST = transitions.get(i).getDaylightSavingOffset();
+                if (previousDST == Integer.MIN_VALUE) {
+                    previousDST = currentDST;
+                } else if (previousDST != currentDST) {
+                    return Math.max(previousDST, currentDST) * 1000;
                 }
             }
-            return dst;
         }
 
-        return 0;
+        return (previousDST == Integer.MIN_VALUE) ? 0 : (previousDST * 1000);
 
     }
 
@@ -139,9 +139,13 @@ final class OldApiTimezone
 
             if (history != null) {
                 List<ZonalTransition> transitions = history.getStdTransitions();
+                int previousDST = Integer.MIN_VALUE;
                 for (int i = transitions.size() - 1; i >= 0; i--) {
-                    if (transitions.get(i).isDaylightSaving()) {
-                        return true;
+                    int currentDST = transitions.get(i).getDaylightSavingOffset();
+                    if (previousDST == Integer.MIN_VALUE) {
+                        previousDST = currentDST;
+                    } else if (previousDST != currentDST) {
+                        return true; // change of dst-offset
                     }
                 }
             }

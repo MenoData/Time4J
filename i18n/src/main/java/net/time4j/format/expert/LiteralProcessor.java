@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LiteralProcessor.java) is part of project Time4J.
  *
@@ -201,7 +201,10 @@ final class LiteralProcessor
             int offset = status.getPosition();
             if ((offset < text.length()) && (text.charAt(offset) == this.single)) {
                 status.setPosition(offset + 1);
-            } else {
+            } else if (
+                (this.single != '.') // CLDR-resources sometimes change abbreviation style (dot or not)
+                || !attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE).booleanValue()
+            ) {
                 this.logError(text, status);
             }
         } else if (this.multi == null) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextProvider.java) is part of project Time4J.
  *
@@ -230,32 +230,6 @@ public interface TextProvider {
      * @return  unmodifiable sorted array of era names
      */
     String[] eras(
-        String calendarType,
-        Locale locale,
-        TextWidth textWidth
-    );
-
-    /**
-     * <p>See {@link CalendarText#getMeridiems}. </p>
-     *
-     * @param   calendarType    calendar type
-     * @param   locale          language of text output
-     * @param   textWidth       text width
-     * @return  unmodifiable sorted array of AM/PM-names
-     * @see     #meridiems(String, Locale, TextWidth, OutputContext)
-     * @deprecated  Will be removed in next major release!
-     */
-    /*[deutsch]
-     * <p>Siehe {@link CalendarText#getMeridiems}. </p>
-     *
-     * @param   calendarType    calendar type
-     * @param   locale          language of text output
-     * @param   textWidth       text width
-     * @return  unmodifiable sorted array of AM/PM-names
-     * @see     #meridiems(String, Locale, TextWidth, OutputContext)
-     * @deprecated  Will be removed in next major release!
-     */
-    String[] meridiems(
         String calendarType,
         Locale locale,
         TextWidth textWidth

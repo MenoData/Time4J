@@ -14,12 +14,14 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         TestInitialization.class,
+        AnnualDateTest.class,
         AxisElementTest.class,
         CompareZonalDateTimeTest.class,
         ComponentElementTest.class,
         DateSuite.class,
         DurationSuite.class,
         JDBCAdapterTest.class,
+        MachineTimeTest.class,
         MinMaxTest.class,
         NumberSuite.class,
         OperatorSuite.class,

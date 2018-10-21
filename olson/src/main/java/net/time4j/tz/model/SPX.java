@@ -22,7 +22,6 @@
 package net.time4j.tz.model;
 
 import net.time4j.Month;
-import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
 import net.time4j.tz.ZonalOffset;
@@ -407,7 +406,7 @@ final class SPX
 
     }
 
-    private static int readSavings(int offsetInfo) throws IOException {
+    private static int readSavings(int offsetInfo) {
 
         switch (offsetInfo / 3) {
             case 0:
@@ -424,6 +423,12 @@ final class SPX
 
     }
 
+    private static int toTimeOfDay(GregorianTimezoneRule rule) {
+
+        return rule.getTimeOfDay().getInt(SECOND_OF_DAY) + MathUtils.safeCast(rule.getDayOverflow() * 86400);
+
+    }
+
     private static void writeFixedDayPattern(
         Object rule,
         DataOutput out
@@ -432,13 +437,13 @@ final class SPX
         FixedDayPattern pattern = (FixedDayPattern) rule;
         boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
         int second = (pattern.getDayOfMonth() << 3);
-        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int tod = toTimeOfDay(pattern);
         int timeIndex = toTimeIndexR(tod);
         second |= timeIndex;
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings0());
+            writeOffset(out, pattern.getSavings());
         }
 
         if (timeIndex == NO_COMPRESSION) {
@@ -448,7 +453,7 @@ final class SPX
     }
 
     private static DaylightSavingRule readFixedDayPattern(DataInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int first = (in.readByte() & 0xFF);
         int month = (first >>> 4);
@@ -467,13 +472,10 @@ final class SPX
             tod = in.readInt();
         }
 
-        PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
-
         return new FixedDayPattern(
             Month.valueOf(month),
             dayOfMonth,
-            timeOfDay,
+            tod,
             indicator,
             dst);
 
@@ -490,7 +492,7 @@ final class SPX
         second |= pattern.getDayOfWeek();
         out.writeByte(second & 0xFF);
         int third = (pattern.isAfter() ? (1 << 7) : 0);
-        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int tod = toTimeOfDay(pattern);
         boolean timeWritten = false;
 
         if ((tod % 1800) == 0) {
@@ -503,7 +505,7 @@ final class SPX
         out.writeByte(third & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings0());
+            writeOffset(out, pattern.getSavings());
         }
 
         if (!timeWritten) {
@@ -513,7 +515,7 @@ final class SPX
     }
 
     private static DaylightSavingRule readDayOfWeekInMonthPattern(DataInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int first = (in.readByte() & 0xFF);
         Month month = Month.valueOf(first >>> 4);
@@ -537,14 +539,11 @@ final class SPX
             tod *= 1800;
         }
 
-        PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
-
         return new DayOfWeekInMonthPattern(
             month,
             dayOfMonth,
             dayOfWeek,
-            timeOfDay,
+            tod,
             indicator,
             dst,
             after);
@@ -559,7 +558,7 @@ final class SPX
         LastWeekdayPattern pattern = (LastWeekdayPattern) rule;
         boolean offsetWritten = writeMonthIndicatorOffset(pattern, out);
         int second = (pattern.getDayOfWeek() << 5);
-        int tod = pattern.getTimeOfDay().get(SECOND_OF_DAY).intValue();
+        int tod = toTimeOfDay(pattern);
         boolean timeWritten = false;
 
         if ((tod % 3600) == 0) {
@@ -572,7 +571,7 @@ final class SPX
         out.writeByte(second & 0xFF);
 
         if (!offsetWritten) {
-            writeOffset(out, pattern.getSavings0());
+            writeOffset(out, pattern.getSavings());
         }
 
         if (!timeWritten) {
@@ -582,7 +581,7 @@ final class SPX
     }
 
     private static DaylightSavingRule readLastDayOfWeekPattern(DataInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int first = (in.readByte() & 0xFF);
         Month month = Month.valueOf(first >>> 4);
@@ -603,13 +602,10 @@ final class SPX
             tod *= 3600;
         }
 
-        PlainTime timeOfDay =
-            PlainTime.midnightAtStartOfDay().with(SECOND_OF_DAY, tod);
-
         return new LastWeekdayPattern(
             month,
             dayOfWeek,
-            timeOfDay,
+            tod,
             indicator,
             dst);
 
@@ -641,9 +637,6 @@ final class SPX
         writeOffset(out, initial.getPreviousOffset());
         writeOffset(out, initial.getTotalOffset());
         int dst = initial.getDaylightSavingOffset();
-        if (initial.isDaylightSaving() && (dst == 0)) {
-            dst = Integer.MAX_VALUE;
-        }
         writeOffset(out, dst);
         writeRules(model.getRules(), out);
 
@@ -689,7 +682,7 @@ final class SPX
     }
 
     private static Object readArrayTransitionModel(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         return new ArrayTransitionModel(
             readTransitions(in),
@@ -738,11 +731,6 @@ final class SPX
         }
 
         int dstOffset = transition.getDaylightSavingOffset();
-
-        if (transition.isDaylightSaving() && (dstOffset == 0)) {
-            dstOffset = Integer.MAX_VALUE;
-        }
-
         int dstIndex;
 
         switch (dstOffset) {
@@ -851,7 +839,7 @@ final class SPX
 
         int first = (rule.getMonthValue() << 4);
         int indicator = rule.getIndicator().ordinal();
-        int dst = rule.getSavings0();
+        int dst = rule.getSavings();
         boolean offsetWritten = true;
 
         switch (dst) {

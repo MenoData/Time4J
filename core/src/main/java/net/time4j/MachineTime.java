@@ -19,12 +19,10 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.range;
+package net.time4j;
 
-import net.time4j.SI;
 import net.time4j.base.MathUtils;
 import net.time4j.base.UnixTime;
-import net.time4j.engine.RealTime;
 import net.time4j.engine.TimeMetric;
 import net.time4j.engine.TimePoint;
 import net.time4j.engine.TimeSpan;
@@ -65,7 +63,7 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   5.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
@@ -86,23 +84,23 @@ import static net.time4j.scale.TimeScale.UTC;
  *
  * @param   <U> either {@code TimeUnit} or {@code SI}
  * @author  Meno Hochschild
- * @since   3.0
+ * @since   5.0
  * @see     TimeUnit#SECONDS
  * @see     TimeUnit#NANOSECONDS
  * @see     SI#SECONDS
  * @see     SI#NANOSECONDS
  */
 public final class MachineTime<U>
-    implements RealTime<U>, Comparable<MachineTime<U>>, Serializable {
+    implements TimeSpan<U>, Comparable<MachineTime<U>>, Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final int MRD = 1000000000;
 
     private static final MachineTime<TimeUnit> POSIX_ZERO =
-        new MachineTime<TimeUnit>(0, 0, POSIX);
+            new MachineTime<TimeUnit>(0, 0, POSIX);
     private static final MachineTime<SI> UTC_ZERO =
-        new MachineTime<SI>(0, 0, UTC);
+            new MachineTime<SI>(0, 0, UTC);
 
     /**
      * Metric on the POSIX scale (without leap seconds).
@@ -114,7 +112,8 @@ public final class MachineTime<U>
      *
      * @since   2.0
      */
-    public static final TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE = new Metric<TimeUnit>(POSIX);
+    public static final TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE =
+            new Metric<TimeUnit>(POSIX);
 
     /**
      * <p>Metric on the UTC scale (inclusive leap seconds). </p>
@@ -130,7 +129,8 @@ public final class MachineTime<U>
      *
      * @since   2.0
      */
-    public static final TimeMetric<TimeUnit, MachineTime<SI>> ON_UTC_SCALE = new Metric<SI>(UTC);
+    public static final TimeMetric<TimeUnit, MachineTime<SI>> ON_UTC_SCALE =
+            new Metric<SI>(UTC);
 
     private static final long serialVersionUID = -4150291820807606229L;
 
@@ -425,7 +425,26 @@ public final class MachineTime<U>
 
     }
 
-    @Override
+    /**
+     * <p>Yields the normalized seconds of this duration. </p>
+     *
+     * <p>The normalization happens in case of a negative duration such that any fraction part
+     * falls into the range {@code 0-999999999}. In this case, following expression is NOT true:
+     * {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
+     *
+     * @return  long
+     * @see     #getFraction()
+     */
+    /*[deutsch]
+     * <p>Liefert die normalisierten Sekunden dieser Dauer. </p>
+     *
+     * <p>Die Normalisierung geschieht im Fall einer negativen Dauer so, da&szlig; ein Sekundenbruchteil
+     * immer in den Bereich {@code 0-999999999} f&auml;llt. In diesem Fall ist folgender Ausdruck NICHT
+     * wahr: {@code Math.abs(getSeconds()) == getPartialAmount(TimeUnit.SECONDS)} </p>
+     *
+     * @return  long
+     * @see     #getFraction()
+     */
     public long getSeconds() {
 
         long secs = this.seconds;
@@ -438,7 +457,18 @@ public final class MachineTime<U>
 
     }
 
-    @Override
+    /**
+     * <p>Yields the normalized nanosecond fraction of this duration. </p>
+     *
+     * @return  nanosecond in range {@code 0-999999999}
+     * @see     #getSeconds()
+     */
+    /*[deutsch]
+     * <p>Liefert den normalisierten Nanosekundenteil dieser Dauer. </p>
+     *
+     * @return  nanosecond in range {@code 0-999999999}
+     * @see     #getSeconds()
+     */
     public int getFraction() {
 
         int n = this.nanos;
@@ -671,7 +701,7 @@ public final class MachineTime<U>
         U unit
     ) {
 
-        return this.plus(MathUtils.safeNegate(amount), unit);
+        return this.plus(negateExact(amount), unit);
 
     }
 
@@ -723,8 +753,7 @@ public final class MachineTime<U>
     public MachineTime<U> abs() {
 
         if (this.isNegative()) {
-            return new MachineTime<U>(
-                MathUtils.safeNegate(this.seconds), -this.nanos, this.scale);
+            return new MachineTime<U>(negateExact(this.seconds), -this.nanos, this.scale);
         } else {
             return this;
         }
@@ -752,8 +781,7 @@ public final class MachineTime<U>
             return this;
         }
 
-        return new MachineTime<U>(
-            MathUtils.safeNegate(this.seconds), -this.nanos, this.scale);
+        return new MachineTime<U>(negateExact(this.seconds), -this.nanos, this.scale);
 
     }
 
@@ -825,9 +853,7 @@ public final class MachineTime<U>
             } else {
                 return cast(UTC_ZERO);
             }
-        } else if (Double.isInfinite(factor) || Double.isNaN(factor)) {
-            throw new IllegalArgumentException("Not finite: " + factor);
-        } else {
+        } else if (!Double.isInfinite(factor) && !Double.isNaN(factor)) {
             double len = this.toBigDecimal().doubleValue() * factor;
             MachineTime<?> mt;
             if (this.scale == POSIX) {
@@ -836,32 +862,9 @@ public final class MachineTime<U>
                 mt = MachineTime.ofSISeconds(len);
             }
             return cast(mt);
+        } else {
+            throw new IllegalArgumentException("Not finite: " + factor);
         }
-
-    }
-
-    /**
-     * <p>Divides this duration by given divisor using rounding
-     * mode {@code HALF_UP}. </p>
-     *
-     * @param   divisor     divisor
-     * @return  changed copy of this duration
-     * @see     RoundingMode#HALF_UP
-     * @deprecated Use {@link #dividedBy(long, RoundingMode) dividedBy(long, RoundingMode.HALF_UP} instead
-     */
-    /*[deutsch]
-     * <p>Dividiert diese Dauer durch den angegebenen Teiler und
-     * benutzt die kaufm&auml;nnische Rundung. </p>
-     *
-     * @param   divisor     Teiler
-     * @return  ge&auml;nderte Kopie dieser Dauer
-     * @see     RoundingMode#HALF_UP
-     * @deprecated Use {@link #dividedBy(long, RoundingMode) dividedBy(long, RoundingMode.HALF_UP} instead
-     */
-    @Deprecated
-    public MachineTime<U> dividedBy(long divisor) {
-
-        return this.dividedBy(divisor, RoundingMode.HALF_UP);
 
     }
 
@@ -904,34 +907,36 @@ public final class MachineTime<U>
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TimePoint<? super U, T>> T addTo(T time) {
 
         U s, f;
 
         if (this.scale == POSIX) {
-            s = cast(TimeUnit.SECONDS);
-            f = cast(TimeUnit.NANOSECONDS);
+            s = (U) TimeUnit.SECONDS;
+            f = (U) TimeUnit.NANOSECONDS;
         } else {
-            s = cast(SI.SECONDS);
-            f = cast(SI.NANOSECONDS);
+            s = (U) SI.SECONDS;
+            f = (U) SI.NANOSECONDS;
         }
 
         return time.plus(this.seconds, s).plus(this.nanos, f);
 
     }
 
+    @SuppressWarnings("unchecked")
     @Override
     public <T extends TimePoint<? super U, T>> T subtractFrom(T time) {
 
         U s, f;
 
         if (this.scale == POSIX) {
-            s = cast(TimeUnit.SECONDS);
-            f = cast(TimeUnit.NANOSECONDS);
+            s = (U) TimeUnit.SECONDS;
+            f = (U) TimeUnit.NANOSECONDS;
         } else {
-            s = cast(SI.SECONDS);
-            f = cast(SI.NANOSECONDS);
+            s = (U) SI.SECONDS;
+            f = (U) SI.NANOSECONDS;
         }
 
         return time.minus(this.seconds, s).minus(this.nanos, f);
@@ -1112,17 +1117,24 @@ public final class MachineTime<U>
     }
 
     @SuppressWarnings("unchecked")
-    private static <U> U cast(Object unit) {
+    private static <T> T cast(Object obj) {
 
-        return (U) unit;
+        return (T) obj;
 
+    }
+
+    private static long negateExact(long a) {
+        if (a == Long.MIN_VALUE) {
+            throw new ArithmeticException("Long overflow.");
+        }
+        return -a;
     }
 
     /**
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.range.SPX">
      *              a dedicated serialization form</a> as proxy. The layout
      *              is bit-compressed. The first byte contains within the
-     *              six most significant bits the type id {@code 7} and as
+     *              four most significant bits the type id {@code 5} and as
      *              least significant bit the value 1 if this instance uses
      *              the UTC-scale. Then the bytes for the seconds and fraction
      *              follow. The fraction bytes are only written if the fraction
@@ -1132,7 +1144,7 @@ public final class MachineTime<U>
      * Schematic algorithm:
      *
      * <pre>
-     *      byte header = (7 &lt;&lt; 2);
+     *      byte header = (5 &lt;&lt; 4);
      *      if (scale == TimeScale.UTC) header |= 1;
      *      if (this.getFraction() &gt; 0) header |= 2;
      *      out.writeByte(header);
@@ -1172,7 +1184,7 @@ public final class MachineTime<U>
      *
      * <pre>
      *  MachineTime.Formatter f =
-     *      MachineTime.Formatter.ofPattern("+hh:mm:ss");
+     *      MachineTime.Formatter.ofPattern(&quot;+hh:mm:ss&quot;);
      *  String s = f.print(MachineTime.of(27 * 3600 + 30 * 60 + 5, TimeUnit.SECONDS));
      *  System.out.println(s); // output: +27:30:05
      * </pre>
@@ -1188,7 +1200,7 @@ public final class MachineTime<U>
      *
      * <pre>
      *  MachineTime.Formatter f =
-     *      MachineTime.Formatter.ofPattern("+hh:mm:ss");
+     *      MachineTime.Formatter.ofPattern(&quot;+hh:mm:ss&quot;);
      *  String s = f.print(MachineTime.of(27 * 3600 + 30 * 60 + 5, TimeUnit.SECONDS));
      *  System.out.println(s); // Ausgabe: +27:30:05
      * </pre>
@@ -1247,8 +1259,8 @@ public final class MachineTime<U>
          * <p><strong>Optional sections</strong></p>
          *
          * <p>Optional sections enclosed by square brackets let the parser be error-tolerant
-         * and continue with the next section in case of errors. During printing,
-         * an optional section will only be printed if there is any non-zero part. When parsing
+         * and continue with the next section in case of errors. During printing, an
+         * optional section will only be printed if there is any non-zero part. When parsing
          * an optional section will be skipped if the input to be parsed does not match the
          * expected pattern. For example: An input missing the hour part can be handled when
          * an optional section is applied on the hour part. </p>
@@ -1355,8 +1367,8 @@ public final class MachineTime<U>
          * Interpretationsvorgang bei Fehlern nicht sofort abbricht, sondern mit dem n&auml;chsten
          * Abschnitt fortsetzt und den fehlerhaften Abschnitt ignoriert. Zum Beispiel wird ein solcher
          * Abschnitt ignoriert, wenn die Eingabe keinen Stundenteil hat, aber der Stundenteil im
-         * Abschnitt als optional gekennzeichnet ist. Es gilt auch, da&szlig; optionale
-         * Abschnitte nur dann etwas ausgeben, wenn es darin irgendeine von {code 0} verschiedene
+         * Abschnitt als optional gekennzeichnet ist. Es gilt auch, da&szlig; optionale Abschnitte
+         * nur dann etwas ausgeben, wenn es darin irgendeine von {code 0} verschiedene
          * Dauerkomponente gibt. </p>
          *
          * <p><strong>Pluralformen</strong></p>
@@ -1669,6 +1681,7 @@ public final class MachineTime<U>
         }
 
     }
+
 
     private static class Metric<U>
         implements TimeMetric<TimeUnit, MachineTime<U>> {

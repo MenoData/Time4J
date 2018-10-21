@@ -1,13 +1,7 @@
-package net.time4j.xml;
+package net.time4j;
 
-import net.time4j.Month;
-import net.time4j.PlainDate;
-import net.time4j.SystemClock;
-import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.format.DisplayMode;
-import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -18,7 +12,6 @@ import java.io.IOException;
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
-import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -135,20 +128,6 @@ public class AnnualDateTest {
         assertThat(
             AnnualDate.of(Month.FEBRUARY, 29).isValidDate(2015),
             is(false));
-    }
-
-    @Test
-    public void format() {
-        ChronoFormatter<AnnualDate> usStyle =
-            ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.US, AnnualDate.chronology());
-        assertThat(
-            usStyle.format(AnnualDate.of(9, 11)),
-            is("9/11"));
-        ChronoFormatter<AnnualDate> germanStyle =
-            ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.GERMANY, AnnualDate.chronology());
-        assertThat(
-            germanStyle.format(AnnualDate.of(9, 11)),
-            is("11.9."));
     }
 
     @Test

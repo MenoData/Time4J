@@ -2,14 +2,11 @@ package net.time4j;
 
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.Chronology;
-
-import java.math.BigDecimal;
-import java.util.Locale;
-
-import net.time4j.format.DisplayMode;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.math.BigDecimal;
 
 import static net.time4j.PlainDate.*;
 import static net.time4j.PlainTime.*;
@@ -19,14 +16,6 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class DatePropertiesTest {
-
-    @Test
-    public void localDateFormatter() {
-        assertThat(
-            PlainDate.localFormatter(DisplayMode.FULL),
-            is(PlainDate.formatter(DisplayMode.FULL, Locale.getDefault()))
-        );
-    }
 
     @Test
     public void registrationOfCalendarDate() {

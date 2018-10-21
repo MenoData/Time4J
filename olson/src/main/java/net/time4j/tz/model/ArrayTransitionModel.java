@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ArrayTransitionModel.java) is part of project Time4J.
  *
@@ -56,6 +56,7 @@ final class ArrayTransitionModel
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final ZonalTransition[] transitions;
+    private transient final boolean negativeDST;
 
     // Cache
     private transient final List<ZonalTransition> stdTransitions;
@@ -83,6 +84,13 @@ final class ArrayTransitionModel
         int n = transitions.size();
         ZonalTransition[] tmp = new ZonalTransition[n];
         tmp = transitions.toArray(tmp);
+        boolean negativeDST = false;
+
+        for (ZonalTransition zt : tmp) {
+            negativeDST = (negativeDST || (zt.getDaylightSavingOffset() < 0));
+        }
+
+        this.negativeDST = negativeDST;
 
         if (create) {
             Arrays.sort(tmp);
@@ -123,24 +131,24 @@ final class ArrayTransitionModel
     }
 
     @Override
-    public ZonalTransition getNextTransition(UnixTime ut) {
-
-        int index = search(ut.getPosixTime(), this.transitions);
-
-        return (
-            (index == this.transitions.length)
-            ? null
-            : this.transitions[index]);
-
-    }
-
-    @Override
     public ZonalTransition getConflictTransition(
         GregorianDate localDate,
         WallTime localTime
     ) {
 
         return this.getConflictTransition(localDate, localTime, null);
+
+    }
+
+    @Override
+    public ZonalTransition getNextTransition(UnixTime ut) {
+
+        int index = search(ut.getPosixTime(), this.transitions);
+
+        return (
+            (index == this.transitions.length)
+                ? null
+                : this.transitions[index]);
 
     }
 
@@ -178,6 +186,13 @@ final class ArrayTransitionModel
     public void dump(Appendable buffer) throws IOException {
 
         this.dump(this.transitions.length, buffer);
+
+    }
+
+    @Override
+    public boolean hasNegativeDST() {
+
+        return this.negativeDST;
 
     }
 
@@ -369,29 +384,6 @@ final class ArrayTransitionModel
 
     }
 
-    // Called by CompositeTransitionModel
-    static void checkSanity(
-        ZonalTransition[] transitions,
-        List<ZonalTransition> original
-    ) {
-
-        int previous = transitions[0].getTotalOffset();
-
-        for (int i = 1; i < transitions.length; i++) {
-            if (previous != transitions[i].getPreviousOffset()) {
-                Moment m =
-                    Moment.of(transitions[i].getPosixTime(), TimeScale.POSIX);
-                throw new IllegalArgumentException(
-                    "Model inconsistency detected at: " + m
-                    + " (" + transitions[i].getPosixTime() + ") "
-                    + " in transitions: " + original);
-            } else {
-                previous = transitions[i].getTotalOffset();
-            }
-        }
-
-    }
-
     /**
      * <p>Benutzt in der Serialisierung. </p>
      *
@@ -415,6 +407,28 @@ final class ArrayTransitionModel
     ) throws IOException {
 
         SPX.writeTransitions(this.transitions, size, out);
+
+    }
+
+    private static void checkSanity(
+        ZonalTransition[] transitions,
+        List<ZonalTransition> original
+    ) {
+
+        int previous = transitions[0].getTotalOffset();
+
+        for (int i = 1; i < transitions.length; i++) {
+            if (previous != transitions[i].getPreviousOffset()) {
+                Moment m =
+                    Moment.of(transitions[i].getPosixTime(), TimeScale.POSIX);
+                throw new IllegalArgumentException(
+                    "Model inconsistency detected at: " + m
+                        + " (" + transitions[i].getPosixTime() + ") "
+                        + " in transitions: " + original);
+            } else {
+                previous = transitions[i].getTotalOffset();
+            }
+        }
 
     }
 
@@ -446,8 +460,7 @@ final class ArrayTransitionModel
         if (i1 > i2) {
             return Collections.emptyList();
         } else {
-            List<ZonalTransition> result =
-                new ArrayList<ZonalTransition>(i2 - i1 + 1);
+            List<ZonalTransition> result = new ArrayList<ZonalTransition>(i2 - i1 + 1);
             for (int i = i1; i <= i2; i++) {
                 result.add(transitions[i]);
             }
@@ -513,7 +526,7 @@ final class ArrayTransitionModel
      *              around midnight in local standard time. Insight in details
      *              see source code.
      *
-     * @return  replacement object
+     * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
@@ -522,12 +535,12 @@ final class ArrayTransitionModel
     }
 
     /**
-     * @param       in  serialization stream
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws InvalidObjectException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

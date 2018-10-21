@@ -36,16 +36,13 @@ import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
-import net.time4j.format.FormatEngine;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
-import net.time4j.i18n.UltimateFormatEngine;
 
 import java.util.Collections;
 import java.util.HashMap;
@@ -69,8 +66,7 @@ import java.util.Set;
  * @see     net.time4j.format.expert.ChronoFormatter.Builder#addPattern(String, PatternType)
  * @since   3.0
  */
-public enum PatternType
-    implements ChronoPattern<PatternType> {
+public enum PatternType {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -285,7 +281,7 @@ public enum PatternType
      *  <tr>
      *      <td>{@link PlainTime#MILLI_OF_DAY}</td>
      *      <td>A</td>
-     *      <td>The count of symbols (1-9) controls the minimum
+     *      <td>The count of symbols (1-8) controls the minimum
      *      count of digits to be printed. </td>
      *  </tr>
      *  <tr>
@@ -580,7 +576,7 @@ public enum PatternType
      *  <tr>
      *      <td>{@link PlainTime#MILLI_OF_DAY}</td>
      *      <td>A</td>
-     *      <td>Die Anzahl der Symbole (1-9) regelt die minimale Anzahl der
+     *      <td>Die Anzahl der Symbole (1-8) regelt die minimale Anzahl der
      *      zu formatierenden Ziffern. </td>
      *  </tr>
      *  <tr>
@@ -1226,27 +1222,6 @@ public enum PatternType
     CLDR_DATE,
 
     /**
-     * <p>A small subset of CLDR applicable on any non-ISO-chronology which has registered the
-     * associated elements with same symbols. </p>
-     *
-     * @since       3.5/4.3
-     * @deprecated  Use {@link #CLDR_DATE} as replacement because the name of this pattern type can be
-     *              confusing considering the fact that not all calendars can be handled by this pattern type
-     *              (for example, the {@code FrenchRepublicanCalendar} is not suitable here)
-     */
-    /*[deutsch]
-     * <p>Eine kleine Untermenge von CLDR, die auf jede Non-ISO-Chronologie anwendbar ist, die die
-     * assoziierten Elemente mit gleichen Symbolen registriert hat. </p>
-     *
-     * @since       3.5/4.3
-     * @deprecated  Use {@link #CLDR_DATE} as replacement because the name of this pattern type can be
-     *              confusing considering the fact that not all calendars can be handled by this pattern type
-     *              (for example, the {@code FrenchRepublicanCalendar} is not suitable here)
-     */
-    @Deprecated
-    NON_ISO_DATE,
-
-    /**
      * <p>Resolves a pattern such that the chronology used in current context determines the meaning
      * of any pattern symbols. </p>
      *
@@ -1282,13 +1257,6 @@ public enum PatternType
     DYNAMIC;
 
     //~ Methoden ----------------------------------------------------------
-
-    @Override
-    public FormatEngine<PatternType> getFormatEngine() {
-
-        return UltimateFormatEngine.INSTANCE;
-
-    }
 
     /**
      * <p>Registers a format symbol. </p>
@@ -1328,11 +1296,6 @@ public enum PatternType
                 return sdf(builder, chronology, locale, symbol, count);
             case CLDR_24:
                 return cldr24(builder, locale, symbol, count);
-            case NON_ISO_DATE:
-                if (isISO(chronology)) {
-                    throw new IllegalArgumentException("Choose CLDR or CLDR_DATE for ISO-8601-chronology.");
-                }
-                return general(builder, chronology, symbol, count, locale);
             case CLDR_DATE:
                 Class<?> type = chronology.getChronoType();
                 if (Calendrical.class.isAssignableFrom(type) || CalendarVariant.class.isAssignableFrom(type)) {
@@ -1648,7 +1611,7 @@ public enum PatternType
                     PlainTime.NANO_OF_SECOND, count, count, false);
                 break;
             case 'A':
-                builder.addInteger(PlainTime.MILLI_OF_DAY, count, 9);
+                builder.addInteger(PlainTime.MILLI_OF_DAY, count, 8);
                 break;
             case 'z':
                 try {
@@ -2251,8 +2214,7 @@ public enum PatternType
                         builder.addFixedNumerical(enumElement, 2);
                     }
                 } else {
-                    builder.startSection(
-                        DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(count));
+                    builder.startSection(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, count);
                     builder.addText(textElement);
                     builder.endSection();
                 }

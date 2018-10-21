@@ -648,10 +648,17 @@ public final class ChronoFormatter<T>
     }
 
     @Override
-    public String format(T formattable) {
+    public String print(T formattable) {
 
         ChronoDisplay display = this.display(formattable, this.globalAttributes);
         return this.format0(display);
+
+    }
+
+    @Override
+    public String format(T formattable) {
+
+        return this.print(formattable);
 
     }
 
@@ -676,18 +683,6 @@ public final class ChronoFormatter<T>
         return this.format0(tsp);
 
     }
-
-    @Override
-    public void formatToBuffer(
-        T formattable,
-        Appendable buffer
-    ) throws IOException {
-
-        ChronoDisplay display = this.display(formattable, this.globalAttributes);
-        this.print(display, buffer, this.globalAttributes, false);
-
-    }
-
 
     /**
      * <p>Prints given chronological entity as formatted text and writes
@@ -979,43 +974,23 @@ public final class ChronoFormatter<T>
 
     }
 
-    /**
-     * <p>For maximum information use {@link #parse(CharSequence, ParseLog)} instead. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     */
-    /*[deutsch]
-     * <p>F&uuml;r maximale Information stattdessen {@link #parse(CharSequence, ParseLog)} nutzen. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     */
     @Override
     public T parse(
         CharSequence text,
-        ParsePosition position
-    ) {
-
-        return this.parse(text, new ParseLog(position));
-
-    }
-
-    @Override
-    public T parse(
-        CharSequence text,
-        ParsePosition position,
         RawValues rawValues
-    ) {
+    ) throws ParseException {
 
-        ParseLog plog = new ParseLog(position);
+        ParseLog plog = new ParseLog();
         T result = this.parse(text, plog);
         rawValues.accept(plog.getRawValues());
-        return result;
+
+        if (plog.isError()) {
+            throw new ParseException(plog.getErrorMessage(), plog.getErrorIndex());
+        } else if (result == null) {
+            throw new ParseException("Cannot parse: \"" + text + "\"", 0);
+        } else {
+            return result;
+        }
 
     }
 
@@ -1555,12 +1530,14 @@ public final class ChronoFormatter<T>
      *
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while this instance remains unaffected
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     /*[deutsch]
      * <p>Entspricht {@link #with(Timezone) with(Timezone.of(tzid))}. </p>
      *
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while this instance remains unaffected
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      */
     @Override
     public ChronoFormatter<T> withTimezone(TZID tzid) {
@@ -1702,9 +1679,9 @@ public final class ChronoFormatter<T>
      *
      * <pre>
      *  ChronoFormatter&lt;PlainDate&gt; fmt =
-     *      PlainDate.localFormatter("MM-dd", PatternType.CLDR)
-     *               .withDefault(PlainDate.YEAR, 2012);
-     *  PlainDate date = fmt.parse("05-21");
+     *      ChronoFormatter.ofDatePattern(&quot;MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
+     *          .withDefault(PlainDate.YEAR, 2012);
+     *  PlainDate date = fmt.parse(&quot;05-21&quot;);
      *  System.out.println(date); // 2012-05-21
      * </pre>
      *
@@ -1732,9 +1709,9 @@ public final class ChronoFormatter<T>
      *
      * <pre>
      *  ChronoFormatter&lt;PlainDate&gt; fmt =
-     *      PlainDate.localFormatter("MM-dd", PatternType.CLDR)
-     *               .withDefault(PlainDate.YEAR, 2012);
-     *  PlainDate date = fmt.parse("05-21");
+     *      ChronoFormatter.ofDatePattern(&quot;MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
+     *          .withDefault(PlainDate.YEAR, 2012);
+     *  PlainDate date = fmt.parse(&quot;05-21&quot;);
      *  System.out.println(date); // 2012-05-21
      * </pre>
      *
@@ -2273,7 +2250,10 @@ public final class ChronoFormatter<T>
      * @param   type        the type of the pattern to be used
      * @param   locale      format locale
      * @param   tzid        timezone id
-     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @return  new format object for formatting {@code Moment}-objects
+     *          using given locale and timezone
+     * @throws  IllegalArgumentException if resolving of pattern fails
+     *          or the timezone cannot be loaded
      * @throws  IllegalArgumentException if resolving of pattern fails
      * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
@@ -2288,8 +2268,10 @@ public final class ChronoFormatter<T>
      * @param   type        the type of the pattern to be used
      * @param   locale      format locale
      * @param   tzid        timezone id
-     * @return  new format object for formatting {@code Moment}-objects using given locale and timezone
+     * @return  new format object for formatting {@code Moment}-objects
+     *          using given locale and timezone
      * @throws  IllegalArgumentException if resolving of pattern fails
+     *          or the timezone cannot be loaded
      * @see     #ofPattern(String, PatternType, Locale, Chronology)
      * @since   3.1
      */
@@ -2486,6 +2468,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @param   tzid        timezone identifier
      * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
@@ -2497,6 +2480,7 @@ public final class ChronoFormatter<T>
      * @param   locale      format locale
      * @param   tzid        timezone identifier
      * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
      */
@@ -3244,7 +3228,6 @@ public final class ChronoFormatter<T>
             case CLDR_24:
             case CLDR_DATE:
             case SIMPLE_DATE_FORMAT:
-            case NON_ISO_DATE:
                 if (p.contains("h") || p.contains("K")) {
                     if (!p.contains("a") && !p.contains("b") && !p.contains("B")) {
                         throw new IllegalArgumentException(
@@ -3810,11 +3793,11 @@ public final class ChronoFormatter<T>
          * SignPolicy.SHOW_NEVER}. </p>
          *
          * @param   element         chronological element
-         * @param   minDigits       minimum count of digits in range 1-9
-         * @param   maxDigits       maximum count of digits in range 1-9
+         * @param   minDigits       minimum count of digits in range 1-10
+         * @param   maxDigits       maximum count of digits in range 1-10
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any of {@code minDigits} and
-         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits} are out of range {@code 1-10} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
@@ -3831,11 +3814,11 @@ public final class ChronoFormatter<T>
          * SignPolicy.SHOW_NEVER}. </p>
          *
          * @param   element         chronological element
-         * @param   minDigits       minimum count of digits in range 1-9
-         * @param   maxDigits       maximum count of digits in range 1-9
+         * @param   minDigits       minimum count of digits in range 1-10
+         * @param   maxDigits       maximum count of digits in range 1-10
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any of {@code minDigits} and
-         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits} are out of range {@code 1-10} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
@@ -3879,7 +3862,7 @@ public final class ChronoFormatter<T>
          * interpreted as digits. If there are less than {@code minDigits}
          * then the text input will be invalid. Note: If there is no
          * strict or smart mode (lax) then the parser will always assume
-         * {@code minDigits == 0} and {@code maxDigits = 9}. </li></ol>
+         * {@code minDigits == 0} and {@code maxDigits = 10}. </li></ol>
          *
          * <p>Note: The arguments {@code minDigits} and {@code maxDigits} will only be taken into account
          * if a decimal number system is used. </p>
@@ -3904,12 +3887,12 @@ public final class ChronoFormatter<T>
          * </pre>
          *
          * @param   element         chronological element
-         * @param   minDigits       minimum count of digits in range 1-9
-         * @param   maxDigits       maximum count of digits in range 1-9
+         * @param   minDigits       minimum count of digits in range 1-10
+         * @param   maxDigits       maximum count of digits in range 1-10
          * @param   signPolicy      controls output of numeric sign
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any of {@code minDigits} and
-         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits} are out of range {@code 1-10} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
@@ -3937,7 +3920,7 @@ public final class ChronoFormatter<T>
          * Stellen, wird die Texteingabe als ung&uuml;ltig angesehen. Zu
          * beachten: Ist ein laxer Parse-Modus angegeben, dann wird
          * unabh&auml;ngig von den hier angegebenen Argumenten stets
-         * {@code minDigits == 0} und die Obergrenze von {@code maxDigits = 9}
+         * {@code minDigits == 0} und die Obergrenze von {@code maxDigits = 10}
          * angenommen. </li></ol>
          *
          * <p>Hinweis: Die Argumente {@code minDigits} und {@code maxDigits} werden nur dann ber&uuml;cksichtigt,
@@ -3963,12 +3946,12 @@ public final class ChronoFormatter<T>
          * </pre>
          *
          * @param   element         chronological element
-         * @param   minDigits       minimum count of digits in range 1-9
-         * @param   maxDigits       maximum count of digits in range 1-9
+         * @param   minDigits       minimum count of digits in range 1-10
+         * @param   maxDigits       maximum count of digits in range 1-10
          * @param   signPolicy      controls output of numeric sign
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any of {@code minDigits} and
-         *          {@code maxDigits} are out of range {@code 1-9} or if
+         *          {@code maxDigits} are out of range {@code 1-10} or if
          *          {@code maxDigits < minDigits} or if given element is
          *          not supported by chronology or its preparser
          * @throws  IllegalStateException if a numerical element is added
@@ -4064,10 +4047,10 @@ public final class ChronoFormatter<T>
          * digits (<i>adjacent digit parsing</i>). </p>
          *
          * @param   element         chronological element
-         * @param   digits          fixed count of digits in range 1-9
+         * @param   digits          fixed count of digits in range 1-10
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if {@code digits} is out of
-         *          range {@code 1-9} or if given element is not supported
+         *          range {@code 1-10} or if given element is not supported
          *          by chronology or its preparser
          * @see     Chronology#isSupported(ChronoElement)
          * @see     SignPolicy#SHOW_NEVER
@@ -4087,10 +4070,10 @@ public final class ChronoFormatter<T>
          * Ziffern interpretieren (<i>adjacent digit parsing</i>). </p>
          *
          * @param   element         chronological element
-         * @param   digits          fixed count of digits in range 1-9
+         * @param   digits          fixed count of digits in range 1-10
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if {@code digits} is out of
-         *          range {@code 1-9} or if given element is not supported
+         *          range {@code 1-10} or if given element is not supported
          *          by chronology
          * @see     Chronology#isSupported(ChronoElement)
          * @see     SignPolicy#SHOW_NEVER
@@ -5025,7 +5008,7 @@ public final class ChronoFormatter<T>
          * treated as literal by double apostroph. </p>
          *
          * <p>For exact interpretation and description of format symbols
-         * see the implementations of interface {@code ChronoPattern}. </p>
+         * see the enum {@code PatternType}. </p>
          *
          * @param   formatPattern   pattern of symbols to be used in formatting
          * @param   patternType     type of pattern how to interprete symbols
@@ -5045,8 +5028,8 @@ public final class ChronoFormatter<T>
          * Apostrophs &quot;'&quot; gekennzeichnet werden (ESCAPE). Das Apostroph selbst wird durch
          * Verdoppelung als Literal interpretiert. </p>
          *
-         * <p>Zur genauen Interpretation der Formatsymbole sei auf die
-         * Implementierungen des Interface {@code ChronoPattern} verwiesen. </p>
+         * <p>Zur genauen Interpretation der Formatsymbole sei auf das Enum
+         * {@code PatternType} verwiesen. </p>
          *
          * @param   formatPattern   pattern of symbols to be used in formatting
          * @param   patternType     type of pattern how to interprete symbols
@@ -6708,7 +6691,7 @@ public final class ChronoFormatter<T>
                 || !last.isNumerical()
                 || (count != 4)
             ) {
-                return this.addNumber(element, false, count, 9, SignPolicy.SHOW_WHEN_NEGATIVE, protectedMode);
+                return this.addNumber(element, false, count, 10, SignPolicy.SHOW_WHEN_NEGATIVE, protectedMode);
             }
 
             // adjacent digit parsing
@@ -7219,19 +7202,6 @@ public final class ChronoFormatter<T>
             }
 
             return new OverrideHandler<C>(override);
-
-        }
-
-        @Override
-        @Deprecated
-        public GeneralTimestamp<C> createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

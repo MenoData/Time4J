@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarFamily.java) is part of project Time4J.
  *
@@ -72,14 +72,26 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
 
     }
 
+    /**
+     * <p>Not supported because the variant is missing. </p>
+     *
+     * @return  nothing
+     * @throws  ChronoException (always)
+     * @see     #getCalendarSystem(String)
+     * @see     Chronology#getCalendarSystem(VariantSource)
+     */
+    /*[deutsch]
+     * <p>Nicht unterst&uuml;tzt, weil der Variantenbezug fehlt. </p>
+     *
+     * @return  nothing
+     * @throws  ChronoException (always)
+     * @see     #getCalendarSystem(String)
+     * @see     Chronology#getCalendarSystem(VariantSource)
+     */
     @Override
     public CalendarSystem<T> getCalendarSystem() {
 
-        if (this.calendars.size() == 1) {
-            return this.calendars.values().iterator().next();
-        } else {
-            throw new ChronoException("Cannot determine calendar system without variant.");
-        }
+        throw new ChronoException("Cannot determine calendar system without variant.");
 
     }
 
@@ -117,6 +129,26 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
     public TimeLine<T> getTimeLine(String variant) {
 
         return new CalendarTimeLine<T>(this, variant);
+
+    }
+
+    /**
+     * <p>Obtains an object which is useful for generic interval support. </p>
+     *
+     * @param   variant     calendar variant
+     * @return  serializable timeline which is variant-specific
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Liefert ein Objekt, das f&uuml;r die allgemeine Intervallunterst&uuml;tzung n&uuml;tzlich ist. </p>
+     *
+     * @param   variant     calendar variant
+     * @return  serializable timeline which is variant-specific
+     * @since   5.0
+     */
+    public TimeLine<T> getTimeLine(VariantSource variant) {
+
+        return this.getTimeLine(variant.getVariant());
 
     }
 

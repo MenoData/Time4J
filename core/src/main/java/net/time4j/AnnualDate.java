@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AnnualDate.java) is part of project Time4J.
  *
@@ -19,12 +19,8 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.xml;
+package net.time4j;
 
-import net.time4j.Moment;
-import net.time4j.Month;
-import net.time4j.PlainDate;
-import net.time4j.SystemClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;
@@ -47,8 +43,6 @@ import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
-import net.time4j.format.expert.ChronoFormatter;
-import net.time4j.format.expert.PatternType;
 import net.time4j.tz.Timezone;
 
 import java.io.InvalidObjectException;
@@ -91,7 +85,7 @@ import java.util.Map;
  * {@code AnnualDate current = SystemClock.inLocalView().now(AnnualDate.chronology())}. </p>
  *
  * @author  Meno Hochschild
- * @since   3.22/4.18
+ * @since   3.44
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Kombination aus Monat und Tag-des-Monats (Jahrestag) als
@@ -125,7 +119,7 @@ import java.util.Map;
  * {@code AnnualDate current = SystemClock.inLocalView().now(AnnualDate.chronology())}. </p>
  *
  * @author  Meno Hochschild
- * @since   3.22/4.18
+ * @since   3.44
  */
 @CalendarType("iso8601")
 public final class AnnualDate
@@ -146,7 +140,7 @@ public final class AnnualDate
     /**
      * <p>Element with the calendar month in numerical form and the value range
      * {@code 1-12}. </p>
-     * <p/>
+     *
      * <p>Normally the enum-variant is recommended due to clarity and
      * type-safety. The enum-form can also be formatted as text. </p>
      *
@@ -178,9 +172,6 @@ public final class AnnualDate
             .appendElement(MONTH_OF_YEAR, new MonthElementRule())
             .appendElement(MONTH_AS_NUMBER, new IntegerElementRule(false))
             .build();
-
-    private static final ChronoFormatter<AnnualDate> PARSER =
-        ChronoFormatter.setUp(ENGINE, Locale.ROOT).addPattern("--MM-dd", PatternType.CLDR).build();
 
     private static final long serialVersionUID = 7510648008819092983L;
 
@@ -435,7 +426,15 @@ public final class AnnualDate
      */
     public static AnnualDate parseXML(String xml) throws ParseException {
 
-        return PARSER.parse(xml);
+        if ((xml.length() == 7) && (xml.charAt(0) == '-') && (xml.charAt(1) == '-') && (xml.charAt(4) == '-')) {
+            int m1 = toDigit(xml, 2);
+            int m2 = toDigit(xml, 3);
+            int d1 = toDigit(xml, 5);
+            int d2 = toDigit(xml, 6);
+            return new AnnualDate(m1 * 10 + m2, d1 * 10 + d2);
+        } else {
+            throw new ParseException("Not compatible to standard XML-format: " + xml, xml.length());
+        }
 
     }
 
@@ -653,6 +652,21 @@ public final class AnnualDate
 
     }
 
+    private static int toDigit(
+        String xml,
+        int offset
+    ) throws ParseException {
+
+        char c = xml.charAt(offset);
+
+        if ((c >= '0') && (c <= '9')) {
+            return (c - '0');
+        } else {
+            throw new ParseException("Digit expected: " + xml, offset);
+        }
+
+    }
+
     private static String toString(
         int month,
         int dayOfMonth
@@ -721,18 +735,6 @@ public final class AnnualDate
         public AnnualDate createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
-        public AnnualDate createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
             boolean lenient,
             boolean preparsing
         ) {
@@ -766,21 +768,16 @@ public final class AnnualDate
             AnnualDate context,
             AttributeQuery attributes
         ) {
-
             return context;
-
         }
 
         @Override
         public Chronology<?> preparser() {
-
             return null;
-
         }
 
         @Override
         public String getFormatPattern(DisplayStyle style, Locale locale) {
-
             Map<String, String> map = CalendarText.getIsoInstance(locale).getTextForms();
             String key = null;
             switch (style.getStyleValue()) {
@@ -799,42 +796,35 @@ public final class AnnualDate
             }
             String pattern = getFormatPattern(map, key);
             return ((pattern == null) ? "MM-dd" : pattern);
-
         }
 
         @Override
         public StartOfDay getDefaultStartOfDay() {
-
             return StartOfDay.MIDNIGHT;
-
         }
 
         @Override
         public int getDefaultPivotYear() {
-
             return PlainDate.axis().getDefaultPivotYear();
-
         }
 
         private static String getFormatPattern(
             Map<String, String> map,
             String key
         ) {
-
             if (map.containsKey(key)) {
                 return map.get(key);
             }
 
-            if (key.equals("F_MMMMd")) {
+            if ("F_MMMMd".equals(key)) {
                 return getFormatPattern(map, "F_MMMd");
-            } else if (key.equals("F_MMMd")) {
+            } else if ("F_MMMd".equals(key)) {
                 return getFormatPattern(map, "F_MMd");
-            } else if (key.equals("F_MMd")) {
+            } else if ("F_MMd".equals(key)) {
                 return getFormatPattern(map, "F_Md");
             } else {
                 return null;
             }
-
         }
 
     }

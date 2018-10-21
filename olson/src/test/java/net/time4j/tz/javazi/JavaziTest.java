@@ -3,23 +3,20 @@ package net.time4j.tz.javazi;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
-import net.time4j.PlainTimestamp;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TransitionHistory;
 import net.time4j.tz.ZonalOffset;
 import net.time4j.tz.ZonalTransition;
 import net.time4j.tz.ZoneModelProvider;
-
-import java.io.IOException;
 import org.junit.BeforeClass;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.io.IOException;
+
 import static net.time4j.ClockUnit.MINUTES;
-import static org.hamcrest.CoreMatchers.is;
-import static org.hamcrest.CoreMatchers.notNullValue;
-import static org.hamcrest.CoreMatchers.nullValue;
+import static org.hamcrest.CoreMatchers.*;
 import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
@@ -114,18 +111,6 @@ public class JavaziTest {
                     fail("Problem with loading history of: " + tzid);
                 }
             }
-        }
-    }
-
-    @Test
-    public void loadSolar89() {
-        if (testable) {
-            TransitionHistory h = zp.load("Asia/Riyadh89");
-            Moment start89 = PlainTimestamp.of(1989, 1, 1, 0, 0).atUTC();
-            assertThat(h.isEmpty(), is(false));
-            assertThat(
-                h.getNextTransition(start89).isDaylightSaving(),
-                is(false));
         }
     }
 

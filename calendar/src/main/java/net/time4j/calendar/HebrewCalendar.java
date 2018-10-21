@@ -240,7 +240,6 @@ public final class HebrewCalendar
                     case CIVIL:
                         return value.getCivilValue(this.hasLeapMonth(context));
                     case BIBLICAL:
-                    case BIBILICAL:
                         return value.getBiblicalValue(this.hasLeapMonth(context));
                     default:
                         return this.numerical(value);
@@ -1534,8 +1533,11 @@ public final class HebrewCalendar
                     return context.dom;
                 case DAY_OF_YEAR_INDEX:
                     int doy = 0;
+                    boolean leap = isLeapYear(context.year);
                     for (int m = 1; m < context.month.getValue(); m++) {
-                        doy += CALSYS.getLengthOfMonth(HebrewEra.ANNO_MUNDI, context.year, m);
+                        if (leap || (m != 6)) {
+                            doy += CALSYS.getLengthOfMonth(HebrewEra.ANNO_MUNDI, context.year, m);
+                        }
                     }
                     return doy + context.dom;
                 default:
@@ -1830,19 +1832,6 @@ public final class HebrewCalendar
         }
 
         @Override
-        @Deprecated
-        public HebrewCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public HebrewCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,
@@ -1866,7 +1855,6 @@ public final class HebrewCalendar
                         month = HebrewMonth.valueOfCivil(m, isLeapYear(year));
                         break;
                     case BIBLICAL:
-                    case BIBILICAL:
                         month = HebrewMonth.valueOfBiblical(m, isLeapYear(year));
                         break;
                     default:

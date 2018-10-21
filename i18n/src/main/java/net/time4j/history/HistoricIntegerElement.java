@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricIntegerElement.java) is part of project Time4J.
  *
@@ -24,6 +24,7 @@ package net.time4j.history;
 import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.base.GregorianDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
@@ -115,7 +116,7 @@ final class HistoricIntegerElement
             attributes.contains(Attributes.ZERO_DIGIT)
             ? attributes.get(Attributes.ZERO_DIGIT).charValue()
             : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
-        this.print(context, buffer, attributes, numsys, zeroChar, 1, 9);
+        this.print(context, buffer, attributes, numsys, zeroChar, 1, 10);
 
     }
 
@@ -185,8 +186,18 @@ final class HistoricIntegerElement
                 buffer.append(text);
                 break;
             case MONTH_INDEX:
-                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-                buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(date.getMonth())));
+                int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
+                int m = date.getMonth();
+                if (count == 0) {
+                    OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+                    buffer.append(this.monthAccessor(attributes, oc).print(Month.valueOf(m)));
+                } else {
+                    String digits = numsys.toNumeral(m);
+                    if (numsys.isDecimal()) {
+                        digits = pad(digits, count, zeroChar);
+                    }
+                    buffer.append(digits);
+                }
                 break;
             case DAY_OF_MONTH_INDEX:
                 buffer.append(String.valueOf(date.getDayOfMonth()));
@@ -218,18 +229,21 @@ final class HistoricIntegerElement
 
         if (this.index == MONTH_INDEX) {
             int index = status.getIndex();
-            OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
-            Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
-            if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
-                status.setErrorIndex(-1);
-                status.setIndex(index);
-                oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
-                month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
-            }
-            if (month == null) {
-                return null;
-            } else {
-                return Integer.valueOf(month.getValue());
+            int count = attributes.get(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, Integer.valueOf(0)).intValue();
+            if (count == 0) { // textual parsing
+                OutputContext oc = attributes.get(Attributes.OUTPUT_CONTEXT, OutputContext.FORMAT);
+                Month month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+                if ((month == null) && attributes.get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)) {
+                    status.setErrorIndex(-1);
+                    status.setIndex(index);
+                    oc = ((oc == OutputContext.FORMAT) ? OutputContext.STANDALONE : OutputContext.FORMAT);
+                    month = this.monthAccessor(attributes, oc).parse(text, status, Month.class, attributes);
+                }
+                if (month == null) {
+                    return null;
+                } else {
+                    return Integer.valueOf(month.getValue());
+                }
             }
         } else if (
             (this.index == YEAR_AFTER_INDEX)
@@ -433,7 +447,7 @@ final class HistoricIntegerElement
         Leniency leniency
     ) {
 
-        int value = 0;
+        long value = 0;
         int pos = offset;
 
         if (numsys.isDecimal()) {
@@ -465,7 +479,10 @@ final class HistoricIntegerElement
                 }
             }
 
-            if (negative) {
+            if (value > Integer.MAX_VALUE) {
+                status.setErrorIndex(offset);
+                return Integer.MIN_VALUE;
+            } else if (negative) {
                 if (pos == offset + 1) {
                     pos = offset;
                 } else {
@@ -490,7 +507,7 @@ final class HistoricIntegerElement
         }
 
         status.setIndex(pos);
-        return value;
+        return (int) value;
 
     }
 
@@ -667,17 +684,34 @@ final class HistoricIntegerElement
                     case YEAR_AFTER_INDEX:
                     case YEAR_BEFORE_INDEX:
                     case CENTURY_INDEX:
-                        if (current.getEra() == HistoricEra.BC) {
-                            max = this.history.convert(PlainDate.axis().getMinimum()).getYearOfEra();
+                        if (this.history == ChronoHistory.PROLEPTIC_BYZANTINE) {
+                            max = ChronoHistory.BYZANTINE_YMAX;
+                        } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
+                            max = ChronoHistory.JULIAN_YMAX;
+                            if (current.getEra() == HistoricEra.BC) {
+                                max++;
+                            }
+                        } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
+                            max = GregorianMath.MAX_YEAR;
+                            if (current.getEra() == HistoricEra.BC) {
+                                max++;
+                            }
                         } else {
-                            max = this.history.convert(PlainDate.axis().getMaximum()).getYearOfEra();
+                            max = ((current.getEra() == HistoricEra.BC) ? 45 : 9999);
                         }
                         if (this.index == CENTURY_INDEX) {
                             max = ((max - 1) / 100) + 1;
                         }
                         return Integer.valueOf(max);
                     case MONTH_INDEX:
-                        max = 12;
+                        if (
+                            (current.getEra() == HistoricEra.BYZANTINE)
+                            && (current.getYearOfEra() == ChronoHistory.BYZANTINE_YMAX)
+                        ) {
+                            max = 8;
+                        } else {
+                            max = 12;
+                        }
                         hd = this.adjust(context, max);
                         break;
                     case DAY_OF_MONTH_INDEX:
@@ -714,8 +748,8 @@ final class HistoricIntegerElement
 
                 max = ((this.index == MONTH_INDEX) ? hd.getMonth() : hd.getDayOfMonth());
                 return Integer.valueOf(max);
-            } catch (IllegalArgumentException iae) {
-                throw new ChronoException(iae.getMessage(), iae);
+            } catch (RuntimeException re) {
+                throw new ChronoException(re.getMessage(), re);
             }
 
         }

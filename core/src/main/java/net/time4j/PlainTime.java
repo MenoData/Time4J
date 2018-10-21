@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTime.java) is part of project Time4J.
  *
@@ -31,6 +31,7 @@ import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
@@ -47,7 +48,6 @@ import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.ChronoPattern;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
@@ -60,6 +60,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.math.RoundingMode;
+import java.text.ParseException;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -200,11 +201,11 @@ public final class PlainTime
      *
      * <pre>
      *  PlainTimestamp tsp =
-     *      PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
+     *      ChronoFormatter.ofTimestampPattern(&quot;uuuu-MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
      *          .withDefault(
      *              PlainTime.COMPONENT,
      *              PlainTime.midnightAtStartOfDay())
-     *          .parse("2014-08-20");
+     *          .parse(&quot;2014-08-20&quot;);
      *  System.out.println(tsp); // output: 2014-08-20T00
      * </pre>
      *
@@ -221,12 +222,12 @@ public final class PlainTime
      *
      * <pre>
      *  PlainTimestamp tsp =
-     *      PlainTimestamp.localFormatter("uuuu-MM-dd", PatternType.CLDR)
+     *      ChronoFormatter.ofTimestampPattern(&quot;uuuu-MM-dd&quot;, PatternType.CLDR, Locale.getDefault())
      *          .withDefault(
      *              PlainTime.COMPONENT,
      *              PlainTime.midnightAtStartOfDay())
-     *          .parse("2014-08-20");
-     *  System.out.println(tsp); // output: 2014-08-20T00
+     *          .parse(&quot;2014-08-20&quot;);
+     *  System.out.println(tsp); // Ausgabe: 2014-08-20T00
      * </pre>
      *
      * <p>Hinweis: Dieses Element definiert keine Basiseinheit. </p>
@@ -561,20 +562,6 @@ public final class PlainTime
             0,
             23,
             'H');
-
-    /**
-     * <p>Synonym for {@code HOUR_FROM_0_TO_24}. </p>
-     *
-     * @deprecated  Use {@link #HOUR_FROM_0_TO_24} instead, will be removed in next major release
-     */
-    /*[deutsch]
-     * <p>Synonym f&uuml;r {@code HOUR_FROM_0_TO_24}. </p>
-     *
-     * @deprecated  Use {@link #HOUR_FROM_0_TO_24} instead, will be removed in next major release
-     */
-    @FormattableElement(format = "H")
-    @Deprecated
-    public static final ProportionalElement<Integer, PlainTime> ISO_HOUR = HOUR_FROM_0_TO_24;
 
     /**
      * <p>Element with the minute of hour in the value range {@code 0-59}. </p>
@@ -1379,133 +1366,55 @@ public final class PlainTime
     }
 
     /**
-     * <p>Creates a new formatter which uses the given pattern in the
-     * default locale for formatting and parsing plain times. </p>
+     * <p>Creates a formatted output of this instance. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   4.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Erzeugt eine formatierte Ausgabe dieser Instanz. </p>
      *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using system locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
+     * @param   printer     helps to format this instance
+     * @return  formatted string
+     * @since   4.0
      */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTime> localFormatter(
-        String formatPattern,
-        P patternType
-    ) {
+    public String print(TemporalFormatter<PlainTime> printer) {
 
-        return FormatSupport.createFormatter(PlainTime.class, formatPattern, patternType, Locale.getDefault());
+        return printer.print(this);
 
     }
 
     /**
-     * <p>Creates a new formatter which uses the given display mode in the
-     * default locale for formatting and parsing plain times. </p>
+     * <p>Parses given text to an instance of this class. </p>
      *
-     * @param   mode        formatting style
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using system locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   4.0
      */
     /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * in der Standard-Sprach- und L&auml;ndereinstellung. </p>
+     * <p>Interpretiert den angegebenen Text zu einer Instanz dieser Klasse. </p>
      *
-     * @param   mode        formatting style
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using system locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
+     * @param   text        text to be parsed
+     * @param   parser      helps to parse given text
+     * @return  parsed result
+     * @throws  IndexOutOfBoundsException if the text is empty
+     * @throws  ChronoException if the text is not parseable
+     * @since   4.0
      */
-    public static TemporalFormatter<PlainTime> localFormatter(DisplayMode mode) {
-
-        return formatter(mode, Locale.getDefault());
-
-    }
-
-    /**
-     * <p>Creates a new formatter which uses the given pattern and locale
-     * for formatting and parsing plain times. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String, ChronoPattern)
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Musters
-     * in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * @param   <P> generic pattern type
-     * @param   formatPattern   format definition as pattern
-     * @param   patternType     pattern dialect
-     * @param   locale          locale setting
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using given locale
-     * @throws  IllegalArgumentException if resolving of pattern fails
-     * @since   3.0
-     * @see     #localFormatter(String, ChronoPattern)
-     */
-    public static <P extends ChronoPattern<P>> TemporalFormatter<PlainTime> formatter(
-        String formatPattern,
-        P patternType,
-        Locale locale
+    public static PlainTime parse(
+        String text,
+        TemporalFormatter<PlainTime> parser
     ) {
 
-        return FormatSupport.createFormatter(PlainTime.class, formatPattern, patternType, locale);
-
-    }
-
-    /**
-     * <p>Creates a new formatter which uses the given display mode and locale
-     * for formatting and parsing plain times. </p>
-     *
-     * @param   mode        formatting style
-     * @param   locale      locale setting
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using given locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     * @see     #localFormatter(DisplayMode)
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein neues Format-Objekt mit Hilfe des angegebenen Stils
-     * und in der angegebenen Sprach- und L&auml;ndereinstellung. </p>
-     *
-     * @param   mode        formatting style
-     * @param   locale      locale setting
-     * @return  format object for formatting {@code PlainTime}-objects
-     *          using given locale
-     * @throws  IllegalStateException if format pattern cannot be retrieved
-     * @since   3.0
-     * @see     #localFormatter(DisplayMode)
-     */
-    public static TemporalFormatter<PlainTime> formatter(
-        DisplayMode mode,
-        Locale locale
-    ) {
-
-        String formatPattern = CalendarText.patternForTime(mode, locale);
-        return FormatSupport.createFormatter(PlainTime.class, formatPattern, locale);
+        try {
+            return parser.parse(text);
+        } catch (ParseException pe) {
+            throw new ChronoException(pe.getMessage(), pe);
+        }
 
     }
 
@@ -3312,19 +3221,6 @@ public final class PlainTime
 
             final UnixTime ut = clock.currentTime();
             return PlainTime.from(ut, zone.getOffset(ut));
-
-        }
-
-        @Override
-        @Deprecated
-        public PlainTime createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

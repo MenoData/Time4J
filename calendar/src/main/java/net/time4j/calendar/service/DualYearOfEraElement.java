@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DualYearOfEraElement.java) is part of project Time4J.
  *
@@ -95,7 +95,7 @@ public abstract class DualYearOfEraElement<T extends ChronoEntity<T>>
             attributes.contains(Attributes.ZERO_DIGIT)
                 ? attributes.get(Attributes.ZERO_DIGIT).charValue()
                 : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
-        this.print(context, buffer, attributes, numsys, zeroChar, minDigits, 9);
+        this.print(context, buffer, attributes, numsys, zeroChar, minDigits, 10);
 
     }
 
@@ -138,7 +138,7 @@ public abstract class DualYearOfEraElement<T extends ChronoEntity<T>>
                 : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
         Leniency leniency =
             (numsys.isDecimal() ? Leniency.SMART : attributes.get(Attributes.LENIENCY, Leniency.SMART));
-        int value = 0;
+        long value = 0;
 
         if (numsys.isDecimal()) {
             for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
@@ -167,12 +167,12 @@ public abstract class DualYearOfEraElement<T extends ChronoEntity<T>>
             }
         }
 
-        if (pos == start) {
+        if ((pos == start) || (value > Integer.MAX_VALUE)) {
             status.setErrorIndex(start);
             return null;
         } else {
             status.setIndex(pos);
-            return Integer.valueOf(value);
+            return Integer.valueOf((int) value);
         }
 
     }

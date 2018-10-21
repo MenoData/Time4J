@@ -293,22 +293,11 @@ public final class GenericTextProviderSPI
     public String[] meridiems(
         String calendarType,
         Locale locale,
-        TextWidth tw
-    ) {
-
-        return EMPTY_STRINGS;
-
-    }
-
-    @Override
-    public String[] meridiems(
-        String calendarType,
-        Locale locale,
         TextWidth textWidth,
         OutputContext outputContext
     ) {
 
-        return this.meridiems(calendarType, locale, textWidth);
+        return EMPTY_STRINGS;
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BridgeChronology.java) is part of project Time4J.
  *
@@ -107,19 +107,6 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
     ) {
 
         T temporal = this.delegate.createFrom(clock, attributes);
-        return ((temporal == null) ? null : this.converter.from(temporal));
-
-    }
-
-    @Override
-    @Deprecated
-    public S createFrom(
-        ChronoEntity<?> entity,
-        AttributeQuery attributes,
-        boolean preparsing
-    ) {
-
-        T temporal = this.delegate.createFrom(entity, attributes, preparsing);
         return ((temporal == null) ? null : this.converter.from(temporal));
 
     }

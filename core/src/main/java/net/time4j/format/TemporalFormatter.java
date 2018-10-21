@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalFormatter.java) is part of project Time4J.
  *
@@ -24,9 +24,7 @@ package net.time4j.format;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.tz.TZID;
 
-import java.io.IOException;
 import java.text.ParseException;
-import java.text.ParsePosition;
 import java.util.Locale;
 
 
@@ -34,19 +32,13 @@ import java.util.Locale;
  * <p>Generic facade for any temporal/chronological format object which can print temporal objects to text
  * or parse texts to temporal objects. </p>
  *
- * <p><strong>Specification:</strong>
- * Implementations must be immutable. </p>
- *
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
  */
 /*[deutsch]
- * <p>Allgemeine Fassade von Zeitformatobjekten, die temporale Objekte zu Text oder umgekehrt Text als
+ * <p>Allgemeine Fassade von Zeitformatobjekten, die temporale Objekte zu Text formatieren oder umgekehrt Text als
  * temporale Objekte interpretieren. </p>
- *
- * <p><strong>Specification:</strong>
- * Implementations must be immutable. </p>
  *
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
@@ -57,7 +49,10 @@ public interface TemporalFormatter<T> {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Prints given chronological entity as formatted text. </p>
+     * <p>Synonym for {@code print(T)}. </p>
+     *
+     * <p>This method adapts the standard naming style of most Java formatters
+     * while Time4J prefers the name &quot;print&quot;. </p>
      *
      * @param   formattable     object to be formatted
      * @return  formatted text
@@ -65,7 +60,10 @@ public interface TemporalFormatter<T> {
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Formatiert das angegebene Objekt als Text. </p>
+     * <p>Synonym f&uuml;r {@code print(T)}. </p>
+     *
+     * <p>Diese Methode &uuml;bernimmt den &uuml;blichen Namensstil der meisten Java-Formatierer,
+     * w&auml;hrend Time4J den Namen &quot;print&quot; bevorzugt. </p>
      *
      * @param   formattable     object to be formatted
      * @return  formatted text
@@ -75,32 +73,25 @@ public interface TemporalFormatter<T> {
     String format(T formattable);
 
     /**
-     * <p>Prints given chronological entity as formatted text and writes it to given buffer. </p>
+     * <p>Prints given chronological entity as formatted text. </p>
      *
      * @param   formattable     object to be formatted
-     * @param   buffer          format buffer
+     * @return  formatted text
      * @throws  IllegalArgumentException if given object is not formattable
-     * @throws  IOException if writing to the buffer fails
-     * @since   3.0
+     * @since   4.0
      */
     /*[deutsch]
-     * <p>Formatiert das angegebene Objekt als Text und schreibt den Text in
-     * den angegebenen Puffer. </p>
+     * <p>Formatiert das angegebene Objekt als Text. </p>
      *
      * @param   formattable     object to be formatted
-     * @param   buffer          format buffer
+     * @return  formatted text
      * @throws  IllegalArgumentException if given object is not formattable
-     * @throws  IOException if writing to the buffer fails
-     * @since   3.0
+     * @since   4.0
      */
-    void formatToBuffer(
-        T formattable,
-        Appendable buffer
-    ) throws IOException;
+    String print(T formattable);
 
     /**
-     * <p>Interpretes given text as chronological entity starting
-     * at the begin of text. </p>
+     * <p>Interpretes given text as chronological entity. </p>
      *
      * @param   text        text to be parsed
      * @return  parse result
@@ -109,7 +100,7 @@ public interface TemporalFormatter<T> {
      * @since   3.0
      */
     /*[deutsch]
-     * <p>Interpretiert den angegebenen Text ab dem Anfang. </p>
+     * <p>Interpretiert den angegebenen Text. </p>
      *
      * @param   text        text to be parsed
      * @return  parse result
@@ -120,57 +111,29 @@ public interface TemporalFormatter<T> {
     T parse(CharSequence text) throws ParseException;
 
     /**
-     * <p>Interpretes given text as chronological entity starting
-     * at the specified position. </p>
+     * <p>Interpretes given text as chronological entity and updates given raw values. </p>
      *
      * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @return  result or {@code null} if parsing does not work
+     * @param   rawValues   holder for raw values (always as new instance)
+     * @return  parsed result
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   3.0
+     * @throws  ParseException if parsing does not work
+     * @since   4.0
      */
     /*[deutsch]
-     * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
-     * Log. </p>
+     * <p>Interpretiert den angegebenen Text und aktualisiert die &uuml;bergebenen Rohwerte. </p>
      *
      * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @return  result or {@code null} if parsing does not work
+     * @param   rawValues   holder for raw values (always as new instance)
+     * @return  parsed result
      * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   3.0
+     * @throws  ParseException if parsing does not work
+     * @since   4.0
      */
     T parse(
         CharSequence text,
-        ParsePosition position
-    );
-
-    /**
-     * <p>Interpretes given text as chronological entity starting
-     * at the specified position. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @param   rawValues   holder for raw values (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   3.0
-     */
-    /*[deutsch]
-     * <p>Interpretiert den angegebenen Text ab der angegebenen Position im
-     * Log. </p>
-     *
-     * @param   text        text to be parsed
-     * @param   position    parse position (always as new instance)
-     * @param   rawValues   holder for raw values (always as new instance)
-     * @return  result or {@code null} if parsing does not work
-     * @throws  IndexOutOfBoundsException if the start position is at end of text or even behind
-     * @since   3.0
-     */
-    T parse(
-        CharSequence text,
-        ParsePosition position,
         RawValues rawValues
-    );
+    ) throws ParseException;
 
     /**
      * <p>Creates a copy of this formatter with given timezone id which
@@ -185,6 +148,7 @@ public interface TemporalFormatter<T> {
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
+     * @throws  IllegalArgumentException if timezone data cannot be loaded
      * @see     Attributes#TIMEZONE_ID
      * @since   3.0
      */
@@ -201,6 +165,7 @@ public interface TemporalFormatter<T> {
      * @param   tzid        timezone id
      * @return  changed copy with the new or changed attribute while
      *          this instance remains unaffected
+     * @throws  IllegalArgumentException if timezone data cannot be loaded
      * @see     Attributes#TIMEZONE_ID
      * @since   3.0
      */

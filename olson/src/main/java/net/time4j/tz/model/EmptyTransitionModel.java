@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EmptyTransitionModel.java) is part of project Time4J.
  *
@@ -123,6 +123,13 @@ final class EmptyTransitionModel
     ) {
 
         return Collections.emptyList();
+
+    }
+
+    @Override
+    public boolean hasNegativeDST() {
+
+        return false;
 
     }
 

@@ -1775,19 +1775,6 @@ public final class PersianCalendar
         }
 
         @Override
-        @Deprecated
-        public PersianCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
-
-        }
-
-        @Override
         public PersianCalendar createFrom(
             ChronoEntity<?> entity,
             AttributeQuery attributes,

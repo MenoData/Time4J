@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoHistory.java) is part of project Time4J.
  *
@@ -52,11 +52,16 @@ import java.util.Set;
 /**
  * <p>Represents the chronological history of calendar reforms in a given region. </p>
  *
+ * <p>All non-proleptic history objects are limited to the range BC 45 until the year AD 9999. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Geschichte der Kalenderreformen in einer gegebenen Region. </p>
+ *
+ * <p>Alle nicht-proleptischen {@code ChronoHistory}-Objekte sind auf den Jahresbereich
+ * BC 45 bis AD 9999 beschr&auml;nkt. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
@@ -98,14 +103,15 @@ public final class ChronoHistory
 
     /**
      * <p>Describes no real historic event but just the proleptic julian calendar which is assumed
-     * to be in power all times. </p>
+     * to be in power all times (with the technical constraint {@code BC 999979466 - AD 999979465}). </p>
      *
      * <p>This constant rather serves for academic purposes because the julian calendar is now nowhere in power
      * and has not existed before the calendar reform of Julius Caesar. </p>
      */
     /*[deutsch]
      * <p>Beschreibt kein wirkliches historisches Ereignis, sondern einfach nur den proleptisch julianischen
-     * Kalender, der als f&uuml;r alle Zeiten g&uuml;ltig angesehen wird. </p>
+     * Kalender, der als f&uuml;r alle Zeiten g&uuml;ltig angesehen wird (mit der technischen Beschr&auml;nkung
+     * {@code BC 999979466 - AD 999979465}). </p>
      *
      * <p>Diese Konstante dient eher akademischen &Uuml;bungen, weil der julianische Kalender aktuell nirgendwo
      * in der Welt in Kraft ist und vor der Kalenderreform von Julius Caesar nicht existierte. </p>
@@ -114,7 +120,7 @@ public final class ChronoHistory
 
     /**
      * <p>Describes no real historic event but just the proleptic byzantine calendar which is assumed
-     * to be in power all times on or after the creation of the world. </p>
+     * to be in power all times from the creation of the world until the byzantine year 999984973. </p>
      *
      * <p>This constant rather serves for academic purposes because the byzantine calendar was in latest use
      * in Russia before 1700. </p>
@@ -124,7 +130,8 @@ public final class ChronoHistory
      */
     /*[deutsch]
      * <p>Beschreibt kein wirkliches historisches Ereignis, sondern einfach nur den proleptisch byzantinischen
-     * Kalender, der als f&uuml;r alle Zeiten ab der Erschaffung der Welt g&uuml;ltig angesehen wird. </p>
+     * Kalender, der f&uuml;r alle Zeiten ab der Erschaffung der Welt bis zum byzantinischen Jahr 999984973
+     * als g&uuml;ltig angesehen wird. </p>
      *
      * <p>Diese Konstante dient eher akademischen &Uuml;bungen, weil der byzantinische Kalender zuletzt in
      * Ru&szlig;land vor 1700 verwendet wurde. </p>
@@ -133,6 +140,9 @@ public final class ChronoHistory
      * @since   3.14/4.11
      */
     public static final ChronoHistory PROLEPTIC_BYZANTINE;
+
+    static final int BYZANTINE_YMAX = 999984973;
+    static final int JULIAN_YMAX = 999979465;
 
     private static final long EARLIEST_CUTOVER;
     private static final ChronoHistory INTRODUCTION_BY_POPE_GREGOR;
@@ -744,7 +754,7 @@ public final class ChronoHistory
      */
     public boolean isValid(HistoricDate date) {
 
-        if (date == null) {
+        if ((date == null) || this.isOutOfRange(date)) {
             return false;
         }
 
@@ -772,6 +782,10 @@ public final class ChronoHistory
      * @since   3.0
      */
     public PlainDate convert(HistoricDate date) {
+
+        if (this.isOutOfRange(date)) {
+            throw new IllegalArgumentException("Out of supported range: " + date);
+        }
 
         Calculus algorithm = this.getAlgorithm(date);
 
@@ -822,6 +836,10 @@ public final class ChronoHistory
         if (era != hd.getEra()) {
             int yoe = era.yearOfEra(hd.getEra(), hd.getYearOfEra());
             hd = HistoricDate.of(era, yoe, hd.getMonth(), hd.getDayOfMonth());
+        }
+
+        if (this.isOutOfRange(hd)) {
+            throw new IllegalArgumentException("Out of supported range: " + hd);
         }
 
         return hd;
@@ -1824,6 +1842,22 @@ public final class ChronoHistory
     EraPreference getEraPreference() {
 
         return this.eraPreference;
+
+    }
+
+    private boolean isOutOfRange(HistoricDate hd) {
+
+        int ad = hd.getEra().annoDomini(hd.getYearOfEra());
+
+        if (this == PROLEPTIC_BYZANTINE) {
+            return ((ad < -5508) || ((ad == -5508) && (hd.getMonth() < 9)) || (ad > BYZANTINE_YMAX - 5508));
+        } else if (this == PROLEPTIC_JULIAN) {
+            return (Math.abs(ad) > JULIAN_YMAX);
+        } else if (this == PROLEPTIC_GREGORIAN) {
+            return (Math.abs(ad) > GregorianMath.MAX_YEAR);
+        } else {
+            return ((ad < -44) || (ad > 9999));
+        }
 
     }
 

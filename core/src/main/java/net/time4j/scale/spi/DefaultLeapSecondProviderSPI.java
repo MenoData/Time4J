@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DefaultLeapSecondProviderSPI.java) is part of project Time4J.
  *
@@ -22,10 +22,10 @@
 package net.time4j.scale.spi;
 
 import net.time4j.PlainDate;
-import net.time4j.Platform;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.ResourceLoader;
 import net.time4j.format.TemporalFormatter;
+import net.time4j.format.platform.SimpleFormatter;
 import net.time4j.scale.LeapSecondProvider;
 
 import java.io.BufferedReader;
@@ -36,6 +36,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URI;
 import java.util.Collections;
 import java.util.LinkedHashMap;
+import java.util.Locale;
 import java.util.Map;
 
 import static net.time4j.scale.LeapSeconds.PATH_TO_LEAPSECONDS;
@@ -74,7 +75,7 @@ public final class DefaultLeapSecondProviderSPI
         if (is != null) {
 
             this.source = uri.toString();
-            TemporalFormatter<PlainDate> f = PlainDate.localFormatter("yyyy-MM-dd", Platform.PATTERN);
+            TemporalFormatter<PlainDate> f = SimpleFormatter.ofDatePattern("yyyy-MM-dd", Locale.ROOT);
 
             try {
 

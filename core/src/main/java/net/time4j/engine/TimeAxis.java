@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -503,22 +503,6 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
         }
 
         return super.getCalendarSystem(variant);
-
-    }
-
-    @Override
-    @Deprecated
-    public T createFrom(
-        ChronoEntity<?> entity,
-        AttributeQuery attributes,
-        boolean preparsing
-    ) {
-
-        if (entity.contains(this.self)) {
-            return entity.get(this.self);
-        }
-
-        return super.createFrom(entity, attributes, preparsing);
 
     }
 

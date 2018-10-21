@@ -263,16 +263,12 @@ public final class SystemClock
      *     PlainTimestamp localTimestamp = SystemClock.inPlatformView().now();
      *     // ...and then we combine correct local device time with the valid timezone data of Time4J
      *     Moment nowCorrect = localTimestamp.inStdTimezone();
-     *     // or in short notation:
-     *     Moment nowCorrect = SystemClock.inPlatformView().currentMoment();
-     *
      * </pre>
      *
      * @return  local clock in system timezone using the platform timezone data
      * @since   3.3/4.2
      * @see     Timezone#ofPlatform()
      * @see     ZonalClock#now()
-     * @see     ZonalClock#currentMoment()
      * @see     #INSTANCE
      * @see     java.util.TimeZone
      */
@@ -291,15 +287,12 @@ public final class SystemClock
      *     PlainTimestamp localTimestamp = SystemClock.inPlatformView().now();
      *     // ...und dann kombinieren wir die lokale Zeit mit den g&uuml;ltigen Zeitzonendaten von Time4J
      *     Moment nowCorrect = localTimestamp.inStdTimezone();
-     *     // Mit der Annahme einer korrekten lokalen Zeit k&oum;nnen wir kurz auch schreiben:
-     *     Moment nowCorrect = SystemClock.inPlatformView().currentMoment();
      * </pre>
      *
      * @return  local clock in system timezone using the platform timezone data
      * @since   3.3/4.2
      * @see     Timezone#ofPlatform()
      * @see     ZonalClock#now()
-     * @see     ZonalClock#currentMoment()
      * @see     #INSTANCE
      * @see     java.util.TimeZone
      */

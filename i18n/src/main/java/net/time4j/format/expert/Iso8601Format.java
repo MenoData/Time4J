@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Iso8601Format.java) is part of project Time4J.
  *
@@ -620,7 +620,7 @@ LOOP:
                 ChronoFunction<ChronoDisplay, R> query
             ) throws IOException {
                 ChronoFormatter<PlainDate> f = (extended ? EXTENDED_CALENDAR_DATE : BASIC_CALENDAR_DATE);
-                f.formatToBuffer(formattable, buffer);
+                f.print(formattable, buffer, attributes);
                 return null;
             }
         };

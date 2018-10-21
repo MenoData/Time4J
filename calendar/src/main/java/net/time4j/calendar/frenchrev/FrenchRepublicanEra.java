@@ -57,14 +57,6 @@ public enum FrenchRepublicanEra
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    @Deprecated
-    public int getValue() {
-
-        return 1;
-
-    }
-
     /**
      * <p>Gets the description text dependent on the locale. </p>
      *

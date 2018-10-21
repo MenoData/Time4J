@@ -573,27 +573,6 @@ public final class EthiopianCalendar
      * <p>Yields the Ethiopian year. </p>
      *
      * @return  int
-     * @since   3.11/4.8
-     * @deprecated  Use {@link #getYear()} instead
-     */
-    /*[deutsch]
-     * <p>Liefert das &auml;thiopische Jahr. </p>
-     *
-     * @return  int
-     * @since   3.11/4.8
-     * @deprecated  Use {@link #getYear()} instead
-     */
-    @Deprecated
-    public int getYearOfEra() {
-
-        return this.getYear();
-
-    }
-
-    /**
-     * <p>Yields the Ethiopian year. </p>
-     *
-     * @return  int
      * @since   3.13/4.10
      */
     /*[deutsch]
@@ -1087,28 +1066,32 @@ public final class EthiopianCalendar
         @Override
         public EthiopianCalendar transform(long utcDays) {
 
-            int mihret =
-                MathUtils.safeCast(
-                    MathUtils.floorDivide(
-                        MathUtils.safeAdd(
-                            MathUtils.safeMultiply(
-                                4,
-                                MathUtils.safeSubtract(utcDays, MIHRET_EPOCH)),
-                            1463),
-                        1461));
+            try {
+                int mihret =
+                    MathUtils.safeCast(
+                        MathUtils.floorDivide(
+                            MathUtils.safeAdd(
+                                MathUtils.safeMultiply(
+                                    4,
+                                    MathUtils.safeSubtract(utcDays, MIHRET_EPOCH)),
+                                1463),
+                            1461));
 
-            int startOfYear = MathUtils.safeCast(this.transform(new EthiopianCalendar(mihret, 1, 1)));
-            int emonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
-            int startOfMonth = MathUtils.safeCast(this.transform(new EthiopianCalendar(mihret, emonth, 1)));
-            int edom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
-            EthiopianEra era = EthiopianEra.AMETE_MIHRET;
+                int startOfYear = MathUtils.safeCast(this.transform(new EthiopianCalendar(mihret, 1, 1)));
+                int emonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
+                int startOfMonth = MathUtils.safeCast(this.transform(new EthiopianCalendar(mihret, emonth, 1)));
+                int edom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
+                EthiopianEra era = EthiopianEra.AMETE_MIHRET;
 
-            if (mihret < 1) {
-                mihret += DELTA_ALEM_MIHRET;
-                era = EthiopianEra.AMETE_ALEM;
+                if (mihret < 1) {
+                    mihret += DELTA_ALEM_MIHRET;
+                    era = EthiopianEra.AMETE_ALEM;
+                }
+
+                return EthiopianCalendar.of(era, mihret, emonth, edom);
+            } catch (ArithmeticException ex) {
+                throw new IllegalArgumentException(ex);
             }
-
-            return EthiopianCalendar.of(era, mihret, emonth, edom);
 
         }
 
@@ -1600,19 +1583,6 @@ public final class EthiopianCalendar
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public EthiopianCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

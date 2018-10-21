@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -163,7 +163,7 @@ final class SPX
                 this.obj = this.readFallback(in, header);
                 break;
             case TRANSITION_RESOLVER_TYPE:
-                this.obj = this.readStrategy(in, header);
+                this.obj = this.readStrategy(header);
                 break;
             case HISTORIZED_TIMEZONE_TYPE:
                 this.obj = this.readZone(in, header);
@@ -216,10 +216,7 @@ final class SPX
 
     }
 
-    private Object readStrategy(
-        ObjectInput in,
-        byte header
-    ) throws IOException, ClassNotFoundException {
+    private Object readStrategy(byte header) {
 
         int key = (header & 0x0F);
         GapResolver gapResolver = GapResolver.values()[key / 2];

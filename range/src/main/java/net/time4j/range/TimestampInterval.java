@@ -359,7 +359,6 @@ public final class TimestampInterval
      * @param   tz      timezone
      * @return  global timestamp intervall interpreted in given timezone
      * @since   2.0
-     * @deprecated  Will become an internal private method starting with v5.0, use {@link #inTimezone(TZID)} instead
      */
     /*[deutsch]
      * <p>Kombiniert dieses lokale Zeitstempelintervall mit der angegebenen
@@ -368,11 +367,8 @@ public final class TimestampInterval
      * @param   tz      timezone
      * @return  global timestamp intervall interpreted in given timezone
      * @since   2.0
-     * @deprecated  Will become an internal private method starting with v5.0, use {@link #inTimezone(TZID)} instead
      */
-    @Deprecated
-    // TODO: make the method package-private in v5.0
-    public MomentInterval in(Timezone tz) {
+    MomentInterval in(Timezone tz) {
 
         Boundary<Moment> b1;
         Boundary<Moment> b2;

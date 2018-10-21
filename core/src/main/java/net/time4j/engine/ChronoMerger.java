@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoMerger.java) is part of project Time4J.
  *
@@ -98,66 +98,6 @@ public interface ChronoMerger<T> {
     T createFrom(
         TimeSource<?> clock,
         AttributeQuery attributes
-    );
-
-    /**
-     * <p>Creates a new entity of type T based on given chronological
-     * data. </p>
-     *
-     * <p>Typically the method will query the given {@code entity} with
-     * different priorities for elements which can compose a new chronological
-     * entity (per group). For example a calendar date can be composed either
-     * by epoch days or the group (year)-(month)-(day-of-month) or the group
-     * (year)-(day-of-year) etc. </p>
-     *
-     * <p>A text parser will call this method after having resolved a text
-     * into single chronological elements and values. Implementations should
-     * always validate the parsed values. In case of error, they are free to
-     * either throw an {@code IllegalArgumentException} or to generate
-     * and to save an error message by mean of the expression
-     * {@code entity.with(ValidationElement.ERROR_MESSAGE, message}. </p>
-     *
-     * @deprecated  use {@link #createFrom(ChronoEntity, AttributeQuery, boolean, boolean)} instead
-     * @param   entity          any chronological entity like parsed
-     *                          elements with their values
-     * @param   attributes      configuration attributes given by parser
-     * @param   preparsing      preparsing phase active?
-     * @return  new time context or {@code null} if given data are insufficient
-     * @throws  IllegalArgumentException in any case of inconsistent data
-     * @see     ValidationElement#ERROR_MESSAGE
-     */
-    /*[deutsch]
-     * <p>Konstruiert eine neue Entit&auml;t basierend auf den angegebenen
-     * chronologischen Daten. </p>
-     *
-     * <p>Typischerweise wird mit verschiedenen Priorit&auml;ten das Argument
-     * {@code entity} nach Elementen abgefragt, die gruppenweise einen
-     * Zeitwert konstruieren. Zum Beispiel kann ein Datum entweder &uuml;ber
-     * die Epochentage, die Gruppe Jahr-Monat-Tag oder die Gruppe Jahr und Tag
-     * des Jahres konstruiert werden. </p>
-     *
-     * <p>Ein Textinterpretierer ruft diese Methode auf, nachdem ein Text
-     * elementweise in chronologische Elemente und Werte aufgel&ouml;st
-     * wurde. Implementierungen sollten immer die interpretierten Werte
-     * validieren. Im Fehlerfall sind Implementierungen frei, entweder eine
-     * {@code IllegalArgumentException} zu werfen oder mittels des Ausdrucks
-     * {@code entity.with(ValidationElement.ERROR_MESSAGE, message} eine
-     * Fehlermeldung nur zu generieren und zu speichern. </p>
-     *
-     * @deprecated  use {@link #createFrom(ChronoEntity, AttributeQuery, boolean, boolean)} instead
-     * @param   entity          any chronological entity like parsed
-     *                          elements with their values
-     * @param   attributes      configuration attributes given by parser
-     * @param   preparsing      preparsing phase active?
-     * @return  new time context or {@code null} if given data are insufficient
-     * @throws  IllegalArgumentException in any case of inconsistent data
-     * @see     ValidationElement#ERROR_MESSAGE
-     */
-    @Deprecated
-    T createFrom(
-        ChronoEntity<?> entity,
-        AttributeQuery attributes,
-        boolean preparsing
     );
 
     /**

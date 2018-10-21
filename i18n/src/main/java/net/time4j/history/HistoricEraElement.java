@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricEraElement.java) is part of project Time4J.
  *
@@ -33,7 +33,6 @@ import net.time4j.engine.ElementRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.DisplayElement;
-import net.time4j.format.NumericalElement;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
@@ -53,7 +52,7 @@ import java.util.Locale;
  */
 final class HistoricEraElement
     extends DisplayElement<HistoricEra>
-    implements NumericalElement<HistoricEra>, TextElement<HistoricEra> {
+    implements TextElement<HistoricEra> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -122,39 +121,6 @@ final class HistoricEraElement
     public boolean isTimeElement() {
 
         return false;
-
-    }
-
-    @Override
-    public int numerical(HistoricEra value) {
-
-        return value.getValue();
-
-    }
-
-    @Override
-    public int printToInt(
-        HistoricEra value,
-        ChronoDisplay context,
-        AttributeQuery attributes
-    ) {
-
-        return value.ordinal();
-
-    }
-
-    @Override
-    public boolean parseFromInt(
-        ChronoEntity<?> entity,
-        int value
-    ) {
-
-        try {
-            entity.with(this, HistoricEra.class.getEnumConstants()[value]);
-            return true;
-        } catch (RuntimeException re) {
-            return false;
-        }
 
     }
 
@@ -314,7 +280,9 @@ final class HistoricEraElement
             boolean lenient
         ) {
 
-            if (value != null) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing era value.");
+            } else {
                 HistoricDate hd = this.history.convert(context.get(PlainDate.COMPONENT));
 
                 if (hd.getEra() == value) {

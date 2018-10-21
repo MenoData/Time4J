@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoTextProviderSPI.java) is part of project Time4J.
  *
@@ -26,7 +26,6 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.ExtendedPatterns;
-import net.time4j.history.HistoricEra;
 
 import java.util.Collections;
 import java.util.HashSet;
@@ -173,17 +172,6 @@ public final class IsoTextProviderSPI
     public String[] meridiems(
         String calendarType,
         Locale locale,
-        TextWidth tw
-    ) {
-
-        return meridiems(locale, tw, OutputContext.FORMAT);
-
-    }
-
-    @Override
-    public String[] meridiems(
-        String calendarType,
-        Locale locale,
         TextWidth tw,
         OutputContext oc
     ) {
@@ -313,7 +301,7 @@ public final class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "MONTH_OF_YEAR");
-            names = lookupBundle(rb, 12, key, tw, oc, 1);
+            names = lookupBundle(rb, 12, key, tw, null, oc, 1);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
@@ -333,7 +321,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-month.",
+                "Cannot find ISO-8601-month for locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -357,7 +345,7 @@ public final class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "QUARTER_OF_YEAR");
-            names = lookupBundle(rb, 4, key, tw, oc, 1);
+            names = lookupBundle(rb, 4, key, tw, null, oc, 1);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
@@ -377,7 +365,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-quarter-of-year.",
+                "Cannot find ISO-8601-quarter-of-year for locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -397,7 +385,7 @@ public final class IsoTextProviderSPI
 
         if (rb != null) {
             String key = getKey(rb, "DAY_OF_WEEK");
-            names = lookupBundle(rb, 7, key, tw, oc, 1);
+            names = lookupBundle(rb, 7, key, tw, null, oc, 1);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if (names == null) {
@@ -419,7 +407,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-quarter-of-year.",
+                "Cannot find ISO-8601-day-of-week for locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -442,7 +430,8 @@ public final class IsoTextProviderSPI
             }
 
             String key = getKey(rb, "ERA");
-            names = lookupBundle(rb, HistoricEra.values().length, key, tw, OutputContext.FORMAT, 0);
+            TextWidth fallback = ((tw == TextWidth.NARROW) ? TextWidth.ABBREVIATED : null);
+            names = lookupBundle(rb, 5, key, tw, fallback, OutputContext.FORMAT, 0);
 
             // fallback rules as found in CLDR-root-properties via alias paths
             if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
@@ -452,7 +441,7 @@ public final class IsoTextProviderSPI
 
         if (names == null) {
             throw new MissingResourceException(
-                "Cannot find ISO-8601-resource for era.",
+                "Cannot find ISO-8601-resource for era and locale: " + locale,
                 IsoTextProviderSPI.class.getName(),
                 locale.toString());
         }
@@ -497,7 +486,7 @@ public final class IsoTextProviderSPI
         }
 
         throw new MissingResourceException(
-            "Cannot find ISO-8601-resource for am/pm.",
+            "Cannot find ISO-8601-resource for am/pm and locale: " + locale,
             IsoTextProviderSPI.class.getName(),
             locale.toString());
 
@@ -525,6 +514,7 @@ public final class IsoTextProviderSPI
         int len,
         String elementName,
         TextWidth tw,
+        TextWidth fallback,
         OutputContext oc,
         int baseIndex
     ) {
@@ -561,6 +551,13 @@ public final class IsoTextProviderSPI
 
             if (rb.containsKey(key)) {
                 names[i] = rb.getString(key);
+            } else if (fallback != null) {
+                String[] arr = lookupBundle(rb, len, elementName, fallback, null, oc, baseIndex);
+                if (arr != null) {
+                    names[i] = arr[i];
+                } else {
+                    return null;
+                }
             } else {
                 return null;
             }

@@ -453,10 +453,10 @@ public class EraFormatTest {
                 .build()
                 .with(Leniency.STRICT)
                 .with(ChronoHistory.ofFirstGregorianReform().with(EraPreference.abUrbeCondita()));
-        PlainDate ad1 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.BC, 753, 1, 1));
+        PlainDate ad1 = ChronoHistory.PROLEPTIC_JULIAN.convert(HistoricDate.of(HistoricEra.BC, 45, 1, 1));
         assertThat(
             formatter.format(ad1),
-            is("01/01/01 a.u.c."));
+            is("01/01/709 a.u.c."));
     }
 
     @Test

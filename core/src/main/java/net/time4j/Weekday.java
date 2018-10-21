@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekday.java) is part of project Time4J.
  *
@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
@@ -50,7 +51,7 @@ import java.util.Locale;
  * @author  Meno Hochschild
  */
 public enum Weekday
-    implements ChronoCondition<GregorianDate> {
+    implements ChronoCondition<GregorianDate>, ChronoOperator<PlainDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -475,6 +476,13 @@ public enum Weekday
         int dom = context.getDayOfMonth();
         
         return (GregorianMath.getDayOfWeek(y, m, dom) == this.getValue());
+
+    }
+
+    @Override
+    public PlainDate apply(PlainDate date) {
+
+        return date.with(PlainDate.DAY_OF_WEEK, this);
 
     }
 

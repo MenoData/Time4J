@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EraPreference.java) is part of project Time4J.
  *
@@ -49,6 +49,7 @@ public final class EraPreference {
     static final EraPreference DEFAULT = new EraPreference();
 
     private static final HistoricDate AD1 = HistoricDate.of(HistoricEra.AD, 1, 1, 1);
+    private static final HistoricDate BC38 = HistoricDate.of(HistoricEra.BC, 38, 1, 1);
     private static final int NON_DEFAULT_MARKER = 127;
     private static final PlainDate PROTOTYPE = PlainDate.of(2000, 1);
 
@@ -327,6 +328,8 @@ public final class EraPreference {
 
         if ((this.era == null) || date.isBefore(this.start) || date.isAfter(this.end)) {
             return ((hd.compareTo(AD1) < 0) ? HistoricEra.BC : HistoricEra.AD);
+        } else if ((this.era == HistoricEra.HISPANIC) && (hd.compareTo(BC38) < 0)) {
+            return HistoricEra.BC; // exceptional case
         } else {
             return this.era;
         }

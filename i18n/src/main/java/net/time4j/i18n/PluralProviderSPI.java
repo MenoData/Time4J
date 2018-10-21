@@ -237,7 +237,7 @@ public final class PluralProviderSPI
                     }
                     return OTHER;
                 case 4: // mazedonisch (mk)
-                    return ((n % 10) == 1 ? ONE : OTHER);
+                    return (((n % 10) == 1) && ((n % 100) != 11)) ? ONE : OTHER;
                 case 5: // tagalog - Philippinen (fil)
                     if (n >= 1 && n <= 3) {
                         return ONE;

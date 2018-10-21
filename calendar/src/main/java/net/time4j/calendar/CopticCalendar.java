@@ -1002,22 +1002,26 @@ public final class CopticCalendar
         @Override
         public CopticCalendar transform(long utcDays) {
 
-            int cyear =
-                MathUtils.safeCast(
-                    MathUtils.floorDivide(
-                        MathUtils.safeAdd(
-                            MathUtils.safeMultiply(
-                                4,
-                                MathUtils.safeSubtract(utcDays, DIOCLETIAN)),
-                            1463),
-                        1461));
+            try {
+                int cyear =
+                    MathUtils.safeCast(
+                        MathUtils.floorDivide(
+                            MathUtils.safeAdd(
+                                MathUtils.safeMultiply(
+                                    4,
+                                    MathUtils.safeSubtract(utcDays, DIOCLETIAN)),
+                                1463),
+                            1461));
 
-            int startOfYear =  MathUtils.safeCast(this.transform(new CopticCalendar(cyear, 1, 1)));
-            int cmonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
-            int startOfMonth = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, cmonth, 1)));
-            int cdom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
+                int startOfYear =  MathUtils.safeCast(this.transform(new CopticCalendar(cyear, 1, 1)));
+                int cmonth = 1 + MathUtils.safeCast(MathUtils.floorDivide(utcDays - startOfYear, 30));
+                int startOfMonth = MathUtils.safeCast(this.transform(new CopticCalendar(cyear, cmonth, 1)));
+                int cdom = 1 + MathUtils.safeCast(MathUtils.safeSubtract(utcDays, startOfMonth));
 
-            return CopticCalendar.of(cyear, cmonth, cdom);
+                return CopticCalendar.of(cyear, cmonth, cdom);
+            } catch (ArithmeticException ex) {
+                throw new IllegalArgumentException(ex);
+            }
 
         }
 
@@ -1363,19 +1367,6 @@ public final class CopticCalendar
 
             StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, this.getDefaultStartOfDay());
             return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, tzid, startOfDay).toDate();
-
-        }
-
-        @Override
-        @Deprecated
-        public CopticCalendar createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

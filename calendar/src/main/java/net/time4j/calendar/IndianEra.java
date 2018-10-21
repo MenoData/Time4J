@@ -56,13 +56,6 @@ public enum IndianEra
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    public int getValue() {
-
-        return 1;
-
-    }
-
     /**
      * <p>Equivalent to the expression {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
      *

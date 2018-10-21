@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarMonth.java) is part of project Time4J.
  *
@@ -726,18 +726,6 @@ public final class CalendarMonth
 
             PlainDate date = Moment.from(clock.currentTime()).toZonalTimestamp(zone.getID()).toDate();
             return CalendarMonth.of(date.getYear(), Month.valueOf(date.getMonth()));
-
-        }
-
-        @Override
-        public CalendarMonth createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

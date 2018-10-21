@@ -22,6 +22,7 @@
 package net.time4j.tz.model;
 
 import net.time4j.ClockUnit;
+import net.time4j.DayCycles;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.base.GregorianDate;
@@ -72,6 +73,7 @@ public abstract class DaylightSavingRule {
 
     //~ Instanzvariablen --------------------------------------------------
 
+    private transient final long dayOverflow;
     private transient final PlainTime timeOfDay;
     private transient final OffsetIndicator indicator;
     private transient final int savings;
@@ -81,7 +83,7 @@ public abstract class DaylightSavingRule {
     /**
      * <p>For non-standard subclasses only. </p>
      *
-     * @param   timeOfDay   time of day when the rule switches the offset
+     * @param   timeOfDay   time of day in seconds after midnight when the rule switches the offset
      * @param   indicator   offset indicator
      * @param   savings     daylight saving offset in effect after this rule
      * @throws  IllegalArgumentException if the last argument is out of range
@@ -89,29 +91,35 @@ public abstract class DaylightSavingRule {
     /*[deutsch]
      * <p>Nur f&uuml;r nicht-standardisierte Subklassen. </p>
      *
-     * @param   timeOfDay   time of day when the rule switches the offset
+     * @param   timeOfDay   time of day in seconds after midnight when the rule switches the offset
      * @param   indicator   offset indicator
      * @param   savings     daylight saving offset in effect after this rule
      * @throws  IllegalArgumentException if the last argument is out of range
      */
     protected DaylightSavingRule(
-        PlainTime timeOfDay,
+        int timeOfDay,
         OffsetIndicator indicator,
         int savings
     ) {
         super();
 
-        if (timeOfDay == null) {
-            throw new NullPointerException("Missing time of day.");
-        } else if (indicator == null) {
+        if (indicator == null) {
             throw new NullPointerException("Missing offset indicator.");
         } else if ((savings != Integer.MAX_VALUE) && ((savings < -18 * 3600) || (savings > 18 * 3600))) {
             throw new IllegalArgumentException("DST out of range: " + savings);
         }
 
-        this.timeOfDay = timeOfDay.with(PlainTime.PRECISION, ClockUnit.SECONDS);
+        if (timeOfDay == 86400) {
+            this.dayOverflow = 0L;
+            this.timeOfDay = PlainTime.midnightAtEndOfDay();
+        } else {
+            DayCycles cycles = PlainTime.midnightAtStartOfDay().roll(timeOfDay, ClockUnit.SECONDS);
+            this.dayOverflow = cycles.getDayOverflow();
+            this.timeOfDay = cycles.getWallTime();
+        }
+
         this.indicator = indicator;
-        this.savings = savings;
+        this.savings = (savings == Integer.MAX_VALUE) ? 0 : savings; // for backwards compatibility
 
     }
 
@@ -162,7 +170,7 @@ public abstract class DaylightSavingRule {
      * @return  Uhrzeit der Umstellung in second precision
      * @since   2.2
      */
-    public PlainTime getTimeOfDay() {
+    public final PlainTime getTimeOfDay() {
 
         return this.timeOfDay;
 
@@ -182,15 +190,16 @@ public abstract class DaylightSavingRule {
      * @return  OffsetIndicator
      * @since   2.2
      */
-    public OffsetIndicator getIndicator() {
+    public final OffsetIndicator getIndicator() {
 
         return this.indicator;
 
     }
 
     /**
-     * <p>Yields the daylight saving amount after the time switch
-     * in seconds. </p>
+     * <p>Yields the daylight saving amount after the time switch in seconds. </p>
+     *
+     * <p><strong>Important: </strong> This offset is not always positive but can also be zero or even negative. </p>
      *
      * @return  DST-Offset in seconds (without standard offset)
      * @since   2.2
@@ -198,30 +207,15 @@ public abstract class DaylightSavingRule {
     /*[deutsch]
      * <p>Liefert den DST-Offset nach der Umstellung in Sekunden. </p>
      *
+     * <p><strong>Wichtig: </strong> Dieser Versatz ist nicht immer positiv, sondern kann auch null oder sogar
+     * negativ sein. </p>
+     *
      * @return  reiner DST-Offset in Sekunden (ohne Standard-Offset)
      * @since   2.2
      */
-    public int getSavings() {
+    public final int getSavings() {
 
-        return ((this.savings == Integer.MAX_VALUE) ? 0 : this.savings);
-
-    }
-
-    /**
-     * Does this rule indicate a switch to daylight-saving-mode?
-     *
-     * @return  boolean
-     * @since   3.39/4.34
-     */
-    /**
-     * Zeigt diese Regel eine Umschaltung zu einem Sommerzeitmodus an?
-     *
-     * @return  boolean
-     * @since   3.39/4.34
-     */
-    public boolean isSaving() {
-
-        return (this.savings > 0);
+        return this.savings;
 
     }
 
@@ -288,10 +282,21 @@ public abstract class DaylightSavingRule {
 
     }
 
-    // for internal use only
-    int getSavings0() {
+    /**
+     * Obtains the possible overflow in days when rolling the wall time.
+     *
+     * @return  day overflow
+     * @since   5.0
+     */
+    /*[deutsch]
+     * Liefert den m&ouml;glichen &Uuml;berlauf in Tagen an, wenn die Uhrzeit berechnet wird.
+     *
+     * @return  day overflow
+     * @since   5.0
+     */
+    protected final long getDayOverflow() {
 
-        return this.savings;
+        return this.dayOverflow;
 
     }
 

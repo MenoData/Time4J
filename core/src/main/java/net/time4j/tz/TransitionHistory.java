@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionHistory.java) is part of project Time4J.
  *
@@ -139,7 +139,6 @@ public interface TransitionHistory {
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition} or {@code null} if given reference time
      *          is after any defined transition
-     * @deprecated  Use the equivalent {@code findNextTransition(UnixTime)} in version v4.18 or later
      */
     /*[deutsch]
      * <p>Ermittelt den n&auml;chsten &Uuml;bergang nach der angegebenen
@@ -148,9 +147,7 @@ public interface TransitionHistory {
      * @param   ut      unix reference time
      * @return  {@code ZonalTransition} or {@code null} if given reference time
      *          is after any defined transition
-     * @deprecated  Use the equivalent {@code findNextTransition(UnixTime)} in version v4.18 or later
      */
-    @Deprecated
     ZonalTransition getNextTransition(UnixTime ut);
 
     /**
@@ -265,6 +262,22 @@ public interface TransitionHistory {
         UnixTime startInclusive,
         UnixTime endExclusive
     );
+
+    /**
+     * <p>This method is only a performance indicator and determines if negative daylight savings
+     * exist at all in this model. </p>
+     *
+     * @return  boolean
+     * @since   3.43
+     */
+    /*[deutsch]
+     * <p>Diese Methode dient nur Optimierungszwecken und ermittelt, ob es &uuml;berhaupt einen
+     * negativen DST-Versatz in diesem Modell gibt. </p>
+     *
+     * @return  boolean
+     * @since   3.43
+     */
+    boolean hasNegativeDST();
 
     /**
      * <p>Determines if this history does not have any transitions. </p>

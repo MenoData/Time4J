@@ -617,49 +617,6 @@ public final class SolarTime
     }
 
     /**
-     * <p>Calculates the local time of sunrise at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
-     * that the calculated clock time is related to the previous day. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunrise function applicable on any calendar date
-     * @see     #sunrise()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunrise()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit des Sonnenaufgangs an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Es ist in seltenen F&auml;llen
-     * m&ouml;glich, da&szlig; die ermittelte Uhrzeit zum vorherigen Tag geh&ouml;rt. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunrise function applicable on any calendar date
-     * @see     #sunrise()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunrise()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, PlainTime> sunrise(final TZID tzid) {
-
-        return new ChronoFunction<CalendarDate, PlainTime>() {
-            @Override
-            public PlainTime apply(CalendarDate date) {
-                Moment m = SolarTime.this.getCalculator().sunrise(
-                    toLMT(date), latitude, longitude, zenithAngle());
-                if (m != null) {
-                    return m.toZonalTimestamp(tzid).getWallTime();
-                } else {
-                    return null;
-                }
-            }
-        };
-
-    }
-
-    /**
      * <p>Calculates the moment of sunset at the location of this instance. </p>
      *
      * <p>Example: </p>
@@ -731,49 +688,6 @@ public final class SolarTime
             public Moment apply(CalendarDate date) {
                 return SolarTime.this.getCalculator().sunset(
                     toLMT(date), latitude, longitude, effAngle);
-            }
-        };
-
-    }
-
-    /**
-     * <p>Calculates the local time of sunset at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The precision is generally constrained to minutes. It is possible in some rare edge cases
-     * that the calculated clock time is related to the next day. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunset function applicable on any calendar date
-     * @see     #sunset()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunset()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit des Sonnenuntergangs an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Genauigkeit liegt generell im Minutenbereich. Es ist in seltenen F&auml;llen
-     * m&ouml;glich, da&szlig; die ermittelte Uhrzeit zum n&auml;chsten Tag geh&ouml;rt. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  sunset function applicable on any calendar date
-     * @see     #sunset()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code sunset()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, PlainTime> sunset(final TZID tzid) {
-
-        return new ChronoFunction<CalendarDate, PlainTime>() {
-            @Override
-            public PlainTime apply(CalendarDate date) {
-                Moment m = SolarTime.this.getCalculator().sunset(
-                    toLMT(date), latitude, longitude, zenithAngle());
-                if (m == null) {
-                    return null;
-                } else {
-                    return m.toZonalTimestamp(tzid).getWallTime();
-                }
             }
         };
 
@@ -938,42 +852,6 @@ public final class SolarTime
     }
 
     /**
-     * <p>Calculates the local time of noon at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  noon function applicable on any calendar date
-     * @see     #transitAtNoon()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code transitAtNoon()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit des Mittags an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  noon function applicable on any calendar date
-     * @see     #transitAtNoon()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users are asked to use {@code transitAtNoon()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, PlainTime> transitAtNoon(final TZID tzid) {
-
-        return new ChronoFunction<CalendarDate, PlainTime>() {
-            @Override
-            public PlainTime apply(CalendarDate date) {
-                Moment m = transitAtNoon(toLMT(date), longitude, calculator);
-                return m.toZonalTimestamp(tzid).getWallTime();
-            }
-        };
-
-    }
-
-    /**
      * <p>Calculates the moment of midnight at the location of this instance (lowest position of sun). </p>
      *
      * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
@@ -995,42 +873,6 @@ public final class SolarTime
             @Override
             public Moment apply(CalendarDate date) {
                 return transitAtMidnight(toLMT(date), longitude, calculator);
-            }
-        };
-
-    }
-
-    /**
-     * <p>Calculates the local time of midnight at the location of this instance in given timezone. </p>
-     *
-     * <p>Note: The transit time does not tell if the sun is above or below the horizon. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  midnight function applicable on any calendar date
-     * @see     #transitAtMidnight()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users ought to use {@code transitAtMidnight()} instead.
-     */
-    /*[deutsch]
-     * <p>Berechnet die lokale Uhrzeit von Mitternacht an der Position dieser Instanz
-     * in der angegebenen Zeitzone. </p>
-     *
-     * <p>Hinweis: Die Transit-Zeit besagt nicht, ob die Sonne &uuml;ber oder unter dem Horizont ist. </p>
-     *
-     * @param   tzid    the identifier of the timezone the local time of the result refers to
-     * @return  midnight function applicable on any calendar date
-     * @see     #transitAtMidnight()
-     * @since   3.34/4.29
-     * @deprecated  This method looses the day information so users ought to use {@code transitAtMidnight()} instead.
-     */
-    @Deprecated
-    public ChronoFunction<CalendarDate, PlainTime> transitAtMidnight(final TZID tzid) {
-
-        return new ChronoFunction<CalendarDate, PlainTime>() {
-            @Override
-            public PlainTime apply(CalendarDate date) {
-                Moment m = transitAtMidnight(toLMT(date), longitude, calculator);
-                return m.toZonalTimestamp(tzid).getWallTime();
             }
         };
 
@@ -1832,7 +1674,6 @@ public final class SolarTime
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     /*[deutsch]
      * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
@@ -1840,38 +1681,8 @@ public final class SolarTime
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     public interface Calculator {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        /**
-         * Follows closely the algorithms published by NOAA (National Oceanic and Atmospheric Administration).
-         *
-         * <p>See {@link StdSolarCalculator#NOAA}. </p>
-         */
-        /*[deutsch]
-         * Folgt nahe den Algorithmen, die von der NOAA (National Oceanic and Atmospheric Administration)
-         * ver&ouml;ffentlicht wurden.
-         *
-         * <p>Siehe {@link StdSolarCalculator#NOAA}. </p>
-         */
-        @Deprecated
-        String NOAA = "NOAA";
-
-        /**
-         * Simple and relatively fast but rather imprecise calculator.
-         *
-         * <p>See {@link StdSolarCalculator#SIMPLE}. </p>
-         */
-        /*[deutsch]
-         * Einfache und relativ schnelle aber eher ungenaue Berechnungsmethode.
-         *
-         * <p>Siehe {@link StdSolarCalculator#SIMPLE}. </p>
-         */
-        @Deprecated
-        String SIMPLE = "SIMPLE";
 
         //~ Methoden ------------------------------------------------------
 
@@ -1954,23 +1765,6 @@ public final class SolarTime
          * @return  value in seconds
          */
         double equationOfTime(double jde);
-
-        /**
-         * <p>Determines the declination of sun. </p>
-         *
-         * @param   jde     julian day in ephemeris time
-         * @return  declination of sun in degrees
-         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
-         */
-        /*[deutsch]
-         * <p>Bestimmt die Deklination der Sonne. </p>
-         *
-         * @param   jde     julian day in ephemeris time
-         * @return  declination of sun in degrees
-         * @deprecated  Use {@link #getFeature(double, String) getFeature(jde, "declination"} instead
-         */
-        @Deprecated
-        double declination(double jde);
 
         /**
          * <p>Calculates a value suitable for given time and feature. </p>

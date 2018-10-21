@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Month.java) is part of project Time4J.
  *
@@ -24,6 +24,7 @@ package net.time4j;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.ChronoCondition;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
@@ -49,7 +50,7 @@ import static net.time4j.Quarter.Q4;
  * @author  Meno Hochschild
  */
 public enum Month
-    implements ChronoCondition<GregorianDate> {
+    implements ChronoCondition<GregorianDate>, ChronoOperator<PlainDate> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -421,6 +422,13 @@ public enum Month
     public boolean test(GregorianDate context) {
 
         return (context.getMonth() == this.getValue());
+
+    }
+
+    @Override
+    public PlainDate apply(PlainDate date) {
+
+        return date.with(PlainDate.MONTH_OF_YEAR, this);
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CompositeTransitionModel.java) is part of project Time4J.
  *
@@ -97,8 +97,22 @@ final class CompositeTransitionModel
             return this.arrayModel.getStartTransition(ut);
         } else {
             ZonalTransition result = this.ruleModel.getStartTransition(ut);
-            return ((result == null) ? this.last : result);
+            return ((result == null) ?  this.last : result);
         }
+
+    }
+
+    @Override
+    public ZonalTransition getConflictTransition(
+        GregorianDate localDate,
+        WallTime localTime
+    ) {
+
+        return this.arrayModel.getConflictTransition(
+            localDate,
+            localTime,
+            this.ruleModel
+        );
 
     }
 
@@ -112,19 +126,6 @@ final class CompositeTransitionModel
         }
 
         return result;
-
-    }
-
-    @Override
-    public ZonalTransition getConflictTransition(
-        GregorianDate localDate,
-        WallTime localTime
-    ) {
-
-        return this.arrayModel.getConflictTransition(
-            localDate,
-            localTime,
-            this.ruleModel);
 
     }
 
@@ -167,6 +168,13 @@ final class CompositeTransitionModel
 
         this.arrayModel.dump(this.size, buffer);
         this.ruleModel.dump(buffer);
+
+    }
+
+    @Override
+    public boolean hasNegativeDST() {
+
+        return this.ruleModel.hasNegativeDST() || this.arrayModel.hasNegativeDST();
 
     }
 
@@ -248,7 +256,7 @@ final class CompositeTransitionModel
      *              at full hours around midnight in local standard time.
      *              Insight in details see source code.
      *
-     * @return  replacement object
+     * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
@@ -257,12 +265,12 @@ final class CompositeTransitionModel
     }
 
     /**
-     * @param       in  serialization stream
      * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
-        throws InvalidObjectException {
+        throws IOException {
 
         throw new InvalidObjectException("Serialization proxy required.");
 

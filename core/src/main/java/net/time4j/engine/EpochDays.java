@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EpochDays.java) is part of project Time4J.
  *
@@ -91,7 +91,7 @@ public enum EpochDays
      * counts in days based on the relation &quot;1 day = 86400 seconds&quot;.
      * </p>
      */
-    /**
+    /*[deutsch]
      * <p>Bezugspunkt ist der erste Januar 1970 Mitternacht als Tag 0. </p>
      *
      * <p>Beispiel: </p>
@@ -209,6 +209,7 @@ public enum EpochDays
      * @param   amount  count of days relative to given epoch at noon
      * @param   epoch   epoch reference
      * @return  count of days relative to this epoch
+     * @throws  IllegalArgumentException if the first argument is out of range
      */
     /*[deutsch]
      * <p>Rechnet die angegebene Tageszahl in eine Tageszahl auf der
@@ -217,16 +218,21 @@ public enum EpochDays
      * @param   amount  count of days relative to given epoch at noon
      * @param   epoch   epoch reference
      * @return  count of days relative to this epoch
+     * @throws  IllegalArgumentException if the first argument is out of range
      */
     public long transform(
         long amount,
         EpochDays epoch
     ) {
 
-        return MathUtils.safeAdd(
-            amount,
-            (epoch.offset - this.offset)
-        );
+        try {
+            return MathUtils.safeAdd(
+                amount,
+                (epoch.offset - this.offset)
+            );
+        } catch (ArithmeticException ex) {
+            throw new IllegalArgumentException(ex);
+        }
 
     }
 
@@ -392,16 +398,22 @@ public enum EpochDays
                 return false;
             }
 
-            long days =
-                MathUtils.safeSubtract(
-                    EpochDays.UNIX.transform(value.longValue(), this.element),
-                    UTC_OFFSET
-                );
+            try {
+                long days =
+                    MathUtils.safeSubtract(
+                        EpochDays.UNIX.transform(value.longValue(), this.element),
+                        UTC_OFFSET
+                    );
 
-            return (
-                (days <= this.calsys.getMaximumSinceUTC())
-                && (days >= this.calsys.getMinimumSinceUTC())
-            );
+                return (
+                    (days <= this.calsys.getMaximumSinceUTC())
+                    && (days >= this.calsys.getMinimumSinceUTC())
+                );
+            } catch (ArithmeticException ex) {
+                return false;
+            } catch (IllegalArgumentException ex) {
+                return false;
+            }
 
         }
 

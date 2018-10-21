@@ -72,8 +72,8 @@ public class HistoricCalendarTest {
         assertThat(cal.getMinimum(HistoricCalendar.WEEKDAY_IN_MONTH), is(1));
 
         assertThat(cal.getMaximum(HistoricCalendar.ERA), is(HistoricEra.AD));
-        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(10000000));
-        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(GregorianMath.MAX_YEAR));
+        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(100));
+        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(9999));
         assertThat(cal.getMaximum(HistoricCalendar.MONTH_OF_YEAR), is(Month.DECEMBER));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_MONTH), is(31));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_YEAR), is(355));
@@ -145,8 +145,8 @@ public class HistoricCalendarTest {
         assertThat(cal.getMinimum(HistoricCalendar.WEEKDAY_IN_MONTH), is(1));
 
         assertThat(cal.getMaximum(HistoricCalendar.ERA), is(HistoricEra.AD));
-        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(10000000));
-        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(GregorianMath.MAX_YEAR));
+        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(100));
+        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(9999));
         assertThat(cal.getMaximum(HistoricCalendar.MONTH_OF_YEAR), is(Month.DECEMBER));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_MONTH), is(31));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_YEAR), is(365));
@@ -227,8 +227,8 @@ public class HistoricCalendarTest {
         assertThat(cal.getMinimum(HistoricCalendar.WEEKDAY_IN_MONTH), is(1));
 
         assertThat(cal.getMaximum(HistoricCalendar.ERA), is(HistoricEra.AD));
-        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(10000000));
-        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(GregorianMath.MAX_YEAR));
+        assertThat(cal.getMaximum(HistoricCalendar.CENTURY_OF_ERA), is(100));
+        assertThat(cal.getMaximum(HistoricCalendar.RELATED_STANDARD_YEAR), is(9999));
         assertThat(cal.getMaximum(HistoricCalendar.MONTH_OF_YEAR), is(Month.DECEMBER));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_MONTH), is(30));
         assertThat(cal.getMaximum(HistoricCalendar.DAY_OF_YEAR), is(355));

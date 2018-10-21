@@ -1,4 +1,3 @@
-
 /**
  * <p>Defines common interfaces for any format support of Time4J. </p>
  */

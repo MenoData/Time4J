@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AttributeKey.java) is part of project Time4J.
  *
@@ -69,7 +69,7 @@ public interface AttributeKey<A> {
      *
      * @return  Class
      */
-    /**
+    /*[deutsch]
      * <p>Typ des assoziierten Formatattributs. </p>
      *
      * @return  Class

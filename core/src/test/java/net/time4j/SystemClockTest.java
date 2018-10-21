@@ -47,7 +47,7 @@ public class SystemClockTest {
     public void realTimeInMicros() {
         SystemClock clock = SystemClock.MONOTONIC;
         assertThat(
-            Math.abs(clock.realTimeInMicros() - SystemClock.INSTANCE.realTimeInMicros()) < 5000,
+            Math.abs(clock.realTimeInMicros() - SystemClock.INSTANCE.realTimeInMicros()) < 10000,
             is(true));
         long utc = clock.realTimeInMicros() / 1000000;
         long unix = clock.currentTimeInMicros() / 1000000;
@@ -112,16 +112,6 @@ public class SystemClockTest {
         PlainTime expected = PlainTime.nowInSystemTime();
         assertThat(
             now.minus(1, ClockUnit.NANOS).isBefore(expected) && now.plus(2, ClockUnit.MILLIS).isAfter(expected),
-            is(true));
-    }
-
-    @Test
-    public void nowMoment() {
-        Moment now = SystemClock.inLocalView().currentMoment();
-        Moment expected = Moment.nowInSystemTime();
-        assertThat(
-            now.minus(1, TimeUnit.NANOSECONDS).isBefore(expected)
-                && now.plus(2, TimeUnit.MILLISECONDS).isAfter(expected),
             is(true));
     }
 

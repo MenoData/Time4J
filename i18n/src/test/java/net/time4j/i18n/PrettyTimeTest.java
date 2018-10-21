@@ -23,7 +23,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.io.IOException;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
@@ -810,7 +809,7 @@ public class PrettyTimeTest {
     }
 
     @Test
-    public void print15Years3Months1Week2DaysFarsiMinus() throws IOException {
+    public void print15Years3Months1Week2DaysFarsiMinus() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
             .inverse();
@@ -1054,8 +1053,18 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void printYesterday() {
+        assertThat(PrettyTime.of(Locale.GERMAN).printYesterday(), is("gestern"));
+    }
+
+    @Test
     public void printToday() {
         assertThat(PrettyTime.of(Locale.GERMAN).printToday(), is("heute"));
+    }
+
+    @Test
+    public void printTomorrow() {
+        assertThat(PrettyTime.of(Locale.GERMAN).printTomorrow(), is("morgen"));
     }
 
     private static class FortnightPlusOneDay

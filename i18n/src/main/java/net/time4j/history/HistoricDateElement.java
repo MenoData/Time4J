@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricDateElement.java) is part of project Time4J.
  *
@@ -22,6 +22,7 @@
 package net.time4j.history;
 
 import net.time4j.PlainDate;
+import net.time4j.base.GregorianMath;
 import net.time4j.engine.BasicElement;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
@@ -43,7 +44,6 @@ final class HistoricDateElement
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int YMAX = 999999999;
     private static final long serialVersionUID = -5386613740709845550L;
 
     //~ Instanzvariablen --------------------------------------------------
@@ -79,14 +79,14 @@ final class HistoricDateElement
     @Override
     public HistoricDate getDefaultMinimum() {
 
-        return HistoricDate.of(HistoricEra.BC, YMAX, 1, 1);
+        return HistoricDate.of(HistoricEra.BC, 45, 1, 1);
 
     }
 
     @Override
     public HistoricDate getDefaultMaximum() {
 
-        return HistoricDate.of(HistoricEra.AD, YMAX, 12, 31);
+        return HistoricDate.of(HistoricEra.AD, 9999, 12, 31);
 
     }
 
@@ -162,10 +162,14 @@ final class HistoricDateElement
         @Override
         public HistoricDate getMinimum(C context) {
 
-            try {
-                return this.history.convert(PlainDate.axis().getMinimum());
-            } catch (IllegalArgumentException iae) {
-                throw new ChronoException(iae.getMessage(), iae);
+            if (this.history == ChronoHistory.PROLEPTIC_BYZANTINE) {
+                return HistoricDate.of(HistoricEra.BYZANTINE, 0, 9, 1);
+            } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
+                return HistoricDate.of(HistoricEra.BC, ChronoHistory.JULIAN_YMAX + 1, 1, 1);
+            } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
+                return HistoricDate.of(HistoricEra.BC, GregorianMath.MAX_YEAR + 1, 1, 1);
+            } else {
+                return HistoricDate.of(HistoricEra.BC, 45, 1, 1);
             }
 
         }
@@ -173,10 +177,14 @@ final class HistoricDateElement
         @Override
         public HistoricDate getMaximum(C context) {
 
-            try {
-                return this.history.convert(PlainDate.axis().getMaximum());
-            } catch (IllegalArgumentException iae) {
-                throw new ChronoException(iae.getMessage(), iae);
+            if (this.history == ChronoHistory.PROLEPTIC_BYZANTINE) {
+                return HistoricDate.of(HistoricEra.BYZANTINE, ChronoHistory.BYZANTINE_YMAX, 8, 31);
+            } else if (this.history == ChronoHistory.PROLEPTIC_JULIAN) {
+                return HistoricDate.of(HistoricEra.AD, ChronoHistory.JULIAN_YMAX, 12, 31);
+            } else if (this.history == ChronoHistory.PROLEPTIC_GREGORIAN) {
+                return HistoricDate.of(HistoricEra.AD, GregorianMath.MAX_YEAR, 12, 31);
+            } else {
+                return HistoricDate.of(HistoricEra.AD, 9999, 12, 31);
             }
 
         }

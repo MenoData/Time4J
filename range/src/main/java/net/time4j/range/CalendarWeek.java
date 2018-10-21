@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarWeek.java) is part of project Time4J.
  *
@@ -753,18 +753,6 @@ public final class CalendarWeek
 
             PlainDate date = Moment.from(clock.currentTime()).toZonalTimestamp(zone.getID()).toDate();
             return CalendarWeek.of(date.getInt(YEAR_OF_WEEKDATE), date.getInt(WEEK_OF_YEAR));
-
-        }
-
-        @Override
-        public CalendarWeek createFrom(
-            ChronoEntity<?> entity,
-            AttributeQuery attributes,
-            boolean preparsing
-        ) {
-
-            boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-            return this.createFrom(entity, attributes, lenient, preparsing);
 
         }
 

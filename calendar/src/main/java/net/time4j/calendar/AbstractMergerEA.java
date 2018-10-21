@@ -100,19 +100,6 @@ abstract class AbstractMergerEA<C extends EastAsianCalendar<?, C>>
     }
 
     @Override
-    @Deprecated
-    public C createFrom(
-        ChronoEntity<?> entity,
-        AttributeQuery attributes,
-        boolean preparsing
-    ) {
-
-        boolean lenient = attributes.get(Attributes.LENIENCY, Leniency.SMART).isLax();
-        return this.createFrom(entity, attributes, lenient, preparsing);
-
-    }
-
-    @Override
     public abstract C createFrom(
         ChronoEntity<?> entity,
         AttributeQuery attributes,

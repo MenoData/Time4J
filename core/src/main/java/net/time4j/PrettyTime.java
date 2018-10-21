@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PrettyTime.java) is part of project Time4J.
  *
@@ -565,6 +565,24 @@ public final class PrettyTime {
     }
 
     /**
+     * <p>Determines the localized word for &quot;yesterday&quot;. </p>
+     *
+     * @return  String
+     * @since   3.43/4.38
+     */
+    /*[deutsch]
+     * <p>Ermittelt das lokalisierte Wort f&uuml;r &quot;gestern&quot;. </p>
+     *
+     * @return  String
+     * @since   3.43/4.38
+     */
+    public String printYesterday() {
+
+        return UnitPatterns.of(this.getLocale()).getYesterdayWord();
+
+    }
+
+    /**
      * <p>Determines the localized word for &quot;today&quot;. </p>
      *
      * @return  String
@@ -579,6 +597,24 @@ public final class PrettyTime {
     public String printToday() {
 
         return UnitPatterns.of(this.getLocale()).getTodayWord();
+
+    }
+
+    /**
+     * <p>Determines the localized word for &quot;tomorrow&quot;. </p>
+     *
+     * @return  String
+     * @since   3.43/4.38
+     */
+    /*[deutsch]
+     * <p>Ermittelt das lokalisierte Wort f&uuml;r &quot;morgen&quot;. </p>
+     *
+     * @return  String
+     * @since   3.43/4.38
+     */
+    public String printTomorrow() {
+
+        return UnitPatterns.of(this.getLocale()).getTomorrowWord();
 
     }
 

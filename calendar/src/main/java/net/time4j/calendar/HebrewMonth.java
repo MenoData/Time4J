@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewMonth.java) is part of project Time4J.
  *
@@ -510,24 +510,7 @@ public enum HebrewMonth
         /*[deutsch]
          * <p>Diese technische Z&auml;hlweise beruht auf der um 1 erh&ouml;hten Ordinalnummer des Enums. </p>
          */
-        ENUM,
-
-        /**
-         * <p>The first month of the biblical numbering is NISAN. </p>
-         *
-         * <p>If no leap month exists then the numbers of following months will be reduced by one. </p>
-         *
-         * @deprecated  Use {@link #BIBLICAL}
-         */
-        /*[deutsch]
-         * <p>Der erste Monat in der Bibelz&auml;hlweise ist NISAN. </p>
-         *
-         * <p>Falls kein Schaltmonat existiert, werden die Nummern der Folgemonate um 1 reduziert. </p>
-         *
-         * @deprecated  Use {@link #BIBLICAL}
-         */
-        @Deprecated
-        BIBILICAL
+        ENUM
 
     }
 

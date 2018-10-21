@@ -21,7 +21,6 @@ import org.junit.runners.Suite.SuiteClasses;
         LengthOfMonthTest.class,
         MonthRangeArithmeticTest.class,
         MonthValueTest.class,
-        PlatformFormatTest.class,
         QuarterValueTest.class,
         SpecialUnitTest.class,
         StdYearOrdinalDateTest.class,
