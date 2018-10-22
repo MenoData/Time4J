@@ -887,10 +887,11 @@ public final class ThaiSolarCalendar
     }
 
     /**
-     * @return replacement object in serialization graph
-     * @serialData Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
-     * a dedicated serialization form</a> as proxy. The first byte contains
-     * the type-ID {@code 8}. Then the associated gregorian date is written.
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
+     *              a dedicated serialization form</a> as proxy. The first byte contains
+     *              the type-ID {@code 8}. Then the associated gregorian date is written.
+     *
+     * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
 
@@ -899,9 +900,9 @@ public final class ThaiSolarCalendar
     }
 
     /**
-     * @param in object input stream
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
      * @throws InvalidObjectException (always)
-     * @serialData Blocks because a serialization proxy is required.
      */
     private void readObject(ObjectInputStream in)
         throws IOException {

@@ -314,7 +314,7 @@ final class SPX
     }
 
     private HijriCalendar readHijri(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         String variant = in.readUTF();
         String version = in.readUTF();
@@ -342,7 +342,7 @@ final class SPX
     }
 
     private PersianCalendar readPersian(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int year = in.readInt();
         int month = in.readByte();
@@ -362,7 +362,7 @@ final class SPX
     }
 
     private CopticCalendar readCoptic(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int year = in.readInt();
         int month = in.readByte();
@@ -383,7 +383,7 @@ final class SPX
     }
 
     private EthiopianCalendar readEthiopianDate(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         EthiopianEra era = EthiopianEra.values()[in.readByte()];
         int year = in.readInt();
@@ -406,7 +406,7 @@ final class SPX
     }
 
     private EthiopianTime readEthiopianTime(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int tod = in.readInt();
         int second = tod % 60;
@@ -445,7 +445,7 @@ final class SPX
     }
 
     private JulianCalendar readJulian(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int pyear = in.readInt();
         int month = in.readInt();
@@ -482,7 +482,7 @@ final class SPX
     }
 
     private JapaneseCalendar readJapanese(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int relgregyear = in.readInt();
         int doy = in.readInt();
@@ -502,7 +502,7 @@ final class SPX
     }
 
     private IndianCalendar readIndian(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int year = in.readInt();
         int month = in.readByte();
@@ -521,7 +521,7 @@ final class SPX
     }
 
     private HistoricCalendar readHistoric(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         String variant = in.readUTF();
         long utcDays = in.readLong();
@@ -542,7 +542,7 @@ final class SPX
     }
 
     private HebrewCalendar readHebrewDate(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int year = in.readInt();
         HebrewMonth month = HebrewMonth.valueOf(in.readByte());
@@ -561,7 +561,7 @@ final class SPX
     }
 
     private HebrewTime readHebrewTime(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int hour23 = in.readByte();
         int part = in.readShort();
@@ -583,7 +583,7 @@ final class SPX
     }
 
     private ChineseCalendar readChinese(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int cycle = in.readByte();
         int yearOfCycle = in.readByte();
@@ -602,7 +602,7 @@ final class SPX
     }
 
     private KoreanCalendar readKorean(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int cycle = in.readByte();
         int yearOfCycle = in.readByte();
@@ -621,7 +621,7 @@ final class SPX
     }
 
     private VietnameseCalendar readVietnamese(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         int cycle = in.readByte();
         int yearOfCycle = in.readByte();

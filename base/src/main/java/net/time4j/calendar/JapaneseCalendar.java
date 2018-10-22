@@ -1582,12 +1582,13 @@ public final class JapaneseCalendar
     }
 
     /**
-     * @return      replacement object in serialization graph
      * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
      *              the type-ID {@code 9}. Then the related gregorian year and the day-of-year
      *              are written as int-primitives. Note that the serialization round-trip
      *              might fail for calendar objects created in lax mode due to normalization.
+     *
+     * @return      replacement object in serialization graph
      */
     private Object writeReplace() {
 
@@ -1596,9 +1597,9 @@ public final class JapaneseCalendar
     }
 
     /**
+     * @serialData  Blocks because a serialization proxy is required.
      * @param       in  object input stream
      * @throws      InvalidObjectException (always)
-     * @serialData  Blocks because a serialization proxy is required.
      */
     private void readObject(ObjectInputStream in)
         throws IOException {

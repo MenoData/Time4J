@@ -756,10 +756,11 @@ public final class JucheCalendar
     }
 
     /**
+     * @serialData  Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
+     *              a dedicated serialization form</a> as proxy. The first byte contains
+     *              the type-ID {@code 17}. Then the associated gregorian date is written.
+     *
      * @return replacement object in serialization graph
-     * @serialData Uses <a href="../../../serialized-form.html#net.time4j.calendar.SPX">
-     * a dedicated serialization form</a> as proxy. The first byte contains
-     * the type-ID {@code 17}. Then the associated gregorian date is written.
      */
     private Object writeReplace() {
 
@@ -768,9 +769,9 @@ public final class JucheCalendar
     }
 
     /**
-     * @param in object input stream
-     * @throws InvalidObjectException (always)
-     * @serialData Blocks because a serialization proxy is required.
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
+     * @throws      InvalidObjectException (always)
      */
     private void readObject(ObjectInputStream in)
         throws IOException {
