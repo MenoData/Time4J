@@ -13,16 +13,12 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2018-05-18, the version v4.38 of Time4J has been finished and released. It requires at least Java-8. The older version line v3.x has reached end-of-life with the latest version v3.41 and is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life, too. Time4J is organized in modules. The module **time4j-core** is always necessary. Other modules are optional and include:
+On 2018-10-23, the version v5.0 of Time4J has been finished and released. It requires at least Java-8. The older version lines v3.x and v4.x have reached end-of-life with the latest versions v3.41 and v4.38 where v3.x is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life, too. Time4J is organized in modules. The module **time4j-base** is always necessary. Other modules are optional and include:
 
-- **time4j-olson** contains predefined timezone identifiers as enums, enables parsing of localized timezone names and also offers access to historized data of Sun/Oracle-timezones in Java. 
-- **time4j-tzdata** is the timezone repository of Time4J based on the IANA-TZDB
-- **time4j-i18n** for enhanced localization, formatting and history support
-- **time4j-calendar** for handling alternative non-iso calendars (needs i18n-module)
-- **time4j-range** for handling intervals (needs i18n-module)
-- **time4j-misc** miscellaneous features like xml-support, alternative clocks or military timezones
-- **time4j-ui** with JavaFX-features
- 
+- **time4j-sqlxml** contains a simple adapter for the support of SQL-databases. 
+- **time4j-tzdata** encapsulates the time zone repository (independent github-project starting with version 5.0-2018f)
+- **time4j-ui** with JavaFX-features (includes a calendar picker)
+
 For **Android support** please refer to the sister project [Time4A](https://github.com/MenoData/Time4A).
 
 Standard use cases will be covered by the main package "net.time4j". It offers four basic temporal types.
@@ -32,7 +28,7 @@ Standard use cases will be covered by the main package "net.time4j". It offers f
 - `PlainTimestamp` = local timestamp as composition of calendar date and wall time
 - `Moment` = global timestamp which refers to true UTC standard including leapsecond-support
 
-Here some examples as a flavour of how Time4J-code looks like (shown code valid for v3.0 or later):
+Here some examples as a flavour of how Time4J-code looks like (shown code valid for v5.0 or later):
 
 ```java
 import net.time4j.*;
@@ -104,12 +100,12 @@ public class Demo {
 	System.out.println(s2); // output: 93 heures, 45 minutes et 40 secondes
 	
 	// following code requires v4.20 (or later) and Java-8 using java.time.LocalDate
-	ChronoFormatter<LocalDate> formatter =
-	    ChronoFormatter.setUp(PlainDate.axis(TemporalType.LOCAL_DATE), new Locale("en", "SE"))
+	ChronoFormatter<LocalDate> formatter2 =
+	    ChronoFormatter.setUp(PlainDate.threeten(), new Locale("en", "SE"))
 	        .addPattern("GGGG yyyy, MMMM ", PatternType.CLDR)
 	        .addEnglishOrdinal(ChronoHistory.ofSweden().dayOfMonth())
 	        .build();
-	System.out.println(formatter.format(LocalDate.of(1712, 3, 11)));
+	System.out.println(formatter2.format(LocalDate.of(1712, 3, 11)));
 	// output: Anno Domini 1712, February 30th
   }
 }
@@ -127,7 +123,7 @@ d) **Temporal arithmetic**: Another way of manipulation is date/time-arithmetic 
 
 e) **Global versus local**: Time4J rejects the design idea of JSR-310 to separate between "machine time" and "human time". This is considered as artificial. So all four basic types offer both aspects in one. For example a calendar date is simultaneously a human time consisting of several meaningful elements like year, month etc. and also a kind of machine or technical time counter because you can define a single incrementing number represented by julian days. In a similar way a UTC-moment has both a technical counter (the number of SI-seconds since UTC-epoch) AND a human representation visible in its canonical output produced by `toString()`-method (example: 2014-04-21T19:45:30Z). However, Time4J emphasizes the difference between local and global types. Conversion between these types always require a timezone or an offset.
 
-f) **Internationalization**: Time4J defines its own i18n-resources for many languages (**89 languages in version 4.38**) in order to defend its i18n-behaviour against poor or insufficient platform resources (which only serve as fallback). Especially localized formatting of durations is not a supported feature on any platform, so Time4J fills an important gap.
+f) **Internationalization**: Time4J defines its own i18n-resources for many languages (**89 languages in version 5.0**) in order to defend its i18n-behaviour against poor or insufficient platform resources (which only serve as fallback). Especially localized formatting of durations is not a supported feature on any platform, so Time4J fills an important gap.
 
 g) **Powerful format engine**: The built-in format engine located in format/expert-package offers overwhelmingly many features, general interfaces for customization and outstanding parsing performance (better than in Joda-Time or JSR-310).
 
@@ -161,7 +157,7 @@ While the main focus of the next releases are standard business use cases, you c
 Downloads and Requirements:
 ---------------------------
 
-You can find the latest downloads on the release page. Alternatively you can use the maven central repository. If you consider building the version line v3.x yourself from the sources then you need a Java7-compiler (not 6!) with options "-source 1.6 -target 1.6". This is necessary to ensure that generified code will correctly compile.
+You can find the latest downloads on the release page. Alternatively you can use the maven central repository.
 
 Please also read the installation notes on Time4J-tutorial.
 
