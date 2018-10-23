@@ -1,12 +1,15 @@
 package net.time4j.calendar;
 
 import net.time4j.ClockUnit;
+import net.time4j.GeneralTimestamp;
 import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.calendar.astro.MoonPhase;
 import net.time4j.engine.CalendarDate;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
@@ -282,6 +285,26 @@ public class ChineseMiscellaneousTest {
                 newMoon.toZonalTimestamp(offset) // 2097-08-08T00:01:47
             ) <= 120L,
             is(true));
+    }
+
+    @Test
+    public void minusClockUnitsOnTimestamp() {
+        ChineseCalendar cc =
+            ChineseCalendar.of(EastAsianYear.forGregorian(2020), EastAsianMonth.valueOf(4).withLeap(), 1);
+        ChineseCalendar expectedDate =
+            ChineseCalendar.of(EastAsianYear.forGregorian(2020), EastAsianMonth.valueOf(4), 30);
+        assertThat(
+            cc.atTime(17, 45).minus(18, ClockUnit.HOURS),
+            is(GeneralTimestamp.of(expectedDate, PlainTime.of(23, 45))));
+    }
+
+    @Test
+    public void minusDaysOnTimestamp() {
+        ChineseCalendar cc =
+            ChineseCalendar.of(EastAsianYear.forGregorian(2020), EastAsianMonth.valueOf(4).withLeap(), 5);
+        assertThat(
+            cc.atTime(17, 45).minus(CalendarDays.ONE),
+            is(GeneralTimestamp.of(cc.minus(CalendarDays.ONE), PlainTime.of(17, 45))));
     }
 
 }

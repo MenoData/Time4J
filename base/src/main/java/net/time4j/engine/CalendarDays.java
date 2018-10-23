@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarDays.java) is part of project Time4J.
  *
@@ -195,7 +195,25 @@ public final class CalendarDays
      */
     public CalendarDays abs() {
 
-        return ((this.days < 0) ? CalendarDays.of(Math.negateExact(this.days)) : this);
+        return ((this.days < 0) ? this.inverse() : this);
+
+    }
+
+    /**
+     * <p>Negates this duration if not zero. </p>
+     *
+     * @return  inversed count of calendar days
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Negiert diese Dauer, wenn nicht null. </p>
+     *
+     * @return  inversed count of calendar days
+     * @since   5.0
+     */
+    public CalendarDays inverse() {
+
+        return CalendarDays.of(Math.negateExact(this.days));
 
     }
 

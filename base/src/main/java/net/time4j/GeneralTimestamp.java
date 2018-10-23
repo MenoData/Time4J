@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GeneralTimestamp.java) is part of project Time4J.
  *
@@ -188,6 +188,134 @@ public final class GeneralTimestamp<C>
     public PlainTime toTime() {
 
         return this.time;
+
+    }
+
+    /**
+     * <p>Subtracts given count of days from this general timestamp and return the result. </p>
+     *
+     * @param   days    the duration in days to be subtracted
+     * @return  result of subtraction as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Zieht die angegebene Anzahl von Tagen von diesem allgemeinen Zeitstempel ab
+     * und liefert das Subtraktionsergebnis. </p>
+     *
+     * @param   days    the duration in days to be subtracted
+     * @return  result of subtraction as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.0
+     */
+    public GeneralTimestamp<C> minus(CalendarDays days) {
+
+        return this.plus(days.inverse());
+
+    }
+
+    /**
+     * <p>Subtracts given count of days from this general timestamp and return the result. </p>
+     *
+     * <p><strong>Warning:</strong> If users also wish to take into account time zones then a conversion
+     * of this general timestamp to a {@code Moment} must be done first before applying any time arithmetic. </p>
+     *
+     * @param   amount  the amount of units to be subtracted
+     * @param   unit    the clock unit to be applied
+     * @return  result of subtraction as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #at(ZonalOffset, StartOfDay)
+     * @see     #in(Timezone, StartOfDay)
+     * @see     Moment#minus(long, Object) Moment.plus(long, TimeUnit)
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>Zieht die angegebene Anzahl von Tagen von diesem allgemeinen Zeitstempel ab
+     * und liefert das Subtraktionsergebnis. </p>
+     *
+     * <p><strong>Warnung:</strong> Wenn Anwender auch Zeitzoneneffekte ber&uuml;cksichtigen wollen, dann
+     * mu&szlig; zuerst eine Umwandlung dieses allgemeinen Zeitstempels zu einem {@code Moment} geschehen,
+     * bevor irgendeine Zeitarithmetik versucht wird. </p>
+     *
+     * @param   amount  the amount of units to be subtracted
+     * @param   unit    the clock unit to be applied
+     * @return  result of subtraction as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #at(ZonalOffset, StartOfDay)
+     * @see     #in(Timezone, StartOfDay)
+     * @see     Moment#minus(long, Object) Moment.plus(long, TimeUnit)
+     * @since   5.0
+     */
+    public GeneralTimestamp<C> minus(long amount, ClockUnit unit) {
+
+        return this.plus(Math.negateExact(amount), unit);
+
+    }
+
+    /**
+     * <p>Adds given count of days to this general timestamp and return the result. </p>
+     *
+     * @param   days    the duration in days to be added
+     * @return  result of addition as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>F&uuml;gt die angegebene Anzahl von Tagen zu diesem allgemeinen Zeitstempel hinzu
+     * und liefert das Additionsergebnis. </p>
+     *
+     * @param   days    the duration in days to be added
+     * @return  result of addition as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.0
+     */
+    public GeneralTimestamp<C> plus(CalendarDays days) {
+
+        CalendarVariant<?> ncv = (this.cv == null) ? null : this.cv.plus(days);
+        Calendrical<?, ?> nca = (this.ca == null) ? null : this.ca.plus(days);
+        return new GeneralTimestamp<>(ncv, nca, this.time);
+
+    }
+
+    /**
+     * <p>Adds given count of clock units to this general timestamp and return the result. </p>
+     *
+     * <p><strong>Warning:</strong> If users also wish to take into account time zones then a conversion
+     * of this general timestamp to a {@code Moment} must be done first before applying any time arithmetic. </p>
+     *
+     * @param   amount  the amount of units to be added
+     * @param   unit    the clock unit to be applied
+     * @return  result of addition as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #at(ZonalOffset, StartOfDay)
+     * @see     #in(Timezone, StartOfDay)
+     * @see     Moment#plus(long, Object) Moment.plus(long, TimeUnit)
+     * @since   5.0
+     */
+    /*[deutsch]
+     * <p>F&uuml;gt die angegebene Anzahl von Uhrzeiteinheiten zu diesem allgemeinen Zeitstempel hinzu
+     * und liefert das Additionsergebnis. </p>
+     *
+     * <p><strong>Warnung:</strong> Wenn Anwender auch Zeitzoneneffekte ber&uuml;cksichtigen wollen, dann
+     * mu&szlig; zuerst eine Umwandlung dieses allgemeinen Zeitstempels zu einem {@code Moment} geschehen,
+     * bevor irgendeine Zeitarithmetik versucht wird. </p>
+     *
+     * @param   amount  the amount of units to be added
+     * @param   unit    the clock unit to be applied
+     * @return  result of addition as changed copy, this instance remains unaffected
+     * @throws  ArithmeticException in case of numerical overflow
+     * @see     #at(ZonalOffset, StartOfDay)
+     * @see     #in(Timezone, StartOfDay)
+     * @see     Moment#plus(long, Object) Moment.plus(long, TimeUnit)
+     * @since   5.0
+     */
+    public GeneralTimestamp<C> plus(long amount, ClockUnit unit) {
+
+        DayCycles cycles = this.time.roll(amount, unit);
+        CalendarDays days = CalendarDays.of(cycles.getDayOverflow());
+        CalendarVariant<?> ncv = (this.cv == null) ? null : this.cv.plus(days);
+        Calendrical<?, ?> nca = (this.ca == null) ? null : this.ca.plus(days);
+        return new GeneralTimestamp<>(ncv, nca, cycles.getWallTime());
 
     }
 
