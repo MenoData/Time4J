@@ -150,14 +150,40 @@ Support for alternative calendars:
 Plans for next releases:
 ------------------------
 
-There are no fixed predictions when some features will be introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/milestones.
-
-While the main focus of the next releases are standard business use cases, you can expect later more exciting features like other calendar systems, more support for historical dates and astronomically related calendar issues. Time4J will be a long-term running project.
+There are no fixed predictions when some features will be introduced in which release. However, you can follow the milestone page to get a rough estimation - see https://github.com/MenoData/Time4J/milestones. Time4J will be a long-term running project.
 
 Downloads and Requirements:
 ---------------------------
 
-You can find the latest downloads on the release page. Alternatively you can use the maven central repository.
+You can find the latest downloads on the release page for running on the classpath. Alternatively you can use the maven central repository. Maven example for using the timezone repository and running on the module path in Java 9+:
+
+Add these dependencies to your pom-file (typical setup):
+
+```
+<dependency>
+  <groupId>net.time4j</groupId>
+  <artifactId>time4j-base</artifactId>
+  <version>5.0</version
+</dependency>
+<dependency>
+  <groupId>net.time4j</groupId>
+  <artifactId>time4j-sqlxml</artifactId>
+  <version>5.0</version
+</dependency>
+<dependency>
+  <groupId>net.time4j</groupId>
+  <artifactId>time4j-tzdata</artifactId>
+  <version>5.0-2018f</version
+</dependency>
+```
+
+Then make sure that the very first usage of Time4J-code starts with the following instruction:
+
+```
+TZDATA.init();
+```
+
+The last step is only necessary for OSGi or module path environments (Java 9+) provided that the timezone repository should be used instead of platform zone rules. This special initialization can be left out if Time4J is run on the traditional classpath (for example Java 8).
 
 Please also read the installation notes on Time4J-tutorial.
 
