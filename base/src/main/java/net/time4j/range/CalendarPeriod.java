@@ -49,7 +49,9 @@ import java.util.stream.Stream;
 /**
  * <p>Represents a closed interval between two incomplete calendar dates like months, weeks, quarters or years. </p>
  *
- * @param   <T> generic type of incomplete calendar date (without day part)
+ * <p>This class can also represent generic intervals using different calendar systems. </p>
+ *
+ * @param   <T> generic type of incomplete calendar date (without day part) or dates in other calendar systems
  * @author  Meno Hochschild
  * @since   5.0
  * @doctags.concurrency {immutable}
@@ -58,7 +60,9 @@ import java.util.stream.Stream;
  * <p>Repr&auml;sentiert ein geschlossenes Intervall zwischen zwei unvollst&auml;ndigen Datumsangaben wie
  * Monaten, Wochen, Quartalen oder Jahren. </p>
  *
- * @param   <T> generic type of incomplete calendar date (without day part)
+ * <p>Diese Klasse kann aber auch allgemeine Intervalle in anderen Kalendersystemen darstellen. </p>
+ *
+ * @param   <T> generic type of incomplete calendar date (without day part) or dates in other calendar systems
  * @author  Meno Hochschild
  * @since   5.0
  * @doctags.concurrency {immutable}
@@ -882,7 +886,7 @@ public class CalendarPeriod<T>
         /**
          * <p>Interpretes given text as interval using given interval pattern. </p>
          *
-         * <p>For version v4.21 or later, it is also possible to use an or-pattern logic. Example
+         * <p>It is also possible to use an or-pattern logic. Example
          * see {@link DateInterval#parse(String, ChronoParser, String)}. </p>
          *
          * @param   text                text to be parsed
@@ -896,8 +900,8 @@ public class CalendarPeriod<T>
          * <p>Interpretiert den angegebenen Text als Intervall mit Hilfe des angegebenen
          * Intervallmusters. </p>
          *
-         * <p>F&uuml;r die Version v4.21 oder sp&auml;ter ist es auch m&ouml;glich, eine Oder-Logik im Muster
-         * zu verwenden. Beispiel siehe {@link DateInterval#parse(String, ChronoParser, String)}. </p>
+         * <p>Es ist auch m&ouml;glich, eine Oder-Logik im Muster zu verwenden.
+         * Beispiel siehe {@link DateInterval#parse(String, ChronoParser, String)}. </p>
          *
          * @param   text                text to be parsed
          * @param   parser              format object for parsing start and end components
