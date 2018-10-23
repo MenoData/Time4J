@@ -1,5 +1,6 @@
 ## [v5.0] not yet released
 ### Added
+- Time arithmetic in class GeneralTimestamp [#810]
 - Support tzdb-time-switches out of range T00:00/T24:00 [#825]
 - New random()-methods in IsoInterval-subclasses [#827]
 - New methods Temporal.isBeforeOrEqual() and Temporal.isAfterOrEqual() [#826]
