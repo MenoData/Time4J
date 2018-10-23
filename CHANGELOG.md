@@ -1,4 +1,6 @@
-## [v5.0] not yet released
+## [v5.1] not yet released
+
+## [v5.0] published on 2018-10-23
 ### Added
 - Time arithmetic in class GeneralTimestamp [#810]
 - Support tzdb-time-switches out of range T00:00/T24:00 [#825]
