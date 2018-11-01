@@ -1,8 +1,11 @@
 package net.time4j.range;
 
+import net.time4j.ClockUnit;
+import net.time4j.Duration;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
+import net.time4j.Weekday;
 import net.time4j.tz.olson.EUROPE;
 import net.time4j.tz.olson.PACIFIC;
 import org.junit.Test;
@@ -11,7 +14,9 @@ import org.junit.runners.JUnit4;
 
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.stream.Collectors;
 
 import static net.time4j.Weekday.*;
@@ -351,6 +356,51 @@ public class DayPartitionTest {
             TimestampInterval.between(PlainTimestamp.of(2018, 10, 27, 10, 0), PlainTimestamp.of(2018, 10, 27, 11, 30)));
 
         assertThat(intervals, is(expected));
+    }
+
+    @Test
+    public void overlapOfPartitions() {
+        DayPartitionRule rule =
+            new DayPartitionBuilder()
+                .addWeekdayRule(
+                    Weekday.MONDAY,
+                    ClockInterval.between(PlainTime.of(8, 0), PlainTime.of(10, 0)))
+                .addWeekdayRule(
+                    Weekday.TUESDAY,
+                    ClockInterval.between(PlainTime.of(10, 0), PlainTime.of(15, 0)))
+                .build();
+        Map<Integer, TimestampInterval> events = new HashMap<>();
+        events.put(
+            1,
+            TimestampInterval.between(
+                PlainTimestamp.of(2018, 1, 1, 8, 0),
+                PlainTimestamp.of(2018, 1, 1, 9, 0)));
+        events.put(
+            2,
+            TimestampInterval.between(
+                PlainTimestamp.of(2018, 1, 1, 10, 0),
+                PlainTimestamp.of(2018, 1, 1, 12, 0)));
+        events.put(
+            3,
+            TimestampInterval.between(
+                PlainTimestamp.of(2018, 1, 2, 10, 0),
+                PlainTimestamp.of(2018, 1, 2, 12, 0)));
+        events.forEach(
+            (id, interval) -> System.out.println(
+                "Event: " + id + " => "
+                    + Duration.formatter(ClockUnit.class, "#h:mm").format(
+                        interval
+                            .streamPartitioned(rule)
+                            .map(i -> i.getDuration(ClockUnit.HOURS, ClockUnit.MINUTES))
+                            .collect(Duration.summingUp())
+                            .with(Duration.STD_CLOCK_PERIOD)
+                    )
+                )
+        );
+        // output:
+        //        Event: 1 => 1:00
+        //        Event: 2 => 0:00
+        //        Event: 3 => 2:00
     }
 
 }
