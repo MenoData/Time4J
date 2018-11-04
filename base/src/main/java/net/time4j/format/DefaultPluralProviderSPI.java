@@ -92,7 +92,7 @@ final class DefaultPluralProviderSPI
         fillO(omap, "hu", 3);
         fillO(omap, "ne", 4);
         fillO(omap, "kk", 5);
-        fillO(omap, "it", 6);
+        fillO(omap, "it sc scn", 6);
         fillO(omap, "ka", 7);
         fillO(omap, "sq", 8);
         fillO(omap, "en", 9);
@@ -107,6 +107,7 @@ final class DefaultPluralProviderSPI
         fillO(omap, "uk", 18);
         fillO(omap, "tk", 19);
         fillO(omap, "or", 20);
+        fillO(omap, "gd", 21);
         ORDINAL_MAP.putAll(omap);
     }
 
@@ -734,6 +735,15 @@ final class DefaultPluralProviderSPI
                         return FEW;
                     } else if (n == 6) {
                         return MANY;
+                    }
+                    return OTHER;
+                case 21: // gd
+                    if (n == 1 || n == 11) {
+                        return ONE;
+                    } else if (n == 2 || n == 12) {
+                        return TWO;
+                    } else if (n == 3 || n == 13) {
+                        return FEW;
                     }
                     return OTHER;
                 default: // fallback
