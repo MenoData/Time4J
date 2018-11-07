@@ -424,7 +424,7 @@ public class HistoryTest {
                 .with(ChronoHistory.ofFirstGregorianReform());
         assertThat(
             formatter.format(PlainDate.of(1582, 10, 1)),
-            is("Sep."));
+            is("Sept."));
     }
 
     @Test

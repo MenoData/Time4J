@@ -98,13 +98,13 @@ public class CalendricalNamesTest {
         result =
             instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.SEPTEMBER);
-        assertThat(result, is("Sep."));
+        assertThat(result, is("Sept."));
 
         textWidth = TextWidth.ABBREVIATED;
         result =
             instance.getStdMonths(textWidth, OutputContext.FORMAT)
             .print(Month.SEPTEMBER);
-        assertThat(result, is("Sep."));
+        assertThat(result, is("Sept."));
     }
 
     @Test
@@ -172,7 +172,7 @@ public class CalendricalNamesTest {
         ParsePosition status = new ParsePosition(0);
         Month value =
             instance.getStdMonths(TextWidth.ABBREVIATED, outputContext)
-            .parse("Sep.", status, Month.class);
+            .parse("Sept.", status, Month.class);
         assertThat(value, is(Month.SEPTEMBER));
 
         status.setIndex(0);
@@ -196,7 +196,7 @@ public class CalendricalNamesTest {
         status.setIndex(0);
         value =
             instance.getStdMonths(TextWidth.SHORT, outputContext)
-            .parse("Sep.", status, Month.class);
+            .parse("Sept.", status, Month.class);
         assertThat(value, is(Month.SEPTEMBER));
 
         status.setIndex(0);
