@@ -1,4 +1,4 @@
-# [v5.1] not yet released
+## [v5.1] not yet released
 ### Added
 - Localized representation of ISO calendar week [#832]
 
