@@ -247,7 +247,7 @@ public class CalendarWeekTest {
     @Test
     public void formatKW() {
         ChronoFormatter<CalendarWeek> f =
-            ChronoFormatter.setUp(CalendarWeek.chronology(), Locale.ROOT)
+            ChronoFormatter.setUp(CalendarWeek.chronology(), Locale.GERMAN)
                 .addPattern("w. 'KW'", PatternType.CLDR).build();
         assertThat(
             f.format(CalendarWeek.of(2016, 4)),

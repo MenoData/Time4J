@@ -76,13 +76,12 @@ import java.util.NoSuchElementException;
  *  <li>{@link #WEEK_OF_YEAR}</li>
  * </ul>
  *
- * <p>This class does not offer localized formatting. However, a combination of numerical formatting and
- * fixed literals is possible using the root locale. Example for using the German abbreviation KW for
- * a calendar week: </p>
+ * <p>This class offers localized formatting, also style-based. However, the week model is not localized
+ * and fixed to ISO-8601. Example for using the German abbreviation KW for a calendar week: </p>
  *
  * <pre>
  *     ChronoFormatter&lt;CalendarWeek&gt; f =
- *          ChronoFormatter.setUp(CalendarWeek.chronology(), Locale.ROOT)
+ *          ChronoFormatter.setUp(CalendarWeek.chronology(), Locale.GERMAN)
  *          .addPattern(&quot;w. &#39;KW&#39;&quot;, PatternType.CLDR).build();
  *     System.out.println(f.format(CalendarWeek.of(2016, 4)); // 4. KW
  * </pre>
@@ -105,12 +104,12 @@ import java.util.NoSuchElementException;
  *  <li>{@link #WEEK_OF_YEAR}</li>
  * </ul>
  *
- * <p>Diese Klasse bietet keine lokalisierten Formatierungsoptionen an. Allerdings ist eine Kombination
- * aus numerischer Darstellung und festen Literalen unter Verwendung der ROOT-locale m&ouml;glich. Beispiel: </p>
+ * <p>Diese Klasse bietet lokalisierte Formatierungsoptionen an, auch stilbasiert. Allerdings ist das
+ * Wochenmodell auf ISO-8601 fest eingestellt. Beispiel mit der deutschen Abk&uuml;rzung &quot;KW&quot;: </p>
  *
  * <pre>
  *     ChronoFormatter&lt;CalendarWeek&gt; f =
- *          ChronoFormatter.setUp(CalendarWeek.chronology(), Locale.ROOT)
+ *          ChronoFormatter.setUp(CalendarWeek.chronology(), Locale.GERMAN)
  *          .addPattern(&quot;w. &#39;KW&#39;&quot;, PatternType.CLDR).build();
  *     System.out.println(f.format(CalendarWeek.of(2016, 4)); // 4. KW
  * </pre>
