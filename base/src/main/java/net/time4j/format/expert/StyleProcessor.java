@@ -102,10 +102,11 @@ final class StyleProcessor<T>
         boolean quickPath
     ) throws IOException {
 
-        ChronoFormatter<T> cf = this.getFormatter(attributes, quickPath);
+        ChronoFormatter<T> cf = this.getFormatter(attributes, quickPath, formattable);
         Set<ElementPosition> newPositions = cf.print(formattable, buffer, attributes, positions != null);
 
         if (positions != null) {
+            assert (newPositions != null);
             positions.addAll(newPositions);
         }
 
@@ -122,7 +123,7 @@ final class StyleProcessor<T>
         boolean quickPath
     ) {
 
-        ChronoFormatter<T> cf = this.getFormatter(attributes, quickPath);
+        ChronoFormatter<T> cf = this.getFormatter(attributes, quickPath, null);
         T result = cf.parse(text, status, attributes);
 
         if (!status.isError() && (result != null)) {
@@ -214,7 +215,8 @@ final class StyleProcessor<T>
                 this.timeStyle,
                 locale,
                 attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
-                (tzid == null) ? null : Timezone.of(tzid).with(strategy));
+                (tzid == null) ? null : Timezone.of(tzid).with(strategy),
+                null);
 
         return new StyleProcessor<>(cf, this.dateStyle, this.timeStyle);
 
@@ -234,34 +236,40 @@ final class StyleProcessor<T>
 
     private ChronoFormatter<T> getFormatter(
         AttributeQuery attributes,
-        boolean quickPath
+        boolean quickPath,
+        ChronoDisplay formattable // when printing
     ) {
 
-        ChronoFormatter<T> cf;
-
         if (quickPath) {
-            cf = this.formatter;
-        } else {
-            AttributeQuery internal = this.formatter.getAttributes();
-            TransitionStrategy strategy =
-                attributes.get(
-                    Attributes.TRANSITION_STRATEGY,
-                    internal.get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY));
-            TZID tzid =
-                attributes.get(
-                    Attributes.TIMEZONE_ID,
-                    internal.get(Attributes.TIMEZONE_ID, null));
-            Timezone tz = ((tzid == null) ? null : Timezone.of(tzid).with(strategy));
-            cf = createFormatter(
-                this.formatter.getChronology(),
-                this.dateStyle,
-                this.timeStyle,
-                attributes.get(Attributes.LANGUAGE, this.formatter.getLocale()),
-                attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
-                tz);
+            if (formattable == null) {
+                return this.formatter;
+            } else if (formattable instanceof LocalizedPatternSupport) {
+                LocalizedPatternSupport lps = LocalizedPatternSupport.class.cast(formattable);
+                if (!lps.useDynamicFormatPattern()) {
+                    return this.formatter; // static use case
+                }
+            }
         }
 
-        return cf;
+        AttributeQuery internal = this.formatter.getAttributes();
+        TransitionStrategy strategy =
+            attributes.get(
+                Attributes.TRANSITION_STRATEGY,
+                internal.get(Attributes.TRANSITION_STRATEGY, Timezone.DEFAULT_CONFLICT_STRATEGY));
+        TZID tzid =
+            attributes.get(
+                Attributes.TIMEZONE_ID,
+                internal.get(Attributes.TIMEZONE_ID, null));
+        Timezone tz = ((tzid == null) ? null : Timezone.of(tzid).with(strategy));
+
+        return createFormatter(
+            this.formatter.getChronology(),
+            this.dateStyle,
+            this.timeStyle,
+            attributes.get(Attributes.LANGUAGE, this.formatter.getLocale()),
+            attributes.get(Attributes.FOUR_DIGIT_YEAR, Boolean.FALSE).booleanValue(),
+            tz,
+            formattable);
 
     }
 
@@ -272,7 +280,8 @@ final class StyleProcessor<T>
         DisplayMode timeStyle,
         Locale locale,
         boolean fourDigitYear,
-        Timezone tz // optional
+        Timezone tz, // optional
+        ChronoDisplay formattable // when printing
     ) {
 
         String pattern;
@@ -296,6 +305,9 @@ final class StyleProcessor<T>
             } else {
                 throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
             }
+        } else if (formattable instanceof LocalizedPatternSupport) {
+            assert (dateStyle == timeStyle);
+            pattern = LocalizedPatternSupport.class.cast(formattable).getFormatPattern(dateStyle, locale);
         } else if (LocalizedPatternSupport.class.isAssignableFrom(chronology.getChronoType())) {
             assert (dateStyle == timeStyle);
             pattern = chronology.getFormatPattern(dateStyle, locale);

@@ -37,14 +37,20 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.TimeLine;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
+import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
 import net.time4j.format.Leniency;
+import net.time4j.format.LocalizedPatternSupport;
+import net.time4j.format.NumberType;
+import net.time4j.format.PluralCategory;
+import net.time4j.format.PluralRules;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.Timezone;
@@ -52,9 +58,11 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.text.DateFormat;
 import java.text.ParseException;
 import java.util.Iterator;
 import java.util.Locale;
+import java.util.Map;
 import java.util.NoSuchElementException;
 
 
@@ -117,7 +125,8 @@ import java.util.NoSuchElementException;
  */
 @CalendarType("iso8601")
 public final class CalendarWeek
-    extends FixedCalendarInterval<CalendarWeek> {
+    extends FixedCalendarInterval<CalendarWeek>
+    implements LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -743,6 +752,35 @@ public final class CalendarWeek
     }
 
     @Override
+    public String getFormatPattern(
+        DisplayStyle style,
+        Locale locale
+    ) {
+
+        PluralCategory pc = PluralRules.of(locale, NumberType.ORDINALS).getCategory(this.week);
+        Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+        String ywKey = "F_yw";
+        String pattern = textForms.get(ywKey + "_" + pc.name().toLowerCase());
+
+        if (pattern == null) {
+            pattern = textForms.get(ywKey);
+            if (pattern == null) {
+                pattern = (style.getStyleValue() == DateFormat.SHORT) ? "YYYY'W'ww" : "YYYY-'W'ww";
+            }
+        }
+
+        return pattern;
+
+    }
+
+    @Override
+    public boolean useDynamicFormatPattern() {
+
+        return true;
+
+    }
+
+    @Override
     protected Chronology<CalendarWeek> getChronology() {
 
         return ENGINE;
@@ -866,6 +904,41 @@ public final class CalendarWeek
             }
 
             return null;
+
+        }
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+
+            StringBuilder sb = new StringBuilder();
+
+            if (!locale.equals(Locale.ROOT)) {
+                Map<String, String> textForms = CalendarText.getIsoInstance(locale).getTextForms();
+
+                for (PluralCategory pc : PluralCategory.values()) {
+                    String key = "F_yw";
+                    if (pc != PluralCategory.OTHER) {
+                        key += "_" + pc.name().toLowerCase();
+                    }
+                    String pattern = textForms.get(key);
+                    if (pattern != null) {
+                        if (sb.length() > 0) {
+                            sb.append('|');
+                        }
+                        sb.append(pattern);
+                    }
+
+                }
+            }
+
+            if (sb.length() == 0) {
+                sb.append((style.getStyleValue() == DateFormat.SHORT) ? "YYYY'W'ww" : "YYYY-'W'ww");
+            }
+
+            return sb.toString();
 
         }
 

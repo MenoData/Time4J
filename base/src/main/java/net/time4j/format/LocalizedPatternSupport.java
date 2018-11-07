@@ -21,6 +21,11 @@
 
 package net.time4j.format;
 
+import net.time4j.engine.Chronology;
+import net.time4j.engine.DisplayStyle;
+
+import java.util.Locale;
+
 
 /**
  * <p>Marker interface which indicates support for general localized format patterns compatible with
@@ -39,5 +44,56 @@ package net.time4j.format;
  * @since   3.10/4.7
  */
 public interface LocalizedPatternSupport {
+
+    //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Defines a CLDR-compatible localized format pattern suitable for printing. </p>
+     *
+     * <p>The default implementation delegates to the underlying chronology. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  localized format pattern
+     * @since   5.1
+     */
+    /*[deutsch]
+     * <p>Definiert ein CLDR-kompatibles lokalisiertes Formatmuster f&uuml;r die Textausgabe. </p>
+     *
+     * <p>Die Standardimplementierung delegiert an die zugrundeliegende Chronologie. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  localized format pattern
+     * @since   5.1
+     */
+    default String getFormatPattern(
+        DisplayStyle style,
+        Locale locale
+    ) {
+        return Chronology.lookup(this.getClass()).getFormatPattern(style, locale);
+    }
+
+    /**
+     * <p>Determines if any created format pattern uses the state of this instance. </p>
+     *
+     * <p>The default implementation returns {@code false}. </p>
+     *
+     * @return  {@code true} if the method {@code getFormatPattern} uses the state of this instance else {@code false}
+     * @see     #getFormatPattern(DisplayStyle, Locale)
+     * @since   5.1
+     */
+    /*[deutsch]
+     * <p>Ermittelt, ob erzeugte Formatmuster den Zustand dieser Instanz auswerten. </p>
+     *
+     * <p>Die Standardimplementierung liefert {@code false}. </p>
+     *
+     * @return  {@code true} if the method {@code getFormatPattern} uses the state of this instance else {@code false}
+     * @see     #getFormatPattern(DisplayStyle, Locale)
+     * @since   5.1
+     */
+    default boolean useDynamicFormatPattern() {
+        return false;
+    }
 
 }

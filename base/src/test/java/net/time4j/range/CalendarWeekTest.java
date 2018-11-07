@@ -7,6 +7,7 @@ import net.time4j.Weekday;
 import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
 import net.time4j.base.GregorianMath;
+import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -251,6 +252,72 @@ public class CalendarWeekTest {
         assertThat(
             f.format(CalendarWeek.of(2016, 4)),
             is("4. KW"));
+    }
+
+    @Test
+    public void styledFormatIsoShort() throws ParseException {
+        ChronoFormatter<CalendarWeek> f =
+            ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.ROOT, CalendarWeek.chronology());
+        assertThat(
+            f.format(CalendarWeek.of(2016, 4)),
+            is("2016W04"));
+        assertThat(
+            f.parse("2016W04"),
+            is(CalendarWeek.of(2016, 4)));
+    }
+
+    @Test
+    public void styledFormatIsoMedium() throws ParseException {
+        ChronoFormatter<CalendarWeek> f =
+            ChronoFormatter.ofStyle(DisplayMode.MEDIUM, Locale.ROOT, CalendarWeek.chronology());
+        assertThat(
+            f.format(CalendarWeek.of(2016, 4)),
+            is("2016-W04"));
+        assertThat(
+            f.parse("2016-W04"),
+            is(CalendarWeek.of(2016, 4)));
+    }
+
+    @Test
+    public void styledFormatWithEnglish() throws ParseException {
+        ChronoFormatter<CalendarWeek> f =
+            ChronoFormatter.ofStyle(DisplayMode.MEDIUM, Locale.ENGLISH, CalendarWeek.chronology());
+        assertThat(
+            f.format(CalendarWeek.of(2016, 4)),
+            is("week 4 of 2016"));
+        assertThat(
+            f.parse("week 4 of 2016"),
+            is(CalendarWeek.of(2016, 4)));
+    }
+
+    @Test
+    public void styledFormatWithGerman() throws ParseException {
+        ChronoFormatter<CalendarWeek> f =
+            ChronoFormatter.ofStyle(DisplayMode.MEDIUM, Locale.GERMAN, CalendarWeek.chronology());
+        assertThat(
+            f.format(CalendarWeek.of(2016, 4)),
+            is("Woche 4 des Jahres 2016"));
+        assertThat(
+            f.parse("Woche 4 des Jahres 2016"),
+            is(CalendarWeek.of(2016, 4)));
+    }
+
+    @Test
+    public void styledFormatWithTagalog() throws ParseException {
+        ChronoFormatter<CalendarWeek> f =
+            ChronoFormatter.ofStyle(DisplayMode.MEDIUM, Locale.forLanguageTag("fil"), CalendarWeek.chronology());
+        assertThat(
+            f.format(CalendarWeek.of(2016, 1)),
+            is("ika-1 linggo ng 2016"));
+        assertThat(
+            f.format(CalendarWeek.of(2016, 4)),
+            is("linggo 4 ng 2016"));
+        assertThat(
+            f.parse("ika-1 linggo ng 2016"),
+            is(CalendarWeek.of(2016, 1)));
+        assertThat(
+            f.parse("linggo 4 ng 2016"),
+            is(CalendarWeek.of(2016, 4)));
     }
 
     @Test
