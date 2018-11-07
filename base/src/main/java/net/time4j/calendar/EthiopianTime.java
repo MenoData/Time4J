@@ -29,7 +29,6 @@ import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.EthiopianExtension;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BasicElement;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoExtension;
@@ -1596,21 +1595,13 @@ public final class EthiopianTime
         }
 
         @Override
-        public ChronoDisplay preformat(
-            EthiopianTime context,
-            AttributeQuery attributes
-        ) {
-            return context;
-        }
-
-        @Override
         public StartOfDay getDefaultStartOfDay() {
             return StartOfDay.MORNING;
         }
 
         @Override
         public int getDefaultPivotYear() {
-            return Integer.MIN_VALUE;
+            return 100;
         }
 
     }

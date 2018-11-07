@@ -34,7 +34,6 @@ import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoFunction;
@@ -1319,21 +1318,13 @@ public final class HebrewTime
         }
 
         @Override
-        public ChronoDisplay preformat(
-            HebrewTime context,
-            AttributeQuery attributes
-        ) {
-            return context;
-        }
-
-        @Override
         public StartOfDay getDefaultStartOfDay() {
             return StartOfDay.EVENING; // simplified 24-hour-scale
         }
 
         @Override
         public int getDefaultPivotYear() {
-            return Integer.MIN_VALUE;
+            return 100;
         }
 
     }
