@@ -1,4 +1,6 @@
-## [v5.1] not yet released
+# [v5.1] not yet released
+### Added
+- Localized representation of ISO calendar week [#832]
 
 ## [v5.0] published on 2018-10-23
 ### Added
