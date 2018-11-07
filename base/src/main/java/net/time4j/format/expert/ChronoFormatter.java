@@ -2648,8 +2648,9 @@ public final class ChronoFormatter<T>
             Builder<T> builder = new Builder<>(chronology, locale);
             builder.addProcessor(new StyleProcessor<>(style, style));
             return builder.build();
-        } else if (chronology.equals(Moment.axis())) {
-            throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
+// Compiler will not accept the Moment-chronology!
+//        } else if (chronology.equals(Moment.axis())) {
+//            throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
         } else {
             throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
         }
