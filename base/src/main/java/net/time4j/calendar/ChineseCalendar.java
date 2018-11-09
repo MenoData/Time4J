@@ -131,7 +131,7 @@ import java.util.Map;
  *       is(chineseDate));
  *     assertThat(
  *       formatter.format(chineseDate),
- *       is(&quot;Sat, 16. M11 2018(wù-xū) dōngzhì&quot;));
+ *       is(&quot;Sat, 16. Eleventh Month 2018(wù-xū) dōngzhì&quot;));
  * </pre>
  *
  * <p>Leap months can be formatted in various ways. Following example shows how to customize numerical printing
@@ -156,7 +156,7 @@ import java.util.Map;
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2020, 5, 24)),
- *          is(&quot;Sunday, (leap) M04 2, 2020(gēng-zǐ)&quot;));
+ *          is(&quot;Sunday, (leap) Fourth Month 2, 2020(gēng-zǐ)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
@@ -237,7 +237,7 @@ import java.util.Map;
  *       is(chineseDate));
  *     assertThat(
  *       formatter.format(chineseDate),
- *       is(&quot;Sat, 16. M11 2018(wù-xū) dōngzhì&quot;));
+ *       is(&quot;Sat, 16. Eleventh Month 2018(wù-xū) dōngzhì&quot;));
  * </pre>
  *
  * <p>Schaltmonate k&ouml;nnen verschieden formatiert werden. Das folgende Beispiel zeigt, wie man
@@ -262,7 +262,7 @@ import java.util.Map;
  *      ChronoFormatter&lt;CalendarDate&gt; f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
  *      assertThat(
  *          f.format(PlainDate.of(2020, 5, 24)),
- *          is(&quot;Sunday, (leap) M04 2, 2020(gēng-zǐ)&quot;));
+ *          is(&quot;Sunday, (leap) Fourth Month 2, 2020(gēng-zǐ)&quot;));
  * </pre>
  *
  * @author  Meno Hochschild
