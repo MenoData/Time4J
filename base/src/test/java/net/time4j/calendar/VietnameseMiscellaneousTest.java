@@ -126,7 +126,7 @@ public class VietnameseMiscellaneousTest {
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
-            is("Sunday, M08 12, 2017(dīng-yǒu)"));
+            is("Sunday, Eighth Month 12, 2017(dīng-yǒu)"));
     }
 
     @Test

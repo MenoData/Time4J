@@ -216,13 +216,13 @@ public class ChineseMiscellaneousTest {
     public void parseEraAndYearOfEra() throws ParseException {
         ChronoFormatter<ChineseCalendar> f =
             ChronoFormatter.ofPattern("G yyyy, MMM/d", PatternType.CLDR, Locale.ENGLISH, ChineseCalendar.axis());
-        ChineseCalendar cc = f.parse("Huángdì 4696, M1/1");
+        ChineseCalendar cc = f.parse("Huángdì 4696, Mo1/1");
         assertThat(cc.get(ChineseCalendar.ERA), is(ChineseEra.YELLOW_EMPEROR));
         assertThat(cc.get(ChineseCalendar.YEAR_OF_ERA), is(4696)); // year-counting of Sun-yat-sen
-        assertThat(f.parse("Huangdi 4696, M1/1"), is(cc)); // root locale as fallback
+        assertThat(f.parse("Huangdi 4696, Mo1/1"), is(cc)); // root locale as fallback
         PlainDate d = cc.transform(PlainDate.axis());
         assertThat(d, is(PlainDate.of(1998, 1, 28)));
-        assertThat(f.format(cc), is("Huángdì 4696, M1/1"));
+        assertThat(f.format(cc), is("Huángdì 4696, Mo1/1"));
     }
 
     @Test
@@ -242,7 +242,7 @@ public class ChineseMiscellaneousTest {
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2020, 5, 24)),
-            is("Sunday, (leap) M04 2, 2020(gēng-zǐ)"));
+            is("Sunday, (leap) Fourth Month 2, 2020(gēng-zǐ)"));
     }
 
     @Test

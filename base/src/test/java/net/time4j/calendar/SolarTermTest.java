@@ -417,7 +417,7 @@ public class SolarTermTest {
             is("周六, 16. 十一月 2018(戊戌) 冬至"));
         assertThat(
             formatter.format(chineseDate),
-            is("Sat, 16. M11 2018(wù-xū) dōngzhì"));
+            is("Sat, 16. Eleventh Month 2018(wù-xū) dōngzhì"));
     }
 
     @Test
