@@ -3,6 +3,9 @@
 - Generic calendar formatting with regional calendar preference [#833]
 - Localized representation of ISO calendar week [#832]
 
+### Changed
+- Update to CLDR 34 [#831]
+
 ## [v5.0] published on 2018-10-23
 ### Added
 - Time arithmetic in class GeneralTimestamp [#810]
