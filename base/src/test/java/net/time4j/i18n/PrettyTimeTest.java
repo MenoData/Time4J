@@ -68,7 +68,7 @@ public class PrettyTimeTest {
                 .printRelative(
                     PlainTimestamp.of(2014, 9, 4, 14, 40, 5).atUTC(), ZonalOffset.UTC
                 ),
-            is("5 seg. atrás")); // Brazilian
+            is("há 5 seg.")); // Brazilian
         assertThat(
             PrettyTime.of(new Locale("pt", "PT"))
                 .withReferenceClock(clock)
