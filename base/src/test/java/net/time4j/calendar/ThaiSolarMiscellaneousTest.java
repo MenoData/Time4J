@@ -84,8 +84,17 @@ public class ThaiSolarMiscellaneousTest {
     }
 
     @Test
-    public void caSupport() throws ParseException {
+    public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-buddhist");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        assertThat(
+            f.format(PlainDate.of(2017, 10, 1)),
+            is("Sunday, October 1, 2560 BE"));
+    }
+
+    @Test
+    public void buddhistPreference() {
+        Locale locale = Locale.forLanguageTag("en-TH");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),

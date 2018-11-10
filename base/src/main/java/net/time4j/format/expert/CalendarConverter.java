@@ -31,6 +31,7 @@ import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.Converter;
+import net.time4j.format.internal.FormatUtils;
 import net.time4j.history.ChronoHistory;
 
 import java.util.Locale;
@@ -90,13 +91,26 @@ final class CalendarConverter<T extends ChronoEntity<T> & CalendarDate>
         String name = locale.getUnicodeLocaleType("ca");
 
         if (name == null) {
-            return adapt(PlainDate.axis(), ""); // ISO-8601 as default
+            switch (FormatUtils.getRegion(locale)) {
+                case "AF":
+                case "IR":
+                    name = "persian";
+                    break;
+                case "SA":
+                    name = "islamic-umalqura";
+                    break;
+                case "TH":
+                    name = "buddhist";
+                    break;
+                default:
+                    return adapt(PlainDate.axis(), ""); // ISO-8601 as default
+            }
         } else if (name.equals("ethiopic-amete-alem")) {
             name = "ethioaa";
         } else if (name.equals("islamicc")) {
             name = "islamic-civil";
         } else if (name.equals("islamic")) {
-            name = "islamic-icu4j"; // later: astro-variant
+            name = "islamic-icu4j"; // TODO: astro-variant
         }
 
         for (CalendarProvider provider : ResourceLoader.getInstance().services(CalendarProvider.class)) {

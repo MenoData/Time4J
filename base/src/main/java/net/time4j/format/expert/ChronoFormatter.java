@@ -2661,8 +2661,8 @@ public final class ChronoFormatter<T>
      * <p>Constructs a CLDR-pattern-based formatter for general calendar chronologies. </p>
      *
      * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
-     * chronology if available. Otherwise ISO-8601 will be used. Following example will obtain a formatter
-     * for the Persian calendar: </p>
+     * chronology if available. Otherwise ISO-8601 will be used with the exception of a few countries which
+     * prefer other calendars. Following example will obtain a formatter for the Persian calendar: </p>
      *
      * <pre>
      *     Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
@@ -2695,8 +2695,9 @@ public final class ChronoFormatter<T>
      * eines CLDR-Formatmusters. </p>
      *
      * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
-     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet.
-     * Folgendes Beispiel wird einen Formatierer f&uuml;r den persischen Kalender liefern: </p>
+     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet bis
+     * auf wenige L&auml;nder, die andere Kalender bevorzugen. Folgendes Beispiel wird einen Formatierer
+     * f&uuml;r den persischen Kalender liefern: </p>
      *
      * <pre>
      *     Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
@@ -2740,7 +2741,8 @@ public final class ChronoFormatter<T>
      * <p>Constructs a style-based formatter for general calendar chronologies which are compatible to CLDR. </p>
      *
      * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
-     * chronology if available. Otherwise ISO-8601 will be used. </p>
+     * chronology if available. Otherwise ISO-8601 will be used with the exception of a few countries which
+     * prefer other calendars. </p>
      *
      * @param   style       format style
      * @param   locale      format locale
@@ -2755,7 +2757,8 @@ public final class ChronoFormatter<T>
      * die zu CLDR kompatibel sind. </p>
      *
      * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
-     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet. </p>
+     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet bis
+     * auf wenige L&auml;nder, die andere Kalender bevorzugen. </p>
      *
      * @param   style       format style
      * @param   locale      format locale

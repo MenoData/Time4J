@@ -285,7 +285,15 @@ public class HijriMiscellaneousTest {
 
     @Test
     public void caSupport() {
-        Locale locale = Locale.forLanguageTag("en-SA-u-ca-islamic-umalqura");
+        Locale locale = Locale.forLanguageTag("en-u-ca-islamic-umalqura");
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        String today = f.format(SystemClock.inLocalView().today());
+        System.out.println(today);
+    }
+
+    @Test
+    public void umalquraPreference() {
+        Locale locale = Locale.forLanguageTag("en-SA");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         String today = f.format(SystemClock.inLocalView().today());
         System.out.println(today);
