@@ -1,5 +1,6 @@
 ## [v5.1] not yet released
 ### Added
+- Generic calendar formatting with regional calendar preference [#833]
 - Localized representation of ISO calendar week [#832]
 
 ## [v5.0] published on 2018-10-23
