@@ -2,6 +2,7 @@
 ### Added
 - Generic calendar formatting with regional calendar preference [#833]
 - Localized representation of ISO calendar week [#832]
+- Formatting relative times like "last Monday" or "next Friday" [#733]
 
 ### Changed
 - Update to CLDR 34 [#831]
