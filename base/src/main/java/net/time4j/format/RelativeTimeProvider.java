@@ -21,6 +21,8 @@
 
 package net.time4j.format;
 
+import net.time4j.Weekday;
+
 import java.util.Locale;
 
 
@@ -320,5 +322,45 @@ public interface RelativeTimeProvider
      * @since   3.6/4.4
      */
     String getTomorrowWord(Locale lang);
+
+    /**
+     * <p>Yields the localized word for &quot;last {weekday}&quot;. </p>
+     *
+     * @param   weekday the last day of week to be queried
+     * @param   lang    language setting
+     * @return  String, maybe empty
+     * @since   5.1
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Wort f&uuml;r den &quot;letzten Wochentag&quot;. </p>
+     *
+     * @param   weekday the last day of week to be queried
+     * @param   lang    language setting
+     * @return  String, maybe empty
+     * @since   5.1
+     */
+    default String labelForLast(Weekday weekday, Locale lang) {
+        return "";
+    }
+
+    /**
+     * <p>Yields the localized word for &quot;next {weekday}&quot;. </p>
+     *
+     * @param   weekday the next day of week to be queried
+     * @param   lang    language setting
+     * @return  String, maybe empty
+     * @since   5.1
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Wort f&uuml;r den &quot;n&auml;chsten Wochentag&quot;. </p>
+     *
+     * @param   weekday the next day of week to be queried
+     * @param   lang    language setting
+     * @return  String, maybe empty
+     * @since   5.1
+     */
+    default String labelForNext(Weekday weekday, Locale lang) {
+        return "";
+    }
 
 }

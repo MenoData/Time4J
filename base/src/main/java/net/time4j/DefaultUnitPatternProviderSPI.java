@@ -366,6 +366,24 @@ final class DefaultUnitPatternProviderSPI
     }
 
     @Override
+    public String labelForLast(Weekday weekday, Locale lang) {
+
+        return this.getLabel(
+            lang,
+            weekday.name().substring(0, 3).toLowerCase() + "-");
+
+    }
+
+    @Override
+    public String labelForNext(Weekday weekday, Locale lang) {
+
+        return this.getLabel(
+            lang,
+            weekday.name().substring(0, 3).toLowerCase() + "+");
+
+    }
+
+    @Override
     public String getListPattern(
         Locale desired,
         TextWidth width,
@@ -511,6 +529,39 @@ final class DefaultUnitPatternProviderSPI
 		);
 
 	}
+
+    private String getLabel(
+        Locale		   desired,
+        String		   key
+    ) {
+
+        boolean init = true;
+        PropertyBundle first = null;
+
+        for (Locale locale : PropertyBundle.getCandidateLocales(desired)) {
+            PropertyBundle bundle = (
+                init && (first != null)
+                    ? first
+                    : PropertyBundle.load("reltime/relpattern", locale));
+
+            if (init) {
+                if (locale.equals(bundle.getLocale())) {
+                    init = false;
+                } else {
+                    first = bundle;
+                    continue;
+                }
+            }
+
+            if (bundle.getInternalKeys().contains(key)) {
+                return bundle.getString(key);
+            }
+
+        }
+
+        return "";
+
+    }
 
     private static String buildKey(
         char unitID,

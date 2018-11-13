@@ -7,6 +7,8 @@ import net.time4j.IsoUnit;
 import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.PrettyTime;
+import net.time4j.SystemClock;
+import net.time4j.Weekday;
 import net.time4j.base.TimeSource;
 import net.time4j.engine.BasicUnit;
 import net.time4j.engine.ChronoEntity;
@@ -394,8 +396,8 @@ public class PrettyTimeTest {
             PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC(),
-                    ZonalOffset.UTC),
+                    PlainTimestamp.of(2014, 9, 3, 14, 30).atUTC().toTemporalAccessor(),
+                    ZoneOffset.UTC),
             is("gestern"));
     }
 
@@ -469,6 +471,20 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void print7DaysEarlierGerman() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .withWeeksToDays()
+                .printRelative(
+                    PlainTimestamp.of(2014, 8, 25, 14, 0).atUTC(), // Monday
+                    ZonalOffset.UTC),
+            is("letzten Montag"));
+    }
+
+    @Test
     public void print3DaysLaterGerman() {
         TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
 
@@ -476,9 +492,22 @@ public class PrettyTimeTest {
             PrettyTime.of(Locale.GERMANY)
                 .withReferenceClock(clock)
                 .printRelative(
-                    PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC(),
+                    PlainTimestamp.of(2014, 9, 5, 14, 0).atUTC(), // Friday
                     ZonalOffset.UTC),
-            is("in 3 Tagen"));
+            is("nächsten Freitag"));
+    }
+
+    @Test
+    public void print8DaysLaterGerman() {
+        TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.GERMANY)
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2014, 9, 10, 14, 0).atUTC(),
+                    ZonalOffset.UTC),
+            is("in 1 Woche"));
     }
 
     @Test
@@ -974,6 +1003,21 @@ public class PrettyTimeTest {
     @Test
     public void printTomorrow() {
         assertThat(PrettyTime.of(Locale.GERMAN).printTomorrow(), is("morgen"));
+    }
+
+    @Test
+    public void printLastWeekday() {
+        assertThat(PrettyTime.of(Locale.GERMAN).printLast(Weekday.FRIDAY), is("letzten Freitag"));
+    }
+
+    @Test
+    public void printNextWeekday() {
+        assertThat(PrettyTime.of(Locale.GERMAN).printNext(Weekday.WEDNESDAY), is("nächsten Mittwoch"));
+    }
+
+    @Test
+    public void getReferenceClock() {
+        assertThat(PrettyTime.of(Locale.getDefault()).getReferenceClock(), is(SystemClock.INSTANCE));
     }
 
     private static class FortnightPlusOneDay

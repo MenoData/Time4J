@@ -616,6 +616,46 @@ public final class PrettyTime {
     }
 
     /**
+     * <p>Obtains the localized word for given last day-of-week if available. </p>
+     *
+     * @param   weekday     the last day of week
+     * @return  localized word, maybe empty
+     * @since   5.1
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Wort f&uuml;r den angegebenen letzten Wochentag, falls verf&uuml;gbar. </p>
+     *
+     * @param   weekday     the last day of week
+     * @return  localized word, maybe empty
+     * @since   5.1
+     */
+    public String printLast(Weekday weekday) {
+
+        return UnitPatterns.of(this.getLocale()).labelForLast(weekday);
+
+    }
+
+    /**
+     * <p>Obtains the localized word for given next day-of-week if available. </p>
+     *
+     * @param   weekday     the next day of week
+     * @return  localized word, maybe empty
+     * @since   5.1
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Wort f&uuml;r den angegebenen n&auml;chsten Wochentag, falls verf&uuml;gbar. </p>
+     *
+     * @param   weekday     the next day of week
+     * @return  localized word, maybe empty
+     * @since   5.1
+     */
+    public String printNext(Weekday weekday) {
+
+        return UnitPatterns.of(this.getLocale()).labelForNext(weekday);
+
+    }
+
+    /**
      * <p>Formats given duration in calendar units. </p>
      *
      * <p>Note: Millennia, centuries and decades are automatically normalized
@@ -1172,8 +1212,8 @@ public final class PrettyTime {
      * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
      * as duration in given precision or less. </p>
      *
-     * <p>If day precision is given then output like &quot;today&quot;, &quot;yesterday&quot; or
-     * &quot;tomorrow&quot; is possible. Example: </p>
+     * <p>If day precision is given then output like &quot;today&quot;, &quot;yesterday&quot;,
+     * &quot;tomorrow&quot; or &quot;last Wednesday&quot; is possible. Example: </p>
      *
      * <pre>
      *      TimeSource&lt;?&gt; clock = () -&gt; PlainTimestamp.of(2015, 8, 1, 10, 24, 5).atUTC();
@@ -1196,8 +1236,8 @@ public final class PrettyTime {
      * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
      * maximalen Genauigkeit. </p>
      *
-     * <p>Wenn Tagesgenauigkeit angegeben ist, sind auch Ausgaben wie &quot;heute&quot;, &quot;gestern&quot;
-     * oder &quot;morgen&quot; m&ouml;glich. Beispiel: </p>
+     * <p>Wenn Tagesgenauigkeit angegeben ist, sind auch Ausgaben wie &quot;heute&quot;, &quot;gestern&quot;,
+     * &quot;morgen&quot; oder &quot;letzten Mittwoch&quot; m&ouml;glich. Beispiel: </p>
      *
      * <pre>
      *      TimeSource&lt;?&gt; clock = () -> PlainTimestamp.of(2015, 8, 1, 10, 24, 5).atUTC();
@@ -1241,6 +1281,9 @@ public final class PrettyTime {
      * <p>Formats given time point relative to the current time of {@link #getReferenceClock()}
      * as duration in given precision or as absolute date-time. </p>
      *
+     * <p>If the calculated duration in seconds is bigger than {@code maxdelta} then the absolute date-time
+     * will be printed else a relative expression will be used. </p>
+     *
      * @param   moment      relative time point
      * @param   tz          time zone for translating to a local duration
      * @param   precision   maximum precision of relative time (not more than seconds)
@@ -1253,6 +1296,9 @@ public final class PrettyTime {
      * <p>Formatiert den angegebenen Zeitpunkt relativ zur aktuellen Zeit
      * der Referenzuhr {@link #getReferenceClock()} als Dauer in der angegebenen
      * maximalen Genauigkeit oder als absolute Datumszeit. </p>
+     *
+     * <p>Wenn die berechnete Dauer in Sekunden gr&ouml;&szlig;er als {@code maxdelta} ist, wird
+     * die absolute Datumszeit formatiert, sonst wird ein relativer Ausdruck verwendet. </p>
      *
      * @param   moment      relative time point
      * @param   tz          time zone for translating to a local duration
@@ -1395,12 +1441,8 @@ public final class PrettyTime {
 
         if (Double.compare(unit.getLength(), maxRelativeUnit.getLength()) > 0) {
             return formatter.format(date);
-        } else if (
-            (amount == 1L)
-            && unit.equals(CalendarUnit.DAYS)
-        ) {
-            UnitPatterns patterns = UnitPatterns.of(this.locale);
-            String replacement = (duration.isNegative() ? patterns.getYesterdayWord() : patterns.getTomorrowWord());
+        } else if (unit.equals(CalendarUnit.DAYS)) {
+            String replacement = this.getRelativeReplacement(date, duration.isNegative(), amount);
 
             if (!replacement.isEmpty()) {
                 return replacement;
@@ -1474,12 +1516,8 @@ public final class PrettyTime {
             && (Double.compare(unit.getLength(), maxRelativeUnit.getLength()) > 0)
         ) {
             return formatter.format(moment);
-        } else if (
-            (amount == 1L)
-            && unit.equals(CalendarUnit.DAYS)
-        ) {
-            UnitPatterns patterns = UnitPatterns.of(this.locale);
-            String replacement = (duration.isNegative() ? patterns.getYesterdayWord() : patterns.getTomorrowWord());
+        } else if (unit.equals(CalendarUnit.DAYS)) {
+            String replacement = this.getRelativeReplacement(end.toDate(), duration.isNegative(), amount);
 
             if (!replacement.isEmpty()) {
                 return replacement;
@@ -1490,19 +1528,44 @@ public final class PrettyTime {
 
         if (duration.isNegative()) {
             if (unit.isCalendrical()) {
+                assert (unit instanceof CalendarUnit);
                 pattern = this.getPastPattern(amount, (CalendarUnit) unit);
             } else {
+                assert (unit instanceof ClockUnit);
                 pattern = this.getPastPattern(amount, (ClockUnit) unit);
             }
         } else {
             if (unit.isCalendrical()) {
+                assert (unit instanceof CalendarUnit);
                 pattern = this.getFuturePattern(amount, (CalendarUnit) unit);
             } else {
+                assert (unit instanceof ClockUnit);
                 pattern = this.getFuturePattern(amount, (ClockUnit) unit);
             }
         }
 
         return this.format(pattern, amount);
+
+    }
+
+    private String getRelativeReplacement(
+        PlainDate date,
+        boolean negative,
+        long amount
+    ) {
+
+        if ((amount >= 1L) && (amount <= 7L)) {
+            UnitPatterns patterns = UnitPatterns.of(this.locale);
+
+            if (amount == 1L) {
+                return (negative ? patterns.getYesterdayWord() : patterns.getTomorrowWord());
+            } else {
+                Weekday dayOfWeek = date.getDayOfWeek();
+                return (negative ? patterns.labelForLast(dayOfWeek): patterns.labelForNext(dayOfWeek));
+            }
+        }
+
+        return "";
 
     }
 
