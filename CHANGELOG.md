@@ -1,5 +1,6 @@
 ## [v5.1] not yet released
 ### Added
+- Support for languages Assamese, Sindhi and Tongan [#834]
 - Generic calendar formatting with regional calendar preference [#833]
 - Localized representation of ISO calendar week [#832]
 - Formatting relative times like "last Monday" or "next Friday" [#733]
