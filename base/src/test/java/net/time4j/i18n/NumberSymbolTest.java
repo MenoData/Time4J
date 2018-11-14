@@ -4,6 +4,7 @@ import net.time4j.format.NumberSymbolProvider;
 
 import java.util.Locale;
 
+import net.time4j.format.NumberSystem;
 import net.time4j.format.internal.SymbolProviderSPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -38,6 +39,14 @@ public class NumberSymbolTest {
         assertThat(
             nsp.getDecimalSeparator(new Locale("de")),
             is(','));
+    }
+
+    @Test
+    public void getZeroDigitAssamese() {
+        NumberSymbolProvider nsp = SymbolProviderSPI.INSTANCE;
+        assertThat(
+            nsp.getZeroDigit(new Locale("as")),
+            is(NumberSystem.BENGALI.getDigits().charAt(0)));
     }
 
 }
