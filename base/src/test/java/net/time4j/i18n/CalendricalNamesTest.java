@@ -583,7 +583,7 @@ public class CalendricalNamesTest {
         assertThat(result, is("Thứ Hai"));
     }
 
-   private static boolean isCalendarTypeSupported(
+    private static boolean isCalendarTypeSupported(
         TextProvider p,
         String calendarType
     ) {
