@@ -38,6 +38,16 @@ import static org.junit.Assert.assertThat;
 public class CalendricalNamesTest {
 
     @Test
+    public void smartMonthParsing() throws ParseException {
+        assertThat(
+            Month.parse("Sept.", Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
+            is(Month.SEPTEMBER));
+        assertThat(
+            Month.parse("Sep.", Locale.GERMAN, TextWidth.ABBREVIATED, OutputContext.FORMAT),
+            is(Month.SEPTEMBER));
+    }
+
+    @Test
     public void getInstance_Chronology_Locale() {
         Chronology<PlainTime> chronology = Chronology.lookup(PlainTime.class);
         Locale locale = Locale.GERMAN;

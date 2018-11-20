@@ -1,14 +1,13 @@
 package net.time4j.i18n;
 
 import net.time4j.format.NumberSymbolProvider;
-
-import java.util.Locale;
-
 import net.time4j.format.NumberSystem;
 import net.time4j.format.internal.SymbolProviderSPI;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
+
+import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

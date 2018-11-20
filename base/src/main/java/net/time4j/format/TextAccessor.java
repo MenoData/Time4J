@@ -131,7 +131,7 @@ public final class TextAccessor {
         Class<V> valueType
     ) {
 
-        return this.parse(parseable, status, valueType, true, false);
+        return this.parse(parseable, status, valueType, true, false, true);
 
     }
 
@@ -170,14 +170,16 @@ public final class TextAccessor {
 
         boolean caseInsensitive = true;
         boolean partialCompare = false;
+        boolean smart = true;
 
         if (leniency == Leniency.STRICT) {
             caseInsensitive = false;
+            smart = false;
         } else if (leniency == Leniency.LAX) {
             partialCompare = true;
         }
 
-        return this.parse(parseable, status, valueType, caseInsensitive, partialCompare);
+        return this.parse(parseable, status, valueType, caseInsensitive, partialCompare, smart);
 
     }
 
@@ -226,8 +228,12 @@ public final class TextAccessor {
             attributes
                 .get(Attributes.PARSE_PARTIAL_COMPARE, Boolean.FALSE)
                 .booleanValue();
+        boolean smart =
+            attributes
+                .get(Attributes.PARSE_MULTIPLE_CONTEXT, Boolean.TRUE)
+                .booleanValue();
         return this.parse(
-            parseable, status, valueType, caseInsensitive, partialCompare);
+            parseable, status, valueType, caseInsensitive, partialCompare, smart);
 
     }
 
@@ -280,19 +286,27 @@ public final class TextAccessor {
         ParsePosition status,
         Class<V> valueType,
         boolean caseInsensitive,
-        boolean partialCompare
+        boolean partialCompare,
+        boolean smart
     ) {
 
         V[] enums = valueType.getEnumConstants();
         int len = this.textForms.size();
         int start = status.getIndex();
         int end = parseable.length();
+        String alt = "";
 
         int maxEq = 0;
         V candidate = null;
 
         for (int i = 0; i < enums.length; i++) {
-            String s = ((i >= len) ? enums[i].name() : this.textForms.get(i));
+            boolean firstTry = alt.isEmpty();
+            String s;
+            if (firstTry) {
+                s = ((i >= len) ? enums[i].name() : this.textForms.get(i));
+            } else {
+                s = alt;
+            }
             int pos = start;
             int n = s.length();
             boolean eq = true;
@@ -315,6 +329,18 @@ public final class TextAccessor {
                     }
                 }
             }
+
+            // special smart procedure for handling "Sept." versus "Sep." in German
+            if (smart && firstTry && (n == 5) && (s.charAt(4) == '.')) {
+                int dot = start + 3;
+                if ((pos == dot) && (dot < end) && (parseable.charAt(dot) == '.')) {
+                    alt = s.subSequence(start, dot) + ".";
+                    i--; // reset loop counter for repeating
+                    continue;
+                }
+            }
+
+            alt = "";
 
             if (partialCompare || (n == 1)) {
                 if (maxEq < pos - start) {
