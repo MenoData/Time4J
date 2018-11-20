@@ -1,4 +1,6 @@
-## [v5.1] not yet released
+## [v5.2] not yet released
+
+## [v5.1] published on 2018-11-20
 ### Added
 - Support for languages Assamese, Sindhi and Tongan [#834]
 - Generic calendar formatting with regional calendar preference [#833]
