@@ -432,26 +432,20 @@ public final class PropertyBundle {
         Locale locale
     ) {
 
-        if (locale == Locale.ROOT) {
-            return baseName + ".properties";
-        }
-
         String language = LanguageMatch.getAlias(locale);
-        String country = locale.getCountry();
+        String country = FormatUtils.getRegion(locale);
         String variant = locale.getVariant();
-
-        if (language.isEmpty() && country.isEmpty() && variant.isEmpty()) {
-            return baseName + ".properties";
-        }
 
         StringBuilder sb = new StringBuilder(baseName.length() + 20);
         sb.append(baseName.replace('.', '/'));
-        sb.append('_').append(language);
 
-        if (!variant.isEmpty()) {
-            sb.append('_').append(country).append('_').append(variant);
-        } else if (!country.isEmpty()) {
-            sb.append('_').append(country);
+        if (!language.isEmpty()) {
+            sb.append('_').append(language);
+            if (!variant.isEmpty()) {
+                sb.append('_').append(country).append('_').append(variant);
+            } else if (!country.isEmpty()) {
+                sb.append('_').append(country);
+            }
         }
 
         return sb.append(".properties").toString();
