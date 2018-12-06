@@ -699,6 +699,36 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void print1Year1DayUS() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(1, 0, 1);
+        assertThat(
+            PrettyTime.of(Locale.US).print(duration, TextWidth.WIDE),
+            is("1 year and 1 day"));
+    }
+
+    @Test
+    public void print1Year1DayBritish() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(1, 0, 1);
+        assertThat(
+            PrettyTime.of(Locale.UK).print(duration, TextWidth.WIDE),
+            is("1 year and 1 day"));
+    }
+
+    @Test
+    public void printDurationWithCustomizedListPatterns() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(1, 2, 3);
+        assertThat(
+            PrettyTime.of(Locale.US)
+                .withDefaultListSeparator(" | ")
+                .withLastListSeparator(" + ")
+                .print(duration, TextWidth.WIDE),
+            is("1 year | 2 months + 3 days"));
+    }
+
+    @Test
     public void print15Years3Months1Week2DaysFrench() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
