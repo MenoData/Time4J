@@ -1,5 +1,6 @@
 ## [v5.2] not yet released
 ### Added
+- New static factory method for astronomical seasons based on a moment [#841]
 - Custom duration separators in `PrettyTime` [#839]
 
 ## [v5.1] published on 2018-11-20
