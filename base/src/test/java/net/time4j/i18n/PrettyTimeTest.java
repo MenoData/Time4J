@@ -717,7 +717,7 @@ public class PrettyTimeTest {
     }
 
     @Test
-    public void printDurationWithCustomizedListPatterns() {
+    public void printDurationWithCustomizedListPatterns1() {
         Duration<?> duration =
             Duration.ofCalendarUnits(1, 2, 3);
         assertThat(
@@ -726,6 +726,40 @@ public class PrettyTimeTest {
                 .withLastListSeparator(" + ")
                 .print(duration, TextWidth.WIDE),
             is("1 year | 2 months + 3 days"));
+    }
+
+    @Test
+    public void printDurationWithCustomizedListPatterns2() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(1, 2, 3);
+        assertThat(
+            PrettyTime.of(Locale.US)
+                .withDefaultListSeparator(" | ")
+                .print(duration, TextWidth.WIDE),
+            is("1 year | 2 months | 3 days"));
+    }
+
+    @Test
+    public void printDurationWithCustomizedListPatterns3() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(1, 0, 3);
+        assertThat(
+            PrettyTime.of(Locale.US)
+                .withDefaultListSeparator(" | ")
+                .withLastListSeparator(" + ")
+                .print(duration, TextWidth.WIDE),
+            is("1 year + 3 days"));
+    }
+
+    @Test
+    public void printDurationWithInactiveCustomizedListPattern() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(1, 0, 3);
+        assertThat(
+            PrettyTime.of(Locale.US)
+                .withLastListSeparator(" + ")
+                .print(duration, TextWidth.WIDE),
+            is("1 year and 3 days"));
     }
 
     @Test
