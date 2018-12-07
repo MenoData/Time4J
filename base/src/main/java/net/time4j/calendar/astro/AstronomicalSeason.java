@@ -25,6 +25,7 @@ import net.time4j.Moment;
 
 import net.time4j.scale.LeapSeconds;
 import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 
 
 /**
@@ -86,6 +87,48 @@ public enum AstronomicalSeason {
 	WINTER_SOLSTICE;
 
 	//~ Methoden ----------------------------------------------------------
+
+	/**
+	 * <p>Determines the astronomical season related to given moment. </p>
+	 *
+	 * <p>The result will be valid for the northern hemisphere. For the southern equivalent, please call
+	 * the method {@link #onSouthernHemisphere()} on the result. </p>
+	 *
+	 * @param 	moment	the moment/instant for which the season is to be determined
+	 * @return	astronomical season (on the northern hemisphere)
+	 * @throws  IllegalArgumentException if the related gregorian year is before {@code -2000}
+	 * @since 	5.2
+	 */
+	/*[deutsch]
+	 * <p>Bestimmt die astronomische Saison, die zum angegebenen Moment geh&ouml;rt. </p>
+	 *
+	 * <p>Das Ergebnis ist f&uuml;r die Nordhalbkugel der Erde g&uuml;ltig. Auf der S&uuml;dhalbkugel
+	 * sollten Anwender die Methode {@link #onSouthernHemisphere()} auf dem Ergebnis aufrufen. </p>
+	 *
+	 * @param 	moment	the moment/instant for which the season is to be determined
+	 * @return	astronomical season (on the northern hemisphere)
+	 * @throws  IllegalArgumentException if the related gregorian year is before {@code -2000}
+	 * @since 	5.2
+	 */
+	public static AstronomicalSeason of(Moment moment) {
+
+		// season does not change around new year so using UTC-offset is okay
+		int year = moment.toZonalTimestamp(ZonalOffset.UTC).getYear();
+
+		// determine the season
+		if (moment.isBefore(AstronomicalSeason.VERNAL_EQUINOX.inYear(year))) {
+			return AstronomicalSeason.WINTER_SOLSTICE;
+		} else if (moment.isBefore(AstronomicalSeason.SUMMER_SOLSTICE.inYear(year))) {
+			return AstronomicalSeason.VERNAL_EQUINOX;
+		} else if (moment.isBefore(AstronomicalSeason.AUTUMNAL_EQUINOX.inYear(year))) {
+			return AstronomicalSeason.SUMMER_SOLSTICE;
+		} else if (moment.isBefore(AstronomicalSeason.WINTER_SOLSTICE.inYear(year))) {
+			return AstronomicalSeason.AUTUMNAL_EQUINOX;
+		} else {
+			return AstronomicalSeason.WINTER_SOLSTICE;
+		}
+
+	}
 
 	/**
 	 * <p>Determines the moment of this astronomical event in given year. </p>

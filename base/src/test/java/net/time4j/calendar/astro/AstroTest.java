@@ -933,4 +933,28 @@ public class AstroTest {
             is(true));
     }
 
+    @Test
+    public void seasonFactory() {
+        assertThat(
+            AstronomicalSeason.of(
+                PlainDate.of(2018, 1, 1).atFirstMoment(ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 6))),
+            is(AstronomicalSeason.WINTER_SOLSTICE)); // tests that the change of year does not affect the season
+        assertThat(
+            AstronomicalSeason.of(
+                PlainDate.of(2018, 1, 1).atFirstMoment(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 6))),
+            is(AstronomicalSeason.WINTER_SOLSTICE));
+        assertThat(
+            AstronomicalSeason.of(PlainDate.of(2018, 4, 1).atFirstMoment(ZonalOffset.UTC)),
+            is(AstronomicalSeason.VERNAL_EQUINOX));
+        assertThat(
+            AstronomicalSeason.of(PlainDate.of(2018, 8, 1).atFirstMoment(ZonalOffset.UTC)),
+            is(AstronomicalSeason.SUMMER_SOLSTICE));
+        assertThat(
+            AstronomicalSeason.of(PlainDate.of(2018, 11, 1).atFirstMoment(ZonalOffset.UTC)),
+            is(AstronomicalSeason.AUTUMNAL_EQUINOX));
+        assertThat(
+            AstronomicalSeason.of(PlainDate.of(2018, 12, 31).atFirstMoment(ZonalOffset.UTC)),
+            is(AstronomicalSeason.WINTER_SOLSTICE));
+    }
+
 }
