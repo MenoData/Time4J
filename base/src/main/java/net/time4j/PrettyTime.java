@@ -1121,7 +1121,7 @@ public final class PrettyTime {
             return parts.get(0).toString();
         }
 
-        // multiple items >= 2
+        // multiple items (count >= 2)
         String listPattern;
 
         if (this.stdListSeparator != null) {
@@ -1130,16 +1130,18 @@ public final class PrettyTime {
                 endSep = this.stdListSeparator;
             }
             StringBuilder sb = new StringBuilder();
-            for (int i = count - 1; i >= 0; i--) {
-                sb.insert(0, '}');
-                sb.insert(0, i);
-                sb.insert(0, '{');
-                if (i == count - 1) {
-                    sb.insert(0, endSep);
-                } else if (i > 0) {
-                    sb.insert(0, this.stdListSeparator);
-                }
+            sb.append("{0}");
+            int max = count - 1;
+            for (int i = 1; i < max; i++) {
+                sb.append(this.stdListSeparator);
+                sb.append('{');
+                sb.append(i);
+                sb.append('}');
             }
+            sb.append(endSep);
+            sb.append('{');
+            sb.append(max);
+            sb.append('}');
             listPattern = sb.toString();
         } else {
             listPattern = UnitPatterns.of(this.locale).getListPattern(width, count);
