@@ -966,4 +966,14 @@ public class AstroTest {
             is(AstronomicalSeason.WINTER_SOLSTICE)); // tests that the change of year does not affect the season
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void seasonBeyondMinYear() {
+        AstronomicalSeason.of(Moment.axis().getMinimum());
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void seasonBeyondMaxYear() {
+        AstronomicalSeason.of(Moment.axis().getMaximum());
+    }
+
 }

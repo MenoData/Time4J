@@ -96,7 +96,7 @@ public enum AstronomicalSeason {
 	 *
 	 * @param 	moment	the moment/instant for which the season is to be determined
 	 * @return	astronomical season (on the northern hemisphere)
-	 * @throws  IllegalArgumentException if the related gregorian year is before {@code -2000}
+	 * @throws  IllegalArgumentException if the year is out of range {@code -2000 <= year <= +3000}
 	 * @since 	5.2
 	 */
 	/*[deutsch]
@@ -107,13 +107,14 @@ public enum AstronomicalSeason {
 	 *
 	 * @param 	moment	the moment/instant for which the season is to be determined
 	 * @return	astronomical season (on the northern hemisphere)
-	 * @throws  IllegalArgumentException if the related gregorian year is before {@code -2000}
+	 * @throws  IllegalArgumentException if the year is out of range {@code -2000 <= year <= +3000}
 	 * @since 	5.2
 	 */
 	public static AstronomicalSeason of(Moment moment) {
 
 		// season does not change around new year so using UTC-offset is okay
 		int year = moment.toZonalTimestamp(ZonalOffset.UTC).getYear();
+		checkYear(year);
 
 		// determine the season
 		if (moment.isBefore(AstronomicalSeason.VERNAL_EQUINOX.inYear(year))) {
@@ -138,7 +139,7 @@ public enum AstronomicalSeason {
 	 *
 	 * @param 	year	gregorian/julian year
 	 * @return	time of this astronomical event (equinox or solstice) in given year
-	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 * @throws  IllegalArgumentException if the year is out of range {@code -2000 <= year <= +3000}
 	 */
 	/*[deutsch]
 	 * <p>Berechnet die Zeit, wann dieses astronomische Ereignis im angegebenen Jahr auftritt. </p>
@@ -149,10 +150,11 @@ public enum AstronomicalSeason {
 	 *
 	 * @param 	year	gregorian/julian year
 	 * @return	time of this astronomical event (equinox or solstice) in given year
-	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 * @throws  IllegalArgumentException if the year is out of range {@code -2000 <= year <= +3000}
 	 */
 	public Moment inYear(int year) {
 
+		checkYear(year);
 		double tt = (this.jdEphemerisDays(year) - 2441317.5) * 86400.0;
 		boolean ls = LeapSeconds.getInstance().isEnabled();
 
@@ -187,7 +189,7 @@ public enum AstronomicalSeason {
 	 *
 	 * @param 	year	gregorian/julian year
 	 * @return	JD(TT) of this astronomical event (equinox or solstice) in given year
-	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 * @throws  IllegalArgumentException if the year is out of range {@code -2000 <= year <= +3000}
 	 * @see 	JulianDay#ofEphemerisTime(double)
 	 */
 	/*[deutsch]
@@ -199,11 +201,12 @@ public enum AstronomicalSeason {
 	 *
 	 * @param 	year	gregorian/julian year
 	 * @return	JD(TT) of this astronomical event (equinox or solstice) in given year
-	 * @throws  IllegalArgumentException if {@code year < -2000}
+	 * @throws  IllegalArgumentException if the year is out of range {@code -2000 <= year <= +3000}
 	 * @see 	JulianDay#ofEphemerisTime(double)
 	 */
 	public JulianDay julianDay(int year) {
 
+		checkYear(year);
 		return JulianDay.ofEphemerisTime(this.jdEphemerisDays(year));
 
 	}
@@ -256,6 +259,14 @@ public enum AstronomicalSeason {
 	public AstronomicalSeason onSouthernHemisphere() {
 
 		return AstronomicalSeason.values()[(this.ordinal() + 2) % 4];
+
+	}
+
+	private static void checkYear(int year) {
+
+		if ((year < -2000) || (year > 3000)) {
+			throw new IllegalArgumentException("Year out of supported range: -2000 <= " + year + " <= +3000");
+		}
 
 	}
 
