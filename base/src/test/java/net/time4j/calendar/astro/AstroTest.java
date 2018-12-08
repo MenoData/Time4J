@@ -935,13 +935,15 @@ public class AstroTest {
 
     @Test
     public void seasonFactory() {
+        Moment m1 = PlainDate.of(2018, 1, 1).atTime(0, 0).at(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 18));
         assertThat(
-            AstronomicalSeason.of(
-                PlainDate.of(2018, 1, 1).atFirstMoment(ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 6))),
+            m1.toZonalTimestamp(ZonalOffset.UTC).getYear(),
+            is(2017));
+        assertThat(
+            AstronomicalSeason.of(m1),
             is(AstronomicalSeason.WINTER_SOLSTICE)); // tests that the change of year does not affect the season
         assertThat(
-            AstronomicalSeason.of(
-                PlainDate.of(2018, 1, 1).atFirstMoment(ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 6))),
+            AstronomicalSeason.of(PlainDate.of(2018, 1, 1).atFirstMoment(ZonalOffset.UTC)),
             is(AstronomicalSeason.WINTER_SOLSTICE));
         assertThat(
             AstronomicalSeason.of(PlainDate.of(2018, 4, 1).atFirstMoment(ZonalOffset.UTC)),
@@ -955,6 +957,13 @@ public class AstroTest {
         assertThat(
             AstronomicalSeason.of(PlainDate.of(2018, 12, 31).atFirstMoment(ZonalOffset.UTC)),
             is(AstronomicalSeason.WINTER_SOLSTICE));
+        Moment m2 = PlainDate.of(2018, 12, 31).atTime(23, 0).at(ZonalOffset.ofHours(OffsetSign.BEHIND_UTC, 18));
+        assertThat(
+            m2.toZonalTimestamp(ZonalOffset.UTC).getYear(),
+            is(2019));
+        assertThat(
+            AstronomicalSeason.of(m2),
+            is(AstronomicalSeason.WINTER_SOLSTICE)); // tests that the change of year does not affect the season
     }
 
 }
