@@ -602,11 +602,15 @@ public final class EthiopianCalendar
     /**
      * <p>Yields the Ethiopian era. </p>
      *
+     * <p>If possible, the era {@code EthiopianEra.AMETE_MIHRET} will be preferred. </p>
+     *
      * @return  enum
      * @since   3.11/4.8
      */
     /*[deutsch]
      * <p>Liefert die &auml;thiopische &Auml;ra. </p>
+     *
+     * <p>Wenn irgendwie m&ouml;glich, wird die &Auml;ra {@code EthiopianEra.AMETE_MIHRET} bevorzugt. </p>
      *
      * @return  enum
      * @since   3.11/4.8
@@ -620,11 +624,15 @@ public final class EthiopianCalendar
     /**
      * <p>Yields the Ethiopian year. </p>
      *
+     * <p>If possible, the year of era {@code EthiopianEra.AMETE_MIHRET} will be preferred. </p>
+     *
      * @return  int
      * @since   3.13/4.10
      */
     /*[deutsch]
      * <p>Liefert das &auml;thiopische Jahr. </p>
+     *
+     * <p>Wenn irgendwie m&ouml;glich, wird das Jahr der &Auml;ra {@code EthiopianEra.AMETE_MIHRET} bevorzugt. </p>
      *
      * @return  int
      * @since   3.13/4.10
