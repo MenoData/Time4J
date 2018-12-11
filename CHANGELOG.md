@@ -1,5 +1,6 @@
 ## [v5.2] not yet released
 ### Added
+- Ethiopian calendar for JavaFX-CalendarPicker [#843]
 - New static factory method for astronomical seasons based on a moment [#841]
 - Custom duration separators in `PrettyTime` [#839]
 
