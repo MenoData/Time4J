@@ -16,6 +16,7 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import net.time4j.PlainDate;
+import net.time4j.calendar.EthiopianCalendar;
 import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
 import net.time4j.calendar.JulianCalendar;
@@ -108,6 +109,14 @@ public class CalendarPickerTest
         labelJDK.setAlignment(Pos.CENTER_RIGHT);
         gridPane.add(labelJDK, 0, row);
         gridPane.add(datePicker, 1, row);
+
+        row++;
+        Label labelEthiopian = new Label("Ethiopian");
+        labelEthiopian.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelEthiopian, 0, row);
+        CalendarPicker<EthiopianCalendar> ethiopianPicker = CalendarPicker.ethiopianWithSystemDefaults();
+        ethiopianPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(ethiopianPicker, 1, row);
 
         row++;
         Label labelHebrew = new Label("Hebrew");

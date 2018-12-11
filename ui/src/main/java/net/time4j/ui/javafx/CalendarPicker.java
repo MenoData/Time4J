@@ -50,6 +50,7 @@ import javafx.util.Duration;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
+import net.time4j.calendar.EthiopianCalendar;
 import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
 import net.time4j.calendar.JulianCalendar;
@@ -318,6 +319,66 @@ public class CalendarPicker<T extends CalendarDate>
     }
 
     /**
+     * <p>Creates a new {@code CalendarPicker} for the ethiopian calendar system using system defaults
+     * for the locale and the current local time. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     * @since   5.2
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den &auml;thiopischen Kalender
+     * unter Benutzung von aus dem System abgeleiteten Standardwerten f&uuml;r die Sprach- und
+     * L&auml;dereinstellung und die aktuelle Zonenzeit. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     * @since   5.2
+     */
+    public static CalendarPicker<EthiopianCalendar> ethiopianWithSystemDefaults() {
+
+        return CalendarPicker.ethiopian(
+            Locale.getDefault(Locale.Category.FORMAT),
+            () -> SystemClock.inLocalView().now(EthiopianCalendar.axis())
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the ethiopian calendar system. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     * @since   5.2
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den &auml;thiopischen Kalender. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     * @since   5.2
+     */
+    public static CalendarPicker<EthiopianCalendar> ethiopian(
+        Locale locale,
+        Supplier<EthiopianCalendar> todaySupplier
+    ) {
+
+        return CalendarPicker.create(
+            EthiopianCalendar.axis(),
+            new FXCalendarSystemEthiopian(),
+            locale,
+            todaySupplier
+        );
+
+    }
+
+    /**
      * <p>Creates a new {@code CalendarPicker} for the hebrew calendar system (jewish calendar) using system defaults
      * for the locale and the current local time. </p>
      *
@@ -325,6 +386,7 @@ public class CalendarPicker<T extends CalendarDate>
      * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
      * @see     SystemClock#inLocalView()
      * @see     ZonalClock#now(Chronology)
+     * @since   4.36
      */
     /*[deutsch]
      * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den hebr&auml;ischen (j&uuml;dischen) Kalender
@@ -335,6 +397,7 @@ public class CalendarPicker<T extends CalendarDate>
      * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
      * @see     SystemClock#inLocalView()
      * @see     ZonalClock#now(Chronology)
+     * @since   4.36
      */
     public static CalendarPicker<HebrewCalendar> hebrewWithSystemDefaults() {
 
