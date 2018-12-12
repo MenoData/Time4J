@@ -657,7 +657,45 @@ public final class ChineseCalendar
     }
 
     /**
+     * <p>Creates a new instance of a Chinese calendar date on first day of QingMing-festival. </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code ChineseCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   5.2
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues chinesisches Kalenderdatum am ersten Tag des QingMing-Fests. </p>
+     *
+     * @param   gregorianYear   gregorian calendar year
+     * @return  new instance of {@code ChineseCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @since   5.2
+     */
+    public static ChineseCalendar ofQingMing(int gregorianYear) {
+
+        ChineseCalendar newyear = ChineseCalendar.ofNewYear(gregorianYear);
+        return newyear.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015);
+
+    }
+
+    /**
      * <p>Creates a new instance of a Chinese calendar date. </p>
+     *
+     * <p>Example for determining the date of Dragon Boat festival in gregorian year 2019: </p>
+     *
+     * <pre>
+     *     ChineseCalendar dragonBoatFestival =
+     *          ChineseCalendar.of(
+     *              EastAsianYear.forGregorian(2019),
+     *              EastAsianMonth.valueOf(5),
+     *              5);
+     *     System.out.println(dragonBoatFestival.transform(PlainDate.class));
+     *     // Output: 2019-06-07
+     * </pre>
+     *
+     * <p>Some other festival dates can be calculated in a similar way, see also
+     * <a href="https://www.officeholidays.com/countries/china/index.php">www.officeholidays.com</a>. </p>
      *
      * @param   year        references the year using different systems like eras or sexagesimal cycles
      * @param   month       the month which might be a leap month
@@ -667,6 +705,21 @@ public final class ChineseCalendar
      */
     /*[deutsch]
      * <p>Erzeugt ein neues chinesisches Kalenderdatum. </p>
+     *
+     * <p>Beispiel zur Bestimmung des Datums des Drachenbootfests im gregorianischen Jahr 2019: </p>
+     *
+     * <pre>
+     *     ChineseCalendar dragonBoatFestival =
+     *          ChineseCalendar.of(
+     *              EastAsianYear.forGregorian(2019),
+     *              EastAsianMonth.valueOf(5),
+     *              5);
+     *     System.out.println(dragonBoatFestival.transform(PlainDate.class));
+     *     // Ausgabe: 2019-06-07
+     * </pre>
+     *
+     * <p>Einige andere Feiertagsdaten k&ouml;nnen in vergleichbarer Weise ausgerechnet werden, siehe auch
+     * <a href="https://www.officeholidays.com/countries/china/index.php">www.officeholidays.com</a>. </p>
      *
      * @param   year        references the year using different systems like eras or sexagesimal cycles
      * @param   month       the month which might be a leap month

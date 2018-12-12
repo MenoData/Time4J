@@ -307,4 +307,21 @@ public class ChineseMiscellaneousTest {
             is(GeneralTimestamp.of(cc.minus(CalendarDays.ONE), PlainTime.of(17, 45))));
     }
 
+    @Test
+    public void qingmingFestival() {
+        ChineseCalendar qingming = ChineseCalendar.ofQingMing(2019);
+        assertThat(qingming.transform(PlainDate.class), is(PlainDate.of(2019, 4, 5)));
+    }
+
+    @Test
+    public void dragonBoatFestival() {
+        ChineseCalendar dragonBoatFestival =
+            ChineseCalendar.of(
+                EastAsianYear.forGregorian(2009),
+                EastAsianMonth.valueOf(5), // not a leap month
+                5);
+        assertThat(dragonBoatFestival.transform(PlainDate.axis()), is(PlainDate.of(2009, 5, 28)));
+        assertThat(dragonBoatFestival.plus(1, ChineseCalendar.Unit.MONTHS).getMonth().isLeap(), is(true));
+    }
+
 }
