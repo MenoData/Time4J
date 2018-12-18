@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockNormalizer.java) is part of project Time4J.
  *
@@ -137,7 +137,7 @@ final class ClockNormalizer
             case ONLY_MODE:
                 return Duration.of(this.unit.convert(dur), this.unit);
             case TRUNCATE_MODE:
-                List<TimeSpan.Item<ClockUnit>> itemList = new ArrayList<TimeSpan.Item<ClockUnit>>();
+                List<TimeSpan.Item<ClockUnit>> itemList = new ArrayList<>();
                 for (TimeSpan.Item<? extends ClockUnit> item : dur.getTotalLength()) {
                     ClockUnit unit = item.getUnit();
                     if (unit.compareTo(this.unit) <= 0) {
@@ -147,7 +147,7 @@ final class ClockNormalizer
                 if (itemList.isEmpty()) {
                     return Duration.ofZero();
                 } else {
-                    return new Duration<ClockUnit>(itemList, dur.isNegative());
+                    return new Duration<>(itemList, dur.isNegative());
                 }
             case ROUNDING_MODE:
                 boolean negative = dur.isNegative();
@@ -189,7 +189,7 @@ final class ClockNormalizer
     private static Map<ClockUnit, ClockNormalizer> fill(int mode) {
 
         Map<ClockUnit, ClockNormalizer> m =
-            new EnumMap<ClockUnit, ClockNormalizer>(ClockUnit.class);
+            new EnumMap<>(ClockUnit.class);
 
         for (ClockUnit unit : ClockUnit.values()) {
             m.put(unit, new ClockNormalizer(unit, mode));
