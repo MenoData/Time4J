@@ -178,6 +178,8 @@ public final class CalendarText {
         lang.add("iw");
         lang.add("ji");
         lang.add("ps");
+        lang.add("sd");
+        lang.add("ug");
         lang.add("ur");
         lang.add("yi");
         RTL = Collections.unmodifiableSet(lang);
