@@ -1,5 +1,6 @@
 ## [v5.2] not yet released
 ### Added
+- Easier truncation of durations with any arbitrary units [#850]
 - Easier calculation of Chinese holidays [#844]
 - Ethiopian calendar for JavaFX-CalendarPicker [#843]
 - New static factory method for astronomical seasons based on a moment [#841]
