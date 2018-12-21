@@ -2078,6 +2078,46 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
+     * <p>Sets all duration parts to zero whose unit has a smaller length than given unit. </p>
+     *
+     * @param   unit    the minimum unit whose associated amount might still be non-zero
+     * @return  truncated duration
+     * @since   5.2
+     */
+    /*[deutsch]
+     * <p>Setzt alle Dauerkomponenten auf null, dessen Einheiten eine kleinere L&auml;nge als die angegebene
+     * Zeiteinheit haben. </p>
+     *
+     * @param   unit    the minimum unit whose associated amount might still be non-zero
+     * @return  truncated duration
+     * @since   5.2
+     */
+    public Duration<U> truncatedTo(U unit) {
+
+        if (this.isEmpty()) {
+            return Duration.ofZero();
+        }
+
+        double min = unit.getLength();
+        List<Item<U>> newItems = new ArrayList<>();
+
+        for (Item<U> item : this.items) {
+            if (Double.compare(item.getUnit().getLength(), min) >= 0) {
+                newItems.add(item);
+            } else {
+                break;
+            }
+        }
+
+        if (newItems.isEmpty()) {
+            return Duration.ofZero();
+        }
+
+        return new Duration<>(newItems, this.isNegative());
+
+    }
+
+    /**
      * <p>Yields an approximate normalizer in steps of hours which
      * finally uses years, months, days and rounded hours. </p>
      *

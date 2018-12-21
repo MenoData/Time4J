@@ -237,11 +237,26 @@ public class DurationNormalizerTest {
     }
 
     @Test
+    public void withTruncatingTimestampNormalizer() {
+        Duration<IsoUnit> dur =
+            Duration.ofPositive().years(2).months(13).days(35).minutes(132).seconds(65).build();
+        assertThat(
+            dur.truncatedTo(ClockUnit.MINUTES),
+            is(Duration.ofPositive().years(2).months(13).days(35).minutes(132).build()));
+        assertThat(
+            dur.truncatedTo(CalendarUnit.DAYS),
+            is(Duration.ofPositive().years(2).months(13).days(35).build()));
+    }
+
+    @Test
     public void withMinutesTruncated() {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 700);
         assertThat(
             timePeriod.with(ClockUnit.MINUTES.truncated()),
+            is(Duration.ofClockUnits(4, 55, 0)));
+        assertThat(
+            timePeriod.truncatedTo(ClockUnit.MINUTES),
             is(Duration.ofClockUnits(4, 55, 0)));
     }
 
@@ -252,13 +267,30 @@ public class DurationNormalizerTest {
         assertThat(
             timePeriod.with(ClockUnit.MINUTES.truncated()),
             is(Duration.ofClockUnits(4, 55, 0).inverse()));
+        assertThat(
+            timePeriod.truncatedTo(ClockUnit.MINUTES),
+            is(Duration.ofClockUnits(4, 55, 0).inverse()));
     }
 
     @Test
-    public void withMinutesTruncatedIfEmpty() {
+    public void withMinutesTruncatedIfEmpty1() {
         Duration<ClockUnit> timePeriod = Duration.ofZero();
         assertThat(
             timePeriod.with(ClockUnit.MINUTES.truncated()).isEmpty(),
+            is(true));
+        assertThat(
+            timePeriod.truncatedTo(ClockUnit.MINUTES).isEmpty(),
+            is(true));
+    }
+
+    @Test
+    public void withMinutesTruncatedIfEmpty2() {
+        Duration<ClockUnit> timePeriod = Duration.ofClockUnits(0, 0, 700);
+        assertThat(
+            timePeriod.with(ClockUnit.MINUTES.truncated()).isEmpty(),
+            is(true));
+        assertThat(
+            timePeriod.truncatedTo(ClockUnit.MINUTES).isEmpty(),
             is(true));
     }
 

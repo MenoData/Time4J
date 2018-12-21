@@ -315,6 +315,7 @@ public enum ClockUnit
      * duration with smaller units truncated. </p>
      *
      * @return  normalizer
+     * @see     Duration#truncatedTo(IsoUnit)
      * @since   3.0
      */
     /*[deutsch]
@@ -323,6 +324,7 @@ public enum ClockUnit
      * abgeschnitten werden. </p>
      *
      * @return  normalizer
+     * @see     Duration#truncatedTo(IsoUnit)
      * @since   3.0
      */
     public Normalizer<ClockUnit> truncated() {
