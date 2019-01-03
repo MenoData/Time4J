@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericTextProviderSPI.java) is part of project Time4J.
  *
@@ -83,6 +83,7 @@ public final class GenericTextProviderSPI
         types.add("coptic");
         types.add("dangi");
         types.add("ethiopic");
+        types.add("extra/bahai");
         types.add("extra/frenchrev");
         types.add("generic");
         types.add("hebrew");
@@ -211,6 +212,24 @@ public final class GenericTextProviderSPI
         TextWidth tw,
         OutputContext oc
     ) {
+
+        if (calendarType.equals("extra/bahai")) {
+            PropertyBundle rb = getBundle(calendarType, locale);
+
+            String[] names =
+                lookupBundle(
+                    rb, calendarType, locale.getLanguage(), 7, "D", TextWidth.WIDE, OutputContext.FORMAT, false, 1);
+
+            if (names == null) {
+                throw new MissingResourceException(
+                    "Cannot find day of week.",
+                    GenericTextProviderSPI.class.getName(),
+                    locale.toString());
+            }
+
+            return names;
+
+        }
 
         return EMPTY_STRINGS;
 
@@ -444,6 +463,10 @@ public final class GenericTextProviderSPI
     }
 
     private static int countOfMonths(String ct) {
+
+        if (ct.equals("extra/bahai")) {
+            return 19;
+        }
 
         return (
             (ct.equals("coptic") || ct.equals("ethiopic") || ct.equals("generic") || ct.equals("hebrew")) ? 13 : 12);
