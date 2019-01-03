@@ -5,7 +5,13 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import static net.time4j.CalendarUnit.CENTURIES;
+import static net.time4j.CalendarUnit.YEARS;
+import static net.time4j.CalendarUnit.MONTHS;
+import static net.time4j.CalendarUnit.WEEKS;
+import static net.time4j.CalendarUnit.DAYS;
 import static net.time4j.ClockUnit.HOURS;
+import static net.time4j.ClockUnit.MINUTES;
 import static net.time4j.ClockUnit.NANOS;
 import static net.time4j.Duration.approximateHours;
 import static org.hamcrest.CoreMatchers.is;
@@ -61,7 +67,7 @@ public class DurationNormalizerTest {
     public void withSTD_PERIOD_unitsOfSameLength() {
 		Duration.ofZero()
 			.plus(1, CalendarUnit.weekBasedYears())
-			.plus(5, CalendarUnit.CENTURIES)
+			.plus(5, CENTURIES)
 			.with(Duration.STD_PERIOD);
     }
 
@@ -77,7 +83,7 @@ public class DurationNormalizerTest {
     @Test
     public void withSTD_CALENDAR_PERIOD2() {
         Duration<CalendarUnit> datePeriod =
-            Duration.ofCalendarUnits(2, 15, 3).plus(3, CalendarUnit.WEEKS);
+            Duration.ofCalendarUnits(2, 15, 3).plus(3, WEEKS);
         assertThat(
             datePeriod.with(Duration.STD_CALENDAR_PERIOD),
             is(Duration.ofCalendarUnits(3, 3, 24)));
@@ -97,8 +103,8 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(2, 61, 122);
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.only()),
-            is(Duration.of(183, ClockUnit.MINUTES)));
+            timePeriod.with(MINUTES.only()),
+            is(Duration.of(183, MINUTES)));
     }
 
     @Test
@@ -106,15 +112,15 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 0).inverse();
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.only()),
-            is(Duration.of(-295, ClockUnit.MINUTES)));
+            timePeriod.with(MINUTES.only()),
+            is(Duration.of(-295, MINUTES)));
     }
 
     @Test
     public void withMinutesOnlyIfEmpty() {
         Duration<ClockUnit> timePeriod = Duration.ofZero();
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.only()).isEmpty(),
+            timePeriod.with(MINUTES.only()).isEmpty(),
             is(true));
     }
 
@@ -177,44 +183,44 @@ public class DurationNormalizerTest {
         Normalizer<IsoUnit> n = Duration.approximateMaxUnitOnly();
         assertThat(
             Duration.ofPositive().years(2).months(13).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(3, CalendarUnit.YEARS)));
+            is(Duration.<IsoUnit>of(3, YEARS)));
         assertThat(
             Duration.ofPositive().years(2).months(16).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(3, CalendarUnit.YEARS)));
+            is(Duration.<IsoUnit>of(3, YEARS)));
         assertThat(
             Duration.ofPositive().years(2).months(17).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(4, CalendarUnit.YEARS)));
+            is(Duration.<IsoUnit>of(4, YEARS)));
         assertThat(
             Duration.ofPositive().months(13).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(1, CalendarUnit.YEARS)));
+            is(Duration.<IsoUnit>of(1, YEARS)));
         assertThat(
             Duration.ofPositive().days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(1, CalendarUnit.MONTHS)));
+            is(Duration.<IsoUnit>of(1, MONTHS)));
         assertThat(
             Duration.ofPositive().days(7).hours(4).minutes(1).build().with(n),
-            is(Duration.<IsoUnit>of(7, CalendarUnit.DAYS)));
+            is(Duration.<IsoUnit>of(7, DAYS)));
         assertThat(
             Duration.ofNegative().hours(4).minutes(1).build().with(n),
-            is(Duration.<IsoUnit>of(-4, ClockUnit.HOURS)));
+            is(Duration.<IsoUnit>of(-4, HOURS)));
     }
 
     @Test
     public void withApproximateMaxUnitOrWeeks() {
         assertThat(
             Duration.ofPositive().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(1, CalendarUnit.WEEKS)));
+            is(Duration.<IsoUnit>of(1, WEEKS)));
         assertThat(
             Duration.ofNegative().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(-1, CalendarUnit.WEEKS)));
+            is(Duration.<IsoUnit>of(-1, WEEKS)));
         assertThat(
             Duration.ofNegative().days(6).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(-6, CalendarUnit.DAYS)));
+            is(Duration.<IsoUnit>of(-6, DAYS)));
         assertThat(
             Duration.ofPositive().days(10).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(1, CalendarUnit.WEEKS)));
+            is(Duration.<IsoUnit>of(1, WEEKS)));
         assertThat(
             Duration.ofPositive().days(11).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(2, CalendarUnit.WEEKS)));
+            is(Duration.<IsoUnit>of(2, WEEKS)));
     }
 
     @Test
@@ -230,7 +236,7 @@ public class DurationNormalizerTest {
 
     @Test
     public void withTimestampNormalizer2() {
-        Duration<CalendarUnit> dur = Duration.of(30, CalendarUnit.DAYS);
+        Duration<CalendarUnit> dur = Duration.of(30, DAYS);
         assertThat(
             PlainTimestamp.of(2012, 2, 28, 0, 0).normalize(dur),
             is(Duration.ofPositive().months(1).days(1).build()));
@@ -241,10 +247,10 @@ public class DurationNormalizerTest {
         Duration<IsoUnit> dur =
             Duration.ofPositive().years(2).months(13).days(35).minutes(132).seconds(65).build();
         assertThat(
-            dur.truncatedTo(ClockUnit.MINUTES),
+            dur.truncatedTo(MINUTES),
             is(Duration.ofPositive().years(2).months(13).days(35).minutes(132).build()));
         assertThat(
-            dur.truncatedTo(CalendarUnit.DAYS),
+            dur.truncatedTo(DAYS),
             is(Duration.ofPositive().years(2).months(13).days(35).build()));
     }
 
@@ -253,10 +259,10 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 700);
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.truncated()),
+            timePeriod.with(MINUTES.truncated()),
             is(Duration.ofClockUnits(4, 55, 0)));
         assertThat(
-            timePeriod.truncatedTo(ClockUnit.MINUTES),
+            timePeriod.truncatedTo(MINUTES),
             is(Duration.ofClockUnits(4, 55, 0)));
     }
 
@@ -265,10 +271,10 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 700).inverse();
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.truncated()),
+            timePeriod.with(MINUTES.truncated()),
             is(Duration.ofClockUnits(4, 55, 0).inverse()));
         assertThat(
-            timePeriod.truncatedTo(ClockUnit.MINUTES),
+            timePeriod.truncatedTo(MINUTES),
             is(Duration.ofClockUnits(4, 55, 0).inverse()));
     }
 
@@ -276,10 +282,10 @@ public class DurationNormalizerTest {
     public void withMinutesTruncatedIfEmpty1() {
         Duration<ClockUnit> timePeriod = Duration.ofZero();
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.truncated()).isEmpty(),
+            timePeriod.with(MINUTES.truncated()).isEmpty(),
             is(true));
         assertThat(
-            timePeriod.truncatedTo(ClockUnit.MINUTES).isEmpty(),
+            timePeriod.truncatedTo(MINUTES).isEmpty(),
             is(true));
     }
 
@@ -287,10 +293,10 @@ public class DurationNormalizerTest {
     public void withMinutesTruncatedIfEmpty2() {
         Duration<ClockUnit> timePeriod = Duration.ofClockUnits(0, 0, 700);
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.truncated()).isEmpty(),
+            timePeriod.with(MINUTES.truncated()).isEmpty(),
             is(true));
         assertThat(
-            timePeriod.truncatedTo(ClockUnit.MINUTES).isEmpty(),
+            timePeriod.truncatedTo(MINUTES).isEmpty(),
             is(true));
     }
 
@@ -299,7 +305,7 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 89);
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.rounded()),
+            timePeriod.with(MINUTES.rounded()),
             is(Duration.ofClockUnits(4, 56, 0)));
     }
 
@@ -308,7 +314,7 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 90);
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.rounded()),
+            timePeriod.with(MINUTES.rounded()),
             is(Duration.ofClockUnits(4, 57, 0)));
     }
 
@@ -317,7 +323,7 @@ public class DurationNormalizerTest {
         Duration<ClockUnit> timePeriod =
             Duration.ofClockUnits(4, 55, 90).inverse();
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.rounded()),
+            timePeriod.with(MINUTES.rounded()),
             is(Duration.ofClockUnits(4, 57, 0).inverse()));
     }
 
@@ -325,17 +331,17 @@ public class DurationNormalizerTest {
     public void withMinutesRoundedIfEmpty() {
         Duration<ClockUnit> timePeriod = Duration.ofZero();
         assertThat(
-            timePeriod.with(ClockUnit.MINUTES.rounded()).isEmpty(),
+            timePeriod.with(MINUTES.rounded()).isEmpty(),
             is(true));
     }
 
     @Test
     public void withNanosRounded() {
         Duration<ClockUnit> timePeriod =
-            Duration.ofClockUnits(4, 65, 1).plus(500000000, ClockUnit.NANOS);
+            Duration.ofClockUnits(4, 65, 1).plus(500000000, NANOS);
         assertThat(
             timePeriod.with(ClockUnit.NANOS.rounded()),
-            is(Duration.ofClockUnits(5, 5, 1).plus(500000000, ClockUnit.NANOS)));
+            is(Duration.ofClockUnits(5, 5, 1).plus(500000000, NANOS)));
     }
 
 }
