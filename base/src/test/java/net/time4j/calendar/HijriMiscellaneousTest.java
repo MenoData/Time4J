@@ -369,4 +369,45 @@ public class HijriMiscellaneousTest {
             is(CommonElements.boundedWeekOfMonth(HijriCalendar.family(), HijriCalendar.getDefaultWeekmodel())));
     }
 
+//    @Test
+//    public void generateUmalqura() {
+//        SolarTime solar = // no altitude correction for Mecca
+//            SolarTime.ofLocation().easternLongitude(39, 49, 34.06).northernLatitude(21, 25, 21.22).build();
+//        ZonalOffset zoneMecca =
+//            ZonalOffset.atLongitude(new BigDecimal(solar.getLongitude()));
+//        LunarTime lunar =
+//            LunarTime.ofLocation(zoneMecca, solar.getLatitude(), solar.getLongitude(), solar.getAltitude());
+//        long daysSinceEpochUTC = HijriCalendar.ofUmalqura(1500, 1, 29).getDaysSinceEpochUTC();
+//        int m = 0;
+//        System.out.print("1500=");
+//
+//        while (true) {
+//            PlainDate date = PlainDate.of(daysSinceEpochUTC, EpochDays.UTC);
+//            Moment sunset = date.get(solar.sunset()).get();
+//            LunarTime.Moonlight moonlight = lunar.on(date);
+//            PlainDate newMoon = MoonPhase.NEW_MOON.before(sunset).toZonalTimestamp(zoneMecca).toDate();
+//            boolean shortMonth = false; // default month length = 30
+//            if (CalendarDays.between(newMoon, date).getAmount() <= 1) {
+//                Optional<Moment> moonset = moonlight.moonset();
+//                if (!moonset.isPresent() || moonset.get().isAfter(sunset)) {
+//                    shortMonth = true;
+//                }
+//            }
+//            m++;
+//            System.out.print(shortMonth ? "29" : "30");
+//            if (m % 12 == 0) {
+//                System.out.println();
+//                int hyear = 1501 + (m - 1) / 12;
+//                if (hyear >= 1600) {
+//                    break;
+//                }
+//                System.out.print(String.valueOf(hyear) + "=");
+//            } else {
+//                System.out.print(" ");
+//            }
+//            daysSinceEpochUTC += ((shortMonth ? 1 : 2) + 28); // go to the 29th day of next month
+//        }
+//        System.out.println("Finished.");
+//    }
+
 }
