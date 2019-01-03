@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FrenchRepublicanMonth.java) is part of project Time4J.
  *
@@ -136,7 +136,7 @@ public enum FrenchRepublicanMonth {
      * <p>The twelvth month starting in August. </p>
      */
     /*[deutsch]
-     * <p>Der zw&ouml:lfte Monat beginnend im August. </p>
+     * <p>Der zw&ouml;lfte Monat beginnend im August. </p>
      */
     FRUCTIDOR;
 
