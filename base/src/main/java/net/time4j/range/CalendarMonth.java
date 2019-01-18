@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarMonth.java) is part of project Time4J.
  *
@@ -166,7 +166,7 @@ public final class CalendarMonth
     /*[deutsch]
      * <p>Element mit dem Monat des Jahres (Wertebereich {@code Januar - Dezember}). </p>
      */
-    @FormattableElement(format = "M", standalone="L")
+    @FormattableElement(format = "M", alt="L")
     public static final ChronoElement<Month> MONTH_OF_YEAR = PlainDate.MONTH_OF_YEAR;
 
     /**

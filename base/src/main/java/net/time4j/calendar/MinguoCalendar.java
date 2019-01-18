@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MinguoCalendar.java) is part of project Time4J.
  *
@@ -181,7 +181,7 @@ public final class MinguoCalendar
     /*[deutsch]
      * <p>Repr&auml;sentiert den Monat. </p>
      */
-    @FormattableElement(format = "M", standalone = "L")
+    @FormattableElement(format = "M", alt = "L")
     public static final StdCalendarElement<Month, MinguoCalendar> MONTH_OF_YEAR =
         new StdEnumDateElement<>(
             "MONTH_OF_YEAR",

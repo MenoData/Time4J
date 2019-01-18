@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AnnualDate.java) is part of project Time4J.
  *
@@ -138,7 +138,7 @@ public final class AnnualDate
     /*[deutsch]
      * <p>Element mit dem Monat als Enum (Wertebereich {@code JANUARY-DECEMBER}). </p>
      */
-    @FormattableElement(format = "M", standalone = "L")
+    @FormattableElement(format = "M", alt = "L")
     public static final ChronoElement<Month> MONTH_OF_YEAR = PlainDate.MONTH_OF_YEAR;
 
     /**

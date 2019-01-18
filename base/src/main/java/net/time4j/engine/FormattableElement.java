@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormattableElement.java) is part of project Time4J.
  *
@@ -70,10 +70,6 @@ public @interface FormattableElement {
      * to the format symbols defined by unicode organization in CLDR. The
      * symbol is case-sensitive. </p>
      *
-     * <p>The default value of an empty string means that the associated
-     * element is not primarily designed for formatting via a pattern
-     * expression. </p>
-     *
      * @return  char
      * @see     net.time4j.format.OutputContext#FORMAT
      */
@@ -87,25 +83,25 @@ public @interface FormattableElement {
      * CLDR-Syntax festgelegten Formatsymbolen. Es wird zwischen Gro&szlig;-
      * und Kleinschreibung unterschieden. </p>
      *
-     * <p>Der Standardwert einer leeren Zeichenkette bedeutet hier, da&szlig;
-     * kein Zeichen in einem Formatmuster vorgesehen ist. </p>
-     *
      * @return  char
      * @see     net.time4j.format.OutputContext#FORMAT
      */
-    String format() default "";
+    String format();
 
     /**
-     * <p>Returns the associated format pattern symbol in the stand-alone
-     * context. </p>
+     * <p>Returns the alternative format pattern symbol. </p>
      *
-     * <p>Almost equivalent to {@code format()} with the difference that
-     * the element shall be formatted in a stand-alone context (for example
+     * <p>Almost equivalent to {@code format()} with the difference that the
+     * element shall be formatted in a stand-alone context in CLDR (for example
      * nominative form &quot;x January&quot; instead of the ordinal form
      * &quot;x-th January&quot;). However, the stand-alone context is not
      * relevant for English - as &quot;January&quot; is still the same word,
      * only relevant for some languages which make an explicit grammar
      * difference. </p>
+     *
+     * <p>When used in dynamic pattern style, this alternative usually denotes
+     * the small letter for numeric formatting - in contrast to the standard
+     * big letter which also allows for textual formatting. </p>
      *
      * <p>The default value of an empty string just means that the
      * stand-alone context should use the same value as in the format
@@ -115,13 +111,16 @@ public @interface FormattableElement {
      * @see     net.time4j.format.OutputContext#STANDALONE
      */
     /*[deutsch]
-     * <p>Liefert das zugeh&ouml;rige Formatmusterzeichen f&uuml;r die
-     * Verwendung in alleinstehendem Kontext. </p>
+     * <p>Liefert das alternative Formatmusterzeichen. </p>
      *
-     * <p>Entspricht weitgehend {@code format()} mit dem Unterschied,
+     * <p>Entspricht in CLDR weitgehend {@code format()} mit dem Unterschied,
      * da&szlig; hier das Element in einem alleinstehenden Kontext
      * formatiert werden soll (zum Beispiel nominativ &quot;x Januar&quot;
      * statt der Ordinalform &quot;x-ter Januar&quot;). </p>
+     *
+     * <p>In dynamischen Formatmustern markiert diese Alternative gew&ouml;hnlich
+     * den Kleinbuchstaben f&uuml;r die numerische Formatierung - im Gegensatz zum
+     * Gro&szlig;buchstaben, der eine textuelle Formatierung erlauben kann. </p>
      *
      * <p>Der Standardwert einer leeren Zeichenkette bedeutet nur, da&szlig;
      * der gleiche Wert wie im normalen Formatkontext gelten soll. </p>
@@ -129,6 +128,27 @@ public @interface FormattableElement {
      * @return  char
      * @see     net.time4j.format.OutputContext#STANDALONE
      */
-    String standalone() default "";
+    String alt() default "";
+
+    /**
+     * <p>Defines a dynamic pattern symbol. </p>
+     *
+     * <p>Dynamic pattern symbols are not handled by CLDR but are resolved by a dynamic element search. </p>
+     *
+     * @return  boolean (default value is false)
+     * @since   5.3
+     * @see     net.time4j.format.expert.PatternType#DYNAMIC
+     */
+    /*[deutsch]
+     * <p>Definiert ein dynamisches Formatmustersymbol. </p>
+     *
+     * <p>Dynamische Formatmustersymbole werden nicht wie in CLDR gehandhabt, sondern werden mittels einer
+     * dynamischen Elementsuche aufgel&ouml;st. </p>
+     *
+     * @return  boolean (default value is false)
+     * @since   5.3
+     * @see     net.time4j.format.expert.PatternType#DYNAMIC
+     */
+    boolean dynamic() default false;
 
 }

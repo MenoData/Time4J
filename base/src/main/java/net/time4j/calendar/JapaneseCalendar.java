@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JapaneseCalendar.java) is part of project Time4J.
  *
@@ -401,7 +401,7 @@ public final class JapaneseCalendar
      * Literal &quot;月&quot;), sollten nur dann verwendet werden, wenn der Kontext ein moderner ist (nach 1872)
      * und gregorianische Monatsnamen gew&uuml;nscht sind. </p>
      */
-    @FormattableElement(format = "M", standalone = "L")
+    @FormattableElement(format = "M", alt = "L")
     public static final TextElement<EastAsianMonth> MONTH_OF_YEAR = new MonthPrimitiveElement();
 
     /**

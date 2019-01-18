@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CopticCalendar.java) is part of project Time4J.
  *
@@ -230,7 +230,7 @@ public final class CopticCalendar
     /*[deutsch]
      * <p>Repr&auml;sentiert den koptischen Monat. </p>
      */
-    @FormattableElement(format = "M", standalone = "L")
+    @FormattableElement(format = "M", alt = "L")
     public static final StdCalendarElement<CopticMonth, CopticCalendar> MONTH_OF_YEAR =
         new StdEnumDateElement<>(
             "MONTH_OF_YEAR",

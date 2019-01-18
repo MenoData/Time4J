@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekmodel.java) is part of project Time4J.
  *
@@ -673,7 +673,7 @@ public final class Weekmodel
      *
      * @return  day of week with localized order
      */
-    @FormattableElement(format = "e", standalone = "c")
+    @FormattableElement(format = "e", alt = "c")
     public NavigableElement<Weekday> localDayOfWeek() {
 
         return this.dayOfWeekElement;

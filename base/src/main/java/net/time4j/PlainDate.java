@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainDate.java) is part of project Time4J.
  *
@@ -391,7 +391,7 @@ public final class PlainDate
     /*[deutsch]
      * <p>Element mit dem Quartal des Jahres (Wertebereich {@code Q1-Q4}). </p>
      */
-    @FormattableElement(format = "Q", standalone="q")
+    @FormattableElement(format = "Q", alt="q")
     public static final NavigableElement<Quarter> QUARTER_OF_YEAR =
         new EnumElement<>(
             "QUARTER_OF_YEAR",
@@ -465,7 +465,7 @@ public final class PlainDate
      *  System.out.println(date); // Ausgabe: 2013-07-01
      * </pre>
      */
-    @FormattableElement(format = "M", standalone="L")
+    @FormattableElement(format = "M", alt="L")
     public static final NavigableElement<Month> MONTH_OF_YEAR =
         new EnumElement<>(
             "MONTH_OF_YEAR",

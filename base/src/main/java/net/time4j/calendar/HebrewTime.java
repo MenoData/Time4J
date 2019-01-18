@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewTime.java) is part of project Time4J.
  *
@@ -166,12 +166,11 @@ public final class HebrewTime
      * Marks the period between either sunset and sunrise (NIGHT) or sunrise and sunset (DAY).
      */
     /*[deutsch]
-     * Markiert die Period zwischen entweder Sonnenuntergang und Sonneaufgang (NIGHT = Nacht) oder
+     * Markiert die Periode zwischen entweder Sonnenuntergang und Sonneaufgang (NIGHT = Nacht) oder
      * Sonnenaufgang und Sonnenuntergang (DAY = Tag).
      */
-    @FormattableElement(format = "c")
     public static final ChronoElement<ClockCycle> CLOCK_CYCLE =
-        new StdEnumDateElement<>("CLOCK_CYCLE", HebrewTime.class, ClockCycle.class, 'c');
+        new StdEnumDateElement<>("CLOCK_CYCLE", HebrewTime.class, ClockCycle.class, '\u0000');
 
     /**
      * The Hebrew hour with the biblical value range 1-12 which is coupled to the sun cycle.
@@ -209,11 +208,17 @@ public final class HebrewTime
 
     /**
      * Marks the part of hour (<em>helek</em>) with the value range 0-1079.
+     *
+     * <p>Note: This element is not covered by ISO-8601 or CLDR standard
+     * but represents an enhancement. </p>
      */
     /*[deutsch]
      * Markiert den Teil einer Stunde (<em>helek</em>) mit dem Wertebereich 0-1079.
+     *
+     * <p>Hinweis: Dieses Element ist nicht vom ISO-8601- oder CLDR-Standard abgedeckt
+     * und stellt eine Erweiterung dar. </p>
      */
-    @FormattableElement(format = "P")
+    @FormattableElement(format = "P", dynamic = true)
     public static final StdCalendarElement<Integer, HebrewTime> PART_OF_HOUR =
         new StdIntegerDateElement<>(
             "PART_OF_HOUR",

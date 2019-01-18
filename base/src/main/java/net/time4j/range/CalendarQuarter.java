@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarQuarter.java) is part of project Time4J.
  *
@@ -135,7 +135,7 @@ public final class CalendarQuarter
     /*[deutsch]
      * <p>Element mit dem Quartal des Jahres (Wertebereich {@code Q1-Q4}). </p>
      */
-    @FormattableElement(format = "Q", standalone="q")
+    @FormattableElement(format = "Q", alt="q")
     public static final ChronoElement<Quarter> QUARTER_OF_YEAR = PlainDate.QUARTER_OF_YEAR;
 
     private static final Chronology<CalendarQuarter> ENGINE =

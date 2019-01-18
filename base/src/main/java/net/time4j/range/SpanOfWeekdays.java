@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SpanOfWeekdays.java) is part of project Time4J.
  *
@@ -95,7 +95,7 @@ public final class SpanOfWeekdays
     /*[deutsch]
      * <p>Bezeichnet den Anfang dieser Wochentagsspanne. </p>
      */
-    @FormattableElement(format = "S")
+    @FormattableElement(format = "S", alt="s", dynamic=true)
     public static final ChronoElement<Weekday> START;
 
     /**
@@ -104,7 +104,7 @@ public final class SpanOfWeekdays
     /*[deutsch]
      * <p>Bezeichnet das Ende dieser Wochentagsspanne. </p>
      */
-    @FormattableElement(format = "E")
+    @FormattableElement(format = "E", alt="e", dynamic=true)
     public static final ChronoElement<Weekday> END;
 
     private static final Chronology<SpanOfWeekdays> ENGINE;

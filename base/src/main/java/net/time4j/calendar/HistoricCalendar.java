@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricCalendar.java) is part of project Time4J.
  *
@@ -316,7 +316,7 @@ public final class HistoricCalendar
      *     // AD-1610-09-02[...]
      * </pre>
      */
-    @FormattableElement(format = "M", standalone = "L")
+    @FormattableElement(format = "M", alt = "L")
     public static final StdCalendarElement<Month, HistoricCalendar> MONTH_OF_YEAR =
         new StdEnumDateElement<Month, HistoricCalendar>(
             "MONTH_OF_YEAR",
