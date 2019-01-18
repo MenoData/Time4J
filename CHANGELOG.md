@@ -1,4 +1,6 @@
 ## [v5.3] not yet released
+### Changed
+- More flexible dynamic patterns [#854]
 
 ## [v5.2] published on 2018-12-21
 ### Added
