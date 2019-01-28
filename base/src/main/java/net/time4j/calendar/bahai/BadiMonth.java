@@ -263,11 +263,17 @@ public enum BadiMonth {
     /**
      * <p>Gets the meaning dependent on the locale. </p>
      *
+     * <p>If a meaning is unavailable then this method will fall back to the transcription given by
+     * {@link #getDisplayName(Locale)}. </p>
+     *
      * @param   locale      language setting
      * @return  meaning for given locale (never {@code null})
      */
     /*[deutsch]
      * <p>Liefert die sprachabh&auml;ngige Bedeutung. </p>
+     *
+     * <p>Wenn die Bedeutung nicht verf&uuml;gbar ist, wird diese Methode lediglich die Transkription gegeben
+     * durch {@link #getDisplayName(Locale)} liefern. </p>
      *
      * @param   locale      language setting
      * @return  meaning for given locale (never {@code null})

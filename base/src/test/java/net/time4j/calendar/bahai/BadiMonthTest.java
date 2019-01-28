@@ -262,4 +262,11 @@ public class BadiMonthTest {
             is("Loftiness"));
     }
 
+    @Test
+    public void getMeaningFallback() {
+        assertThat(
+            BadiMonth.BAHA.getMeaning(new Locale("xyz")),
+            is("Bahá"));
+    }
+
 }
