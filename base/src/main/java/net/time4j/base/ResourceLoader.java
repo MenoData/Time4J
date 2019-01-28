@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ResourceLoader.java) is part of project Time4J.
  *
@@ -21,6 +21,7 @@
 
 package net.time4j.base;
 
+import net.time4j.calendar.service.BadiTextProviderSPI;
 import net.time4j.calendar.service.GenericCalendarProviderSPI;
 import net.time4j.calendar.service.GenericTextProviderSPI;
 import net.time4j.calendar.service.KoreanExtension;
@@ -495,7 +496,7 @@ public abstract class ResourceLoader {
                 Arrays.asList(new HistoricExtension(), new KoreanExtension()));
             map.put(
                 TextProvider.class,
-                Arrays.asList(IsoTextProviderSPI.SINGLETON, new GenericTextProviderSPI()));
+                Arrays.asList(IsoTextProviderSPI.SINGLETON, new GenericTextProviderSPI(), new BadiTextProviderSPI()));
             map.put(
                 ZoneModelProvider.class,
                 Arrays.asList(new JdkZoneProviderSPI(), new WinZoneProviderSPI(), new MilZoneProviderSPI()));

@@ -23,9 +23,11 @@ package net.time4j.calendar.bahai;
 
 import net.time4j.format.CalendarText;
 import net.time4j.format.OutputContext;
+import net.time4j.format.TextAccessor;
 import net.time4j.format.TextWidth;
 
 import java.util.Locale;
+import java.util.Map;
 
 
 /**
@@ -35,7 +37,7 @@ import java.util.Locale;
  * @since   5.3
  */
 /*[deutsch]
- * <p>Repr&auml;sentiert die Monate, die im Badi-Kalender Verwendung fanden. </p>
+ * <p>Repr&auml;sentiert die Monate, die im Badi-Kalender Verwendung finden. </p>
  *
  * @author  Meno Hochschild
  * @since   5.3
@@ -241,57 +243,45 @@ public enum BadiMonth {
     /**
      * <p>Gets the description text dependent on the locale. </p>
      *
-     * <p>Equivalent to {@code getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT)}. </p>
-     *
      * @param   locale      language setting
      * @return  descriptive text for given locale (never {@code null})
-     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
      */
     /*[deutsch]
      * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
      *
-     * <p>&Auml;quivalent zu {@code getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT)}. </p>
-     *
      * @param   locale      language setting
      * @return  descriptive text for given locale (never {@code null})
-     * @see     #getDisplayName(Locale, TextWidth, OutputContext)
      */
     public String getDisplayName(Locale locale) {
 
-        return this.getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT);
+        TextAccessor ta =
+            CalendarText.getInstance("extra/bahai", locale).getStdMonths(TextWidth.WIDE, OutputContext.FORMAT);
+        return ta.print(this);
 
     }
 
     /**
-     * <p>Gets the description text dependent on the locale. </p>
-     *
-     * <p>Note: The abbreviated style will produce numbers, and the narrow style will produce
-     * one single capital letter per month. </p>
+     * <p>Gets the meaning dependent on the locale. </p>
      *
      * @param   locale      language setting
-     * @param   width       text width
-     * @param   oc          output context
-     * @return  descriptive text for given locale (never {@code null})
+     * @return  meaning for given locale (never {@code null})
      */
     /*[deutsch]
-     * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
-     *
-     * <p>Hinweis: Abk&uuml;rzungen sind numerisch, und der NARROW-Stil wird einen einfachen Gro&szlig;buchstaben
-     * pro Monat fabrizieren. </p>
+     * <p>Liefert die sprachabh&auml;ngige Bedeutung. </p>
      *
      * @param   locale      language setting
-     * @param   width       text width
-     * @param   oc          output context
-     * @return  descriptive text for given locale (never {@code null})
+     * @return  meaning for given locale (never {@code null})
      */
-    public String getDisplayName(
-        Locale locale,
-        TextWidth width,
-        OutputContext oc
-    ) {
+    public String getMeaning(Locale locale) {
 
-        CalendarText names = CalendarText.getInstance("extra/bahai", locale);
-        return names.getStdMonths(width, oc).print(this);
+        Map<String, String> names = CalendarText.getInstance("extra/bahai", locale).getTextForms();
+        String meaning = names.get("m_" + this.getValue());
+
+        if (meaning == null) {
+            return names.get("M_" + this.getValue());
+        } else {
+            return meaning;
+        }
 
     }
 
