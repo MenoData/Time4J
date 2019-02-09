@@ -34,15 +34,18 @@ import java.util.Map;
  * <p>Represents the months used in the Badi calendar. </p>
  *
  * @author  Meno Hochschild
+ * @see     BadiDivison#comparator()
  * @since   5.3
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Monate, die im Badi-Kalender Verwendung finden. </p>
  *
  * @author  Meno Hochschild
+ * @see     BadiDivison#comparator()
  * @since   5.3
  */
-public enum BadiMonth {
+public enum BadiMonth
+    implements BadiDivison {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
