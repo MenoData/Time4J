@@ -163,17 +163,17 @@ Add these dependencies to your pom-file (typical setup):
 <dependency>
   <groupId>net.time4j</groupId>
   <artifactId>time4j-base</artifactId>
-  <version>5.0</version
+  <version>5.0</version>
 </dependency>
 <dependency>
   <groupId>net.time4j</groupId>
   <artifactId>time4j-sqlxml</artifactId>
-  <version>5.0</version
+  <version>5.0</version>
 </dependency>
 <dependency>
   <groupId>net.time4j</groupId>
   <artifactId>time4j-tzdata</artifactId>
-  <version>5.0-2018f</version
+  <version>5.0-2018f</version>
 </dependency>
 ```
 
