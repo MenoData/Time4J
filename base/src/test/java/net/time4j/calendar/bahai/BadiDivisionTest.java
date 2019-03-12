@@ -155,31 +155,31 @@ public class BadiDivisionTest {
     @Test
     public void comparator() {
         assertThat(
-            BadiDivison.comparator().compare(BadiMonth.ALA, BadiMonth.ALA) == 0,
+            BadiDivision.comparator().compare(BadiMonth.ALA, BadiMonth.ALA) == 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiMonth.MULK, BadiMonth.MULK) == 0,
+            BadiDivision.comparator().compare(BadiMonth.MULK, BadiMonth.MULK) == 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiMonth.ALA, BadiMonth.MULK) > 0,
+            BadiDivision.comparator().compare(BadiMonth.ALA, BadiMonth.MULK) > 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiMonth.MULK, BadiMonth.ALA) < 0,
+            BadiDivision.comparator().compare(BadiMonth.MULK, BadiMonth.ALA) < 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiMonth.MULK, BadiIntercalaryDays.AYYAM_I_HA) < 0,
+            BadiDivision.comparator().compare(BadiMonth.MULK, BadiIntercalaryDays.AYYAM_I_HA) < 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiIntercalaryDays.AYYAM_I_HA, BadiMonth.MULK) > 0,
+            BadiDivision.comparator().compare(BadiIntercalaryDays.AYYAM_I_HA, BadiMonth.MULK) > 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiIntercalaryDays.AYYAM_I_HA, BadiIntercalaryDays.AYYAM_I_HA) == 0,
+            BadiDivision.comparator().compare(BadiIntercalaryDays.AYYAM_I_HA, BadiIntercalaryDays.AYYAM_I_HA) == 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiMonth.ALA, BadiIntercalaryDays.AYYAM_I_HA) > 0,
+            BadiDivision.comparator().compare(BadiMonth.ALA, BadiIntercalaryDays.AYYAM_I_HA) > 0,
             is(true));
         assertThat(
-            BadiDivison.comparator().compare(BadiIntercalaryDays.AYYAM_I_HA, BadiMonth.ALA) < 0,
+            BadiDivision.comparator().compare(BadiIntercalaryDays.AYYAM_I_HA, BadiMonth.ALA) < 0,
             is(true));
     }
 
