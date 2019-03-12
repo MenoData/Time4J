@@ -1720,7 +1720,7 @@ public final class JapaneseCalendar
         }
 
         /**
-         * <p>Calculates the difference between given Coptic dates in this unit. </p>
+         * <p>Calculates the difference between given Japanese dates in this unit. </p>
          *
          * @param   start   start date (inclusive)
          * @param   end     end date (exclusive)

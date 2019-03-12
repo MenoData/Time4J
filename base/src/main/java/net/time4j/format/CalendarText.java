@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -871,7 +871,11 @@ public final class CalendarText {
             }
 
             if (key == null) {
-                tfs[i] = enums[i].name(); // fallback
+                if (this.textForms.containsKey(name)) {
+                    tfs[i] = this.textForms.get(name);
+                } else {
+                    tfs[i] = enums[i].name(); // fallback
+                }
             } else {
                 tfs[i] = this.textForms.get(key);
             }
