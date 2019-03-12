@@ -36,7 +36,7 @@ import java.util.Comparator;
  * @author  Meno Hochschild
  * @since   5.3
  */
-public interface BadiDivison {
+public interface BadiDivision {
 
     //~ Methoden ----------------------------------------------------------
 
@@ -51,7 +51,7 @@ public interface BadiDivison {
      *
      * @return  Comparator
      */
-    static Comparator<BadiDivison> comparator() {
+    static Comparator<BadiDivision> comparator() {
         return (o1, o2) -> {
             if (o1 instanceof BadiMonth) {
                 if (o2 instanceof BadiMonth) {

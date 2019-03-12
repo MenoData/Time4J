@@ -31,18 +31,18 @@ import java.util.Map;
  * <p>Represents the intercalary days of the Badi calendar. </p>
  *
  * @author  Meno Hochschild
- * @see     BadiDivison#comparator()
+ * @see     BadiDivision#comparator()
  * @since   5.3
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die eingeschobenen Tage des Badi-Kalenders. </p>
  *
  * @author  Meno Hochschild
- * @see     BadiDivison#comparator()
+ * @see     BadiDivision#comparator()
  * @since   5.3
  */
 public enum BadiIntercalaryDays
-    implements BadiDivison {
+    implements BadiDivision {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
