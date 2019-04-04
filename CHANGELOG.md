@@ -1,5 +1,6 @@
 ## [v5.3] not yet released
 ### Changed
+- New Japanese Nengo "Reiwa" [#840]
 - More flexible dynamic patterns [#854]
 
 ## [v5.2] published on 2018-12-21
