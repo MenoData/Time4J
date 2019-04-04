@@ -853,12 +853,12 @@ public final class CalendarText {
         int baseIndex = (CalendarEra.class.isAssignableFrom(type) ? 0 : 1);
 
         for (int i = 0; i < len; i++) {
+            String raw;
             int step = 0;
-            String raw = getKeyStart(prefix, 0, variants);
             String key = null;
 
             // sukzessives Reduzieren der Varianten, wenn nicht gefunden
-            while (raw != null) {
+            while ((raw = getKeyStart(prefix, step, variants)) != null) {
                 String test = toKey(raw, i, baseIndex);
 
                 if (this.textForms.containsKey(test)) {
@@ -867,7 +867,6 @@ public final class CalendarText {
                 }
 
                 step++;
-                raw = getKeyStart(prefix, step, variants);
             }
 
             if (key == null) {
@@ -1185,7 +1184,6 @@ public final class CalendarText {
         if ((variants != null) && (variants.length > 0)) {
             if (variants.length < step) {
                 return null;
-
             }
 
             StringBuilder sb = new StringBuilder(elementName);

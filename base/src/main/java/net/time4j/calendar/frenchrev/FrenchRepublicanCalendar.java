@@ -129,19 +129,19 @@ import java.util.Locale;
  *  <td>ERA</td><td>G</td><td>text</td>
  * </tr>
  * <tr>
- *  <td>YEAR_OF_ERA</td><td>Y</td><td>number</td>
+ *  <td>YEAR_OF_ERA</td><td>y/Y</td><td>number</td>
  * </tr>
  * <tr>
- *  <td>MONTH_OF_YEAR</td><td>M</td><td>text</td>
+ *  <td>MONTH_OF_YEAR</td><td>m/M</td><td>number/text</td>
  * </tr>
  * <tr>
- *  <td>SANSCULOTTIDES</td><td>S</td><td>text</td>
+ *  <td>SANSCULOTTIDES</td><td>s/S</td><td>text</td>
  * </tr>
  * <tr>
- *  <td>DAY_OF_MONTH</td><td>D</td><td>number</td>
+ *  <td>DAY_OF_MONTH</td><td>d/D</td><td>number</td>
  * </tr>
  * <tr>
- *  <td>DAY_OF_DECADE</td><td>C</td><td>text</td>
+ *  <td>DAY_OF_DECADE</td><td>c/C</td><td>text</td>
  * </tr>
  * <tr>
  *  <td>DAY_OF_WEEK</td><td>E</td><td>text</td>
@@ -236,19 +236,19 @@ import java.util.Locale;
  *  <td>ERA</td><td>G</td><td>text</td>
  * </tr>
  * <tr>
- *  <td>YEAR_OF_ERA</td><td>Y</td><td>number</td>
+ *  <td>YEAR_OF_ERA</td><td>y/Y</td><td>number</td>
  * </tr>
  * <tr>
- *  <td>MONTH_OF_YEAR</td><td>M</td><td>text</td>
+ *  <td>MONTH_OF_YEAR</td><td>m/M</td><td>number/text</td>
  * </tr>
  * <tr>
- *  <td>SANSCULOTTIDES</td><td>S</td><td>text</td>
+ *  <td>SANSCULOTTIDES</td><td>s/S</td><td>text</td>
  * </tr>
  * <tr>
- *  <td>DAY_OF_MONTH</td><td>D</td><td>number</td>
+ *  <td>DAY_OF_MONTH</td><td>d/D</td><td>number</td>
  * </tr>
  * <tr>
- *  <td>DAY_OF_DECADE</td><td>C</td><td>text</td>
+ *  <td>DAY_OF_DECADE</td><td>c/C</td><td>text</td>
  * </tr>
  * <tr>
  *  <td>DAY_OF_WEEK</td><td>E</td><td>text</td>
@@ -311,7 +311,7 @@ public final class FrenchRepublicanCalendar
     /*[deutsch]
      * <p>Repr&auml;sentiert die republikanische &Auml;ra der franz&ouml;sischen Revolution. </p>
      */
-    @FormattableElement(format = "G", alt = "g", dynamic=true)
+    @FormattableElement(format = "G", dynamic = true)
     public static final ChronoElement<FrenchRepublicanEra> ERA =
         new StdEnumDateElement<>("ERA", FrenchRepublicanCalendar.class, FrenchRepublicanEra.class, 'G');
 
@@ -326,7 +326,7 @@ public final class FrenchRepublicanCalendar
      * <p>Das Jahr wird als r&ouml;mische Zahl formatiert, wenn ein Formatmuster und die franz&ouml;sische
      * Sprache verwendet werden. </p>
      */
-    @FormattableElement(format = "Y", alt="y", dynamic=true)
+    @FormattableElement(format = "Y", alt = "y", dynamic = true)
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> YEAR_OF_ERA =
         new YearOfEraElement();
 
@@ -361,7 +361,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
-    @FormattableElement(format = "S", alt="s", dynamic=true)
+    @FormattableElement(format = "S", alt = "s", dynamic = true)
     public static final ChronoElement<Sansculottides> SANSCULOTTIDES = SANSCULOTTIDES_ACCESS;
 
     /**
@@ -393,7 +393,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
-    @FormattableElement(format = "M", alt="m", dynamic=true)
+    @FormattableElement(format = "M", alt = "m", dynamic = true)
     public static final StdCalendarElement<FrenchRepublicanMonth, FrenchRepublicanCalendar> MONTH_OF_YEAR =
         new StdEnumDateElement<>(
             "MONTH_OF_YEAR",
@@ -448,7 +448,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
-    @FormattableElement(format = "C", alt="c", dynamic=true)
+    @FormattableElement(format = "C", alt = "c", dynamic = true)
     public static final ChronoElement<DayOfDecade> DAY_OF_DECADE = DAY_OF_DECADE_ACCESS;
 
     /**
@@ -473,7 +473,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasSansculottides()
      * @see     #hasMonth()
      */
-    @FormattableElement(format = "D", dynamic=true)
+    @FormattableElement(format = "D", alt = "d", dynamic = true)
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> DAY_OF_MONTH =
         new StdIntegerDateElement<>("DAY_OF_MONTH", FrenchRepublicanCalendar.class, 1, 30, 'D');
 
@@ -502,7 +502,7 @@ public final class FrenchRepublicanCalendar
      *
      * @see     #DAY_OF_DECADE
      */
-    @FormattableElement(format = "E", dynamic=true)
+    @FormattableElement(format = "E", dynamic = true)
     public static final StdCalendarElement<Weekday, FrenchRepublicanCalendar> DAY_OF_WEEK =
         new StdWeekdayElement<>(FrenchRepublicanCalendar.class, getDefaultWeekmodel());
 
@@ -1311,7 +1311,7 @@ public final class FrenchRepublicanCalendar
     /**
      * @serialData  Uses <a href="../../../../serialized-form.html#net.time4j.calendar.frenchrev/SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
-     *              the type-ID {@code 11}. Then the year is written as int, finally
+     *              the type-ID {@code 18}. Then the year is written as int, finally
      *              month and day-of-month as bytes.
      *
      * @return  replacement object in serialization graph

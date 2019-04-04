@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdIntegerDateElement.java) is part of project Time4J.
  *
@@ -60,7 +60,7 @@ public class StdIntegerDateElement<T extends ChronoEntity<T>>
         int max,
         char symbol
     ) {
-        super(name, chrono, symbol, true);
+        super(name, chrono, symbol, name.startsWith("DAY_OF_"));
 
         this.min = min;
         this.max = max;

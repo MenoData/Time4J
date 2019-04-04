@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdWeekdayElement.java) is part of project Time4J.
  *
@@ -39,7 +39,7 @@ import net.time4j.engine.ChronoEntity;
  * @author  Meno Hochschild
  * @since   3.5/4.3
  */
-public final class StdWeekdayElement<T extends ChronoEntity<T>>
+public class StdWeekdayElement<T extends ChronoEntity<T>>
     extends StdEnumDateElement<Weekday, T> {
 
     //~ Statische Felder/Initialisierungen --------------------------------

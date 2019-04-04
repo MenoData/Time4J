@@ -98,6 +98,8 @@ final class SPX
     /** Serialisierungstyp. */
     static final int JUCHE = 17;
 
+    // Note: Types 18 and 19 are reserved for FrenchRepublican and Bahai
+
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -42,7 +42,7 @@ final class SPX
     //~ Statische Felder/Initialisierungen ----------------------------
 
     /** Serialisierungstyp. */
-    static final int FRENCH_REV = 11;
+    static final int FRENCH_REV = 18;
 
     private static final long serialVersionUID = 1L;
 

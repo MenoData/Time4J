@@ -116,6 +116,24 @@ public class FormatTest {
             is(cal));
     }
 
+    @Test
+    public void printNumbers() {
+        ChronoFormatter<FrenchRepublicanCalendar> f = create("yyyy-mm-dd");
+        FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
+        assertThat(
+            f.format(cal),
+            is("0227-01-01"));
+    }
+
+    @Test
+    public void parseNumbers() throws ParseException {
+        ChronoFormatter<FrenchRepublicanCalendar> f = create("yyyy-mm-dd");
+        FrenchRepublicanCalendar cal = PlainDate.of(2018, 9, 23).transform(FrenchRepublicanCalendar.axis());
+        assertThat(
+            f.parse("0227-01-01"),
+            is(cal));
+    }
+
     private static ChronoFormatter<FrenchRepublicanCalendar> create(String pattern) {
         return ChronoFormatter.ofPattern(pattern, PatternType.DYNAMIC, Locale.FRENCH, FrenchRepublicanCalendar.axis());
     }

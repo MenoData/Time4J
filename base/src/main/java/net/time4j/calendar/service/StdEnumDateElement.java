@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StdEnumDateElement.java) is part of project Time4J.
  *
@@ -297,20 +297,16 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
 
     }
 
-    private static boolean isWeekdayElement(char symbol) {
-
-        return (symbol == 'E');
-
-    }
-
-    private static String extractCalendarType(Class<?> type) {
-
-        CalendarType ft = type.getAnnotation(CalendarType.class);
-        return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
-
-    }
-
-    private TextAccessor accessor(
+    /**
+     * Might be overridden in special cases.
+     *
+     * @param   attributes      format attributes
+     * @param   outputContext   the output context
+     * @param   leap            leap month flag
+     * @return  TextAccessor
+     * @since   5.3
+     */
+    protected TextAccessor accessor(
         AttributeQuery attributes,
         OutputContext outputContext,
         boolean leap
@@ -333,6 +329,19 @@ public class StdEnumDateElement<V extends Enum<V>, T extends ChronoEntity<T>>
         } else {
             return cnames.getTextForms(this.name(), this.type);
         }
+
+    }
+
+    private static boolean isWeekdayElement(char symbol) {
+
+        return (symbol == 'E');
+
+    }
+
+    private static String extractCalendarType(Class<?> type) {
+
+        CalendarType ft = type.getAnnotation(CalendarType.class);
+        return ((ft == null) ? ISO_CALENDAR_TYPE : ft.value());
 
     }
 
