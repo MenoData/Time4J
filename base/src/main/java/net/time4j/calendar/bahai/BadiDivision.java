@@ -41,29 +41,37 @@ public interface BadiDivision {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Obtains a comparator comparing either Badi months or the Ayyam-i-Ha-period. </p>
+     * <p>Obtains a comparator comparing either Badi months or the Ayyam-i-Ha-period in terms of time order. </p>
      *
      * @return  Comparator
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Comparator}, der entweder Badi-Monate oder die Ayyam-i-Ha-Periode miteinander
-     * vergleicht. </p>
+     * <p>Liefert einen {@code Comparator}, der entweder Badi-Monate oder die Ayyam-i-Ha-Periode
+     * zeitlich miteinander vergleicht. </p>
      *
      * @return  Comparator
      */
     static Comparator<BadiDivision> comparator() {
         return (o1, o2) -> {
-            if (o1 instanceof BadiMonth) {
+            if (o1 == null) {
+                throw new NullPointerException("First argument is null.");
+            } else if (o2 == null) {
+                throw new NullPointerException("Second argument is null.");
+            } else if (o1 instanceof BadiMonth) {
                 if (o2 instanceof BadiMonth) {
                     return BadiMonth.class.cast(o1).compareTo(BadiMonth.class.cast(o2));
-                } else {
+                } else if (o2 == BadiIntercalaryDays.AYYAM_I_HA) {
                     return (o1 == BadiMonth.ALA) ? 1 : -1;
                 }
             } else if (o2 instanceof BadiMonth) {
-                return (o2 == BadiMonth.ALA) ? -1 : 1;
-            } else {
+                if (o1 == BadiIntercalaryDays.AYYAM_I_HA) {
+                    return (o2 == BadiMonth.ALA) ? -1 : 1;
+                }
+            } else if ((o1 == BadiIntercalaryDays.AYYAM_I_HA) && (o2 == BadiIntercalaryDays.AYYAM_I_HA)) {
                 return 0;
             }
+
+            throw new ClassCastException("Not comparable: " + o1 + "/" + o2);
         };
     }
 

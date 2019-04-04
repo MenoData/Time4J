@@ -22,12 +22,9 @@
 package net.time4j.calendar.bahai;
 
 import net.time4j.format.CalendarText;
-import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
-import net.time4j.format.TextWidth;
 
 import java.util.Locale;
-import java.util.Map;
 
 
 /**
@@ -257,9 +254,7 @@ public enum BadiMonth
      */
     public String getDisplayName(Locale locale) {
 
-        TextAccessor ta =
-            CalendarText.getInstance("extra/bahai", locale).getStdMonths(TextWidth.WIDE, OutputContext.FORMAT);
-        return ta.print(this);
+        return accessor(locale, FormattedContent.TRANSCRIPTION).print(this);
 
     }
 
@@ -283,14 +278,17 @@ public enum BadiMonth
      */
     public String getMeaning(Locale locale) {
 
-        Map<String, String> names = CalendarText.getInstance("extra/bahai", locale).getTextForms();
-        String meaning = names.get("m_" + this.getValue());
+        return accessor(locale, FormattedContent.MEANING).print(this);
 
-        if (meaning == null) {
-            return names.get("M_" + this.getValue());
-        } else {
-            return meaning;
-        }
+    }
+
+    private static TextAccessor accessor(
+        Locale lang,
+        FormattedContent fc
+    ) {
+
+        CalendarText ct = CalendarText.getInstance("extra/bahai", lang);
+        return ct.getTextForms("M", BadiMonth.class, fc.variant());
 
     }
 

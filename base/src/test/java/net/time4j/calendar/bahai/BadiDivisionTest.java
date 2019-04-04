@@ -142,6 +142,118 @@ public class BadiDivisionTest {
     }
 
     @Test
+    public void getDisplayNameDE() {
+        assertThat(
+            BadiMonth.BAHA.getDisplayName(Locale.GERMAN),
+            is("Baha'"));
+        assertThat(
+            BadiMonth.JALAL.getDisplayName(Locale.GERMAN),
+            is("Dschalal"));
+        assertThat(
+            BadiMonth.JAMAL.getDisplayName(Locale.GERMAN),
+            is("Dschamal"));
+        assertThat(
+            BadiMonth.AZAMAT.getDisplayName(Locale.GERMAN),
+            is("'Azamat"));
+        assertThat(
+            BadiMonth.NUR.getDisplayName(Locale.GERMAN),
+            is("Nur"));
+        assertThat(
+            BadiMonth.RAHMAT.getDisplayName(Locale.GERMAN),
+            is("Rahmat"));
+        assertThat(
+            BadiMonth.KALIMAT.getDisplayName(Locale.GERMAN),
+            is("Kalimat"));
+        assertThat(
+            BadiMonth.KAMAL.getDisplayName(Locale.GERMAN),
+            is("Kamal"));
+        assertThat(
+            BadiMonth.ASMA.getDisplayName(Locale.GERMAN),
+            is("Asma'"));
+        assertThat(
+            BadiMonth.IZZAT.getDisplayName(Locale.GERMAN),
+            is("ʿIzzat"));
+        assertThat(
+            BadiMonth.MASHIYYAT.getDisplayName(Locale.GERMAN),
+            is("Maschiyyat"));
+        assertThat(
+            BadiMonth.ILM.getDisplayName(Locale.GERMAN),
+            is("ʿIlm"));
+        assertThat(
+            BadiMonth.QUDRAT.getDisplayName(Locale.GERMAN),
+            is("Qudrat"));
+        assertThat(
+            BadiMonth.QAWL.getDisplayName(Locale.GERMAN),
+            is("Qawl"));
+        assertThat(
+            BadiMonth.MASAIL.getDisplayName(Locale.GERMAN),
+            is("Masaʾil"));
+        assertThat(
+            BadiMonth.SHARAF.getDisplayName(Locale.GERMAN),
+            is("Scharaf"));
+        assertThat(
+            BadiMonth.SULTAN.getDisplayName(Locale.GERMAN),
+            is("Sultan"));
+        assertThat(
+            BadiMonth.MULK.getDisplayName(Locale.GERMAN),
+            is("Mulk"));
+        assertThat(
+            BadiIntercalaryDays.AYYAM_I_HA.getDisplayName(Locale.GERMAN),
+            is("Aiyam-e Ha'"));
+        assertThat(
+            BadiMonth.ALA.getDisplayName(Locale.GERMAN),
+            is("ʿAla'"));
+    }
+
+    @Test
+    public void getDisplayNameFR() {
+        assertThat(
+            BadiMonth.BAHA.getDisplayName(Locale.FRENCH),
+            is("Bahāʾ"));
+        assertThat(
+            BadiMonth.JALAL.getDisplayName(Locale.FRENCH),
+            is("Ǧalāl"));
+    }
+
+    @Test
+    public void getMeaningFR() {
+        assertThat(
+            BadiMonth.BAHA.getMeaning(Locale.FRENCH),
+            is("Splendeur"));
+        assertThat(
+            BadiMonth.JALAL.getMeaning(Locale.FRENCH),
+            is("Gloire"));
+    }
+
+    @Test
+    public void getDisplayNameFarsi() {
+        Locale farsi = Locale.forLanguageTag("fa");
+        assertThat(
+            BadiMonth.BAHA.getDisplayName(farsi),
+            is("بهاء"));
+        assertThat(
+            BadiMonth.JALAL.getDisplayName(farsi),
+            is("جلال"));
+        assertThat(
+            BadiIntercalaryDays.AYYAM_I_HA.getDisplayName(farsi),
+            is("ايام هاء"));
+    }
+
+    @Test
+    public void getMeaningFarsi() {
+        Locale farsi = Locale.forLanguageTag("fa");
+        assertThat(
+            BadiMonth.BAHA.getMeaning(farsi),
+            is("بهاء")); // same as transcription
+        assertThat(
+            BadiMonth.JALAL.getMeaning(farsi),
+            is("جلال")); // same as transcription
+        assertThat(
+            BadiIntercalaryDays.AYYAM_I_HA.getMeaning(farsi),
+            is("ايام هاء")); // same as transcription
+    }
+
+    @Test
     public void getMeaningFallback() {
         Locale unknown = new Locale("xyz");
         assertThat(

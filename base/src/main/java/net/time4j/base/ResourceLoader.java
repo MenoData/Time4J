@@ -21,7 +21,6 @@
 
 package net.time4j.base;
 
-import net.time4j.calendar.service.BadiTextProviderSPI;
 import net.time4j.calendar.service.GenericCalendarProviderSPI;
 import net.time4j.calendar.service.GenericTextProviderSPI;
 import net.time4j.calendar.service.KoreanExtension;
@@ -496,7 +495,7 @@ public abstract class ResourceLoader {
                 Arrays.asList(new HistoricExtension(), new KoreanExtension()));
             map.put(
                 TextProvider.class,
-                Arrays.asList(IsoTextProviderSPI.SINGLETON, new GenericTextProviderSPI(), new BadiTextProviderSPI()));
+                Arrays.asList(IsoTextProviderSPI.SINGLETON, new GenericTextProviderSPI()));
             map.put(
                 ZoneModelProvider.class,
                 Arrays.asList(new JdkZoneProviderSPI(), new WinZoneProviderSPI(), new MilZoneProviderSPI()));
