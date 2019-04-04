@@ -36,6 +36,7 @@ public class NengoTest {
 
     @Test
     public void ofRelatedGregorianYearModern() {
+        assertThat(Nengo.ofRelatedGregorianYear(2019), is(Nengo.REIWA));
         assertThat(Nengo.ofRelatedGregorianYear(1989), is(Nengo.HEISEI));
         assertThat(Nengo.ofRelatedGregorianYear(1988), is(Nengo.SHOWA));
         assertThat(Nengo.ofRelatedGregorianYear(1926), is(Nengo.SHOWA));
@@ -138,16 +139,32 @@ public class NengoTest {
         assertThat(Nengo.HEISEI.isModern(), is(true));
         assertThat(Nengo.HEISEI.matches(Nengo.Selector.MODERN), is(true));
         assertThat(Nengo.HEISEI.matches(Nengo.Selector.OFFICIAL), is(true));
-        assertThat(Nengo.HEISEI.findNext().isPresent(), is(false));
+        assertThat(Nengo.HEISEI.findNext().get(), is(Nengo.REIWA));
         assertThat(Nengo.HEISEI.getDisplayName(Locale.JAPANESE), is("平成"));
         assertThat(Nengo.HEISEI.getDisplayName(Locale.ENGLISH), is("Heisei"));
         assertThat(Nengo.HEISEI.getDisplayName(Locale.ENGLISH, TextWidth.NARROW), is("H"));
     }
 
     @Test
+    public void reiwa() {
+        assertThat(Nengo.ofKanji("令和"), is(Nengo.REIWA));
+        assertThat(Nengo.parseRomaji("reiwa").get(0), is(Nengo.REIWA));
+        assertThat(Nengo.ofRelatedGregorianYear(2020), is(Nengo.REIWA));
+        assertThat(Nengo.REIWA.getFirstRelatedGregorianYear(), is(2019));
+        assertThat(Nengo.REIWA.getStart(), is(PlainDate.of(2019, 5, 1)));
+        assertThat(Nengo.REIWA.isModern(), is(true));
+        assertThat(Nengo.REIWA.matches(Nengo.Selector.MODERN), is(true));
+        assertThat(Nengo.REIWA.matches(Nengo.Selector.OFFICIAL), is(true));
+        assertThat(Nengo.REIWA.findNext().isPresent(), is(false));
+        assertThat(Nengo.REIWA.getDisplayName(Locale.JAPANESE), is("令和"));
+        assertThat(Nengo.REIWA.getDisplayName(Locale.ENGLISH), is("Reiwa"));
+        assertThat(Nengo.REIWA.getDisplayName(Locale.ENGLISH, TextWidth.NARROW), is("R"));
+    }
+
+    @Test
     public void newest() {
         assertThat(
-            Nengo.NEWEST.getFirstRelatedGregorianYear() >= Nengo.HEISEI.getFirstRelatedGregorianYear(),
+            Nengo.NEWEST.getFirstRelatedGregorianYear() >= Nengo.REIWA.getFirstRelatedGregorianYear(),
             is(true));
         assertThat(
             Nengo.NEWEST,
@@ -211,7 +228,7 @@ public class NengoTest {
 
     @Test
     public void stream() {
-        assertThat(Nengo.stream().count(), is(227L)); // official nengos until HEISEI
+        assertThat(Nengo.stream().count(), is(228L)); // official nengos until REIWA
     }
 
     @Test

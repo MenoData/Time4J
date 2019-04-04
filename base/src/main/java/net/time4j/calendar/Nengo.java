@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Nengo.java) is part of project Time4J.
  *
@@ -301,12 +301,24 @@ public final class Nengo
     public static final Nengo SHOWA = OFFICIAL_NENGOS[225];
 
     /**
-     * <p>Heisei is valid from 1989-01-08 onwards (emperor Akihito). </p>
+     * <p>Heisei is valid from 1989-01-08 until 2019-04-30 (emperor Akihito). </p>
      */
     /*[deutsch]
-     * <p>Heisei gilt ab 1989-01-08 (Kaiser Akihito). </p>
+     * <p>Heisei gilt von 1989-01-08 bis 2019-04-30 (Kaiser Akihito). </p>
      */
     public static final Nengo HEISEI = OFFICIAL_NENGOS[226];
+
+    /**
+     * <p>Reiwa is valid from 2019-05-01 onwards (emperor Naruhito). </p>
+     *
+     * @since   5.3
+     */
+    /*[deutsch]
+     * <p>Reiwa gilt ab 2019-05-01 (Kaiser Naruhito). </p>
+     *
+     * @since   5.3
+     */
+    public static final Nengo REIWA = OFFICIAL_NENGOS[227];
 
     /**
      * <p>The newest known nengo. </p>
@@ -328,12 +340,9 @@ public final class Nengo
      */
     public static final AttributeKey<Selector> SELECTOR = Attributes.createKey("NENGO_SELECTOR", Selector.class);
 
-    private static final String MEIJI_KEY = "meiji";
-    private static final String TAISHO_KEY = "taisho";
-    private static final String SHOWA_KEY = "showa";
-    private static final String HEISEI_KEY = "heisei";
-
-    private static final String[] MODERN_KEYS = { HEISEI_KEY, SHOWA_KEY, TAISHO_KEY, MEIJI_KEY };
+    // used in property resources, too
+    private static final String[] MODERN_KEYS = { "reiwa", "heisei", "showa", "taisho", "meiji" };
+    private static final Nengo[] MODERN_NENGOS = { REIWA, HEISEI, SHOWA, TAISHO, MEIJI };
 
     private static final long serialVersionUID = 5696395761628504723L;
 
@@ -830,18 +839,20 @@ public final class Nengo
 
         if (locale.getLanguage().isEmpty()) {
             return this.romaji;
-        } else if (((this.index >= MEIJI.index)) && (this.index <= HEISEI.index) && !locale.getLanguage().equals("ru")) {
-            String key;
-            if (this.equals(HEISEI)) {
-                key = HEISEI_KEY;
-            } else if (this.equals(SHOWA)) {
-                key = SHOWA_KEY;
-            } else if (this.equals(TAISHO)) {
-                key = TAISHO_KEY;
-            } else {
-                key = MEIJI_KEY;
+        } else if (
+            ((this.index >= MEIJI.index))
+            && (this.index <= NEWEST.index) && !locale.getLanguage().equals("ru")
+        ) {
+            String key = null;
+            for (int i = 0; i < MODERN_NENGOS.length; i++) {
+                if (this.equals(MODERN_NENGOS[i])) {
+                    key = MODERN_KEYS[i];
+                    break;
+                }
             }
-            if (width == TextWidth.NARROW) {
+            if (key == null) {
+                throw new IllegalStateException("Modern nengos need an update.");
+            } else if (width == TextWidth.NARROW) {
                 key = key + "_n";
             }
             Map<String, String> textForms = CalendarText.getInstance("japanese", locale).getTextForms();
@@ -1240,7 +1251,7 @@ public final class Nengo
          *
          * <p>See also <a href="https://en.wikipedia.org/wiki/Edo_period">Wikipedia</a>. </p>
          */
-        /**
+        /*[deutsch]
          * <p>W&auml;hlt alle Nengos der Edo-Zeit aus (1603-1868). </p>
          *
          * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Edo-Zeit">Wikipedia</a>. </p>
@@ -1257,7 +1268,7 @@ public final class Nengo
          *
          * <p>See also <a href="https://en.wikipedia.org/wiki/Azuchi%E2%80%93Momoyama_period">Wikipedia</a>. </p>
          */
-        /**
+        /*[deutsch]
          * <p>W&auml;hlt alle Nengos der Azuchi-Momoyama-Zeit aus (1573-1603). </p>
          *
          * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Azuchi-Momoyama-Zeit">Wikipedia</a>. </p>
@@ -1277,7 +1288,7 @@ public final class Nengo
          * of the northern court are excluded because otherwise a historical order of generated
          * lists is hard to achieve. </p>
          */
-        /**
+        /*[deutsch]
          * <p>W&auml;hlt alle Nengos der Muromachi-Zeit aus (1336-1573). </p>
          *
          * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Muromachi-Zeit">Wikipedia</a>.
@@ -1335,7 +1346,7 @@ public final class Nengo
          *
          * <p>See also <a href="https://en.wikipedia.org/wiki/Kamakura_period">Wikipedia</a></p>
          */
-        /**
+        /*[deutsch]
          * <p>W&auml;hlt alle Nengos der Kamakura-Zeit aus (1185-1332). </p>
          *
          * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Kamakura-Zeit">Wikipedia</a></p>
@@ -1352,7 +1363,7 @@ public final class Nengo
          *
          * <p>See also <a href="https://en.wikipedia.org/wiki/Heian_period">Wikipedia</a></p>
          */
-        /**
+        /*[deutsch]
          * <p>W&auml;hlt alle Nengos der Heian-Zeit aus (794-1185). </p>
          *
          * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Heian-Zeit">Wikipedia</a></p>
@@ -1369,7 +1380,7 @@ public final class Nengo
          *
          * <p>See also <a href="https://en.wikipedia.org/wiki/Nara_period">Wikipedia</a></p>
          */
-        /**
+        /*[deutsch]
          * <p>W&auml;hlt alle Nengos der Nara-Zeit aus (710-794). </p>
          *
          * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Nara-Zeit">Wikipedia</a></p>
@@ -1463,22 +1474,7 @@ public final class Nengo
                 }
                 String test = textForms.get(key);
                 if (query.startsWith(test)) {
-                    switch (i) {
-                        case 0:
-                            candidate = HEISEI;
-                            break;
-                        case 1:
-                            candidate = SHOWA;
-                            break;
-                        case 2:
-                            candidate = TAISHO;
-                            break;
-                        case 3:
-                            candidate = MEIJI;
-                            break;
-                        default:
-                            throw new AssertionError();
-                    }
+                    candidate = MODERN_NENGOS[i];
                     len = test.length();
                     if ((width != TextWidth.NARROW) && (candidate != SHOWA)) { // Shōwa is ambivalent!
                         pp.setIndex(offset + len);
@@ -1555,7 +1551,7 @@ public final class Nengo
 
             int count = candidates.size();
 
-            if (count == 0) {
+            if ((count == 0) || (prefix == null)) {
                 if (candidate == null) {
                     return null;
                 } else {
@@ -1591,9 +1587,8 @@ public final class Nengo
                 nengos.add(candidate);
             }
 
-            Collections.sort(
-                nengos,
-                (n1, n2) -> ((n1.start < n2.start) ? 1 : ((n1.start == n2.start) ? 0 : -1))); // descending order
+            // descending order
+            nengos.sort((n1, n2) -> ((n1.start < n2.start) ? 1 : ((n1.start == n2.start) ? 0 : -1)));
             Iterator<Nengo> iter = nengos.iterator();
 
             while (iter.hasNext()) {
