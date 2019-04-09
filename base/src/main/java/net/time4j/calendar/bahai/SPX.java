@@ -157,7 +157,7 @@ final class SPX
         throws IOException {
 
         BadiCalendar cal = (BadiCalendar) this.obj;
-        out.writeByte(cal.getKull_i_Shai());
+        out.writeByte(cal.getKullishai());
         out.writeByte(cal.getVahid());
         out.writeByte(cal.getYearOfVahid());
         out.writeByte(cal.hasMonth() ? cal.getMonth().getValue() : 0);

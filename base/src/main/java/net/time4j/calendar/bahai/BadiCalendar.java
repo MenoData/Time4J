@@ -102,6 +102,7 @@ import java.util.Locale;
  *  <li>{@link #YEAR_OF_VAHID}</li>
  *  <li>{@link #VAHID}</li>
  *  <li>{@link #KULL_I_SHAI}</li>
+ *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
  *
@@ -192,6 +193,7 @@ import java.util.Locale;
  *  <li>{@link #YEAR_OF_VAHID}</li>
  *  <li>{@link #VAHID}</li>
  *  <li>{@link #KULL_I_SHAI}</li>
+ *  <li>{@link #YEAR_OF_ERA}</li>
  *  <li>{@link #ERA}</li>
  * </ul>
  *
@@ -288,6 +290,7 @@ public final class BadiCalendar
     private static final int YEAR_INDEX = 2;
     private static final int DAY_OF_DIVISION_INDEX = 3;
     private static final int DAY_OF_YEAR_INDEX = 4;
+    private static final int YOE_INDEX = 5;
 
     /**
      * <p>Represents the Bahai era. </p>
@@ -311,10 +314,29 @@ public final class BadiCalendar
         };
 
     /**
+     * <p>Represents the proleptic year of era (relative to gregorian year 1844). </p>
+     *
+     * <p>Note that this kind of year definition which counts years since the Bahai era is unusual.
+     * For the standard way to count years see the elements {@link #KULL_I_SHAI}, {@link #VAHID}
+     * and {@link #YEAR_OF_VAHID}. This element can only be parsed if there is no vahid-related element
+     * and if the era is also present. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das proleptische Jahr seit der Bahai-&Auml;ra (1844). </p>
+     *
+     * <p>Achtung: Diese Jahresdefinition ist un&uuml;blich. Der Standardweg verwendet stattdessen die
+     * Elemente {@link #KULL_I_SHAI}, {@link #VAHID} und {@link #YEAR_OF_VAHID}. Dieses Element kann
+     * nur in Anwesenheit einer &Auml;ra vom Parser interpretiert werden, und auch nur dann, wenn es
+     * kein VAHID- oder YEAR_OF_VAHID-Element gibt. </p>
+     */
+    public static final StdCalendarElement<Integer, BadiCalendar> YEAR_OF_ERA =
+        new StdIntegerDateElement<>("YEAR_OF_ERA", BadiCalendar.class, 1, 3 * 361, '\u0000');
+
+    /**
      * <p>Represents the major cycle (kull-i-shai). </p>
      *
      * <p>This calendar supports the values 1-3. However, only the first major cycle can be interpreted as safe
-     * while the higher values are an astronomic approximation.</p>
+     * while the higher values are an astronomic approximation. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert den Hauptzyklus (kull-i-shai). </p>
@@ -324,7 +346,12 @@ public final class BadiCalendar
      */
     @FormattableElement(format = "K", alt = "k", dynamic = true)
     public static final ChronoElement<Integer> KULL_I_SHAI =
-        new StdIntegerDateElement<>("KULL_I_SHAI", BadiCalendar.class, 1, 3, 'K');
+        new StdIntegerDateElement<BadiCalendar>("KULL_I_SHAI", BadiCalendar.class, 1, 3, 'K') {
+            @Override
+            public String getDisplayName(Locale language) {
+                return CalendarText.getInstance("extra/bahai", language).getTextForms().get("K");
+            }
+        };
 
     /**
      * <p>Represents the vahid cycle which consists of 19 years. </p>
@@ -334,7 +361,12 @@ public final class BadiCalendar
      */
     @FormattableElement(format = "V", alt = "v", dynamic = true)
     public static final StdCalendarElement<Integer, BadiCalendar> VAHID =
-        new StdIntegerDateElement<>("VAHID", BadiCalendar.class, 1, 19, 'V');
+        new StdIntegerDateElement<BadiCalendar>("VAHID", BadiCalendar.class, 1, 19, 'V') {
+            @Override
+            public String getDisplayName(Locale language) {
+                return CalendarText.getInstance("extra/bahai", language).getTextForms().get("V");
+            }
+        };
 
     /**
      * <p>Represents the year of vahid cycle. </p>
@@ -463,6 +495,10 @@ public final class BadiCalendar
             .appendElement(
                 ERA,
                 new EraRule())
+            .appendElement(
+                YEAR_OF_ERA,
+                new IntegerRule(YOE_INDEX),
+                Unit.YEARS)
             .appendElement(
                 KULL_I_SHAI,
                 new IntegerRule(KULL_I_SHAI_INDEX))
@@ -735,7 +771,7 @@ public final class BadiCalendar
      * @return  int
      * @see     #KULL_I_SHAI
      */
-    public int getKull_i_Shai() {
+    public int getKullishai() {
 
         return this.major;
 
@@ -1471,14 +1507,14 @@ public final class BadiCalendar
         @Override
         public ChronoElement<?> getChildAtFloor(BadiCalendar context) {
 
-            return null; // TODO: YEAR_OF_ERA;
+            return YEAR_OF_ERA;
 
         }
 
         @Override
         public ChronoElement<?> getChildAtCeiling(BadiCalendar context) {
 
-            return null; // TODO: YEAR_OF_ERA;
+            return YEAR_OF_ERA;
 
         }
 
@@ -1516,6 +1552,8 @@ public final class BadiCalendar
                     return context.day;
                 case DAY_OF_YEAR_INDEX:
                     return context.getDayOfYear();
+                case YOE_INDEX:
+                    return (context.major - 1) * 361 + (context.cycle - 1) * 19 + context.year;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -1571,6 +1609,14 @@ public final class BadiCalendar
                         pDay = value - (context.isLeapYear() ? 5 : 4) - 18 * 19;
                     }
                     return new BadiCalendar(context.major, context.cycle, context.year, pDiv, pDay);
+                case YOE_INDEX:
+                    int m = MathUtils.floorDivide(value - 1, 361) + 1;
+                    int v = MathUtils.floorDivide(value - (m - 1) * 361 - 1, 19) + 1;
+                    int yov = MathUtils.floorModulo(value - 1, 19) + 1;
+                    if (context.isIntercalaryDay() && (d == 5) && !isLeapYear(m, v, yov)) {
+                        d = 4;
+                    }
+                    return BadiCalendar.ofComplete(m, v, yov, context.getDivision(), d);
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -1632,6 +1678,7 @@ public final class BadiCalendar
                 case VAHID_INDEX:
                     return YEAR_OF_VAHID;
                 case YEAR_INDEX:
+                case YOE_INDEX:
                     return MONTH_OF_YEAR;
                 case DAY_OF_DIVISION_INDEX:
                 case DAY_OF_YEAR_INDEX:
@@ -1651,6 +1698,7 @@ public final class BadiCalendar
                 case VAHID_INDEX:
                     return YEAR_OF_VAHID;
                 case YEAR_INDEX:
+                case YOE_INDEX:
                     return MONTH_OF_YEAR;
                 case DAY_OF_DIVISION_INDEX:
                 case DAY_OF_YEAR_INDEX:
@@ -1677,6 +1725,8 @@ public final class BadiCalendar
                     }
                 case DAY_OF_YEAR_INDEX:
                     return context.isLeapYear() ? 366 : 365;
+                case YOE_INDEX:
+                    return 3 * 361;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -2298,10 +2348,10 @@ public final class BadiCalendar
             }
 
             int vahid = entity.getInt(VAHID);
+            boolean hasVahid = true;
 
             if (vahid == Integer.MIN_VALUE) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing vahid cycle.");
-                return null;
+                hasVahid = false;
             } else if ((vahid < 1) || (vahid > 19)) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Vahid cycle out of range: " + vahid);
                 return null;
@@ -2310,10 +2360,21 @@ public final class BadiCalendar
             int year = entity.getInt(YEAR_OF_VAHID);
 
             if (year == Integer.MIN_VALUE) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Missing year-of-vahid.");
-                return null;
+                if (hasVahid) {
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Missing year-of-vahid.");
+                    return null;
+                } else if (entity.contains(ERA) && entity.contains(YEAR_OF_ERA)) {
+                    BadiCalendar prototype =
+                        BadiCalendar.axis().getMinimum().with(YEAR_OF_ERA, entity.getInt(YEAR_OF_ERA));
+                    major = prototype.getKullishai();
+                    vahid = prototype.getVahid();
+                    year = prototype.getYearOfVahid();
+                } else {
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Missing vahid cycle.");
+                    return null;
+                }
             } else if ((year < 1) || (year > 19)) {
-                entity.with(ValidationElement.ERROR_MESSAGE, "Badi year out of range: " + year);
+                entity.with(ValidationElement.ERROR_MESSAGE, "Badi year-of-vahid out of range: " + year);
                 return null;
             }
 
