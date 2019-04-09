@@ -416,9 +416,9 @@ public class JapaneseElementTest {
     public void twoDigitYearFormat() throws ParseException { // see also JDK-8065557
         ChronoFormatter<JapaneseCalendar> formatter =
             ChronoFormatter.ofPattern("GGGGG.yy.MM.dd", PatternType.CLDR, Locale.US, JapaneseCalendar.axis());
-        assertThat(formatter.parse("H.10.11.12").getYear(), is(10));
-        assertThat(formatter.parse("H.20.11.12").getYear(), is(20));
-        assertThat(formatter.parse("H.105.11.12").getYear(), is(105));
+        assertThat(formatter.parse("R.10.11.12").getYear(), is(10));
+        assertThat(formatter.parse("R.20.11.12").getYear(), is(20));
+        assertThat(formatter.parse("R.105.11.12").getYear(), is(105));
     }
 
     @Test
