@@ -1589,14 +1589,7 @@ public final class Nengo
 
             // descending order
             nengos.sort((n1, n2) -> ((n1.start < n2.start) ? 1 : ((n1.start == n2.start) ? 0 : -1)));
-            Iterator<Nengo> iter = nengos.iterator();
-
-            while (iter.hasNext()) {
-                Nengo nengo = iter.next();
-                if (!nengo.matches(selector)) {
-                    iter.remove();
-                }
-            }
+            nengos.removeIf(nengo -> !nengo.matches(selector));
 
             if (nengos.size() == 1) {
                 pp.setIndex(offset + end);
