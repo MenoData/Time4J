@@ -48,6 +48,17 @@ public class FormatTest {
             is(BadiCalendar.ofIntercalary(5, 11, 2)));
     }
 
+    @Test
+    public void html() {
+        ChronoFormatter<BadiCalendar> f =
+            ChronoFormatter
+                .ofPattern("k-v-y-MMMM-d", PatternType.DYNAMIC, Locale.ENGLISH, BadiCalendar.axis())
+                .with(BadiCalendar.TEXT_CONTENT_ATTRIBUTE, FormattedContent.HTML);
+        assertThat(
+            f.print(BadiCalendar.of(5, 11, BadiMonth.MASHIYYAT, 15)),
+            is("1-5-11-Ma<span style=\"text-decoration: underline;\">sh</span>íyyat-15"));
+    }
+
     private static ChronoFormatter<BadiCalendar> stdFormat() {
         return ChronoFormatter.ofPattern(
             "k.v.y.m.d|k.v.y.A.d",
