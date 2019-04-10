@@ -28,6 +28,7 @@ import net.time4j.PlainTime;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.StdCalendarElement;
@@ -51,6 +52,7 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.ElementRule;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.StartOfDay;
@@ -66,10 +68,8 @@ import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
 import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
-import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
-import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -291,6 +291,101 @@ public final class BadiCalendar
     private static final int DAY_OF_DIVISION_INDEX = 3;
     private static final int DAY_OF_YEAR_INDEX = 4;
     private static final int YOE_INDEX = 5;
+
+    private static final int[] NEWROZ = {
+        15785, 16150, 16515, 16881, 17246, 17611, 17976, 18342, 18707, 19072,
+        19437, 19803, 20168, 20533, 20898, 21263, 21629, 21994, 22359, 22724,
+        23090, 23455, 23820, 24185, 24551, 24916, 25281, 25646, 26012, 26377,
+        26742, 27107, 27473, 27838, 28203, 28568, 28934, 29299, 29664, 30029,
+        30395, 30760, 31125, 31490, 31855, 32221, 32586, 32951, 33316, 33682,
+        34047, 34412, 34777, 35143, 35508, 35873, 36238, 36604, 36969, 37334,
+        37699, 38065, 38430, 38795, 39160, 39526, 39891, 40256, 40621, 40987,
+        41352, 41717, 42082, 42448, 42813, 43178, 43543, 43908, 44274, 44639,
+        45004, 45369, 45735, 46100, 46465, 46830, 47196, 47561, 47926, 48291,
+        48657, 49022, 49387, 49752, 50118, 50483, 50848, 51213, 51579, 51944,
+        52309, 52674, 53040, 53405, 53770, 54135, 54501, 54866, 55231, 55596,
+        55961, 56327, 56692, 57057, 57422, 57788, 58153, 58518, 58883, 59249,
+        59614, 59979, 60344, 60710, 61075, 61440, 61805, 62171, 62536, 62901,
+        63266, 63632, 63997, 64362, 64727, 65093, 65458, 65823, 66188, 66554,
+        66919, 67284, 67649, 68014, 68380, 68745, 69110, 69475, 69841, 70206,
+        70571, 70936, 71302, 71667, 72032, 72397, 72763, 73128, 73493, 73858,
+        74224, 74589, 74954, 75319, 75685, 76050, 76415, 76780, 77146, 77511,
+        77876, 78241, 78607, 78972, 79337, 79702, 80067, 80433, 80798, 81163,
+        81528, 81894, 82259, 82624, 82989, 83355, 83720, 84085, 84450, 84816,
+        85181, 85546, 85911, 86277, 86642, 87007, 87372, 87738, 88103, 88468,
+        88833, 89199, 89564, 89929, 90294, 90660, 91025, 91390, 91755, 92120,
+        92486, 92851, 93216, 93581, 93947, 94312, 94677, 95042, 95408, 95773,
+        96138, 96503, 96869, 97234, 97599, 97964, 98330, 98695, 99060, 99425,
+        99791, 100156, 100521, 100886, 101252, 101617, 101982, 102347, 102713, 103078,
+        103443, 103808, 104173, 104539, 104904, 105269, 105634, 106000, 106365, 106730,
+        107095, 107461, 107826, 108191, 108556, 108922, 109287, 109652, 110017, 110383,
+        110748, 111113, 111478, 111844, 112209, 112574, 112939, 113305, 113670, 114035,
+        114400, 114766, 115131, 115496, 115861, 116226, 116592, 116957, 117322, 117687,
+        118053, 118418, 118783, 119148, 119514, 119879, 120244, 120609, 120975, 121340,
+        121705, 122070, 122436, 122801, 123166, 123531, 123897, 124262, 124627, 124992,
+        125358, 125723, 126088, 126453, 126819, 127184, 127549, 127914, 128279, 128645,
+        129010, 129375, 129740, 130106, 130471, 130836, 131201, 131567, 131932, 132297,
+        132662, 133028, 133393, 133758, 134123, 134489, 134854, 135219, 135584, 135950,
+        136315, 136680, 137045, 137411, 137776, 138141, 138506, 138872, 139237, 139602,
+        139967, 140332, 140698, 141063, 141428, 141793, 142159, 142524, 142889, 143254,
+        143620, 143985, 144350, 144715, 145081, 145446, 145811, 146176, 146542, 146907,
+        147272, 147637, 148003, 148368, 148733, 149098, 149464, 149829, 150194, 150559,
+        150924, 151290, 151655, 152020, 152385, 152751, 153116, 153481, 153846, 154212,
+        154577, 154942, 155307, 155673, 156038, 156403, 156768, 157134, 157499, 157864,
+        158229, 158595, 158960, 159325, 159690, 160056, 160421, 160786, 161151, 161517,
+        161882, 162247, 162612, 162978, 163343, 163708, 164073, 164438, 164804, 165169,
+        165534, 165899, 166265, 166630, 166995, 167360, 167726, 168091, 168456, 168821,
+        169187, 169552, 169917, 170282, 170648, 171013, 171378, 171743, 172109, 172474,
+        172839, 173204, 173570, 173935, 174300, 174665, 175031, 175396, 175761, 176126,
+        176491, 176857, 177222, 177587, 177952, 178318, 178683, 179048, 179413, 179779,
+        180144, 180509, 180874, 181240, 181605, 181970, 182335, 182701, 183066, 183431,
+        183796, 184162, 184527, 184892, 185257, 185623, 185988, 186353, 186718, 187084,
+        187449, 187814, 188179, 188544, 188910, 189275, 189640, 190005, 190371, 190736,
+        191101, 191466, 191832, 192197, 192562, 192927, 193293, 193658, 194023, 194388,
+        194754, 195119, 195484, 195849, 196215, 196580, 196945, 197310, 197676, 198041,
+        198406, 198771, 199136, 199502, 199867, 200232, 200597, 200963, 201328, 201693,
+        202058, 202424, 202789, 203154, 203519, 203885, 204250, 204615, 204980, 205346,
+        205711, 206076, 206441, 206807, 207172, 207537, 207902, 208268, 208633, 208998,
+        209363, 209729, 210094, 210459, 210824, 211189, 211555, 211920, 212285, 212650,
+        213016, 213381, 213746, 214111, 214477, 214842, 215207, 215572, 215938, 216303,
+        216668, 217033, 217399, 217764, 218129, 218494, 218860, 219225, 219590, 219955,
+        220321, 220686, 221051, 221416, 221782, 222147, 222512, 222877, 223242, 223608,
+        223973, 224338, 224703, 225069, 225434, 225799, 226164, 226530, 226895, 227260,
+        227625, 227991, 228356, 228721, 229086, 229452, 229817, 230182, 230547, 230913,
+        231278, 231643, 232008, 232374, 232739, 233104, 233469, 233835, 234200, 234565,
+        234930, 235295, 235661, 236026, 236391, 236756, 237122, 237487, 237852, 238217,
+        238583, 238948, 239313, 239678, 240044, 240409, 240774, 241139, 241505, 241870,
+        242235, 242600, 242966, 243331, 243696, 244061, 244427, 244792, 245157, 245522,
+        245888, 246253, 246618, 246983, 247348, 247714, 248079, 248444, 248809, 249175,
+        249540, 249905, 250270, 250636, 251001, 251366, 251731, 252097, 252462, 252827,
+        253192, 253558, 253923, 254288, 254653, 255019, 255384, 255749, 256114, 256480,
+        256845, 257210, 257575, 257941, 258306, 258671, 259036, 259401, 259767, 260132,
+        260497, 260862, 261228, 261593, 261958, 262323, 262689, 263054, 263419, 263784,
+        264150, 264515, 264880, 265245, 265611, 265976, 266341, 266706, 267072, 267437,
+        267802, 268167, 268533, 268898, 269263, 269628, 269994, 270359, 270724, 271089,
+        271454, 271820, 272185, 272550, 272915, 273281, 273646, 274011, 274376, 274742,
+        275107, 275472, 275837, 276203, 276568, 276933, 277298, 277664, 278029, 278394,
+        278759, 279125, 279490, 279855, 280220, 280586, 280951, 281316, 281681, 282047,
+        282412, 282777, 283142, 283507, 283873, 284238, 284603, 284968, 285334, 285699,
+        286064, 286429, 286795, 287160, 287525, 287890, 288256, 288621, 288986, 289351,
+        289717, 290082, 290447, 290812, 291178, 291543, 291908, 292273, 292639, 293004,
+        293369, 293734, 294100, 294465, 294830, 295195, 295560, 295926, 296291, 296656,
+        297021, 297387, 297752, 298117, 298482, 298848, 299213, 299578, 299943, 300309,
+        300674, 301039, 301404, 301770, 302135, 302500, 302865, 303231, 303596, 303961,
+        304326, 304692, 305057, 305422, 305787, 306153, 306518, 306883, 307248, 307613,
+        307979, 308344, 308709, 309074, 309440, 309805, 310170, 310535, 310901, 311266,
+        311631, 311996, 312362, 312727, 313092, 313457, 313823, 314188, 314553, 314918,
+        315284, 315649, 316014, 316379, 316745, 317110, 317475, 317840, 318206, 318571,
+        318936, 319301, 319666, 320032, 320397, 320762, 321127, 321493, 321858, 322223,
+        322588, 322954, 323319, 323684, 324049, 324415, 324780, 325145, 325510, 325876,
+        326241, 326606, 326971, 327337, 327702, 328067, 328432, 328798, 329163, 329528,
+        329893, 330259, 330624, 330989, 331354, 331719, 332085, 332450, 332815, 333180,
+        333546, 333911, 334276, 334641, 335007, 335372, 335737, 336102, 336468, 336833,
+        337198, 337563, 337929, 338294, 338659, 339024, 339390, 339755, 340120, 340485,
+        340851, 341216, 341581, 341946, 342312, 342677, 343042, 343407, 343772, 344138,
+        344503, 344868, 345233, 345599, 345964, 346329, 346694, 347060, 347425, 347790,
+        348155, 348521, 348886
+    };
 
     /**
      * <p>Represents the Bahai era. </p>
@@ -1008,8 +1103,22 @@ public final class BadiCalendar
         int yearOfVahid
     ) {
 
-        // TODO: implementieren
-        return false;
+        if ((kullishay < 1) || (kullishay > 3)) {
+            throw new IllegalArgumentException("Major cycle (kull-i-shai) out of range 1-3: " + kullishay);
+        } else if ((vahid < 1) || (vahid > 19)) {
+            throw new IllegalArgumentException("Vahid cycle out of range 1-19: " + vahid);
+        } else if ((yearOfVahid < 1) || (yearOfVahid > 19)) {
+            throw new IllegalArgumentException("Year out of range 1-19: " + yearOfVahid);
+        }
+
+        int relgregyear = getRelatedGregorianYear(kullishay, vahid, yearOfVahid);
+
+        if (relgregyear < 2015) {
+            return GregorianMath.isLeapYear(relgregyear + 1);
+        } else {
+            int index = relgregyear - 2015;
+            return (NEWROZ[index + 1] - NEWROZ[index] == 366);
+        }
 
     }
 
@@ -1240,6 +1349,36 @@ public final class BadiCalendar
 
     }
 
+    private static int getRelatedGregorianYear(
+        int kullishay,
+        int vahid,
+        int yearOfVahid
+    ) {
+
+        return (kullishay - 1) * 361 + (vahid - 1) * 19 + yearOfVahid + 1843;
+
+    }
+
+    private BadiCalendar withDayOfYear(int value) {
+
+        int pDiv;
+        int pDay;
+
+        if (value <= 18 * 19) {
+            pDiv = ((value - 1) / 19) + 1;
+            pDay = ((value - 1) % 19) + 1;
+        } else if (value <= 18 * 19 + (this.isLeapYear() ? 5 : 4)) {
+            pDiv = 0;
+            pDay = value - 18 * 19;
+        } else {
+            pDiv = 19;
+            pDay = value - (this.isLeapYear() ? 5 : 4) - 18 * 19;
+        }
+
+        return new BadiCalendar(this.major, this.cycle, this.year, pDiv, pDay);
+
+    }
+
     private static <V> boolean isAccessible(
         BadiCalendar fcal,
         ChronoElement<V> element
@@ -1401,53 +1540,71 @@ public final class BadiCalendar
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        private static final ZonalOffset OFFSET =
-            ZonalOffset.ofHoursMinutes(OffsetSign.AHEAD_OF_UTC, 3, 30);
-        private static final long EPOCH =
-            PlainDate.of(1844, 3, 21).getDaysSinceEpochUTC();
-        private static final long SWITCH =
-            PlainDate.of(2015, 3, 21).getDaysSinceEpochUTC();
+        private static final long EPOCH = PlainDate.of(1844, 3, 21).getDaysSinceEpochUTC();
 
         //~ Methoden ------------------------------------------------------
 
         @Override
         public BadiCalendar transform(long utcDays) {
 
-            if (utcDays < SWITCH) {
-
+            if (utcDays < EPOCH) {
+                throw new IllegalArgumentException("Not defined before Bahai era: " + utcDays);
+            } else if (utcDays < NEWROZ[0]) {
+                PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
+                int yoe = date.getYear() - 1843;
+                int yov = MathUtils.floorModulo(yoe - 1, 19) + 1;
+                int vahid = MathUtils.floorDivide(yoe - 1, 19) + 1;
+                BadiCalendar newroz = new BadiCalendar(1, vahid, yov, 1, 1);
+                return newroz.withDayOfYear(MathUtils.safeCast(utcDays - this.transform(newroz) + 1));
             } else {
+                for (int index = 0, max = NEWROZ.length - 2; index <= max; index++) {
+                    if (utcDays < NEWROZ[index + 1]) {
+                        int doy = MathUtils.safeCast(utcDays - NEWROZ[index] + 1);
+                        int yoe = index + 2015 - 1843;
+                        int m = MathUtils.floorDivide(yoe - 1, 361) + 1;
+                        int vahid = MathUtils.floorDivide(yoe - (m - 1) * 361 - 1, 19) + 1;
+                        int yov = MathUtils.floorModulo(yoe - 1, 19) + 1;
+                        BadiCalendar newroz = new BadiCalendar(m, vahid, yov, 1, 1);
+                        return newroz.withDayOfYear(doy);
+                    }
+                }
+                throw new IllegalArgumentException("Out of range: " + utcDays);
             }
-            return new BadiCalendar(1, 1, 1, 1, 1); // TODO: implementieren
 
         }
 
         @Override
         public long transform(BadiCalendar date) {
 
-            return 0L; // TODO: implementieren
+            int relgregyear = getRelatedGregorianYear(date.major, date.cycle, date.year);
+            int doy = date.getDayOfYear();
+
+            if (relgregyear < 2015) {
+                return PlainDate.of(relgregyear, 3, 21).getDaysSinceEpochUTC() + doy - 1;
+            } else {
+                return NEWROZ[relgregyear - 2015] + doy - 1;
+            }
 
         }
 
         @Override
         public long getMinimumSinceUTC() {
 
-            BadiCalendar min = new BadiCalendar(1, 1, 1, 1, 1);
-            return this.transform(min);
+            return EPOCH;
 
         }
 
         @Override
         public long getMaximumSinceUTC() {
 
-            BadiCalendar max = new BadiCalendar(3, 19, 19, 19, 19);
-            return this.transform(max);
+            return NEWROZ[NEWROZ.length - 1] - 1;
 
         }
 
         @Override
         public List<CalendarEra> getEras() {
 
-            return Collections.emptyList();
+            return Collections.singletonList(BadiEra.BAHAI);
 
         }
 
@@ -1553,7 +1710,7 @@ public final class BadiCalendar
                 case DAY_OF_YEAR_INDEX:
                     return context.getDayOfYear();
                 case YOE_INDEX:
-                    return (context.major - 1) * 361 + (context.cycle - 1) * 19 + context.year;
+                    return getRelatedGregorianYear(context.major, context.cycle, context.year) - 1843;
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -1596,24 +1753,12 @@ public final class BadiCalendar
                 case DAY_OF_DIVISION_INDEX:
                     return new BadiCalendar(context.major, context.cycle, context.year, context.division, value);
                 case DAY_OF_YEAR_INDEX:
-                    int pDiv;
-                    int pDay;
-                    if (value <= 18 * 19) {
-                        pDiv = ((value - 1) / 19) + 1;
-                        pDay = ((value - 1) % 19) + 1;
-                    } else if (value <= 18 * 19 + (context.isLeapYear() ? 5 : 4)) {
-                        pDiv = 0;
-                        pDay = value - 18 * 19;
-                    } else {
-                        pDiv = 19;
-                        pDay = value - (context.isLeapYear() ? 5 : 4) - 18 * 19;
-                    }
-                    return new BadiCalendar(context.major, context.cycle, context.year, pDiv, pDay);
+                    return context.withDayOfYear(value);
                 case YOE_INDEX:
                     int m = MathUtils.floorDivide(value - 1, 361) + 1;
                     int v = MathUtils.floorDivide(value - (m - 1) * 361 - 1, 19) + 1;
                     int yov = MathUtils.floorModulo(value - 1, 19) + 1;
-                    if (context.isIntercalaryDay() && (d == 5) && !isLeapYear(m, v, yov)) {
+                    if ((d == 5) && context.isIntercalaryDay() && !isLeapYear(m, v, yov)) {
                         d = 4;
                     }
                     return BadiCalendar.ofComplete(m, v, yov, context.getDivision(), d);

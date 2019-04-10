@@ -9,7 +9,11 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         BadiDivisionTest.class,
-        BadiMonthTest.class
+        BadiElementTest.class,
+        BadiEraTest.class,
+        BadiMonthTest.class,
+        FormatTest.class,
+        SerializationTest.class
     }
 )
 public class BadiSuite {
