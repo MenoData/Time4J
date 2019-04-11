@@ -1,6 +1,6 @@
 package net.time4j.calendar.bahai;
 
-import net.time4j.calendar.frenchrev.FrenchRepublicanEra;
+import net.time4j.PlainDate;
 import net.time4j.format.TextWidth;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -36,6 +36,16 @@ public class BadiEraTest {
         assertThat(
             BadiEra.BAHAI.getDisplayName(Locale.FRENCH, TextWidth.NARROW),
             is("EB"));
+    }
+
+    @Test
+    public void yearOfEra() {
+        assertThat(
+            PlainDate.of(2015, 3, 20).transform(BadiCalendar.axis()).getInt(BadiCalendar.YEAR_OF_ERA),
+            is(171));
+        assertThat(
+            PlainDate.of(2015, 3, 21).transform(BadiCalendar.axis()).getInt(BadiCalendar.YEAR_OF_ERA),
+            is(172));
     }
 
 }

@@ -909,6 +909,24 @@ public final class BadiCalendar
     }
 
     /**
+     * <p>Yields the proleptic Badi year related to the Bahai era. </p>
+     *
+     * @return  int (1-1083)
+     * @see     #YEAR_OF_ERA
+     */
+    /*[deutsch]
+     * <p>Liefert das proleptische Badi-Jahr relativ zur Bahai-&Auml;ra. </p>
+     *
+     * @return  int (1-1083)
+     * @see     #YEAR_OF_ERA
+     */
+    public int getYearOfEra() {
+
+        return this.getRelatedGregorianYear() - 1843;
+
+    }
+
+    /**
      * <p>Yields the Badi month if available. </p>
      *
      * @return  month enum
@@ -1349,6 +1367,12 @@ public final class BadiCalendar
 
     }
 
+    private int getRelatedGregorianYear() {
+
+        return getRelatedGregorianYear(this.major, this.cycle, this.year);
+
+    }
+
     private static int getRelatedGregorianYear(
         int kullishay,
         int vahid,
@@ -1552,6 +1576,10 @@ public final class BadiCalendar
             } else if (utcDays < NEWROZ[0]) {
                 PlainDate date = PlainDate.of(utcDays, EpochDays.UTC);
                 int yoe = date.getYear() - 1843;
+                int month = date.getMonth();
+                if ((month <= 2) || ((month == 3) && (date.getDayOfMonth() < 21))) {
+                    yoe--;
+                }
                 int yov = MathUtils.floorModulo(yoe - 1, 19) + 1;
                 int vahid = MathUtils.floorDivide(yoe - 1, 19) + 1;
                 BadiCalendar newroz = new BadiCalendar(1, vahid, yov, 1, 1);
@@ -1576,7 +1604,7 @@ public final class BadiCalendar
         @Override
         public long transform(BadiCalendar date) {
 
-            int relgregyear = getRelatedGregorianYear(date.major, date.cycle, date.year);
+            int relgregyear = date.getRelatedGregorianYear();
             int doy = date.getDayOfYear();
 
             if (relgregyear < 2015) {
@@ -1710,7 +1738,7 @@ public final class BadiCalendar
                 case DAY_OF_YEAR_INDEX:
                     return context.getDayOfYear();
                 case YOE_INDEX:
-                    return getRelatedGregorianYear(context.major, context.cycle, context.year) - 1843;
+                    return context.getYearOfEra();
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);
             }
@@ -2384,16 +2412,34 @@ public final class BadiCalendar
         @Override
         public Weekday getMinimum(BadiCalendar context) {
 
-            // TODO: Grenzwerte richtig stellen
-            return ((context.year == 1) && (context.getDayOfYear() == 1)) ? Weekday.SATURDAY : Weekday.SUNDAY;
+            if (
+                (context.major == 1)
+                && (context.cycle == 1)
+                && (context.year == 1)
+                && (context.division == 1)
+                && (context.day <= 2)
+            ) {
+                return Weekday.THURSDAY;
+            }
+
+            return Weekday.SATURDAY;
 
         }
 
         @Override
         public Weekday getMaximum(BadiCalendar context) {
 
-            // TODO: Grenzwerte richtig stellen
-            return ((context.year == 500) && (context.getDayOfYear() == 366)) ? Weekday.SUNDAY : Weekday.SATURDAY;
+            if (
+                (context.major == 3)
+                && (context.cycle == 19)
+                && (context.year == 19)
+                && (context.division == 19)
+                && (context.day >= 14)
+            ) {
+                return Weekday.THURSDAY;
+            }
+
+            return Weekday.FRIDAY;
 
         }
 

@@ -8,9 +8,11 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        BadiCalendarTest.class,
         BadiDivisionTest.class,
         BadiElementTest.class,
         BadiEraTest.class,
+        BadiMiscTest.class,
         BadiMonthTest.class,
         FormatTest.class,
         SerializationTest.class

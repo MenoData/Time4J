@@ -815,7 +815,7 @@ public class BadiElementTest {
             is(BadiCalendar.of(1, 1, 1, 1)));
         assertThat(
             min.getMinimum(BadiCalendar.DAY_OF_WEEK),
-            is(Weekday.SATURDAY));
+            is(Weekday.THURSDAY));
         assertThat(
             min.getMaximum(BadiCalendar.DAY_OF_WEEK),
             is(Weekday.FRIDAY));
@@ -838,12 +838,12 @@ public class BadiElementTest {
             is(Weekday.SATURDAY));
         assertThat(
             max.getMaximum(BadiCalendar.DAY_OF_WEEK),
-            is(Weekday.FRIDAY));
+            is(Weekday.THURSDAY));
         assertThat(
             max.isValid(BadiCalendar.DAY_OF_WEEK, Weekday.SUNDAY),
             is(true));
         assertThat(
-            max.isValid(BadiCalendar.DAY_OF_WEEK, Weekday.MONDAY),
+            max.isValid(BadiCalendar.DAY_OF_WEEK, Weekday.FRIDAY),
             is(false));
     }
 
