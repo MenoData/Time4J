@@ -651,7 +651,7 @@ public final class BadiCalendar
         ENGINE = builder.build();
     }
 
-//    private static final long serialVersionUID = -6054794927532842783L;
+    private static final long serialVersionUID = 7091925253640345123L;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -1983,8 +1983,7 @@ public final class BadiCalendar
 
         static final MonthElement SINGLETON = new MonthElement();
 
-        // TODO: serialver
-        //private static final long serialVersionUID = -8211850819064695450L;
+        private static final long serialVersionUID = -5483090643555757806L;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -2043,8 +2042,7 @@ public final class BadiCalendar
 
         static final DowElement SINGLETON = new DowElement();
 
-        // TODO: serialver
-        //private static final long serialVersionUID = -8211850819064695450L;
+        private static final long serialVersionUID = -1733732651700208755L;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -2104,8 +2102,7 @@ public final class BadiCalendar
 
         static final YOV SINGLETON = new YOV();
 
-        // TODO: serialver
-        //private static final long serialVersionUID = -8211850819064695450L;
+        private static final long serialVersionUID = -8280579801733395557L;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -2220,8 +2217,7 @@ public final class BadiCalendar
 
         static final IntercalaryAccess SINGLETON = new IntercalaryAccess();
 
-        // TODO: serialver
-        //private static final long serialVersionUID = -8211850819064695450L;
+        private static final long serialVersionUID = -772152174221291354L;
 
         //~ Konstruktoren -------------------------------------------------
 
