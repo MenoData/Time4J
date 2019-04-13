@@ -1,5 +1,6 @@
 package net.time4j.calendar.bahai;
 
+import net.time4j.PlainDate;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -52,16 +53,30 @@ public class FormatTest {
     public void html() {
         ChronoFormatter<BadiCalendar> f =
             ChronoFormatter
-                .ofPattern("k-v-y-MMMM-d", PatternType.DYNAMIC, Locale.ENGLISH, BadiCalendar.axis())
+                .ofPattern("k-v-x-MMMM-d", PatternType.DYNAMIC, Locale.ENGLISH, BadiCalendar.axis())
                 .with(BadiCalendar.TEXT_CONTENT_ATTRIBUTE, FormattedContent.HTML);
         assertThat(
             f.print(BadiCalendar.of(5, 11, BadiMonth.MASHIYYAT, 15)),
             is("1-5-11-Ma<span style=\"text-decoration: underline;\">sh</span>íyyat-15"));
     }
 
+    @Test
+    public void yearOfEraFormat() throws ParseException {
+        ChronoFormatter<BadiCalendar> f =
+            ChronoFormatter.ofPattern(
+                "d M y|d A y",
+                PatternType.DYNAMIC,
+                Locale.ENGLISH,
+                BadiCalendar.axis());
+        String text = "1 Bahá 173";
+        assertThat(
+            f.parse(text),
+            is(BadiCalendar.ofComplete(BadiEra.BAHAI, 173, BadiMonth.BAHA, 1)));
+    }
+
     private static ChronoFormatter<BadiCalendar> stdFormat() {
         return ChronoFormatter.ofPattern(
-            "k.v.y.m.d|k.v.y.A.d",
+            "k.v.x.m.d|k.v.x.A.d",
             PatternType.DYNAMIC,
             Locale.GERMAN,
             BadiCalendar.axis());

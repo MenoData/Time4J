@@ -26,12 +26,18 @@ package net.time4j.calendar.bahai;
  * Controls the type of content to be formatted in the Badi calendar.
  *
  * @author  Meno Hochschild
+ * @see     BadiMonth
+ * @see     BadiIntercalaryDays
+ * @see     BadiCalendar#YEAR_OF_VAHID
  * @since   5.3
  */
 /*[deutsch]
  * <p>Steuert den Typ des Inhalts von zu formatierenden Elementen im Badi-Kalender. </p>
  *
  * @author  Meno Hochschild
+ * @see     BadiMonth
+ * @see     BadiIntercalaryDays
+ * @see     BadiCalendar#YEAR_OF_VAHID
  * @since   5.3
  */
 public enum FormattedContent {

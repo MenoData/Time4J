@@ -444,7 +444,7 @@ public class BadiElementTest {
             is(true));
         assertThat(
             BadiCalendar.YEAR_OF_ERA.getSymbol(),
-            is('\u0000'));
+            is('Y'));
         assertThat(
             BadiCalendar.YEAR_OF_ERA.isDateElement(),
             is(true));
@@ -462,7 +462,7 @@ public class BadiElementTest {
             is(3 * 361));
         assertThat(
             BadiCalendar.YEAR_OF_ERA.getDisplayName(Locale.ENGLISH),
-            is("YEAR_OF_ERA"));
+            is("year"));
 
         // values
         BadiCalendar bcal = BadiCalendar.of(5, 11, BadiMonth.JALAL, 13);
@@ -663,7 +663,7 @@ public class BadiElementTest {
             is(true));
         assertThat(
             BadiCalendar.YEAR_OF_VAHID.getSymbol(),
-            is('Y'));
+            is('X'));
         assertThat(
             BadiCalendar.YEAR_OF_VAHID.isDateElement(),
             is(true));

@@ -124,13 +124,16 @@ import java.util.Locale;
  *  <td>ERA</td><td>G</td><td>text</td>
  * </tr>
  * <tr>
+ *  <td>YEAR_OF_ERA</td><td>y/Y</td><td>number</td>
+ * </tr>
+ * <tr>
  *  <td>KULL_I_SHAI</td><td>k/K</td><td>number</td>
  * </tr>
  * <tr>
  *  <td>VAHID</td><td>v/V</td><td>number</td>
  * </tr>
  * <tr>
- *  <td>YEAR_OF_VAHID</td><td>y/Y</td><td>number/text</td>
+ *  <td>YEAR_OF_VAHID</td><td>x/X</td><td>number/text</td>
  * </tr>
  * <tr>
  *  <td>MONTH_OF_YEAR</td><td>m/M</td><td>number/text</td>
@@ -153,7 +156,7 @@ import java.util.Locale;
  * <pre>
  *     ChronoFormatter&lt;BadiCalendar&gt; f =
  *      ChronoFormatter.ofPattern(
- *          &quot;k.v.y.m.d|k.v.y.A.d&quot;,
+ *          &quot;k.v.x.m.d|k.v.x.A.d&quot;,
  *          PatternType.DYNAMIC,
  *          Locale.GERMAN,
  *          BadiCalendar.axis());
@@ -214,13 +217,16 @@ import java.util.Locale;
  *  <td>ERA</td><td>G</td><td>text</td>
  * </tr>
  * <tr>
+ *  <td>YEAR_OF_ERA</td><td>y/Y</td><td>number</td>
+ * </tr>
+ * <tr>
  *  <td>KULL_I_SHAI</td><td>k/K</td><td>number</td>
  * </tr>
  * <tr>
  *  <td>VAHID</td><td>v/V</td><td>number</td>
  * </tr>
  * <tr>
- *  <td>YEAR_OF_VAHID</td><td>y/Y</td><td>number/text</td>
+ *  <td>YEAR_OF_VAHID</td><td>x/X</td><td>number/text</td>
  * </tr>
  * <tr>
  *  <td>MONTH_OF_YEAR</td><td>m/M</td><td>number/text</td>
@@ -243,7 +249,7 @@ import java.util.Locale;
  * <pre>
  *     ChronoFormatter&lt;BadiCalendar&gt; f =
  *      ChronoFormatter.ofPattern(
- *          &quot;k.v.y.m.d|k.v.y.A.d&quot;,
+ *          &quot;k.v.x.m.d|k.v.x.A.d&quot;,
  *          PatternType.DYNAMIC,
  *          Locale.GERMAN,
  *          BadiCalendar.axis());
@@ -411,21 +417,19 @@ public final class BadiCalendar
     /**
      * <p>Represents the proleptic year of era (relative to gregorian year 1844). </p>
      *
-     * <p>Note that this kind of year definition which counts years since the Bahai era is unusual.
-     * For the standard way to count years see the elements {@link #KULL_I_SHAI}, {@link #VAHID}
-     * and {@link #YEAR_OF_VAHID}. This element can only be parsed if there is no vahid-related element
-     * and if the era is also present. </p>
+     * <p>Note that this kind of year definition which counts years since the Bahai era deviates from the.
+     * 19-cycle. For the standard way to count years see the elements {@link #KULL_I_SHAI}, {@link #VAHID}
+     * and {@link #YEAR_OF_VAHID}. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das proleptische Jahr seit der Bahai-&Auml;ra (1844). </p>
      *
-     * <p>Achtung: Diese Jahresdefinition ist un&uuml;blich. Der Standardweg verwendet stattdessen die
-     * Elemente {@link #KULL_I_SHAI}, {@link #VAHID} und {@link #YEAR_OF_VAHID}. Dieses Element kann
-     * nur in Anwesenheit einer &Auml;ra vom Parser interpretiert werden, und auch nur dann, wenn es
-     * kein VAHID- oder YEAR_OF_VAHID-Element gibt. </p>
+     * <p>Achtung: Diese Jahresdefinition weicht vom 19er-Zyklus ab. Der Standardweg verwendet stattdessen
+     * die Elemente {@link #KULL_I_SHAI}, {@link #VAHID} und {@link #YEAR_OF_VAHID}. </p>
      */
+    @FormattableElement(format = "Y", alt = "y", dynamic = true)
     public static final StdCalendarElement<Integer, BadiCalendar> YEAR_OF_ERA =
-        new StdIntegerDateElement<>("YEAR_OF_ERA", BadiCalendar.class, 1, 3 * 361, '\u0000');
+        new StdIntegerDateElement<>("YEAR_OF_ERA", BadiCalendar.class, 1, 3 * 361, 'Y');
 
     /**
      * <p>Represents the major cycle (kull-i-shai). </p>
@@ -466,16 +470,16 @@ public final class BadiCalendar
     /**
      * <p>Represents the year of vahid cycle. </p>
      *
-     * <p>The dynamic pattern symbol Y or y will print the year of vahid either as text (big symbol letter)
+     * <p>The dynamic pattern symbol X or x will print the year of vahid either as text (big symbol letter)
      * or as number (small symbol letter). </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das Jahr des assoziierten Vahid-Zyklus. </p>
      *
-     * <p>Das dynamische Formatmustersymbol Y oder y wird dieses Jahr entweder als Text (Gro&szlig;buchstabe)
+     * <p>Das dynamische Formatmustersymbol X oder x wird dieses Jahr entweder als Text (Gro&szlig;buchstabe)
      * oder als Zahl (Kleinbuchstabe) formatieren. </p>
      */
-    @FormattableElement(format = "Y", alt = "y", dynamic = true)
+    @FormattableElement(format = "X", alt = "x", dynamic = true)
     public static final TextElement<Integer> YEAR_OF_VAHID = YOV.SINGLETON;
 
     /**
@@ -717,8 +721,67 @@ public final class BadiCalendar
         } else if ((vahid < 1) || (vahid > 19)) {
             throw new IllegalArgumentException("Vahid cycle out of range 1-19: " + vahid);
         } else if ((yearOfVahid < 1) || (yearOfVahid > 19)) {
-            throw new IllegalArgumentException("Year out of range 1-19: " + yearOfVahid);
+            throw new IllegalArgumentException("Year of vahid out of range 1-19: " + yearOfVahid);
         } else if (division instanceof BadiMonth) {
+            if ((day < 1) || (day > 19)) {
+                throw new IllegalArgumentException("Day out of range 1-19: " + day);
+            } else {
+                return new BadiCalendar(kullishay, vahid, yearOfVahid, BadiMonth.class.cast(division).getValue(), day);
+            }
+        } else if (division == BadiIntercalaryDays.AYYAM_I_HA) {
+            int max = isLeapYear(kullishay, vahid, yearOfVahid) ? 5 : 4;
+            if ((day < 1) || (day > max)) {
+                throw new IllegalArgumentException("Day out of range 1-" + max + ": " + day);
+            } else {
+                return new BadiCalendar(kullishay, vahid, yearOfVahid, 0, day);
+            }
+        } else if (division == null) {
+            throw new NullPointerException("Missing Badi month or Ayyam-i-Ha.");
+        } else {
+            throw new IllegalArgumentException("Invalid implementation of Badi division: " + division);
+        }
+
+    }
+
+    /**
+     * <p>Creates a new instance of a Badi calendar date. </p>
+     *
+     * @param   era             Bahai era
+     * @param   yearOfEra       year of era in range 1-1083
+     * @param   division        either {@code BadiMonth} or {@code BadiIntercalaryDays}
+     * @param   day             day in range 1-19 (1-4/5 in case of Ayyam-i-Ha)
+     * @return  new instance of {@code BadiCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein neues Badi-Kalenderdatum. </p>
+     *
+     * @param   era             Bahai era
+     * @param   yearOfEra       year of era in range 1-1083
+     * @param   division        either {@code BadiMonth} or {@code BadiIntercalaryDays}
+     * @param   day             day in range 1-19 (1-4/5 in case of Ayyam-i-Ha)
+     * @return  new instance of {@code BadiCalendar}
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    public static BadiCalendar ofComplete(
+        BadiEra era,
+        int yearOfEra,
+        BadiDivision division,
+        int day
+    ) {
+
+        if (era == null) {
+            throw new NullPointerException("Missing Bahai era.");
+        } else if ((yearOfEra < 1) || (yearOfEra > 1083)) {
+            throw new IllegalArgumentException("Year of era out of range 1-1083: " + yearOfEra);
+        }
+
+        BadiCalendar prototype = BadiCalendar.axis().getMinimum().with(YEAR_OF_ERA, yearOfEra);
+        int kullishay = prototype.getKullishai();
+        int vahid = prototype.getVahid();
+        int yearOfVahid = prototype.getYearOfVahid();
+
+        if (division instanceof BadiMonth) {
             if ((day < 1) || (day > 19)) {
                 throw new IllegalArgumentException("Day out of range 1-19: " + day);
             } else {
@@ -1347,19 +1410,11 @@ public final class BadiCalendar
 
     }
 
-    /**
-     * <p>Obtains the standard week model of this calendar. </p>
+    /*
+     * Obtains the standard week model of this calendar.
      *
-     * <p>This calendar starts on Saturday (more precisely at sunset on Friday). </p>
-     *
-     * @return  Weekmodel
-     */
-    /*[deutsch]
-     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
-     *
-     * <p>Dieser Kalender startet am Samstag (eigentlich zum Sonnenuntergang am Freitag). </p>
-     *
-     * @return  Weekmodel
+     * This calendar starts on Saturday (more precisely at sunset on Friday). The weekend
+     * is neither standardized nor used, therefore this method is kept private.
      */
     private static Weekmodel getDefaultWeekmodel() {
 
@@ -1764,17 +1819,17 @@ public final class BadiCalendar
 
             switch (this.index) {
                 case KULL_I_SHAI_INDEX:
-                    if (context.isIntercalaryDay() && (d == 5) && !isLeapYear(value, context.cycle, context.year)) {
+                    if ((d == 5) && context.isIntercalaryDay() && !isLeapYear(value, context.cycle, context.year)) {
                         d = 4;
                     }
                     return new BadiCalendar(value, context.cycle, context.year, context.division, d);
                 case VAHID_INDEX:
-                    if (context.isIntercalaryDay() && (d == 5) && !isLeapYear(context.major, value, context.year)) {
+                    if ((d == 5) && context.isIntercalaryDay() && !isLeapYear(context.major, value, context.year)) {
                         d = 4;
                     }
                     return new BadiCalendar(context.major, value, context.year, context.division, d);
                 case YEAR_INDEX:
-                    if (context.isIntercalaryDay() && (d == 5) && !isLeapYear(context.major, context.cycle, value)) {
+                    if ((d == 5) && context.isIntercalaryDay() && !isLeapYear(context.major, context.cycle, value)) {
                         d = 4;
                     }
                     return new BadiCalendar(context.major, context.cycle, value, context.division, d);
@@ -2115,7 +2170,7 @@ public final class BadiCalendar
         @Override
         public char getSymbol() {
 
-            return 'Y';
+            return 'X';
 
         }
 
@@ -2547,19 +2602,19 @@ public final class BadiCalendar
             int year = entity.getInt(YEAR_OF_VAHID);
 
             if (year == Integer.MIN_VALUE) {
-                if (hasVahid) {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Missing year-of-vahid.");
-                    return null;
-                } else if (entity.contains(ERA) && entity.contains(YEAR_OF_ERA)) {
+                if (entity.contains(YEAR_OF_ERA)) {
                     BadiCalendar prototype =
                         BadiCalendar.axis().getMinimum().with(YEAR_OF_ERA, entity.getInt(YEAR_OF_ERA));
                     major = prototype.getKullishai();
                     vahid = prototype.getVahid();
                     year = prototype.getYearOfVahid();
                 } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Missing vahid cycle.");
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Missing year-of-vahid.");
                     return null;
                 }
+            } else if (!hasVahid) {
+                entity.with(ValidationElement.ERROR_MESSAGE, "Missing vahid cycle.");
+                return null;
             } else if ((year < 1) || (year > 19)) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Badi year-of-vahid out of range: " + year);
                 return null;

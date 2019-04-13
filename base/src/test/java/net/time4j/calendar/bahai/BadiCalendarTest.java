@@ -24,6 +24,7 @@ public class BadiCalendarTest {
             new Object[][] {
                 {1, 1, 1, 1, 1, "1844-03-21"},
                 {1, 5, 11, 2, 13, "1930-04-21"},
+                {1, 9, 19, 19, 19, "2015-03-20"},
                 {3, 19, 19, 19, 19, "2927-03-20"},
 
                 // http://www.religiouslife.emory.edu/documents/Baha_i%20Holy%20Days%2050%20year%20calendar.pdf

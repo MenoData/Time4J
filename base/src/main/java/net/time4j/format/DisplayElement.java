@@ -58,6 +58,7 @@ public abstract class DisplayElement<V extends Comparable<V>>
 
     static {
         Map<String, String> map = new HashMap<>();
+        map.put("YEAR_OF_VAHID", "L_year");
         map.put("YEAR_OF_DISPLAY", "L_year");
         map.put("MONTH_AS_NUMBER", "L_month");
         map.put("HOUR_FROM_0_TO_24", "L_hour");
