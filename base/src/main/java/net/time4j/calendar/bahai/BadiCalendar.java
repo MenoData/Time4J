@@ -1372,7 +1372,7 @@ public final class BadiCalendar
         V value
     ) {
 
-        if ((element == MONTH_OF_YEAR) || (element == AYYAM_I_HA)) {
+        if ((element == MONTH_OF_YEAR) || (element == AYYAM_I_HA) || (element == ERA)) {
             return (value != null);
         }
 
@@ -1459,12 +1459,12 @@ public final class BadiCalendar
     }
 
     private static <V> boolean isAccessible(
-        BadiCalendar fcal,
+        BadiCalendar cal,
         ChronoElement<V> element
     ) {
 
         try {
-            return fcal.isValid(element, fcal.get(element));
+            return cal.isValid(element, cal.get(element));
         } catch (ChronoException ex) {
             return false;
         }
