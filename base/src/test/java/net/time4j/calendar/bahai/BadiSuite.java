@@ -14,6 +14,7 @@ import org.junit.runners.Suite.SuiteClasses;
         BadiEraTest.class,
         BadiMiscTest.class,
         BadiMonthTest.class,
+        BadiUnitTest.class,
         FormatTest.class,
         SerializationTest.class
     }
