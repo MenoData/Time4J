@@ -274,12 +274,50 @@ public final class BadiCalendar
     /**
      * Format attribute which controls the content of some text elements like months or weekdays.
      *
-     * <p>Standard value is: {@link FormattedContent#TRANSCRIPTION}</p>
+     * <p>Standard value is: {@link FormattedContent#TRANSCRIPTION}. Example: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;BadiCalendar&gt; f =
+     *      ChronoFormatter
+     *          .ofPattern(
+     *              &quot;k-v-x-MMMM-d|k-v-x-A-d&quot;,
+     *              PatternType.DYNAMIC,
+     *              Locale.ENGLISH,
+     *              BadiCalendar.axis())
+     *          .with(BadiCalendar.TEXT_CONTENT_ATTRIBUTE, FormattedContent.HTML);
+     *  System.out.println(f.print(BadiCalendar.of(5, 11, BadiMonth.MASHIYYAT, 15)));
+     * </pre>
+     *
+     * <p>Output with underlined sh:
+     * &quot;1-5-11-Ma<span style="text-decoration: underline;">sh</span>íyyat-15&quot;</p>
+     *
+     * @see     #YEAR_OF_VAHID
+     * @see     #MONTH_OF_YEAR
+     * @see     #DAY_OF_WEEK
      */
     /*[deutsch]
      * Formatattribut, das den Inhalt von einigen Textelementen wie Monaten oder Wochentagen steuert.
      *
-     * <p>Standardwert ist: {@link FormattedContent#TRANSCRIPTION}</p>
+     * <p>Standardwert ist: {@link FormattedContent#TRANSCRIPTION}. Beispiel: </p>
+     *
+     * <pre>
+     *  ChronoFormatter&lt;BadiCalendar&gt; f =
+     *      ChronoFormatter
+     *          .ofPattern(
+     *              &quot;k-v-x-MMMM-d|k-v-x-A-d&quot;,
+     *              PatternType.DYNAMIC,
+     *              Locale.ENGLISH,
+     *              BadiCalendar.axis())
+     *          .with(BadiCalendar.TEXT_CONTENT_ATTRIBUTE, FormattedContent.HTML);
+     *  System.out.println(f.print(BadiCalendar.of(5, 11, BadiMonth.MASHIYYAT, 15)));
+     * </pre>
+     *
+     * <p>Ausgabe mit unterstrichenem sh:
+     * &quot;1-5-11-Ma<span style="text-decoration: underline;">sh</span>íyyat-15&quot;</p>
+     *
+     * @see     #YEAR_OF_VAHID
+     * @see     #MONTH_OF_YEAR
+     * @see     #DAY_OF_WEEK
      */
     public static final AttributeKey<FormattedContent> TEXT_CONTENT_ATTRIBUTE =
         Attributes.createKey("FORMATTED_CONTENT", FormattedContent.class);
