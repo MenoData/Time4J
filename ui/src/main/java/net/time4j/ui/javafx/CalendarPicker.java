@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarPicker.java) is part of project Time4J.
  *
@@ -80,6 +80,25 @@ import java.util.function.Supplier;
  * <p>Represents a combination of a text editor and a button which can open a calendar view for picking
  * any arbitrary calendar date. </p>
  *
+ * <h4>Customizing the style of the calendar view</h4>
+ *
+ * <p>General customization can be done via adding style sheets this way: </p>
+ *
+ * <pre>
+ *     private CalendarPicker&lt;PersianCalendar&gt; myDatePicker = CalendarPicker.persianWithSystemDefaults();
+ *     myDatePicker.getStylesheets().add(&quot;/myCSS-Style.css&quot;);
+ * </pre>
+ *
+ * <p>The customization of the style of single cells can be done by a <code>CellCustomizer</code>: </p>
+ *
+ * <pre>
+ *     myDatePicker.setCellCustomizer(
+ *          (cell, column, row, model, date) -> {
+ *              cell.setStyle(&quot;-fx-font-family: myFont;&quot;);
+ *          }
+ *     );
+ * </pre>
+ *
  * @param   <T> denotes the calendar system to be used
  * @author  Meno Hochschild
  * @since   4.20
@@ -88,6 +107,26 @@ import java.util.function.Supplier;
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Kombination aus einem Texteditor und einer Schaltfl&auml;che, die
  * einen grafischen Kalender zur Auswahl eines beliebigen Datums &ouml;ffnen kann. </p>
+ *
+ * <h4>Anpassung des Stils im grafischen Kalender</h4>
+ *
+ * <p>Allgemeine Stilanpassungen k&ouml;nnen Entwickler mittels des Hinzuf&uuml;gens von <i>style sheets</i>
+ * so machen: </p>
+ *
+ * <pre>
+ *     private CalendarPicker&lt;PersianCalendar&gt; myDatePicker = CalendarPicker.persianWithSystemDefaults();
+ *     myDatePicker.getStylesheets().add(&quot;/myCSS-Style.css&quot;);
+ * </pre>
+ *
+ * <p>Die Anpassung des Stils f&uuml;r einzelne Zellen erfolgt mittels eines <code>CellCustomizer</code>: </p>
+ *
+ * <pre>
+ *     myDatePicker.setCellCustomizer(
+ *          (cell, column, row, model, date) -> {
+ *              cell.setStyle(&quot;-fx-font-family: myFont;&quot;);
+ *          }
+ *     );
+ * </pre>
  *
  * @param   <T> denotes the calendar system to be used
  * @author  Meno Hochschild
