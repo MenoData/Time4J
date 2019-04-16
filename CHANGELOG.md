@@ -1,4 +1,7 @@
 ## [v5.3] not yet released
+### Added
+- Documentation of calendar view customization in JavaFX-CalendarPicker [#857]
+
 ### Changed
 - New Japanese Nengo "Reiwa" [#840]
 - More flexible dynamic patterns [#854]
