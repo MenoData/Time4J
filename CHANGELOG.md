@@ -1,5 +1,6 @@
 ## [v5.3] not yet released
 ### Added
+- Badi calendar (Bahai) [#798]
 - Documentation of calendar view customization in JavaFX-CalendarPicker [#857]
 
 ### Changed
