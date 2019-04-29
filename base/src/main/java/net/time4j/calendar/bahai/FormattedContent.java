@@ -73,12 +73,12 @@ public enum FormattedContent {
     /**
      * Mandates the HTML way of transcription of element content in a given language.
      *
-     * Only relevant for English.
+     * Only relevant for a few languages like English, Spanish and Portuguese.
      */
     /*[deutsch]
      * Bestimmt, da&szlig; ein Element in der HTML-Umschreibung zu formatieren ist.
      *
-     * Nur f&uuml;r Englisch relevant.
+     * Nur f&uuml;r wenige Sprachen wie Englisch, Spanisch und Portugiesisch relevant.
      */
     HTML {
         @Override
