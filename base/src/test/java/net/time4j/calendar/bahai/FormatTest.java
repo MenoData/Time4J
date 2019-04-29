@@ -1,6 +1,8 @@
 package net.time4j.calendar.bahai;
 
 import net.time4j.PlainDate;
+import net.time4j.Weekday;
+import net.time4j.format.Leniency;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -16,6 +18,30 @@ import static org.junit.Assert.assertThat;
 
 @RunWith(JUnit4.class)
 public class FormatTest {
+
+    @Test
+    public void printOrParseWeekday() throws ParseException {
+        ChronoFormatter<BadiCalendar> f =
+            ChronoFormatter.ofPattern(
+                "E, k.v.x.m.d",
+                PatternType.DYNAMIC,
+                Locale.ENGLISH,
+                BadiCalendar.axis()
+            ).with(Leniency.STRICT);
+        BadiCalendar cal = BadiCalendar.of(5, 11, BadiMonth.JALAL, 13);
+        assertThat(
+            cal.getDayOfWeek(),
+            is(Weekday.MONDAY));
+        assertThat(
+            cal.transform(PlainDate.axis()).getDayOfWeek(),
+            is(Weekday.MONDAY));
+        assertThat(
+            f.print(cal),
+            is("Kamál, 1.5.11.2.13"));
+        assertThat(
+            f.parse("Kamál, 1.5.11.2.13"),
+            is(cal));
+    }
 
     @Test
     public void printNormalDate() {
