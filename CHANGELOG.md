@@ -1,4 +1,10 @@
 ## [v5.4] not yet released
+### Added
+- More translations for Badi calendar [#862]
+- More translations for new Japanese era REIWA [#860]
+
+### Fixed
+- Printing of weekdays in Bahai calendar broken [#861]
 
 ## [v5.3] published on 2019-04-16
 ### Added
