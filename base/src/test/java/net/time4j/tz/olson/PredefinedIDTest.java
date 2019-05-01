@@ -55,13 +55,13 @@ public class PredefinedIDTest {
 
     @Test
     public void equalsByObject() {
-        TZID tzid = EUROPE.BERLIN::canonical;
+        TZID tzid = () -> EUROPE.BERLIN.canonical();
         assertThat(tzid.equals(EUROPE.BERLIN), is(false));
     }
 
     @Test
     public void equalsByCanonical() {
-        TZID tzid = EUROPE.BERLIN::canonical;
+        TZID tzid = () -> EUROPE.BERLIN.canonical();
         assertThat(
             tzid.canonical().equals(EUROPE.BERLIN.canonical()),
             is(true));
@@ -109,15 +109,13 @@ public class PredefinedIDTest {
         Map<String, List<TZID>> map = new HashMap<>();
 
         for (TZID tzid : prefs) {
+            if (tzid.canonical().equals("America/Adak")) {
+                continue; // duplicate name entry in jdk 8u212
+            }
             String name =
                 Timezone.of(tzid).getDisplayName(
                     NameStyle.LONG_STANDARD_TIME, Locale.US);
-            List<TZID> ids = map.get(name);
-            if (ids == null) {
-                ids = new ArrayList<>();
-                map.put(name, ids);
-            }
-            ids.add(tzid);
+            map.computeIfAbsent(name, k -> new ArrayList<>()).add(tzid);
 
             System.out.println(
                 "TZID="
