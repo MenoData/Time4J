@@ -4,6 +4,7 @@
 - More translations for new Japanese era REIWA [#860]
 
 ### Fixed
+- Smart parsing of protected space char [#864]
 - Printing of weekdays in Bahai calendar broken [#861]
 
 ## [v5.3] published on 2019-04-16
