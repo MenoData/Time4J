@@ -472,19 +472,19 @@ public class DayPeriodTest {
             is(PlainTime.of(19, 45)));
     }
 
-    @Test
-    public void parseFlexibleFarsi() throws ParseException { // test for ambivalent dayperiods
+    @Test // test for ambivalent dayperiods, now adjusted for CLDR-35
+    public void parseFlexibleFarsi() throws ParseException {
         ChronoFormatter<PlainTime> f =
             ChronoFormatter
                 .ofTimePattern("h:mm BBBB", PatternType.CLDR, new Locale("fa"))
                 .with(Leniency.STRICT)
                 .with(Attributes.ZERO_DIGIT, '0');
         assertThat(
-            f.parse("3:45 بعدازظهر"), // afternoon1 (was ambivalent before CLDR-v32, now the  literal has changed)
+            f.parse("3:45 عصر"), // afternoon1
             is(PlainTime.of(15, 45)));
         assertThat(
-            f.parse("6:45 عصر"), // evening1
-            is(PlainTime.of(18, 45)));
+            f.parse("7:45 شب"), // night1
+            is(PlainTime.of(19, 45)));
     }
 
     @Test
