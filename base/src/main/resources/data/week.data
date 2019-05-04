@@ -1,5 +1,5 @@
 # -----------------------------------------------------------------------------------------
-# Version like in CLDR-v34 (only deviations from standard are explicitly written)
+# Version like in CLDR-v35 (only deviations from standard are explicitly written)
 # Implicit standards are (country=001): minDays=1, first=Monday, start=Saturday, end=Sunday
 # Format:
 # minDays-4={ISO-3166-2-codes}
