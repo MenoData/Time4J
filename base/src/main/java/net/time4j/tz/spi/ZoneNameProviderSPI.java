@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZoneNameProviderSPI.java) is part of project Time4J.
  *
@@ -86,7 +86,7 @@ public class ZoneNameProviderSPI
         loadTerritories(temp, name);
         TERRITORIES = Collections.unmodifiableMap(temp);
 
-        // CLDR32 - supplemental\metaZones.xml - primaryZones
+        // CLDR35 - supplemental\metaZones.xml - primaryZones
         Map<String, String> primaries = new HashMap<>();
         addPrimary(primaries, "CL", "America/Santiago");
         addPrimary(primaries, "CN", "Asia/Shanghai");
