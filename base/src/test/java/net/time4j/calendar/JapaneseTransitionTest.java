@@ -9,7 +9,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -260,7 +259,7 @@ public class JapaneseTransitionTest {
     }
 
     @Test
-    public void caSupport() throws ParseException {
+    public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-japanese");
         ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
         assertThat(

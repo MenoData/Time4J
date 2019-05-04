@@ -121,7 +121,6 @@ public class ZoneNameProviderSPI
                 tzids.add("America/Los_Angeles");
                 tzids.add("America/Anchorage");
                 tzids.add("Pacific/Honolulu");
-                tzids.add("America/Adak");
                 return Collections.unmodifiableSet(tzids);
             } else {
                 String primaryZone = PRIMARIES.get(country);
@@ -277,14 +276,7 @@ public class ZoneNameProviderSPI
         String tzid
     ) {
 
-        Set<String> preferred = map.get(country);
-
-        if (preferred == null) {
-            preferred = new LinkedHashSet<>();
-            map.put(country, preferred);
-        }
-
-        preferred.add(tzid);
+        map.computeIfAbsent(country, k -> new LinkedHashSet<>()).add(tzid);
 
     }
 

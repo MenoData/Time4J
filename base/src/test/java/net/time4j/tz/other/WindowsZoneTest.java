@@ -34,7 +34,7 @@ public class WindowsZoneTest {
     public void getVersion() {
         assertThat(
             WindowsZone.getVersion(),
-            is("$Revision: 14334 $")); // CLDR 34
+            is("$Revision: 14742 $")); // CLDR 35
     }
 
     @Test(expected=UnsupportedOperationException.class)
