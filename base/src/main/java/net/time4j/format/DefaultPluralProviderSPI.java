@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DefaultPluralProviderSPI.java) is part of project Time4J.
  *
@@ -50,17 +50,17 @@ final class DefaultPluralProviderSPI
         fillC(cmap, "bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt", -1);
         fillC(cmap, "lo ms my nqo root sah ses sg th to vi wo yo zh", -1);
         fillC(cmap, "pt_PT", 0);
-        fillC(cmap, "am as bn fa gu hi kn mr zu", 1);
+        fillC(cmap, "am as bn fa gu hi kn zu", 1);
         fillC(cmap, "ff fr hy kab pt", 1);
         fillC(cmap, "si", 1);
         fillC(cmap, "ak bh guw ln mg nso pa ti wa", 1);
         fillC(cmap, "tzm", 2);
         fillC(cmap, "is", 3);
         fillC(cmap, "mk", 4);
-        fillC(cmap, "fil tl", 5);
+        fillC(cmap, "ceb fil tl", 5);
         fillC(cmap, "lv prg", 6);
         fillC(cmap, "lag ksh", 7);
-        fillC(cmap, "iu kw naq se sma smi smj smn sms", 8);
+        fillC(cmap, "iu naq se sma smi smj smn sms", 8);
         fillC(cmap, "shi", 9);
         fillC(cmap, "mo ro", 10);
         fillC(cmap, "bs hr sh sr", 11);
@@ -79,6 +79,7 @@ final class DefaultPluralProviderSPI
         fillC(cmap, "ar", 23);
         fillC(cmap, "cy", 24);
         fillC(cmap, "dsb hsb", 25);
+        fillC(cmap, "kw", 26);
         CARDINAL_MAP.putAll(cmap);
     }
 
@@ -108,6 +109,7 @@ final class DefaultPluralProviderSPI
         fillO(omap, "tk", 19);
         fillO(omap, "or", 20);
         fillO(omap, "gd", 21);
+        fillO(omap, "kw", 22);
         ORDINAL_MAP.putAll(omap);
     }
 
@@ -249,7 +251,7 @@ final class DefaultPluralProviderSPI
                     mod100 = n % 100;
                     if (mod100 >= 11 && mod100 <= 19) {
                         return ZERO;
-                    } else if (((n % 10) == 1) && (mod100 != 11)) {
+                    } else if ((n % 10) == 1) {
                         return ONE;
                     }
                     return OTHER;
@@ -281,7 +283,7 @@ final class DefaultPluralProviderSPI
                         return FEW;
                     }
                     mod100 = n % 100;
-                    if (mod100 >= 1 && mod100 <= 19 && n != 1) {
+                    if (mod100 >= 2 && mod100 <= 19) {
                         return FEW;
                     }
                     return OTHER;
@@ -346,7 +348,7 @@ final class DefaultPluralProviderSPI
                     ) {
                         return FEW;
                     } else if (
-                        (n != 1 && mod10 >= 0 && mod10 <= 1)
+                        (mod10 >= 0 && mod10 <= 1)
                         || (mod10 >= 5 && mod10 <= 9)
                         || (mod100 >= 12 && mod100 <= 14)
                     ) {
@@ -481,6 +483,21 @@ final class DefaultPluralProviderSPI
                         return FEW;
                     }
                     return OTHER;
+                case 26: // kornisch (kw)
+                    if (n == 0) {
+                        return ZERO;
+                    } else if (n == 1) {
+                        return ONE;
+                    }
+                    mod100 = n % 100;
+                    if (mod100 == 2 || mod100 == 22 || mod100 == 42 || mod100 == 62 || mod100 == 82) {
+                        return TWO;
+                    } else if (mod100 == 3 || mod100 == 23 || mod100 == 43 || mod100 == 63 || mod100 == 83) {
+                        return FEW;
+                    } else if (mod100 == 1 || mod100 == 21 || mod100 == 41 || mod100 == 61 || mod100 == 81) {
+                        return MANY;
+                    }
+                    return OTHER;
                 default: // chinesisch (zh)
                     return OTHER;
             }
@@ -544,7 +561,7 @@ final class DefaultPluralProviderSPI
                     }
                     return OTHER;
                 case 4: // nepalesisch (ne)
-                    if ((n >= 1) || (n <= 4)) {
+                    if ((n >= 1) && (n <= 4)) {
                         return ONE;
                     }
                     return OTHER;
@@ -744,6 +761,20 @@ final class DefaultPluralProviderSPI
                         return TWO;
                     } else if (n == 3 || n == 13) {
                         return FEW;
+                    }
+                    return OTHER;
+                case 22: // kornisch (kw)
+                    mod100 = n % 100;
+                    if (
+                        (mod100 >= 1 && mod100 <= 4)
+                        || (mod100 >= 21 && mod100 <= 24)
+                        || (mod100 >= 41 && mod100 <= 44)
+                        || (mod100 >= 61 && mod100 <= 64)
+                        || (mod100 >= 81 && mod100 <= 84)
+                    ) {
+                        return ONE;
+                    } else if (mod100 == 5) {
+                        return MANY;
                     }
                     return OTHER;
                 default: // fallback
