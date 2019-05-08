@@ -7,6 +7,7 @@
 - Update to CLDR v35.1 [#863]
 
 ### Fixed
+- Plural rules for Marathi and Nepali are wrong [#865]
 - Smart parsing of protected space char [#864]
 - Printing of weekdays in Bahai calendar broken [#861]
 
