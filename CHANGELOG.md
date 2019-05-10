@@ -1,5 +1,6 @@
 ## [v5.4] not yet released
 ### Added
+- Support for Kurdish (ku) and Somali (so) languages [#866]
 - More translations for Badi calendar [#862]
 - More translations for new Japanese era REIWA [#860]
 
