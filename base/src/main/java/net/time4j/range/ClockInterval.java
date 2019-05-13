@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockInterval.java) is part of project Time4J.
  *
@@ -70,6 +70,19 @@ public final class ClockInterval
     implements Serializable {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Represents the full day from 00:00 inclusive to 24:00 exclusive. </p>
+     *
+     * @since   5.4
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert den vollen Tag von 00:00 inklusive bis 24:00 exklusive. </p>
+     *
+     * @since   5.4
+     */
+    public static final ClockInterval FULL_DAY =
+        ClockInterval.between(PlainTime.midnightAtStartOfDay(), PlainTime.midnightAtEndOfDay());
 
     private static final long serialVersionUID = -6020908050362634577L;
 

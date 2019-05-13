@@ -80,12 +80,8 @@ public class RangeDurationTest {
 
     @Test
     public void durationFromMidnightToMidnightExclusive() {
-        ClockInterval interval =
-            ClockInterval.between(
-                PlainTime.midnightAtStartOfDay(),
-                PlainTime.midnightAtEndOfDay());
         assertThat(
-            interval.getDuration(),
+            ClockInterval.FULL_DAY.getDuration(),
             is(Duration.of(24, ClockUnit.HOURS)));
     }
 
