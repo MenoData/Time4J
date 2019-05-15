@@ -180,8 +180,11 @@ public class DefaultValueTest {
     public void doubleElementForHour24() throws ParseException {
         ChronoFormatter<PlainTime> ff =
             ChronoFormatter.ofTimePattern("HH:mm:ss", PatternType.CLDR, Locale.ROOT)
-                .withDefault(PlainTime.HOUR_FROM_0_TO_24, 0).with(Leniency.STRICT);
-        assertThat(ff.parse("21:15:04"), is(PlainTime.of(21, 15, 4)));
+                .withDefault(PlainTime.HOUR_FROM_0_TO_24, 0)
+                .with(Leniency.STRICT);
+        assertThat(
+            ff.parse("21:15:04"),
+            is(PlainTime.of(21, 15, 4)));
     }
 
 }

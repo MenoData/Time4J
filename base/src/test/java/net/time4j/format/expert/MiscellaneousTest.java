@@ -233,6 +233,70 @@ public class MiscellaneousTest {
     }
 
     @Test
+    public void parseClockHour0Strict() {
+        ParseLog plog = new ParseLog();
+        assertThat(
+            ChronoFormatter.setUp(PlainTime.class, Locale.ENGLISH)
+                .addPattern("hh:mm a", PatternType.CLDR).build()
+                .with(Attributes.LENIENCY, Leniency.STRICT)
+                .parse("00:00 PM", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(8));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => Clock hour cannot be zero"),
+            is(true));
+    }
+
+    @Test
+    public void parseClockHour0Smart() {
+        ParseLog plog = new ParseLog();
+        assertThat(
+            ChronoFormatter.setUp(PlainTime.class, Locale.ENGLISH)
+                .addPattern("hh:mm a", PatternType.CLDR).build()
+                .with(Attributes.LENIENCY, Leniency.SMART)
+                .parse("00:00 PM", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(8));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => Clock hour cannot be zero"),
+            is(true));
+    }
+
+    @Test
+    public void parseClockHour0Lax() throws ParseException {
+        assertThat(
+            ChronoFormatter.setUp(PlainTime.class, Locale.ENGLISH)
+                .addPattern("hh:mm a", PatternType.CLDR).build()
+                .with(Attributes.LENIENCY, Leniency.LAX)
+                .parse("00:00 AM"),
+            is(PlainTime.of(0)));
+        assertThat(
+            ChronoFormatter.setUp(PlainTime.class, Locale.ENGLISH)
+                .addPattern("hh:mm a", PatternType.CLDR).build()
+                .with(Attributes.LENIENCY, Leniency.LAX)
+                .parse("00:00 PM"),
+            is(PlainTime.of(12)));
+    }
+
+    @Test
+    public void parseTime24Strict() {
+        ParseLog plog = new ParseLog();
+        assertThat(
+            ChronoFormatter.setUp(PlainTime.class, Locale.ENGLISH)
+                .addPattern("HH:mm", PatternType.CLDR).build()
+                .with(Attributes.LENIENCY, Leniency.STRICT)
+                .parse("24:00", plog),
+            nullValue());
+        assertThat(plog.getErrorIndex(), is(5));
+        assertThat(
+            plog.getErrorMessage().startsWith(
+                "Validation failed => Time 24:00 not allowed"),
+            is(true));
+    }
+
+    @Test
     public void parseTime24Smart() {
         ParseLog plog = new ParseLog();
         assertThat(

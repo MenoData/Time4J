@@ -373,6 +373,7 @@ public class EthiopianTimeTest {
 
     @Test
     public void parseAmPm() throws ParseException {
+        // in context of Ethiopian Time AND AM/PM-marker: interprete as western time
         ChronoFormatter<EthiopianTime> f =
             ChronoFormatter.setUp(EthiopianTime.axis(), new Locale("am"))
                 .addPattern("h:mm a", PatternType.CLDR)
@@ -382,10 +383,10 @@ public class EthiopianTimeTest {
             f.parse("11:30 ከሰዓት").toISO(),
             is(PlainTime.of(23, 30)));
         assertThat(
-            f.parse("0:00 ጥዋት").toISO(),
+            f.parse("12:00 ጥዋት").toISO(),
             is(PlainTime.midnightAtStartOfDay()));
         assertThat(
-            f.parse("0:30 ጥዋት").toISO(),
+            f.parse("12:30 ጥዋት").toISO(),
             is(PlainTime.of(0, 30)));
     }
 

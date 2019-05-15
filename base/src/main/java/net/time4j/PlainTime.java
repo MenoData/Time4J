@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTime.java) is part of project Time4J.
  *
@@ -556,14 +556,13 @@ public final class PlainTime
      * @see     #getHour()
      * @since   v3.35/4.30
      */
-    @FormattableElement(format = "H")
     public static final ProportionalElement<Integer, PlainTime> HOUR_FROM_0_TO_24 =
         IntegerTimeElement.createTimeElement(
             "HOUR_FROM_0_TO_24",
             IntegerTimeElement.ISO_HOUR,
             0,
             23,
-            'H');
+            'H'); // internal symbol used for better resolving of duplicate default hour elements in ChronoFormatter
 
     /**
      * <p>Element with the minute of hour in the value range {@code 0-59}. </p>
@@ -3370,8 +3369,16 @@ public final class PlainTime
                 hour = readHour(entity);
                 if (hour == Integer.MIN_VALUE) {
                     return readSpecialCases(entity);
-                }
-                if ((hour == 24) && !lenient) {
+                } else if ((hour == -1) || (hour == -2)) {
+                    if (lenient) {
+                        hour = ((hour == -1) ? 0 : 12);
+                    } else {
+                        flagValidationError(
+                            entity,
+                            "Clock hour cannot be zero.");
+                        return null;
+                    }
+                } else if ((hour == 24) && !lenient) {
                     flagValidationError(
                         entity,
                         "Time 24:00 not allowed, "
@@ -3476,6 +3483,7 @@ public final class PlainTime
 
         }
 
+        // read to digital hour 0-23 (or -1 / -2 in case of zero clock hour)
         private static int readHour(ChronoEntity<?> entity) {
 
             int hour = entity.getInt(DIGITAL_HOUR_OF_DAY);
@@ -3486,7 +3494,9 @@ public final class PlainTime
 
             hour = entity.getInt(CLOCK_HOUR_OF_DAY);
 
-            if (hour == 24) {
+            if (hour == 0) {
+                return -1; // flag for wrong zero clock hour
+            } else if (hour == 24) {
                 return 0;
             } else if (hour != Integer.MIN_VALUE) {
                 return hour;
@@ -3497,7 +3507,9 @@ public final class PlainTime
                 int h = entity.getInt(CLOCK_HOUR_OF_AMPM);
 
                 if (h != Integer.MIN_VALUE) {
-                    if (h == 12) {
+                    if (h == 0) {
+                        return ((ampm == Meridiem.AM) ? -1 : -2); // flag for wrong zero clock hour
+                    } else if (h == 12) {
                         h = 0;
                     }
                     return ((ampm == Meridiem.AM) ? h : h + 12);
