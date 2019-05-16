@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LiteralProcessor.java) is part of project Time4J.
  *
@@ -227,35 +227,37 @@ final class LiteralProcessor
         char c = '\u0000';
         char literal = this.single;
 
-        if (this.attribute != null) {
-            literal = attributes.get(this.attribute, Character.valueOf('\u0000')).charValue();
-        }
-
-        if ((offset >= text.length()) || (literal == '\u0000') || Character.isDigit(literal)) {
+        if (offset >= text.length()) {
             error = true;
         } else {
             c = text.charAt(offset);
             char alternative = this.alt;
 
-            if (
-                (this.attribute != null)
-                && Attributes.DECIMAL_SEPARATOR.name().equals(this.attribute.name())
-                && Locale.ROOT.equals(attributes.get(Attributes.LANGUAGE, Locale.ROOT))
-            ) { // Spezialfall: ISO-8601
-                alternative = (
-                    (literal == ',')
-                    ? '.'
-                    : ((literal == '.') ? ',' : literal)
-                );
+            if (this.attribute == null) {
+                error = ((c != literal) && (c != alternative));
+            } else {
+                literal = attributes.get(this.attribute, Character.valueOf('\u0000')).charValue();
+                if ((literal == '\u0000') || Character.isDigit(literal)) {
+                    error = true;
+                } else {
+                    if (
+                        Attributes.DECIMAL_SEPARATOR.name().equals(this.attribute.name())
+                        && Locale.ROOT.equals(attributes.get(Attributes.LANGUAGE, Locale.ROOT))
+                    ) { // Spezialfall: ISO-8601
+                        alternative = (
+                            (literal == ',')
+                                ? '.'
+                                : ((literal == '.') ? ',' : literal)
+                        );
+                    }
+                    error = ((c != literal) && (c != alternative));
+                }
             }
-
-            error = ((c != literal) && (c != alternative));
-
             if (error) {
                 boolean caseInsensitive = (
                     quickPath
-                    ? this.caseInsensitive
-                    : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
+                        ? this.caseInsensitive
+                        : attributes.get(Attributes.PARSE_CASE_INSENSITIVE, Boolean.TRUE).booleanValue());
                 if (caseInsensitive && (charEqualsIgnoreCase(c, literal) || charEqualsIgnoreCase(c, alternative))) {
                     error = false;
                 }
