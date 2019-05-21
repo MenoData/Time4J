@@ -161,7 +161,7 @@ public class MoonTest {
             );
 
         // Meeus - example 47.a
-        double[] data = MoonPosition.calculateMeeus(jd.getCenturyJ2000());
+        double[] data = MoonPosition.calculateMeeus47(jd.getCenturyJ2000());
 
         assertThat(
             data[0],
@@ -483,6 +483,27 @@ public class MoonTest {
         } catch (IllegalArgumentException iae) {
             // expected
         }
+    }
+
+    @Test
+    public void apogee() { // Meeus - example 50.a
+
+        Moment m = PlainDate.of(1988, 10, 1).at(PlainTime.midnightAtStartOfDay()).atUTC();
+        Moment result = PlainDate.of(1988, 10, 7).at(PlainTime.of(20, 29)).atUTC();
+        assertThat(MoonPosition.inNextApogeeAfter(m), is(result));
+
+        System.out.println(MoonPosition.at(result, GeoLocation.of(0.0, 0.0)).getDistance()); // 405978 km
+    }
+
+    @Test
+    public void perigee() { // vgl. TimeAndDate (two minutes difference)
+
+        Moment m = PlainDate.of(2019, 1, 1).at(PlainTime.midnightAtStartOfDay()).atUTC();
+        Moment result = PlainDate.of(2019, 1, 21).at(PlainTime.of(19, 57)).atUTC();
+        assertThat(MoonPosition.inNextPerigeeAfter(m), is(result));
+
+        System.out.println(MoonPosition.at(result, GeoLocation.of(0.0, 0.0)).getDistance()); // 357344 km
+
     }
 
 }

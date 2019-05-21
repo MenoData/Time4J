@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MoonPosition.java) is part of project Time4J.
  *
@@ -22,8 +22,11 @@
 package net.time4j.calendar.astro;
 
 import net.time4j.Moment;
+import net.time4j.PlainDate;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.Serializable;
+import java.util.concurrent.TimeUnit;
 
 
 /**
@@ -101,6 +104,49 @@ public class MoonPosition
         -185, 181, -177, 176, 166, -164, 132, -119, 115, 107
     };
 
+    // Meeus - table 50.a (perigee)
+    private static final int[] PERIGEE_D = {
+        2, 4, 6, 8, 2, 0, 10, 4, 6, 12, 1, 8, 14, 0, 3, 10, 16, 12, 5, 2, 18, 14, 7, 2, 20, 1, 16, 4, 9, 4, 2, 4,
+        6, 22, 18, 6, 11, 8, 4, 6, 3, 5, 13, 20, 3, 4, 1, 22, 0, 6, 2, 0, 0, 2, 0, 2, 24, 4, 2, 1
+    };
+    private static final int[] PERIGEE_F = {
+        0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0, 0,
+        0, 0, 0, -2, 2, 0, 0, 0, 0, 0, 2, 0, 0, 4, -2, -2, 0, 2, 4, 2, -2, 0, -4, 0, 0
+    };
+    private static final int[] PERIGEE_M = {
+        0, 0, 0, 0, -1, 1, 0, -1, -1, 0, 0, -1, 0, 0, 0, -1, 0, -1, 0, 0, 0, -1, 0, 1, 0, 1, -1, 1, 0, 0, -2, -2,
+        -2, 0, -1, 1, 0, 1, 0, 0, 1, 1, 0, -1, 2, -2, 2, -1, 0, 0, 1, 2, -1, 0, -2, 2, 0, 0, 2, -1
+    };
+    private static final double[] PERIGEE_COEFF = {
+        -1.6769, 0.4589, -0.1856, 0.0883, -0.0773, 0.0502, -0.046, 0.0422, -0.0256, 0.0253, 0.0237, 0.0162, -0.0145,
+        0.0129, -0.0112, -0.0104, 0.0086, 0.0069, 0.0066, -0.0053, -0.0052, -0.0046, -0.0041, 0.004, 0.0032, -0.0032,
+        0.0031, -0.0029, 0.0027, 0.0027, -0.0027, 0.0024, -0.0021, -0.0021, -0.0021, 0.0019, -0.0018, -0.0014,
+        -0.0014, -0.0014, 0.0014, -0.0014, 0.0013, 0.0013, 0.0011, -0.0011, -0.001, -0.0009, -0.0008, 0.0008,
+        0.0008, 0.0007, 0.0007, 0.0007, -0.0006, -0.0006, 0.0006, 0.0005, 0.0005, -0.0004
+    };
+    private static final double[] PERIGEE_COEFF_T = {
+        0, 0, 0, 0, 0.00019, -0.00013, 0, -0.00011
+    };
+
+    // Meeus - table 50.a (apogee)
+    private static final int[] APOGEE_D = {
+        2, 4, 0, 2, 0, 1, 6, 4, 2, 1, 8, 6, 2, 2, 3, 4, 8, 4, 10, 3, 0, 2, 2, 6, 6, 10, 5, 4, 0, 12, 2, 1
+    };
+    private static final int[] APOGEE_F = {
+        0, 0, 0, 0, 2, 0, 0, 0, 2, 0, 0, 0, -2, 0, 0, 2, 0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, -2, 2, 0, 2, 0
+    };
+    private static final int[] APOGEE_M = {
+        0, 0, 1, -1, 0, 0, 0, -1, 0, 1, 0, -1, 0, -2, 0, 0, -1, -2, 0, 1, 2, 1, 2, 0, -2, -1, 0, 0, 1, 0, -1, -1
+    };
+    private static final double[] APOGEE_COEFF = {
+        0.4392, 0.0684, 0.0456, 0.0426, 0.0212, -0.0189, 0.0144, 0.0113, 0.0047, 0.0036, 0.0035, 0.0034, -0.0034,
+        0.0022, -0.0017, 0.0013, 0.0011, 0.001, 0.0009, 0.0007, 0.0006, 0.0005, 0.0005, 0.0004, 0.0004, 0.0004,
+        -0.0004, -0.0004, 0.0003, 0.0003, 0.0003, -0.0003
+    };
+    private static final double[] APOGEE_COEFF_T = {
+        0, 0, -0.00011, -0.00011
+    };
+
     private static final int MIO = 1_000_000;
     private static final long serialVersionUID = 5736859564589473324L;
 
@@ -176,7 +222,7 @@ public class MoonPosition
         GeoLocation location
     ) {
 
-        double[] data = calculateMeeus(JulianDay.ofEphemerisTime(moment).getCenturyJ2000());
+        double[] data = calculateMeeus47(JulianDay.ofEphemerisTime(moment).getCenturyJ2000());
         double ra = Math.toRadians(data[2]);
         double decl = Math.toRadians(data[3]);
         double distance = data[4];
@@ -251,6 +297,57 @@ public class MoonPosition
     public static Zodiac.Event inSignOf(Zodiac zodiac) {
 
         return Zodiac.Event.ofSign('L', zodiac);
+
+    }
+
+    /**
+     * <p>Obtains the time of next apogee after given moment. </p>
+     *
+     * @param   moment  the moment after which the time of next apogee is to be determined
+     * @return  time of next apogee as {@code Moment} in minute precision
+     * @throws  IllegalArgumentException if the Julian day of result is not in supported range
+     * @since   5.4
+     */
+    /*[deutsch]
+     * <p>Liefert die Zeit, wann der Mond nach dem angegebenen Moment im Apog&auml;um ist. </p>
+     *
+     * @param   moment  the moment after which the time of next apogee is to be determined
+     * @return  time of next apogee as {@code Moment} in minute precision
+     * @throws  IllegalArgumentException if the Julian day of result is not in supported range
+     * @since   5.4
+     */
+    public static Moment inNextApogeeAfter(Moment moment) {
+
+        return anomalistic(moment, true);
+
+    }
+
+    /**
+     * <p>Obtains the time of next perigee after given moment. </p>
+     *
+     * <p>Note: The perigee time might deviate from exact astronomical calculations by several minutes
+     * in some cases so this method represents a compromise between speed and accuracy. </p>
+     *
+     * @param   moment  the moment after which the time of next perigee is to be determined
+     * @return  time of next perigee as {@code Moment} in minute precision
+     * @throws  IllegalArgumentException if the Julian day of result is not in supported range
+     * @since   5.4
+     */
+    /*[deutsch]
+     * <p>Liefert die Zeit, wann der Mond nach dem angegebenen Moment im Perig&auml;um ist. </p>
+     *
+     * <p>Hinweis: Die Zeit des Perig&auml;um kann von exakten astronomischen Berechnungen um mehrere
+     * Minuten abweichen. Diese Methode ist daher ein Kompromi&szlig; zwischen Rechengeschwindigkeit
+     * und Genauigkeit. </p>
+     *
+     * @param   moment  the moment after which the time of next perigee is to be determined
+     * @return  time of next perigee as {@code Moment} in minute precision
+     * @throws  IllegalArgumentException if the Julian day of result is not in supported range
+     * @since   5.4
+     */
+    public static Moment inNextPerigeeAfter(Moment moment) {
+
+        return anomalistic(moment, false);
 
     }
 
@@ -378,7 +475,7 @@ public class MoonPosition
     }
 
     // max error given by J. Meeus: 10'' in longitude and 4'' in latitude
-    static double[] calculateMeeus(double jct) { // jct = julian centuries since J2000 in ephemeris time
+    static double[] calculateMeeus47(double jct) { // jct = julian centuries since J2000 in ephemeris time
 
         // Meeus (47.1): L'
         double meanLongitude =
@@ -575,6 +672,67 @@ public class MoonPosition
         double[] result = new double[5];
         StdSolarCalculator.nutations(jct, result);
         return AstroUtils.toRange_0_360(meanLongitude + (sumL / MIO) + result[0]);
+
+    }
+
+    private static Moment calculateMeeus50(
+        int lunation,
+        boolean apogee
+    ) {
+
+        double k = lunation + (apogee ? -0.5 : 0.0); // anomalistic lunation
+        double jct = k / 1325.55; // Meeus (50.3)
+        double t2 = jct * jct;
+
+        double jde = // Meeus (50.1), mean apogee/perigee
+            2451534.6698 + 27.55454989 * k + (-0.0006691 + (-0.000001098 + 0.0000000052 * jct) * jct) * t2;
+
+        double meanElongation_D = // related to moon
+            normalize(171.9179 + 335.9106046 * k + (-0.0100383 + (-0.00001156 + 0.000000055 * jct) * jct) * t2);
+        double meanAnomaly_M = // related to sun
+            normalize(347.3477 + 27.1577721 * k + (-0.000813 - 0.000001 * jct) * t2);
+        double argOfLatitude_F = // related to moon
+            normalize(316.6109 + 364.5287911 * k + (-0.0125053 - 0.0000148 * jct) * t2);
+
+        int[] d = (apogee ? APOGEE_D : PERIGEE_D);
+        int[] m = (apogee ? APOGEE_M : PERIGEE_M);
+        int[] f = (apogee ? APOGEE_F : PERIGEE_F);
+        double[] coeff = (apogee ? APOGEE_COEFF : PERIGEE_COEFF);
+        double[] coeffT = (apogee ? APOGEE_COEFF_T : PERIGEE_COEFF_T);
+
+        double sum = 0.0;
+
+        for (int i = d.length - 1; i >= 0; i--) {
+            double arg = d[i] * meanElongation_D + m[i] * meanAnomaly_M + f[i] * argOfLatitude_F;
+            double c = coeff[i];
+            if (i < coeffT.length) {
+                c += coeffT[i] * jct;
+            }
+            sum += (c * Math.sin(Math.toRadians(arg)));
+        }
+
+        return JulianDay.ofEphemerisTime(jde + sum).toMoment();
+
+    }
+
+    private static Moment anomalistic(
+        Moment after,
+        boolean apogee
+    ) {
+
+        // first calculate an approximate anomalistic lunation which is rather too small
+        PlainDate date = after.toZonalTimestamp(ZonalOffset.UTC).toDate();
+        double doy = date.getDayOfYear();
+        int lunation = (int) Math.floor((date.getYear() + (doy / date.lengthOfYear()) - 1999.97) * 13.2555);
+
+        Moment m = calculateMeeus50(lunation, apogee);
+
+        while (m.isBeforeOrEqual(after)) {
+            lunation++;
+            m = calculateMeeus50(lunation, apogee);
+        }
+
+        return m.with(Moment.PRECISION, TimeUnit.MINUTES);
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LunarTime.java) is part of project Time4J.
  *
@@ -437,7 +437,7 @@ public final class LunarTime
 
         double mjd = mjd0 + hour / 24.0; // UT
         double jct = toJulianCenturies(mjd + (deltaT / 86400));
-        double[] data = MoonPosition.calculateMeeus(jct);
+        double[] data = MoonPosition.calculateMeeus47(jct);
         double nutationCorr = data[0] * Math.cos(Math.toRadians(data[1])); // for apparent sidereal time
         double tau = AstroUtils.gmst(mjd) + Math.toRadians(nutationCorr) + longitudeRad - Math.toRadians(data[2]);
         double decl = Math.toRadians(data[3]);
