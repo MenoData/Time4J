@@ -1,5 +1,6 @@
 ## [v5.4] not yet released
 ### Added
+- Anomalistic month (apogee/perigee of moon) [#859]
 - FULL_DAY-instance in ClockInterval [#867]
 - Support for Kurdish (ku) and Somali (so) languages [#866]
 - More translations for Badi calendar [#862]
