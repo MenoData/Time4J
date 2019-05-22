@@ -506,4 +506,21 @@ public class MoonTest {
 
     }
 
+    @Test
+    public void stableLoopingOfAnomalisticMonths() {
+
+        Moment m = PlainDate.of(1988, 7, 1).at(PlainTime.midnightAtStartOfDay()).atUTC();
+        int lunation = 0; // start
+
+        while (lunation < 4) {
+            lunation++;
+            m = MoonPosition.inNextApogeeAfter(m);
+        }
+
+        Moment result = PlainDate.of(1988, 10, 7).at(PlainTime.of(20, 29)).atUTC();
+        assertThat(m, is(result));
+        assertThat(lunation, is(4));
+
+    }
+
 }

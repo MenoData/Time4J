@@ -711,7 +711,7 @@ public class MoonPosition
             sum += (c * Math.sin(Math.toRadians(arg)));
         }
 
-        return JulianDay.ofEphemerisTime(jde + sum).toMoment();
+        return JulianDay.ofEphemerisTime(jde + sum).toMoment().with(Moment.PRECISION, TimeUnit.MINUTES);
 
     }
 
@@ -721,18 +721,19 @@ public class MoonPosition
     ) {
 
         // first calculate an approximate anomalistic lunation which is rather too small
-        PlainDate date = after.toZonalTimestamp(ZonalOffset.UTC).toDate();
+        Moment ref = after.with(Moment.PRECISION, TimeUnit.MINUTES);
+        PlainDate date = ref.toZonalTimestamp(ZonalOffset.UTC).toDate();
         double doy = date.getDayOfYear();
         int lunation = (int) Math.floor((date.getYear() + (doy / date.lengthOfYear()) - 1999.97) * 13.2555);
 
         Moment m = calculateMeeus50(lunation, apogee);
 
-        while (m.isBeforeOrEqual(after)) {
+        while (m.isBeforeOrEqual(ref)) {
             lunation++;
             m = calculateMeeus50(lunation, apogee);
         }
 
-        return m.with(Moment.PRECISION, TimeUnit.MINUTES);
+        return m;
 
     }
 
