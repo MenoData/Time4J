@@ -10,6 +10,7 @@
 - Update to CLDR v35.1 [#863]
 
 ### Fixed
+- Improved approximated normalization of durations [#869]
 - Zero clock hour not tolerable in smart parsing [#868]
 - Plural rules for Marathi and Nepali are wrong [#865]
 - Smart parsing of protected space char [#864]
