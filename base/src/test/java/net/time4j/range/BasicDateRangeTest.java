@@ -3,8 +3,12 @@ package net.time4j.range;
 import net.time4j.CalendarUnit;
 import net.time4j.Duration;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
+import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.format.expert.Iso8601Format;
+import net.time4j.tz.Timezone;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -688,6 +692,20 @@ public class BasicDateRangeTest {
             PlainDate random = interval.random();
             assertThat(interval.contains(random), is(true));
         }
+    }
+
+    @Test
+    public void currentWeekAsDateInterval() {
+        System.out.println(
+            "Current calendar week = "
+            + DateInterval.ofCurrentWeek(SystemClock.INSTANCE, Timezone.ofSystem().getID(), Weekday.SUNDAY));
+        assertThat(
+            DateInterval.ofCurrentWeek(
+                () -> PlainTimestamp.of(2019, 5, 27, 12, 0).atUTC(),
+                ZonalOffset.UTC,
+                Weekday.SUNDAY),
+            is(DateInterval.between(PlainDate.of(2019, 5, 26), PlainDate.of(2019, 6, 1)))
+        );
     }
 
 }

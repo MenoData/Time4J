@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateInterval.java) is part of project Time4J.
  *
@@ -24,6 +24,7 @@ package net.time4j.range;
 import net.time4j.CalendarUnit;
 import net.time4j.Duration;
 import net.time4j.IsoDateUnit;
+import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
@@ -31,11 +32,11 @@ import net.time4j.Weekcycle;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.GregorianMath;
+import net.time4j.base.TimeSource;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
-import net.time4j.engine.ChronoException;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
@@ -404,6 +405,61 @@ public final class DateInterval
     public static DateInterval emptyWithAnchor(LocalDate anchor) {
 
         return DateInterval.emptyWithAnchor(PlainDate.from(anchor));
+
+    }
+
+    /**
+     * <p>Obtains the current calendar week based on given clock, time zone and first day of week. </p>
+     *
+     * <p>A localized first day of week can be obtained by the expression
+     * {@code Weekmodel.of(Locale.getDefault()).getFirstDayOfWeek()}. The
+     * next week can be found by applying {@code move(1, CalendarUnit.DAYS)}
+     * on the result of this method. If the first day of week is Monday then
+     * users should consider the alternative {@link CalendarWeek ISO calendar week}. </p>
+     *
+     * @param   clock       the clock for evaluating the current calendar week
+     * @param   tzid        time zone in which the calendar week is valid
+     * @param   firstDay    first day of week
+     * @return  the current calendar week as {@code DateInterval}
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     net.time4j.SystemClock#INSTANCE
+     * @see     Timezone#getID()
+     * @see     Weekmodel#getFirstDayOfWeek()
+     * @see     #move(long, IsoDateUnit)
+     * @since   5.4
+     */
+    /*[deutsch]
+     * <p>Liefert die aktuelle Kalenderwoche, die auf den angegebenen Parametern wie Uhr, Zeitzone
+     * und Wochenanfang beruht. </p>
+     *
+     * <p>Ein lokalisierter Wochenanfang kann mittels des Ausdrucks
+     * {@code Weekmodel.of(Locale.getDefault()).getFirstDayOfWeek()}
+     * ermittelt werden. Die Folgewoche kann mittels {@code move(1, CalendarUnit.DAYS)}
+     * angewendet auf das Ergebnis gefunden werden. Wenn der erste Tag der Woche der
+     * Montag ist, sollte die Verwendung der Alternative {@link CalendarWeek ISO calendar week}
+     * in Betracht gezogen werden. </p>
+     *
+     * @param   clock       the clock for evaluating the current calendar week
+     * @param   tzid        time zone in which the calendar week is valid
+     * @param   firstDay    first day of week
+     * @return  the current calendar week as {@code DateInterval}
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     net.time4j.SystemClock#INSTANCE
+     * @see     Timezone#getID()
+     * @see     Weekmodel#getFirstDayOfWeek()
+     * @see     #move(long, IsoDateUnit)
+     * @since   5.4
+     */
+    public static DateInterval ofCurrentWeek(
+        TimeSource clock,
+        TZID tzid,
+        Weekday firstDay
+    ) {
+
+        PlainDate today = Moment.from(clock.currentTime()).toZonalTimestamp(tzid).toDate();
+        PlainDate start = today.with(PlainDate.DAY_OF_WEEK.setToPreviousOrSame(firstDay));
+        PlainDate end = start.plus(6, CalendarUnit.DAYS);
+        return DateInterval.between(start, end);
 
     }
 
