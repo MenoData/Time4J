@@ -182,45 +182,54 @@ public class DurationNormalizerTest {
     public void withApproximateMaxUnitOnly() {
         Normalizer<IsoUnit> n = Duration.approximateMaxUnitOnly();
         assertThat(
+            Duration.<IsoUnit>of(60 * 60 * 24 * 365, ClockUnit.SECONDS).with(n),
+            is(Duration.of(1, YEARS)));
+        assertThat(
+            Duration.ofPositive().months(11).days(15).build().with(n),
+            is(Duration.of(11, MONTHS)));
+        assertThat(
+            Duration.ofPositive().months(11).days(16).build().with(n),
+            is(Duration.of(1, YEARS)));
+        assertThat(
             Duration.ofPositive().years(2).months(13).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(3, YEARS)));
+            is(Duration.of(3, YEARS)));
         assertThat(
             Duration.ofPositive().years(2).months(16).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(3, YEARS)));
+            is(Duration.of(3, YEARS)));
         assertThat(
             Duration.ofPositive().years(2).months(17).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(4, YEARS)));
+            is(Duration.of(4, YEARS)));
         assertThat(
             Duration.ofPositive().months(13).days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(1, YEARS)));
+            is(Duration.of(1, YEARS)));
         assertThat(
             Duration.ofPositive().days(35).minutes(132).build().with(n),
-            is(Duration.<IsoUnit>of(1, MONTHS)));
+            is(Duration.of(1, MONTHS)));
         assertThat(
             Duration.ofPositive().days(7).hours(4).minutes(1).build().with(n),
-            is(Duration.<IsoUnit>of(7, DAYS)));
+            is(Duration.of(7, DAYS)));
         assertThat(
             Duration.ofNegative().hours(4).minutes(1).build().with(n),
-            is(Duration.<IsoUnit>of(-4, HOURS)));
+            is(Duration.of(-4, HOURS)));
     }
 
     @Test
     public void withApproximateMaxUnitOrWeeks() {
         assertThat(
             Duration.ofPositive().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(1, WEEKS)));
+            is(Duration.of(1, WEEKS)));
         assertThat(
             Duration.ofNegative().days(7).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(-1, WEEKS)));
+            is(Duration.of(-1, WEEKS)));
         assertThat(
             Duration.ofNegative().days(6).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(-6, DAYS)));
+            is(Duration.of(-6, DAYS)));
         assertThat(
             Duration.ofPositive().days(10).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(1, WEEKS)));
+            is(Duration.of(1, WEEKS)));
         assertThat(
             Duration.ofPositive().days(11).hours(4).minutes(1).build().with(Duration.approximateMaxUnitOrWeeks()),
-            is(Duration.<IsoUnit>of(2, WEEKS)));
+            is(Duration.of(2, WEEKS)));
     }
 
     @Test

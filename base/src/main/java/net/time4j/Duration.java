@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Duration.java) is part of project Time4J.
  *
@@ -43,6 +43,7 @@ import java.time.temporal.IsoFields;
 import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -1462,10 +1463,10 @@ public final class Duration<U extends IsoUnit>
             }
 
             throw new IllegalStateException(
-                    "Mixed signs in result time span not allowed: "
-                    + this
-                    + " PLUS "
-                    + timespan);
+                "Mixed signs in result time span not allowed: "
+                + this
+                + " PLUS "
+                + timespan);
     	}
 
     	return result;
@@ -1760,18 +1761,18 @@ public final class Duration<U extends IsoUnit>
      */
 	public List<Duration<U>> union(TimeSpan<? extends U> timespan) {
 
-		Duration<U> merged = merge(this, timespan);
+        Duration<U> merged = merge(this, timespan);
 
-		if (merged == null) {
-			List<Duration<U>> result = new ArrayList<>();
-			result.add(this);
-			Duration<U> empty = ofZero();
-			Duration<U> other = empty.plus(timespan);
-			result.add(other);
-			return Collections.unmodifiableList(result);
+        if (merged == null) {
+            List<Duration<U>> result = new ArrayList<>();
+            result.add(this);
+            Duration<U> empty = ofZero();
+            Duration<U> other = empty.plus(timespan);
+            result.add(other);
+            return Collections.unmodifiableList(result);
         }
 
-		return Collections.singletonList(merged);
+        return Collections.singletonList(merged);
 
 	}
 
@@ -1857,6 +1858,7 @@ public final class Duration<U extends IsoUnit>
      * @since   3.0
      * @see     #compose(Duration, Duration)
      * @see     #toCalendarPeriod()
+     * @see     #toClockPeriodWithDaysAs24Hours()
      */
     /*[deutsch]
      * <p>Extrahiert eine neue Dauer, die nur alle Uhrzeiteinheiten
@@ -1868,6 +1870,7 @@ public final class Duration<U extends IsoUnit>
      * @since   3.0
      * @see     #compose(Duration, Duration)
      * @see     #toCalendarPeriod()
+     * @see     #toClockPeriodWithDaysAs24Hours()
      */
     public Duration<ClockUnit> toClockPeriod() {
 
@@ -2236,8 +2239,20 @@ public final class Duration<U extends IsoUnit>
     }
 
     /**
-     * <p>Creates a normalizer which yields an approximate duration based on the maximum unit
-     * of the original duration (but not smaller than seconds). </p>
+     * <p>Creates a normalizer which yields an approximate duration based on the maximum
+     * relevant unit of the original duration (but not smaller than seconds). </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     assertThat(
+     *          Duration.&lt;IsoUnit&gt;of(60 * 60 * 24 * 365, ClockUnit.SECONDS)
+     *              .with(Duration.approximateMaxUnitOnly()),
+     *          is(Duration.of(1, YEARS)));
+     * </pre>
+     *
+     * <p>Note: Due to the nature of this approximation-based normalization, exact results
+     * cannot be expected. Subsecond components are ignored. </p>
      *
      * @return	new normalizer for fuzzy and approximate durations of only one unit
      *          (either years, months, days, hours, minutes or seconds)
@@ -2248,8 +2263,20 @@ public final class Duration<U extends IsoUnit>
      */
     /*[deutsch]
      * <p>Liefert einen Normalisierer, der eine gen&auml;herte Dauer basierend auf der
-     * gr&ouml;&szlig;ten Zeiteinheit der urspr&uuml;nglichen Dauer (aber nicht kleiner
-     * als Sekunden) erstellt. </p>
+     * gr&ouml;&szlig;ten relevanten Zeiteinheit der urspr&uuml;nglichen Dauer (aber nicht
+     * kleiner als Sekunden) erstellt. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     assertThat(
+     *          Duration.&lt;IsoUnit&gt;of(60 * 60 * 24 * 365, ClockUnit.SECONDS)
+     *              .with(Duration.approximateMaxUnitOnly()),
+     *          is(Duration.of(1, YEARS)));
+     * </pre>
+     *
+     * <p>Hinweis: Die Natur dieser n&auml;herungsweisen Normalisierung l&auml;sst keine exakten Ergebnisse
+     * erwarten. Subsekundenanteile werden ignoriert. </p>
      *
      * @return	new normalizer for fuzzy and approximate durations of only one unit
      *          (either years, months, days, hours, minutes or seconds)
@@ -2850,10 +2877,7 @@ public final class Duration<U extends IsoUnit>
 
     private String toString(int style) {
 
-        if (
-            (style == PRINT_STYLE_ISO)
-            && this.isNegative()
-        ) {
+        if ((style == PRINT_STYLE_ISO) && this.isNegative()) {
             throw new ChronoException("Negative sign not allowed in ISO-8601.");
         }
 
@@ -5020,22 +5044,22 @@ public final class Duration<U extends IsoUnit>
         public Duration<IsoUnit> normalize(TimeSpan<? extends IsoUnit> dur) {
 
             double total = 0.0;
-            IsoUnit umax = null;
+            boolean empty = true;
 
             for (int i = 0, n = dur.getTotalLength().size(); i < n; i++) {
                 Item<? extends IsoUnit> item = dur.getTotalLength().get(i);
                 total += (item.getAmount() * item.getUnit().getLength());
-                if ((umax == null) && (item.getAmount() > 0)) {
-                    umax = item.getUnit();
+                if (item.getAmount() > 0) {
+                    empty = false;
                 }
             }
 
-            if (umax == null) {
+            if (empty) {
                 return Duration.ofZero();
             }
 
             // rounding applied
-            IsoUnit u = ((this.unit == null) ? umax : this.unit);
+            IsoUnit u = ((this.unit == null) ? maxUnit(total) : this.unit);
             double len = u.getLength() * this.steps;
             long value = (long) (total + (len / 2.0)); // half-up
             int lint = (int) Math.floor(len);
@@ -5117,6 +5141,18 @@ public final class Duration<U extends IsoUnit>
             } else {
                 return (int) num;
             }
+
+        }
+
+        private static IsoUnit maxUnit(double total) {
+
+            for (IsoUnit unit : Arrays.asList(YEARS, MONTHS, DAYS, HOURS, MINUTES)) {
+                if (total >= unit.getLength()) {
+                    return unit;
+                }
+            }
+
+            return ClockUnit.SECONDS;
 
         }
 
