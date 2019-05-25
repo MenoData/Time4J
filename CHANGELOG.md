@@ -1,5 +1,6 @@
 ## [v5.4] not yet released
 ### Added
+- Localized stream of weekdays [#871]
 - Current calendar week with generic parameters [#870]
 - Anomalistic month (apogee/perigee of moon) [#859]
 - FULL_DAY-instance in ClockInterval [#867]
