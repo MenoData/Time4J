@@ -1,4 +1,6 @@
-## [v5.4] not yet released
+## [v5.5] not yet released
+
+## [v5.4] published on 2019-05-25
 ### Added
 - Localized stream of weekdays [#871]
 - Current calendar week with generic parameters [#870]
