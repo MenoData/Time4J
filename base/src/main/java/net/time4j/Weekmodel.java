@@ -55,6 +55,8 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.IntStream;
+import java.util.stream.Stream;
 
 import static net.time4j.PlainDate.CALENDAR_DATE;
 import static net.time4j.PlainDate.WEEKDAY_IN_MONTH;
@@ -808,6 +810,26 @@ public final class Weekmodel
     public ChronoCondition<GregorianDate> weekend() {
 
         return this.weekendCondition;
+
+    }
+
+    /**
+     * <p>Obtains a stream where the first element is the first day of week. </p>
+     *
+     * @return  Stream
+     * @see     #getFirstDayOfWeek()
+     * @since   5.4
+     */
+    /*[deutsch]
+     * <p>Liefert einen {@code Stream}, dessen erstes Element der erste Tag der Woche ist. </p>
+     *
+     * @return  Stream
+     * @see     #getFirstDayOfWeek()
+     * @since   5.4
+     */
+    public Stream<Weekday> stream() {
+
+        return IntStream.range(0, 7).mapToObj(this.firstDayOfWeek::roll);
 
     }
 

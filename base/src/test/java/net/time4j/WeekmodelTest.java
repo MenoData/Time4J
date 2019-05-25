@@ -2,12 +2,15 @@ package net.time4j;
 
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.NumericalElement;
-
-import java.util.Locale;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Arrays;
+import java.util.Locale;
+import java.util.stream.Collectors;
+
+import static net.time4j.Weekday.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -19,26 +22,26 @@ public class WeekmodelTest {
     public void modelISO() {
         assertThat(
             Weekmodel.ISO,
-            is(Weekmodel.of(Weekday.MONDAY, 4)));
+            is(Weekmodel.of(MONDAY, 4)));
         assertThat(
             Weekmodel.ISO,
             is(Weekmodel.of(
-                Weekday.MONDAY, 4, Weekday.SATURDAY, Weekday.SUNDAY)));
+                MONDAY, 4, SATURDAY, SUNDAY)));
         assertThat(
             Weekmodel.ISO.getFirstDayOfWeek(),
-            is(Weekday.MONDAY));
+            is(MONDAY));
         assertThat(
             Weekmodel.ISO.getMinimalDaysInFirstWeek(),
             is(4));
         assertThat(
             Weekmodel.ISO.getStartOfWeekend(),
-            is(Weekday.SATURDAY));
+            is(SATURDAY));
         assertThat(
             Weekmodel.ISO.getEndOfWeekend(),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
         assertThat(
             Weekmodel.ISO.getFirstWorkday(),
-            is(Weekday.MONDAY));
+            is(MONDAY));
     }
 
     @Test
@@ -527,7 +530,7 @@ public class WeekmodelTest {
     public void flooredISOBoundedWeekOfMonth() {
         assertThat(
             PlainDate.of(2018, 5, 4).getDayOfWeek(),
-            is(Weekday.FRIDAY));
+            is(FRIDAY));
         assertThat(
             PlainDate.of(2018, 5, 4).with(Weekmodel.ISO.boundedWeekOfMonth().atFloor()),
             is(PlainDate.of(2018, 5, 1)));
@@ -672,11 +675,11 @@ public class WeekmodelTest {
     public void getISOLocalDayOfWeek() {
         assertThat(
             PlainDate.of(2012, 1, 1).get(Weekmodel.ISO.localDayOfWeek()),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
         NumericalElement<Weekday> ne =
             (NumericalElement<Weekday>) Weekmodel.ISO.localDayOfWeek();
         assertThat(
-            ne.numerical(Weekday.SUNDAY),
+            ne.numerical(SUNDAY),
             is(7));
     }
 
@@ -685,7 +688,7 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2012, 1, 1).with(
                 Weekmodel.ISO.localDayOfWeek(),
-                Weekday.MONDAY),
+                MONDAY),
             is(PlainDate.of(2011, 12, 26)));
     }
 
@@ -693,14 +696,14 @@ public class WeekmodelTest {
     public void getMinimumISOLocalDayOfWeek() {
         assertThat(
             PlainDate.of(2012, 1, 1).getMinimum(Weekmodel.ISO.localDayOfWeek()),
-            is(Weekday.MONDAY));
+            is(MONDAY));
     }
 
     @Test
     public void getMaximumISOLocalDayOfWeek() {
         assertThat(
             PlainDate.of(2012, 1, 1).getMaximum(Weekmodel.ISO.localDayOfWeek()),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
     }
 
     @Test
@@ -769,12 +772,12 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2012, 1, 1).get(
                 Weekmodel.of(Locale.US).localDayOfWeek()),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
         NumericalElement<Weekday> ne =
             (NumericalElement<Weekday>)
                 Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
-            ne.numerical(Weekday.SUNDAY),
+            ne.numerical(SUNDAY),
             is(1));
     }
 
@@ -783,7 +786,7 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2012, 1, 1).with(
                 Weekmodel.of(Locale.US).localDayOfWeek(),
-                Weekday.MONDAY),
+                MONDAY),
             is(PlainDate.of(2012, 1, 2)));
     }
 
@@ -792,7 +795,7 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2012, 1, 1).getMinimum(
                 Weekmodel.of(Locale.US).localDayOfWeek()),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
     }
 
     @Test
@@ -800,7 +803,7 @@ public class WeekmodelTest {
         assertThat(
             PlainDate.of(2012, 1, 1).getMaximum(
                 Weekmodel.of(Locale.US).localDayOfWeek()),
-            is(Weekday.SATURDAY));
+            is(SATURDAY));
     }
 
     @Test
@@ -1101,20 +1104,20 @@ public class WeekmodelTest {
     public void getDefaultMinimumLocalDayOfWeek() {
         assertThat(
             Weekmodel.ISO.localDayOfWeek().getDefaultMinimum(),
-            is(Weekday.MONDAY));
+            is(MONDAY));
         assertThat(
             Weekmodel.of(Locale.US).localDayOfWeek().getDefaultMinimum(),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
     }
 
     @Test
     public void getDefaultMaximumLocalDayOfWeek() {
         assertThat(
             Weekmodel.ISO.localDayOfWeek().getDefaultMaximum(),
-            is(Weekday.SUNDAY));
+            is(SUNDAY));
         assertThat(
             Weekmodel.of(Locale.US).localDayOfWeek().getDefaultMaximum(),
-            is(Weekday.SATURDAY));
+            is(SATURDAY));
     }
 
     @Test
@@ -1123,11 +1126,11 @@ public class WeekmodelTest {
             Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToNext(Weekday.FRIDAY)),
+                .with(element.setToNext(FRIDAY)),
             is(PlainDate.of(2014, 4, 25)));
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToNext(Weekday.MONDAY)),
+                .with(element.setToNext(MONDAY)),
             is(PlainDate.of(2014, 4, 28)));
     }
 
@@ -1137,11 +1140,11 @@ public class WeekmodelTest {
             Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToPrevious(Weekday.FRIDAY)),
+                .with(element.setToPrevious(FRIDAY)),
             is(PlainDate.of(2014, 4, 18)));
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToPrevious(Weekday.MONDAY)),
+                .with(element.setToPrevious(MONDAY)),
             is(PlainDate.of(2014, 4, 14)));
     }
 
@@ -1151,11 +1154,11 @@ public class WeekmodelTest {
             Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToNextOrSame(Weekday.FRIDAY)),
+                .with(element.setToNextOrSame(FRIDAY)),
             is(PlainDate.of(2014, 4, 25)));
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToNextOrSame(Weekday.MONDAY)),
+                .with(element.setToNextOrSame(MONDAY)),
             is(PlainDate.of(2014, 4, 21)));
     }
 
@@ -1165,38 +1168,48 @@ public class WeekmodelTest {
             Weekmodel.of(Locale.US).localDayOfWeek();
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToPreviousOrSame(Weekday.FRIDAY)),
+                .with(element.setToPreviousOrSame(FRIDAY)),
             is(PlainDate.of(2014, 4, 18)));
         assertThat(
             PlainDate.of(2014, 4, 21)
-                .with(element.setToPreviousOrSame(Weekday.MONDAY)),
+                .with(element.setToPreviousOrSame(MONDAY)),
             is(PlainDate.of(2014, 4, 21)));
     }
 
     @Test
     public void minmax() {
-        assertThat(PlainDate.MIN.getMinimum(PlainDate.DAY_OF_WEEK), is(Weekday.MONDAY));
-        assertThat(PlainDate.MIN.getMaximum(PlainDate.DAY_OF_WEEK), is(Weekday.SUNDAY));
-        assertThat(PlainDate.MAX.getMinimum(PlainDate.DAY_OF_WEEK), is(Weekday.MONDAY));
-        assertThat(PlainDate.MAX.getMaximum(PlainDate.DAY_OF_WEEK), is(Weekday.FRIDAY));
+        assertThat(PlainDate.MIN.getMinimum(PlainDate.DAY_OF_WEEK), is(MONDAY));
+        assertThat(PlainDate.MIN.getMaximum(PlainDate.DAY_OF_WEEK), is(SUNDAY));
+        assertThat(PlainDate.MAX.getMinimum(PlainDate.DAY_OF_WEEK), is(MONDAY));
+        assertThat(PlainDate.MAX.getMaximum(PlainDate.DAY_OF_WEEK), is(FRIDAY));
 
         NavigableElement<Weekday> elementISO =
             Weekmodel.ISO.localDayOfWeek();
-        assertThat(PlainDate.MIN.getMinimum(elementISO), is(Weekday.MONDAY));
-        assertThat(PlainDate.MIN.getMaximum(elementISO), is(Weekday.SUNDAY));
-        assertThat(PlainDate.MAX.getMinimum(elementISO), is(Weekday.MONDAY));
-        assertThat(PlainDate.MAX.getMaximum(elementISO), is(Weekday.FRIDAY));
+        assertThat(PlainDate.MIN.getMinimum(elementISO), is(MONDAY));
+        assertThat(PlainDate.MIN.getMaximum(elementISO), is(SUNDAY));
+        assertThat(PlainDate.MAX.getMinimum(elementISO), is(MONDAY));
+        assertThat(PlainDate.MAX.getMaximum(elementISO), is(FRIDAY));
 
         NavigableElement<Weekday> elementUS =
             Weekmodel.of(Locale.US).localDayOfWeek();
-        assertThat(PlainDate.MIN.getMinimum(elementUS), is(Weekday.MONDAY));
-        assertThat(PlainDate.MIN.getMaximum(elementUS), is(Weekday.SATURDAY));
-        assertThat(PlainDate.MAX.getMinimum(elementUS), is(Weekday.SUNDAY));
-        assertThat(PlainDate.MAX.getMaximum(elementUS), is(Weekday.FRIDAY));
+        assertThat(PlainDate.MIN.getMinimum(elementUS), is(MONDAY));
+        assertThat(PlainDate.MIN.getMaximum(elementUS), is(SATURDAY));
+        assertThat(PlainDate.MAX.getMinimum(elementUS), is(SUNDAY));
+        assertThat(PlainDate.MAX.getMaximum(elementUS), is(FRIDAY));
 
         assertThat(
-            PlainDate.MAX.getMaximum(Weekmodel.of(Weekday.MONDAY, 2).weekOfYear()),
+            PlainDate.MAX.getMaximum(Weekmodel.of(MONDAY, 2).weekOfYear()),
             is(53));
+    }
+
+    @Test
+    public void stream() {
+        assertThat(
+            Weekmodel.ISO.stream().collect(Collectors.toList()),
+            is(Arrays.asList(MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY, SUNDAY)));
+        assertThat(
+            Weekmodel.of(SUNDAY, 1).stream().collect(Collectors.toList()),
+            is(Arrays.asList(SUNDAY, MONDAY, TUESDAY, WEDNESDAY, THURSDAY, FRIDAY, SATURDAY)));
     }
 
 }
