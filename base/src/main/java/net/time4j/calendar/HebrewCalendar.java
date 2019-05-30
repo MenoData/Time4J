@@ -82,8 +82,9 @@ import java.util.Locale;
  * of the hebrew year of 365.2468 days is slightly longer than the tropical solar year. See also
  * <a href="https://en.wikipedia.org/wiki/Hebrew_calendar">Wikipedia</a>. The implementation of this
  * calendar is based on the book &quot;Calendrical calculations&quot; of Dershowitz/Reingold. The
- * civil hebrew day starts at 18:00 o&#39;clock on the previous day. Time4J enables users to use
- * the sunset as begin of day for religious purposes. </p>
+ * hebrew day starts at sunset on the previous day. By default and as rough approximation, the time
+ * 18:00 o&#39;clock is used - especially in case of missing geographic location. However, Time4J
+ * enables users to use the exact astronomical sunset as begin of day for religious purposes. </p>
  *
  * <h4>Following elements which are declared as constants are registered by this class</h4>
  *
@@ -146,8 +147,10 @@ import java.util.Locale;
  * zum tropischen Sonnenjahr die mittlere L&auml;nge von 365,2468 Tagen minimal l&auml;nger ist. Siehe
  * auch <a href="https://en.wikipedia.org/wiki/Hebrew_calendar">Wikipedia</a>. Die Implementierung dieses
  * Kalenders st&uuml;tzt sich auf das Buch &quot;Calendrical calculations&quot; von Dershowitz/Reingold. Der
- * zivile hebr&auml;ische Tag f&auml;ngt um 18 Uhr am Vortag an. F&uuml;r religi&ouml;se Zwecke ist es im
- * Rahmen von Time4J auch m&ouml;glich, den exakten Sonnenuntergang des Vortags als Tagesbeginn zu berechnen. </p>
+ * hebr&auml;ische Tag f&auml;ngt zum Sonnenuntergang am Vortag an. Als vereinfachende N&auml;herung wird
+ * die Zeit um 18 Uhr genommen, besonders wenn eine geographische Ortsangabe fehlt. F&uuml;r religi&ouml;se
+ * Zwecke ist es im Rahmen von Time4J aber m&ouml;glich, den exakten astronomischen Sonnenuntergang des
+ * Vortags als Tagesbeginn zu berechnen. </p>
  *
  * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
  *
@@ -631,17 +634,13 @@ public final class HebrewCalendar
      * <p>Obtains the current calendar date in system time. </p>
      *
      * <p>Convenient short-cut for: {@code SystemClock.inLocalView().now(HebrewCalendar.axis())}.
-     * Attention: The Hebrew calendar changes the date in the evening at 6 PM (on previous day).
+     * Attention: The Hebrew calendar changes here the date in the evening at 6 PM (on previous day).
      * If users wish more control over the start of day then following code might be used: </p>
      *
      * <pre>
      *     SolarTime jerusalem = SolarTime.ofLocation(31.779167, 35.223611);
      *     HebrewCalendar currentHebrewDate =
-     *          SystemClock.currentMoment().toGeneralTimestamp(
-     *              HebrewCalendar.axis(),
-     *              Timezone.ofSystem().getID(),
-     *              StartOfDay.definedBy(jerusalem.sunset())
-     *          ).toDate();
+     *          HebrewCalendar.nowInSystemTime(StartOfDay.definedBy(jerusalem.sunset()));
      * </pre>
      *
      * @return  current calendar date in system time zone using the system clock
@@ -654,18 +653,14 @@ public final class HebrewCalendar
      * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit. </p>
      *
      * <p>Bequeme Abk&uuml;rzung f&uuml;r: {@code SystemClock.inLocalView().now(HebrewCalendar.axis())}.
-     * Achtung: Der hebr&auml;ische Kalender wechselt das Datum am Abend des Vortags um 18 Uhr. Wenn
+     * Achtung: Der hebr&auml;ische Kalender wechselt hier das Datum am Abend des Vortags um 18 Uhr. Wenn
      * Anwender mehr Kontrolle &uuml;ber den Start des Tages w&uuml;nschen, dann k&ouml;nnen sie zum
      * Beispiel folgenden Code verwenden: </p>
      *
      * <pre>
      *     SolarTime jerusalem = SolarTime.ofLocation(31.779167, 35.223611);
      *     HebrewCalendar currentHebrewDate =
-     *          SystemClock.currentMoment().toGeneralTimestamp(
-     *              HebrewCalendar.axis(),
-     *              Timezone.ofSystem().getID(),
-     *              StartOfDay.definedBy(jerusalem.sunset())
-     *          ).toDate();
+     *          HebrewCalendar.nowInSystemTime(StartOfDay.definedBy(jerusalem.sunset()));
      * </pre>
      *
      * @return  current calendar date in system time zone using the system clock
@@ -677,6 +672,34 @@ public final class HebrewCalendar
     public static HebrewCalendar nowInSystemTime() {
 
         return SystemClock.inLocalView().now(HebrewCalendar.axis());
+
+    }
+
+    /**
+     * <p>Obtains the current calendar date in system time with given start of day. </p>
+     *
+     * @param   startOfDay      exact definition when the day starts (should be sunset on previous day)
+     * @return  current calendar date in system time zone using the system clock
+     * @see     StartOfDay#definedBy(ChronoFunction)
+     * @see     SolarTime#sunset()
+     * @since   5.5
+     */
+    /*[deutsch]
+     * <p>Ermittelt das aktuelle Kalenderdatum in der Systemzeit mit dem angegebenen Start des Tages. </p>
+     *
+     * @param   startOfDay      exact definition when the day starts (should be sunset on previous day)
+     * @return  current calendar date in system time zone using the system clock
+     * @see     StartOfDay#definedBy(ChronoFunction)
+     * @see     SolarTime#sunset()
+     * @since   5.5
+     */
+    public static HebrewCalendar nowInSystemTime(StartOfDay startOfDay) {
+
+        return SystemClock.currentMoment().toGeneralTimestamp(
+            HebrewCalendar.axis(),
+            Timezone.ofSystem().getID(),
+            startOfDay
+        ).toDate();
 
     }
 

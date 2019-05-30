@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StartOfDay.java) is part of project Time4J.
  *
@@ -57,17 +57,31 @@ public abstract class StartOfDay {
 
     /**
      * Start of calendar day at 18:00 on previous day.
+     *
+     * Used in {@code HebrewCalendar} and {@code HijriCalendar} as rough approximation for sunset.
+     * However, most users should apply an astronomical definition.
+     *
+     * @see     #definedBy(ChronoFunction)
      */
     /*[deutsch]
      * Beginn eines Kalendertages zu 18 Uhr am Vortag.
+     *
+     * Verwendet in {@code HebrewCalendar} und {@code HijriCalendar} als grobe N&auml;herung f&uuml;r
+     * den Sonnenuntergang. Anwender sollten aber meist eine astronomische Definition nehmen.
+     *
+     * @see     #definedBy(ChronoFunction)
      */
     public static final StartOfDay EVENING = fixed(-21600);
 
     /**
      * Start of calendar day at 06:00 in the morning.
+     *
+     * @see     net.time4j.calendar.EthiopianCalendar
      */
     /*[deutsch]
      * Beginn eines Kalendertages zu 6 Uhr morgens.
+     *
+     * @see     net.time4j.calendar.EthiopianCalendar
      */
     public static final StartOfDay MORNING = fixed(21600);
 
