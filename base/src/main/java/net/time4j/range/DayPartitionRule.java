@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPartitionRule.java) is part of project Time4J.
  *
@@ -53,17 +53,25 @@ public interface DayPartitionRule {
     /**
      * <p>Obtains the partitions for given date if defined. </p>
      *
+     * <p>All resulting partitions are half-open clock intervals (start inclusive and end exclusive)
+     * and refer only to given calendar date. </p>
+     *
      * @param   date    the calendar date to be queried
-     * @return  unmodifiable sorted list of day partitions, maybe empty
+     * @return  unmodifiable sorted list of canonical day partitions, maybe empty
      * @see     ClockInterval#comparator()
+     * @see     IsoInterval#toCanonical()
      * @since   5.0
      */
     /*[deutsch]
      * <p>Liefert die Tagesabschnitte zum angegebenen Datum, wenn definiert. </p>
      *
+     * <p>Alle resultierenden Tagesabschnitte sind halboffene Uhrzeitintervalle (Start inklusive und Ende exklusive)
+     * und beziehen sich ausschlie&szlig;lich auf das angegebene Kalenderdatum. </p>
+     *
      * @param   date    the calendar date to be queried
-     * @return  unmodifiable sorted list of day partitions, maybe empty
+     * @return  unmodifiable sorted list of canonical day partitions, maybe empty
      * @see     ClockInterval#comparator()
+     * @see     IsoInterval#toCanonical()
      * @since   5.0
      */
     List<ChronoInterval<PlainTime>> getPartitions(PlainDate date);

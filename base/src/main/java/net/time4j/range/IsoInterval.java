@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoInterval.java) is part of project Time4J.
  *
@@ -95,7 +95,9 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         if (Boundary.isAfter(start, end)) { // NPE-check
             throw new IllegalArgumentException(
                 "Start after end: " + start + "/" + end);
-        } else if (
+        }
+
+        if (
             end.isOpen() // NPE-check
             && start.isOpen()
             && Boundary.isSimultaneous(start, end)
@@ -157,26 +159,6 @@ public abstract class IsoInterval<T extends Temporal<? super T>, I extends IsoIn
         return function.apply(this);
 
     }
-
-//    /**
-//     * <p>Checks if this interval matches given condition. </p>
-//     *
-//     * @param   condition    interval query as conditional expression
-//     * @return  {@code true} if given condition is matched else {@code false}
-//     * @since   4.24
-//     */
-//    /*[deutsch]
-//     * <p>Pr&uuml;ft, ob die angegebene Bedingung von diesem Intervall erf&uuml;llt wird. </p>
-//     *
-//     * @param   condition    interval query as conditional expression
-//     * @return  {@code true} if given condition is matched else {@code false}
-//     * @since   4.24
-//     */
-//    public final boolean matches(ChronoCondition<ChronoInterval<T>> condition) {
-//
-//        return condition.test(this);
-//
-//    }
 
     /**
      * <p>Yields a copy of this interval with given start time. </p>
