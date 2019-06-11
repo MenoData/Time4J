@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleBasedTransitionModel.java) is part of project Time4J.
  *
@@ -143,15 +143,15 @@ final class RuleBasedTransitionModel
         ZonalTransition zt = initial;
 
         if (initial.getPosixTime() == Long.MIN_VALUE) {
-            if (initial.getDaylightSavingOffset() != 0) {
+            if (initial.getExtraOffset() != 0) {
                 throw new IllegalArgumentException(
                     "Initial transition must not have any dst-offset: " + initial);
             }
 
             zt = new ZonalTransition(
                 Moment.axis().getMinimum().getPosixTime(),
-                initial.getStandardOffset(),
-                initial.getStandardOffset(),
+                initial.getRawOffset(),
+                initial.getRawOffset(),
                 0
             );
         } else {
@@ -192,7 +192,7 @@ final class RuleBasedTransitionModel
         }
 
         ZonalTransition current = null;
-        int stdOffset = this.initial.getStandardOffset();
+        int stdOffset = this.initial.getRawOffset();
         int n = this.rules.size();
         DaylightSavingRule rule = this.rules.get(0);
         DaylightSavingRule previous = this.rules.get(n - 1);
@@ -456,7 +456,7 @@ final class RuleBasedTransitionModel
         int year = Integer.MIN_VALUE;
         int n = rules.size();
         int i = 0;
-        int stdOffset = initial.getStandardOffset();
+        int stdOffset = initial.getRawOffset();
 
         while (true) {
             DaylightSavingRule rule = rules.get(i % n);
@@ -499,7 +499,7 @@ final class RuleBasedTransitionModel
 
         long start = Math.max(ut, initial.getPosixTime());
         int year = Integer.MIN_VALUE;
-        int stdOffset = initial.getStandardOffset();
+        int stdOffset = initial.getRawOffset();
         ZonalTransition next = null;
 
         for (int i = 0, n = rules.size(); next == null; i++) {
@@ -574,7 +574,7 @@ final class RuleBasedTransitionModel
 
         if (transitions == null) {
             List<ZonalTransition> list = new ArrayList<>();
-            int stdOffset = this.initial.getStandardOffset();
+            int stdOffset = this.initial.getRawOffset();
 
             for (int i = 0, n = this.rules.size(); i < n; i++) {
                 DaylightSavingRule rule = this.rules.get(i);

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalTransition.java) is part of project Time4J.
  *
@@ -34,11 +34,10 @@ import java.io.Serializable;
  * <p>This class contains informations about the global timestamp of the
  * transition and the shifts/offsets before and after the transitions.
  * A change of a zonal shift can either be caused by special historical
- * events and political actions (change of standard time) or by establishing
+ * events and political actions (change of raw time) or by establishing
  * <i>daylight saving</i>-rules (change from winter time to summer time and
- * reverse - DST). Therefore the total shift {@code getTotalOffset()} is
- * always the sum of the parts {@code getStandardOffset()} and
- * {@code getDaylightSavingOffset()}. </p>
+ * reverse - DST). Therefore the total shift {@code getTotalOffset()} is always
+ * the sum of the parts {@code getRawOffset()} and {@code getExtraOffset()}. </p>
  *
  * <p>Shifts are described on the local timeline in seconds. Following
  * relationship holds between local time and POSIX-time: </p>
@@ -65,7 +64,7 @@ import java.io.Serializable;
  * bedingt sein, also die Umstellung von Winterzeit auf Sommerzeit und
  * umgekehrt (DST). Somit ist die Gesamtverschiebung {@code getTotalOffset()}
  * immer die Summe aus den einzelnen Verschiebungsanteilen
- * {@code getStandardOffset()} und {@code getDaylightSavingOffset()}. </p>
+ * {@code getRawOffset()} und {@code getExtraOffset()}. </p>
  *
  * <p>Verschiebungen werden grunds&auml;tzlich auf dem lokalen Zeitstrahl einer
  * Zeitzone beschrieben. Es gilt somit folgende Beziehung zwischen einer
@@ -116,12 +115,12 @@ public final class ZonalTransition
     private final int total;
 
     /**
-     * @serial  new daylight-saving-shift in seconds (DST)
+     * @serial  new extra shift in seconds (typically DST)
      */
     /*[deutsch]
-     * @serial  neue DST-Verschiebung in Sekunden
+     * @serial  neue Extra-Verschiebung in Sekunden (typischerweise DST)
      */
-    private final int dst;
+    private final int extra;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -135,7 +134,7 @@ public final class ZonalTransition
      * @param   posixTime               POSIX time of transition
      * @param   previousOffset          previous total shift in seconds
      * @param   totalOffset             new total shift in seconds
-     * @param   daylightSavingOffset    DST-shift in seconds
+     * @param   extraOffset             extra shift in seconds
      * @throws  IllegalArgumentException if any offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
      * @see     net.time4j.scale.UniversalTime#getPosixTime()
      * @see     ZonalOffset#getIntegralAmount()
@@ -144,14 +143,14 @@ public final class ZonalTransition
      * <p>Konstruiert einen neuen &Uuml;bergang zwischen zwei
      * Verschiebungen. </p>
      *
-     * <p>Die angegebene DST-Verschiebung darf ausnahmsweise auch gleich {@code Integer.MAX_VALUE} sein.
+     * <p>Die angegebene Extra-Verschiebung darf ausnahmsweise auch gleich {@code Integer.MAX_VALUE} sein.
      * Dieser besondere Wert zeigt eine Null-Verschiebung an, die aber als abweichende Sommerzeiteinstellung
      * interpretiert wird. Dieses spezielle Verhalten wird erst seit Version v3.39/4.34 angeboten. </p>
      *
      * @param   posixTime               POSIX time of transition
      * @param   previousOffset          previous total shift in seconds
      * @param   totalOffset             new total shift in seconds
-     * @param   daylightSavingOffset    DST-shift in seconds
+     * @param   extraOffset             extra shift in seconds
      * @throws  IllegalArgumentException if any offset is out of range {@code -18 * 3600 <= total <= 18 * 3600}
      * @see     net.time4j.scale.UniversalTime#getPosixTime()
      * @see     ZonalOffset#getIntegralAmount()
@@ -160,18 +159,18 @@ public final class ZonalTransition
         long posixTime,
         int previousOffset,
         int totalOffset,
-        int daylightSavingOffset
+        int extraOffset
     ) {
         super();
 
         this.posix = posixTime;
         this.previous = previousOffset;
         this.total = totalOffset;
-        this.dst = daylightSavingOffset;
+        this.extra = extraOffset;
 
         checkRange(previousOffset);
         checkRange(totalOffset);
-        checkDST(daylightSavingOffset);
+        checkDST(extraOffset);
 
     }
 
@@ -224,8 +223,8 @@ public final class ZonalTransition
      *
      * @return  new total shift in seconds
      * @see     #getPreviousOffset()
-     * @see     #getStandardOffset()
-     * @see     #getDaylightSavingOffset()
+     * @see     #getRawOffset()
+     * @see     #getExtraOffset()
      * @see     ZonalOffset#getIntegralAmount()
      */
     /*[deutsch]
@@ -233,8 +232,8 @@ public final class ZonalTransition
      *
      * @return  new total shift in seconds
      * @see     #getPreviousOffset()
-     * @see     #getStandardOffset()
-     * @see     #getDaylightSavingOffset()
+     * @see     #getRawOffset()
+     * @see     #getExtraOffset()
      * @see     ZonalOffset#getIntegralAmount()
      */
     public int getTotalOffset() {
@@ -244,64 +243,77 @@ public final class ZonalTransition
     }
 
     /**
-     * <p>Returns the standard shift after this transition as difference
-     * between total shift and DST-shift (daylight savings). </p>
+     * <p>Returns the raw shift after this transition as difference
+     * between total shift and an extra shift (often daylight savings). </p>
      *
-     * <p>Negative standard shifts are related to timezones west for
+     * <p>Negative raw shifts are related to timezones west for
      * Greenwich, positive to timezones east for Greenwich. The addition
-     * of the standard shift to POSIX-time yields the
-     * <i>standard local time</i> corresponding to winter time. </p>
+     * of the raw shift to POSIX-time yields the <i>standard local time</i>
+     * typically corresponding to winter time. </p>
+     *
+     * <p>Some few countries define the legal standard time the other way round.
+     * For example, Ireland labels the summer time as standard time. Hence this class
+     * avoids the usage of the term &quot;standard time&quot;, but prefers the term
+     * &quot;raw offset&quot;. </p>
      *
      * @return  raw shift in seconds after transition
      * @see     #getTotalOffset()
-     * @see     #getDaylightSavingOffset()
+     * @see     #getExtraOffset()
+     * @since   5.5
      */
     /*[deutsch]
      * <p>Liefert die aktuelle Standardverschiebung nach diesem &Uuml;bergang
-     * als Differenz zwischen Gesamtverschiebung und DST-Verschiebung. </p>
+     * als Differenz zwischen Gesamtverschiebung und einer extra Verschiebung. </p>
      *
-     * <p>Negative Standardverschiebungen beziehen sich auf Zeitzonen westlich
+     * <p>Negative Verschiebungen beziehen sich auf Zeitzonen westlich
      * des Nullmeridians von Greenwich, positive auf Zeitzonen &ouml;stlich
      * davon. Die Addition dieser Verschiebung zur POSIX-Zeit ergibt die
-     * <i>standard local time</i>, die der Winterzeit entspricht. </p>
+     * <i>standard local time</i>, die typischerweise der Winterzeit entspricht. </p>
+     *
+     * <p>Einige wenige L&auml;nder definieren die gesetzliche Standardzeit in
+     * umgekehrter Weise. Zum Beispiel bezeichnet Irland die Sommerzeit als Standardzeit.
+     * Deshalb bevorzugt diese Klasse den Begriff &quot;raw offset&quot; (Rohverschiebung). </p>
      *
      * @return  raw shift in seconds after transition
      * @see     #getTotalOffset()
-     * @see     #getDaylightSavingOffset()
+     * @see     #getExtraOffset()
+     * @since   5.5
      */
-    public int getStandardOffset() {
+    public int getRawOffset() {
 
-        return (this.total - this.getDaylightSavingOffset());
+        return (this.total - this.getExtraOffset());
 
     }
 
     /**
-     * <p>Returns the DST-shift (daylight savings) after this transition that is
+     * <p>Returns typically the DST-shift (daylight savings) after this transition that is
      * the shift normally induced by change to summer time. </p>
      *
-     * <p>This offset defines a deviation from the standard offset. The only legitimate method
+     * <p>This offset defines a deviation from the raw offset. The only legitimate method
      * to determine if a time zone is actually in daylight saving mode is the method
      * {@link Timezone#isDaylightSaving Timezone.isDaylightSaving(moment)}. </p>
      *
-     * @return  daylight-saving-shift in seconds after transition, can also be negative
+     * @return  extra shift in seconds after transition, can also be negative
      * @see     #getTotalOffset()
-     * @see     #getStandardOffset()
+     * @see     #getRawOffset()
+     * @since   5.5
      */
     /*[deutsch]
-     * <p>Liefert die DST-Verschiebung nach dem &Uuml;bergang, also
+     * <p>Liefert typischerweise die DST-Verschiebung nach dem &Uuml;bergang, also
      * normalerweise den durch die Sommerzeit induzierten Versatz. </p>
      *
-     * <p>Hiermit wird eine Abweichung vom Standard-Offset definiert. Ob aber &uuml;berhaupt ein
-     * &Uuml;bergang als <i>daylightSaving</i> interpretiert werden darf, kann nur mittels
+     * <p>Hiermit wird eine Abweichung von der Standardverschiebung definiert. Ob aber &uuml;berhaupt
+     * ein &Uuml;bergang als <i>daylightSaving</i> interpretiert werden darf, kann nur mittels
      * {@link Timezone#isDaylightSaving Timezone.isDaylightSaving(moment)} entschieden werden. </p>
      *
-     * @return  daylight-saving-shift in seconds after transition, can also be negative
+     * @return  extra shift in seconds after transition, can also be negative
      * @see     #getTotalOffset()
-     * @see     #getStandardOffset()
+     * @see     #getRawOffset()
+     * @since   5.5
      */
-    public int getDaylightSavingOffset() {
+    public int getExtraOffset() {
 
-        return ((this.dst == Integer.MAX_VALUE) ? 0 : this.dst); // for backwards compatibility
+        return ((this.extra == Integer.MAX_VALUE) ? 0 : this.extra); // for backwards compatibility in serialization
 
     }
 
@@ -370,14 +382,14 @@ public final class ZonalTransition
     /**
      * <p>Compares preferrably the timeline order based on the global
      * timestamps of transitions, otherwise the total shift and finally
-     * the DST-shift. </p>
+     * the extra shift. </p>
      *
      * <p>The natural order is consistent with {@code equals()}. </p>
      */
     /*[deutsch]
      * <p>Beruht bevorzugt auf der zeitlichen Reihenfolge des POSIX-Zeitpunkts
      * des &Uuml;bergangs, sonst auf den Gesamtverschiebungen und zuletzt auf
-     * der DST-Verschiebung. </p>
+     * der Extra-Verschiebung. </p>
      *
      * <p>Die nat&uuml;rliche Ordnung ist konsistent mit {@code equals()}. </p>
      */
@@ -391,7 +403,7 @@ public final class ZonalTransition
             if (delta == 0) {
                 delta = (this.total - other.total);
                 if (delta == 0) {
-                    delta = (this.getDaylightSavingOffset() - other.getDaylightSavingOffset());
+                    delta = (this.getExtraOffset() - other.getExtraOffset());
                     if (delta == 0) {
                         return 0;
                     }
@@ -422,7 +434,7 @@ public final class ZonalTransition
                 (this.posix == that.posix)
                 && (this.previous == that.previous)
                 && (this.total == that.total)
-                && (this.getDaylightSavingOffset() == that.getDaylightSavingOffset()));
+                && (this.getExtraOffset() == that.getExtraOffset()));
         }
 
         return false;
@@ -462,10 +474,38 @@ public final class ZonalTransition
         sb.append(this.previous);
         sb.append(", total-offset=");
         sb.append(this.total);
-        sb.append(", dst-offset=");
-        sb.append(this.getDaylightSavingOffset());
+        sb.append(", extra-offset=");
+        sb.append(this.getExtraOffset());
         sb.append(']');
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Synonym for {@code getRawOffset()}. </p>
+     *
+     * @return  raw shift in seconds after transition
+     * @see     #getRawOffset()
+     * @deprecated  method was renamed and is subject to removal in future versions
+     */
+    @Deprecated
+    public int getStandardOffset() {
+
+        return this.getRawOffset();
+
+    }
+
+    /**
+     * <p>Synonym for {@code getExtraOffset()}. </p>
+     *
+     * @return  daylight-saving-shift in seconds after transition, can also be negative
+     * @see     #getExtraOffset()
+     * @deprecated  method was renamed and is subject to removal in future versions
+     */
+    @Deprecated
+    public int getDaylightSavingOffset() {
+
+        return this.getExtraOffset();
 
     }
 
@@ -500,7 +540,7 @@ public final class ZonalTransition
         try {
             checkRange(this.previous);
             checkRange(this.total);
-            checkDST(this.dst);
+            checkDST(this.extra);
         } catch (IllegalArgumentException iae) {
             throw new InvalidObjectException(iae.getMessage());
         }

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ArrayTransitionModel.java) is part of project Time4J.
  *
@@ -89,7 +89,7 @@ final class ArrayTransitionModel
         boolean negativeDST = false;
 
         for (ZonalTransition zt : tmp) {
-            negativeDST = (negativeDST || (zt.getDaylightSavingOffset() < 0));
+            negativeDST = (negativeDST || (zt.getExtraOffset() < 0));
         }
 
         this.negativeDST = negativeDST;

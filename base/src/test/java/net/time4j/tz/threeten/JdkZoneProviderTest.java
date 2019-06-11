@@ -119,7 +119,7 @@ public class JdkZoneProviderTest {
     }
 
     @Test
-    public void midsummer() throws IOException {
+    public void midsummer() {
         PlainDate date = PlainDate.of(1945, 5, 24);
         PlainTime time = PlainTime.of(2);
         Moment m = date.at(time).at(ZonalOffset.ofTotalSeconds(7200));
@@ -135,12 +135,12 @@ public class JdkZoneProviderTest {
             conflict.getTotalOffset(),
             is(3 * 3600));
         assertThat(
-            conflict.getDaylightSavingOffset(),
+            conflict.getExtraOffset(),
             is(2 * 3600));
     }
 
     @Test
-    public void dhakaInDSTa() throws IOException {
+    public void dhakaInDSTa() {
         TransitionHistory history = zp.load("Asia/Dhaka");
         PlainDate date = PlainDate.of(2009, 6, 19);
         PlainTime time = PlainTime.of(23, 0);
@@ -159,12 +159,12 @@ public class JdkZoneProviderTest {
             conflict.getTotalOffset(),
             is(7 * 3600));
         assertThat(
-            conflict.getDaylightSavingOffset(),
+            conflict.getExtraOffset(),
             is(3600));
     }
 
     @Test
-    public void dhakaInDSTb() throws IOException {
+    public void dhakaInDSTb() {
         TransitionHistory history = zp.load("Asia/Dhaka");
         PlainDate date = PlainDate.of(2009, 6, 19);
         PlainTime time = PlainTime.of(23, 0);
@@ -183,12 +183,12 @@ public class JdkZoneProviderTest {
             conflict.getTotalOffset(),
             is(7 * 3600));
         assertThat(
-            conflict.getDaylightSavingOffset(),
+            conflict.getExtraOffset(),
             is(3600));
     }
 
     @Test
-    public void dhakaAtEndOf2009a() throws IOException {
+    public void dhakaAtEndOf2009a() {
         TransitionHistory history = zp.load("Asia/Dhaka");
         PlainDate date = PlainDate.of(2009, 12, 31);
         PlainTime time = PlainTime.midnightAtEndOfDay();
@@ -207,12 +207,12 @@ public class JdkZoneProviderTest {
             conflict.getTotalOffset(),
             is(6 * 3600));
         assertThat(
-            conflict.getDaylightSavingOffset(),
+            conflict.getExtraOffset(),
             is(0));
     }
 
     @Test
-    public void dhakaAtEndOf2009b() throws IOException {
+    public void dhakaAtEndOf2009b() {
         TransitionHistory history = zp.load("Asia/Dhaka");
         PlainDate date = PlainDate.of(2009, 12, 31);
         PlainTime time = PlainTime.midnightAtEndOfDay();
@@ -231,7 +231,7 @@ public class JdkZoneProviderTest {
             conflict.getTotalOffset(),
             is(6 * 3600));
         assertThat(
-            conflict.getDaylightSavingOffset(),
+            conflict.getExtraOffset(),
             is(0));
     }
 

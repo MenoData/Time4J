@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -636,7 +636,7 @@ final class SPX
 
         writeOffset(out, initial.getPreviousOffset());
         writeOffset(out, initial.getTotalOffset());
-        int dst = initial.getDaylightSavingOffset();
+        int dst = initial.getExtraOffset();
         writeOffset(out, dst);
         writeRules(model.getRules(), out);
 
@@ -722,7 +722,7 @@ final class SPX
         DataOutput out
     ) throws IOException {
 
-        int rawOffset = transition.getStandardOffset();
+        int rawOffset = transition.getRawOffset();
         boolean newStdOffset = (rawOffset != stdOffset);
         byte first = 0;
 
@@ -730,7 +730,7 @@ final class SPX
             first |= (1 << 7);
         }
 
-        int dstOffset = transition.getDaylightSavingOffset();
+        int dstOffset = transition.getExtraOffset();
         int dstIndex;
 
         switch (dstOffset) {

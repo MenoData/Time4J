@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OldApiTimezone.java) is part of project Time4J.
  *
@@ -119,7 +119,7 @@ final class OldApiTimezone
         if (history != null) {
             List<ZonalTransition> transitions = history.getStdTransitions();
             for (int i = transitions.size() - 1; i >= 0; i--) {
-                int currentDST = transitions.get(i).getDaylightSavingOffset();
+                int currentDST = transitions.get(i).getExtraOffset();
                 if (previousDST == Integer.MIN_VALUE) {
                     previousDST = currentDST;
                 } else if (previousDST != currentDST) {
@@ -142,7 +142,7 @@ final class OldApiTimezone
                 List<ZonalTransition> transitions = history.getStdTransitions();
                 int previousDST = Integer.MIN_VALUE;
                 for (int i = transitions.size() - 1; i >= 0; i--) {
-                    int currentDST = transitions.get(i).getDaylightSavingOffset();
+                    int currentDST = transitions.get(i).getExtraOffset();
                     if (previousDST == Integer.MIN_VALUE) {
                         previousDST = currentDST;
                     } else if (previousDST != currentDST) {

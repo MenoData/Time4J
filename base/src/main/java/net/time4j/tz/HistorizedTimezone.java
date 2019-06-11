@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistorizedTimezone.java) is part of project Time4J.
  *
@@ -137,7 +137,7 @@ final class HistorizedTimezone
         return (
             (t == null)
             ? this.history.getInitialOffset()
-            : ZonalOffset.ofTotalSeconds(t.getStandardOffset())
+            : ZonalOffset.ofTotalSeconds(t.getRawOffset())
         );
 
     }
@@ -150,7 +150,7 @@ final class HistorizedTimezone
         return (
             (t == null)
             ? ZonalOffset.UTC
-            : ZonalOffset.ofTotalSeconds(t.getDaylightSavingOffset())
+            : ZonalOffset.ofTotalSeconds(t.getExtraOffset())
         );
 
     }
@@ -193,7 +193,7 @@ final class HistorizedTimezone
             return false;
         }
 
-        int dst = start.getDaylightSavingOffset();
+        int dst = start.getExtraOffset();
 
         if (dst > 0) {
             return true;
@@ -216,8 +216,8 @@ final class HistorizedTimezone
         if (previousTransition == null) {
             return false;
         } else {
-            if (previousTransition.getStandardOffset() == start.getStandardOffset()) {
-                return (previousTransition.getDaylightSavingOffset() < 0);
+            if (previousTransition.getRawOffset() == start.getRawOffset()) {
+                return (previousTransition.getExtraOffset() < 0);
             } else {
                 return this.isDaylightSaving(previousTime);
             }
