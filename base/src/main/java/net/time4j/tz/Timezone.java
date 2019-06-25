@@ -1025,8 +1025,10 @@ public abstract class Timezone
     );
 
     /**
-     * <p>Queries if given global timestamp matches daylight saving time
-     * relative to winter in this timezone? </p>
+     * <p>Queries if the local clock has been adjusted forward at given timestamp. </p>
+     *
+     * <p>This usually means if the given time matches daylight saving time
+     * relative to winter in this timezone. </p>
      *
      * <p>The DST correction can be obtained as difference between total
      * offset and raw offset if the raw offset has not changed yet.
@@ -1041,7 +1043,9 @@ public abstract class Timezone
      * @see     java.util.TimeZone#inDaylightTime(java.util.Date) java.util.TimeZone.inDaylightTime(java.util.Date)
      */
     /*[deutsch]
-     * <p>Herrscht zum angegebenen Zeitpunkt Sommerzeit in der Zeitzone? </p>
+     * <p>Geht die lokale Uhr zur fraglichen Zeit vor? </p>
+     *
+     * <p>Das bedeutet gew&ouml;hnlich, da&szlig; zum angegebenen Zeitpunkt Sommerzeit in der Zeitzone herrscht. </p>
      *
      * <p>Die DST-Korrektur selbst kann als Differenz zwischen dem Gesamt-Offset
      * und dem Standard-Offset erhalten werden, wenn sich der Standard-Offset
