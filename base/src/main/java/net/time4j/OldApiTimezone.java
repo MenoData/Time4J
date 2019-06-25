@@ -106,7 +106,7 @@ final class OldApiTimezone
     @Override
     public int getRawOffset() {
 
-        return this.tz.getStandardOffset(SystemClock.currentMoment()).getIntegralAmount() * 1000;
+        return this.tz.getRawOffset(SystemClock.currentMoment()).getIntegralAmount() * 1000;
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlatformTimezone.java) is part of project Time4J.
  *
@@ -177,7 +177,7 @@ final class PlatformTimezone
     }
 
     @Override
-    public ZonalOffset getStandardOffset(UnixTime ut) {
+    public ZonalOffset getRawOffset(UnixTime ut) {
 
         java.util.TimeZone inner;
 
@@ -194,7 +194,7 @@ final class PlatformTimezone
     }
 
     @Override
-    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+    public ZonalOffset getExtraOffset(UnixTime ut){
 
         java.util.TimeZone inner;
 

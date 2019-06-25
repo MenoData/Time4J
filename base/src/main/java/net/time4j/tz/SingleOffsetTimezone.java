@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SingleOffsetTimezone.java) is part of project Time4J.
  *
@@ -93,14 +93,14 @@ final class SingleOffsetTimezone
     }
 
     @Override
-    public ZonalOffset getStandardOffset(UnixTime ut) {
+    public ZonalOffset getRawOffset(UnixTime ut) {
 
         return this.offset;
 
     }
 
     @Override
-    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+    public ZonalOffset getExtraOffset(UnixTime ut){
 
         return ZonalOffset.UTC;
 

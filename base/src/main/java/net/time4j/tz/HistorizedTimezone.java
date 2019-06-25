@@ -130,7 +130,7 @@ final class HistorizedTimezone
     }
 
     @Override
-    public ZonalOffset getStandardOffset(UnixTime ut) {
+    public ZonalOffset getRawOffset(UnixTime ut) {
 
         ZonalTransition t = this.history.getStartTransition(ut);
 
@@ -143,7 +143,7 @@ final class HistorizedTimezone
     }
 
     @Override
-    public ZonalOffset getDaylightSavingOffset(UnixTime ut) {
+    public ZonalOffset getExtraOffset(UnixTime ut) {
 
         ZonalTransition t = this.history.getStartTransition(ut);
 

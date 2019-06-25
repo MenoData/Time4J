@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Timezone.java) is part of project Time4J.
  *
@@ -817,8 +817,8 @@ public abstract class Timezone
      * @return  total shift in seconds which yields local time if added to unix time
      * @see     java.util.TimeZone#getOffset(long)
      *          java.util.TimeZone.getOffset(long)
-     * @see     #getStandardOffset(UnixTime)
-     * @see     #getDaylightSavingOffset(UnixTime)
+     * @see     #getRawOffset(UnixTime)
+     * @see     #getExtraOffset(UnixTime)
      */
     /*[deutsch]
      * <p>Ermittelt die gesamte Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
@@ -832,20 +832,20 @@ public abstract class Timezone
      * @return  total shift in seconds which yields local time if added to unix time
      * @see     java.util.TimeZone#getOffset(long)
      *          java.util.TimeZone.getOffset(long)
-     * @see     #getStandardOffset(UnixTime)
-     * @see     #getDaylightSavingOffset(UnixTime)
+     * @see     #getRawOffset(UnixTime)
+     * @see     #getExtraOffset(UnixTime)
      */
     public abstract ZonalOffset getOffset(UnixTime ut);
 
     /**
-     * <p>Calculates the standard offset for given global timestamp. </p>
+     * <p>Calculates the raw offset for given global timestamp. </p>
      *
      * <p>Note: The returned offset has never any subsecond part, normally
      * not even seconds but full minutes or hours. </p>
      *
      * @param   ut      unix time
-     * @return  standard shift in seconds which yields standard local time if added to unix time
-     * @since   3.2/4.1
+     * @return  raw shift in seconds which yields standard local time if added to unix time
+     * @since   5.5
      */
     /*[deutsch]
      * <p>Ermittelt die Standard-Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
@@ -856,13 +856,13 @@ public abstract class Timezone
      * nur volle Minuten oder Stunden. </p>
      *
      * @param   ut      unix time
-     * @return  standard shift in seconds which yields standard local time if added to unix time
-     * @since   3.2/4.1
+     * @return  raw shift in seconds which yields standard local time if added to unix time
+     * @since   5.5
      */
-    public abstract ZonalOffset getStandardOffset(UnixTime ut);
+    public abstract ZonalOffset getRawOffset(UnixTime ut);
 
     /**
-     * <p>Calculates the daylight saving amount for given global timestamp. </p>
+     * <p>Calculates the extra shift for given global timestamp, in addition to the raw shift. </p>
      *
      * <p>Notes: The returned offset has never any subsecond part, normally
      * not even seconds but full minutes or hours. Starting with tzdb-version 2018b,
@@ -873,12 +873,12 @@ public abstract class Timezone
      * to standard time (what ever this might be). </p>
      *
      * @param   ut      unix time
-     * @return  DST-shift in seconds which yields local wall time if added to standard local time
+     * @return  extra shift in seconds which yields local wall time if added to standard local time
      * @see     #isDaylightSaving(UnixTime)
-     * @since   3.2/4.1
+     * @since   5.5
      */
     /*[deutsch]
-     * <p>Ermittelt die Tageslichtverschiebung zum angegebenen Zeitpunkt auf
+     * <p>Ermittelt die extra Verschiebung zum angegebenen Zeitpunkt auf
      * der UT-Weltzeitlinie in Sekunden. </p>
      *
      * <p>Hinweise: Die zur&uuml;ckgegebene Verschiebung hat niemals
@@ -893,11 +893,61 @@ public abstract class Timezone
      * letztere sei. </p>
      *
      * @param   ut      unix time
+     * @return  extra shift in seconds which yields local wall time if added to standard local time
+     * @see     #isDaylightSaving(UnixTime)
+     * @since   5.5
+     */
+    public abstract ZonalOffset getExtraOffset(UnixTime ut);
+
+    /**
+     * <p>Calculates the standard offset for given global timestamp. </p>
+     *
+     * @param   ut      unix time
+     * @return  standard shift in seconds which yields standard local time if added to unix time
+     * @since   3.2/4.1
+     * @deprecated  This method was renamed, use {@link #getRawOffset(UnixTime)} instead.
+     */
+    /*[deutsch]
+     * <p>Ermittelt die Standard-Zeitzonenverschiebung zum angegebenen Zeitpunkt auf
+     * der UT-Weltzeitlinie in Sekunden. </p>
+     *
+     * @param   ut      unix time
+     * @return  standard shift in seconds which yields standard local time if added to unix time
+     * @since   3.2/4.1
+     * @deprecated  This method was renamed, use {@link #getRawOffset(UnixTime)} instead.
+     */
+    @Deprecated
+    public final ZonalOffset getStandardOffset(UnixTime ut) {
+
+        return this.getRawOffset(ut);
+
+    }
+
+    /**
+     * <p>Calculates the daylight saving amount for given global timestamp. </p>
+     *
+     * @param   ut      unix time
      * @return  DST-shift in seconds which yields local wall time if added to standard local time
      * @see     #isDaylightSaving(UnixTime)
      * @since   3.2/4.1
+     * @deprecated  This method was renamed, use {@link #getExtraOffset(UnixTime)} instead.
      */
-    public abstract ZonalOffset getDaylightSavingOffset(UnixTime ut);
+    /*[deutsch]
+     * <p>Ermittelt die Tageslichtverschiebung zum angegebenen Zeitpunkt auf
+     * der UT-Weltzeitlinie in Sekunden. </p>
+     *
+     * @param   ut      unix time
+     * @return  DST-shift in seconds which yields local wall time if added to standard local time
+     * @see     #isDaylightSaving(UnixTime)
+     * @since   3.2/4.1
+     * @deprecated  This method was renamed, use {@link #getExtraOffset(UnixTime)} instead.
+     */
+    @Deprecated
+    public final ZonalOffset getDaylightSavingOffset(UnixTime ut) {
+
+        return this.getExtraOffset(ut);
+
+    }
 
     /**
      * <p>Calculates the offset for given local timestamp. </p>

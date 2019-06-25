@@ -39,39 +39,39 @@ public class EireZoneTest {
         assertThat(
             model.hasNegativeDST(), is(true));
         assertThat(
-            tz.getStandardOffset(PlainTimestamp.of(1968, 1, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
+            tz.getRawOffset(PlainTimestamp.of(1968, 1, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
         assertThat(
-            tz.getDaylightSavingOffset(PlainTimestamp.of(1968, 1, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
+            tz.getExtraOffset(PlainTimestamp.of(1968, 1, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
         assertThat(
             tz.isDaylightSaving(PlainTimestamp.of(1968, 1, 1, 0, 0).atUTC()), is(false));
         assertThat(
-            tz.getStandardOffset(PlainTimestamp.of(1968, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
+            tz.getRawOffset(PlainTimestamp.of(1968, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
         assertThat(
-            tz.getDaylightSavingOffset(PlainTimestamp.of(1968, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
+            tz.getExtraOffset(PlainTimestamp.of(1968, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
         assertThat(
             tz.isDaylightSaving(PlainTimestamp.of(1968, 4, 1, 0, 0).atUTC()), is(true));
         assertThat(
-            tz.getStandardOffset(Moment.UNIX_EPOCH).getIntegralAmount(), is(3600));
+            tz.getRawOffset(Moment.UNIX_EPOCH).getIntegralAmount(), is(3600));
         assertThat(
-            tz.getDaylightSavingOffset(Moment.UNIX_EPOCH).getIntegralAmount(), is(0));
+            tz.getExtraOffset(Moment.UNIX_EPOCH).getIntegralAmount(), is(0));
         assertThat(
             tz.isDaylightSaving(Moment.UNIX_EPOCH), is(true));
         assertThat(
-            tz.getStandardOffset(PlainTimestamp.of(1972, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
+            tz.getRawOffset(PlainTimestamp.of(1972, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
         assertThat(
-            tz.getDaylightSavingOffset(PlainTimestamp.of(1972, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
+            tz.getExtraOffset(PlainTimestamp.of(1972, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
         assertThat(
             tz.isDaylightSaving(PlainTimestamp.of(1972, 4, 1, 0, 0).atUTC()), is(true));
         assertThat(
-            tz.getStandardOffset(PlainTimestamp.of(1972, 11, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
+            tz.getRawOffset(PlainTimestamp.of(1972, 11, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
         assertThat(
-            tz.getDaylightSavingOffset(PlainTimestamp.of(1972, 11, 1, 0, 0).atUTC()).getIntegralAmount(), is(-3600));
+            tz.getExtraOffset(PlainTimestamp.of(1972, 11, 1, 0, 0).atUTC()).getIntegralAmount(), is(-3600));
         assertThat(
             tz.isDaylightSaving(PlainTimestamp.of(1972, 11, 1, 0, 0).atUTC()), is(false));
         assertThat(
-            tz.getStandardOffset(PlainTimestamp.of(1973, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
+            tz.getRawOffset(PlainTimestamp.of(1973, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(3600));
         assertThat(
-            tz.getDaylightSavingOffset(PlainTimestamp.of(1973, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
+            tz.getExtraOffset(PlainTimestamp.of(1973, 4, 1, 0, 0).atUTC()).getIntegralAmount(), is(0));
         assertThat(
             tz.isDaylightSaving(PlainTimestamp.of(1973, 4, 1, 0, 0).atUTC()), is(true));
     }

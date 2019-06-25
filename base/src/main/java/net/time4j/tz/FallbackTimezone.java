@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FallbackTimezone.java) is part of project Time4J.
  *
@@ -87,16 +87,16 @@ final class FallbackTimezone
     }
 
     @Override
-    public ZonalOffset getStandardOffset(UnixTime ut) {
+    public ZonalOffset getRawOffset(UnixTime ut) {
 
-        return this.fallback.getStandardOffset(ut);
+        return this.fallback.getRawOffset(ut);
 
     }
 
     @Override
-    public ZonalOffset getDaylightSavingOffset(UnixTime ut){
+    public ZonalOffset getExtraOffset(UnixTime ut){
 
-        return this.fallback.getDaylightSavingOffset(ut);
+        return this.fallback.getExtraOffset(ut);
 
     }
 

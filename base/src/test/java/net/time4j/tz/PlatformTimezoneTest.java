@@ -56,16 +56,16 @@ public class PlatformTimezoneTest {
     public void getPartialOffsetsOfUnixTimeWinter() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
         Moment utc = Moment.of(40 * 365 * 86400, TimeScale.POSIX);
-        assertThat(tz.getStandardOffset(utc).canonical(), is("UTC+01:00"));
-        assertThat(tz.getDaylightSavingOffset(utc).canonical(), is("Z"));
+        assertThat(tz.getRawOffset(utc).canonical(), is("UTC+01:00"));
+        assertThat(tz.getExtraOffset(utc).canonical(), is("Z"));
     }
 
     @Test
     public void getPartialOffsetsOfUnixTimeSummer() {
         Timezone tz = loadFromPlatform("Europe/Berlin");
         Moment utc = Moment.of((40 * 365 + 180) * 86400, TimeScale.POSIX);
-        assertThat(tz.getStandardOffset(utc).canonical(), is("UTC+01:00"));
-        assertThat(tz.getDaylightSavingOffset(utc).canonical(), is("UTC+01:00"));
+        assertThat(tz.getRawOffset(utc).canonical(), is("UTC+01:00"));
+        assertThat(tz.getExtraOffset(utc).canonical(), is("UTC+01:00"));
     }
 
     @Test
