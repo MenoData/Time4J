@@ -1,4 +1,7 @@
 ## [v5.5] not yet released
+### Deprecated
+- Rename the terms "standard offset" and "daylight-saving-offset" in related methods [#874]
+
 ### Fixed
 - Document that Hebrew calendar starting at 18:00 is an approximation for sunset [#873]
 
