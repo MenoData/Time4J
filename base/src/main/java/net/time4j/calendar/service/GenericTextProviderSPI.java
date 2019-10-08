@@ -84,6 +84,7 @@ public final class GenericTextProviderSPI
         types.add("dangi");
         types.add("ethiopic");
         types.add("extra/frenchrev");
+        types.add("extra/hindu");
         types.add("generic");
         types.add("hebrew");
         types.add("indian");
@@ -143,15 +144,21 @@ public final class GenericTextProviderSPI
         boolean leapForm
     ) {
 
-        if (calendarType.equals("roc") || calendarType.equals("buddhist")) {
-            List<String> months = CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms();
-            return months.toArray(new String[months.size()]);
-        } else if (calendarType.equals("japanese")) {
-            return new String[] { "1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13" };
-        } else if (calendarType.equals("dangi") || calendarType.equals("vietnam")) {
-            calendarType = "chinese"; // Umleitung
-        } else if (calendarType.equals("juche")) {
-            return CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms().toArray(new String[12]);
+        switch (calendarType) {
+            case "roc":
+            case "buddhist":
+            case "juche":
+                List<String> months = CalendarText.getIsoInstance(locale).getStdMonths(tw, oc).getTextForms();
+                return months.toArray(new String[months.size()]);
+            case "japanese":
+                return new String[]{"1", "2", "3", "4", "5", "6", "7", "8", "9", "10", "11", "12", "13"};
+            case "dangi":
+            case "vietnam":
+                calendarType = "chinese"; // Umleitung
+                break;
+            case "extra/hindu":
+                calendarType = "indian"; // Umleitung
+                break;
         }
 
         PropertyBundle rb = getBundle(calendarType, locale);
@@ -223,19 +230,23 @@ public final class GenericTextProviderSPI
         TextWidth tw
     ) {
 
-        if (calendarType.equals("chinese") || calendarType.equals("vietnam")) {
-            return EMPTY_STRINGS; // special handling in era elements of East Asian calendars
-        } else if (calendarType.equals("japanese")) { // special handling in class Nengo !!!
-            if (tw == TextWidth.NARROW) {
-                return new String[] { "M", "T", "S", "H" };
-            } else {
-                return new String[] { "Meiji", "Taishō", "Shōwa", "Heisei" };
-            }
-        } else if (calendarType.equals("dangi") || calendarType.equals("juche")) {
-            String[] koreans = this.eras("korean", locale, tw);
-            String[] names = new String[1];
-            names[0] = (calendarType.equals("dangi") ? koreans[0] : koreans[1]);
-            return names;
+        switch (calendarType) {
+            case "chinese":
+            case "vietnam":
+                return EMPTY_STRINGS; // special handling in era elements of East Asian calendars
+
+            case "japanese":  // special handling in class Nengo !!!
+                if (tw == TextWidth.NARROW) {
+                    return new String[]{"M", "T", "S", "H"};
+                } else {
+                    return new String[]{"Meiji", "Taishō", "Shōwa", "Heisei"};
+                }
+            case "dangi":
+            case "juche":
+                String[] koreans = this.eras("korean", locale, tw);
+                String[] names = new String[1];
+                names[0] = (calendarType.equals("dangi") ? koreans[0] : koreans[1]);
+                return names;
         }
 
         PropertyBundle rb = getBundle(calendarType, locale);
@@ -452,9 +463,13 @@ public final class GenericTextProviderSPI
 
     private static int countOfEras(String ct) {
 
+        if (ct.equals("extra/hindu")) {
+            return 6;
+        }
+
         return (
             (ct.equals("ethiopic") || ct.equals("generic")
-                || ct.equals("roc") || ct.equals("buddhist") || ct.equals("korean")) ? 2 : 1);
+             || ct.equals("roc") || ct.equals("buddhist") || ct.equals("korean")) ? 2 : 1);
 
     }
 
