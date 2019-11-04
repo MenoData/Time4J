@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractMetric.java) is part of project Time4J.
  *
@@ -40,6 +40,9 @@ import java.util.List;
  * the duration will be normalized such that small units will be
  * converted to larger units if possible. </p>
  *
+ * <p>This metric can be changed to a reversible one by calling {@code reversible()}
+ * (third invariance in {@code AbstractDuration}. </p>
+ *
  * @param   <U> generic type of time unit ({@code ChronoUnit})
  * @param   <P> generic type of duration result
  * @author  Meno Hochschild
@@ -59,6 +62,9 @@ import java.util.List;
  * in der Regel normalisiert, also kleine Zeiteinheiten so weit wie
  * m&ouml;glich in gro&szlig;e Einheiten umgerechnet. </p>
  *
+ * <p>Diese Metrik kann mittels Aufruf von {@code reversible()} umkehrbar gemacht werden
+ * (dritte Invarianzbedingung in {@code AbstractDuration}. </p>
+ *
  * @param   <U> generic type of time unit ({@code ChronoUnit})
  * @param   <P> generic type of duration result
  * @author  Meno Hochschild
@@ -70,6 +76,7 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final int MIO = 1000000;
+    private static final double LENGTH_OF_FORTNIGHT = 86400.0 * 14;
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -117,12 +124,14 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
 
         List<U> list = new ArrayList<>(units.length);
         Collections.addAll(list, units);
-        Collections.sort(list, this);
+        list.sort(this);
 
         for (int i = 0, n = list.size(); i < n; i++) {
+            U unit = list.get(i);
+
             for (int j = i + 1; j < n; j++) {
-                if (list.get(i).equals(list.get(j))) {
-                    throw new IllegalArgumentException("Duplicate unit: " + list.get(i));
+                if (unit.equals(list.get(j))) {
+                    throw new IllegalArgumentException("Duplicate unit: " + unit);
                 }
             }
         }
@@ -162,6 +171,17 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
         T end
     ) {
 
+        return this.between(start, end, -1);
+
+    }
+
+    @SuppressWarnings("unchecked")
+    private <T extends TimePoint<? super U, T>> P between(
+        T start,
+        T end,
+        int monthIndex
+    ) {
+
         if (end.equals(start)) {
             return this.createEmptyTimeSpan();
         }
@@ -180,26 +200,19 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
 
         List<TimeSpan.Item<U>> resultList = new ArrayList<>(10);
         TimeAxis<? super U, T> engine = start.getChronology();
-        U unit = null;
-        long amount = 0;
         int index = 0;
         int endIndex = this.sortedUnits.size();
 
         while (index < endIndex) {
 
-            // Nächste Subtraktion vorbereiten
-            if (amount > 0) {
-                t1 = t1.plus(amount, unit);
-            }
-
             // Aktuelle Zeiteinheit bestimmen
-            unit = this.sortedUnits.get(index);
+            U unit = this.sortedUnits.get(index);
 
             if (
                 (this.getLength(engine, unit) < 1.0)
                 && (index < endIndex - 1)
             ) {
-                amount = 0; // Millis oder Mikros vor Nanos nicht berechnen (maximal eine fraktionale Einheit)
+                // Millis oder Mikros vor Nanos nicht berechnen (maximal eine fraktionale Einheit)
             } else {
                 // konvertierbare Einheiten zusammenfassen
                 int k = index + 1;
@@ -221,15 +234,29 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
                 index = k - 1;
 
                 // Differenz in einer Einheit berechnen
-                amount = t1.until(t2, unit);
-                
-                if (amount > 0) {
-                    resultList.add(this.resolve(TimeSpan.Item.of(amount, unit)));
-                } else if (amount < 0) {
+                long amount = t1.until(t2, unit);
+
+                if (amount < 0) {
                     throw new IllegalStateException(
                         "Implementation error: "
-                        + "Cannot compute timespan "
-                        + "due to illegal negative timespan amounts.");
+                            + "Cannot compute timespan "
+                            + "due to illegal negative timespan amounts.");
+                }
+
+                // Dauerkomponente erzeugen, mit Monatsendekorrektur ggf. Betrag verkleinern
+                while (amount > 0) {
+                    T temp = t1.plus(amount, unit);
+                    if (
+                        (index > monthIndex)
+                        || (index == endIndex - 1)
+                        || temp.minus(amount, unit).equals(t1)
+                    ) {
+                        t1 = temp;
+                        resultList.add(this.resolve(TimeSpan.Item.of(amount, unit)));
+                        break;
+                    } else {
+                        amount--; // avoid possible end-of-month-correction
+                    }
                 }
             }
             index++;
@@ -240,6 +267,13 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
         }
 
         return this.createTimeSpan(resultList, negative);
+
+    }
+
+    @Override
+    public TimeMetric<U, P> reversible() {
+
+        return new ReversalMetric<>(this);
 
     }
 
@@ -297,6 +331,7 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
 
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends TimePoint<? super U, T>> void normalize(
         TimeAxis<? super U, T> engine,
         List<U> sortedUnits,
@@ -416,6 +451,7 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
 
     }
 
+    @SuppressWarnings("unchecked")
     private <T extends TimePoint<? super U, T>> double getLength(
         TimeAxis<? super U, T> engine,
         U unit
@@ -423,6 +459,49 @@ public abstract class AbstractMetric<U extends ChronoUnit, P extends AbstractDur
 
         return engine.getLength(unit);
 
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class ReversalMetric<U extends ChronoUnit, P extends AbstractDuration<U>>
+        implements TimeMetric<U, P> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final AbstractMetric<U, P> delegate;
+        private final int monthIndex;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        private ReversalMetric(AbstractMetric<U, P> delegate) {
+            super();
+
+            this.delegate = delegate;
+            int mi = -1;
+
+            for (int i = this.delegate.sortedUnits.size() - 1; i >= 0; i--) {
+                U unit = this.delegate.sortedUnits.get(i);
+
+                if (Double.compare(unit.getLength(), LENGTH_OF_FORTNIGHT) > 0) {
+                    mi = i;
+                    break;
+                }
+            }
+
+            this.monthIndex = mi;
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public <T extends TimePoint<? super U, T>> P between(T start, T end) {
+            return this.delegate.between(start, end, this.monthIndex);
+        }
+
+        @Override
+        public TimeMetric<U, P> reversible() {
+            return this;
+        }
     }
 
 }

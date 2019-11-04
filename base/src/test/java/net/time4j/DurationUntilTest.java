@@ -1,5 +1,6 @@
 package net.time4j;
 
+import net.time4j.engine.TimeMetric;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -9,6 +10,7 @@ import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.WEEKS;
 import static net.time4j.CalendarUnit.YEARS;
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 
@@ -52,6 +54,9 @@ public class DurationUntilTest {
         assertThat(
             start.until(end, Duration.in(MONTHS, DAYS)),
             is(Duration.ofCalendarUnits(0, 1, 30)));
+        assertThat(
+            start.until(end, Duration.in(MONTHS, DAYS).reversible()),
+            is(Duration.ofCalendarUnits(0, 0, 58)));
 
         start = PlainDate.of(2013, 5, 29);
         end = PlainDate.of(2014, 2, 28);
@@ -121,11 +126,12 @@ public class DurationUntilTest {
         IsoUnit[] units = {
             CalendarUnit.MONTHS, CalendarUnit.DAYS,
             ClockUnit.HOURS, ClockUnit.MINUTES};
+        Duration<?> p = Duration.ofPositive().months(1).days(3).hours(9).minutes(15).build();
         assertThat(
             Duration.in(units).between(t1, t2),
-            is(
-                Duration.ofPositive().months(1).days(3)
-                    .hours(9).minutes(15).build()));
+            is(p));
+        assertThat(t1.plus(p), is(t2));
+        assertThat(t2.minus(p), not(t1));
     }
 
     @Test
@@ -149,11 +155,12 @@ public class DurationUntilTest {
         IsoUnit[] units = {
             CalendarUnit.MONTHS, CalendarUnit.DAYS,
             ClockUnit.HOURS, ClockUnit.MINUTES};
+        Duration<?> p = Duration.ofPositive().months(1).hours(9).minutes(15).build();
         assertThat(
             Duration.in(units).between(t1, t2),
-            is(
-                Duration.ofPositive().months(1).days(0)
-                .hours(9).minutes(15).build()));
+            is(p));
+        assertThat(t1.plus(p), is(t2));
+        assertThat(t2.minus(p), not(t1));
     }
 
     @Test
@@ -176,9 +183,12 @@ public class DurationUntilTest {
 		PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 1, 7, 0);
 		IsoUnit[] units = {
 		    CalendarUnit.MONTHS, ClockUnit.HOURS, ClockUnit.MINUTES};
+        Duration<?> p = Duration.ofPositive().months(1).hours(9).minutes(15).build();
         assertThat(
             Duration.in(units).between(t1, t2),
-            is(Duration.ofPositive().months(1).hours(9).minutes(15).build()));
+            is(p));
+        assertThat(t1.plus(p), is(t2));
+        assertThat(t2.minus(p), not(t1));
     }
 
     @Test
@@ -204,6 +214,20 @@ public class DurationUntilTest {
     }
 
     @Test
+    public void betweenTimestamps8() {
+        PlainTimestamp t1 = PlainTimestamp.of(2014, 1, 31, 21, 45);
+        PlainTimestamp t2 = PlainTimestamp.of(2014, 3, 1, 7, 0);
+        IsoUnit[] units = {
+            CalendarUnit.MONTHS, ClockUnit.HOURS, ClockUnit.MINUTES};
+        Duration<?> p = Duration.ofPositive().hours(681).minutes(15).build();
+        assertThat(
+            Duration.in(units).reversible().between(t1, t2),
+            is(p));
+        assertThat(t1.plus(p), is(t2));
+        assertThat(t2.minus(p), is(t1));
+    }
+
+    @Test
     public void betweenWeekBased() {
         PlainDate d1 = PlainDate.of(2012, 1, 1); // Sunday
         PlainDate d2 = PlainDate.of(2016, 3, 1); // Tuesday
@@ -214,6 +238,23 @@ public class DurationUntilTest {
         assertThat(
             d1.plus(expected),
             is(d2));
+    }
+
+    @Test
+    public void reversible() {
+        PlainDate d1 = PlainDate.of(2011, 3, 31);
+        PlainDate d2 = PlainDate.of(2011, 7, 1);
+
+        TimeMetric<CalendarUnit, Duration<CalendarUnit>> metric =
+            Duration.inYearsMonthsDays().reversible();
+        Duration<CalendarUnit> duration =
+            metric.between(d1, d2); // P2M31D
+        Duration<CalendarUnit> invDur =
+            metric.between(d2, d1); // -P2M31D
+
+        assertThat(d1.plus(duration), is(d2)); // first invariance
+        assertThat(invDur, is(duration.inverse())); // second invariance
+        assertThat(d2.minus(duration), is(d1)); // third invariance
     }
 
 }

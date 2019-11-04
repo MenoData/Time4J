@@ -21,6 +21,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import static org.hamcrest.CoreMatchers.is;
+import static org.hamcrest.CoreMatchers.not;
 import static org.junit.Assert.assertThat;
 
 
@@ -136,17 +137,20 @@ public class RangeDurationTest {
     public void durationOfTimestampInterval() {
         TimestampInterval interval =
             TimestampInterval.between(
-                PlainTimestamp.of(2014, 1, 31, 21, 45),
+                PlainTimestamp.of(2013, 12, 31, 21, 45),
                 PlainTimestamp.of(2014, 3, 4, 7, 0)
             );
         IsoUnit[] units = {
             CalendarUnit.MONTHS, CalendarUnit.DAYS,
             ClockUnit.HOURS, ClockUnit.MINUTES};
+        Duration<?> p = Duration.ofPositive().months(2).days(3).hours(9).minutes(15).build();
+        Duration<?> r = Duration.ofPositive().months(1).days(31).hours(9).minutes(15).build();
         assertThat(
             interval.getDuration(units),
-            is(
-                Duration.ofPositive().months(1).days(3)
-                .hours(9).minutes(15).build()));
+            is(p));
+        assertThat(interval.getStartAsTimestamp().plus(p), is(interval.getEndAsTimestamp()));
+        assertThat(interval.getEndAsTimestamp().minus(p), not(interval.getStartAsTimestamp()));
+        assertThat(interval.getEndAsTimestamp().minus(r), is(interval.getStartAsTimestamp()));
     }
 
     @Test
