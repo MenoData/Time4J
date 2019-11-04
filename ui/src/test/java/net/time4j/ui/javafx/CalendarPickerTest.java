@@ -16,6 +16,7 @@ import javafx.scene.paint.Paint;
 import javafx.stage.Stage;
 import javafx.util.Duration;
 import net.time4j.PlainDate;
+import net.time4j.calendar.CopticCalendar;
 import net.time4j.calendar.EthiopianCalendar;
 import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
@@ -111,6 +112,14 @@ public class CalendarPickerTest
         gridPane.add(datePicker, 1, row);
 
         row++;
+        Label labelCoptic = new Label("Coptic");
+        labelCoptic.setAlignment(Pos.CENTER_RIGHT);
+        gridPane.add(labelCoptic, 0, row);
+        CalendarPicker<CopticCalendar> copticPicker = CalendarPicker.copticWithSystemDefaults();
+        copticPicker.setLocale(Locale.ENGLISH);
+        gridPane.add(copticPicker, 1, row);
+
+        row++;
         Label labelEthiopian = new Label("Ethiopian");
         labelEthiopian.setAlignment(Pos.CENTER_RIGHT);
         gridPane.add(labelEthiopian, 0, row);
@@ -183,7 +192,7 @@ public class CalendarPickerTest
         gridPane.add(thaisolarPicker, 1, row);
 
         gridPane.setAlignment(Pos.CENTER);
-        Scene scene = new Scene(gridPane, 305, 320);
+        Scene scene = new Scene(gridPane, 305, 350);
         stage.setScene(scene);
         stage.show();
 
