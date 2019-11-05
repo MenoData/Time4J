@@ -50,6 +50,7 @@ import javafx.util.Duration;
 import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
+import net.time4j.calendar.CopticCalendar;
 import net.time4j.calendar.EthiopianCalendar;
 import net.time4j.calendar.HebrewCalendar;
 import net.time4j.calendar.HijriCalendar;
@@ -351,6 +352,66 @@ public class CalendarPicker<T extends CalendarDate>
         return CalendarPicker.create(
             PlainDate.axis(),
             new FXCalendarSystemIso8601(),
+            locale,
+            todaySupplier
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the coptic calendar system using system defaults
+     * for the locale and the current local time. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     * @since   5.5
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den koptischen Kalender
+     * unter Benutzung von aus dem System abgeleiteten Standardwerten f&uuml;r die Sprach- und
+     * L&auml;dereinstellung und die aktuelle Zonenzeit. </p>
+     *
+     * @return  CalendarPicker
+     * @see     Locale#getDefault(Locale.Category) Locale.getDefault(Locale.Category.FORMAT)
+     * @see     SystemClock#inLocalView()
+     * @see     ZonalClock#now(Chronology)
+     * @since   5.5
+     */
+    public static CalendarPicker<CopticCalendar> copticWithSystemDefaults() {
+
+        return CalendarPicker.coptic(
+            Locale.getDefault(Locale.Category.FORMAT),
+            () -> SystemClock.inLocalView().now(CopticCalendar.axis())
+        );
+
+    }
+
+    /**
+     * <p>Creates a new {@code CalendarPicker} for the coptic calendar system. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     * @since   5.5
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen neuen {@code CalendarPicker} f&uuml;r den koptischen Kalender. </p>
+     *
+     * @param   locale          the language and country configuration
+     * @param   todaySupplier   determines the current calendar date
+     * @return  CalendarPicker
+     * @since   5.5
+     */
+    public static CalendarPicker<CopticCalendar> coptic(
+        Locale locale,
+        Supplier<CopticCalendar> todaySupplier
+    ) {
+
+        return CalendarPicker.create(
+            CopticCalendar.axis(),
+            new FXCalendarSystemCoptic(),
             locale,
             todaySupplier
         );

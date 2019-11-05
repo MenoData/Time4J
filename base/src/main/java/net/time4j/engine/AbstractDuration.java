@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractDuration.java) is part of project Time4J.
  *
@@ -41,7 +41,7 @@ import java.util.List;
  *  given time point argument in the future. </li>
  *  <li>Negative duration =&gt; All contained time units will be
  *  subtracted in the reversed order from the smallest to the largest
- *  units.  Convertible units will be consolidated in one step. The
+ *  units. Convertible units will be consolidated in one step. The
  *  new time point is relative to given time point argument in the
  *  past. </li>
  * </ol>
@@ -73,15 +73,33 @@ import java.util.List;
  *  {@code t2.until(t1).equals(t1.until(t2).inverse()) == true}
  * </li></ul>
  *
- * <p><strong>Note:</strong> The THIRD INVARIANCE
- * {@code t1.plus(t1.until(t2)).minus(t1.until(t2)).equals(t1) == true}
- * is often INVALID. A counter example where this invariance is
- * violated is given with following dates:
- * {t1, t2} = {[2011-05-31], [2011-07-01]}. But if the additional
- * condition is required that the day of month is never after 28th
- * of a month then this third invariance can be guaranteed.
- * Therefore it is recommended to avoid dates near the end of
- * month in addition. </p>
+ * <p>Following condition only holds if either the day-of-month of any involved date is
+ * smaller than 28 or if a reversible metric is used: </p>
+ *
+ * <ul><li>THIRD INVARIANCE:
+ *  {@code t2.minus(t1.until(t2)).equals(t1) == true}
+ * </li></ul>
+ *
+ * <p><strong>Note:</strong> Usually the third invariance is NOT valid. A counter example
+ * is given with following dates: {t1, t2} = {[2011-03-31], [2011-07-01]} =&gt; P3M1D (using
+ * the standard metric) because of [2011-07-01] - P3M1D = [2011-03-30]. Example for using
+ * a reversible metric: </p>
+ *
+ * <pre>
+ *     PlainDate d1 = PlainDate.of(2011, 3, 31);
+ *     PlainDate d2 = PlainDate.of(2011, 7, 1);
+ *
+ *     TimeMetric&lt;CalendarUnit, Duration&lt;CalendarUnit&gt;&gt; metric =
+ *        Duration.inYearsMonthsDays().reversible();
+ *     Duration&lt;CalendarUnit&gt; duration =
+ *        metric.between(d1, d2); // P2M31D
+ *     Duration&lt;CalendarUnit&gt; invDur =
+ *        metric.between(d2, d1); // -P2M31D
+ *
+ *     boolean firstInvariance = d1.plus(duration).equals(d2); // true
+ *     boolean secondInvariance = invDur.equals(duration.inverse()); // true
+ *     boolean thirdInvariance = d2.minus(duration).equals(d1); // true
+ * </pre>
  *
  * <div style="background-color:#E0E0E0;padding:5px;margin:5px;">
  *
@@ -102,7 +120,7 @@ import java.util.List;
  * equivalent relation holds (paying attention to non-commutativity
  * and given the side conditions to compute the duration without
  * remainder completely and to consider a minus-operation as
- * equalizing a plus-operation (with t1-day-of-month &lt;= 28): </p>
+ * equalizing a plus-operation: </p>
  *
  * <ul>
  *  <li>[t1] - [months] - [days] = [t2]</li>
@@ -126,15 +144,16 @@ import java.util.List;
  * even if the day of month is the first day of month: t2.minus(P1M30D)
  * would not yield t1 but [2013-01-29]. Surely, the sign-dependent
  * execution of addition steps cannot completely guarantee the third
- * invariance but it can guarantee it at least for all days in original
- * date until the 28th of month. </p>
+ * invariance in case of factory-created durations but it can guarantee
+ * it at least for all days in original date until the 28th of month. </p>
  *
  * <p>Furthermore the specified algorithm ensures the second invariance
  * {@code Duration([t1, t2]) = -Duration([t2, t1])} which expresses
- * a physical property of any duration. The second invariance means
- * that the sign of a duration can only qualify if the first time point
- * is before the second time point or other way around. The sign must
- * not qualify the always positive length of a duration itself however. </p>
+ * a physical property of any duration as a directed temporal amount.
+ * The second invariance means that the sign of a duration can only
+ * qualify if the first time point is before the second time point or
+ * other way around. The sign must not qualify the always positive length
+ * of a duration itself however. </p>
  * </div>
  *
  * @author  Meno Hochschild
@@ -193,14 +212,34 @@ import java.util.List;
  *  {@code t2.until(t1).equals(t1.until(t2).inverse()) == true}
  * </li></ul>
  *
- * <p><strong>Zu beachten:</strong> Allgemein gilt die DRITTE INVARIANZ
- * {@code t1.plus(t1.until(t2)).minus(t1.until(t2)).equals(t1) == true}
- * NICHT. Ein Gegenbeispiel ist mit {t1, t2} = {[2011-05-31], [2011-07-01]}
- * gegeben. Wird aber hier als zus&auml;tzliche Randbedingung verlangt,
- * da&szlig; etwa der Tag des Monats nicht nach dem 28. liegt, dann gilt
- * diese Invarianz doch noch. Es wid daher empfohlen, bei der Addition von
- * Monaten m&ouml;glichst Datumsangaben zu vermeiden, die am Ende eines
- * Monats liegen. </p>
+ * <p>Die folgende Invarianzbedingung gilt nur, wenn entweder der betroffene
+ * Tag des Monats in den beteiligten Datumsangaben kleiner als 28 ist oder
+ * wenn eine umkehrbare Metrik verwendet wird: </p>
+ *
+ * <ul><li>DRITTE INVARIANZ:
+ *  {@code t2.minus(t1.until(t2)).equals(t1) == true}
+ * </li></ul>
+ *
+ * <p><strong>Note:</strong> Gew&ouml;hnlich ist die dritte Invarianzbedingung nicht g&uuml;ltig.
+ * Ein Gegenbeispiel ist mit folgenden Werten gegeben: {t1, t2} = {[2011-03-31], [2011-07-01]}
+ * =&gt; P3M1D (im Fall der Standardmetrik) wegen [2011-07-01] - P3M1D = [2011-03-30]. Beispiel
+ * zur Verwendung einer umkehrbaren Metrik: </p>
+ *
+ * <pre>
+ *     PlainDate d1 = PlainDate.of(2011, 3, 31);
+ *     PlainDate d2 = PlainDate.of(2011, 7, 1);
+ *
+ *     TimeMetric&lt;CalendarUnit, Duration&lt;CalendarUnit&gt;&gt; metric =
+ *        Duration.inYearsMonthsDays().reversible();
+ *     Duration&lt;CalendarUnit&gt; duration =
+ *        metric.between(d1, d2); // P2M31D
+ *     Duration&lt;CalendarUnit&gt; invDur =
+ *        metric.between(d2, d1); // -P2M31D
+ *
+ *     boolean firstInvariance = d1.plus(duration).equals(d2); // true
+ *     boolean secondInvariance = invDur.equals(duration.inverse()); // true
+ *     boolean thirdInvariance = d2.minus(duration).equals(d1); // true
+ * </pre>
  *
  * <div style="background-color:#E0E0E0;padding:5px;margin:5px;">
  *
@@ -242,8 +281,9 @@ import java.util.List;
  * Tag des Monats im Ausgangsdatum der erste ist. Denn: t2.minus(P1M30D)
  * erg&auml;be dann nicht t1, sondern [2013-01-29]. Zwar kann die
  * vorzeichenabh&auml;ngige Ausf&uuml;hrung der Rechenschritte nicht
- * vollst&auml;ndig die dritte Invarianz garantieren, aber wenigstens
- * doch f&uuml;r alle Tage im Ausgangsdatum bis zum 28. eines Monats. </p>
+ * vollst&auml;ndig die dritte Invarianz garantieren (im Fall von nicht
+ * berechneten Dauer-Objekten), aber wenigstens doch f&uuml;r alle Tage
+ * im Ausgangsdatum bis zum 28. eines Monats. </p>
  *
  * <p>Gleichzeitig hilft der Time4J-Algorithmus die Invarianz
  * {@code Duration([t1, t2]) = -Duration([t2, t1])} einzuhalten,

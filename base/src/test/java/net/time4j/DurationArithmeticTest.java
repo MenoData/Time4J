@@ -17,9 +17,9 @@ import static org.junit.Assert.assertThat;
 @RunWith(Parameterized.class)
 public class DurationArithmeticTest {
 
- 	@Parameters(name= "{index}: [start={0}-{1}-{2}/end={3}-{4}-{5}] => {6}")
- 	public static Iterable<Object[]> data() {
- 		return Arrays.asList(
+    @Parameters(name= "{index}: [start={0}-{1}-{2}/end={3}-{4}-{5}] => {6}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(
             new Object[][] {
                 {2012, 2, 29, 2016, 2, 29, "P4Y"},
                 {2012, 2, 29, 2016, 2, 29, "P3Y12M"},

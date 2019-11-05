@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MachineTime.java) is part of project Time4J.
  *
@@ -105,26 +105,26 @@ public final class MachineTime<U>
     private static final MachineTime<SI> UTC_ZERO = new MachineTime<>(0, 0, UTC);
 
     /**
-     * Metric on the POSIX scale (without leap seconds).
+     * Reversible metric on the POSIX scale (without leap seconds).
      *
      * @since   2.0
      */
     /*[deutsch]
-     * Metrik auf der POSIX-Skala (ohne Schaltsekunden).
+     * Umkehrbare Metrik auf der POSIX-Skala (ohne Schaltsekunden).
      *
      * @since   2.0
      */
     public static final TimeMetric<TimeUnit, MachineTime<TimeUnit>> ON_POSIX_SCALE = new Metric<>(POSIX);
 
     /**
-     * <p>Metric on the UTC scale (inclusive leap seconds). </p>
+     * <p>Reversible metric on the UTC scale (inclusive leap seconds). </p>
      * 
      * <p>Time points before 1972 are not supported. </p>
      *
      * @since   2.0
      */
     /*[deutsch]
-     * <p>Metrik auf der UTC-Skala (inklusive Schaltsekunden). </p>
+     * <p>Umkehrbare Metrik auf der UTC-Skala (inklusive Schaltsekunden). </p>
      *
      * <p>Zeitpunkte vor 1972 werden nicht unterst&uuml;tzt. </p>
      *
@@ -1833,6 +1833,11 @@ public final class MachineTime<U>
 
             return new MachineTime<>(secs, nanos, this.scale);
 
+        }
+
+        @Override
+        public Metric<U> reversible() {
+            return this;
         }
 
     }

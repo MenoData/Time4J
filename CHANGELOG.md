@@ -1,4 +1,10 @@
-## [v5.5] not yet released
+## [v5.6] not yet released
+
+## [v5.5] published on 2019-11-04
+### Added
+- Reversible time metric [#881]
+- Coptic calendar for JavaFX-CalendarPicker [#882]
+
 ### Deprecated
 - Rename the terms "standard offset" and "daylight-saving-offset" in related methods [#874]
 
