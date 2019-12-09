@@ -2,6 +2,7 @@ package net.time4j;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.engine.TimePoint;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
