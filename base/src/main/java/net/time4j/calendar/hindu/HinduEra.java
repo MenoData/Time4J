@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HinduEra.java) is part of project Time4J.
  *
@@ -32,14 +32,14 @@ import java.util.Locale;
  * <p>The Hindu calendar supports several eras in different regions of Indian subcontinent. </p>
  *
  * @author  Meno Hochschild
- * @since   5.5
+ * @since   5.6
  */
 /*[deutsch]
  * <p>Der Hindu-Kalender unterst&uuml;tzt mehrere &Auml;ras in verschiedenen Regionen des
  * indischen Subkontinents. </p>
  *
  * @author  Meno Hochschild
- * @since   5.5
+ * @since   5.6
  */
 public enum HinduEra
     implements CalendarEra {
