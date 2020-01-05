@@ -8,7 +8,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        HinduEraTest.class
+        HinduEraTest.class,
+        HinduVariantTest.class
     }
 )
 public class HinduSuite {

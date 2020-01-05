@@ -71,12 +71,27 @@ public final class HinduVariant
      */
     private final HinduEra era;
 
+    /**
+     * @serial  determines if elapsed years are used
+     */
+    private final boolean elapsedMode;
+
     //~ Konstruktoren -----------------------------------------------------
 
     private HinduVariant(
         int type,
         HinduRule rule,
         HinduEra era
+    ) {
+        this(type, rule, era, useStandardElapsedMode(era, rule));
+
+    }
+
+    private HinduVariant(
+        int type,
+        HinduRule rule,
+        HinduEra era,
+        boolean elapsedMode
     ) {
         super();
 
@@ -91,6 +106,7 @@ public final class HinduVariant
         this.type = type;
         this.rule = rule;
         this.era = era;
+        this.elapsedMode = elapsedMode;
 
     }
 
@@ -296,6 +312,7 @@ public final class HinduVariant
         int lType = -1;
         HinduRule lRule = null;
         HinduEra lEra = null;
+        boolean elapsedMode = false;
 
         while (st.hasMoreTokens()) {
             count++;
@@ -310,13 +327,16 @@ public final class HinduVariant
                 case 3:
                     lEra = HinduEra.valueOf(token);
                     break;
+                case 4:
+                    elapsedMode = token.equals("e");
+                    break;
                 default:
                     throw new IllegalArgumentException("Invalid variant: " + variant);
             }
         }
 
         try {
-            return new HinduVariant(lType, lRule, lEra);
+            return new HinduVariant(lType, lRule, lEra, elapsedMode);
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid variant: " + variant);
         }
@@ -335,7 +355,7 @@ public final class HinduVariant
      */
     public CalendarSystem<HinduCalendar> getCalendarSystem() {
 
-        throw new UnsupportedOperationException("Not yet implemented.");
+        throw new UnsupportedOperationException("Not yet implemented: " + this.getVariant());
 
     }
 
@@ -383,7 +403,7 @@ public final class HinduVariant
      */
     public boolean isSolar() {
 
-        return (this.type == 0);
+        return (this.type == TYPE_SOLAR);
 
     }
 
@@ -403,6 +423,43 @@ public final class HinduVariant
 
     }
 
+    /**
+     * <p>Determines if this variant describes the purnimanta scheme. </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
+     * <p>Bestimmt, ob diese Variante das Purnimanta-Schema beschreibt. </p>
+     *
+     * @return  boolean
+     */
+    public boolean isPurnimanta() {
+
+        return (this.type == TYPE_PURNIMANTA);
+
+    }
+
+    /**
+     * <p>Does this variant use elapsed years? </p>
+     *
+     * <p>Elapsed years are the standard, however, in most southern parts of India current years are used. </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
+     * <p>Verwendet diese Variante abgelaufene Jahre? </p>
+     *
+     * <p>Abgelaufene Jahre sind der Standard. Allerdings verwenden einige s&uuml;dliche Teile von Indien
+     * laufende Jahre. </p>
+     *
+     * @return  boolean
+     */
+    public boolean isUsingElapsedYears() {
+
+        return this.elapsedMode;
+
+    }
+
     @Override
     public boolean equals(Object obj) {
 
@@ -410,7 +467,11 @@ public final class HinduVariant
             return true;
         } else if (obj instanceof HinduVariant) {
             HinduVariant that = (HinduVariant) obj;
-            return ((this.type == that.type) && (this.rule == that.rule) && (this.era == that.era));
+            return (
+                (this.type == that.type)
+                    && (this.rule == that.rule)
+                    && (this.era == that.era)
+                    && (this.elapsedMode == that.elapsedMode));
         } else {
             return false;
         }
@@ -420,7 +481,7 @@ public final class HinduVariant
     @Override
     public int hashCode() {
 
-        return this.type + 17 * this.rule.hashCode() + 31 * this.era.hashCode();
+        return this.type + 17 * this.rule.hashCode() + 31 * this.era.hashCode() + (this.elapsedMode ? 1 : 0);
 
     }
 
@@ -454,6 +515,8 @@ public final class HinduVariant
         sb.append(this.rule.name());
         sb.append('|');
         sb.append(this.era.name());
+        sb.append('|');
+        sb.append(this.elapsedMode ? "elapsed-year" : "current-year");
         sb.append(']');
         return sb.toString();
 
@@ -468,7 +531,110 @@ public final class HinduVariant
         sb.append(this.rule.name());
         sb.append('|');
         sb.append(this.era.name());
+        sb.append('|');
+        sb.append(this.elapsedMode ? "e" : "c");
         return sb.toString();
+
+    }
+
+    /**
+     * <p>Creates a copy of this variant with given preferred era. </p>
+     *
+     * @param   defaultEra  the new deviating era
+     * @return  modified copy or this variant if the era does not change
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Variante mit der angegebenen bevorzugten &Auml;ra. </p>
+     *
+     * @param   defaultEra  the new deviating era
+     * @return  modified copy or this variant if the era does not change
+     */
+    public HinduVariant with(HinduEra defaultEra) {
+
+        if (this.era.equals(defaultEra)) {
+            return this;
+        }
+
+        return new HinduVariant(this.type, this.rule, defaultEra, this.elapsedMode);
+
+    }
+
+    /**
+     * <p>Creates a copy of this variant with elapsed years. </p>
+     *
+     * <p>Note: Elapsed years count one less than current years.</p>
+     *
+     * @return  modified copy or this variant if the elapsed year mode does not change
+     * @see     #withCurrentYears()
+     * @see     #isUsingElapsedYears()
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Variante mit abgelaufenen Jahren. </p>
+     *
+     * <p>Hinweis: Abgelaufene Jahre z&auml;hlen eins weniger als laufende Jahre. </p>
+     *
+     * @return  modified copy or this variant if the elapsed year mode does not change
+     * @see     #withCurrentYears()
+     * @see     #isUsingElapsedYears()
+     */
+    public HinduVariant withElapsedYears() {
+
+        if (this.elapsedMode) {
+            return this;
+        }
+
+        return new HinduVariant(this.type, this.rule, this.era, true);
+
+    }
+
+    /**
+     * <p>Creates a copy of this variant with current years. </p>
+     *
+     * <p>Note: Elapsed years count one less than current years.</p>
+     *
+     * @return  modified copy or this variant if the elapsed year mode does not change
+     * @see     #withElapsedYears()
+     * @see     #isUsingElapsedYears()
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Variante mit laufenden Jahren. </p>
+     *
+     * <p>Hinweis: Abgelaufene Jahre z&auml;hlen eins weniger als laufende Jahre. </p>
+     *
+     * @return  modified copy or this variant if the elapsed year mode does not change
+     * @see     #withElapsedYears()
+     * @see     #isUsingElapsedYears()
+     */
+    public HinduVariant withCurrentYears() {
+
+        if (!this.elapsedMode) {
+            return this;
+        }
+
+        return new HinduVariant(this.type, this.rule, this.era, false);
+
+    }
+
+    private static boolean useStandardElapsedMode(
+        HinduEra era,
+        HinduRule rule
+    ) {
+
+        switch (era) {
+            case SAKA:
+                switch (rule) {
+                    case MADRAS:
+                    case MALAYALI:
+                    case TAMIL:
+                        return false;
+                    default:
+                        return true;
+                }
+            case KOLLAM:
+                return false;
+            default:
+                return true;
+        }
 
     }
 
