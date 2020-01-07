@@ -21,10 +21,14 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.engine.CalendarEra;
 import net.time4j.engine.CalendarSystem;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
 
 import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
 import java.util.StringTokenizer;
 
 
@@ -55,24 +59,24 @@ public final class HinduVariant
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serial  type of calendar
-     *          (0 = solar, 1 = amanta - year starts with chaitra, 2 = amanta - year starts with ashadha,
-     *          3 = amanta - year starts with kartika, 4 = purnimanta)
+     * @serial type of calendar
+     * (0 = solar, 1 = amanta - year starts with chaitra, 2 = amanta - year starts with ashadha,
+     * 3 = amanta - year starts with kartika, 4 = purnimanta)
      */
     private final int type;
 
     /**
-     * @serial  the rule to be used
+     * @serial the rule to be used
      */
     private final HinduRule rule;
 
     /**
-     * @serial  default era
+     * @serial default era
      */
     private final HinduEra era;
 
     /**
-     * @serial  determines if elapsed years are used
+     * @serial determines if elapsed years are used
      */
     private final boolean elapsedMode;
 
@@ -118,7 +122,7 @@ public final class HinduVariant
      * <p>The default era is usually SAKA unless the malayalam rule (KOLLAM) or
      * the bengal rule is chosen. The old Hindu calendar always uses KALI_YUGA. </p>
      *
-     * @param   rule    the underlying algorithmic rule
+     * @param   rule the underlying algorithmic rule
      * @return  HinduVariant
      */
     /*[deutsch]
@@ -155,8 +159,8 @@ public final class HinduVariant
     /**
      * <p>Constructs a variant for the solar Hindu calendar and given default era. </p>
      *
-     * @param   rule        the underlying algorithmic rule
-     * @param   defaultEra  the era to be used
+     * @param   rule       the underlying algorithmic rule
+     * @param   defaultEra the era to be used
      * @return  HinduVariant
      */
     /*[deutsch]
@@ -180,48 +184,29 @@ public final class HinduVariant
      * <p>The amanta scheme is a lunisolar calendar based on the new moon cycle
      * and starting the year with the month Chaitra. </p>
      *
-     * <p>Equivalent to calling {@link #ofAmanta(HinduRule, HinduEra) ofAmanta(rule, HinduEra.VIKRAMA}. </p>
+     * <p>The era {@link HinduEra#VIKRAMA} is used. Used mainly in Maharashtra, Karnataka, Kerala,
+     * Tamilnadu, Andhra pradesh, Telangana, and West Bengal. Gujarat uses special Amanta-versions
+     * which differs in when the year starts. </p>
      *
-     * @param   rule        the underlying algorithmic rule
      * @return  HinduVariant
+     * @see     #ofGujaratStartingYearOnAshadha()
+     * @see     #ofGujaratStartingYearOnKartika()
      */
     /*[deutsch]
      * <p>Das Amanta-Schema ist ein lunisolarer Kalender, der auf dem Neumondzyklus
      * basiert und das Jahr mit dem Monat Chaitra beginnt. </p>
      *
-     * <p>&Auml;quivalent zu {@link #ofAmanta(HinduRule, HinduEra) ofAmanta(rule, HinduEra.VIKRAMA}. </p>
+     * <p>Die &Auml;ra {@link HinduEra#VIKRAMA} wird verwendet. In Gebrauch haupts&auml;chlich
+     * in Maharashtra, Karnataka, Kerala, Tamilnadu, Andhra pradesh, Telangana, and West Bengal.
+     * Gujarat verwendet besondere Amanta-Varianten, die sich im Jahresanfang unterscheiden. </p>
      *
-     * @param   rule        the underlying algorithmic rule
      * @return  HinduVariant
+     * @see     #ofGujaratStartingYearOnAshadha()
+     * @see     #ofGujaratStartingYearOnKartika()
      */
-    public static HinduVariant ofAmanta(HinduRule rule) {
+    public static HinduVariant ofAmanta() {
 
-        return HinduVariant.ofAmanta(rule, HinduEra.VIKRAMA);
-
-    }
-
-    /**
-     * <p>The amanta scheme is a lunisolar calendar based on the new moon cycle
-     * and starting the year with the month Chaitra. </p>
-     *
-     * @param   rule        the underlying algorithmic rule
-     * @param   defaultEra  the era to be used
-     * @return  HinduVariant
-     */
-    /*[deutsch]
-     * <p>Das Amanta-Schema ist ein lunisolarer Kalender, der auf dem Neumondzyklus
-     * basiert und das Jahr mit dem Monat Chaitra beginnt. </p>
-     *
-     * @param   rule        the underlying algorithmic rule
-     * @param   defaultEra  the era to be used
-     * @return  HinduVariant
-     */
-    public static HinduVariant ofAmanta(
-        HinduRule rule,
-        HinduEra defaultEra
-    ) {
-
-        return new HinduVariant(TYPE_AMANTA_CHAITRA, rule, defaultEra);
+        return new HinduVariant(TYPE_AMANTA_CHAITRA, HinduRule.ORISSA, HinduEra.VIKRAMA);
 
     }
 
@@ -289,10 +274,10 @@ public final class HinduVariant
 
     /**
      * <p>Parses given variant string. </p>
-     *
+     * <p>
      * <p>The variant string is the same as created by calling {@link #getVariant()}. </p>
      *
-     * @param   variant     variant string
+     * @param   variant variant string
      * @return  parsed variant
      * @throws  IllegalArgumentException if given argument cannot be parsed
      */
@@ -354,6 +339,16 @@ public final class HinduVariant
      * @return  calendar system for this variant of Hindu calendar
      */
     public CalendarSystem<HinduCalendar> getCalendarSystem() {
+
+        switch (this.type) {
+            case TYPE_SOLAR:
+                switch (this.rule) {
+                    case ARYA_SIDDHANTA:
+                        return new OldSolarCS(this);
+                }
+                break;
+            default:
+        }
 
         throw new UnsupportedOperationException("Not yet implemented: " + this.getVariant());
 
@@ -441,7 +436,7 @@ public final class HinduVariant
 
     /**
      * <p>Does this variant use elapsed years? </p>
-     *
+     * <p>
      * <p>Elapsed years are the standard, however, in most southern parts of India current years are used. </p>
      *
      * @return  boolean
@@ -516,7 +511,7 @@ public final class HinduVariant
         sb.append('|');
         sb.append(this.era.name());
         sb.append('|');
-        sb.append(this.elapsedMode ? "elapsed-year" : "current-year");
+        sb.append(this.elapsedMode ? "elapsed-year-mode" : "current-year-mode");
         sb.append(']');
         return sb.toString();
 
@@ -561,7 +556,7 @@ public final class HinduVariant
 
     /**
      * <p>Creates a copy of this variant with elapsed years. </p>
-     *
+     * <p>
      * <p>Note: Elapsed years count one less than current years.</p>
      *
      * @return  modified copy or this variant if the elapsed year mode does not change
@@ -589,7 +584,7 @@ public final class HinduVariant
 
     /**
      * <p>Creates a copy of this variant with current years. </p>
-     *
+     * <p>
      * <p>Note: Elapsed years count one less than current years.</p>
      *
      * @return  modified copy or this variant if the elapsed year mode does not change
@@ -634,6 +629,98 @@ public final class HinduVariant
                 return false;
             default:
                 return true;
+        }
+
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    static abstract class BaseCS
+        implements CalendarSystem<HinduCalendar> {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final long KALI_YUGA_EPOCH = -1132959; // julian-BCE-3102-02-18 (as rata die)
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        final HinduVariant variant;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        BaseCS(HinduVariant variant) {
+            super();
+
+            if (variant == null) {
+                throw new NullPointerException();
+            }
+
+            this.variant = variant;
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public long getMinimumSinceUTC() {
+            return EpochDays.UTC.transform(KALI_YUGA_EPOCH, EpochDays.RATA_DIE);
+        }
+
+        @Override
+        public long getMaximumSinceUTC() {
+            return 0; // TODO: implementieren
+        }
+
+        @Override
+        public List<CalendarEra> getEras() {
+            return Arrays.asList(HinduEra.values());
+        }
+
+        // used in subclasses
+        static double modulo(double x, double y) {
+            return x - y * Math.floor(x / y);
+        }
+
+    }
+
+    private static class OldSolarCS
+        extends BaseCS {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        static final double ARYA_SOLAR_YEAR = 15779175.0 / 43200.0;
+        static final double ARYA_SOLAR_MONTH = ARYA_SOLAR_YEAR / 12.0;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        OldSolarCS(HinduVariant variant) {
+            super(variant);
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public HinduCalendar transform(long utcDays) {
+            double sun = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC) - KALI_YUGA_EPOCH + 0.25;
+            int y = (int) Math.floor(sun / ARYA_SOLAR_YEAR);
+            int m = (int) modulo(Math.floor(sun / ARYA_SOLAR_MONTH), 12) + 1;
+            int dom = (int) Math.floor(modulo(sun, ARYA_SOLAR_MONTH)) + 1;
+
+            return new HinduCalendar(
+                super.variant,
+                y,
+                HinduMonth.ofSolar(m),
+                HinduDay.valueOf(dom));
+        }
+
+        @Override
+        public long transform(HinduCalendar date) {
+            double d =
+                KALI_YUGA_EPOCH
+                    + date.getExpiredYearOfKaliYuga() * ARYA_SOLAR_YEAR
+                    + (date.getMonth().getRasi() - 1) * ARYA_SOLAR_MONTH
+                    + date.getDayOfMonth().getValue()
+                    - 1.25;
+            return EpochDays.UTC.transform((long) Math.ceil(d), EpochDays.RATA_DIE);
         }
 
     }

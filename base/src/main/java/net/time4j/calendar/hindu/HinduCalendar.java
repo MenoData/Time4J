@@ -21,35 +21,99 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.Weekday;
+import net.time4j.Weekmodel;
+import net.time4j.base.MathUtils;
+import net.time4j.calendar.IndianCalendar;
 import net.time4j.engine.CalendarFamily;
+import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.format.CalendarType;
 
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+
 
 /**
- * <p>The traditional Hindu calendar. </p>
+ * <p>The traditional Hindu calendar which exists in many regional variants. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
  */
 /*[deutsch]
- * <p>Der traditionelle Hindukalender. </p>
+ * <p>Der traditionelle Hindukalender, der in vielen verschiedenen regionalen Varianten existiert. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
  */
-@CalendarType("hindu")
+@CalendarType("extra/hindu")
 public final class HinduCalendar
     extends CalendarVariant<HinduCalendar> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final CalendarFamily<HinduCalendar> ENGINE = null; // TODO: implement
+    private static final Map<String, CalendarSystem<HinduCalendar>> CALSYS;
+    private static final CalendarFamily<HinduCalendar> ENGINE;
+
+    static {
+        Map<String, CalendarSystem<HinduCalendar>> calsys = new VariantMap();
+//        for (HinduRule rule : HinduRule.values()) {
+//            HinduVariant v = HinduVariant.ofSolar(rule);
+//            calsys.put(v.getVariant(), v.getCalendarSystem());
+//        }
+//        HinduVariant amanta = HinduVariant.ofAmanta();
+//        HinduVariant purnimanta = HinduVariant.ofPurnimanta();
+//        calsys.put(amanta.getVariant(), amanta.getCalendarSystem());
+//        calsys.put(purnimanta.getVariant(), purnimanta.getCalendarSystem());
+        CALSYS = calsys;
+
+        ENGINE = null;
+
+//        CalendarFamily.Builder<HinduCalendar> builder =
+//            CalendarFamily.Builder.setUp(
+//                HinduCalendar.class,
+//                new Merger(),
+//                CALSYS)
+//                .appendElement(
+//                    ERA,
+//                    new EraRule())
+//                .appendElement(
+//                    YEAR_OF_ERA,
+//                    new IntegerRule(YEAR_INDEX))
+//                .appendElement(
+//                    MONTH_OF_YEAR,
+//                    new MonthRule())
+//                .appendElement(
+//                    CommonElements.RELATED_GREGORIAN_YEAR,
+//                    new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
+//                .appendElement(
+//                    DAY_OF_MONTH,
+//                    new IntegerRule(DAY_OF_MONTH_INDEX))
+//                .appendElement(
+//                    DAY_OF_YEAR,
+//                    new IntegerRule(DAY_OF_YEAR_INDEX))
+//                .appendElement(
+//                    DAY_OF_WEEK,
+//                    new WeekdayRule<>(
+//                        getDefaultWeekmodel(),
+//                        (context) -> context.getChronology().getCalendarSystem(context.getVariant())
+//                    ))
+//                .appendElement(
+//                    WIM_ELEMENT,
+//                    WeekdayInMonthElement.getRule(WIM_ELEMENT))
+//                .appendExtension(
+//                    new CommonElements.Weekengine(
+//                        HijriCalendar.class,
+//                        DAY_OF_MONTH,
+//                        DAY_OF_YEAR,
+//                        getDefaultWeekmodel()));
+//        ENGINE = builder.build();
+    }
 
     //~ Instanzvariablen --------------------------------------------------
 
     private final HinduVariant variant;
-    private final int kyYear; // expired year of Kali Yuga
+    private final int kyYear; // year of Kali Yuga (elapsed / expired)
     private final HinduMonth month;
     private final HinduDay dayOfMonth;
 
@@ -70,7 +134,7 @@ public final class HinduCalendar
         } else if (dayOfMonth == null) {
             throw new NullPointerException("Missing day of month.");
         } else if (kyYear < 0) {
-            throw new IllegalArgumentException("Kali yuga year must not be smaller than 1: " + kyYear);
+            throw new IllegalArgumentException("Kali yuga year must not be smaller than 0: " + kyYear);
         }
 
         this.variant = variant;
@@ -85,6 +149,100 @@ public final class HinduCalendar
     @Override
     public String getVariant() {
         return this.variant.getVariant();
+    }
+
+    /**
+     * <p>Obtains the era from the current Hindu variant. </p>
+     *
+     * <p>If the associated (elapsed) year becomes negative then the method will fall back to Kali Yuga era. </p>
+     *
+     * @return  HinduEra
+     * @see     HinduVariant#getDefaultEra()
+     */
+    /*[deutsch]
+     * <p>Liefert die Standard&auml;ra der aktuellen Hindu-Kalendervariante. </p>
+     *
+     * <p>Wenn das zugeordnete (abgelaufene) Jahr negativ werden sollte, wird die Methode
+     * die &Auml;ra Kali Yuga liefern. </p>
+     *
+     * @return  HinduEra
+     * @see     HinduVariant#getDefaultEra()
+     */
+    public HinduEra getEra() {
+        HinduEra era = this.variant.getDefaultEra();
+        if (era.yearOfEra(HinduEra.KALI_YUGA, this.kyYear) < 0) {
+            era = HinduEra.KALI_YUGA;
+        }
+        return era;
+    }
+
+    /**
+     * <p>Obtains the year according to the current era and according to if the current Hindu variant
+     * uses elapsed years or current years. </p>
+     *
+     * @return  int
+     * @see     #getEra()
+     * @see     HinduEra#yearOfEra(HinduEra, int)
+     * @see     HinduVariant#isUsingElapsedYears()
+     */
+    /*[deutsch]
+     * <p>Liefert das Jahr passend zur aktuellen &Auml;ra und passend dazu, ob die
+     * aktuelle Hindu-Kalendervariante abgelaufene oder laufende Jahre z&auml;hlt. </p>
+     *
+     * @return  int
+     * @see     #getEra()
+     * @see     HinduEra#yearOfEra(HinduEra, int)
+     * @see     HinduVariant#isUsingElapsedYears()
+     */
+    public int getYear() {
+        int y = this.getEra().yearOfEra(HinduEra.KALI_YUGA, this.kyYear);
+        if (!this.variant.isUsingElapsedYears()) {
+            y++;
+        }
+        return y;
+    }
+
+    /**
+     * <p>Obtains the month. </p>
+     *
+     * @return  HinduMonth
+     */
+    /*[deutsch]
+     * <p>Liefert den Monat. </p>
+     *
+     * @return  HinduMonth
+     */
+    public HinduMonth getMonth() {
+        return this.month;
+    }
+
+    /**
+     * <p>Obtains the day of month. </p>
+     *
+     * @return  HinduDay
+     */
+    /*[deutsch]
+     * <p>Liefert den Tag des Monats. </p>
+     *
+     * @return  HinduDay
+     */
+    public HinduDay getDayOfMonth() {
+        return this.dayOfMonth;
+    }
+
+    /**
+     * <p>Determines the day of week. </p>
+     *
+     * @return  Weekday
+     */
+    /*[deutsch]
+     * <p>Ermittelt den Wochentag. </p>
+     *
+     * @return  Weekday
+     */
+    public Weekday getDayOfWeek() {
+        long utcDays = this.getCalendarSystem().transform(this);
+        return Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1);
     }
 
     @Override
@@ -130,6 +288,22 @@ public final class HinduCalendar
     }
 
     /**
+     * <p>Obtains the standard week model of this calendar. </p>
+     *
+     * @return  Weekmodel
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
+     *
+     * @return  Weekmodel
+     */
+    public static Weekmodel getDefaultWeekmodel() {
+
+        return IndianCalendar.getDefaultWeekmodel();
+
+    }
+
+    /**
      * <p>Returns the associated calendar family. </p>
      *
      * @return  chronology as calendar family
@@ -151,6 +325,43 @@ public final class HinduCalendar
     @Override
     protected HinduCalendar getContext() {
         return this;
+    }
+
+    @Override
+    protected CalendarSystem<HinduCalendar> getCalendarSystem() {
+        return this.variant.getCalendarSystem();
+    }
+
+    int getExpiredYearOfKaliYuga() {
+        return this.kyYear;
+    }
+
+    //~ Innere Klassen ----------------------------------------------------
+
+    private static class VariantMap
+        extends ConcurrentHashMap<String, CalendarSystem<HinduCalendar>> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public CalendarSystem<HinduCalendar> get(Object key) {
+
+            CalendarSystem<HinduCalendar> calsys = super.get(key);
+
+            if (calsys == null) {
+                String variant = key.toString();
+                calsys = HinduVariant.from(variant).getCalendarSystem();
+                CalendarSystem<HinduCalendar> old = this.putIfAbsent(variant, calsys);
+
+                if (old != null) {
+                    calsys = old;
+                }
+            }
+
+            return calsys;
+
+        }
+
     }
 
 }
