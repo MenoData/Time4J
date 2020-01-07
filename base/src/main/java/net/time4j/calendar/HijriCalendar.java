@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriCalendar.java) is part of project Time4J.
  *
@@ -1429,7 +1429,8 @@ public final class HijriCalendar
      *
      * @return  associated calendar system
      */
-    EraYearMonthDaySystem<HijriCalendar> getCalendarSystem() {
+    @Override
+    protected EraYearMonthDaySystem<HijriCalendar> getCalendarSystem() {
 
         return getCalendarSystem(this.variant);
 
