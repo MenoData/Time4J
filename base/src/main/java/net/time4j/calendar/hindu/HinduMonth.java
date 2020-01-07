@@ -22,8 +22,10 @@
 package net.time4j.calendar.hindu;
 
 import net.time4j.calendar.IndianMonth;
+import net.time4j.format.CalendarText;
 
 import java.io.Serializable;
+import java.util.Locale;
 
 
 /**
@@ -91,14 +93,14 @@ public final class HinduMonth
      * @param   month   month of Indian national calendar
      * @return  associated Hindu month
      */
-    public static HinduMonth valueOf(IndianMonth month) {
+    public static HinduMonth of(IndianMonth month) {
 
         return new HinduMonth(month, false);
 
     }
 
     /**
-     * <p>Gets the Hindu month which corresponds to the given numerical value. </p>
+     * <p>Gets the Hindu month which corresponds to the given numerical value in lunisolar context. </p>
      *
      * <p>Users have to invoke the method {@link #withLeap()} in order to obtain a leap month
      * in lunisolar context. The first month is Chaitra. </p>
@@ -108,7 +110,7 @@ public final class HinduMonth
      * @throws  IllegalArgumentException if given argument is out of range 1-12
      */
     /*[deutsch]
-     * <p>Liefert den normalen Hindumonat mit dem angegebenen kalendarischen Integer-Wert. </p>
+     * <p>Liefert den normalen Hindumonat mit dem angegebenen kalendarischen Integer-Wert im lunisolaren Kalender. </p>
      *
      * <p>Um einen Schaltmonat im lunisolaren Kontext zu erhalten, ist anschlie&szlig;end die Methode
      * {@link #withLeap()} aufrufen. Der erste Monat ist Chaitra. </p>
@@ -117,9 +119,38 @@ public final class HinduMonth
      * @return  Hindu month as wrapper around a number
      * @throws  IllegalArgumentException if given argument is out of range 1-12
      */
-    public static HinduMonth valueOf(int month) {
+    public static HinduMonth ofLunisolar(int month) {
 
         return new HinduMonth(IndianMonth.valueOf(month), false);
+
+    }
+
+    /**
+     * <p>Gets the Hindu month which corresponds to the given solar numerical value. </p>
+     *
+     * <p>Note: The first month of solar calendar is Mesa (or in lunisolar naming Vaishakha). </p>
+     *
+     * @param   month   month value in the range [1-12]
+     * @return  Hindu month as wrapper around a number
+     * @throws  IllegalArgumentException if given argument is out of range 1-12
+     * @see     #getRasi()
+     * @see     #getRasi(Locale)
+     */
+    /*[deutsch]
+     * <p>Liefert den normalen Hindumonat mit dem angegebenen kalendarischen Integer-Wert im Sonnenkalender. </p>
+     *
+     * <p>Hinweis: Der erste Monat des Sonnenkalenders ist Mesa (oder in lunisolarer Benennung Vaishakha). </p>
+     *
+     * @param   month   month value in the range [1-12]
+     * @return  Hindu month as wrapper around a number
+     * @throws  IllegalArgumentException if given argument is out of range 1-12
+     * @see     #getRasi()
+     * @see     #getRasi(Locale)
+     */
+    public static HinduMonth ofSolar(int month) {
+
+        int m = ((month == 12) ? 1 : month + 1);
+        return new HinduMonth(IndianMonth.valueOf(m), false);
 
     }
 
@@ -142,6 +173,57 @@ public final class HinduMonth
     public IndianMonth getValue() {
 
         return this.value;
+
+    }
+
+    /**
+     * <p>Obtains the value of solar month as the sun is going through the corresponding constellation (Rasi). </p>
+     *
+     * <p>The first solar month is VAISHAKHA. </p>
+     *
+     * @return  int
+     * @see     #ofSolar(int)
+     * @see     #getRasi(Locale)
+     */
+    /*[deutsch]
+     * <p>Liefert den Wert des solaren Monats, so wie die Sonne durch die jeweilige Konstellation (Rasi) geht. </p>
+     *
+     * <p>Der erste solare Monat ist VAISHAKHA. </p>
+     *
+     * @return  int
+     * @see     #ofSolar(int)
+     * @see     #getRasi(Locale)
+     */
+    public int getRasi() {
+
+        return ((this.value == IndianMonth.CHAITRA) ? 12 : this.value.getValue() - 1);
+
+    }
+
+    /**
+     * <p>Obtains the localized text of solar month corresponding to the Hindu zodiac (Rasi). </p>
+     *
+     * <p>In many cases however, the lunisolar name is still used and can be obtained by
+     * {@code getValue().getDisplayName(locale)}. </p>
+     *
+     * @return  String
+     * @see     #getRasi()
+     * @see     IndianMonth#getDisplayName(Locale)
+     */
+    /*[deutsch]
+     * <p>Liefert den lokalisierten Namen des solaren Monats entsprechend dem Hindu-Tierkreiszeichen (Rasi). </p>
+     *
+     * <p>In vielen F&auml;llen wird jedoch der lunisolare Name noch verwendet und kann mittels
+     * {@code getValue().getDisplayName(locale)} ermittelt werden. </p>
+     *
+     * @return  String
+     * @see     #getRasi()
+     * @see     IndianMonth#getDisplayName(Locale)
+     */
+    public String getRasi(Locale locale) {
+
+        CalendarText names = CalendarText.getInstance("extra/hindu", locale);
+        return names.getTextForms("R", IndianMonth.class).print(IndianMonth.valueOf(this.getRasi()));
 
     }
 

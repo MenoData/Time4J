@@ -105,7 +105,6 @@ public enum HinduEra
      * @param   locale      language setting
      * @return  descriptive text (long form, never {@code null})
      * @see     #getDisplayName(Locale, TextWidth)
-     * @since   5.5
      */
     /*[deutsch]
      * <p>Entspricht dem Ausdruck {@code getDisplayName(locale, TextWidth.WIDE)}. </p>
@@ -113,7 +112,6 @@ public enum HinduEra
      * @param   locale      language setting
      * @return  descriptive text (long form, never {@code null})
      * @see     #getDisplayName(Locale, TextWidth)
-     * @since   5.5
      */
     public String getDisplayName(Locale locale) {
 
@@ -129,7 +127,6 @@ public enum HinduEra
      * @param   locale      language setting
      * @param   width       text width
      * @return  descriptive text for given locale and style (never {@code null})
-     * @since   5.5
      */
     /*[deutsch]
      * <p>Liefert den sprachabh&auml;ngigen Beschreibungstext. </p>
@@ -143,7 +140,6 @@ public enum HinduEra
      * @param   locale      language setting
      * @param   width       text width
      * @return  descriptive text for given locale and style (never {@code null})
-     * @since   5.5
      */
     public String getDisplayName(
         Locale locale,
@@ -159,19 +155,17 @@ public enum HinduEra
      * <p>Scales given year of era to another year related to this era. </p>
      *
      * @param   era         era reference of given year
-     * @param   yearOfEra   current year reckoned in given era
-     * @return  current year related to this era
-     * @throws  IllegalArgumentException if given year of era is out of range
-     * @since   5.5
+     * @param   yearOfEra   year reckoned in given era
+     * @return  year related to this era
+     * @throws  IllegalArgumentException if numerical overflow occurs
      */
     /*[deutsch]
      * <p>Skaliert das angegebene Jahr der &Auml;ra zu einem anderen Jahreswert bezogen auf diese &Auml;ra. </p>
      *
      * @param   era         era reference of given year
-     * @param   yearOfEra   current year reckoned in given era
-     * @return  current year related to this era
-     * @throws  IllegalArgumentException if given year of era is out of range
-     * @since   5.5
+     * @param   yearOfEra   year reckoned in given era
+     * @return  year related to this era
+     * @throws  IllegalArgumentException if numerical overflow occurs
      */
     public int yearOfEra(
         HinduEra era,
