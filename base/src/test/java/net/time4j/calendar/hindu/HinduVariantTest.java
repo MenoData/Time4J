@@ -1,6 +1,5 @@
 package net.time4j.calendar.hindu;
 
-import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.engine.CalendarSystem;
@@ -21,93 +20,105 @@ public class HinduVariantTest {
     @Test
     public void isSolar() {
         for (HinduRule rule : HinduRule.values()) {
-            assertThat(
-                HinduVariant.ofSolar(rule).isSolar(),
-                is(true));
+            switch (rule) {
+                case ORISSA:
+                case TAMIL:
+                case MALAYALI:
+                case MADRAS:
+                case BENGAL:
+                    assertThat(
+                        rule.variant().isSolar(),
+                        is(true));
+                    break;
+                default:
+                    assertThat(
+                        rule.variant().isSolar(),
+                        is(false));
+            }
         }
         assertThat(
-            HinduVariant.ofAmanta().isSolar(),
+            HinduRule.AMANTA.variant().isSolar(),
             is(false));
         assertThat(
-            HinduVariant.ofGujaratStartingYearOnAshadha().isSolar(),
+            HinduRule.AMANTA_ASHADHA.variant().isSolar(),
             is(false));
         assertThat(
-            HinduVariant.ofGujaratStartingYearOnKartika().isSolar(),
+            HinduRule.AMANTA_KARTIKA.variant().isSolar(),
             is(false));
         assertThat(
-            HinduVariant.ofPurnimanta().isSolar(),
+            HinduRule.PURNIMANTA.variant().isSolar(),
             is(false));
     }
 
     @Test
     public void isLunisolar() {
         assertThat(
-            HinduVariant.ofSolar(HinduRule.ORISSA).isLunisolar(),
+            HinduRule.ORISSA.variant().isLunisolar(),
             is(false));
         assertThat(
-            HinduVariant.ofAmanta().isLunisolar(),
+            HinduRule.AMANTA.variant().isLunisolar(),
             is(true));
         assertThat(
-            HinduVariant.ofGujaratStartingYearOnAshadha().isLunisolar(),
+            HinduRule.AMANTA_ASHADHA.variant().isLunisolar(),
             is(true));
         assertThat(
-            HinduVariant.ofGujaratStartingYearOnKartika().isLunisolar(),
+            HinduRule.AMANTA_KARTIKA.variant().isLunisolar(),
             is(true));
         assertThat(
-            HinduVariant.ofPurnimanta().isLunisolar(),
+            HinduRule.PURNIMANTA.variant().isLunisolar(),
             is(true));
     }
 
     @Test
     public void isPurnimanta() {
         assertThat(
-            HinduVariant.ofSolar(HinduRule.ORISSA).isPurnimanta(),
+            HinduRule.ORISSA.variant().isPurnimanta(),
             is(false));
         assertThat(
-            HinduVariant.ofAmanta().isPurnimanta(),
+            HinduRule.AMANTA.variant().isPurnimanta(),
             is(false));
         assertThat(
-            HinduVariant.ofGujaratStartingYearOnAshadha().isPurnimanta(),
+            HinduRule.AMANTA_ASHADHA.variant().isPurnimanta(),
             is(false));
         assertThat(
-            HinduVariant.ofGujaratStartingYearOnKartika().isPurnimanta(),
+            HinduRule.AMANTA_KARTIKA.variant().isPurnimanta(),
             is(false));
         assertThat(
-            HinduVariant.ofPurnimanta().isPurnimanta(),
+            HinduRule.PURNIMANTA.variant().isPurnimanta(),
             is(true));
     }
 
     @Test
     public void isUsingElapsedYears() {
         assertThat(
-            HinduVariant.ofSolar(HinduRule.ORISSA, HinduEra.SAKA).isUsingElapsedYears(),
+            HinduRule.ORISSA.variant().isUsingElapsedYears(),
             is(true));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.ORISSA, HinduEra.SAKA).withElapsedYears().isUsingElapsedYears(),
+            HinduRule.ORISSA.variant().withElapsedYears().isUsingElapsedYears(),
             is(true));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.ORISSA, HinduEra.SAKA).withCurrentYears().isUsingElapsedYears(),
+            HinduRule.ORISSA.variant().withCurrentYears().isUsingElapsedYears(),
             is(false));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.TAMIL, HinduEra.SAKA).isUsingElapsedYears(),
+            HinduRule.TAMIL.variant().isUsingElapsedYears(),
             is(false));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.TAMIL, HinduEra.SAKA).withElapsedYears().isUsingElapsedYears(),
+            HinduRule.TAMIL.variant().withElapsedYears().isUsingElapsedYears(),
             is(true));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.TAMIL, HinduEra.SAKA).withCurrentYears().isUsingElapsedYears(),
+            HinduRule.TAMIL.variant().withCurrentYears().isUsingElapsedYears(),
             is(false));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.MALAYALI, HinduEra.KOLLAM).isUsingElapsedYears(),
+            HinduRule.MALAYALI.variant().isUsingElapsedYears(),
             is(false));
         assertThat(
-            HinduVariant.ofSolar(HinduRule.ARYA_SIDDHANTA, HinduEra.KALI_YUGA).isUsingElapsedYears(),
+            HinduVariant.VAR_OLD_SOLAR.isUsingElapsedYears(),
             is(true));
     }
 
     @Test
     public void getDefaultEra() {
-        HinduVariant v1 = HinduVariant.ofSolar(HinduRule.ORISSA, HinduEra.SAKA);
+        HinduVariant v1 = HinduRule.ORISSA.variant();
         HinduVariant v2 = v1.with(HinduEra.NEPALESE);
         assertThat(
             v1.getDefaultEra(),
@@ -119,12 +130,12 @@ public class HinduVariantTest {
 
     @Test
     public void variant() {
-        HinduVariant v1 = HinduVariant.ofSolar(HinduRule.ORISSA, HinduEra.SAKA);
-        HinduVariant v2 = HinduVariant.ofAmanta();
-        HinduVariant v3 = HinduVariant.ofPurnimanta().withCurrentYears();
-        HinduVariant v4 = HinduVariant.ofPurnimanta().with(HinduEra.KALI_YUGA);
-        HinduVariant v5 = HinduVariant.ofGujaratStartingYearOnAshadha();
-        HinduVariant v6 = HinduVariant.ofGujaratStartingYearOnKartika();
+        HinduVariant v1 = HinduRule.ORISSA.variant();
+        HinduVariant v2 = HinduRule.AMANTA.variant();
+        HinduVariant v3 = HinduRule.PURNIMANTA.variant().withCurrentYears();
+        HinduVariant v4 = HinduRule.PURNIMANTA.variant().with(HinduEra.KALI_YUGA);
+        HinduVariant v5 = HinduRule.AMANTA_ASHADHA.variant();
+        HinduVariant v6 = HinduRule.AMANTA_KARTIKA.variant();
         assertThat(
             HinduVariant.from(v1.getVariant()),
             is(v1));
@@ -147,7 +158,7 @@ public class HinduVariantTest {
 
     @Test
     public void oldSolarCS() {
-        HinduVariant hv = HinduVariant.ofSolar(HinduRule.ARYA_SIDDHANTA);
+        HinduVariant hv = HinduVariant.VAR_OLD_SOLAR;
         CalendarSystem<HinduCalendar> cs = hv.getCalendarSystem();
         HinduCalendar cal = cs.transform(EpochDays.UTC.transform(0, EpochDays.RATA_DIE));
 

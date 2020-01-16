@@ -21,6 +21,7 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.calendar.astro.GeoLocation;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
@@ -50,227 +51,89 @@ public final class HinduVariant
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final int TYPE_SOLAR = 0;
-    private static final int TYPE_AMANTA_CHAITRA = 1;
-    private static final int TYPE_AMANTA_ASHADHA = 2;
-    private static final int TYPE_AMANTA_KARTIKA = 3;
-    private static final int TYPE_PURNIMANTA = 4;
+    private static final HinduRule[] RULES = HinduRule.values();
+
+    // Attention: not serializable (TODO: serialization via SPX)
+    private static final GeoLocation UJJAIN = GeoLocation.of(23.0 + 9.0 / 60.0, 75.0 + 46.0 / 60.0 + 6.0 / 3600.0);
+
+    private static final int TYPE_OLD_SOLAR = -1;
+    private static final int TYPE_OLD_LUNAR = -2;
+
+    static final HinduVariant VAR_OLD_SOLAR = new HinduVariant(AryaSiddhanta.SOLAR);
+    static final HinduVariant VAR_OLD_LUNAR = new HinduVariant(AryaSiddhanta.LUNAR);
 
     //~ Instanzvariablen --------------------------------------------------
 
     /**
-     * @serial type of calendar
-     * (0 = solar, 1 = amanta - year starts with chaitra, 2 = amanta - year starts with ashadha,
-     * 3 = amanta - year starts with kartika, 4 = purnimanta)
+     * @serial the rule to be used
      */
     private final int type;
 
     /**
-     * @serial the rule to be used
-     */
-    private final HinduRule rule;
-
-    /**
      * @serial default era
      */
-    private final HinduEra era;
+    private final HinduEra defaultEra;
 
     /**
      * @serial determines if elapsed years are used
      */
     private final boolean elapsedMode;
 
+    /**
+     * @serial determines if astronomical calculations for an alternative sunrise are used
+     */
+    private final boolean altHinduSunrise;
+
+    /**
+     * @serial determines the geographical location as reference in time zone offset calculations
+     */
+    private final GeoLocation location;
+
     //~ Konstruktoren -----------------------------------------------------
 
-    private HinduVariant(
-        int type,
+    HinduVariant(
         HinduRule rule,
-        HinduEra era
+        HinduEra defaultEra
     ) {
-        this(type, rule, era, useStandardElapsedMode(era, rule));
+        this(rule.ordinal(), defaultEra, useStandardElapsedMode(defaultEra, rule), false, UJJAIN);
 
+    }
+
+    private HinduVariant(AryaSiddhanta aryaSiddhanta) {
+        this(
+            (aryaSiddhanta == AryaSiddhanta.SOLAR) ? TYPE_OLD_SOLAR : TYPE_OLD_LUNAR,
+            HinduEra.KALI_YUGA,
+            true,
+            false,
+            UJJAIN);
     }
 
     private HinduVariant(
         int type,
-        HinduRule rule,
-        HinduEra era,
-        boolean elapsedMode
+        HinduEra defaultEra,
+        boolean elapsedMode,
+        boolean altHinduSunrise,
+        GeoLocation location
     ) {
         super();
 
-        if ((type < 0) || (type > 4)) {
-            throw new IllegalArgumentException("Type of Hindu variant out of range (0-4): " + type);
-        } else if (rule == null) {
-            throw new NullPointerException("Missing Hindu rule.");
-        } else if (era == null) {
+        if ((type < TYPE_OLD_LUNAR) || (type >= HinduRule.values().length)) {
+            throw new IllegalArgumentException("Undefined Hindu rule.");
+        } else if (defaultEra == null) {
             throw new NullPointerException("Missing default Hindu era.");
+        } else if (location == null) {
+            throw new NullPointerException("Missing geographical location.");
         }
 
         this.type = type;
-        this.rule = rule;
-        this.era = era;
+        this.defaultEra = defaultEra;
         this.elapsedMode = elapsedMode;
+        this.altHinduSunrise = altHinduSunrise;
+        this.location = location;
 
     }
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Constructs a variant for the solar Hindu calendar. </p>
-     *
-     * <p>The default era is usually SAKA unless the malayalam rule (KOLLAM) or
-     * the bengal rule is chosen. The old Hindu calendar always uses KALI_YUGA. </p>
-     *
-     * @param   rule the underlying algorithmic rule
-     * @return  HinduVariant
-     */
-    /*[deutsch]
-     * <p>Konstruiert eine Variant f&uuml;r den solaren Hindukalender. </p>
-     *
-     * <p>Die Standard&auml;ra is normalerweise SAKA, es sei denn, die Malayalam-Regel (KOLLAM) oder
-     * die Bengal-Regel wurden gew&auml;hlt. Der alte Hindukalender verwendet immer KALI_YUGA. </p>
-     *
-     * @param   rule    the underlying algorithmic rule
-     * @return  HinduVariant
-     */
-    public static HinduVariant ofSolar(HinduRule rule) {
-
-        HinduEra defaultEra;
-
-        switch (rule) {
-            case MALAYALI:
-                defaultEra = HinduEra.KOLLAM;
-                break;
-            case BENGAL:
-                defaultEra = HinduEra.BENGAL;
-                break;
-            case ARYA_SIDDHANTA:
-                defaultEra = HinduEra.KALI_YUGA;
-                break;
-            default:
-                defaultEra = HinduEra.SAKA;
-        }
-
-        return HinduVariant.ofSolar(rule, defaultEra);
-
-    }
-
-    /**
-     * <p>Constructs a variant for the solar Hindu calendar and given default era. </p>
-     *
-     * @param   rule       the underlying algorithmic rule
-     * @param   defaultEra the era to be used
-     * @return  HinduVariant
-     */
-    /*[deutsch]
-     * <p>Konstruiert eine Variant f&uuml;r den solaren Hindukalender und die angegebene
-     * Standard&auml;ra. </p>
-     *
-     * @param   rule        the underlying algorithmic rule
-     * @param   defaultEra  the era to be used
-     * @return  HinduVariant
-     */
-    public static HinduVariant ofSolar(
-        HinduRule rule,
-        HinduEra defaultEra
-    ) {
-
-        return new HinduVariant(TYPE_SOLAR, rule, defaultEra);
-
-    }
-
-    /**
-     * <p>The amanta scheme is a lunisolar calendar based on the new moon cycle
-     * and starting the year with the month Chaitra. </p>
-     *
-     * <p>The era {@link HinduEra#VIKRAMA} is used. Used mainly in Maharashtra, Karnataka, Kerala,
-     * Tamilnadu, Andhra pradesh, Telangana, and West Bengal. Gujarat uses special Amanta-versions
-     * which differs in when the year starts. </p>
-     *
-     * @return  HinduVariant
-     * @see     #ofGujaratStartingYearOnAshadha()
-     * @see     #ofGujaratStartingYearOnKartika()
-     */
-    /*[deutsch]
-     * <p>Das Amanta-Schema ist ein lunisolarer Kalender, der auf dem Neumondzyklus
-     * basiert und das Jahr mit dem Monat Chaitra beginnt. </p>
-     *
-     * <p>Die &Auml;ra {@link HinduEra#VIKRAMA} wird verwendet. In Gebrauch haupts&auml;chlich
-     * in Maharashtra, Karnataka, Kerala, Tamilnadu, Andhra pradesh, Telangana, and West Bengal.
-     * Gujarat verwendet besondere Amanta-Varianten, die sich im Jahresanfang unterscheiden. </p>
-     *
-     * @return  HinduVariant
-     * @see     #ofGujaratStartingYearOnAshadha()
-     * @see     #ofGujaratStartingYearOnKartika()
-     */
-    public static HinduVariant ofAmanta() {
-
-        return new HinduVariant(TYPE_AMANTA_CHAITRA, HinduRule.ORISSA, HinduEra.VIKRAMA);
-
-    }
-
-    /**
-     * <p>This amanta scheme is a lunisolar calendar based on the new moon cycle
-     * and starting the year with the month Kartika. </p>
-     *
-     * <p>It uses the default era {@code HinduEra.VIKRAMA} and is applied in Gujarat. </p>
-     *
-     * @return  HinduVariant
-     */
-    /*[deutsch]
-     * <p>Dieses Amanta-Schema ist ein lunisolarer Kalender, der auf dem Neumondzyklus
-     * basiert und das Jahr mit dem Monat Kartika beginnt. </p>
-     *
-     * <p>Es verwendet die Standard&auml;ra {@code HinduEra.VIKRAMA} und wird in Gujarat angewandt. </p>
-     *
-     * @return  HinduVariant
-     */
-    public static HinduVariant ofGujaratStartingYearOnKartika() {
-
-        return new HinduVariant(TYPE_AMANTA_KARTIKA, HinduRule.ORISSA, HinduEra.VIKRAMA);
-
-    }
-
-    /**
-     * <p>This amanta scheme is a lunisolar calendar based on the new moon cycle
-     * and starting the year with the month Ashadha. </p>
-     *
-     * <p>It uses the default era {@code HinduEra.VIKRAMA} and is applied in some parts of Gujarat. </p>
-     *
-     * @return  HinduVariant
-     */
-    /*[deutsch]
-     * <p>Dieses Amanta-Schema ist ein lunisolarer Kalender, der auf dem Neumondzyklus
-     * basiert und das Jahr mit dem Monat Ashadha beginnt. </p>
-     *
-     * <p>Es verwendet die Standard&auml;ra {@code HinduEra.VIKRAMA} und wird in Teilen von
-     * Gujarat angewandt. </p>
-     *
-     * @return  HinduVariant
-     */
-    public static HinduVariant ofGujaratStartingYearOnAshadha() {
-
-        return new HinduVariant(TYPE_AMANTA_ASHADHA, HinduRule.ORISSA, HinduEra.VIKRAMA);
-
-    }
-
-    /**
-     * <p>The purnimanta scheme is a lunisolar calendar based on the full moon cycle. </p>
-     *
-     * @return  HinduVariant
-     */
-    /*[deutsch]
-     * <p>Das Purnimanta-Schema ist ein lunisolarer Kalender, der auf dem Vollmondzyklus
-     * basiert. </p>
-     *
-     * @return  HinduVariant
-     */
-    public static HinduVariant ofPurnimanta() {
-
-        return new HinduVariant(TYPE_PURNIMANTA, HinduRule.ORISSA, HinduEra.VIKRAMA);
-
-    }
 
     /**
      * <p>Parses given variant string. </p>
@@ -291,37 +154,62 @@ public final class HinduVariant
      * @throws  IllegalArgumentException if given argument cannot be parsed
      */
     public static HinduVariant from(String variant) {
+        if (variant.startsWith(AryaSiddhanta.PREFIX)) {
+            return new HinduVariant(AryaSiddhanta.valueOf(variant.substring(AryaSiddhanta.PREFIX.length())));
+        }
 
         StringTokenizer st = new StringTokenizer(variant, "|");
         int count = 0;
-        int lType = -1;
-        HinduRule lRule = null;
-        HinduEra lEra = null;
-        boolean elapsedMode = false;
+        int type = Integer.MIN_VALUE;
+        HinduEra defaultEra = null;
+        boolean elapsedMode = true;
+        boolean altHinduSunrise = false;
+        double latitude = UJJAIN.getLatitude();
+        double longitude = UJJAIN.getLongitude();
+        int altitude = UJJAIN.getAltitude();
 
         while (st.hasMoreTokens()) {
             count++;
             String token = st.nextToken();
             switch (count) {
                 case 1:
-                    lType = Integer.valueOf(token);
+                    type = Integer.valueOf(token);
                     break;
                 case 2:
-                    lRule = HinduRule.valueOf(token);
+                    defaultEra = HinduEra.valueOf(token);
                     break;
                 case 3:
-                    lEra = HinduEra.valueOf(token);
+                    elapsedMode = token.equals("elapsed");
                     break;
                 case 4:
-                    elapsedMode = token.equals("e");
+                    altHinduSunrise = token.equals("alt");
+                    break;
+                case 5:
+                    latitude = Double.valueOf(token).doubleValue();
+                    break;
+                case 6:
+                    longitude = Double.valueOf(token).doubleValue();
+                    break;
+                case 7:
+                    altitude = Integer.valueOf(token).intValue();
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid variant: " + variant);
             }
         }
 
+        if (type < 0) {
+            throw new IllegalArgumentException("Invalid variant: " + variant);
+        }
+
         try {
-            return new HinduVariant(lType, lRule, lEra, elapsedMode);
+            return new HinduVariant(
+                type,
+                defaultEra,
+                elapsedMode,
+                altHinduSunrise,
+                GeoLocation.of(latitude, longitude, altitude)
+            );
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid variant: " + variant);
         }
@@ -339,35 +227,14 @@ public final class HinduVariant
      * @return  calendar system for this variant of Hindu calendar
      */
     public CalendarSystem<HinduCalendar> getCalendarSystem() {
-
         switch (this.type) {
-            case TYPE_SOLAR:
-                switch (this.rule) {
-                    case ARYA_SIDDHANTA:
-                        return new OldSolarCS(this);
-                }
-                break;
+            case TYPE_OLD_SOLAR:
+                return AryaSiddhanta.SOLAR.getCalendarSystem();
+            case TYPE_OLD_LUNAR:
+                return AryaSiddhanta.LUNAR.getCalendarSystem();
             default:
+                return this.getRule().getCalendarSystem();
         }
-
-        throw new UnsupportedOperationException("Not yet implemented: " + this.getVariant());
-
-    }
-
-    /**
-     * <p>Obtains the underlying rule set. </p>
-     *
-     * @return  HinduRule
-     */
-    /*[deutsch]
-     * <p>Liefert den zugrundelegenden Regelsatz. </p>
-     *
-     * @return  HinduRule
-     */
-    public HinduRule getRule() {
-
-        return this.rule;
-
     }
 
     /**
@@ -381,9 +248,7 @@ public final class HinduVariant
      * @return  HinduEra
      */
     public HinduEra getDefaultEra() {
-
-        return this.era;
-
+        return this.defaultEra;
     }
 
     /**
@@ -397,9 +262,7 @@ public final class HinduVariant
      * @return  boolean
      */
     public boolean isSolar() {
-
-        return (this.type == TYPE_SOLAR);
-
+        return !this.isLunisolar();
     }
 
     /**
@@ -413,9 +276,21 @@ public final class HinduVariant
      * @return  boolean
      */
     public boolean isLunisolar() {
+        return ((this.type == TYPE_OLD_LUNAR) || this.isAmanta() || this.isPurnimanta());
+    }
 
-        return (this.type > 0);
-
+    /**
+     * <p>Determines if this variant describes the amanta scheme. </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
+     * <p>Bestimmt, ob diese Variante das Amanta-Schema beschreibt. </p>
+     *
+     * @return  boolean
+     */
+    public boolean isAmanta() {
+        return ((this.type >= HinduRule.AMANTA.ordinal()) && (this.type < HinduRule.PURNIMANTA.ordinal()));
     }
 
     /**
@@ -429,9 +304,7 @@ public final class HinduVariant
      * @return  boolean
      */
     public boolean isPurnimanta() {
-
-        return (this.type == TYPE_PURNIMANTA);
-
+        return (this.type == HinduRule.PURNIMANTA.ordinal());
     }
 
     /**
@@ -450,86 +323,101 @@ public final class HinduVariant
      * @return  boolean
      */
     public boolean isUsingElapsedYears() {
-
         return this.elapsedMode;
-
     }
 
     @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         } else if (obj instanceof HinduVariant) {
             HinduVariant that = (HinduVariant) obj;
             return (
                 (this.type == that.type)
-                    && (this.rule == that.rule)
-                    && (this.era == that.era)
-                    && (this.elapsedMode == that.elapsedMode));
+                    && (this.defaultEra == that.defaultEra)
+                    && (this.elapsedMode == that.elapsedMode)
+                    && (this.altHinduSunrise == that.altHinduSunrise)
+                    && (this.location.getLatitude() == that.location.getLatitude())
+                    && (this.location.getLongitude() == that.location.getLongitude())
+                    && (this.location.getAltitude() == that.location.getAltitude()));
         } else {
             return false;
         }
-
     }
 
     @Override
     public int hashCode() {
-
-        return this.type + 17 * this.rule.hashCode() + 31 * this.era.hashCode() + (this.elapsedMode ? 1 : 0);
-
+        return this.type
+            + 17 * this.defaultEra.hashCode()
+            + (this.elapsedMode ? 1 : 0)
+            + (this.altHinduSunrise ? 100 : 99);
     }
 
     @Override
     public String toString() {
-
         StringBuilder sb = new StringBuilder();
         sb.append("Hindu-variant=[");
 
         switch (this.type) {
-            case 0:
-                sb.append("solar");
+            case TYPE_OLD_SOLAR:
+                sb.append("OLD-SOLAR");
                 break;
-            case 1:
-                sb.append("amanta-chaitra");
-                break;
-            case 2:
-                sb.append("amanta-ashadha");
-                break;
-            case 3:
-                sb.append("amanta-kartika");
-                break;
-            case 4:
-                sb.append("purnimanta");
+            case TYPE_OLD_LUNAR:
+                sb.append("OLD-LUNAR");
                 break;
             default:
-                throw new UnsupportedOperationException("Unknown type of variant: " + this.type);
+                sb.append(this.getRule().name());
         }
 
-        sb.append('|');
-        sb.append(this.rule.name());
-        sb.append('|');
-        sb.append(this.era.name());
+        sb.append("|default-era=");
+        sb.append(this.defaultEra.name());
         sb.append('|');
         sb.append(this.elapsedMode ? "elapsed-year-mode" : "current-year-mode");
+        if (this.altHinduSunrise) {
+            sb.append("|alt-hindu-sunrise");
+        }
+        if (this.location != UJJAIN) {
+            sb.append("|lat=");
+            sb.append(this.location.getLatitude());
+            sb.append(",lng=");
+            sb.append(this.location.getLongitude());
+            int altitude = this.location.getAltitude();
+            if (altitude != 0) {
+                sb.append(",alt=");
+                sb.append(altitude);
+            }
+        }
         sb.append(']');
         return sb.toString();
-
     }
 
     @Override
     public String getVariant() {
+        if (this.type < 0) {
+            AryaSiddhanta old = ((this.type == TYPE_OLD_SOLAR) ? AryaSiddhanta.SOLAR : AryaSiddhanta.LUNAR);
+            return old.getVariant();
+        }
 
         StringBuilder sb = new StringBuilder();
         sb.append(this.type);
         sb.append('|');
-        sb.append(this.rule.name());
+        sb.append(this.defaultEra.name());
         sb.append('|');
-        sb.append(this.era.name());
+        sb.append(this.elapsedMode ? "elapsed" : "current");
         sb.append('|');
-        sb.append(this.elapsedMode ? "e" : "c");
+        sb.append(this.altHinduSunrise ? "alt" : "std");
+        if (this.location != UJJAIN) {
+            sb.append('|');
+            sb.append(this.location.getLatitude());
+            sb.append('|');
+            sb.append(this.location.getLongitude());
+            int altitude = this.location.getAltitude();
+            if (altitude != 0) {
+                sb.append('|');
+                sb.append(altitude);
+            }
+        }
         return sb.toString();
-
     }
 
     /**
@@ -545,13 +433,11 @@ public final class HinduVariant
      * @return  modified copy or this variant if the era does not change
      */
     public HinduVariant with(HinduEra defaultEra) {
-
-        if (this.era.equals(defaultEra)) {
+        if (this.defaultEra.equals(defaultEra)) {
             return this;
         }
 
-        return new HinduVariant(this.type, this.rule, defaultEra, this.elapsedMode);
-
+        return new HinduVariant(this.type, defaultEra, this.elapsedMode, this.altHinduSunrise, this.location);
     }
 
     /**
@@ -573,13 +459,11 @@ public final class HinduVariant
      * @see     #isUsingElapsedYears()
      */
     public HinduVariant withElapsedYears() {
-
         if (this.elapsedMode) {
             return this;
         }
 
-        return new HinduVariant(this.type, this.rule, this.era, true);
-
+        return new HinduVariant(this.type, this.defaultEra, true, this.altHinduSunrise, this.location);
     }
 
     /**
@@ -601,21 +485,18 @@ public final class HinduVariant
      * @see     #isUsingElapsedYears()
      */
     public HinduVariant withCurrentYears() {
-
         if (!this.elapsedMode) {
             return this;
         }
 
-        return new HinduVariant(this.type, this.rule, this.era, false);
-
+        return new HinduVariant(this.type, this.defaultEra, false, this.altHinduSunrise, this.location);
     }
 
     private static boolean useStandardElapsedMode(
-        HinduEra era,
+        HinduEra defaultEra,
         HinduRule rule
     ) {
-
-        switch (era) {
+        switch (defaultEra) {
             case SAKA:
                 switch (rule) {
                     case MADRAS:
@@ -630,7 +511,10 @@ public final class HinduVariant
             default:
                 return true;
         }
+    }
 
+    private HinduRule getRule() {
+        return RULES[this.type];
     }
 
     //~ Innere Klassen ----------------------------------------------------
