@@ -135,7 +135,7 @@ public enum HinduRule {
      * der Monat am n&auml;chsten Tag an. Wenn Samkranti nach Mitternacht eintritt, dann f&auml;ngt der Monat am
      * Tag nach dem n&auml;chsten Tag an, also am dritten Tag. </p>
      */
-    BENGAL() {
+    BENGAL() { // TODO: improve javadoc (tabular data with other range!)
         @Override
         HinduEra getDefaultEra() {
             return HinduEra.BENGAL;

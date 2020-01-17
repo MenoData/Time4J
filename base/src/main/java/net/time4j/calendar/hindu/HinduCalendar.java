@@ -30,6 +30,9 @@ import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.format.CalendarType;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -56,15 +59,13 @@ public final class HinduCalendar
     private static final CalendarFamily<HinduCalendar> ENGINE;
 
     static {
-        Map<String, CalendarSystem<HinduCalendar>> calsys = new VariantMap();
-//        for (HinduRule rule : HinduRule.values()) {
-//            HinduVariant v = HinduVariant.ofSolar(rule);
-//            calsys.put(v.getVariant(), v.getCalendarSystem());
-//        }
-//        HinduVariant amanta = HinduVariant.ofAmanta();
-//        HinduVariant purnimanta = HinduVariant.ofPurnimanta();
-//        calsys.put(amanta.getVariant(), amanta.getCalendarSystem());
-//        calsys.put(purnimanta.getVariant(), purnimanta.getCalendarSystem());
+        VariantMap calsys = new VariantMap();
+        for (HinduRule rule : HinduRule.values()) {
+            HinduVariant v = rule.variant();
+            calsys.put(v.getVariant(), v.getCalendarSystem());
+        }
+        calsys.accept(HinduVariant.VAR_OLD_SOLAR);
+        calsys.accept(HinduVariant.VAR_OLD_LUNAR);
         CALSYS = calsys;
 
         ENGINE = null;
@@ -112,10 +113,10 @@ public final class HinduCalendar
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final HinduVariant variant;
-    private final int kyYear; // year of Kali Yuga (elapsed / expired)
-    private final HinduMonth month;
-    private final HinduDay dayOfMonth;
+    private transient final HinduVariant variant;
+    private transient final int kyYear; // year of Kali Yuga (elapsed / expired)
+    private transient final HinduMonth month;
+    private transient final HinduDay dayOfMonth;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -137,6 +138,8 @@ public final class HinduCalendar
             throw new IllegalArgumentException("Kali yuga year must not be smaller than 0: " + kyYear);
         }
 
+        // TODO: validation of date components
+
         this.variant = variant;
         this.kyYear = kyYear;
         this.month = month;
@@ -145,6 +148,52 @@ public final class HinduCalendar
     }
 
     //~ Methoden ----------------------------------------------------------
+
+    /**
+     * <p>Creates an old Hindu calendar with given components. </p>
+     *
+     * <p>In case of solar calendar, the months use rasi numbers and start with VAISAKHA else with CHAITRA. </p>
+     *
+     * @param   aryaSiddhanta   either solar or lunar
+     * @param   year            expired year of era Kali Yuga
+     * @param   month           month number whose value depends on solar or lunisolar mode
+     * @param   dayOfMonth      the day of given month
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @see     HinduMonth#getRasi()
+     * @see     HinduMonth#getValue()
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Kalenderdatum auf Basis des alten Hindu-Kalenders. </p>
+     *
+     * <p>Im Fall des Sonnenkalenders verwenden die Monate Rasi-Nummern und fangen mit dem Monat
+     * VAISAKHA an, sonst mit dem Monat CHAITRA. </p>
+     *
+     * @param   aryaSiddhanta   either solar or lunar
+     * @param   year            expired year of era Kali Yuga
+     * @param   month           month number whose value depends on solar or lunisolar mode
+     * @param   dayOfMonth      the day of given month
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @see     HinduMonth#getRasi()
+     * @see     HinduMonth#getValue()
+     */
+    public static HinduCalendar of(
+        AryaSiddhanta aryaSiddhanta,
+        int year,
+        int month,
+        int dayOfMonth
+    ) {
+
+        if (aryaSiddhanta == AryaSiddhanta.SOLAR) {
+            return new HinduCalendar(
+                HinduVariant.VAR_OLD_SOLAR, year, HinduMonth.ofSolar(month), HinduDay.valueOf(dayOfMonth));
+        } else { // lunisolar
+            return new HinduCalendar(
+                HinduVariant.VAR_OLD_LUNAR, year, HinduMonth.ofLunisolar(month), HinduDay.valueOf(dayOfMonth));
+        }
+
+    }
 
     @Override
     public String getVariant() {
@@ -336,6 +385,31 @@ public final class HinduCalendar
         return this.kyYear;
     }
 
+    /**
+     * @serialData  Uses <a href="../../../../serialized-form.html#net.time4j.calendar.hindu/SPX">
+     *              a dedicated serialization form</a> as proxy. The first byte contains
+     *              the type-ID {@code 20}. Then the variant is written as UTF-String.
+     *
+     * @return  replacement object in serialization graph
+     */
+    private Object writeReplace() {
+
+        return new SPX(this, SPX.HINDU_CAL);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
+     * @throws InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
+
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
     private static class VariantMap
@@ -359,6 +433,12 @@ public final class HinduCalendar
             }
 
             return calsys;
+
+        }
+
+        void accept(HinduVariant variant) {
+
+            this.put(variant.getVariant(), variant.getCalendarSystem());
 
         }
 

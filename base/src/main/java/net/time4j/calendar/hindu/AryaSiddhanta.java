@@ -93,6 +93,7 @@ public enum AryaSiddhanta
         return PREFIX + this.name();
     }
 
+    // used in HinduVariant
     abstract CalendarSystem<HinduCalendar> getCalendarSystem();
 
     //~ Innere Klassen ----------------------------------------------------
@@ -105,7 +106,6 @@ public enum AryaSiddhanta
         private static final double ARYA_SOLAR_YEAR = 15779175.0 / 43200.0;
         private static final double ARYA_SOLAR_MONTH = ARYA_SOLAR_YEAR / 12.0;
 
-
         //~ Konstruktoren -------------------------------------------------
 
         OldCS(boolean solar) {
@@ -113,16 +113,6 @@ public enum AryaSiddhanta
         }
 
         //~ Methoden ------------------------------------------------------
-
-        @Override
-        public long getMinimumSinceUTC() {
-            return EpochDays.UTC.transform(KALI_YUGA_EPOCH, EpochDays.RATA_DIE);
-        }
-
-        @Override
-        public long getMaximumSinceUTC() {
-            return 0; // TODO: implementieren
-        }
 
         @Override
         public List<CalendarEra> getEras() {
@@ -142,8 +132,8 @@ public enum AryaSiddhanta
                     y,
                     HinduMonth.ofSolar(m),
                     HinduDay.valueOf(dom));
-            } else {
-                return null;
+            } else { // lunisolar
+                return null; // TODO: implementieren
             }
         }
 
@@ -157,8 +147,8 @@ public enum AryaSiddhanta
                         + date.getDayOfMonth().getValue()
                         - 1.25;
                 return EpochDays.UTC.transform((long) Math.ceil(d), EpochDays.RATA_DIE);
-            } else {
-                return 0L;
+            } else { // lunisolar
+                return 0L; // TODO: implementieren
             }
         }
 

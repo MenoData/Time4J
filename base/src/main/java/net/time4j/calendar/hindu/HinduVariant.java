@@ -27,6 +27,9 @@ import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
 
+import java.io.IOException;
+import java.io.InvalidObjectException;
+import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
@@ -52,8 +55,6 @@ public final class HinduVariant
     //~ Statische Felder/Initialisierungen --------------------------------
 
     private static final HinduRule[] RULES = HinduRule.values();
-
-    // Attention: not serializable (TODO: serialization via SPX)
     private static final GeoLocation UJJAIN = GeoLocation.of(23.0 + 9.0 / 60.0, 75.0 + 46.0 / 60.0 + 6.0 / 3600.0);
 
     private static final int TYPE_OLD_SOLAR = -1;
@@ -64,30 +65,11 @@ public final class HinduVariant
 
     //~ Instanzvariablen --------------------------------------------------
 
-    /**
-     * @serial the rule to be used
-     */
-    private final int type;
-
-    /**
-     * @serial default era
-     */
-    private final HinduEra defaultEra;
-
-    /**
-     * @serial determines if elapsed years are used
-     */
-    private final boolean elapsedMode;
-
-    /**
-     * @serial determines if astronomical calculations for an alternative sunrise are used
-     */
-    private final boolean altHinduSunrise;
-
-    /**
-     * @serial determines the geographical location as reference in time zone offset calculations
-     */
-    private final GeoLocation location;
+    private transient final int type;
+    private transient final HinduEra defaultEra;
+    private transient final boolean elapsedMode;
+    private transient final boolean altHinduSunrise;
+    private transient final GeoLocation location;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -137,7 +119,7 @@ public final class HinduVariant
 
     /**
      * <p>Parses given variant string. </p>
-     * <p>
+     *
      * <p>The variant string is the same as created by calling {@link #getVariant()}. </p>
      *
      * @param   variant variant string
@@ -217,12 +199,12 @@ public final class HinduVariant
     }
 
     /**
-     * Obtains the associated calendar system.
+     * <p>Obtains the associated calendar system. </p>
      *
      * @return  calendar system for this variant of Hindu calendar
      */
     /*[deutsch]
-     * Liefert das zu dieser Variante passende Kalendersystem.
+     * <p>Liefert das zu dieser Variante passende Kalendersystem. </p>
      *
      * @return  calendar system for this variant of Hindu calendar
      */
@@ -268,38 +250,57 @@ public final class HinduVariant
     /**
      * <p>Determines if this variant describes the lunisolar Hindu calendar. </p>
      *
+     * <p>Lunisolar variants follow either the amanta or the purnimanta scheme. </p>
+     *
      * @return  boolean
+     * @see     #isAmanta()
+     * @see     #isPurnimanta()
      */
     /*[deutsch]
      * <p>Bestimmt, ob diese Variante den lunisolaren Hindukalender beschreibt. </p>
      *
+     * <p>Lunisolare Varianten folgen entweder dem Amanta- oder dem Purnimanta-Schema. </p>
+     *
      * @return  boolean
+     * @see     #isAmanta()
+     * @see     #isPurnimanta()
      */
     public boolean isLunisolar() {
-        return ((this.type == TYPE_OLD_LUNAR) || this.isAmanta() || this.isPurnimanta());
+        return (this.isAmanta() || this.isPurnimanta());
     }
 
     /**
      * <p>Determines if this variant describes the amanta scheme. </p>
+     *
+     * <p>Months are synchronized with the New Moon. </p>
      *
      * @return  boolean
      */
     /*[deutsch]
      * <p>Bestimmt, ob diese Variante das Amanta-Schema beschreibt. </p>
      *
+     * <p>Die Monate folgen dem Neumondzyklus. </p>
+     *
      * @return  boolean
      */
     public boolean isAmanta() {
+        if (this.type == TYPE_OLD_LUNAR) {
+            return true;
+        }
         return ((this.type >= HinduRule.AMANTA.ordinal()) && (this.type < HinduRule.PURNIMANTA.ordinal()));
     }
 
     /**
      * <p>Determines if this variant describes the purnimanta scheme. </p>
      *
+     * <p>Months are synchronized with the Full Moon. </p>
+     *
      * @return  boolean
      */
     /*[deutsch]
      * <p>Bestimmt, ob diese Variante das Purnimanta-Schema beschreibt. </p>
+     *
+     * <p>Die Monate folgen dem Vollmondzyklus. </p>
      *
      * @return  boolean
      */
@@ -309,7 +310,7 @@ public final class HinduVariant
 
     /**
      * <p>Does this variant use elapsed years? </p>
-     * <p>
+     *
      * <p>Elapsed years are the standard, however, in most southern parts of India current years are used. </p>
      *
      * @return  boolean
@@ -442,7 +443,7 @@ public final class HinduVariant
 
     /**
      * <p>Creates a copy of this variant with elapsed years. </p>
-     * <p>
+     *
      * <p>Note: Elapsed years count one less than current years.</p>
      *
      * @return  modified copy or this variant if the elapsed year mode does not change
@@ -468,7 +469,7 @@ public final class HinduVariant
 
     /**
      * <p>Creates a copy of this variant with current years. </p>
-     * <p>
+     *
      * <p>Note: Elapsed years count one less than current years.</p>
      *
      * @return  modified copy or this variant if the elapsed year mode does not change
@@ -490,6 +491,53 @@ public final class HinduVariant
         }
 
         return new HinduVariant(this.type, this.defaultEra, false, this.altHinduSunrise, this.location);
+    }
+
+    /**
+     * <p>Creates a copy of this variant with an alternative internal calculation for the sunrise. </p>
+     *
+     * @return  modified copy or this variant if the alternative calculation mode was already set
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen internen Berechnung f&uuml;r
+     * den Sonnenaufgang. </p>
+     *
+     * @return  modified copy or this variant if the alternative calculation mode was already set
+     */
+    public HinduVariant withAlternativeHinduSunrise() {
+        if (this.altHinduSunrise) {
+            return this;
+        }
+
+        return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, true, this.location);
+    }
+
+    /**
+     * <p>Creates a copy of this variant with an alternative geographical location. </p>
+     *
+     * <p>By default, the location of the Holy City Ujjain is used. </p>
+     *
+     * @param   location    alternative geographical location
+     * @return  modified copy or this variant if the location does not change
+     */
+    /*[deutsch]
+     * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen geographischen Bezugsangabe. </p>
+     *
+     * <p>Standardm&auml;&szlig;ig wird der Ort der heiligen Stadt Ujjain verwendet. </p>
+     *
+     * @param   location    alternative geographical location
+     * @return  modified copy or this variant if the location does not change
+     */
+    public HinduVariant withAlternativeLocation(GeoLocation location) {
+        if (
+            (location.getLatitude() == this.location.getLatitude())
+            && (location.getLongitude() == this.location.getLongitude())
+            && (location.getAltitude() == this.location.getAltitude())
+        ) {
+            return this;
+        }
+
+        return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, this.altHinduSunrise, location);
     }
 
     private static boolean useStandardElapsedMode(
@@ -515,6 +563,31 @@ public final class HinduVariant
 
     private HinduRule getRule() {
         return RULES[this.type];
+    }
+
+    /**
+     * @serialData  Uses <a href="../../../../serialized-form.html#net.time4j.calendar.hindu/SPX">
+     *              a dedicated serialization form</a> as proxy. The first byte contains
+     *              the type-ID {@code 21}. Then the variant is written as UTF-String.
+     *
+     * @return  replacement object in serialization graph
+     */
+    private Object writeReplace() {
+
+        return new SPX(this, SPX.HINDU_VAR);
+
+    }
+
+    /**
+     * @serialData  Blocks because a serialization proxy is required.
+     * @param       in      object input stream
+     * @throws InvalidObjectException (always)
+     */
+    private void readObject(ObjectInputStream in)
+        throws IOException {
+
+        throw new InvalidObjectException("Serialization proxy required.");
+
     }
 
     //~ Innere Klassen ----------------------------------------------------
@@ -562,49 +635,6 @@ public final class HinduVariant
         // used in subclasses
         static double modulo(double x, double y) {
             return x - y * Math.floor(x / y);
-        }
-
-    }
-
-    private static class OldSolarCS
-        extends BaseCS {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final double ARYA_SOLAR_YEAR = 15779175.0 / 43200.0;
-        static final double ARYA_SOLAR_MONTH = ARYA_SOLAR_YEAR / 12.0;
-
-        //~ Konstruktoren -------------------------------------------------
-
-        OldSolarCS(HinduVariant variant) {
-            super(variant);
-        }
-
-        //~ Methoden ------------------------------------------------------
-
-        @Override
-        public HinduCalendar transform(long utcDays) {
-            double sun = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC) - KALI_YUGA_EPOCH + 0.25;
-            int y = (int) Math.floor(sun / ARYA_SOLAR_YEAR);
-            int m = (int) modulo(Math.floor(sun / ARYA_SOLAR_MONTH), 12) + 1;
-            int dom = (int) Math.floor(modulo(sun, ARYA_SOLAR_MONTH)) + 1;
-
-            return new HinduCalendar(
-                super.variant,
-                y,
-                HinduMonth.ofSolar(m),
-                HinduDay.valueOf(dom));
-        }
-
-        @Override
-        public long transform(HinduCalendar date) {
-            double d =
-                KALI_YUGA_EPOCH
-                    + date.getExpiredYearOfKaliYuga() * ARYA_SOLAR_YEAR
-                    + (date.getMonth().getRasi() - 1) * ARYA_SOLAR_MONTH
-                    + date.getDayOfMonth().getValue()
-                    - 1.25;
-            return EpochDays.UTC.transform((long) Math.ceil(d), EpochDays.RATA_DIE);
         }
 
     }

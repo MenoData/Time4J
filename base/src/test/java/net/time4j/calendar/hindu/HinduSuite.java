@@ -9,7 +9,8 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         HinduEraTest.class,
-        HinduVariantTest.class
+        HinduVariantTest.class,
+        SerializationTest.class
     }
 )
 public class HinduSuite {
