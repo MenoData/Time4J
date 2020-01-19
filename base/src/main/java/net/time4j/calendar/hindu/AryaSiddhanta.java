@@ -61,7 +61,7 @@ public enum AryaSiddhanta
      */
     SOLAR {
         @Override
-        CalendarSystem<HinduCalendar> getCalendarSystem() {
+        public CalendarSystem<HinduCalendar> getCalendarSystem() {
             return new OldCS(true);
         }
     },
@@ -79,7 +79,7 @@ public enum AryaSiddhanta
      */
     LUNAR {
         @Override
-        CalendarSystem<HinduCalendar> getCalendarSystem() {
+        public CalendarSystem<HinduCalendar> getCalendarSystem() {
             return new OldCS(false);
         }
     };
@@ -93,8 +93,17 @@ public enum AryaSiddhanta
         return PREFIX + this.name();
     }
 
-    // used in HinduVariant
-    abstract CalendarSystem<HinduCalendar> getCalendarSystem();
+    /**
+     * <p>Obtains the associated calendar system. </p>
+     *
+     * @return  CalendarSystem for the old Hindu calendar
+     */
+    /*[deutsch]
+     * <p>Liefert das zugeh&ouml;rige Kalendersystem. </p>
+     *
+     * @return  CalendarSystem for the old Hindu calendar
+     */
+    public abstract CalendarSystem<HinduCalendar> getCalendarSystem();
 
     //~ Innere Klassen ----------------------------------------------------
 
@@ -105,6 +114,7 @@ public enum AryaSiddhanta
 
         private static final double ARYA_SOLAR_YEAR = 15779175.0 / 43200.0;
         private static final double ARYA_SOLAR_MONTH = ARYA_SOLAR_YEAR / 12.0;
+        private static final double ARYA_LUNAR_MONTH = 1577917500.0 / 53433336.0;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -121,11 +131,12 @@ public enum AryaSiddhanta
 
         @Override
         public HinduCalendar transform(long utcDays) {
+            double sun = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC) - KALI_YUGA_EPOCH + 0.25;
+
             if (this.isSolar()) {
-                double sun = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC) - KALI_YUGA_EPOCH + 0.25;
                 int y = (int) Math.floor(sun / ARYA_SOLAR_YEAR);
-                int m = (int) HinduVariant.BaseCS.modulo(Math.floor(sun / ARYA_SOLAR_MONTH), 12) + 1;
-                int dom = (int) Math.floor(HinduVariant.BaseCS.modulo(sun, ARYA_SOLAR_MONTH)) + 1;
+                int m = (int) modulo(Math.floor(sun / ARYA_SOLAR_MONTH), 12) + 1;
+                int dom = (int) Math.floor(modulo(sun, ARYA_SOLAR_MONTH)) + 1;
 
                 return new HinduCalendar(
                     super.variant,
@@ -133,23 +144,50 @@ public enum AryaSiddhanta
                     HinduMonth.ofSolar(m),
                     HinduDay.valueOf(dom));
             } else { // lunisolar
-                return null; // TODO: implementieren
+                double newMoon = sun - modulo(sun, ARYA_LUNAR_MONTH);
+                double modNMAS = modulo(newMoon, ARYA_SOLAR_MONTH);
+                boolean leap = (ARYA_SOLAR_MONTH - ARYA_LUNAR_MONTH >= modNMAS) && (modNMAS > 0);
+                int y = (int) (Math.ceil((newMoon + ARYA_SOLAR_MONTH) / ARYA_SOLAR_YEAR) - 1);
+                int m = (int) (modulo(Math.ceil(newMoon / ARYA_SOLAR_MONTH), 12) + 1);
+                int dom = (int) (modulo(Math.floor(sun * 30 / ARYA_LUNAR_MONTH), 30) + 1);
+                HinduMonth month = HinduMonth.ofLunisolar(m);
+
+                return new HinduCalendar(
+                    super.variant,
+                    y,
+                    leap ? month.withLeap() : month,
+                    HinduDay.valueOf(dom)
+                );
             }
         }
 
         @Override
         public long transform(HinduCalendar date) {
+            double d;
+
             if (this.isSolar()) {
-                double d =
-                    KALI_YUGA_EPOCH
-                        + date.getExpiredYearOfKaliYuga() * ARYA_SOLAR_YEAR
-                        + (date.getMonth().getRasi() - 1) * ARYA_SOLAR_MONTH
-                        + date.getDayOfMonth().getValue()
-                        - 1.25;
-                return EpochDays.UTC.transform((long) Math.ceil(d), EpochDays.RATA_DIE);
+                d = date.getExpiredYearOfKaliYuga() * ARYA_SOLAR_YEAR
+                    + (date.getMonth().getRasi() - 1) * ARYA_SOLAR_MONTH
+                    + date.getDayOfMonth().getValue()
+                    - 1.25;
             } else { // lunisolar
-                return 0L; // TODO: implementieren
+                double mina = (12 * date.getExpiredYearOfKaliYuga() - 1) * ARYA_SOLAR_MONTH;
+                double lunarNewYear = ARYA_LUNAR_MONTH * (Math.floor(mina / ARYA_LUNAR_MONTH) + 1);
+                int month = date.getMonth().getValue().getValue();
+
+                if (
+                    date.getMonth().isLeap()
+                    || (Math.ceil((lunarNewYear - mina) / (ARYA_SOLAR_MONTH - ARYA_LUNAR_MONTH)) > month)
+                ) {
+                    month--;
+                }
+
+                d = lunarNewYear
+                    + ARYA_LUNAR_MONTH * month
+                    + (date.getDayOfMonth().getValue() - 1) * (ARYA_LUNAR_MONTH / 30) - 0.25;
             }
+
+            return EpochDays.UTC.transform((long) Math.ceil(KALI_YUGA_EPOCH + d), EpochDays.RATA_DIE);
         }
 
         private boolean isSolar() {

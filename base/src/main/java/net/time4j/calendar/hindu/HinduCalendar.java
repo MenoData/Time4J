@@ -61,8 +61,7 @@ public final class HinduCalendar
     static {
         VariantMap calsys = new VariantMap();
         for (HinduRule rule : HinduRule.values()) {
-            HinduVariant v = rule.variant();
-            calsys.put(v.getVariant(), v.getCalendarSystem());
+//            calsys.accept(rule.variant()); // TODO: implementieren und aktivieren
         }
         calsys.accept(HinduVariant.VAR_OLD_SOLAR);
         calsys.accept(HinduVariant.VAR_OLD_LUNAR);
@@ -138,8 +137,6 @@ public final class HinduCalendar
             throw new IllegalArgumentException("Kali yuga year must not be smaller than 0: " + kyYear);
         }
 
-        // TODO: validation of date components
-
         this.variant = variant;
         this.kyYear = kyYear;
         this.month = month;
@@ -184,6 +181,7 @@ public final class HinduCalendar
         int month,
         int dayOfMonth
     ) {
+        // TODO: validation of date components
 
         if (aryaSiddhanta == AryaSiddhanta.SOLAR) {
             return new HinduCalendar(
@@ -192,6 +190,43 @@ public final class HinduCalendar
             return new HinduCalendar(
                 HinduVariant.VAR_OLD_LUNAR, year, HinduMonth.ofLunisolar(month), HinduDay.valueOf(dayOfMonth));
         }
+
+    }
+
+    /**
+     * <p>Creates an old Hindu calendar with given components. </p>
+     *
+     * <p>In case of solar calendar, the months use rasi numbers and start with VAISAKHA else with CHAITRA. </p>
+     *
+     * @param   aryaSiddhanta   either solar or lunar
+     * @param   year            expired year of era Kali Yuga
+     * @param   month           the Hindu month (in lunisolar case possibly as leap month)
+     * @param   dayOfMonth      the day of given month
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Kalenderdatum auf Basis des alten Hindu-Kalenders. </p>
+     *
+     * <p>Im Fall des Sonnenkalenders verwenden die Monate Rasi-Nummern und fangen mit dem Monat
+     * VAISAKHA an, sonst mit dem Monat CHAITRA. </p>
+     *
+     * @param   aryaSiddhanta   either solar or lunar
+     * @param   year            expired year of era Kali Yuga
+     * @param   month           the Hindu month (in lunisolar case possibly as leap month)
+     * @param   dayOfMonth      the day of given month
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    public static HinduCalendar of(
+        AryaSiddhanta aryaSiddhanta,
+        int year,
+        HinduMonth month,
+        int dayOfMonth
+    ) {
+        // TODO: validation of date components
+
+        HinduVariant variant =
+            (aryaSiddhanta == AryaSiddhanta.SOLAR) ? HinduVariant.VAR_OLD_SOLAR : HinduVariant.VAR_OLD_LUNAR;
+        return new HinduCalendar(variant, year, month, HinduDay.valueOf(dayOfMonth));
 
     }
 

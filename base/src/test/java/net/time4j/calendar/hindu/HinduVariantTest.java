@@ -222,4 +222,20 @@ public class HinduVariantTest {
         assertThat(EpochDays.RATA_DIE.transform(cs.transform(cal), EpochDays.UTC), is(0L));
     }
 
+    @Test
+    public void oldLunarCS() {
+        HinduVariant hv = HinduVariant.VAR_OLD_LUNAR;
+        CalendarSystem<HinduCalendar> cs = hv.getCalendarSystem();
+        HinduCalendar cal = cs.transform(EpochDays.UTC.transform(0, EpochDays.RATA_DIE));
+
+        // see Calendrical Calculations (ultimate edition), p162
+        assertThat(cal.getEra(), is(HinduEra.KALI_YUGA));
+        assertThat(cal.getYear(), is(3101));
+        assertThat(cal.getMonth().getValue(), is(IndianMonth.PAUSHA));
+        assertThat(cal.getMonth().isLeap(), is(false));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
+        assertThat(cal.getDayOfWeek(), is(Weekday.SUNDAY));
+        assertThat(EpochDays.RATA_DIE.transform(cs.transform(cal), EpochDays.UTC), is(0L));
+    }
+
 }

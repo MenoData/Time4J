@@ -394,7 +394,7 @@ public final class HinduVariant
 
     @Override
     public String getVariant() {
-        if (this.type < 0) {
+        if (this.isOld()) {
             AryaSiddhanta old = ((this.type == TYPE_OLD_SOLAR) ? AryaSiddhanta.SOLAR : AryaSiddhanta.LUNAR);
             return old.getVariant();
         }
@@ -434,7 +434,7 @@ public final class HinduVariant
      * @return  modified copy or this variant if the era does not change
      */
     public HinduVariant with(HinduEra defaultEra) {
-        if (this.defaultEra.equals(defaultEra)) {
+        if (this.isOld() || this.defaultEra.equals(defaultEra)) {
             return this;
         }
 
@@ -460,7 +460,7 @@ public final class HinduVariant
      * @see     #isUsingElapsedYears()
      */
     public HinduVariant withElapsedYears() {
-        if (this.elapsedMode) {
+        if (this.isOld() || this.elapsedMode) {
             return this;
         }
 
@@ -486,7 +486,7 @@ public final class HinduVariant
      * @see     #isUsingElapsedYears()
      */
     public HinduVariant withCurrentYears() {
-        if (!this.elapsedMode) {
+        if (this.isOld() || !this.elapsedMode) {
             return this;
         }
 
@@ -505,7 +505,7 @@ public final class HinduVariant
      * @return  modified copy or this variant if the alternative calculation mode was already set
      */
     public HinduVariant withAlternativeHinduSunrise() {
-        if (this.altHinduSunrise) {
+        if (this.isOld() || this.altHinduSunrise) {
             return this;
         }
 
@@ -529,6 +529,9 @@ public final class HinduVariant
      * @return  modified copy or this variant if the location does not change
      */
     public HinduVariant withAlternativeLocation(GeoLocation location) {
+        if (this.isOld()) {
+            return this;
+        }
         if (
             (location.getLatitude() == this.location.getLatitude())
             && (location.getLongitude() == this.location.getLongitude())
@@ -538,6 +541,10 @@ public final class HinduVariant
         }
 
         return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, this.altHinduSunrise, location);
+    }
+
+    private boolean isOld() {
+        return (this.type < 0);
     }
 
     private static boolean useStandardElapsedMode(
