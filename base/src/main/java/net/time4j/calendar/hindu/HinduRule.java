@@ -22,8 +22,6 @@
 package net.time4j.calendar.hindu;
 
 
-import net.time4j.engine.CalendarSystem;
-
 /**
  * <p>The Hindu calendar variants use a set of different algorithmic rules
  * how to determine the start of solar month  in relation to the zodiacal position
@@ -248,9 +246,5 @@ public enum HinduRule {
     }
 
     abstract HinduEra getDefaultEra();
-
-    public CalendarSystem<HinduCalendar> getCalendarSystem() { // TODO: make abstract and package private
-        throw new AbstractMethodError();
-    }
 
 }

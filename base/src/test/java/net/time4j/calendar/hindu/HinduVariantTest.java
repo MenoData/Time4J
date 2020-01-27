@@ -1,5 +1,7 @@
 package net.time4j.calendar.hindu;
 
+import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
+import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.SolarTime;
@@ -220,6 +222,20 @@ public class HinduVariantTest {
         assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
         assertThat(cal.getDayOfWeek(), is(Weekday.SUNDAY));
         assertThat(EpochDays.RATA_DIE.transform(cs.transform(cal), EpochDays.UTC), is(0L));
+
+        cal = cs.transform(cs.getMinimumSinceUTC());
+        assertThat(cal.getEra(), is(HinduEra.KALI_YUGA));
+        assertThat(cal.getYear(), is(0));
+        assertThat(cal.getMonth().getValue(), is(IndianMonth.VAISHAKHA));
+        assertThat(cal.getMonth().isLeap(), is(false));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(1)));
+
+        cal = cs.transform(cs.getMaximumSinceUTC());
+        assertThat(cal.getEra(), is(HinduEra.KALI_YUGA));
+        assertThat(cal.getYear(), is(5999));
+        assertThat(cal.getMonth().getValue(), is(IndianMonth.CHAITRA));
+        assertThat(cal.getMonth().isLeap(), is(false));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(30)));
     }
 
     @Test
@@ -236,6 +252,35 @@ public class HinduVariantTest {
         assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
         assertThat(cal.getDayOfWeek(), is(Weekday.SUNDAY));
         assertThat(EpochDays.RATA_DIE.transform(cs.transform(cal), EpochDays.UTC), is(0L));
+
+        cal = cs.transform(cs.getMinimumSinceUTC());
+        assertThat(cal.getEra(), is(HinduEra.KALI_YUGA));
+        assertThat(cal.getYear(), is(0));
+        assertThat(cal.getMonth().getValue(), is(IndianMonth.CHAITRA));
+        assertThat(cal.getMonth().isLeap(), is(true));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(1)));
+
+        cal = cs.transform(cs.getMaximumSinceUTC());
+        assertThat(cal.getEra(), is(HinduEra.KALI_YUGA));
+        assertThat(cal.getYear(), is(5999));
+        assertThat(cal.getMonth().getValue(), is(IndianMonth.PHALGUNA));
+        assertThat(cal.getMonth().isLeap(), is(false));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(30)));
+    }
+
+    @Test
+    public void oldLunarInvalid() {
+        HinduCS cs = HinduVariant.VAR_OLD_LUNAR.getCalendarSystem();
+        HinduMonth m = HinduMonth.ofLunisolar(1).withLeap();
+        assertThat(
+            cs.isValid(0, m, HinduDay.valueOf(14)),
+            is(true));
+        assertThat(
+            cs.isValid(0, m, HinduDay.valueOf(15)), // expunged day
+            is(false));
+        assertThat(
+            cs.isValid(0, m, HinduDay.valueOf(16)),
+            is(true));
     }
 
 }

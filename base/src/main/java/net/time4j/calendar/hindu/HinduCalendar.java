@@ -55,7 +55,7 @@ public final class HinduCalendar
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    private static final Map<String, CalendarSystem<HinduCalendar>> CALSYS;
+    private static final Map<String, HinduCS> CALSYS;
     private static final CalendarFamily<HinduCalendar> ENGINE;
 
     static {
@@ -116,6 +116,7 @@ public final class HinduCalendar
     private transient final int kyYear; // year of Kali Yuga (elapsed / expired)
     private transient final HinduMonth month;
     private transient final HinduDay dayOfMonth;
+    private transient final long utcDays;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -123,7 +124,8 @@ public final class HinduCalendar
         HinduVariant variant,
         int kyYear,
         HinduMonth month,
-        HinduDay dayOfMonth
+        HinduDay dayOfMonth,
+        long utcDays
     ) {
         super();
 
@@ -141,6 +143,7 @@ public final class HinduCalendar
         this.kyYear = kyYear;
         this.month = month;
         this.dayOfMonth = dayOfMonth;
+        this.utcDays = utcDays;
 
     }
 
@@ -181,15 +184,10 @@ public final class HinduCalendar
         int month,
         int dayOfMonth
     ) {
-        // TODO: validation of date components
 
-        if (aryaSiddhanta == AryaSiddhanta.SOLAR) {
-            return new HinduCalendar(
-                HinduVariant.VAR_OLD_SOLAR, year, HinduMonth.ofSolar(month), HinduDay.valueOf(dayOfMonth));
-        } else { // lunisolar
-            return new HinduCalendar(
-                HinduVariant.VAR_OLD_LUNAR, year, HinduMonth.ofLunisolar(month), HinduDay.valueOf(dayOfMonth));
-        }
+        HinduMonth m = (
+            (aryaSiddhanta == AryaSiddhanta.SOLAR) ? HinduMonth.ofSolar(month) : HinduMonth.ofLunisolar(month));
+        return HinduCalendar.of(aryaSiddhanta, year, m, dayOfMonth);
 
     }
 
@@ -222,11 +220,16 @@ public final class HinduCalendar
         HinduMonth month,
         int dayOfMonth
     ) {
-        // TODO: validation of date components
 
-        HinduVariant variant =
-            (aryaSiddhanta == AryaSiddhanta.SOLAR) ? HinduVariant.VAR_OLD_SOLAR : HinduVariant.VAR_OLD_LUNAR;
-        return new HinduCalendar(variant, year, month, HinduDay.valueOf(dayOfMonth));
+        HinduDay dom = HinduDay.valueOf(dayOfMonth);
+        HinduCS calsys = aryaSiddhanta.getCalendarSystem();
+
+        if (calsys.isValid(year, month, dom)) {
+            return calsys.create(year, month, dom);
+        } else {
+            throw new IllegalArgumentException(
+                "Invalid values: " + aryaSiddhanta.getVariant() + "/" + year + "/" + month + "/" + dayOfMonth);
+        }
 
     }
 
@@ -371,15 +374,22 @@ public final class HinduCalendar
         return sb.toString();
     }
 
+    @Override
+    public long getDaysSinceEpochUTC() {
+        return this.utcDays;
+    }
+
     /**
      * <p>Obtains the standard week model of this calendar. </p>
      *
      * @return  Weekmodel
+     * @see     IndianCalendar#getDefaultWeekmodel()
      */
     /*[deutsch]
      * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
      *
      * @return  Weekmodel
+     * @see     IndianCalendar#getDefaultWeekmodel()
      */
     public static Weekmodel getDefaultWeekmodel() {
 
@@ -423,7 +433,8 @@ public final class HinduCalendar
     /**
      * @serialData  Uses <a href="../../../../serialized-form.html#net.time4j.calendar.hindu/SPX">
      *              a dedicated serialization form</a> as proxy. The first byte contains
-     *              the type-ID {@code 20}. Then the variant is written as UTF-String.
+     *              the type-ID {@code 20}. Then the variant is written as UTF-String and finally
+     *              the days since UTC-epoch as long-primitive.
      *
      * @return  replacement object in serialization graph
      */
@@ -448,19 +459,19 @@ public final class HinduCalendar
     //~ Innere Klassen ----------------------------------------------------
 
     private static class VariantMap
-        extends ConcurrentHashMap<String, CalendarSystem<HinduCalendar>> {
+        extends ConcurrentHashMap<String, HinduCS> {
 
         //~ Methoden ------------------------------------------------------
 
         @Override
-        public CalendarSystem<HinduCalendar> get(Object key) {
+        public HinduCS get(Object key) {
 
-            CalendarSystem<HinduCalendar> calsys = super.get(key);
+            HinduCS calsys = super.get(key);
 
             if (calsys == null) {
                 String variant = key.toString();
                 calsys = HinduVariant.from(variant).getCalendarSystem();
-                CalendarSystem<HinduCalendar> old = this.putIfAbsent(variant, calsys);
+                HinduCS old = this.putIfAbsent(variant, calsys);
 
                 if (old != null) {
                     calsys = old;

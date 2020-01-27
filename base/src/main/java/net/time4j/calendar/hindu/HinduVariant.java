@@ -22,17 +22,12 @@
 package net.time4j.calendar.hindu;
 
 import net.time4j.calendar.astro.GeoLocation;
-import net.time4j.engine.CalendarEra;
-import net.time4j.engine.CalendarSystem;
-import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
 import java.util.StringTokenizer;
 
 
@@ -199,27 +194,6 @@ public final class HinduVariant
     }
 
     /**
-     * <p>Obtains the associated calendar system. </p>
-     *
-     * @return  calendar system for this variant of Hindu calendar
-     */
-    /*[deutsch]
-     * <p>Liefert das zu dieser Variante passende Kalendersystem. </p>
-     *
-     * @return  calendar system for this variant of Hindu calendar
-     */
-    public CalendarSystem<HinduCalendar> getCalendarSystem() {
-        switch (this.type) {
-            case TYPE_OLD_SOLAR:
-                return AryaSiddhanta.SOLAR.getCalendarSystem();
-            case TYPE_OLD_LUNAR:
-                return AryaSiddhanta.LUNAR.getCalendarSystem();
-            default:
-                return this.getRule().getCalendarSystem();
-        }
-    }
-
-    /**
      * <p>Obtains the default era. </p>
      *
      * @return  HinduEra
@@ -323,7 +297,7 @@ public final class HinduVariant
      *
      * @return  boolean
      */
-    public boolean isUsingElapsedYears() {
+    public boolean isUsingElapsedYears() { // TODO: mehr dokumentieren, für welche Regeln was als Standard gilt
         return this.elapsedMode;
     }
 
@@ -532,6 +506,7 @@ public final class HinduVariant
         if (this.isOld()) {
             return this;
         }
+
         if (
             (location.getLatitude() == this.location.getLatitude())
             && (location.getLongitude() == this.location.getLongitude())
@@ -541,6 +516,27 @@ public final class HinduVariant
         }
 
         return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, this.altHinduSunrise, location);
+    }
+
+    /**
+     * <p>Obtains the associated calendar system. </p>
+     *
+     * @return  calendar system for this variant of Hindu calendar
+     */
+    /*[deutsch]
+     * <p>Liefert das zu dieser Variante passende Kalendersystem. </p>
+     *
+     * @return  calendar system for this variant of Hindu calendar
+     */
+    HinduCS getCalendarSystem() {
+        switch (this.type) {
+            case TYPE_OLD_SOLAR:
+                return AryaSiddhanta.SOLAR.getCalendarSystem();
+            case TYPE_OLD_LUNAR:
+                return AryaSiddhanta.LUNAR.getCalendarSystem();
+            default:
+                return new ModernHinduCS(this);
+        }
     }
 
     private boolean isOld() {
@@ -599,49 +595,40 @@ public final class HinduVariant
 
     //~ Innere Klassen ----------------------------------------------------
 
-    static abstract class BaseCS
-        implements CalendarSystem<HinduCalendar> {
-
-        //~ Statische Felder/Initialisierungen ----------------------------
-
-        static final long KALI_YUGA_EPOCH = -1132959; // julian-BCE-3102-02-18 (as rata die)
-
-        //~ Instanzvariablen ----------------------------------------------
-
-        final HinduVariant variant;
+    private static class ModernHinduCS // TODO: implement
+        extends HinduCS {
 
         //~ Konstruktoren -------------------------------------------------
 
-        BaseCS(HinduVariant variant) {
-            super();
-
-            if (variant == null) {
-                throw new NullPointerException();
-            }
-
-            this.variant = variant;
+        ModernHinduCS(HinduVariant variant) {
+            super(variant);
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
+        HinduCalendar create(long utcDays) {
+            return null;
+        }
+
+        @Override
+        HinduCalendar create(int kyYear, HinduMonth month, HinduDay dom) {
+            return null;
+        }
+
+        @Override
+        boolean isValid(int kyYear, HinduMonth month, HinduDay dom) {
+            return false;
+        }
+
+        @Override
         public long getMinimumSinceUTC() {
-            return EpochDays.UTC.transform(KALI_YUGA_EPOCH, EpochDays.RATA_DIE);
+            return 0;
         }
 
         @Override
         public long getMaximumSinceUTC() {
-            return 0; // TODO: implementieren
-        }
-
-        @Override
-        public List<CalendarEra> getEras() {
-            return Arrays.asList(HinduEra.values());
-        }
-
-        // used in subclasses
-        static double modulo(double x, double y) {
-            return x - y * Math.floor(x / y);
+            return 0;
         }
 
     }

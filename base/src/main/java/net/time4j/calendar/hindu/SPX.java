@@ -130,18 +130,16 @@ final class SPX
      *
      * @param   in      input stream
      * @throws  IOException in any case of IO-failures
-     * @throws  ClassNotFoundException if class loading fails
      */
     /*[deutsch]
      * <p>Implementierungsmethode des Interface {@link Externalizable}. </p>
      *
      * @param   in      input stream
      * @throws  IOException in any case of IO-failures
-     * @throws  ClassNotFoundException if class loading fails
      */
     @Override
     public void readExternal(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         byte header = in.readByte();
 
@@ -169,21 +167,16 @@ final class SPX
 
         HinduCalendar cal = (HinduCalendar) this.obj;
         out.writeUTF(cal.getVariant());
-        out.writeInt(cal.getExpiredYearOfKaliYuga());
-        out.writeObject(cal.getMonth());
-        out.writeObject(cal.getDayOfMonth());
+        out.writeLong(cal.getDaysSinceEpochUTC());
 
     }
 
     private HinduCalendar readHinduCalendar(ObjectInput in)
-        throws IOException, ClassNotFoundException {
+        throws IOException {
 
         HinduVariant variant = HinduVariant.from(in.readUTF());
-        int kyYear = in.readInt();
-        HinduMonth month = (HinduMonth) in.readObject();
-        HinduDay dom = (HinduDay) in.readObject();
-
-        return new HinduCalendar(variant, kyYear, month, dom);
+        long utcDays = in.readLong();
+        return variant.getCalendarSystem().transform(utcDays);
 
     }
 
