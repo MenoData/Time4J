@@ -62,7 +62,7 @@ public abstract class DualYearOfEraElement<T extends ChronoEntity<T>>
         int defaultMax,
         char symbol
     ) {
-        super("YEAR_OF_ERA", chronoType, defaultMin, defaultMax, symbol, null, null);
+        super("YEAR_OF_ERA", chronoType, defaultMin, defaultMax, symbol);
 
     }
 

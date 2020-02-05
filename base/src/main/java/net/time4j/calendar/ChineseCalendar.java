@@ -376,9 +376,7 @@ public final class ChineseCalendar
             ChineseCalendar.class,
             72,
             94,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Chinese year related to the Chinese era. </p>
@@ -405,9 +403,7 @@ public final class ChineseCalendar
             ChineseCalendar.class,
             1,
             5636,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Chinese year related to the current sexagesimal cycle. </p>
@@ -471,7 +467,7 @@ public final class ChineseCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, ChineseCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", ChineseCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", ChineseCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Chinese day of month. </p>

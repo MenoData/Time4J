@@ -267,9 +267,7 @@ public final class KoreanCalendar
             KoreanCalendar.class,
             72,
             94,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Korean year related to the Korean era. </p>
@@ -376,7 +374,7 @@ public final class KoreanCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, KoreanCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", KoreanCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", KoreanCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Korean day of month. </p>

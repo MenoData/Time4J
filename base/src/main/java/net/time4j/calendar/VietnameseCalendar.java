@@ -262,9 +262,7 @@ public final class VietnameseCalendar
             VietnameseCalendar.class,
             75,
             94,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Vietnamese year related to the current sexagesimal cycle. </p>
@@ -310,7 +308,7 @@ public final class VietnameseCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, VietnameseCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", VietnameseCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", VietnameseCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Vietnamese day of month. </p>

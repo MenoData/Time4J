@@ -374,9 +374,7 @@ public final class JapaneseCalendar
             JapaneseCalendar.class,
             701 + 660,
             MRD + 659,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Japanese month. </p>
@@ -505,7 +503,7 @@ public final class JapaneseCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, JapaneseCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", JapaneseCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", JapaneseCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Japanese day of month. </p>
@@ -2458,9 +2456,7 @@ public final class JapaneseCalendar
                 JapaneseCalendar.class,
                 1,
                 MRD - Nengo.Element.SINGLETON.getDefaultMaximum().getFirstRelatedGregorianYear(),
-                'y',
-                null,
-                null);
+                'y');
         }
 
         //~ Methoden ------------------------------------------------------

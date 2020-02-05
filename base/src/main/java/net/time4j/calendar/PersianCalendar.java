@@ -222,9 +222,7 @@ public final class PersianCalendar
             PersianCalendar.class,
             1,
             3000,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Persian month. </p>

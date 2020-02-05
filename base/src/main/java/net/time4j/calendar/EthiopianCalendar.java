@@ -278,9 +278,7 @@ public final class EthiopianCalendar
             EthiopianCalendar.class,
             1,
             9999,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Ethiopian month. </p>

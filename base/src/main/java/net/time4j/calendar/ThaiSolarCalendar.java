@@ -208,9 +208,7 @@ public final class ThaiSolarCalendar
             ThaiSolarCalendar.class,
             1,
             GregorianMath.MAX_YEAR + 543,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the month. </p>

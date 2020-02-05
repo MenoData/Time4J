@@ -222,9 +222,7 @@ public final class IndianCalendar
             IndianCalendar.class,
             1,
             MAX_YEAR,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Indian month. </p>

@@ -220,9 +220,7 @@ public final class CopticCalendar
             CopticCalendar.class,
             1,
             9999,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Coptic month. </p>

@@ -236,9 +236,7 @@ public final class HebrewCalendar
             HebrewCalendar.class,
             1,
             9999,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Hebrew month. </p>

@@ -170,9 +170,7 @@ public final class JucheCalendar
             JucheCalendar.class,
             1,
             GregorianMath.MAX_YEAR - 1911,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the month. </p>

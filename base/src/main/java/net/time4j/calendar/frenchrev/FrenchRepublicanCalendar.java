@@ -424,7 +424,7 @@ public final class FrenchRepublicanCalendar
      * @see     #hasMonth()
      */
     public static final StdCalendarElement<Integer, FrenchRepublicanCalendar> DECADE_OF_MONTH =
-        new StdIntegerDateElement<>("DECADE_OF_MONTH", FrenchRepublicanCalendar.class, 1, 3, '\u0000', null, null);
+        new StdIntegerDateElement<>("DECADE_OF_MONTH", FrenchRepublicanCalendar.class, 1, 3, '\u0000');
 
     /**
      * <p>Represents the days of decade which consists of ten days. </p>
