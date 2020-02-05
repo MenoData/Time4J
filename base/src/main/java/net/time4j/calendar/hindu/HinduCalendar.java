@@ -21,18 +21,41 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.Moment;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
+import net.time4j.base.TimeSource;
 import net.time4j.calendar.IndianCalendar;
+import net.time4j.calendar.StdCalendarElement;
+import net.time4j.calendar.astro.GeoLocation;
+import net.time4j.calendar.astro.SolarTime;
+import net.time4j.calendar.astro.StdSolarCalculator;
+import net.time4j.calendar.service.StdEnumDateElement;
+import net.time4j.calendar.service.StdIntegerDateElement;
+import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.CalendarVariant;
+import net.time4j.engine.ChronoElement;
+import net.time4j.engine.ChronoEntity;
+import net.time4j.engine.ChronoMerger;
+import net.time4j.engine.DisplayStyle;
+import net.time4j.engine.ElementRule;
+import net.time4j.engine.FormattableElement;
+import net.time4j.engine.StartOfDay;
+import net.time4j.engine.ValidationElement;
+import net.time4j.format.Attributes;
 import net.time4j.format.CalendarType;
+import net.time4j.format.LocalizedPatternSupport;
+import net.time4j.tz.TZID;
+import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.math.BigDecimal;
+import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 
@@ -51,9 +74,35 @@ import java.util.concurrent.ConcurrentHashMap;
  */
 @CalendarType("extra/hindu")
 public final class HinduCalendar
-    extends CalendarVariant<HinduCalendar> {
+    extends CalendarVariant<HinduCalendar>
+    implements LocalizedPatternSupport {
 
     //~ Statische Felder/Initialisierungen --------------------------------
+
+    /**
+     * <p>Represents the Hindu era. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert die Hindu-&Auml;ra. </p>
+     */
+    @FormattableElement(format = "G")
+    public static final ChronoElement<HinduEra> ERA =
+        new StdEnumDateElement<>("ERA", HinduCalendar.class, HinduEra.class, 'G');
+
+    /**
+     * <p>Represents the Hindu year. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert das Hindu-Jahr. </p>
+     */
+    @FormattableElement(format = "y")
+    public static final StdCalendarElement<Integer, HinduCalendar> YEAR_OF_ERA =
+        new StdIntegerDateElement<>(
+            "YEAR_OF_ERA",
+            HinduCalendar.class,
+            0,
+            5999,
+            'y');
 
     private static final Map<String, HinduCS> CALSYS;
     private static final CalendarFamily<HinduCalendar> ENGINE;
@@ -67,16 +116,14 @@ public final class HinduCalendar
         calsys.accept(HinduVariant.VAR_OLD_LUNAR);
         CALSYS = calsys;
 
-        ENGINE = null;
-
-//        CalendarFamily.Builder<HinduCalendar> builder =
-//            CalendarFamily.Builder.setUp(
-//                HinduCalendar.class,
-//                new Merger(),
-//                CALSYS)
-//                .appendElement(
-//                    ERA,
-//                    new EraRule())
+        CalendarFamily.Builder<HinduCalendar> builder =
+            CalendarFamily.Builder.setUp(
+                HinduCalendar.class,
+                new Merger(),
+                CALSYS)
+                .appendElement(
+                    ERA,
+                    new EraRule());
 //                .appendElement(
 //                    YEAR_OF_ERA,
 //                    new IntegerRule(YEAR_INDEX))
@@ -107,7 +154,7 @@ public final class HinduCalendar
 //                        DAY_OF_MONTH,
 //                        DAY_OF_YEAR,
 //                        getDefaultWeekmodel()));
-//        ENGINE = builder.build();
+        ENGINE = builder.build();
     }
 
     //~ Instanzvariablen --------------------------------------------------
@@ -486,6 +533,197 @@ public final class HinduCalendar
 
             this.put(variant.getVariant(), variant.getCalendarSystem());
 
+        }
+
+    }
+
+    private static class EraRule
+        implements ElementRule<HinduCalendar, HinduEra> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public HinduEra getValue(HinduCalendar context) {
+            return context.getEra();
+        }
+
+        @Override
+        public HinduEra getMinimum(HinduCalendar context) {
+            return HinduEra.KALI_YUGA;
+        }
+
+        @Override
+        public HinduEra getMaximum(HinduCalendar context) {
+            if (!context.variant.isOld()) {
+                HinduEra[] eras = HinduEra.values();
+
+                for (int i = eras.length - 1; i >= 1; i--) {
+                    HinduEra era = eras[i];
+                    if (era.yearOfEra(HinduEra.KALI_YUGA, context.kyYear) >= 0) {
+                        return era;
+                    }
+                }
+            }
+
+            return HinduEra.KALI_YUGA;
+        }
+
+        @Override
+        public boolean isValid(
+            HinduCalendar context,
+            HinduEra value
+        ) {
+            return (context.variant.isOld() ? (value == HinduEra.KALI_YUGA) : (value != null));
+        }
+
+        @Override
+        public HinduCalendar withValue(
+            HinduCalendar context,
+            HinduEra value,
+            boolean lenient
+        ) {
+            if (this.isValid(context, value)) {
+                HinduVariant hv = context.variant.with(value);
+                if (hv == context.variant) {
+                    return context; // optimization
+                } else {
+                    return new HinduCalendar(hv, context.kyYear, context.month, context.dayOfMonth, context.utcDays);
+                }
+            } else {
+                throw new IllegalArgumentException("Invalid Hindu era: " + value);
+            }
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(HinduCalendar context) {
+            return YEAR_OF_ERA;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(HinduCalendar context) {
+            return YEAR_OF_ERA;
+        }
+
+    }
+
+    private static class Merger
+        implements ChronoMerger<HinduCalendar> {
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public String getFormatPattern(
+            DisplayStyle style,
+            Locale locale
+        ) {
+            return IndianCalendar.axis().getFormatPattern(style, locale);
+        }
+
+        @Override
+        public HinduCalendar createFrom(
+            TimeSource<?> clock,
+            AttributeQuery attributes
+        ) {
+            String hv = attributes.get(Attributes.CALENDAR_VARIANT, "");
+
+            if (hv.isEmpty()) {
+                return null;
+            }
+
+            HinduVariant variant = HinduVariant.from(hv);
+            GeoLocation location = variant.getLocation();
+
+            StartOfDay defaultStartOfDay;
+            TZID tzid;
+
+            if (attributes.contains(Attributes.TIMEZONE_ID)) {
+                tzid = attributes.get(Attributes.TIMEZONE_ID);
+            } else {
+                tzid = ZonalOffset.atLongitude(new BigDecimal(variant.getLocation().getLongitude()));
+            }
+
+            defaultStartOfDay =
+                StartOfDay.definedBy(
+                    SolarTime.ofLocation(
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        location.getAltitude(),
+                        StdSolarCalculator.TIME4J // sensible for altitude parameter
+                    ).sunrise()
+                );
+
+            StartOfDay startOfDay = attributes.get(Attributes.START_OF_DAY, defaultStartOfDay);
+            return Moment.from(clock.currentTime()).toGeneralTimestamp(ENGINE, hv, tzid, startOfDay).toDate();
+        }
+
+        @Override
+        public HinduCalendar createFrom(
+            ChronoEntity<?> entity,
+            AttributeQuery attributes,
+            boolean lenient,
+            boolean preparsing
+        ) {
+            String variant = attributes.get(Attributes.CALENDAR_VARIANT, "");
+
+            if (variant.isEmpty()) {
+                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Hindu calendar variant.");
+                return null;
+            }
+
+            int yoe = entity.getInt(YEAR_OF_ERA);
+
+            if (yoe == Integer.MIN_VALUE) {
+                entity.with(ValidationElement.ERROR_MESSAGE, "Missing Hindu year.");
+                return null;
+            }
+
+//            if (entity.contains(MONTH_OF_YEAR)) {
+//                int cmonth = entity.get(MONTH_OF_YEAR).getValue();
+//                int cdom = entity.getInt(DAY_OF_MONTH);
+//
+//                if (cdom != Integer.MIN_VALUE) {
+//                    if (CALSYS.isValid(HinduEra.ANNO_MARTYRUM, yoe, cmonth, cdom)) {
+//                        return HinduCalendar.of(yoe, cmonth, cdom);
+//                    } else {
+//                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
+//                    }
+//                }
+//            } else {
+//                int cdoy = entity.getInt(DAY_OF_YEAR);
+//                if (cdoy != Integer.MIN_VALUE) {
+//                    if (cdoy > 0) {
+//                        int cmonth = 1;
+//                        int daycount = 0;
+//                        while (cmonth <= 13) {
+//                            int len = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
+//                            if (cdoy > daycount + len) {
+//                                cmonth++;
+//                                daycount += len;
+//                            } else {
+//                                return HinduCalendar.of(yoe, cmonth, cdoy - daycount);
+//                            }
+//                        }
+//                    }
+//                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
+//                }
+//            }
+
+            return null;
+        }
+
+        @Override
+        public StartOfDay getDefaultStartOfDay() {
+            // without any context, we assume Ujjain as reference point
+            return StartOfDay.definedBy(
+                SolarTime.ofLocation(
+                    HinduVariant.UJJAIN.getLatitude(),
+                    HinduVariant.UJJAIN.getLongitude()
+                ).sunrise());
+        }
+
+        @Override
+        public int getDefaultPivotYear() {
+            return 100; // two-digit-years are effectively switched off
         }
 
     }

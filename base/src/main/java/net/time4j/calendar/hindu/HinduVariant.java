@@ -49,8 +49,13 @@ public final class HinduVariant
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    // the holy city of Ujjain serves as main reference point of Hinduism
+    static final GeoLocation UJJAIN =
+        GeoLocation.of(
+            23.0 + 9.0 / 60.0,
+            75.0 + 46.0 / 60.0 + 6.0 / 3600.0);
+
     private static final HinduRule[] RULES = HinduRule.values();
-    private static final GeoLocation UJJAIN = GeoLocation.of(23.0 + 9.0 / 60.0, 75.0 + 46.0 / 60.0 + 6.0 / 3600.0);
 
     private static final int TYPE_OLD_SOLAR = -1;
     private static final int TYPE_OLD_LUNAR = -2;
@@ -115,20 +120,26 @@ public final class HinduVariant
     /**
      * <p>Parses given variant string. </p>
      *
-     * <p>The variant string is the same as created by calling {@link #getVariant()}. </p>
+     * <p>The variant string is the same as created by calling {@code getVariant()}. </p>
      *
      * @param   variant variant string
      * @return  parsed variant
      * @throws  IllegalArgumentException if given argument cannot be parsed
+     * @see     #getVariant()
+     * @see     HinduRule#variant()
+     * @see     AryaSiddhanta#getVariant()
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Varianttext. </p>
      *
-     * <p>Der Varianttext ist der gleiche wie durch {@link #getVariant()} erzeugt. </p>
+     * <p>Der Varianttext ist der gleiche wie durch {@code getVariant()} erzeugt. </p>
      *
      * @param   variant     variant string
      * @return  parsed variant
      * @throws  IllegalArgumentException if given argument cannot be parsed
+     * @see     #getVariant()
+     * @see     HinduRule#variant()
+     * @see     AryaSiddhanta#getVariant()
      */
     public static HinduVariant from(String variant) {
         if (variant.startsWith(AryaSiddhanta.PREFIX)) {
@@ -144,6 +155,7 @@ public final class HinduVariant
         double latitude = UJJAIN.getLatitude();
         double longitude = UJJAIN.getLongitude();
         int altitude = UJJAIN.getAltitude();
+        boolean ujjain = true;
 
         while (st.hasMoreTokens()) {
             count++;
@@ -163,12 +175,15 @@ public final class HinduVariant
                     break;
                 case 5:
                     latitude = Double.valueOf(token).doubleValue();
+                    ujjain = (latitude == UJJAIN.getLatitude());
                     break;
                 case 6:
                     longitude = Double.valueOf(token).doubleValue();
+                    ujjain = ujjain && (longitude == UJJAIN.getLongitude());
                     break;
                 case 7:
                     altitude = Integer.valueOf(token).intValue();
+                    ujjain = ujjain && (altitude == 0);
                     break;
                 default:
                     throw new IllegalArgumentException("Invalid variant: " + variant);
@@ -185,7 +200,7 @@ public final class HinduVariant
                 defaultEra,
                 elapsedMode,
                 altHinduSunrise,
-                GeoLocation.of(latitude, longitude, altitude)
+                ujjain ? UJJAIN : GeoLocation.of(latitude, longitude, altitude)
             );
         } catch (Exception e) {
             throw new IllegalArgumentException("Invalid variant: " + variant);
@@ -205,6 +220,20 @@ public final class HinduVariant
      */
     public HinduEra getDefaultEra() {
         return this.defaultEra;
+    }
+
+    /**
+     * <p>Obtains the geographical reference point which is usually the holy city of Ujjain. </p>
+     *
+     * @return  GeoLocation
+     */
+    /*[deutsch]
+     * <p>Liefert den geographischen Referenzpunkt, der gew&ouml;hnlich die heilige Stadt von Ujjain ist. </p>
+     *
+     * @return  GeoLocation
+     */
+    public GeoLocation getLocation() {
+        return this.location;
     }
 
     /**
@@ -280,6 +309,21 @@ public final class HinduVariant
      */
     public boolean isPurnimanta() {
         return (this.type == HinduRule.PURNIMANTA.ordinal());
+    }
+
+    /**
+     * <p>Determines if this variant describes the old Hindu calendar based on mean astronomical values. </p>
+     *
+     * @return  boolean
+     */
+    /*[deutsch]
+     * <p>Bestimmt, ob diese Variante den alten Hindu-Kalender beschreibt, der auf mittleren astronomischen
+     * Werten beruht. </p>
+     *
+     * @return  boolean
+     */
+    public boolean isOld() {
+        return (this.type < 0);
     }
 
     /**
@@ -537,10 +581,6 @@ public final class HinduVariant
             default:
                 return new ModernHinduCS(this);
         }
-    }
-
-    private boolean isOld() {
-        return (this.type < 0);
     }
 
     private static boolean useStandardElapsedMode(

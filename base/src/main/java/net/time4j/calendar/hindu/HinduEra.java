@@ -55,6 +55,23 @@ public enum HinduEra
     KALI_YUGA,
 
     /**
+     * The onset of this era mainly used in Nepal is 955 years before Saka.
+     */
+    /*[deutsch]
+     * Der Beginn dieser vorwiegend in Nepal verwendeten &Auml;ra liegt 955 Jahre vor Saka.
+     */
+    NEPALESE,
+
+    /**
+     * The onset of this era mainly used in Kerala (part of Malayalam calendar) is 900 years before Saka.
+     */
+    /*[deutsch]
+     * Der Beginn dieser vorwiegend in Kerala verwendeten &Auml;ra (Bestandteil des Malayalam-Kalenders)
+     * liegt 900 Jahre vor Saka.
+     */
+    KOLLAM,
+
+    /**
      * The onset of this era mainly used in Northern India is 135 years before Saka.
      */
     /*[deutsch]
@@ -76,26 +93,9 @@ public enum HinduEra
     /*[deutsch]
      * Der Beginn dieser vorwiegend in Westbengalen verwendeten &Auml;ra liegt 515 Jahre nach Saka.
      */
-    BENGAL,
+    BENGAL;
 
-    /**
-     * The onset of this era mainly used in Kerala (part of Malayalam calendar) is 900 years before Saka.
-     */
-    /*[deutsch]
-     * Der Beginn dieser vorwiegend in Kerala verwendeten &Auml;ra (Bestandteil des Malayalam-Kalenders)
-     * liegt 900 Jahre vor Saka.
-     */
-    KOLLAM,
-
-    /**
-     * The onset of this era mainly used in Nepal is 955 years before Saka.
-     */
-    /*[deutsch]
-     * Der Beginn dieser vorwiegend in Nepal verwendeten &Auml;ra liegt 955 Jahre vor Saka.
-     */
-    NEPALESE;
-
-    private static final int[] SAKA_OFFSETS = {3179, 135, 0, -515, 900, 955};
+    private static final int[] SAKA_OFFSETS = {3179, 955, 900, 135, 0, -515};
 
     //~ Methoden ----------------------------------------------------------
 

@@ -123,6 +123,31 @@ public class HinduVariantTest {
     }
 
     @Test
+    public void isOld() {
+        assertThat(
+            HinduRule.ORISSA.variant().isOld(),
+            is(false));
+        assertThat(
+            HinduRule.AMANTA.variant().isOld(),
+            is(false));
+        assertThat(
+            HinduRule.AMANTA_ASHADHA.variant().isOld(),
+            is(false));
+        assertThat(
+            HinduRule.AMANTA_KARTIKA.variant().isOld(),
+            is(false));
+        assertThat(
+            HinduRule.PURNIMANTA.variant().isOld(),
+            is(false));
+        assertThat(
+            HinduVariant.VAR_OLD_SOLAR.isOld(),
+            is(true));
+        assertThat(
+            HinduVariant.VAR_OLD_LUNAR.isOld(),
+            is(true));
+    }
+
+    @Test
     public void isUsingElapsedYears() {
         assertThat(
             HinduRule.ORISSA.variant().isUsingElapsedYears(),
