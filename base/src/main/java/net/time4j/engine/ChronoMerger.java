@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoMerger.java) is part of project Time4J.
  *
@@ -265,7 +265,8 @@ public interface ChronoMerger<T> {
      * formatting of two-digit-years. </p>
      *
      * <p>Most calendar chronologies should choose a pivot year 20 years in the future. The standard
-     * implementation is based on the gregorian calendar. </p>
+     * implementation is based on the gregorian calendar. If an implementation returns the value
+     * {@code 100} then the formatting of two-digit-years is effectively switched off. </p>
      *
      * @return  default pivot year (must not be smaller than {@code 100})
      * @since   3.32/4.27
@@ -275,7 +276,9 @@ public interface ChronoMerger<T> {
      * von zweistelligen Jahresangaben dient. </p>
      *
      * <p>Die meisten Kalenderchronologien sollten ein Kippjahr 20 Jahre in der Zukunft w&auml;hlen.
-     * Die Standardimplementierung basiert auf dem gregorianischen Kalender. </p>
+     * Die Standardimplementierung basiert auf dem gregorianischen Kalender. Wenn eine Implementierung
+     * den Wert {@code 100} liefert, dann ist die Formatierung von zweisteligen Jahresangaben de facto
+     * ausgeschaltet. </p>
      *
      * @return  default pivot year (must not be smaller than {@code 100})
      * @since   3.32/4.27
