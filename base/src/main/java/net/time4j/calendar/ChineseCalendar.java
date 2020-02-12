@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChineseCalendar.java) is part of project Time4J.
  *
@@ -24,8 +24,10 @@ package net.time4j.calendar;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoDisplay;

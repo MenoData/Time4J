@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IndianCalendar.java) is part of project Time4J.
  *
@@ -32,9 +32,11 @@ import net.time4j.base.GregorianMath;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
@@ -1189,7 +1191,7 @@ public final class IndianCalendar
                 case DAY_OF_MONTH_INDEX:
                     return new IndianCalendar(context.iyear, context.imonth, value);
                 case DAY_OF_YEAR_INDEX:
-                    int delta = value - this.getValue(context).intValue();
+                    int delta = value - this.getInt(context);
                     return context.plus(CalendarDays.of(delta));
                 default:
                     throw new UnsupportedOperationException("Unknown element index: " + this.index);

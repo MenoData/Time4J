@@ -83,14 +83,17 @@ abstract class HinduCS
         return Arrays.asList(HinduEra.values());
     }
 
+    // non-validating method to create a Hindu date
     abstract HinduCalendar create(long utcDays);
 
+    // non-validating method to create a Hindu date
     abstract HinduCalendar create(
         int kyYear,
         HinduMonth month,
         HinduDay dom
     );
 
+    // general validation method
     abstract boolean isValid(
         int kyYear,
         HinduMonth month,

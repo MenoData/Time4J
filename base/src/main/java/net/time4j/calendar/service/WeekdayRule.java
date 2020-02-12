@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayRule.java) is part of project Time4J.
  *
@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar;
+package net.time4j.calendar.service;
 
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
@@ -36,9 +36,15 @@ import java.util.function.Function;
  * Generic element rule for weekdays.
  *
  * @author  Meno Hochschild
- * @since   3.39/4.34
+ * @since   5.6
  */
-class WeekdayRule<D extends CalendarDate>
+/*[deutsch]
+ * Generische Elementregel f&uuml;r Wochentage.
+ *
+ * @author  Meno Hochschild
+ * @since   5.6
+ */
+public class WeekdayRule<D extends CalendarDate>
     implements ElementRule<D, Weekday> {
 
     //~ Instanzvariablen --------------------------------------------------
@@ -48,7 +54,7 @@ class WeekdayRule<D extends CalendarDate>
 
     //~ Konstruktoren -----------------------------------------------------
 
-    WeekdayRule(
+    public WeekdayRule(
         Weekmodel stdWeekmodel,
         Function<D, CalendarSystem<D>> calsysFunc
     ) {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CopticCalendar.java) is part of project Time4J.
  *
@@ -31,9 +31,11 @@ import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;

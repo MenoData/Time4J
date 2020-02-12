@@ -70,7 +70,7 @@ public class OldHinduSolarCalendarTest {
     ) {
         super();
 
-        this.hindu = HinduCalendar.of(AryaSiddhanta.SOLAR, year, month, dom);
+        this.hindu = HinduCalendar.ofOldSolar(year, month, dom);
         this.utcDays = EpochDays.UTC.transform(rataDie, EpochDays.RATA_DIE);
 
     }

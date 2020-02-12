@@ -5,14 +5,8 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import static net.time4j.CalendarUnit.CENTURIES;
-import static net.time4j.CalendarUnit.YEARS;
-import static net.time4j.CalendarUnit.MONTHS;
-import static net.time4j.CalendarUnit.WEEKS;
-import static net.time4j.CalendarUnit.DAYS;
-import static net.time4j.ClockUnit.HOURS;
-import static net.time4j.ClockUnit.MINUTES;
-import static net.time4j.ClockUnit.NANOS;
+import static net.time4j.CalendarUnit.*;
+import static net.time4j.ClockUnit.*;
 import static net.time4j.Duration.approximateHours;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;

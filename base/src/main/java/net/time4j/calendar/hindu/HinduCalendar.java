@@ -26,23 +26,31 @@ import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.base.MathUtils;
 import net.time4j.base.TimeSource;
+import net.time4j.calendar.CommonElements;
 import net.time4j.calendar.IndianCalendar;
 import net.time4j.calendar.StdCalendarElement;
 import net.time4j.calendar.astro.GeoLocation;
 import net.time4j.calendar.astro.SolarTime;
 import net.time4j.calendar.astro.StdSolarCalculator;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
+import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarFamily;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.CalendarVariant;
+import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
+import net.time4j.engine.Chronology;
 import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
+import net.time4j.engine.IntElementRule;
 import net.time4j.engine.StartOfDay;
 import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
@@ -79,11 +87,21 @@ public final class HinduCalendar
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final int MAX_YEAR = 5999;
+    private static final int YEAR_INDEX = 0;
+    private static final int DAY_OF_YEAR_INDEX = 1;
+
     /**
      * <p>Represents the Hindu era. </p>
+     *
+     * <p>A change of the era by {@code with()} will not change the Hindu date in a temporal way
+     * but only the year representation. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die Hindu-&Auml;ra. </p>
+     *
+     * <p>Eine &Auml;nderung der &Auml;ra durch {@code with()} wird das Datum nicht zeitlich &auml;ndern,
+     * sondern nur die Jahresdarstellung. </p>
      */
     @FormattableElement(format = "G")
     public static final ChronoElement<HinduEra> ERA =
@@ -91,9 +109,16 @@ public final class HinduCalendar
 
     /**
      * <p>Represents the Hindu year. </p>
+     *
+     * <p>The range is for the era Kali Yuga defined by {@code 0-5999} (elapsed year) resprective {@code 1-6000}
+     * (current year) and will be adjusted accordingly for other eras. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das Hindu-Jahr. </p>
+     *
+     * <p>Der Wertebereich ist f&uuml;r die &Auml;ra Kali Yuga durch {@code 0-5999} (abgelaufenes Jahr)
+     * beziehungsweilse durch {@code 1-6000} (laufendes Jahr) definiert und wird f&uuml;r andere &Auml;ras
+     * entsprechend angepasst. </p>
      */
     @FormattableElement(format = "y")
     public static final StdCalendarElement<Integer, HinduCalendar> YEAR_OF_ERA =
@@ -101,8 +126,40 @@ public final class HinduCalendar
             "YEAR_OF_ERA",
             HinduCalendar.class,
             0,
-            5999,
+            MAX_YEAR + 1,
             'y');
+
+    /**
+     * <p>Represents the Hindu day of year. </p>
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert den Hindu-Tag des Jahres. </p>
+     */
+    @FormattableElement(format = "D")
+    public static final StdCalendarElement<Integer, HinduCalendar> DAY_OF_YEAR =
+        new StdIntegerDateElement<>("DAY_OF_YEAR", HinduCalendar.class, 1, 365, 'D');
+
+    /**
+     * <p>Represents the Hindu day of week. </p>
+     *
+     * <p>If the day-of-week is set to a new value then Time4J handles the Hindu calendar week
+     * as starting on Sunday. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     */
+    /*[deutsch]
+     * <p>Repr&auml;sentiert den Hindu-Tag der Woche. </p>
+     *
+     * <p>Wenn der Tag der Woche auf einen neuen Wert gesetzt wird, behandelt Time4J
+     * die Hindu-Woche so, da&szlig; sie am Sonntag beginnt. </p>
+     *
+     * @see     #getDefaultWeekmodel()
+     * @see     CommonElements#localDayOfWeek(Chronology, Weekmodel)
+     */
+    @FormattableElement(format = "E")
+    public static final StdCalendarElement<Weekday, HinduCalendar> DAY_OF_WEEK =
+        new StdWeekdayElement<>(HinduCalendar.class, getDefaultWeekmodel());
 
     private static final Map<String, HinduCS> CALSYS;
     private static final CalendarFamily<HinduCalendar> ENGINE;
@@ -121,36 +178,33 @@ public final class HinduCalendar
                 HinduCalendar.class,
                 new Merger(),
                 CALSYS)
-                .appendElement(
-                    ERA,
-                    new EraRule());
-//                .appendElement(
-//                    YEAR_OF_ERA,
-//                    new IntegerRule(YEAR_INDEX))
+            .appendElement(
+                CommonElements.RELATED_GREGORIAN_YEAR,
+                new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
+            .appendElement(
+                ERA,
+                new EraRule())
+            .appendElement(
+                YEAR_OF_ERA,
+                new IntegerRule(YEAR_INDEX))
 //                .appendElement(
 //                    MONTH_OF_YEAR,
 //                    new MonthRule())
 //                .appendElement(
-//                    CommonElements.RELATED_GREGORIAN_YEAR,
-//                    new RelatedGregorianYearRule<>(CALSYS, DAY_OF_YEAR))
-//                .appendElement(
 //                    DAY_OF_MONTH,
 //                    new IntegerRule(DAY_OF_MONTH_INDEX))
-//                .appendElement(
-//                    DAY_OF_YEAR,
-//                    new IntegerRule(DAY_OF_YEAR_INDEX))
-//                .appendElement(
-//                    DAY_OF_WEEK,
-//                    new WeekdayRule<>(
-//                        getDefaultWeekmodel(),
-//                        (context) -> context.getChronology().getCalendarSystem(context.getVariant())
-//                    ))
-//                .appendElement(
-//                    WIM_ELEMENT,
-//                    WeekdayInMonthElement.getRule(WIM_ELEMENT))
+            .appendElement(
+                DAY_OF_YEAR,
+                new IntegerRule(DAY_OF_YEAR_INDEX))
+            .appendElement(
+                DAY_OF_WEEK,
+                new WeekdayRule<>(
+                    getDefaultWeekmodel(),
+                    (context) -> context.getChronology().getCalendarSystem(context.getVariant())
+                ));
 //                .appendExtension(
 //                    new CommonElements.Weekengine(
-//                        HijriCalendar.class,
+//                        HinduCalendar.class,
 //                        DAY_OF_MONTH,
 //                        DAY_OF_YEAR,
 //                        getDefaultWeekmodel()));
@@ -197,87 +251,116 @@ public final class HinduCalendar
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Creates an old Hindu calendar with given components. </p>
+     * <p>Creates an old solar Hindu calendar with given components. </p>
      *
-     * <p>In case of solar calendar, the months use rasi numbers and start with VAISAKHA else with CHAITRA. </p>
+     * <p>The months use rasi numbers and start with VAISAKHA. </p>
      *
-     * @param   aryaSiddhanta   either solar or lunar
      * @param   year            expired year of era Kali Yuga
-     * @param   month           month number whose value depends on solar or lunisolar mode
+     * @param   month           month number (rasi numbering)
      * @param   dayOfMonth      the day of given month
      * @return  HinduCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @see     HinduMonth#getRasi()
-     * @see     HinduMonth#getValue()
+     * @see     AryaSiddhanta
      */
     /*[deutsch]
-     * <p>Erzeugt ein Kalenderdatum auf Basis des alten Hindu-Kalenders. </p>
+     * <p>Erzeugt ein Kalenderdatum auf Basis des alten solaren Hindu-Kalenders. </p>
      *
-     * <p>Im Fall des Sonnenkalenders verwenden die Monate Rasi-Nummern und fangen mit dem Monat
-     * VAISAKHA an, sonst mit dem Monat CHAITRA. </p>
+     * <p>Die Monate verwenden Rasi-Nummern und fangen mit dem Monat VAISAKHA an. </p>
      *
-     * @param   aryaSiddhanta   either solar or lunar
      * @param   year            expired year of era Kali Yuga
-     * @param   month           month number whose value depends on solar or lunisolar mode
+     * @param   month           month number (rasi numbering)
      * @param   dayOfMonth      the day of given month
      * @return  HinduCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @see     HinduMonth#getRasi()
-     * @see     HinduMonth#getValue()
+     * @see     AryaSiddhanta
      */
-    public static HinduCalendar of(
-        AryaSiddhanta aryaSiddhanta,
+    public static HinduCalendar ofOldSolar(
         int year,
         int month,
         int dayOfMonth
     ) {
-
-        HinduMonth m = (
-            (aryaSiddhanta == AryaSiddhanta.SOLAR) ? HinduMonth.ofSolar(month) : HinduMonth.ofLunisolar(month));
-        return HinduCalendar.of(aryaSiddhanta, year, m, dayOfMonth);
-
+        HinduMonth m = HinduMonth.ofSolar(month);
+        HinduDay dom = HinduDay.valueOf(dayOfMonth);
+        return HinduCalendar.of(HinduVariant.VAR_OLD_SOLAR, HinduEra.KALI_YUGA, year, m, dom);
     }
 
     /**
-     * <p>Creates an old Hindu calendar with given components. </p>
+     * <p>Creates an old lunisolar Hindu calendar with given components. </p>
      *
-     * <p>In case of solar calendar, the months use rasi numbers and start with VAISAKHA else with CHAITRA. </p>
+     * <p>The month CHAITRA is the first month of year. </p>
      *
-     * @param   aryaSiddhanta   either solar or lunar
      * @param   year            expired year of era Kali Yuga
-     * @param   month           the Hindu month (in lunisolar case possibly as leap month)
-     * @param   dayOfMonth      the day of given month
-     */
-    /*[deutsch]
-     * <p>Erzeugt ein Kalenderdatum auf Basis des alten Hindu-Kalenders. </p>
-     *
-     * <p>Im Fall des Sonnenkalenders verwenden die Monate Rasi-Nummern und fangen mit dem Monat
-     * VAISAKHA an, sonst mit dem Monat CHAITRA. </p>
-     *
-     * @param   aryaSiddhanta   either solar or lunar
-     * @param   year            expired year of era Kali Yuga
-     * @param   month           the Hindu month (in lunisolar case possibly as leap month)
+     * @param   month           the Hindu month (possibly as leap month)
      * @param   dayOfMonth      the day of given month
      * @return  HinduCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
+     * @see     AryaSiddhanta
      */
-    public static HinduCalendar of(
-        AryaSiddhanta aryaSiddhanta,
+    /*[deutsch]
+     * <p>Erzeugt ein Kalenderdatum auf Basis des alten lunisolaren Hindu-Kalenders. </p>
+     *
+     * <p>Der Monat CHAITRA ist der erste Monat des Jahres. </p>
+     *
+     * @param   year            expired year of era Kali Yuga
+     * @param   month           the Hindu month (possibly as leap month)
+     * @param   dayOfMonth      the day of given month
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     * @see     AryaSiddhanta
+     */
+    public static HinduCalendar ofOldLunar(
         int year,
         HinduMonth month,
         int dayOfMonth
     ) {
-
         HinduDay dom = HinduDay.valueOf(dayOfMonth);
-        HinduCS calsys = aryaSiddhanta.getCalendarSystem();
+        return HinduCalendar.of(HinduVariant.VAR_OLD_LUNAR, HinduEra.KALI_YUGA, year, month, dom);
+    }
 
-        if (calsys.isValid(year, month, dom)) {
-            return calsys.create(year, month, dom);
-        } else {
-            throw new IllegalArgumentException(
-                "Invalid values: " + aryaSiddhanta.getVariant() + "/" + year + "/" + month + "/" + dayOfMonth);
+    /**
+     * <p>Creates an Hindu calendar with given components. </p>
+     *
+     * @param   variant         the variant of Hindu calendar
+     * @param   era             the desired era
+     * @param   yearOfEra       the year of given era (expired or current according to variant configuration)
+     * @param   month           the Hindu month (in lunisolar case possibly as leap month)
+     * @param   dayOfMonth      the day of given month (in lunisolar case possibly in leap state)
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    /*[deutsch]
+     * <p>Erzeugt ein Datum des Hindu-Kalenders mit den angegebenen Komponenten. </p>
+     *
+     * @param   variant         the variant of Hindu calendar
+     * @param   era             the desired era
+     * @param   yearOfEra       the year of given era (expired or current according to variant configuration)
+     * @param   month           the Hindu month (in lunisolar case possibly as leap month)
+     * @param   dayOfMonth      the day of given month (in lunisolar case possibly in leap state)
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException in case of any inconsistencies
+     */
+    public static HinduCalendar of(
+        HinduVariant variant,
+        HinduEra era,
+        int yearOfEra,
+        HinduMonth month,
+        HinduDay dayOfMonth
+    ) {
+        HinduCS calsys = variant.with(era).getCalendarSystem();
+        int kyYear = HinduEra.KALI_YUGA.yearOfEra(era, yearOfEra);
+
+        if (!variant.isUsingElapsedYears()) {
+            kyYear--;
         }
 
+        if (calsys.isValid(kyYear, month, dayOfMonth)) {
+            return calsys.create(kyYear, month, dayOfMonth);
+        } else {
+            throw new IllegalArgumentException(
+                "Invalid values: " + variant + "[" + era + "/" + yearOfEra + "/" + month + "/" + dayOfMonth + "]");
+        }
     }
 
     @Override
@@ -379,6 +462,86 @@ public final class HinduCalendar
         return Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1);
     }
 
+    /**
+     * <p>Obtains the day of year. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
+     * <p>Liefert den Tag des Jahres. </p>
+     *
+     * @return  int
+     */
+    public int getDayOfYear() {
+        return (int) (this.utcDays - this.withNewYear().utcDays + 1);
+    }
+
+    /**
+     * <p>Obtains the previous day. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    /*[deutsch]
+     * <p>Liefert den vorherigen Tag. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    public HinduCalendar previousDay() {
+        return this.variant.getCalendarSystem().transform(this.utcDays - 1);
+    }
+
+    /**
+     * <p>Obtains the corresponding date of previous month. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    /*[deutsch]
+     * <p>Liefert das entsprechende Datum des vorherigen Monats. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    public HinduCalendar previousMonth() {
+        HinduCalendar cal = this.withMidOfMonth(-1);
+        return cal.withAdjustedDayInMonth(this.dayOfMonth);
+    }
+
+    /**
+     * <p>Obtains the next day. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    /*[deutsch]
+     * <p>Liefert den n&auml;chsten Tag. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    public HinduCalendar nextDay() {
+        return this.variant.getCalendarSystem().transform(this.utcDays + 1);
+    }
+
+    /**
+     * <p>Obtains the corresponding date of next month. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    /*[deutsch]
+     * <p>Liefert das entsprechende Datum des n&auml;chsten Monats. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    public HinduCalendar nextMonth() {
+        HinduCalendar cal = this.withMidOfMonth(1);
+        return cal.withAdjustedDayInMonth(this.dayOfMonth);
+    }
+
     @Override
     public boolean equals(Object obj) {
         if (this == obj) {
@@ -475,6 +638,71 @@ public final class HinduCalendar
 
     int getExpiredYearOfKaliYuga() {
         return this.kyYear;
+    }
+
+    private HinduCalendar withNewYear() {
+        HinduMonth first = (this.variant.isSolar() ? HinduMonth.ofSolar(1) : HinduMonth.ofLunisolar(1));
+        HinduCS calsys = this.variant.getCalendarSystem();
+        HinduCalendar date = calsys.create(this.kyYear, first, HinduDay.valueOf(15));
+
+        if (this.variant.isLunisolar()) {
+            HinduCalendar previousMonth = calsys.create(date.utcDays - 30);
+            if (previousMonth.getMonth().isLeap() && (previousMonth.kyYear == this.kyYear)) {
+                date = previousMonth;
+            }
+        }
+
+        return date.withFirstDayInMonth();
+    }
+
+    private HinduCalendar withMidOfMonth(int monthUnits) {
+        long utc = this.utcDays + monthUnits * 30 + 15 - this.dayOfMonth.getValue();
+        return this.variant.getCalendarSystem().transform(utc);
+    }
+
+    private HinduCalendar withFirstDayInMonth() {
+        HinduDay dom = HinduDay.valueOf(1); // always valid in solar calendar
+        HinduCS calsys = this.variant.getCalendarSystem();
+
+        if (this.variant.isLunisolar()) {
+            int count = 3;
+            while (!calsys.isValid(this.kyYear, this.month, dom)) {
+                if (count == 0) {
+                    throw new IllegalArgumentException("Cannot determine first day of month: " + this);
+                } else if (dom.isLeap()) {
+                    dom = HinduDay.valueOf(dom.getValue() + 1);
+                } else {
+                    dom = dom.withLeap();
+                }
+                count--;
+            }
+        }
+
+        return calsys.create(this.kyYear, this.month, dom);
+    }
+
+    private HinduCalendar withAdjustedDayInMonth(HinduDay desired) {
+        HinduDay dom = desired;
+        HinduCS calsys = this.variant.getCalendarSystem();
+        int count = 5;
+
+        while (!calsys.isValid(this.kyYear, this.month, dom)) {
+            if ((dom.getValue() == 1) && !dom.isLeap()) {
+                return this.withFirstDayInMonth();
+            } else if (count == 0) {
+                throw new IllegalArgumentException("No valid day found: " + this + " => (day=" + desired + ")");
+            } else if (dom.isLeap()) {
+                dom = HinduDay.valueOf(dom.getValue());
+            } else {
+                dom = HinduDay.valueOf(dom.getValue() - 1);
+                if (this.variant.isLunisolar()) {
+                    dom = dom.withLeap();
+                }
+            }
+            count--;
+        }
+
+        return calsys.create(this.kyYear, this.month, dom);
     }
 
     /**
@@ -606,6 +834,161 @@ public final class HinduCalendar
 
     }
 
+    private static class IntegerRule
+        implements IntElementRule<HinduCalendar> {
+
+        //~ Instanzvariablen ----------------------------------------------
+
+        private final int index;
+
+        //~ Konstruktoren -------------------------------------------------
+
+        IntegerRule(int index) {
+            super();
+
+            this.index = index;
+        }
+
+        //~ Methoden ------------------------------------------------------
+
+        @Override
+        public int getInt(HinduCalendar context) {
+            switch (this.index) {
+                case YEAR_INDEX:
+                    return context.getYear();
+                case DAY_OF_YEAR_INDEX:
+                    return context.getDayOfYear();
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+            }
+        }
+
+        @Override
+        public boolean isValid(HinduCalendar context, int value) {
+            int min = this.getMin(context);
+            int max = this.getMax(context);
+            return ((min <= value) && (max >= value));
+        }
+
+        @Override
+        public HinduCalendar withValue(
+            HinduCalendar context,
+            int value,
+            boolean lenient
+        ) {
+            if (!this.isValid(context, value)) {
+                throw new IllegalArgumentException("Out of range: " + value);
+            }
+
+            switch (this.index) {
+                case YEAR_INDEX:
+                    HinduCS calsys = context.variant.getCalendarSystem();
+                    int y = HinduEra.KALI_YUGA.yearOfEra(context.getEra(), value);
+
+                    if (!context.variant.isUsingElapsedYears()) {
+                        y--;
+                    }
+
+                    HinduCalendar date = calsys.create(y, context.month, HinduDay.valueOf(15));
+
+                    if (context.month.isLeap()) {
+                        date = calsys.transform(date.utcDays);
+                        if (date.month.getValue().getValue() > context.month.getValue().getValue()) {
+                            date = calsys.create(date.utcDays - 30);
+                        }
+                    }
+
+                    return date.withAdjustedDayInMonth(context.dayOfMonth);
+                case DAY_OF_YEAR_INDEX:
+                    int delta = value - this.getInt(context);
+                    return context.plus(CalendarDays.of(delta));
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+            }
+        }
+
+        @Override
+        public Integer getValue(HinduCalendar context) {
+            return Integer.valueOf(this.getInt(context));
+        }
+
+        @Override
+        public Integer getMinimum(HinduCalendar context) {
+            return Integer.valueOf(this.getMin(context));
+        }
+
+        @Override
+        public Integer getMaximum(HinduCalendar context) {
+            return Integer.valueOf(this.getMax(context));
+        }
+
+        @Override
+        public boolean isValid(
+            HinduCalendar context,
+            Integer value
+        ) {
+            return ((value != null) && this.isValid(context, value.intValue()));
+        }
+
+        @Override
+        public HinduCalendar withValue(
+            HinduCalendar context,
+            Integer value,
+            boolean lenient
+        ) {
+            if (value == null) {
+                throw new IllegalArgumentException("Missing new value.");
+            }
+
+            return this.withValue(context, value.intValue(), lenient);
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtFloor(HinduCalendar context) {
+            if (this.index == YEAR_INDEX) {
+//                return MONTH_OF_YEAR; // TODO: activate
+            }
+
+            return null;
+        }
+
+        @Override
+        public ChronoElement<?> getChildAtCeiling(HinduCalendar context) {
+            if (this.index == YEAR_INDEX) {
+//                return MONTH_OF_YEAR; // TODO: activate
+            }
+
+            return null;
+        }
+
+        private int getMin(HinduCalendar context) {
+            switch (this.index) {
+                case YEAR_INDEX:
+                    return context.variant.isUsingElapsedYears() ? 0 : 1;
+                case DAY_OF_YEAR_INDEX:
+                    return 1;
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+            }
+
+        }
+
+        private int getMax(HinduCalendar context) {
+            switch (this.index) {
+                case YEAR_INDEX:
+                    int ymax = context.variant.isUsingElapsedYears() ? MAX_YEAR : MAX_YEAR + 1;
+                    return context.getEra().yearOfEra(HinduEra.KALI_YUGA, ymax);
+                case DAY_OF_YEAR_INDEX:
+                    HinduCalendar lower = context.withNewYear();
+                    HinduCalendar upper = context.variant.getCalendarSystem().create(lower.utcDays + 400).withNewYear();
+                    return (int) (upper.utcDays - lower.utcDays);
+                default:
+                    throw new UnsupportedOperationException("Unknown element index: " + this.index);
+            }
+        }
+
+    }
+
     private static class Merger
         implements ChronoMerger<HinduCalendar> {
 
@@ -719,6 +1102,14 @@ public final class HinduCalendar
                     HinduVariant.UJJAIN.getLatitude(),
                     HinduVariant.UJJAIN.getLongitude()
                 ).sunrise());
+        }
+
+        @Override
+        public ChronoDisplay preformat(
+            HinduCalendar context,
+            AttributeQuery attributes
+        ) {
+            return context;
         }
 
         @Override

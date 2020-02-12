@@ -77,7 +77,7 @@ public class OldHinduLunarCalendarTest {
             m = m.withLeap();
         }
 
-        this.hindu = HinduCalendar.of(AryaSiddhanta.LUNAR, year, m, dom);
+        this.hindu = HinduCalendar.ofOldLunar(year, m, dom);
         this.utcDays = EpochDays.UTC.transform(rataDie, EpochDays.RATA_DIE);
 
     }

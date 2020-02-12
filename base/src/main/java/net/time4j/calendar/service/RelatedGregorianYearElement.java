@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RelatedGregorianYearElement.java) is part of project Time4J.
  *
@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar;
+package net.time4j.calendar.service;
 
 import net.time4j.base.GregorianMath;
 import net.time4j.engine.BasicElement;
@@ -31,20 +31,26 @@ import java.io.ObjectStreamException;
  * <p>Specific element for the related gregorian year. </p>
  *
  * @author  Meno Hochschild
- * @since   3.20/4.16
+ * @since   5.6
  */
 /*[deutsch]
  * <p>Spezialelement f&uuml;r das gregorianische Bezugsjahr. </p>
  *
  * @author  Meno Hochschild
- * @since   3.20/4.16
+ * @since   5.6
  */
-final class RelatedGregorianYearElement
+public final class RelatedGregorianYearElement
     extends BasicElement<Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
-    static final RelatedGregorianYearElement SINGLETON = new RelatedGregorianYearElement();
+    /**
+     * Singleton.
+     */
+    /*[deutsch]
+     * Einzige Instanz dieser Klasse.
+     */
+    public static final RelatedGregorianYearElement SINGLETON = new RelatedGregorianYearElement();
 
     private static final long serialVersionUID = -1117064522468823402L;
 

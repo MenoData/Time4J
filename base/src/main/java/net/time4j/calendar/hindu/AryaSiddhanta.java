@@ -206,6 +206,10 @@ public enum AryaSiddhanta
                 return false;
             }
 
+            if (this.isSolar() && (month.isLeap() || dom.isLeap())) {
+                return false;
+            }
+
             // solar: 30/31, lunar: 29/30
             if (dom.getValue() > (this.isSolar() ? 31 : 30)) {
                 return false;

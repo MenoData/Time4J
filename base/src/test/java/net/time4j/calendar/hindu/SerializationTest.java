@@ -2,8 +2,6 @@ package net.time4j.calendar.hindu;
 
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.SolarTime;
-import net.time4j.calendar.frenchrev.FrenchRepublicanCalendar;
-import net.time4j.calendar.frenchrev.Sansculottides;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -38,7 +36,7 @@ public class SerializationTest {
 
     @Test
     public void serializeCalendar() throws IOException, ClassNotFoundException {
-        roundtrip(HinduCalendar.of(AryaSiddhanta.SOLAR, 3101, HinduMonth.of(IndianMonth.MAGHA).getRasi(), 19));
+        roundtrip(HinduCalendar.ofOldSolar(3101, HinduMonth.of(IndianMonth.MAGHA).getRasi(), 19));
     }
 
     private static int roundtrip(Object obj)
