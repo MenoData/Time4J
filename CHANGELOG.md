@@ -1,4 +1,6 @@
 ## [v5.6] not yet released
+### Fixed
+- Build problem: More tolerant double comparisons in astro tests [#886]
 
 ## [v5.5] published on 2019-11-04
 ### Added
