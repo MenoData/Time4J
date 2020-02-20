@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeSource.java) is part of project Time4J.
  *
@@ -20,6 +20,8 @@
  */
 
 package net.time4j.base;
+
+import java.time.Instant;
 
 
 /**
@@ -50,5 +52,22 @@ public interface TimeSource<T extends UnixTime> {
      * @return  current time in seconds (as {@code UnixTime} object or derivate)
      */
     T currentTime();
+
+    /**
+     * <p>Obtains the current instant. </p>
+     *
+     * @return  current instant as JSR-310-type
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Liefert die aktuelle Zeit als JSR-310-&Auml;quivalent. </p>
+     *
+     * @return  current instant as JSR-310-type
+     * @since   5.6
+     */
+    default Instant currentInstant() {
+        UnixTime ut = this.currentTime();
+        return Instant.ofEpochSecond(ut.getPosixTime() , ut.getNanosecond()) ;
+    }
 
 }
