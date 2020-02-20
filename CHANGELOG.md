@@ -1,4 +1,7 @@
 ## [v5.6] not yet released
+### Added
+- Let TimeSource deliver current Instant [#884]
+
 ### Fixed
 - Build problem: More tolerant double comparisons in astro tests [#886]
 
