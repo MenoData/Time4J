@@ -27,6 +27,8 @@ import static org.junit.Assert.fail;
 @RunWith(JUnit4.class)
 public class AstroTest {
 
+    private static final double TOLERANCE = 0.001;
+
     @Test
     public void nasaSeasonsInMinutePrecision() { // see: http://aa.usno.navy.mil/data/docs/EarthSeasons.php
         timeOfSeason(2000, VERNAL_EQUINOX, PlainTimestamp.of(2000, 3, 20, 7, 35));
@@ -797,29 +799,29 @@ public class AstroTest {
                 ZonalOffset.UTC
             );
         assertThat(
-            StdSolarCalculator.SIMPLE.rightAscension(jd.getValue()),
-            is(198.76419030829365));
+            Math.abs(StdSolarCalculator.SIMPLE.rightAscension(jd.getValue()) - 198.76419030829365) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.SIMPLE.declination(jd.getValue()),
-            is(-7.939068113994067));
+            Math.abs(StdSolarCalculator.SIMPLE.declination(jd.getValue()) + 7.939068113994067) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.NOAA.rightAscension(jd.getValue()),
-            is(198.38082521237328));
+            Math.abs(StdSolarCalculator.NOAA.rightAscension(jd.getValue()) - 198.38082521237328) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.NOAA.declination(jd.getValue()),
-            is(-7.785069796023854));
+            Math.abs(StdSolarCalculator.NOAA.declination(jd.getValue()) + 7.785069796023854) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.CC.rightAscension(jd.getValue()),
-            is(198.37832979724269));
+            Math.abs(StdSolarCalculator.CC.rightAscension(jd.getValue()) - 198.37832979724269) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.CC.declination(jd.getValue()),
-            is(-7.7841496152567915));
+            Math.abs(StdSolarCalculator.CC.declination(jd.getValue()) + 7.7841496152567915) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.TIME4J.rightAscension(jd.getValue()),
-            is(198.37826281251168));
+            Math.abs(StdSolarCalculator.TIME4J.rightAscension(jd.getValue()) - 198.37826281251168) < TOLERANCE,
+            is(true));
         assertThat(
-            StdSolarCalculator.TIME4J.declination(jd.getValue()),
-            is(-7.784091134226315));
+            Math.abs(StdSolarCalculator.TIME4J.declination(jd.getValue()) + 7.784091134226315) < TOLERANCE,
+            is(true));
 
         // comparison with VSOP87-theory
         System.out.println("ra-VSOP87: " + String.valueOf(15 * (30.749 / 3600 + 13 / 60 + 13))); // 195.12812083333333
@@ -853,7 +855,7 @@ public class AstroTest {
     @Test
     public void geodeticAngleCC() {
         double dip = StdSolarCalculator.CC.getGeodeticAngle(-22.36, 46);
-        assertThat(dip, is(0.2535051183347955));
+        assertThat(Math.abs(dip - 0.2535051183347955) < TOLERANCE, is(true));
     }
 
     @Test
@@ -868,11 +870,11 @@ public class AstroTest {
         SunPosition position = SunPosition.at(moment, hh);
 
         assertThat(
-            position.getAzimuth(),
-            is(77.44408289997781)); // usno => 77.4
+            Math.abs(position.getAzimuth() - 77.44408289997781) < TOLERANCE,
+            is(true)); // usno => 77.4
         assertThat(
-            position.getElevation(),
-            is(19.986857686242704)); // usno => 20.0
+            Math.abs(position.getElevation() - 19.986857686242704) < TOLERANCE,
+            is(true)); // usno => 20.0
     }
 
     @Test
@@ -887,20 +889,20 @@ public class AstroTest {
         SunPosition position = SunPosition.at(moment, shanghai);
 
         assertThat(
-            position.getRightAscension(),
-            is(260.38484838292726));
+            Math.abs(position.getRightAscension() - 260.38484838292726) < TOLERANCE,
+            is(true));
         assertThat(
             position.getRightAscensionHMS(),
             is("17:21:32"));
         assertThat(
-            position.getDeclination(),
-            is(-23.140561983747027));
+            Math.abs(position.getDeclination() + 23.140561983747027) < TOLERANCE,
+            is(true));
         assertThat(
-            position.getAzimuth(),
-            is(129.28036788666304)); // usno => 129.3
+            Math.abs(position.getAzimuth() - 129.28036788666304) < TOLERANCE,
+            is(true)); // usno => 129.3
         assertThat(
-            position.getElevation(),
-            is(14.679074225415283)); // usno => 14.7
+            Math.abs(position.getElevation() - 14.679074225415283) < TOLERANCE,
+            is(true)); // usno => 14.7
         assertThat(
             Math.round(position.getShadowLength(1.8) * 100) / 100.0,
             is(6.87));
@@ -917,19 +919,19 @@ public class AstroTest {
         SunPosition position = SunPosition.at(moment, lakeNasser);
         System.out.println(StdSolarCalculator.TIME4J.getGeodeticAngle(53.0, 11000));
         assertThat(
-            position.getRightAscension(),
-            is(90.01069057923154));
+            Math.abs(position.getRightAscension() - 90.01069057923154) < TOLERANCE,
+            is(true));
         assertThat(
-            position.getDeclination(),
-            is(23.435194643263145));
+            Math.abs(position.getDeclination() - 23.435194643263145) < TOLERANCE,
+            is(true));
         assertThat(
-            position.getAzimuth(),
-            is(93.61015814829585));
+            Math.abs(position.getAzimuth() - 93.61015814829585) < TOLERANCE,
+            is(true));
         assertThat(
-            position.getElevation(),
-            is(89.99779837537335)); // ~ zenith = 90°
+            Math.abs(position.getElevation() - 89.99779837537335) < TOLERANCE,
+            is(true)); // ~ zenith = 90°
         assertThat(
-            position.getShadowLength(1.8) < 0.001,
+            position.getShadowLength(1.8) < TOLERANCE,
             is(true));
     }
 
