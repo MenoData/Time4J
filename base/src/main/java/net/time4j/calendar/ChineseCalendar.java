@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChineseCalendar.java) is part of project Time4J.
  *
@@ -24,8 +24,10 @@ package net.time4j.calendar;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoDisplay;
@@ -376,9 +378,7 @@ public final class ChineseCalendar
             ChineseCalendar.class,
             72,
             94,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Chinese year related to the Chinese era. </p>
@@ -405,9 +405,7 @@ public final class ChineseCalendar
             ChineseCalendar.class,
             1,
             5636,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the Chinese year related to the current sexagesimal cycle. </p>
@@ -471,7 +469,7 @@ public final class ChineseCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, ChineseCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", ChineseCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", ChineseCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Chinese day of month. </p>

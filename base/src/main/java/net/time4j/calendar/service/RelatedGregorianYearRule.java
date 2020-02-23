@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RelatedGregorianYearRule.java) is part of project Time4J.
  *
@@ -19,7 +19,7 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.calendar;
+package net.time4j.calendar.service;
 
 import net.time4j.base.MathUtils;
 import net.time4j.engine.CalendarSystem;
@@ -37,9 +37,15 @@ import java.util.Map;
  * <p>Defines a rule for the related gregorian year. </p>
  *
  * @author  Meno Hochschild
- * @since   3.20/4.16
+ * @since   5.6
  */
-final class RelatedGregorianYearRule<T extends ChronoEntity<T>>
+/*[deutsch]
+ * <p>Definiert eine Regel f&uuml;r das gregorianische Bezugsjahr. </p>
+ *
+ * @author  Meno Hochschild
+ * @since   5.6
+ */
+public final class RelatedGregorianYearRule<T extends ChronoEntity<T>>
     implements ElementRule<T, Integer> {
 
     //~ Statische Felder/Initialisierungen --------------------------------
@@ -53,7 +59,7 @@ final class RelatedGregorianYearRule<T extends ChronoEntity<T>>
 
     //~ Konstruktoren -----------------------------------------------------
 
-    RelatedGregorianYearRule(
+    public RelatedGregorianYearRule(
         CalendarSystem<T> calsys,
         ChronoElement<Integer> dayOfYear
     ) {
@@ -64,7 +70,7 @@ final class RelatedGregorianYearRule<T extends ChronoEntity<T>>
 
     }
 
-    RelatedGregorianYearRule(
+    public RelatedGregorianYearRule(
         Map<String, ? extends CalendarSystem<T>> map,
         ChronoElement<Integer> dayOfYear
     ) {

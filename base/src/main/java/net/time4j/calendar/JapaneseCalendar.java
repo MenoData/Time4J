@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JapaneseCalendar.java) is part of project Time4J.
  *
@@ -36,6 +36,7 @@ import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarEra;
@@ -374,9 +375,7 @@ public final class JapaneseCalendar
             JapaneseCalendar.class,
             701 + 660,
             MRD + 659,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Japanese month. </p>
@@ -505,7 +504,7 @@ public final class JapaneseCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, JapaneseCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", JapaneseCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", JapaneseCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Japanese day of month. </p>
@@ -2458,9 +2457,7 @@ public final class JapaneseCalendar
                 JapaneseCalendar.class,
                 1,
                 MRD - Nengo.Element.SINGLETON.getDefaultMaximum().getFirstRelatedGregorianYear(),
-                'y',
-                null,
-                null);
+                'y');
         }
 
         //~ Methoden ------------------------------------------------------

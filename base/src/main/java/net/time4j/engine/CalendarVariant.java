@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarVariant.java) is part of project Time4J.
  *
@@ -387,6 +387,24 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
     @Override
     protected abstract CalendarFamily<D> getChronology();
 
+    /**
+     * <p>Obtains the calendar system of the underlying variant. </p>
+     *
+     * @return  CalendarSystem
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Liefert das Kalendersystem der zugrundeliegenden Variante. </p>
+     *
+     * @return  CalendarSystem
+     * @since   5.6
+     */
+    protected CalendarSystem<D> getCalendarSystem() {
+
+        return this.getChronology().getCalendarSystem(this.getVariant());
+
+    }
+
     @SuppressWarnings("unchecked")
     @Override
     <V> ElementRule<D, V> getRule(ChronoElement<V> element) {
@@ -397,12 +415,6 @@ public abstract class CalendarVariant<D extends CalendarVariant<D>>
         } else {
             return super.getRule(element);
         }
-
-    }
-
-    private CalendarSystem<D> getCalendarSystem() {
-
-        return this.getChronology().getCalendarSystem(this.getVariant());
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ThaiSolarCalendar.java) is part of project Time4J.
  *
@@ -33,9 +33,11 @@ import net.time4j.Weekmodel;
 import net.time4j.base.GregorianMath;
 import net.time4j.base.TimeSource;
 import net.time4j.calendar.service.GenericDatePatterns;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdEnumDateElement;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
@@ -208,9 +210,7 @@ public final class ThaiSolarCalendar
             ThaiSolarCalendar.class,
             1,
             GregorianMath.MAX_YEAR + 543,
-            'y',
-            null,
-            null);
+            'y');
 
     /**
      * <p>Represents the month. </p>

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (KoreanCalendar.java) is part of project Time4J.
  *
@@ -25,8 +25,10 @@ import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
+import net.time4j.calendar.service.RelatedGregorianYearRule;
 import net.time4j.calendar.service.StdIntegerDateElement;
 import net.time4j.calendar.service.StdWeekdayElement;
+import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
@@ -267,9 +269,7 @@ public final class KoreanCalendar
             KoreanCalendar.class,
             72,
             94,
-            '\u0000',
-            null,
-            null);
+            '\u0000');
 
     /**
      * <p>Represents the Korean year related to the Korean era. </p>
@@ -376,7 +376,7 @@ public final class KoreanCalendar
      * verwendet werden. </p>
      */
     public static final StdCalendarElement<Integer, KoreanCalendar> MONTH_AS_ORDINAL =
-        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", KoreanCalendar.class, 1, 12, '\u0000', null, null);
+        new StdIntegerDateElement<>("MONTH_AS_ORDINAL", KoreanCalendar.class, 1, 12, '\u0000');
 
     /**
      * <p>Represents the Korean day of month. </p>
