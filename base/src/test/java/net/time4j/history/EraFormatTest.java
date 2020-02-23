@@ -259,8 +259,15 @@ public class EraFormatTest {
             ChronoFormatter.setUp(PlainDate.class, new Locale("sv", "SE"))
                 .addPattern("d. MMMM yyyy GGGG", PatternType.CLDR)
                 .build();
+        ChronoFormatter<PlainDate> formatterAlt =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("sv", "SE"))
+                .addPattern("d. MMMM yyyy GGGG", PatternType.CLDR_DATE)
+                .build();
         assertThat(
             formatter.format(PlainDate.of(1712, 3, 11)),
+            is("30. februari 1712 efter Kristus"));
+        assertThat(
+            formatterAlt.format(PlainDate.of(1712, 3, 11)),
             is("30. februari 1712 efter Kristus"));
     }
 
@@ -282,8 +289,16 @@ public class EraFormatTest {
                 .addPattern("d. MMMM yyyy", PatternType.CLDR)
                 .build()
                 .with(ChronoHistory.ofSweden());
+        ChronoFormatter<PlainDate> formatterAlt =
+            ChronoFormatter.setUp(PlainDate.class, new Locale("sv"))
+                .addPattern("d. MMMM yyyy", PatternType.CLDR_DATE)
+                .build()
+                .with(ChronoHistory.ofSweden());
         assertThat(
             formatter.format(PlainDate.of(1712, 3, 11)),
+            is("30. februari 1712"));
+        assertThat(
+            formatterAlt.format(PlainDate.of(1712, 3, 11)),
             is("30. februari 1712"));
     }
 

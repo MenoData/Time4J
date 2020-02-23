@@ -155,11 +155,13 @@ public class MiscellaneousTest {
             .build();
     }
 
-    @Test(expected=IllegalArgumentException.class)
+    @Test
     public void printWithGenericPattern() {
         ChronoFormatter<PlainDate> formatter =
             ChronoFormatter.ofDatePattern("EEEE, yyyy-MM-dd", PatternType.CLDR_DATE, Locale.GERMAN);
-        formatter.format(PlainDate.of(2015, 7, 17));
+        assertThat(
+            formatter.format(PlainDate.of(2015, 7, 17)),
+            is("Freitag, 2015-07-17"));
     }
 
     @Test
