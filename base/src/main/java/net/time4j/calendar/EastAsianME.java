@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EastAsianME.java) is part of project Time4J.
  *
@@ -214,7 +214,7 @@ class EastAsianME
             int m = 0;
 
             for (int num = 12; (num >= 1) && (m == 0); num--) {
-                String display = EastAsianMonth.toNumeral(numsys, zeroDigit, num);
+                String display = DualFormatElement.toNumeral(numsys, zeroDigit, num);
                 int numlen = display.length();
                 for (int i = 0; ; i++) {
                     if ((len > pos + i) && (text.charAt(pos + i) != display.charAt(i))) {

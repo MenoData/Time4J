@@ -18,8 +18,11 @@ import static org.junit.Assert.assertThat;
 import static org.junit.Assert.fail;
 
 
+@SuppressWarnings("ConstantConditions")
 @RunWith(JUnit4.class)
 public class MoonTest {
+
+    private static final double TOLERANCE = 0.001;
 
     @Test
     public void newMoon() {
@@ -162,22 +165,21 @@ public class MoonTest {
 
         // Meeus - example 47.a
         double[] data = MoonPosition.calculateMeeus47(jd.getCenturyJ2000());
-
         assertThat(
-            data[0],
-            is(0.004609595895691879)); // nutation-in-longitude
+            Math.abs(data[0] - 0.004609595895691879) < TOLERANCE,
+            is(true)); // nutation-in-longitude
         assertThat(
-            data[1],
-            is(23.440635013964783)); // true obliquity in degrees
+            Math.abs(data[1] - 23.440635013964783) < TOLERANCE,
+            is(true)); // true obliquity in degrees
         assertThat(
-            data[2],
-            is(134.68846856938873)); // right ascension in degrees
+            Math.abs(data[2] - 134.6884685693878) < TOLERANCE,
+            is(true)); // right ascension in degrees
         assertThat(
-            data[3],
-            is(13.768366716980461)); // declination in degrees
+            Math.abs(data[3] - 13.768366716980795) < TOLERANCE,
+            is(true)); // declination in degrees
         assertThat(
-            data[4],
-            is(368409.6848161269)); // distance in km
+            Math.abs(data[4] - 368409.6848161264) < TOLERANCE,
+            is(true)); // distance in km
     }
 
     @Test
@@ -192,11 +194,11 @@ public class MoonTest {
         MoonPosition position = MoonPosition.at(moment, hh);
 
         assertThat(
-            position.getAzimuth(),
-            is(207.6220337901229)); // usno => 207.6, mooncalc => 207.62
+            Math.abs(position.getAzimuth() - 207.62203379012075) < TOLERANCE,
+            is(true)); // usno => 207.6, mooncalc => 207.62
         assertThat(
-            position.getElevation(),
-            is(19.343136587415223)); // usno => 19.4, mooncalc => 19.4
+            Math.abs(position.getElevation() - 19.34313658741647) < TOLERANCE,
+            is(true)); // usno => 19.4, mooncalc => 19.4
     }
 
     @Test
@@ -211,38 +213,38 @@ public class MoonTest {
         Moment m = PlainTimestamp.of(2018, 1, 1, 0, 30).in(tz);
         MoonPosition position = MoonPosition.at(m, ny);
         assertThat(
-            position.getAzimuth(),
-            is(226.80838342906432)); // usno => 226.8
+            Math.abs(position.getAzimuth() - 226.80838342908987) < TOLERANCE,
+            is(true)); // usno => 226.8
         assertThat(
-            position.getElevation(),
-            is(61.2341366304413)); // usno => 61.8
+            Math.abs(position.getElevation() - 61.23413663043105) < TOLERANCE,
+            is(true)); // usno => 61.8
 
         m = PlainTimestamp.of(2018, 1, 1, 5, 20).in(tz);
         position = MoonPosition.at(m, ny);
         assertThat(
-            position.getAzimuth(),
-            is(285.6150230123558)); // usno => 285.6
+            Math.abs(position.getAzimuth() - 285.6150230123651) < TOLERANCE,
+            is(true)); // usno => 285.6
         assertThat(
-            position.getElevation(),
-            is(11.417767062383334)); // usno => 11.4
+            Math.abs(position.getElevation() - 11.41776706237054) < TOLERANCE,
+            is(true)); // usno => 11.4
 
         m = PlainTimestamp.of(2018, 1, 1, 16, 50).in(tz);
         position = MoonPosition.at(m, ny);
         assertThat(
-            position.getAzimuth(),
-            is(65.70561602012208)); // usno => 65.7
+            Math.abs(position.getAzimuth() - 65.7056160201322) < TOLERANCE,
+            is(true)); // usno => 65.7
         assertThat(
-            position.getElevation(),
-            is(1.9708028936549722)); // usno => 2.0
+            Math.abs(position.getElevation() - 1.9708028936650985) < TOLERANCE,
+            is(true)); // usno => 2.0
 
         m = PlainTimestamp.of(2018, 1, 1, 21, 0).in(tz);
         position = MoonPosition.at(m, ny);
         assertThat(
-            position.getAzimuth(),
-            is(105.11861494255274)); // usno => 105.1
+            Math.abs(position.getAzimuth() - 105.11861494256615) < TOLERANCE,
+            is(true)); // usno => 105.1
         assertThat(
-            position.getElevation(),
-            is(46.04943472445113)); // usno => 46.4
+            Math.abs(position.getElevation() - 46.04943472446251) < TOLERANCE,
+            is(true)); // usno => 46.4
     }
 
     @Test
@@ -257,20 +259,20 @@ public class MoonTest {
         MoonPosition position = MoonPosition.at(moment, shanghai);
 
         assertThat(
-            position.getRightAscension(),
-            is(202.87178103802486));
+            Math.abs(position.getRightAscension() - 202.87178103802793) < TOLERANCE,
+            is(true));
         assertThat(
-            position.getDeclination(),
-            is(-4.551668018004738));
+            Math.abs(position.getDeclination() + 4.551668018005712) < TOLERANCE,
+            is(true));
         assertThat(
-            position.getAzimuth(),
-            is(185.05531696446835)); // usno => 185.1, mooncalc => 186.28
+            Math.abs(position.getAzimuth() - 185.055316964463) < TOLERANCE,
+            is(true)); // usno => 185.1, mooncalc => 186.28
         assertThat(
-            position.getElevation(),
-            is(53.18921727502208)); // usno => 53.6, mooncalc => 53.5
+            Math.abs(position.getElevation() - 53.18921727502122) < TOLERANCE,
+            is(true)); // usno => 53.6, mooncalc => 53.5
         assertThat(
-            position.getDistance(),
-            is(394687.49161370925));
+            Math.abs(position.getDistance() - 394687.4916136658) < TOLERANCE,
+            is(true));
     }
 
     @Test

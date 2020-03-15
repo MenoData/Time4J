@@ -2705,7 +2705,8 @@ public final class JapaneseCalendar
                 } else {
                     NumberSystem numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
                     char zeroDigit = attributes.get(Attributes.ZERO_DIGIT, numsys.getDigits().charAt(0));
-                    String s = EastAsianMonth.toNumeral(numsys, zeroDigit, num);
+                    String s = DualFormatElement.toNumeral(numsys, zeroDigit, num);
+
                     if (numsys.isDecimal()) {
                         int padding = count - s.length();
                         while (padding > 0) {

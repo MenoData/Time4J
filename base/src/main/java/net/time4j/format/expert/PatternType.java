@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -1280,12 +1280,12 @@ public enum PatternType {
      *  <tr>
      *      <td>YEAR_OF_WEEKDATE</td>
      *      <td>Y</td>
-     *      <td>Not supported here. Use ISO-8601-types only in combination with {@link #CLDR}. </td>
+     *      <td>Not supported here. Use only ISO-8601-types in combination with {@link #CLDR}. </td>
      *  </tr>
      *  <tr>
      *      <td>YEAR</td>
      *      <td>u</td>
-     *      <td>Not supported here. Use ISO-8601-types only in combination with {@link #CLDR}. </td>
+     *      <td>Not supported here. Use only ISO-8601-types in combination with {@link #CLDR}. </td>
      *  </tr>
      * </table>
      * </div>
@@ -2358,6 +2358,8 @@ public enum PatternType {
                 18,
                 SignPolicy.SHOW_WHEN_NEGATIVE);
             return Collections.emptyMap();
+        } else if ((symbol == 'G') && (chronology == PlainDate.axis())) {
+            return this.cldrISO(builder, chronology, locale, symbol, count, false); // historic calendar date
         }
 
         Set<ChronoElement<?>> elements = getElements(chronology, symbol, locale);
@@ -2695,9 +2697,17 @@ public enum PatternType {
         char c = ((symbol == 'L') ? 'M' : ((symbol == 'c') ? 'e' : symbol));
 
         for (ChronoElement<?> element : elements) {
-            if (element.isDateElement() && (element.getSymbol() == c)) {
+            if (
+                element.isDateElement()
+                && (element.getSymbol() == c)
+                && ((c != 'M') || !element.name().equals("MONTH_AS_NUMBER"))
+            ) {
                 return element;
             }
+        }
+
+        if ((symbol == 'y') && chronoType.equals("net.time4j.PlainDate")) {
+            return PlainDate.YEAR;
         }
 
         throw new IllegalArgumentException(

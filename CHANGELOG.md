@@ -1,4 +1,11 @@
 ## [v5.6] not yet released
+### Added
+- Let TimeSource deliver current Instant [#884]
+- Make PatternType.CLDR_DATE being applicable on PlainDate [#889]
+
+### Fixed
+- Build problem: More tolerant double comparisons in astro tests [#886]
+- Incorrect sign in last term of calculation of mean lunar anomaly [#891]
 
 ## [v5.5] published on 2019-11-04
 ### Added

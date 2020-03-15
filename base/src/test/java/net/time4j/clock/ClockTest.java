@@ -28,6 +28,7 @@ public class ClockTest {
         Moment m = SystemClock.INSTANCE.currentTime();
         TimeSource<Moment> clock = FixedClock.of(m);
         assertThat(clock.currentTime(), is(m));
+        assertThat(clock.currentInstant(), is(m.toTemporalAccessor()));
 
         Thread.sleep(1000);
         assertThat(clock.currentTime(), is(m));

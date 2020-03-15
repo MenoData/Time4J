@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MoonPosition.java) is part of project Time4J.
  *
@@ -478,33 +478,19 @@ public class MoonPosition
     static double[] calculateMeeus47(double jct) { // jct = julian centuries since J2000 in ephemeris time
 
         // Meeus (47.1): L'
-        double meanLongitude =
-            normalize(
-                218.3164477
-                    + (481267.88123421 + (-0.0015786 + (1.0 / 538841 + (-1.0 / 65194000) * jct) * jct) * jct) * jct);
+        double meanLongitude = getMeanLongitude(jct);
 
         // Meeus (47.2): D
-        double meanElongation =
-            normalize(
-                297.8501921
-                    + (445267.1114034 + (-0.0018819 + (1.0 / 545868 + (1.0 / 113065000) * jct) * jct) * jct) * jct);
+        double meanElongation = getMeanElongation(jct);
 
         // Meeus (47.3): M
-        double meanAnomalySun =
-            normalize(
-                357.5291092 + (35999.0502909 + (-0.0001536 + (1.0 / 24490000) * jct) * jct) * jct);
+        double meanAnomalySun = getMeanAnomalyOfSun(jct);
 
         // Meeus (47.4): M'
-        double meanAnomalyMoon =
-            normalize(
-                134.9633964
-                    + (477198.8675055 + (0.0087414 + (1.0 / 69699 + (1.0 / 14712000) * jct) * jct) * jct) * jct);
+        double meanAnomalyMoon = getMeanAnomalyOfMoon(jct);
 
         // Meeus (47.5): F
-        double meanDistance =
-            normalize(
-                93.272095
-                    + (483202.0175233 + (-0.0036539 + (-1.0 / 3526000 + (1.0 / 863310000) * jct) * jct) * jct) * jct);
+        double meanDistance = getMeanDistanceOfMoon(jct);
 
         // Meeus (47.6)
         double e = 1 - (0.002516 + 0.0000074 * jct) * jct;
@@ -607,33 +593,19 @@ public class MoonPosition
         double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
 
         // Meeus (47.1): L'
-        double meanLongitude =
-            normalize(
-                218.3164477
-                    + (481267.88123421 + (-0.0015786 + (1.0 / 538841 + (-1.0 / 65194000) * jct) * jct) * jct) * jct);
+        double meanLongitude = getMeanLongitude(jct);
 
         // Meeus (47.2): D
-        double meanElongation =
-            normalize(
-                297.8501921
-                    + (445267.1114034 + (-0.0018819 + (1.0 / 545868 + (1.0 / 113065000) * jct) * jct) * jct) * jct);
+        double meanElongation = getMeanElongation(jct);
 
         // Meeus (47.3): M
-        double meanAnomalySun =
-            normalize(
-                357.5291092 + (35999.0502909 + (-0.0001536 + (1.0 / 24490000) * jct) * jct) * jct);
+        double meanAnomalySun = getMeanAnomalyOfSun(jct);
 
         // Meeus (47.4): M'
-        double meanAnomalyMoon =
-            normalize(
-                134.9633964
-                    + (477198.8675055 + (0.0087414 + (1.0 / 69699 + (1.0 / 14712000) * jct) * jct) * jct) * jct);
+        double meanAnomalyMoon = getMeanAnomalyOfMoon(jct);
 
         // Meeus (47.5): F
-        double meanDistance =
-            normalize(
-                93.272095
-                    + (483202.0175233 + (-0.0036539 + (-1.0 / 3526000 + (1.0 / 863310000) * jct) * jct) * jct) * jct);
+        double meanDistance = getMeanDistanceOfMoon(jct);
 
         // Meeus (47.6)
         double e = 1 - (0.002516 + 0.0000074 * jct) * jct;
@@ -673,6 +645,38 @@ public class MoonPosition
         StdSolarCalculator.nutations(jct, result);
         return AstroUtils.toRange_0_360(meanLongitude + (sumL / MIO) + result[0]);
 
+    }
+
+    // Meeus (47.1)
+    static double getMeanLongitude(double jct) {
+        return normalize(
+            218.3164477
+                + (481267.88123421 + (-0.0015786 + (1.0 / 538841 + (-1.0 / 65194000) * jct) * jct) * jct) * jct);
+    }
+
+    // Meeus (47.2)
+    static double getMeanElongation(double jct) {
+        return normalize(
+            297.8501921 + (445267.1114034 + (-0.0018819 + (1.0 / 545868 - (1.0 / 113065000) * jct) * jct) * jct) * jct);
+    }
+
+    // Meeus (47.3)
+    static double getMeanAnomalyOfSun(double jct) {
+        return normalize(
+            357.5291092 + (35999.0502909 + (-0.0001536 + (1.0 / 24490000) * jct) * jct) * jct);
+    }
+
+    // Meeus (47.4)
+    static double getMeanAnomalyOfMoon(double jct) {
+        return normalize(
+            134.9633964 + (477198.8675055 + (0.0087414 + ((1.0 / 69699) - (1.0 / 14712000) * jct) * jct) * jct) * jct);
+    }
+
+    // Meeus (47.5)
+    static double getMeanDistanceOfMoon(double jct) {
+        return normalize(
+            93.272095
+                + (483202.0175233 + (-0.0036539 + (-1.0 / 3526000 + (1.0 / 863310000) * jct) * jct) * jct) * jct);
     }
 
     private static Moment calculateMeeus50(

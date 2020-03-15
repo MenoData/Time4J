@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EastAsianMonth.java) is part of project Time4J.
  *
@@ -26,6 +26,7 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.NumberSystem;
+import net.time4j.format.internal.DualFormatElement;
 
 import java.io.ObjectStreamException;
 import java.io.Serializable;
@@ -374,7 +375,7 @@ public final class EastAsianMonth
 
         Map<String, String> textForms = CalendarText.getInstance("generic", locale).getTextForms();
         char zeroDigit = attributes.get(Attributes.ZERO_DIGIT, numsys.getDigits().charAt(0));
-        String display = toNumeral(numsys, zeroDigit, this.getNumber());
+        String display = DualFormatElement.toNumeral(numsys, zeroDigit, this.getNumber());
 
         if (this.leap) {
             boolean trailing =
@@ -385,35 +386,6 @@ public final class EastAsianMonth
         }
 
         return display;
-
-    }
-
-    // also called by EastAsianME
-    static String toNumeral(
-        NumberSystem numsys,
-        char zeroDigit,
-        int number
-    ) {
-
-        if (numsys.isDecimal()) {
-            int delta = zeroDigit - '0';
-            String standard = Integer.toString(number);
-
-            if (delta == 0) {
-                return standard;
-            }
-
-            StringBuilder numeral = new StringBuilder();
-
-            for (int i = 0, n = standard.length(); i < n; i++) {
-                int codepoint = standard.charAt(i) + delta;
-                numeral.append((char) codepoint);
-            }
-
-            return numeral.toString();
-        } else {
-            return numsys.toNumeral(number);
-        }
 
     }
 
