@@ -5,6 +5,7 @@
 
 ### Fixed
 - Build problem: More tolerant double comparisons in astro tests [#886]
+- Incorrect sign in last term of calculation of mean lunar anomaly [#891]
 
 ## [v5.5] published on 2019-11-04
 ### Added
