@@ -462,7 +462,6 @@ public enum MoonPhase {
 		double jct = JulianDay.ofEphemerisTime(moment).getCenturyJ2000();
 
 		// Meeus (47.2)
-		double meanElongation =
 			297.8501921 + (445267.1114034 + (-0.0018819 + (1.0 / 545868 + (1.0 / 113065000) * jct) * jct) * jct) * jct;
 
 		// Meeus (47.3)

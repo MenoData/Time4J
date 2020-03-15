@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DualFormatElement.java) is part of project Time4J.
  *
@@ -47,10 +47,16 @@ public interface DualFormatElement // ehemals: net.time4j.history.internal.Histo
 
     /**
      * <p>Special format attribute for text elements which need to know the original pattern length. </p>
+     *
+     * <p>This attribute will only be set if the count indicates numerical formatting and is either
+     * {@code 1} or {@code 2}. </p>
      */
     /*[deutsch]
      * <p>Spezialformatattribut f&uuml;r Textelemente, die die urspr&uuml;ngliche Symboll&auml;nge im Formatmuster
      * kennen m&uuml;ssen. </p>
+     *
+     * <p>Dieses Attribut wird nur gesetzt, wenn die Anzahl eine numerische Formatierung anzeigt und entweder
+     * {@code 1} oder {@code 2} ist. </p>
      */
     AttributeKey<Integer> COUNT_OF_PATTERN_SYMBOLS = Attributes.createKey("COUNT_OF_PATTERN_SYMBOLS", Integer.class);
 
@@ -123,5 +129,49 @@ public interface DualFormatElement // ehemals: net.time4j.history.internal.Histo
         AttributeQuery attributes,
         ChronoEntity<?> parsedResult
     );
+
+    /**
+     * <p>Prints given number as numeral. </p>
+     *
+     * @param   numsys      number system to be applied
+     * @param   zeroDigit   relevant for decimal number systems
+     * @param   number      the number to be printed
+     * @return  numeral string
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Formatiert die angegebene Zahl als Numeral. </p>
+     *
+     * @param   numsys      number system to be applied
+     * @param   zeroDigit   relevant for decimal number systems
+     * @param   number      the number to be printed
+     * @return  numeral string
+     * @since   5.6
+     */
+    static String toNumeral(
+        NumberSystem numsys,
+        char zeroDigit,
+        int number
+    ) {
+        if (numsys.isDecimal()) {
+            int delta = zeroDigit - '0';
+            String standard = Integer.toString(number);
+
+            if (delta == 0) {
+                return standard;
+            }
+
+            StringBuilder numeral = new StringBuilder();
+
+            for (int i = 0, n = standard.length(); i < n; i++) {
+                int codepoint = standard.charAt(i) + delta;
+                numeral.append((char) codepoint);
+            }
+
+            return numeral.toString();
+        } else {
+            return numsys.toNumeral(number);
+        }
+    }
 
 }
