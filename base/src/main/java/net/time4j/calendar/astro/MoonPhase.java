@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MoonPhase.java) is part of project Time4J.
  *
@@ -461,16 +461,14 @@ public enum MoonPhase {
 
 		double jct = JulianDay.ofEphemerisTime(moment).getCenturyJ2000();
 
-		// Meeus (47.2)
-			297.8501921 + (445267.1114034 + (-0.0018819 + (1.0 / 545868 + (1.0 / 113065000) * jct) * jct) * jct) * jct;
+		// Meeus (47.2): D
+		double meanElongation = MoonPosition.getMeanElongation(jct);
 
-		// Meeus (47.3)
-		double meanAnomalySun =
-			357.5291092 + (35999.0502909 + (-0.0001536 + (1.0 / 24490000) * jct) * jct) * jct;
+		// Meeus (47.3): M
+		double meanAnomalySun = MoonPosition.getMeanAnomalyOfSun(jct);
 
-		// Meeus (47.4)
-		double meanAnomalyMoon =
-			134.9633964 + (477198.8675055 + (0.0087414 + ((1.0 / 69699) + (1.0 / 14712000) * jct) * jct) * jct) * jct;
+		// Meeus (47.4): M'
+		double meanAnomalyMoon = MoonPosition.getMeanAnomalyOfMoon(jct);
 
 		double i = // phase angle of moon for a geocentric observer, Meeus (48.4)
 			180 - meanElongation
