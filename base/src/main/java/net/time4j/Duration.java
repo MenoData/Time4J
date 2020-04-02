@@ -2800,7 +2800,8 @@ public final class Duration<U extends IsoUnit>
 
     /**
      * <p>Parses a canonical representation with only week-based units (Y, W and D) to a
-     * calendrical duration where years are interpreted as week-based years. </p>
+     * calendrical duration where years are interpreted as week-based years with either 364 days
+     * (= 52 weeks) or 371 days (= 53 weeks). </p>
      *
      * @param   period          duration in canonical or ISO-8601-compatible format (P-string)
      * @return  parsed calendrical duration
@@ -2810,9 +2811,10 @@ public final class Duration<U extends IsoUnit>
      * @since   3.21/4.17
      */
     /*[deutsch]
-     * <p>Parst eine kanonische Darstellung nur mit wochen-basierten
-     * Datumskomponenten (Y, W, D) zu einer Dauer, in der Jahr als
-     * wochenbasierte Jahre interpretiert werden. </p>
+     * <p>Interpretiert eine kanonische Darstellung nur mit wochen-basierten
+     * Datumskomponenten (Y, W, D) zu einer Dauer, in der Jahre als
+     * wochenbasierte Jahre mit entweder 364 Tagen (= 52 Wochen) oder
+     * 371 Tagen (= 53 Wochen) interpretiert werden. </p>
      *
      * @param   period          duration in canonical or ISO-8601-compatible format (P-string)
      * @return  parsed calendrical duration

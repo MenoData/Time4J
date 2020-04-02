@@ -925,6 +925,12 @@ public class DurationBasicsTest {
     }
 
     @Test(expected=ParseException.class)
+    public void parseWeekBasedPeriodWithMonths() throws Exception {
+        String period = "P3M";
+        Duration.parseWeekBasedPeriod(period);
+    }
+
+    @Test(expected=ParseException.class)
     public void parseWithoutPeriodSymbol() throws Exception {
         try {
             String period = "-12Y4M30D";
