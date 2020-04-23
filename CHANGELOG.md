@@ -1,5 +1,6 @@
 ## [v5.6] not yet released
 ### Added
+- Support for Duration.in(Collection<? extends Unit>) [#899]
 - Let TimeSource deliver current Instant [#884]
 - Make PatternType.CLDR_DATE being applicable on PlainDate [#889]
 
