@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Duration.java) is part of project Time4J.
  *
@@ -44,6 +44,7 @@ import java.time.temporal.TemporalAmount;
 import java.time.temporal.TemporalUnit;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
@@ -825,6 +826,34 @@ public final class Duration<U extends IsoUnit>
      */
     @SafeVarargs
     public static <U extends IsoUnit> TimeMetric<U, Duration<U>> in(U... units) {
+
+        return new Metric<>(units);
+
+    }
+
+    /**
+     * <p>Constructs a metric for any kind of standard units in normalized form. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   units       time units to be used in calculation
+     * @return  reversible immutable metric for calculating a duration in given units
+     * @throws  IllegalArgumentException if no time unit is given or if there are unit duplicates
+     * @see     AbstractMetric
+     * @see     #in(IsoUnit[])
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Konstruiert eine Metrik f&uuml;r beliebige Standard-Zeiteinheiten in normalisierter Form. </p>
+     *
+     * @param   <U> generic unit type
+     * @param   units       time units to be used in calculation
+     * @return  reversible immutable metric for calculating a duration in given units
+     * @throws  IllegalArgumentException if no time unit is given or if there are unit duplicates
+     * @see     AbstractMetric
+     * @see     #in(IsoUnit[])
+     * @since   5.6
+     */
+    public static <U extends IsoUnit> TimeMetric<U, Duration<U>> in(Collection<? extends U> units) {
 
         return new Metric<>(units);
 
@@ -4920,6 +4949,11 @@ public final class Duration<U extends IsoUnit>
         @SafeVarargs
         private Metric(U... units) {
             super((units.length > 1), units);
+
+        }
+
+        private Metric(Collection<? extends U> units) {
+            super((units.size() > 1), units);
 
         }
 
