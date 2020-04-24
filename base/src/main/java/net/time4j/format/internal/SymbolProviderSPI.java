@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SymbolProviderSPI.java) is part of project Time4J.
  *
@@ -150,10 +150,7 @@ public final class SymbolProviderSPI
 
         PropertyBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && rb.containsKey(key)
-        ) {
+        if ((rb != null) && rb.containsKey(key)) {
             return rb.getString(key).charAt(0);
         }
 
@@ -169,10 +166,7 @@ public final class SymbolProviderSPI
 
         PropertyBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && rb.containsKey(key)
-        ) {
+        if ((rb != null) && rb.containsKey(key)) {
             return rb.getString(key);
         }
 
