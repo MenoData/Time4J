@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SymbolProviderSPI.java) is part of project Time4J.
  *
@@ -131,7 +131,19 @@ public final class SymbolProviderSPI
     public NumberSystem getDefaultNumberSystem(Locale locale) {
 
         String cldr = lookup(locale, "numsys", NumberSystem.ARABIC.getCode());
-        return CLDR_NAMES.get(cldr);
+        NumberSystem numsys = CLDR_NAMES.get(cldr);
+
+        if (numsys == null) {
+            StringBuilder errmsg = new StringBuilder();
+            errmsg.append("Unrecognized number system: ");
+            errmsg.append(cldr);
+            errmsg.append(" (locale=");
+            errmsg.append(locale);
+            errmsg.append(')');
+            throw new IllegalStateException(errmsg.toString());
+        }
+
+        return numsys;
 
     }
 
@@ -150,10 +162,7 @@ public final class SymbolProviderSPI
 
         PropertyBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && rb.containsKey(key)
-        ) {
+        if ((rb != null) && rb.containsKey(key)) {
             return rb.getString(key).charAt(0);
         }
 
@@ -169,10 +178,7 @@ public final class SymbolProviderSPI
 
         PropertyBundle rb = getBundle(locale);
 
-        if (
-            (rb != null)
-            && rb.containsKey(key)
-        ) {
+        if ((rb != null) && rb.containsKey(key)) {
             return rb.getString(key);
         }
 

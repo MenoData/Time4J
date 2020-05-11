@@ -5,6 +5,9 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.util.Collection;
+import java.util.HashSet;
+
 import static net.time4j.CalendarUnit.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.not;
@@ -114,6 +117,19 @@ public class DurationUntilTest {
         PlainDate start = PlainDate.of(2003, 2, 27);
         PlainDate end = PlainDate.of(2008, 2, 26);
         start.until(end, Duration.in(MONTHS, MONTHS));
+    }
+
+    @Test
+    public void betweenDates() {
+        PlainDate d1 = PlainDate.of(2014, 1, 31);
+        PlainDate d2 = PlainDate.of(2014, 3, 4);
+        Collection<CalendarUnit> units = new HashSet<>();
+        units.add(CalendarUnit.DAYS);
+        units.add(CalendarUnit.MONTHS);
+        Duration<?> p = Duration.ofPositive().months(1).days(4).build();
+        assertThat(
+            Duration.in(units).between(d1, d2),
+            is(p));
     }
 
     @Test

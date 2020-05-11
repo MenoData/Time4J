@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSymbolProvider.java) is part of project Time4J.
  *
@@ -182,15 +182,22 @@ public interface NumberSymbolProvider {
     /**
      * <p>Obtains the standard number system for given locale. </p>
      *
-     * @param   locale      language and country setting
-     * @return  default number system
-     * @since   3.23/4.19
-     */
-    /*[deutsch]
-     * <p>Ermitelt das Standardzahlsystem f&uuml;r die angegebene Sprache. </p>
+     * <p>The default implementation is independent on the locale
+     * and simply yields {@code NumberSystem.ARABIC}. </p>
      *
      * @param   locale      language and country setting
      * @return  default number system
+     * @throws  IllegalStateException if the number system cannot be determined
+     * @since   3.23/4.19
+     */
+    /*[deutsch]
+     * <p>Ermittelt das Standardzahlsystem f&uuml;r die angegebene Sprache. </p>
+     *
+     * <p>Die Standardimplementierung liefert sprachunabh&auml;ngig {@code NumberSystem.ARABIC}. </p>
+     *
+     * @param   locale      language and country setting
+     * @return  default number system
+     * @throws  IllegalStateException if the number system cannot be determined
      * @since   3.23/4.19
      */
     default NumberSystem getDefaultNumberSystem(Locale locale) {
