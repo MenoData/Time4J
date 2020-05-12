@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFormatter.java) is part of project Time4J.
  *
@@ -3210,11 +3210,12 @@ public final class ChronoFormatter<T>
             StartOfDay startOfDay = query.get(Attributes.START_OF_DAY, this.overrideHandler.getDefaultStartOfDay());
             Moment m = Moment.class.cast(formattable);
             TZID tzid = query.get(Attributes.TIMEZONE_ID);
+            String variant = "";
             GeneralTimestamp<?> tsp;
 
             if (CalendarVariant.class.isAssignableFrom(otype)) {
                 CalendarFamily<?> family = cast(this.overrideHandler.getCalendarOverride());
-                String variant = query.get(Attributes.CALENDAR_VARIANT);
+                variant = query.get(Attributes.CALENDAR_VARIANT);
                 tsp = m.toGeneralTimestamp(family, variant, tzid, startOfDay);
             } else if (Calendrical.class.isAssignableFrom(otype)) {
                 Chronology<? extends Calendrical> axis = cast(this.overrideHandler.getCalendarOverride());
@@ -3223,7 +3224,7 @@ public final class ChronoFormatter<T>
                 throw new IllegalStateException("Unexpected calendar override: " + otype);
             }
 
-            return new ZonalDisplay(tsp, tzid);
+            return new ZonalDisplay(tsp, variant, tzid);
         } catch (ClassCastException ex) {
             throw new IllegalArgumentException("Not formattable: " + formattable, ex);
         } catch (NoSuchElementException ex) { // missing timezone or calendar variant
@@ -7020,6 +7021,10 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
          */
         public ChronoFormatter<T> build(Attributes attributes) {
 
+            if (attributes == null) {
+                throw new NullPointerException("Missing format attributes.");
+            }
+
             Map<Integer, FormatStep> m = null;
 
             for (int index = 0, len = this.steps.size(); index < len; index++) {
@@ -7758,93 +7763,81 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
     }
 
     private static class ZonalDisplay
-        implements ChronoDisplay, UnixTime {
+        implements ChronoDisplay, VariantSource, UnixTime {
 
         //~ Instanzvariablen ----------------------------------------------
 
         private final GeneralTimestamp<?> tsp;
+        private final String variant;
         private final TZID tzid;
 
         //~ Konstruktoren -------------------------------------------------
 
         private ZonalDisplay(
             GeneralTimestamp<?> tsp,
+            String variant,
             TZID tzid
         ) {
             super();
 
             this.tsp = tsp;
+            this.variant = variant;
             this.tzid = tzid;
-
         }
 
         //~ Methoden ------------------------------------------------------
 
         @Override
         public boolean contains(ChronoElement<?> element) {
-
             return this.tsp.contains(element);
-
         }
 
         @Override
         public <V> V get(ChronoElement<V> element) {
-
             return this.tsp.get(element);
-
         }
 
         @Override
         public int getInt(ChronoElement<Integer> element) {
-
             return this.tsp.getInt(element);
-
         }
 
         @Override
         public <V> V getMinimum(ChronoElement<V> element) {
-
             return this.tsp.getMinimum(element);
-
         }
 
         @Override
         public <V> V getMaximum(ChronoElement<V> element) {
-
             return this.tsp.getMaximum(element);
-
         }
 
         @Override
         public boolean hasTimezone() {
-
             return true;
-
         }
 
         @Override
         public TZID getTimezone() {
-
             return this.tzid;
+        }
 
+        @Override
+        public String getVariant() {
+            return this.variant;
         }
 
         @Override
         public long getPosixTime() {
-
             return this.getUnixTime().getPosixTime(); // can be used by TimezoneNameProcessor when printing
-
         }
 
         @Override
         public int getNanosecond() {
-
             return this.getUnixTime().getNanosecond();
-
         }
 
         private UnixTime getUnixTime() {
-
             StartOfDay startOfDay;
 
             try {
@@ -7855,7 +7848,6 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
             }
 
             return this.tsp.in(Timezone.of(this.tzid), startOfDay);
-
         }
 
     }

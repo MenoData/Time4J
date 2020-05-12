@@ -2460,7 +2460,17 @@ public enum PatternType {
                 }
                 break;
             case 'd':
-                addNumber(intElement, symbol, builder, count, false);
+                if (intElement == null) {
+                    if (count <= 2) {
+                        builder.startSection(DualFormatElement.COUNT_OF_PATTERN_SYMBOLS, count);
+                        builder.addText(textElement);
+                        builder.endSection();
+                    } else {
+                        throw new IllegalArgumentException("Too many pattern letters for day-of-month: " + count);
+                    }
+                } else {
+                    addNumber(intElement, symbol, builder, count, false); // standard case
+                }
                 break;
             case 'D':
                 if (count < 3) {

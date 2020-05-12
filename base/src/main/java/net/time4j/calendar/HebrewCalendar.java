@@ -1941,20 +1941,6 @@ public final class HebrewCalendar
         }
 
         @Override
-        public ChronoDisplay preformat(HebrewCalendar context, AttributeQuery attributes) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
-
-            return null;
-
-        }
-
-        @Override
         public StartOfDay getDefaultStartOfDay() {
 
             return StartOfDay.EVENING;

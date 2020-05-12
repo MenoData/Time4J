@@ -41,7 +41,6 @@ import net.time4j.calendar.service.WeekdayRule;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
@@ -1233,13 +1232,6 @@ public final class ThaiSolarCalendar
         }
 
         @Override
-        public StartOfDay getDefaultStartOfDay() {
-
-            return StartOfDay.MIDNIGHT;
-
-        }
-
-        @Override
         public int getDefaultPivotYear() {
 
             return PlainDate.axis().getDefaultPivotYear() + 543;
@@ -1338,23 +1330,6 @@ public final class ThaiSolarCalendar
                     entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Thai calendar date.");
                 }
             }
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(
-            ThaiSolarCalendar context,
-            AttributeQuery attributes
-        ) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
 
             return null;
 

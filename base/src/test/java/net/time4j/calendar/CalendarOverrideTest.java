@@ -33,8 +33,7 @@ public class CalendarOverrideTest {
         ChronoFormatter<Moment> f =
             ChronoFormatter.setUpWithOverride(Locale.ENGLISH, HijriCalendar.family())
                 .addPattern("G-yyyy-MM-dd HH:mm", PatternType.CLDR)
-                .build()
-                .withCalendarVariant(HijriCalendar.VARIANT_UMALQURA);
+                .build();
         Moment m = PlainTimestamp.of(2015, 11, 19, 21, 45).at(offset);
         GeneralTimestamp<HijriCalendar> tsp =
             m.toGeneralTimestamp(HijriCalendar.family(), HijriCalendar.VARIANT_UMALQURA, offset, StartOfDay.EVENING);

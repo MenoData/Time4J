@@ -1,9 +1,13 @@
 package net.time4j;
 
 import net.time4j.engine.RuleNotFoundException;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.Iso8601Format;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
+import java.util.Locale;
+
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -23,17 +27,16 @@ public class ComponentElementTest {
     }
 
     @Test
-    public void timeComponent1() throws ParseException {
+    public void timeComponent1() {
         PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
         tsp = tsp.with(PlainTime.COMPONENT, PlainTime.of(23, 59));
         assertThat(tsp, is(PlainTimestamp.of(2014, 8, 21, 23, 59)));
     }
 
     @Test(expected=IllegalArgumentException.class)
-    public void timeComponent2() throws ParseException {
+    public void timeComponent2() {
         PlainTimestamp tsp = PlainTimestamp.of(2014, 8, 21, 14, 30);
-        tsp = tsp.with(PlainTime.COMPONENT, PlainTime.midnightAtEndOfDay());
-        //assertThat(tsp, is(PlainTimestamp.of(2014, 8, 22, 0, 0)));
+        tsp.with(PlainTime.COMPONENT, PlainTime.midnightAtEndOfDay());
     }
 
     @Test(expected=RuleNotFoundException.class)
@@ -317,6 +320,20 @@ public class ComponentElementTest {
             ts.with(PlainDate.COMPONENT.lastDayOfPreviousYear()),
             is(PlainTimestamp.of(2013, 12, 31, 23, 59, 1)));
 
+    }
+
+    @Test
+    public void combinedFormat() throws ParseException {
+        ChronoFormatter<PlainTimestamp> f =
+            ChronoFormatter.setUp(PlainTimestamp.axis(), Locale.ROOT)
+                .addCustomized(PlainDate.CALENDAR_DATE, Iso8601Format.BASIC_CALENDAR_DATE)
+                .addLiteral('-')
+                .addCustomized(PlainTime.WALL_TIME, Iso8601Format.EXTENDED_WALL_TIME)
+                .build();
+        assertThat(
+            f.parse("20180302-17:45:21"),
+            is(PlainTimestamp.of(2018, 3, 2, 17, 45, 21))
+        ); // see also: JDK-issue 8199412
     }
 
 }
