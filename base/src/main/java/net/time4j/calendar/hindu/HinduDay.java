@@ -21,6 +21,8 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.engine.ChronoCondition;
+
 import java.io.Serializable;
 
 
@@ -39,7 +41,8 @@ import java.io.Serializable;
  * @since   5.6
  */
 public final class HinduDay
-    implements Serializable {
+    extends HinduPrimitive
+    implements Comparable<HinduDay>, ChronoCondition<HinduCalendar>, Serializable {
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -123,13 +126,19 @@ public final class HinduDay
     /**
      * <p>Determines if this day of month is in leap state (intercalated day). </p>
      *
+     * <p>A leap day follows after an ordinary day while a leap month is before the ordinary month. </p>
+     *
      * @return  boolean
      */
     /*[deutsch]
      * <p>Bestimmt, ob dieser Tag des Monats ein Schalttag ist, also ein eingeschobener Tag mit gleicher Nummer. </p>
      *
+     * <p>Ein Schalttag folgt nach einem normalen Tag gleicher Nummer w&auml;hrend ein Schaltmonat dem normalen
+     * Monat vorausgeht. </p>
+     *
      * @return  boolean
      */
+    @Override
     public boolean isLeap() {
 
         return this.leap;
@@ -179,6 +188,44 @@ public final class HinduDay
         String s = String.valueOf(this.value);
         return (this.leap ? "*" + s : s);
 
+    }
+
+    /**
+     * <p>Uses the comparing order of the lunisolar calendar. </p>
+     *
+     * <p>Leap days are sorted after days with same number. </p>
+     *
+     * @param   other   another month to be compared with
+     * @return  comparing result
+     */
+    /*[deutsch]
+     * <p>Verwendet die Anordnung der Monate im lunisolaren Kalender. </p>
+     *
+     * <p>Schalttage werden nach Tagen mit gleicher Nummer einsortiert. </p>
+     *
+     * @param   other   another month to be compared with
+     * @return  comparing result
+     */
+    @Override
+    public int compareTo(HinduDay other) {
+
+        int result = this.value - other.value;
+
+        if (result == 0) {
+            if (this.leap) {
+                result = (other.leap ? 0 : 1);
+            } else {
+                result = (other.leap ? -1 : 0);
+            }
+        }
+
+        return result;
+
+    }
+
+    @Override
+    public boolean test(HinduCalendar context) {
+        return this.equals(context.getDayOfMonth());
     }
 
 }

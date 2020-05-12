@@ -326,6 +326,11 @@ public final class HinduVariant
         return (this.type < 0);
     }
 
+    // Kerala region only
+    boolean prefersRasiNames() {
+        return (this.type == HinduRule.MADRAS.ordinal()) || (this.type == HinduRule.MALAYALI.ordinal());
+    }
+
     /**
      * <p>Does this variant use elapsed years? </p>
      *
