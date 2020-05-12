@@ -113,25 +113,9 @@ import java.io.Serializable;
  */
 public abstract class CalendarVariant<D extends CalendarVariant<D>>
     extends ChronoEntity<D>
-    implements CalendarDate, Comparable<D>, Serializable {
+    implements CalendarDate, VariantSource, Comparable<D>, Serializable {
 
     //~ Methoden ----------------------------------------------------------
-
-    /**
-     * <p>Returns the name of the associated variant of underlying calendar system. </p>
-     *
-     * @return  String
-     * @since   3.4/4.3
-     * @see     CalendarFamily#getCalendarSystem(String)
-     */
-    /*[deutsch]
-     * <p>Liefert den Namen der assoziierten Variante des zugrundeliegenden Kalendersystems. </p>
-     *
-     * @return  String
-     * @since   3.4/4.3
-     * @see     CalendarFamily#getCalendarSystem(String)
-     */
-    public abstract String getVariant();
 
     /**
      * <p>Creates a copy of this instance with given variant. </p>
