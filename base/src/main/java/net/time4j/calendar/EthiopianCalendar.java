@@ -40,7 +40,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
@@ -1691,20 +1690,6 @@ public final class EthiopianCalendar
                     entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Ethiopian date.");
                 }
             }
-
-            return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(EthiopianCalendar context, AttributeQuery attributes) {
-
-            return context;
-
-        }
-
-        @Override
-        public Chronology<?> preparser() {
 
             return null;
 

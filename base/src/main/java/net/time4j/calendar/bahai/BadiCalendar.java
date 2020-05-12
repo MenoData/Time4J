@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BadiCalendar.java) is part of project Time4J.
  *
@@ -2702,13 +2702,6 @@ public final class BadiCalendar
             }
 
             return cal;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(BadiCalendar context, AttributeQuery attributes) {
-
-            return context;
 
         }
 

@@ -41,7 +41,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.Calendrical;
-import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
@@ -1517,13 +1516,6 @@ public final class IndianCalendar
             }
 
             return null;
-
-        }
-
-        @Override
-        public ChronoDisplay preformat(IndianCalendar context, AttributeQuery attributes) {
-
-            return context;
 
         }
 
