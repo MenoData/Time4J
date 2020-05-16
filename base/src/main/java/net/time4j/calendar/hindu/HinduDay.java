@@ -27,14 +27,14 @@ import java.io.Serializable;
 
 
 /**
- * <p>The Hindu day of month extends between 1 and 32 and
+ * <p>The Hindu day of month extends between 1 and at maximum 32 and
  * might also have a leap state when used in lunisolar context. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
  */
 /*[deutsch]
- * <p>Der Tag eines Hindumonats erstreckt sich zwischen 1 und 32 und kann im lunisolaren Kontext auch im
+ * <p>Der Tag eines Hindumonats erstreckt sich zwischen 1 und maximal 32 und kann im lunisolaren Kontext auch im
  * Schaltzustand vorliegen. </p>
  *
  * @author  Meno Hochschild
@@ -70,7 +70,6 @@ public final class HinduDay
 
         this.value = value;
         this.leap = leap;
-
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -96,9 +95,7 @@ public final class HinduDay
      * @throws  IllegalArgumentException if given argument is out of range 1-32
      */
     public static HinduDay valueOf(int dayOfMonth) {
-
         return new HinduDay(dayOfMonth, false);
-
     }
 
     /**
@@ -118,9 +115,7 @@ public final class HinduDay
      * @return  int
      */
     public int getValue() {
-
         return this.value;
-
     }
 
     /**
@@ -140,9 +135,7 @@ public final class HinduDay
      */
     @Override
     public boolean isLeap() {
-
         return this.leap;
-
     }
 
     /**
@@ -156,14 +149,11 @@ public final class HinduDay
      * @return  copy of this day but in leap state
      */
     public HinduDay withLeap() {
-
         return (this.leap ? this : new HinduDay(this.value, true));
-
     }
 
     @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         } else if (obj instanceof HinduDay) {
@@ -172,22 +162,17 @@ public final class HinduDay
         } else {
             return false;
         }
-
     }
 
     @Override
     public int hashCode() {
-
         return this.value + (this.leap ? 12 : 0);
-
     }
 
     @Override
     public String toString() {
-
         String s = String.valueOf(this.value);
         return (this.leap ? "*" + s : s);
-
     }
 
     /**
@@ -208,7 +193,6 @@ public final class HinduDay
      */
     @Override
     public int compareTo(HinduDay other) {
-
         int result = this.value - other.value;
 
         if (result == 0) {
@@ -220,7 +204,6 @@ public final class HinduDay
         }
 
         return result;
-
     }
 
     @Override

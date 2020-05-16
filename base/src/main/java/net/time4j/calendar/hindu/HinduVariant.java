@@ -296,14 +296,15 @@ public final class HinduVariant
     /**
      * <p>Determines if this variant describes the purnimanta scheme. </p>
      *
-     * <p>Months are synchronized with the Full Moon. </p>
+     * <p>Months are synchronized with the Full Moon. The first day of a purnimanta month
+     * starts with 16 or higher. </p>
      *
      * @return  boolean
      */
     /*[deutsch]
      * <p>Bestimmt, ob diese Variante das Purnimanta-Schema beschreibt. </p>
      *
-     * <p>Die Monate folgen dem Vollmondzyklus. </p>
+     * <p>Die Monate folgen dem Vollmondzyklus. Deren erster Tag f&auml;ngt mit 16 oder h&ouml;her an. </p>
      *
      * @return  boolean
      */
@@ -334,19 +335,24 @@ public final class HinduVariant
     /**
      * <p>Does this variant use elapsed years? </p>
      *
-     * <p>Elapsed years are the standard, however, in most southern parts of India current years are used. </p>
+     * <p>Elapsed years are the standard, however, in most southern parts of India current years are used,
+     * for example Madras, Malayali (Kollam) and Tamil use current years. </p>
      *
      * @return  boolean
+     * @see     #withElapsedYears()
+     * @see     #withCurrentYears()
      */
     /*[deutsch]
      * <p>Verwendet diese Variante abgelaufene Jahre? </p>
      *
      * <p>Abgelaufene Jahre sind der Standard. Allerdings verwenden einige s&uuml;dliche Teile von Indien
-     * laufende Jahre. </p>
+     * laufende Jahre, zum Beispiel gelten f&uuml;r Madras, Malayali (Kollam) und Tamil laufende Jahre. </p>
      *
      * @return  boolean
+     * @see     #withElapsedYears()
+     * @see     #withCurrentYears()
      */
-    public boolean isUsingElapsedYears() { // TODO: mehr dokumentieren, für welche Regeln was als Standard gilt
+    public boolean isUsingElapsedYears() {
         return this.elapsedMode;
     }
 
@@ -621,9 +627,7 @@ public final class HinduVariant
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
-
         return new SPX(this, SPX.HINDU_VAR);
-
     }
 
     /**
@@ -631,11 +635,8 @@ public final class HinduVariant
      * @param       in      object input stream
      * @throws InvalidObjectException (always)
      */
-    private void readObject(ObjectInputStream in)
-        throws IOException {
-
+    private void readObject(ObjectInputStream in) throws IOException {
         throw new InvalidObjectException("Serialization proxy required.");
-
     }
 
     //~ Innere Klassen ----------------------------------------------------

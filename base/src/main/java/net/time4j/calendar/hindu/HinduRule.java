@@ -27,7 +27,8 @@ package net.time4j.calendar.hindu;
  * how to determine the start of solar month  in relation to the zodiacal position
  * of the sun (samkranti). </p>
  *
- * <p>The rule also affects the naming of solar months. </p>
+ * <p>The rule also affects the naming of solar months. For example: Madras and
+ * the Malayali-rule prefer rasi names. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
@@ -37,7 +38,8 @@ package net.time4j.calendar.hindu;
  * wie die Tierkreisposition der Sonne (Samkranti) sich auf den Start des jeweiligen
  * Sonnenmonats auswirkt. </p>
  *
- * <p>Die Regel wirkt sich auch auf die Benennung der Sonnenmonate aus. </p>
+ * <p>Die Regel wirkt sich auch auf die Benennung der Sonnenmonate aus. Zum Beispiel bevorzugen
+ * Madras und die Malayali-Regel Rasi-Namen. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
@@ -85,13 +87,17 @@ public enum HinduRule {
      * which corresponds to 3/5 th of the time period between sunrise and sunset
      * in this definition. </p>
      *
-     * <p>Mainly used in Kerala region. The default era is KOLLAM. </p>
+     * <p>Mainly used in Kerala region. The default era is KOLLAM. The months usually use
+     * rasi names unless the format attribute {@link HinduMonth#RASI_NAMES} is used together
+     * with the format class {@code ChronoFormatter}. </p>
      */
     /*[deutsch]
      * <p>Ein Sonnenkalender, der den Sonnenuntergang des aktuellen Tages verwendet,
      * was in dieser Definition 3/5 der Zeit zwischen Sonnenaufgang und Sonnenuntergang entspricht. </p>
      *
-     * <p>Haupts&auml;chlich in Kerala verwendet. Die Standard&auml;ra ist KOLLAM. </p>
+     * <p>Haupts&auml;chlich in Kerala verwendet. Die Standard&auml;ra ist KOLLAM. Die Monate verwenden
+     * gew&ouml;hnlich Rasi-Namen, es sei denn, das Formatattribut {@link HinduMonth#RASI_NAMES} wird
+     * zusammen mit der Formatklasse {@code ChronoFormatter} gesetzt. </p>
      */
     MALAYALI() {
         @Override
@@ -103,12 +109,14 @@ public enum HinduRule {
     /**
      * <p>A solar calendar which uses midnight at end of current day as critical time. </p>
      *
-     * <p>Mainly used in Madras (Chennai). The default era is SAKA. </p>
+     * <p>Mainly used in Madras (Chennai). The default era is SAKA. The month names are handled
+     * in a similar way to the {@link #MALAYALI Malayali rule}. </p>
      */
     /*[deutsch]
      * <p>Ein Sonnenkalender, der Mitternacht am Ende des aktuellen Tages verwendet. </p>
      *
-     * <p>Haupts&auml;chlich in Madras (Chennai) verwendet. Die Standard&auml;ra ist SAKA. </p>
+     * <p>Haupts&auml;chlich in Madras (Chennai) verwendet. Die Standard&auml;ra ist SAKA. F&uuml;r die
+     * Monatsnamen gilt ein &auml;hnliches Verhalten wie f&uuml;r die {@link #MALAYALI Malayali-Regel}. </p>
      */
     MADRAS() {
         @Override
@@ -217,10 +225,14 @@ public enum HinduRule {
 
     /**
      * <p>The purnimanta scheme is a lunisolar calendar based on the full moon cycle. </p>
+     *
+     * <p>It is shifted for about two weeks compared with the amanta scheme. </p>
      */
     /*[deutsch]
      * <p>Das Purnimanta-Schema ist ein lunisolarer Kalender, der auf dem Vollmondzyklus
      * basiert. </p>
+     *
+     * <p>Es ist im Vergleich zum Amanta-Schema um ungef&auml;hr zwei Wochen versetzt. </p>
      */
     PURNIMANTA() {
         @Override

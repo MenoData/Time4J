@@ -215,9 +215,7 @@ public enum AryaSiddhanta
                 return false;
             }
 
-            HinduCalendar cal = this.create(kyYear, month, dom);
-            return cal.equals(this.create(cal.getDaysSinceEpochUTC()));
-
+            return !this.isExpunged(kyYear, month, dom);
         }
 
         @Override

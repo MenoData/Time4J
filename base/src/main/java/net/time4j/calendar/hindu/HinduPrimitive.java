@@ -26,7 +26,8 @@ import net.time4j.engine.AttributeKey;
 
 
 /**
- * <p>Abstract super class of Hindu months or days which can carry a leap status in lunisolar calendar. </p>
+ * <p>Abstract super class of Hindu months or days which can carry a leap status in the lunisolar
+ * variants of the Hindu calendar. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6

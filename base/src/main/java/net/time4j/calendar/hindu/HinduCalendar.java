@@ -108,13 +108,16 @@ public final class HinduCalendar
      * <p>Represents the Hindu era. </p>
      *
      * <p>A change of the era by {@code with()} will not change the Hindu date in a temporal way
-     * but only the year representation. </p>
+     * but only the year representation. The changed era is stored in the variant of this calendar
+     * object. Attention: The old Hindu calendar ignores any era change and only supports Kali Yuga. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert die Hindu-&Auml;ra. </p>
      *
      * <p>Eine &Auml;nderung der &Auml;ra durch {@code with()} wird das Datum nicht zeitlich &auml;ndern,
-     * sondern nur die Jahresdarstellung. </p>
+     * sondern nur die Jahresdarstellung. Die ge&auml;nderte &Auml;ra wird in der Variante dieses
+     * Kalenderobjekts gespeichert. Achtung: Der alte Hindu-Kalender ignoriert die &Auml;nderung und
+     * unterst&uuml;tzt nur Kali Yuga. </p>
      */
     @FormattableElement(format = "G")
     public static final ChronoElement<HinduEra> ERA =
@@ -236,7 +239,7 @@ public final class HinduCalendar
 //                .appendExtension(
 //                    new CommonElements.Weekengine(
 //                        HinduCalendar.class,
-//                        DAY_OF_MONTH,
+//                        DAY_OF_MONTH, // TODO: day-of-month as ordinal ???
 //                        DAY_OF_YEAR,
 //                        getDefaultWeekmodel()));
         ENGINE = builder.build();
@@ -276,7 +279,6 @@ public final class HinduCalendar
         this.month = month;
         this.dayOfMonth = dayOfMonth;
         this.utcDays = utcDays;
-
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -287,8 +289,8 @@ public final class HinduCalendar
      * <p>The months use rasi numbers and start with VAISAKHA. </p>
      *
      * @param   year            expired year of era Kali Yuga
-     * @param   month           month number (rasi numbering)
-     * @param   dayOfMonth      the day of given month
+     * @param   month           month number (rasi numbering in range 1-12)
+     * @param   dayOfMonth      the day of given month in range 1-31
      * @return  HinduCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @see     HinduMonth#getRasi()
@@ -300,8 +302,8 @@ public final class HinduCalendar
      * <p>Die Monate verwenden Rasi-Nummern und fangen mit dem Monat VAISAKHA an. </p>
      *
      * @param   year            expired year of era Kali Yuga
-     * @param   month           month number (rasi numbering)
-     * @param   dayOfMonth      the day of given month
+     * @param   month           month number (rasi numbering in range 1-12)
+     * @param   dayOfMonth      the day of given month in range 1-31
      * @return  HinduCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      * @see     HinduMonth#getRasi()
@@ -312,6 +314,10 @@ public final class HinduCalendar
         int month,
         int dayOfMonth
     ) {
+        if (dayOfMonth > 31) { // in context of old solar calendar only
+            throw new IllegalArgumentException("Day-of-month out of range: " + dayOfMonth);
+        }
+
         HinduMonth m = HinduMonth.ofSolar(month);
         HinduDay dom = HinduDay.valueOf(dayOfMonth);
         return HinduCalendar.of(HinduVariant.VAR_OLD_SOLAR, HinduEra.KALI_YUGA, year, m, dom);
@@ -346,6 +352,10 @@ public final class HinduCalendar
         HinduMonth month,
         int dayOfMonth
     ) {
+        if (dayOfMonth > 30) { // in context of old lunar calendar only
+            throw new IllegalArgumentException("Day-of-month out of range: " + dayOfMonth);
+        }
+
         HinduDay dom = HinduDay.valueOf(dayOfMonth);
         return HinduCalendar.of(HinduVariant.VAR_OLD_LUNAR, HinduEra.KALI_YUGA, year, month, dom);
     }
@@ -489,8 +499,7 @@ public final class HinduCalendar
      * @return  Weekday
      */
     public Weekday getDayOfWeek() {
-        long utcDays = this.getCalendarSystem().transform(this);
-        return Weekday.valueOf(MathUtils.floorModulo(utcDays + 5, 7) + 1);
+        return Weekday.valueOf(MathUtils.floorModulo(this.utcDays + 5, 7) + 1);
     }
 
     /**
@@ -520,7 +529,7 @@ public final class HinduCalendar
      * @throws  IllegalArgumentException if the adjusted date is out of range
      */
     public HinduCalendar previousDay() {
-        return this.variant.getCalendarSystem().transform(this.utcDays - 1);
+        return this.getCalendarSystem().transform(this.utcDays - 1);
     }
 
     /**
@@ -553,7 +562,7 @@ public final class HinduCalendar
      * @throws  IllegalArgumentException if the adjusted date is out of range
      */
     public HinduCalendar nextDay() {
-        return this.variant.getCalendarSystem().transform(this.utcDays + 1);
+        return this.getCalendarSystem().transform(this.utcDays + 1);
     }
 
     /**
@@ -633,9 +642,7 @@ public final class HinduCalendar
      * @see     IndianCalendar#getDefaultWeekmodel()
      */
     public static Weekmodel getDefaultWeekmodel() {
-
         return IndianCalendar.getDefaultWeekmodel();
-
     }
 
     /**
@@ -667,14 +674,16 @@ public final class HinduCalendar
         return this.variant.getCalendarSystem();
     }
 
+    // used by HinduRule-based calendar systems
     int getExpiredYearOfKaliYuga() {
         return this.kyYear;
     }
 
-    private HinduCalendar withNewYear() { // TODO: ashadha / kartika as begin of year??? Purnimanta???
+    private HinduCalendar withNewYear() { // TODO: ashadha / kartika as begin of year???
         HinduMonth first = (this.variant.isSolar() ? HinduMonth.ofSolar(1) : HinduMonth.ofLunisolar(1));
         HinduCS calsys = this.variant.getCalendarSystem();
-        HinduCalendar date = calsys.create(this.kyYear, first, HinduDay.valueOf(15));
+        int midOfMonth = this.variant.isPurnimanta() ? 1 : 15; // estimation
+        HinduCalendar date = calsys.create(this.kyYear, first, HinduDay.valueOf(midOfMonth));
 
         if (this.variant.isLunisolar()) {
             HinduCalendar previousMonth = calsys.create(date.utcDays - 30);
@@ -683,21 +692,37 @@ public final class HinduCalendar
             }
         }
 
-        return date.withFirstDayInMonth();
+        return date.withFirstDayOfMonth();
     }
 
+    // estimation
     private HinduCalendar withMidOfMonth(int monthUnits) {
-        long utc = this.utcDays + monthUnits * 30 + 15 - this.dayOfMonth.getValue();
-        return this.variant.getCalendarSystem().transform(utc);
+        int dom = this.dayOfMonth.getValue();
+
+        if (this.variant.isPurnimanta()) {
+            if (dom >= 16) {
+                dom -= 15;
+            } else {
+                dom += 15;
+            }
+        }
+
+        long utc = this.utcDays + monthUnits * 30 + 15 - dom;
+        return this.variant.getCalendarSystem().create(utc);
     }
 
-    private HinduCalendar withFirstDayInMonth() {
+    private HinduCalendar withFirstDayOfMonth() {
         HinduDay dom = HinduDay.valueOf(1); // always valid in solar calendar
         HinduCS calsys = this.variant.getCalendarSystem();
 
         if (this.variant.isLunisolar()) {
             int count = 3;
-            while (!calsys.isValid(this.kyYear, this.month, dom)) {
+
+            if (this.variant.isPurnimanta()) {
+                dom = HinduDay.valueOf(16);
+            }
+
+            while (calsys.isExpunged(this.kyYear, this.month, dom)) {
                 if (count == 0) {
                     throw new IllegalArgumentException("Cannot determine first day of month: " + this);
                 } else if (dom.isLeap()) {
@@ -716,16 +741,21 @@ public final class HinduCalendar
         HinduDay dom = desired;
         HinduCS calsys = this.variant.getCalendarSystem();
         int count = 5;
+        boolean purnimanta = this.variant.isPurnimanta();
 
-        while (!calsys.isValid(this.kyYear, this.month, dom)) {
-            if ((dom.getValue() == 1) && !dom.isLeap()) {
-                return this.withFirstDayInMonth();
+        while (calsys.isExpunged(this.kyYear, this.month, dom)) {
+            if ((dom.getValue() == (purnimanta ? 16 : 1)) && !dom.isLeap()) {
+                return this.withFirstDayOfMonth();
             } else if (count == 0) {
                 throw new IllegalArgumentException("No valid day found: " + this + " => (day=" + desired + ")");
             } else if (dom.isLeap()) {
                 dom = HinduDay.valueOf(dom.getValue());
             } else {
-                dom = HinduDay.valueOf(dom.getValue() - 1);
+                int previous = dom.getValue() - 1;
+                if (purnimanta && (previous == 0)) {
+                    previous = 30;
+                }
+                dom = HinduDay.valueOf(previous);
                 if (this.variant.isLunisolar()) {
                     dom = dom.withLeap();
                 }
@@ -855,9 +885,7 @@ public final class HinduCalendar
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
-
         return new SPX(this, SPX.HINDU_CAL);
-
     }
 
     /**
@@ -865,11 +893,8 @@ public final class HinduCalendar
      * @param       in      object input stream
      * @throws InvalidObjectException (always)
      */
-    private void readObject(ObjectInputStream in)
-        throws IOException {
-
+    private void readObject(ObjectInputStream in) throws IOException {
         throw new InvalidObjectException("Serialization proxy required.");
-
     }
 
     //~ Innere Klassen ----------------------------------------------------
@@ -881,7 +906,6 @@ public final class HinduCalendar
 
         @Override
         public HinduCS get(Object key) {
-
             HinduCS calsys = super.get(key);
 
             if (calsys == null) {
@@ -895,13 +919,10 @@ public final class HinduCalendar
             }
 
             return calsys;
-
         }
 
         void accept(HinduVariant variant) {
-
             this.put(variant.getVariant(), variant.getCalendarSystem());
-
         }
 
     }
@@ -1030,7 +1051,8 @@ public final class HinduCalendar
                         y--;
                     }
 
-                    HinduCalendar date = calsys.create(y, context.month, HinduDay.valueOf(15));
+                    int midOfMonth = (context.variant.isPurnimanta() ? 1 : 15);
+                    HinduCalendar date = calsys.create(y, context.month, HinduDay.valueOf(midOfMonth));
 
                     if (context.month.isLeap()) {
                         date = calsys.transform(date.utcDays);
@@ -1163,7 +1185,9 @@ public final class HinduCalendar
             if (context.variant.isSolar()) {
                 return HinduMonth.ofSolar(12);
             } else {
-                return context.withNewYear().previousMonth().month;
+                HinduCalendar previous =
+                    context.variant.getCalendarSystem().create(context.withNewYear().utcDays - 1);
+                return previous.month; // same as last month of current year, cannot be a leap month
             }
         }
 
@@ -1500,12 +1524,14 @@ public final class HinduCalendar
 
         @Override
         public HinduDay getMinimum(HinduCalendar context) {
-            throw new UnsupportedOperationException("Not yet implemented.");
+            return context.withFirstDayOfMonth().dayOfMonth;
         }
 
         @Override
         public HinduDay getMaximum(HinduCalendar context) {
-            throw new UnsupportedOperationException("Not yet implemented.");
+            HinduCalendar startOfNextMonth = context.withMidOfMonth(1).withFirstDayOfMonth();
+            HinduCS calsys = context.variant.getCalendarSystem();
+            return calsys.create(startOfNextMonth.utcDays - 1).dayOfMonth;
         }
 
         @Override
@@ -1517,7 +1543,7 @@ public final class HinduCalendar
                 return false;
             }
 
-            throw new UnsupportedOperationException("Not yet implemented.");
+            return context.variant.getCalendarSystem().isValid(context.kyYear, context.month, value);
         }
 
         @Override
@@ -1526,11 +1552,11 @@ public final class HinduCalendar
             HinduDay value,
             boolean lenient
         ) {
-            if ((value == null) || (value.isLeap() && context.variant.isSolar())) {
+            if (this.isValid(context, value)) {
+                return context.variant.getCalendarSystem().create(context.kyYear, context.month, value);
+            } else {
                 throw new IllegalArgumentException("Invalid day of month: " + value);
             }
-
-            throw new UnsupportedOperationException("Not yet implemented.");
         }
 
         @Override
@@ -1798,11 +1824,27 @@ public final class HinduCalendar
             boolean lenient,
             boolean preparsing
         ) {
-            String variant = attributes.get(Attributes.CALENDAR_VARIANT, "");
+            String hv = attributes.get(Attributes.CALENDAR_VARIANT, "");
 
-            if (variant.isEmpty()) {
+            if (hv.isEmpty()) {
                 entity.with(ValidationElement.ERROR_MESSAGE, "Missing Hindu calendar variant.");
                 return null;
+            }
+
+            HinduVariant variant;
+
+            try {
+                variant = HinduVariant.from(hv);
+            } catch (IllegalArgumentException iae) {
+                entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu calendar variant.");
+                return null;
+            }
+
+            HinduCS calsys = variant.getCalendarSystem();
+            HinduEra era = variant.getDefaultEra();
+
+            if (entity.contains(ERA)) {
+                era = entity.get(ERA);
             }
 
             int yoe = entity.getInt(YEAR_OF_ERA);
@@ -1812,36 +1854,43 @@ public final class HinduCalendar
                 return null;
             }
 
-//            if (entity.contains(MONTH_OF_YEAR)) {
-//                int cmonth = entity.get(MONTH_OF_YEAR).getValue();
-//                int cdom = entity.getInt(DAY_OF_MONTH);
-//
-//                if (cdom != Integer.MIN_VALUE) {
-//                    if (CALSYS.isValid(HinduEra.ANNO_MARTYRUM, yoe, cmonth, cdom)) {
-//                        return HinduCalendar.of(yoe, cmonth, cdom);
-//                    } else {
-//                        entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
-//                    }
-//                }
-//            } else {
-//                int cdoy = entity.getInt(DAY_OF_YEAR);
-//                if (cdoy != Integer.MIN_VALUE) {
-//                    if (cdoy > 0) {
-//                        int cmonth = 1;
-//                        int daycount = 0;
-//                        while (cmonth <= 13) {
-//                            int len = CALSYS.getLengthOfMonth(CopticEra.ANNO_MARTYRUM, cyear, cmonth);
-//                            if (cdoy > daycount + len) {
-//                                cmonth++;
-//                                daycount += len;
-//                            } else {
-//                                return HinduCalendar.of(yoe, cmonth, cdoy - daycount);
-//                            }
-//                        }
-//                    }
-//                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
-//                }
-//            }
+            int kyYear = HinduEra.KALI_YUGA.yearOfEra(era, yoe);
+
+            if (!variant.isUsingElapsedYears()) {
+                kyYear--;
+            }
+
+            if (entity.contains(MONTH_OF_YEAR) && entity.contains(DAY_OF_MONTH)) {
+                HinduMonth month = entity.get(MONTH_OF_YEAR);
+                HinduDay dom = entity.get(DAY_OF_MONTH);
+
+                if (calsys.isValid(kyYear, month, dom)) {
+                    return calsys.create(kyYear, month, dom);
+                } else {
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
+                }
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+
+                if (doy != Integer.MIN_VALUE) {
+                    if (doy >= 1) {
+                        HinduCalendar c =
+                            calsys.create(kyYear, HinduMonth.of(IndianMonth.KARTIKA), HinduDay.valueOf(5));
+                        c = calsys.create(c.utcDays).withNewYear();
+                        long u = c.utcDays + doy - 1;
+                        c = calsys.create(u);
+
+                        if (
+                            (calsys.getMinimumSinceUTC() <= u)
+                            && (calsys.getMaximumSinceUTC() >= u)
+                            && (lenient || (c.kyYear == kyYear))
+                        ) {
+                            return c;
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
+                }
+            }
 
             return null;
         }

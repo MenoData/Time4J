@@ -99,7 +99,6 @@ public final class HinduMonth
 
         this.value = value;
         this.leap = leap;
-
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -123,9 +122,7 @@ public final class HinduMonth
      * @return  associated Hindu month
      */
     public static HinduMonth of(IndianMonth month) {
-
         return new HinduMonth(month, false);
-
     }
 
     /**
@@ -149,9 +146,7 @@ public final class HinduMonth
      * @throws  IllegalArgumentException if given argument is out of range 1-12
      */
     public static HinduMonth ofLunisolar(int month) {
-
         return new HinduMonth(IndianMonth.valueOf(month), false);
-
     }
 
     /**
@@ -177,10 +172,8 @@ public final class HinduMonth
      * @see     #getRasi(Locale)
      */
     public static HinduMonth ofSolar(int month) {
-
         int m = ((month == 12) ? 1 : month + 1);
         return new HinduMonth(IndianMonth.valueOf(m), false);
-
     }
 
     /**
@@ -200,9 +193,7 @@ public final class HinduMonth
      * @return  IndianMonth
      */
     public IndianMonth getValue() {
-
         return this.value;
-
     }
 
     /**
@@ -224,9 +215,7 @@ public final class HinduMonth
      * @see     #getRasi(Locale)
      */
     public int getRasi() {
-
         return ((this.value == IndianMonth.CHAITRA) ? 12 : this.value.getValue() - 1);
-
     }
 
     /**
@@ -253,16 +242,14 @@ public final class HinduMonth
      * @see     #getDisplayName(Locale)
      */
     public String getRasi(Locale locale) {
-
         CalendarText names = CalendarText.getInstance("extra/hindu", locale);
         String rasi = names.getTextForms("R", IndianMonth.class).print(IndianMonth.valueOf(this.getRasi()));
 
-        if (this.leap) {
+        if (this.leap) { // should not happen because rasi is for solar calendars without leap months
             rasi = getAdhika(locale) + rasi;
         }
 
         return rasi;
-
     }
 
     /**
@@ -288,9 +275,7 @@ public final class HinduMonth
      * @see     #getDisplayName(Locale, TextWidth, OutputContext)
      */
     public String getDisplayName(Locale locale) {
-
         return this.getDisplayName(locale, TextWidth.WIDE, OutputContext.FORMAT);
-
     }
 
     /**
@@ -339,7 +324,6 @@ public final class HinduMonth
         TextWidth width,
         OutputContext context
     ) {
-
         String displayName = CalendarText.getInstance("indian", locale).getStdMonths(width, context).print(this.value);
 
         if (this.leap) {
@@ -347,7 +331,6 @@ public final class HinduMonth
         }
 
         return displayName;
-
     }
 
     /**
@@ -366,30 +349,29 @@ public final class HinduMonth
      */
     @Override
     public boolean isLeap() {
-
         return this.leap;
-
     }
 
     /**
      * <p>Obtains the leap month version of this month. </p>
+     *
+     * <p>Leap months only exist in the lunisolar versions of the Hindu calendar. </p>
      *
      * @return  copy of this month but in leap state
      */
     /*[deutsch]
      * <p>Liefert die geschaltete Version dieses Monats. </p>
      *
+     * <p>Schaltmonate existieren nur in den lunisolaren Varianten des Hindu-Kalenders. </p>
+     *
      * @return  copy of this month but in leap state
      */
     public HinduMonth withLeap() {
-
         return (this.leap ? this : new HinduMonth(this.value, true));
-
     }
 
     @Override
     public boolean equals(Object obj) {
-
         if (this == obj) {
             return true;
         } else if (obj instanceof HinduMonth) {
@@ -398,22 +380,17 @@ public final class HinduMonth
         } else {
             return false;
         }
-
     }
 
     @Override
     public int hashCode() {
-
         return this.value.hashCode() + (this.leap ? 12 : 0);
-
     }
 
     @Override
     public String toString() {
-
         String s = this.value.toString();
         return (this.leap ? "*" + s : s);
-
     }
 
     /**
@@ -434,7 +411,6 @@ public final class HinduMonth
      */
     @Override
     public int compareTo(HinduMonth other) {
-
         int result = this.value.compareTo(other.value);
 
         if (result == 0) {
@@ -446,7 +422,6 @@ public final class HinduMonth
         }
 
         return result;
-
     }
 
     @Override

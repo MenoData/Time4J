@@ -100,6 +100,16 @@ abstract class HinduCS
         HinduDay dom
     );
 
+    // expunged days are gaps
+    final boolean isExpunged(
+        int kyYear,
+        HinduMonth month,
+        HinduDay dom
+    ) {
+        HinduCalendar cal = this.create(kyYear, month, dom);
+        return !cal.equals(this.create(cal.getDaysSinceEpochUTC()));
+    }
+
     // used in subclasses
     static double modulo(double x, double y) {
         return x - y * Math.floor(x / y);

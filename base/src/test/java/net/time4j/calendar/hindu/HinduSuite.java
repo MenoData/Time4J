@@ -9,6 +9,7 @@ import org.junit.runners.Suite.SuiteClasses;
 @SuiteClasses(
     {
         HinduEraTest.class,
+        HinduFormatTest.class,
         HinduVariantTest.class,
         OldHinduSolarCalendarTest.class,
         OldHinduLunarCalendarTest.class,

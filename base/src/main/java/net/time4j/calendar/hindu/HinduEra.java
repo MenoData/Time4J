@@ -114,9 +114,7 @@ public enum HinduEra
      * @see     #getDisplayName(Locale, TextWidth)
      */
     public String getDisplayName(Locale locale) {
-
         return this.getDisplayName(locale, TextWidth.WIDE);
-
     }
 
     /**
@@ -145,10 +143,8 @@ public enum HinduEra
         Locale locale,
         TextWidth width
     ) {
-
         CalendarText names = CalendarText.getInstance("extra/hindu", locale);
         return names.getEras(width).print(this);
-
     }
 
     /**
@@ -171,7 +167,6 @@ public enum HinduEra
         HinduEra era,
         int yearOfEra
     ) {
-
         try {
             return Math.subtractExact(
                 Math.addExact(yearOfEra, SAKA_OFFSETS[this.ordinal()]),
@@ -179,7 +174,6 @@ public enum HinduEra
         } catch (ArithmeticException ex) {
             throw new IllegalArgumentException("Out of range: " + yearOfEra);
         }
-
     }
 
 }
