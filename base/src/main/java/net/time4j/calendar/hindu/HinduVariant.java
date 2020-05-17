@@ -21,6 +21,7 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.GeoLocation;
 import net.time4j.engine.VariantSource;
 
@@ -77,7 +78,13 @@ public final class HinduVariant
         HinduRule rule,
         HinduEra defaultEra
     ) {
-        this(rule.ordinal(), defaultEra, useStandardElapsedMode(defaultEra, rule), false, UJJAIN);
+        this(
+            rule.ordinal(),
+            defaultEra,
+            useStandardElapsedMode(defaultEra, rule),
+            false,
+            UJJAIN
+        );
 
     }
 
@@ -87,7 +94,9 @@ public final class HinduVariant
             HinduEra.KALI_YUGA,
             true,
             false,
-            UJJAIN);
+            UJJAIN
+        );
+
     }
 
     private HinduVariant(
@@ -399,24 +408,27 @@ public final class HinduVariant
                 sb.append(this.getRule().name());
         }
 
-        sb.append("|default-era=");
-        sb.append(this.defaultEra.name());
-        sb.append('|');
-        sb.append(this.elapsedMode ? "elapsed-year-mode" : "current-year-mode");
-        if (this.altHinduSunrise) {
-            sb.append("|alt-hindu-sunrise");
-        }
-        if (this.location != UJJAIN) {
-            sb.append("|lat=");
-            sb.append(this.location.getLatitude());
-            sb.append(",lng=");
-            sb.append(this.location.getLongitude());
-            int altitude = this.location.getAltitude();
-            if (altitude != 0) {
-                sb.append(",alt=");
-                sb.append(altitude);
+        if (!this.isOld()) {
+            sb.append("|default-era=");
+            sb.append(this.defaultEra.name());
+            sb.append('|');
+            sb.append(this.elapsedMode ? "elapsed-year-mode" : "current-year-mode");
+            if (this.altHinduSunrise) {
+                sb.append("|alt-hindu-sunrise");
+            }
+            if (this.location != UJJAIN) {
+                sb.append("|lat=");
+                sb.append(this.location.getLatitude());
+                sb.append(",lng=");
+                sb.append(this.location.getLongitude());
+                int altitude = this.location.getAltitude();
+                if (altitude != 0) {
+                    sb.append(",alt=");
+                    sb.append(altitude);
+                }
             }
         }
+
         sb.append(']');
         return sb.toString();
     }
@@ -594,6 +606,37 @@ public final class HinduVariant
         }
     }
 
+    /**
+     * <p>Obtains the number of the first month of Hindu year. </p>
+     *
+     * @return  int
+     */
+    /*[deutsch]
+     * <p>Liefert die Nummer des ersten Monats des Hindu-Jahres. </p>
+     *
+     * @return  int
+     */
+    int getFirstMonthOfYear() {
+        if (this.isOld()) {
+            return 1;
+        }
+
+        IndianMonth month;
+
+        switch (this.getRule()) {
+            case AMANTA_ASHADHA:
+                month = IndianMonth.ASHADHA;
+                break;
+            case AMANTA_KARTIKA:
+                month = IndianMonth.KARTIKA;
+                break;
+            default:
+                month = IndianMonth.CHAITRA;
+        }
+
+        return month.getValue();
+    }
+
     private static boolean useStandardElapsedMode(
         HinduEra defaultEra,
         HinduRule rule
@@ -617,6 +660,16 @@ public final class HinduVariant
 
     private HinduRule getRule() {
         return RULES[this.type];
+    }
+
+    private HinduCS toAmanta() {
+        return new HinduVariant(
+            HinduRule.AMANTA.ordinal(),
+            this.defaultEra,
+            this.elapsedMode,
+            this.altHinduSunrise,
+            this.location
+        ).getCalendarSystem();
     }
 
     /**
@@ -654,16 +707,48 @@ public final class HinduVariant
 
         @Override
         HinduCalendar create(long utcDays) {
+            switch (this.getRule()) {
+                case AMANTA_ASHADHA:
+                case AMANTA_KARTIKA:
+                    HinduCalendar cal = super.variant.toAmanta().create(utcDays);
+                    if (cal.getMonth().getValue().getValue() < super.variant.getFirstMonthOfYear()) {
+                        cal =
+                            new HinduCalendar(
+                                super.variant,
+                                cal.getExpiredYearOfKaliYuga() - 1,
+                                cal.getMonth(),
+                                cal.getDayOfMonth(),
+                                utcDays
+                            );
+                    }
+                    return cal;
+            }
             return null;
         }
 
         @Override
         HinduCalendar create(int kyYear, HinduMonth month, HinduDay dom) {
+            switch (this.getRule()) {
+                case AMANTA_ASHADHA:
+                case AMANTA_KARTIKA:
+                    if (month.getValue().getValue() < super.variant.getFirstMonthOfYear()) {
+                        kyYear++;
+                    }
+                    return super.variant.toAmanta().create(kyYear, month, dom);
+            }
             return null;
         }
 
         @Override
         boolean isValid(int kyYear, HinduMonth month, HinduDay dom) {
+            switch (this.getRule()) {
+                case AMANTA_ASHADHA:
+                case AMANTA_KARTIKA:
+                    if (month.getValue().getValue() < super.variant.getFirstMonthOfYear()) {
+                        kyYear++;
+                    }
+                    return super.variant.toAmanta().isValid(kyYear, month, dom);
+            }
             return false;
         }
 
@@ -675,6 +760,10 @@ public final class HinduVariant
         @Override
         public long getMaximumSinceUTC() {
             return 0;
+        }
+
+        private HinduRule getRule() {
+            return super.variant.getRule();
         }
 
     }

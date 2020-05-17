@@ -245,6 +245,8 @@ public final class HinduCalendar
         ENGINE = builder.build();
     }
 
+    private static final long serialVersionUID = 4078031838043675524L;
+
     //~ Instanzvariablen --------------------------------------------------
 
     private transient final HinduVariant variant;
@@ -612,7 +614,7 @@ public final class HinduCalendar
     @Override
     public String toString() {
         StringBuilder sb = new StringBuilder();
-        sb.append("[hindu-");
+        sb.append('[');
         sb.append(this.variant);
         sb.append(",kali-yuga-year=");
         sb.append(this.kyYear);
@@ -679,8 +681,11 @@ public final class HinduCalendar
         return this.kyYear;
     }
 
-    private HinduCalendar withNewYear() { // TODO: ashadha / kartika as begin of year???
-        HinduMonth first = (this.variant.isSolar() ? HinduMonth.ofSolar(1) : HinduMonth.ofLunisolar(1));
+    private HinduCalendar withNewYear() {
+        HinduMonth first = (
+            this.variant.isSolar()
+                ? HinduMonth.ofSolar(1)
+                : HinduMonth.ofLunisolar(this.variant.getFirstMonthOfYear()));
         HinduCS calsys = this.variant.getCalendarSystem();
         int midOfMonth = this.variant.isPurnimanta() ? 1 : 15; // estimation
         HinduCalendar date = calsys.create(this.kyYear, first, HinduDay.valueOf(midOfMonth));
@@ -1160,7 +1165,7 @@ public final class HinduCalendar
 
         static final MonthElement SINGLETON = new MonthElement();
 
-        // TODO: private static final long serialVersionUID = -2978966174642315851L;
+        private static final long serialVersionUID = 7462717336727909653L;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1507,7 +1512,7 @@ public final class HinduCalendar
 
         static final DayOfMonthElement SINGLETON = new DayOfMonthElement();
 
-        // TODO: private static final long serialVersionUID = -2978966174642315851L;
+        private static final long serialVersionUID = 992340906349614332L;
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -1867,27 +1872,6 @@ public final class HinduCalendar
                 if (calsys.isValid(kyYear, month, dom)) {
                     return calsys.create(kyYear, month, dom);
                 } else {
-                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
-                }
-            } else {
-                int doy = entity.getInt(DAY_OF_YEAR);
-
-                if (doy != Integer.MIN_VALUE) {
-                    if (doy >= 1) {
-                        HinduCalendar c =
-                            calsys.create(kyYear, HinduMonth.of(IndianMonth.KARTIKA), HinduDay.valueOf(5));
-                        c = calsys.create(c.utcDays).withNewYear();
-                        long u = c.utcDays + doy - 1;
-                        c = calsys.create(u);
-
-                        if (
-                            (calsys.getMinimumSinceUTC() <= u)
-                            && (calsys.getMaximumSinceUTC() >= u)
-                            && (lenient || (c.kyYear == kyYear))
-                        ) {
-                            return c;
-                        }
-                    }
                     entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
                 }
             }
