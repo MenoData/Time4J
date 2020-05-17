@@ -1874,6 +1874,26 @@ public final class HinduCalendar
                 } else {
                     entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
                 }
+            } else {
+                int doy = entity.getInt(DAY_OF_YEAR);
+
+                if (doy != Integer.MIN_VALUE) {
+                    if (doy >= 1) {
+                        HinduCalendar any = // choice of month ensures correct year numbering in all variants
+                            calsys.create(kyYear, HinduMonth.of(IndianMonth.AGRAHAYANA), HinduDay.valueOf(1));
+                        long u = calsys.create(any.utcDays).withNewYear().utcDays + doy - 1;
+                        HinduCalendar c = calsys.create(u);
+
+                        if (
+                            (calsys.getMinimumSinceUTC() <= u)
+                            && (calsys.getMaximumSinceUTC() >= u)
+                            && (lenient || (c.kyYear == kyYear))
+                        ) {
+                            return c;
+                        }
+                    }
+                    entity.with(ValidationElement.ERROR_MESSAGE, "Invalid Hindu date.");
+                }
             }
 
             return null;
