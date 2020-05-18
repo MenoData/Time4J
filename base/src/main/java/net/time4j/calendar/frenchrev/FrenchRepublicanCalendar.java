@@ -1275,20 +1275,7 @@ public final class FrenchRepublicanCalendar
 
     }
 
-    /**
-     * <p>Obtains the standard week model of this calendar. </p>
-     *
-     * <p>This calendar historically starts on Sunday. </p>
-     *
-     * @return  Weekmodel
-     */
-    /*[deutsch]
-     * <p>Ermittelt das Standardwochenmodell dieses Kalenders. </p>
-     *
-     * <p>Dieser Kalender startet historisch am Sonntag. </p>
-     *
-     * @return  Weekmodel
-     */
+    // Obtains the standard week model of this calendar whose weeks historically start on Sunday.
     private static Weekmodel getDefaultWeekmodel() {
 
         return Weekmodel.of(Weekday.SUNDAY, 1, Weekday.SUNDAY, Weekday.SUNDAY); // historic condition
