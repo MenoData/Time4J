@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LunarTime.java) is part of project Time4J.
  *
@@ -532,12 +532,14 @@ public final class LunarTime
     /**
      * @serialData  Checks the sanity of the state.
      * @param       in                          object input stream
-     * @throws IOException                 in any case of I/O-errors
+     * @throws      IOException                 in any case of I/O-errors
+     * @throws      ClassCastException          in any case of I/O-errors
      * @throws      IllegalArgumentException    in any case of inconsistent state
      */
     private void readObject(ObjectInputStream in)
-        throws IOException {
+        throws IOException, ClassNotFoundException {
 
+        in.defaultReadObject();
         check(this.latitude, this.longitude, this.altitude, this.observerZoneID);
 
     }

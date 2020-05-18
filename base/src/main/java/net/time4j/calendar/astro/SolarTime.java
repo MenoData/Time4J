@@ -270,7 +270,7 @@ public final class SolarTime
     private final String calculator;
 
     /**
-     * @serial  zone identifier for the interpretation of calendar date input
+     * @serial  zone identifier for the interpretation of calendar date input (optional)
      * @since   3.38/4.33
      */
     private final TZID observerZoneID;
@@ -1237,11 +1237,13 @@ public final class SolarTime
      * @serialData  Checks the sanity of the state.
      * @param       in                          object input stream
      * @throws      IOException                 in any case of I/O-errors
+     * @throws      ClassCastException          in any case of I/O-errors
      * @throws      IllegalArgumentException    in any case of inconsistent state
      */
     private void readObject(ObjectInputStream in)
-        throws IOException {
+        throws IOException, ClassNotFoundException {
 
+        in.defaultReadObject();
         check(this.latitude, this.longitude, this.altitude, this.calculator);
 
     }
