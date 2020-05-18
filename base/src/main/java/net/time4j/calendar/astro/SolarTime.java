@@ -1237,7 +1237,7 @@ public final class SolarTime
      * @serialData  Checks the sanity of the state.
      * @param       in                          object input stream
      * @throws      IOException                 in any case of I/O-errors
-     * @throws      ClassCastException          in any case of I/O-errors
+     * @throws      ClassNotFoundException      in any case of I/O-errors
      * @throws      IllegalArgumentException    in any case of inconsistent state
      */
     private void readObject(ObjectInputStream in)
