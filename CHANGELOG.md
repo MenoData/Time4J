@@ -6,6 +6,7 @@
 - Make PatternType.CLDR_DATE being applicable on PlainDate [#889]
 
 ### Fixed
+- NPE in deserializing of SolarTime and LunarTime [#901]
 - Build problem: More tolerant double comparisons in astro tests [#886]
 - Incorrect sign in last term of calculation of mean lunar anomaly [#891]
 
