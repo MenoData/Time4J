@@ -44,7 +44,7 @@ package net.time4j.calendar.hindu;
  * @author  Meno Hochschild
  * @since   5.6
  */
-public enum HinduRule {
+enum HinduRule { // TODO: make public
 
     //~ Statische Felder/Initialisierungen --------------------------------
 

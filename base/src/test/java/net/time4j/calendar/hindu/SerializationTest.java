@@ -39,7 +39,7 @@ public class SerializationTest {
         roundtrip(HinduCalendar.ofOldSolar(3101, HinduMonth.of(IndianMonth.MAGHA).getRasi(), 19));
     }
 
-    private static int roundtrip(Object obj)
+    private static void roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
@@ -51,7 +51,6 @@ public class SerializationTest {
         ObjectInputStream ois = new ObjectInputStream(bais);
         assertThat(ois.readObject(), is(obj));
         ois.close();
-        return data.length;
     }
 
 }

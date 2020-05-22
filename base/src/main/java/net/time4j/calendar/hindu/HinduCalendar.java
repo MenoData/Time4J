@@ -66,7 +66,6 @@ import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextAccessor;
-import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.format.internal.DualFormatElement;
 import net.time4j.tz.TZID;
@@ -84,10 +83,11 @@ import java.util.concurrent.ConcurrentHashMap;
 
 
 /**
- * <p>The traditional Hindu calendar which exists in many regional variants. </p>
+ * <p>The traditional Hindu calendar which exists in many regional variants throughout the Indian
+ * subcontinent. </p>
  *
- * <p>Following elements which are declared as constants are registered by
- * this class: </p>
+ * <p>This version actually supports the {@link AryaSiddhanta old Hindu calendar} only. Following elements
+ * which are declared as constants are registered by this class: </p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -101,14 +101,20 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@code CommonElements.RELATED_GREGORIAN_YEAR}
  * are supported. </p>
  *
+ * <p>A date arithmetic using units beyond the class {@link net.time4j.engine.CalendarDays} is not offered.
+ * But there are methods like {@code previousMonth()} or {@code nextYear()}. About years, user can also use
+ * expressions like {@code with(YEAR_OF_ERA, getYear() + amount)}. </p>
+ *
  * @author  Meno Hochschild
  * @since   5.6
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
- * <p>Der traditionelle Hindukalender, der in vielen verschiedenen regionalen Varianten existiert. </p>
+ * <p>Der traditionelle Hindukalender, der in vielen verschiedenen regionalen Varianten auf dem indischen
+ * Subkontinent existiert. </p>
  *
- * <p>Folgende als Konstanten deklarierte Elemente werden von dieser Klasse registriert: </p>
+ * <p>Aktuell wird nur der {@link AryaSiddhanta alte Hindukalender} unterst&uuml;tzt. Folgende als Konstanten
+ * deklarierte Elemente werden von dieser Klasse registriert: </p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -121,6 +127,10 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@code CommonElements.RELATED_GREGORIAN_YEAR}
  * unterst&uuml;tzt. </p>
+ *
+ * <p>Eine Datumsarithmetik mittels Zeiteinheiten wird au&szlig;er der Klasse {@link net.time4j.engine.CalendarDays}
+ * nicht angeboten. Aber es gibt Methoden wie {@code previousMonth()} oder {@code nextYear()}. Was Jahre angeht,
+ * k&ouml;nnen Anwender auch Ausdr&uuml;cke wie {@code with(YEAR_OF_ERA, getYear() + amount)} verwenden. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
@@ -786,8 +796,27 @@ public final class HinduCalendar
      * @throws  IllegalArgumentException if the adjusted date is out of range
      */
     public HinduCalendar previousMonth() {
-        HinduCalendar cal = this.withMidOfMonth(-1);
-        return cal.withAdjustedDayInMonth(this.dayOfMonth);
+        HinduCalendar cal = this.withMidOfMonth(-1).withAdjustedDayInMonth(this.dayOfMonth);
+        if (cal.utcDays < this.variant.getCalendarSystem().getMinimumSinceUTC()) {
+            throw new IllegalArgumentException("Hindu date out of range");
+        }
+        return cal;
+    }
+
+    /**
+     * <p>Obtains the corresponding date of previous year. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    /*[deutsch]
+     * <p>Liefert das entsprechende Datum des vorherigen Jahres. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    public HinduCalendar previousYear() {
+        return this.withYearChangedBy(-1);
     }
 
     /**
@@ -819,8 +848,27 @@ public final class HinduCalendar
      * @throws  IllegalArgumentException if the adjusted date is out of range
      */
     public HinduCalendar nextMonth() {
-        HinduCalendar cal = this.withMidOfMonth(1);
-        return cal.withAdjustedDayInMonth(this.dayOfMonth);
+        HinduCalendar cal = this.withMidOfMonth(1).withAdjustedDayInMonth(this.dayOfMonth);
+        if (cal.utcDays > this.variant.getCalendarSystem().getMaximumSinceUTC()) {
+            throw new IllegalArgumentException("Hindu date out of range");
+        }
+        return cal;
+    }
+
+    /**
+     * <p>Obtains the corresponding date of next year. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    /*[deutsch]
+     * <p>Liefert das entsprechende Datum des n&auml;chsten Jahres. </p>
+     *
+     * @return  HinduCalendar
+     * @throws  IllegalArgumentException if the adjusted date is out of range
+     */
+    public HinduCalendar nextYear() {
+        return this.withYearChangedBy(1);
     }
 
     /**
@@ -1013,6 +1061,10 @@ public final class HinduCalendar
 
         long utc = this.utcDays + monthUnits * 30 + 15 - dom;
         return this.variant.getCalendarSystem().create(utc);
+    }
+
+    private HinduCalendar withYearChangedBy(int increment) {
+        return this.with(HinduCalendar.YEAR_OF_ERA, this.getYear() + increment);
     }
 
     private HinduCalendar withAdjustedDayInMonth(HinduDay desired) {

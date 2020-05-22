@@ -352,11 +352,42 @@ public class HinduElementTest {
     }
 
     @Test
+    public void withLastDayOfMonth() {
+        HinduCalendar cal = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA).withLeap(), 1);
+        HinduCalendar expected = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA).withLeap(), 30);
+        assertThat(cal.with(HinduCalendar.DAY_OF_MONTH.maximized()), is(expected));
+    }
+
+    @Test
     public void withNewYear() {
         HinduCalendar cal = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA), 2);
         HinduCalendar expected = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA).withLeap(), 1);
         assertThat(cal.with(HinduCalendar.DAY_OF_YEAR.minimized()), is(expected));
         assertThat(cal.with(HinduCalendar.DAY_OF_YEAR, 1), is(expected));
+    }
+
+    @Test
+    public void previousYear() {
+        HinduCalendar cal = HinduCalendar.ofOldLunar(1, HinduMonth.of(IndianMonth.CHAITRA), 15);
+        HinduCalendar expected = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA), 15);
+        assertThat(cal.previousYear(), is(expected));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void previousYearOutOfRange() {
+        HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA), 15).previousYear();
+    }
+
+    @Test
+    public void nextYear() {
+        HinduCalendar cal = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA).withLeap(), 14);
+        HinduCalendar expected = HinduCalendar.ofOldLunar(1, HinduMonth.of(IndianMonth.CHAITRA), 14);
+        assertThat(cal.nextYear(), is(expected));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void nextYearOutOfRange() {
+        HinduCalendar.ofOldLunar(5999, HinduMonth.of(IndianMonth.CHAITRA), 15).nextYear();
     }
 
     @Test
@@ -366,11 +397,21 @@ public class HinduElementTest {
         assertThat(cal.previousMonth(), is(expected));
     }
 
+    @Test(expected=IllegalArgumentException.class)
+    public void previousMonthOutOfRange() {
+        HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA).withLeap(), 15).previousMonth();
+    }
+
     @Test
     public void nextMonth() {
         HinduCalendar cal = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA).withLeap(), 14);
         HinduCalendar expected = HinduCalendar.ofOldLunar(0, HinduMonth.of(IndianMonth.CHAITRA), 14);
         assertThat(cal.nextMonth(), is(expected));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void nextMonthOutOfRange() {
+        HinduCalendar.ofOldLunar(5999, HinduMonth.of(IndianMonth.PHALGUNA), 15).nextMonth();
     }
 
     @Test
