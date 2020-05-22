@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarDays.java) is part of project Time4J.
  *
@@ -28,6 +28,10 @@ import java.io.Serializable;
  * <p>Represents a count of calendar days. </p>
  *
  * @author  Meno Hochschild
+ * @see     Calendrical#plus(CalendarDays)
+ * @see     Calendrical#minus(CalendarDays)
+ * @see     CalendarVariant#plus(CalendarDays)
+ * @see     CalendarVariant#minus(CalendarDays)
  * @since   3.4/4.3
  * @doctags.concurrency {immutable}
  */
@@ -35,6 +39,10 @@ import java.io.Serializable;
  * <p>Repr&auml;sentiert eine Anzahl von Kalendertagen. </p>
  *
  * @author  Meno Hochschild
+ * @see     Calendrical#plus(CalendarDays)
+ * @see     Calendrical#minus(CalendarDays)
+ * @see     CalendarVariant#plus(CalendarDays)
+ * @see     CalendarVariant#minus(CalendarDays)
  * @since   3.4/4.3
  * @doctags.concurrency {immutable}
  */

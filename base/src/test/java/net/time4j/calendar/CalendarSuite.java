@@ -2,6 +2,7 @@ package net.time4j.calendar;
 
 import net.time4j.calendar.astro.AstroSuite;
 import net.time4j.calendar.frenchrev.FrenchRepublicanSuite;
+import net.time4j.calendar.hindu.HinduSuite;
 import org.junit.runner.RunWith;
 import org.junit.runners.Suite;
 import org.junit.runners.Suite.SuiteClasses;
@@ -39,6 +40,7 @@ import org.junit.runners.Suite.SuiteClasses;
         HijriPatternTest.class,
         HijriUnitTest.class,
         HijriYearTest.class,
+        HinduSuite.class,
         HistoricCalendarTest.class,
         HongkongObservatory1Test.class,
         HongkongObservatory2Test.class,
