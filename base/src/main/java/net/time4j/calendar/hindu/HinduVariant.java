@@ -136,7 +136,7 @@ public final class HinduVariant
      * @throws  IllegalArgumentException if given argument cannot be parsed
      * @see     #getVariant()
      * @see     HinduRule#variant()
-     * @see     AryaSiddhanta#getVariant()
+     * @see     AryaSiddhanta#variant()
      */
     /*[deutsch]
      * <p>Interpretiert den angegebenen Varianttext. </p>
@@ -148,11 +148,16 @@ public final class HinduVariant
      * @throws  IllegalArgumentException if given argument cannot be parsed
      * @see     #getVariant()
      * @see     HinduRule#variant()
-     * @see     AryaSiddhanta#getVariant()
+     * @see     AryaSiddhanta#variant()
      */
     public static HinduVariant from(String variant) {
         if (variant.startsWith(AryaSiddhanta.PREFIX)) {
-            return new HinduVariant(AryaSiddhanta.valueOf(variant.substring(AryaSiddhanta.PREFIX.length())));
+            try {
+                AryaSiddhanta aryaSiddhanta = AryaSiddhanta.valueOf(variant.substring(AryaSiddhanta.PREFIX.length()));
+                return (aryaSiddhanta == AryaSiddhanta.SOLAR) ? VAR_OLD_SOLAR : VAR_OLD_LUNAR;
+            } catch (IndexOutOfBoundsException ex) {
+                throw new IllegalArgumentException("Invalid variant: " + variant, ex);
+            }
         }
 
         StringTokenizer st = new StringTokenizer(variant, "|");
@@ -437,7 +442,7 @@ public final class HinduVariant
     public String getVariant() {
         if (this.isOld()) {
             AryaSiddhanta old = ((this.type == TYPE_OLD_SOLAR) ? AryaSiddhanta.SOLAR : AryaSiddhanta.LUNAR);
-            return old.getVariant();
+            return AryaSiddhanta.PREFIX + old.name();
         }
 
         StringBuilder sb = new StringBuilder();
@@ -465,11 +470,15 @@ public final class HinduVariant
     /**
      * <p>Creates a copy of this variant with given preferred era. </p>
      *
+     * <p>Note: The old Hindu calendar is not customizable. </p>
+     *
      * @param   defaultEra  the new deviating era
      * @return  modified copy or this variant if the era does not change
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Variante mit der angegebenen bevorzugten &Auml;ra. </p>
+     *
+     * <p>Hinweis: Der alte Hindu-Kalender erlaubt keine Anpassung. </p>
      *
      * @param   defaultEra  the new deviating era
      * @return  modified copy or this variant if the era does not change
@@ -511,7 +520,7 @@ public final class HinduVariant
     /**
      * <p>Creates a copy of this variant with current years. </p>
      *
-     * <p>Note: Elapsed years count one less than current years.</p>
+     * <p>Note: Elapsed years count one less than current years. The old Hindu calendar is not customizable. </p>
      *
      * @return  modified copy or this variant if the elapsed year mode does not change
      * @see     #withElapsedYears()
@@ -520,7 +529,8 @@ public final class HinduVariant
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Variante mit laufenden Jahren. </p>
      *
-     * <p>Hinweis: Abgelaufene Jahre z&auml;hlen eins weniger als laufende Jahre. </p>
+     * <p>Hinweis: Abgelaufene Jahre z&auml;hlen eins weniger als laufende Jahre. Der alte Hindu-Kalender
+     * erlaubt keine Anpassung. </p>
      *
      * @return  modified copy or this variant if the elapsed year mode does not change
      * @see     #withElapsedYears()
@@ -537,11 +547,15 @@ public final class HinduVariant
     /**
      * <p>Creates a copy of this variant with an alternative internal calculation for the sunrise. </p>
      *
+     * <p>Note: The old Hindu calendar is not customizable. </p>
+     *
      * @return  modified copy or this variant if the alternative calculation mode was already set
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen internen Berechnung f&uuml;r
      * den Sonnenaufgang. </p>
+     *
+     * <p>Hinweis: Der alte Hindu-Kalender erlaubt keine Anpassung. </p>
      *
      * @return  modified copy or this variant if the alternative calculation mode was already set
      */
@@ -558,6 +572,8 @@ public final class HinduVariant
      *
      * <p>By default, the location of the Holy City Ujjain is used. </p>
      *
+     * <p>Note: The old Hindu calendar is not customizable. </p>
+     *
      * @param   location    alternative geographical location
      * @return  modified copy or this variant if the location does not change
      */
@@ -565,6 +581,8 @@ public final class HinduVariant
      * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen geographischen Bezugsangabe. </p>
      *
      * <p>Standardm&auml;&szlig;ig wird der Ort der heiligen Stadt Ujjain verwendet. </p>
+     *
+     * <p>Hinweis: Der alte Hindu-Kalender erlaubt keine Anpassung. </p>
      *
      * @param   location    alternative geographical location
      * @return  modified copy or this variant if the location does not change

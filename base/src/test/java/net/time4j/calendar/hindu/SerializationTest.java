@@ -21,8 +21,8 @@ public class SerializationTest {
 
     @Test
     public void serializeVariants() throws IOException, ClassNotFoundException {
-        roundtrip(HinduVariant.VAR_OLD_SOLAR);
-        roundtrip(HinduVariant.VAR_OLD_LUNAR);
+        roundtrip(AryaSiddhanta.SOLAR.variant());
+        roundtrip(AryaSiddhanta.LUNAR.variant());
 
         for (HinduRule rule : HinduRule.values()) {
             roundtrip(rule.variant());

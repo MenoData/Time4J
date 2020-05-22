@@ -23,7 +23,6 @@ package net.time4j.calendar.hindu;
 
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.EpochDays;
-import net.time4j.engine.VariantSource;
 
 import java.util.Collections;
 import java.util.List;
@@ -47,8 +46,7 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   5.6
  */
-public enum AryaSiddhanta
-    implements VariantSource {
+public enum AryaSiddhanta {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -87,9 +85,18 @@ public enum AryaSiddhanta
 
     //~ Methoden ----------------------------------------------------------
 
-    @Override
-    public String getVariant() {
-        return PREFIX + this.name();
+    /**
+     * <p>Obtains the associated non-customizable variant of Hindu calendar. </p>
+     *
+     * @return  HinduVariant
+     */
+    /*[deutsch]
+     * <p>Liefert die hiermit verkn&uuml;pfte nicht anpassbare Variante des Hindu-Kalenders. </p>
+     *
+     * @return  HinduVariant
+     */
+    public HinduVariant variant() {
+        return (this == SOLAR) ? HinduVariant.VAR_OLD_SOLAR : HinduVariant.VAR_OLD_LUNAR;
     }
 
     /**

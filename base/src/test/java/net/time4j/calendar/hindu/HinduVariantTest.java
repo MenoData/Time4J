@@ -1,7 +1,5 @@
 package net.time4j.calendar.hindu;
 
-import com.sun.scenario.effect.impl.sw.sse.SSEBlend_SRC_OUTPeer;
-import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.SolarTime;
@@ -40,10 +38,10 @@ public class HinduVariantTest {
             }
         }
         assertThat(
-            HinduVariant.VAR_OLD_SOLAR.isSolar(),
+            AryaSiddhanta.SOLAR.variant().isSolar(),
             is(true));
         assertThat(
-            HinduVariant.VAR_OLD_LUNAR.isSolar(),
+            AryaSiddhanta.LUNAR.variant().isSolar(),
             is(false));
     }
 
@@ -65,10 +63,10 @@ public class HinduVariantTest {
             HinduRule.PURNIMANTA.variant().isLunisolar(),
             is(true));
         assertThat(
-            HinduVariant.VAR_OLD_SOLAR.isLunisolar(),
+            AryaSiddhanta.SOLAR.variant().isLunisolar(),
             is(false));
         assertThat(
-            HinduVariant.VAR_OLD_LUNAR.isLunisolar(),
+            AryaSiddhanta.LUNAR.variant().isLunisolar(),
             is(true));
     }
 
@@ -90,10 +88,10 @@ public class HinduVariantTest {
             HinduRule.PURNIMANTA.variant().isAmanta(),
             is(false));
         assertThat(
-            HinduVariant.VAR_OLD_SOLAR.isAmanta(),
+            AryaSiddhanta.SOLAR.variant().isAmanta(),
             is(false));
         assertThat(
-            HinduVariant.VAR_OLD_LUNAR.isAmanta(),
+            AryaSiddhanta.LUNAR.variant().isAmanta(),
             is(true));
     }
 
@@ -115,10 +113,10 @@ public class HinduVariantTest {
             HinduRule.PURNIMANTA.variant().isPurnimanta(),
             is(true));
         assertThat(
-            HinduVariant.VAR_OLD_SOLAR.isPurnimanta(),
+            AryaSiddhanta.SOLAR.variant().isPurnimanta(),
             is(false));
         assertThat(
-            HinduVariant.VAR_OLD_LUNAR.isPurnimanta(),
+            AryaSiddhanta.LUNAR.variant().isPurnimanta(),
             is(false));
     }
 
@@ -140,10 +138,10 @@ public class HinduVariantTest {
             HinduRule.PURNIMANTA.variant().isOld(),
             is(false));
         assertThat(
-            HinduVariant.VAR_OLD_SOLAR.isOld(),
+            AryaSiddhanta.SOLAR.variant().isOld(),
             is(true));
         assertThat(
-            HinduVariant.VAR_OLD_LUNAR.isOld(),
+            AryaSiddhanta.LUNAR.variant().isOld(),
             is(true));
     }
 
@@ -171,7 +169,7 @@ public class HinduVariantTest {
             HinduRule.MALAYALI.variant().isUsingElapsedYears(),
             is(false));
         assertThat(
-            HinduVariant.VAR_OLD_SOLAR.isUsingElapsedYears(),
+            AryaSiddhanta.SOLAR.variant().isUsingElapsedYears(),
             is(true));
     }
 
@@ -195,8 +193,8 @@ public class HinduVariantTest {
         HinduVariant v4 = HinduRule.PURNIMANTA.variant().with(HinduEra.KALI_YUGA);
         HinduVariant v5 = HinduRule.AMANTA_ASHADHA.variant();
         HinduVariant v6 = HinduRule.AMANTA_KARTIKA.variant();
-        HinduVariant v7 = HinduVariant.VAR_OLD_SOLAR;
-        HinduVariant v8 = HinduVariant.VAR_OLD_LUNAR;
+        HinduVariant v7 = AryaSiddhanta.SOLAR.variant();
+        HinduVariant v8 = AryaSiddhanta.LUNAR.variant();
         HinduVariant v9 = HinduRule.MALAYALI.variant().withAlternativeHinduSunrise();
         HinduVariant v10 = HinduRule.MALAYALI.variant().withAlternativeLocation(SolarTime.ofMecca());
         assertThat(
@@ -233,7 +231,7 @@ public class HinduVariantTest {
 
     @Test
     public void oldSolarCS() {
-        HinduVariant hv = HinduVariant.VAR_OLD_SOLAR;
+        HinduVariant hv = AryaSiddhanta.SOLAR.variant();
         CalendarSystem<HinduCalendar> cs = hv.getCalendarSystem();
         HinduCalendar cal = cs.transform(EpochDays.UTC.transform(0, EpochDays.RATA_DIE));
 
@@ -265,7 +263,7 @@ public class HinduVariantTest {
 
     @Test
     public void oldLunarCS() {
-        HinduVariant hv = HinduVariant.VAR_OLD_LUNAR;
+        HinduVariant hv = AryaSiddhanta.LUNAR.variant();
         CalendarSystem<HinduCalendar> cs = hv.getCalendarSystem();
         HinduCalendar cal = cs.transform(EpochDays.UTC.transform(0, EpochDays.RATA_DIE));
 
@@ -295,7 +293,7 @@ public class HinduVariantTest {
 
     @Test
     public void oldLunarInvalid() {
-        HinduCS cs = HinduVariant.VAR_OLD_LUNAR.getCalendarSystem();
+        HinduCS cs = AryaSiddhanta.LUNAR.variant().getCalendarSystem();
         HinduMonth m = HinduMonth.ofLunisolar(1).withLeap();
         assertThat(
             cs.isValid(0, m, HinduDay.valueOf(14)),
