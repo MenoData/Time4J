@@ -1381,6 +1381,41 @@ public final class HijriCalendar
     }
 
     /**
+     * <p>Registers a regional variant of the Hijri calendar. </p>
+     *
+     * <p>Repeated calls with the same variant will effectively update the existing registered variant. </p>
+     *
+     * @param   hijriData   interface for regional Hijri variant
+     * @throws  IllegalStateException if the initialization of Hijri data fails
+     * @throws  IllegalArgumentException if the data are wrong
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Registriert eine regionale Variante des Hijri-Kalenders. </p>
+     *
+     * <p>Wiederholte Aufrufe dieser Methode mit derselben Variante werden effektiv die vorhandene
+     * registrierte Variante aktualisieren. </p>
+     *
+     * @param   hijriData   interface for regional Hijri variant
+     * @throws  IllegalStateException if the initialization of Hijri data fails
+     * @throws  IllegalArgumentException if the data are wrong
+     * @since   5.6
+     */
+    public static void register(HijriData hijriData) {
+
+        String variant = "islamic-" + hijriData.name(); // with NPE-check
+        hijriData.prepare();
+
+        try {
+            EraYearMonthDaySystem<HijriCalendar> calsys = new AstronomicalHijriData(hijriData);
+            CALSYS.put(variant, calsys);
+        } catch (RuntimeException re) {
+            throw new IllegalArgumentException("Invalid Hijri data.", re);
+        }
+
+    }
+
+    /**
      * <p>Determines the data version of given variant. </p>
      *
      * <p>This method serves for data analysis only. </p>

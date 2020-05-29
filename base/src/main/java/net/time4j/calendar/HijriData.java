@@ -49,13 +49,14 @@ public interface HijriData {
     //~ Methoden ----------------------------------------------------------
 
     /**
-     * <p>Initialized the data. </p>
+     * <p>Initializes the data. </p>
      *
      * <p>This method will be called by Time4J every time when the data have to be registered.
      * A typical implementation might read a SQL database and load an internal array cache
      * in order to avoid excessive calls of database. </p>
      *
      * @throws  IllegalStateException if the initialization fails
+     * @see     HijriCalendar#register(HijriData)
      */
     /*[deutsch]
      * <p>Initialisiert die Daten. </p>
@@ -65,6 +66,7 @@ public interface HijriData {
      * f&uuml;llen, um wiederholte Datenbankzugriffe zu vermeiden. </p>
      *
      * @throws  IllegalStateException if the initialization fails
+     * @see     HijriCalendar#register(HijriData)
      */
     void prepare();
 
@@ -75,7 +77,7 @@ public interface HijriData {
      * For example: The calendar of Saudi-Arabia with the name &quot;umalqura&quot; has the
      * calendar type and full variant name &quot;islamic-umalqura&quot;. </p>
      *
-     * @return  String
+     * @return  String which must not start with prefix &quot;islamic&quot;
      */
     /*[deutsch]
      * <p>Liefert den Namen der verkn&uuml;pften Hijri-Kalendervariante. </p>
@@ -85,7 +87,7 @@ public interface HijriData {
      * von Saudi-Arabien mit dem Namen &quot;umalqura&quot; den Kalendertyp und vollen Variantennamen
      * &quot;islamic-umalqura&quot;. </p>
      *
-     * @return  String
+     * @return  String which must not start with prefix &quot;islamic&quot;
      */
     String name();
 
@@ -146,16 +148,24 @@ public interface HijriData {
     /**
      * <p>Obtains the length of given month in days. </p>
      *
-     * @param   hijriYear   the Hijri year which contains the month in question
-     * @param   hijriMonth  the Hijri month in the range 1-12
-     * @return  length of month (usually 29 or 30)
-     */
-    /*[deutsch]
-     * <p>Liefert die L&auml;nge des angegebenen Monats in Tagen. </p>
+     * <p>The {@code hijriYear}-parameter is always in the range {@code minimumYear()}-{@code maximumYear()}. </p>
      *
      * @param   hijriYear   the Hijri year which contains the month in question
      * @param   hijriMonth  the Hijri month in the range 1-12
      * @return  length of month (usually 29 or 30)
+     * @see     #minimumYear()
+     * @see     #maximumYear()
+     */
+    /*[deutsch]
+     * <p>Liefert die L&auml;nge des angegebenen Monats in Tagen. </p>
+     *
+     * <p>Der {@code hijriYear}-Parameter ist immer im Bereich {@code minimumYear()}-{@code maximumYear()}. </p>
+     *
+     * @param   hijriYear   the Hijri year which contains the month in question
+     * @param   hijriMonth  the Hijri month in the range 1-12
+     * @return  length of month (usually 29 or 30)
+     * @see     #minimumYear()
+     * @see     #maximumYear()
      */
     int lengthOfMonth(
         int hijriYear,
