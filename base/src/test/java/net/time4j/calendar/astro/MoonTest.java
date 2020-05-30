@@ -284,6 +284,7 @@ public class MoonTest {
                 .easternLongitude(114, 57, 39.24)
                 .atAltitude(46)
                 .build();
+        assertThat(lunarTime.getObserverZoneID().canonical(), is("Australia/Perth"));
         LunarTime.Moonlight moonlight = lunarTime.on(PlainDate.of(2016, 7, 4));
         assertThat(moonlight.moonrise().get(),
             is(PlainTimestamp.of(2016, 7, 4, 6, 25, 10).in(tz)));

@@ -1219,6 +1219,8 @@ public final class SolarTime
             throw new IllegalArgumentException("Degrees out of range -90.0 <= latitude <= +90.0: " + latitude);
         } else if ((Double.compare(longitude, 180.0) >= 0) || (Double.compare(longitude, -180.0) < 0)) {
             throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
+        } else if (!Double.isFinite(altitude)) {
+            throw new IllegalArgumentException("Altitude must be finite: " + altitude);
         } else if ((altitude < 0) || (altitude >= 11_000)) {
             throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
         } else if (calculator.isEmpty()) {

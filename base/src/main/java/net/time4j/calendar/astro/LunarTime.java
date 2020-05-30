@@ -163,6 +163,10 @@ public final class LunarTime
      */
     public static LunarTime.Builder ofLocation(TZID observerZoneID) {
 
+        if (observerZoneID == null) {
+            throw new NullPointerException("Missing observer timezone.");
+        }
+
         return new Builder(observerZoneID);
 
     }
@@ -260,6 +264,27 @@ public final class LunarTime
     public int getAltitude() {
 
         return this.altitude;
+
+    }
+
+    /**
+     * <p>Obtains the observer timezone which is associated with any calendar date input. </p>
+     *
+     * @return  zone identifier associated with this geographical position
+     * @see     #ofLocation(TZID)
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Liefert die Beobachterzeitzone, die mit einer beliebigen Kalenderdatumseingabe
+     * verkn&uuml;pft ist. </p>
+     *
+     * @return  zone identifier associated with this geographical position
+     * @see     #ofLocation(TZID)
+     * @since   5.6
+     */
+    public TZID getObserverZoneID() {
+
+        return this.observerZoneID;
 
     }
 
@@ -521,6 +546,8 @@ public final class LunarTime
             throw new IllegalArgumentException("Degrees out of range -90.0 <= latitude <= +90.0: " + latitude);
         } else if ((Double.compare(longitude, 180.0) >= 0) || (Double.compare(longitude, -180.0) < 0)) {
             throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
+        } else if (!Double.isFinite(altitude)) {
+            throw new IllegalArgumentException("Altitude must be finite: " + altitude);
         } else if ((altitude < 0) || (altitude >= 11_000)) {
             throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
         } else {
@@ -740,12 +767,11 @@ public final class LunarTime
          * <p>The altitude is used to model a geodetic correction as well as a refraction correction based
          * on the simple assumption of a standard atmosphere. Users should keep in mind that the local
          * topology with mountains breaking the horizon line and special weather conditions cannot be taken
-         * into account. </p>
-         *
-         * <p>Attention: Users should also apply an algorithm which is capable of altitude corrections. </p>
+         * into account. If this method is not called then a default altitude of zero is assumed. </p>
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is not finite or out of range
          */
         /*[deutsch]
          * <p>Setzt die H&ouml;he in Metern. </p>
@@ -754,17 +780,17 @@ public final class LunarTime
          * Korrektur der atmosph&auml;rischen Lichtbeugung basierend auf der einfachen Annahme einer
          * Standardatmosph&auml;re. Anwender m&uuml;ssen im Auge behalten, da&szlig; die lokale Topologie
          * mit Bergen, die die Horizontlinie unterbrechen und spezielle Wetterbedingungen nicht berechenbar
-         * sind. </p>
-         *
-         * <p>Achtung: Anwender sollten auch einen Algorithmus w&auml;hlen, der in der Lage ist,
-         * H&ouml;henkorrekturen vorzunehmen. </p>
+         * sind. Wenn diese Methode nicht aufgerufen wird, wird eine H&ouml;he von 0 Metern angenommen. </p>
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is not finite or out of range
          */
         public Builder atAltitude(int altitude) {
 
-            if ((altitude < 0) || (altitude >= 11_000)) {
+            if (!Double.isFinite(altitude)) {
+                throw new IllegalArgumentException("Altitude must be finite: " + altitude);
+            } else if ((altitude < 0) || (altitude >= 11_000)) {
                 throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
             }
 
@@ -778,12 +804,14 @@ public final class LunarTime
          *
          * @return  new configured instance of {@code LunarTime}
          * @throws  IllegalStateException if either latitude or longitude have not yet been set
+         * @throws  IllegalArgumentException if the observer timezone cannot be loaded
          */
         /*[deutsch]
          * <p>Schlie&szlig;t den Erzeugungs- und Konfigurationsprozess ab. </p>
          *
          * @return  new configured instance of {@code LunarTime}
          * @throws  IllegalStateException if either latitude or longitude have not yet been set
+         * @throws  IllegalArgumentException if the observer timezone cannot be loaded
          */
         public LunarTime build() {
 
