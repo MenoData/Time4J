@@ -1,6 +1,7 @@
 ## [v5.6] not yet released
 ### Added
 - Old Hindu calendar [#892]
+- Local variant data for Hijri calendar [#888]
 - Support for Duration.in(Collection<? extends Unit>) [#899]
 - Support for Swiss German (Schwyzerdütsch) [#895]
 - Let TimeSource deliver current Instant [#884]
