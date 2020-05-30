@@ -128,12 +128,20 @@ public class DatelineBorderTest {
     }
 
     @Test
-    public void invalidDaySamoa() {
+    public void invalidDaySamoa1() {
         TZID timezone = Timezone.of("Pacific/Apia").getID();
         assertThat(
             PlainDate.of(2011, Month.DECEMBER, 30).atTime(12, 0)
                 .isValid(timezone),
             is(false));
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void invalidDaySamoa2() {
+        PlainDate
+            .of(2011, Month.DECEMBER, 30) // date was completely skipped
+            .atTime(12, 0)
+            .in(Timezone.of("Pacific/Apia").with(GapResolver.ABORT.and(OverlapResolver.EARLIER_OFFSET)));
     }
 
     @Test
