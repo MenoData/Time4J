@@ -432,6 +432,7 @@ public final class HijriCalendar
      * <p>The supported range of islamic years is 1-1600. </p>
      *
      * @since   3.6/4.4
+     * @deprecated  scheduled for future removal, as workaround, users might directly use ICU4J
      */
     /*[deutsch]
      * Der Name der astronomischen ICU4J-Variante.
@@ -439,7 +440,9 @@ public final class HijriCalendar
      * <p>Der unterst&uuml;tze Wertebereich der islamischen Jahre ist 1-1600. </p>
      *
      * @since   3.6/4.4
+     * @deprecated  scheduled for future removal, as workaround, users might directly use ICU4J
      */
+    @Deprecated
     public static final String VARIANT_ICU4J = "islamic-icu4j";
 
     /**
