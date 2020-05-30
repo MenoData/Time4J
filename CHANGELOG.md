@@ -2,7 +2,7 @@
 ### Added
 - Old Hindu calendar [#892]
 - Local variant data for Hijri calendar [#888]
-- Getter for observer zone id in `SolarTime` [#904]
+- Getter for observer zone id in `SolarTime` and `LunarTime` [#904]
 - Support for Duration.in(Collection<? extends Unit>) [#899]
 - Support for Swiss German (Schwyzerdütsch) [#895]
 - Let TimeSource deliver current Instant [#884]
