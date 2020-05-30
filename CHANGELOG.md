@@ -7,6 +7,9 @@
 - Let TimeSource deliver current Instant [#884]
 - Make PatternType.CLDR_DATE being applicable on PlainDate [#889]
 
+### Deprecated
+- `HijriCalendar.VARIANT_ICU4J` scheduled for future removal [#905]
+
 ### Fixed
 - NPE in deserializing of SolarTime and LunarTime [#901]
 - Build problem: More tolerant double comparisons in astro tests [#886]
