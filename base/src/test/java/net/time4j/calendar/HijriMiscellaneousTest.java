@@ -48,17 +48,6 @@ public class HijriMiscellaneousTest {
     }
 
     @Test
-    public void executeICU() throws ParseException {
-        ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.ofPattern(
-                "y-MM-dd", PatternType.CLDR_DATE, Locale.ENGLISH, HijriCalendar.family())
-            .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
-        HijriCalendar hijri = formatter.parse("1-01-01");
-        PlainDate date = hijri.transform(PlainDate.class);
-        assertThat(date, is(PlainDate.of(622, 7, 18)));
-    }
-
-    @Test
     public void defaultFirstDayOfWeek() {
         assertThat(HijriCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
     }
