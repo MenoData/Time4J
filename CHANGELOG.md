@@ -1,4 +1,6 @@
-## [v5.6] not yet released
+## [v5.7] not yet released
+
+## [v5.6] published on 2020-05-31
 ### Added
 - Old Hindu calendar [#892]
 - Local variant data for Hijri calendar [#888]
