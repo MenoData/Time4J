@@ -1,4 +1,6 @@
 ## [v5.7] not yet released
+### Fixed
+- Package `net.time4j.calendar.hindu` not exported for jigsaw [#906]
 
 ## [v5.6] published on 2020-05-31
 ### Added
