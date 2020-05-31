@@ -40,16 +40,6 @@ public class HinduFormatTest {
     }
 
     @Test
-    public void printDMY() {
-        ChronoFormatter<HinduCalendar> f =
-            ChronoFormatter.ofPattern("G, d. MMMM yyyy", PatternType.CLDR, Locale.ENGLISH, HinduCalendar.family());
-        HinduCalendar cal = HinduCalendar.ofOldSolar(3101, HinduMonth.of(IndianMonth.MAGHA).getRasi(), 19);
-        assertThat(
-            f.print(cal),
-            is("K.Y, 19. Magha 3101"));
-    }
-
-    @Test
     public void parseDMY() throws ParseException {
         ChronoFormatter<HinduCalendar> f =
             ChronoFormatter.ofPattern("G, d. MMMM yyyy", PatternType.CLDR, Locale.ENGLISH, HinduCalendar.family())
