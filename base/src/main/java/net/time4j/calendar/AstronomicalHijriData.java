@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AstronomicalHijriData.java) is part of project Time4J.
  *
@@ -74,6 +74,49 @@ final class AstronomicalHijriData
     private final long[] firstOfMonth;
 
     //~ Konstruktoren -----------------------------------------------------
+
+    /**
+     * <p>Creates a new instance for given regional variant. </p>
+     *
+     * @param   hijriData   interface for regional Hijri variant
+     * @throws  RuntimeException if the data are wrong
+     * @since   5.6
+     */
+    AstronomicalHijriData(HijriData hijriData) {
+        super();
+
+        this.variant = "islamic-" + hijriData.name();
+        this.adjustment = 0;
+        this.version = hijriData.version();
+        this.minYear = hijriData.minimumYear();
+        this.maxYear = hijriData.maximumYear();
+
+        if (this.maxYear < this.minYear) {
+            throw new IllegalArgumentException("Maximum year before minimum year.");
+        } else if (hijriData.name().startsWith("islamic")) {
+            throw new IllegalArgumentException("Name must not start with \"islamic\".");
+        }
+
+        this.minUTC = hijriData.firstGregorianDate().getDaysSinceEpochUTC();
+        int n = (this.maxYear - this.minYear + 1) * 12;
+        this.lengthOfMonth = new int[n];
+        this.firstOfMonth = new long[n];
+        long days = 0;
+        int i = 0;
+
+        for (int year = this.minYear; year <= this.maxYear; year++) {
+            for (int month = 1; month <= 12; month++) {
+                int len = hijriData.lengthOfMonth(year, month);
+                this.lengthOfMonth[i] = len;
+                this.firstOfMonth[i] = this.minUTC + days;
+                days += len;
+                i++;
+            }
+        }
+
+        this.maxUTC = this.minUTC + days - 1;
+
+    }
 
     /**
      * <p>Creates a new instance for given variant loading its resource data. </p>

@@ -1,13 +1,25 @@
-## [v5.6] not yet released
+## [v5.7] not yet released
+### Fixed
+- Package `net.time4j.calendar.hindu` not exported for jigsaw [#906]
+
+## [v5.6] published on 2020-05-31
 ### Added
+- Old Hindu calendar [#892]
+- Local variant data for Hijri calendar [#888]
+- Getter for observer zone id in `SolarTime` and `LunarTime` [#904]
 - Support for Duration.in(Collection<? extends Unit>) [#899]
 - Support for Swiss German (Schwyzerdütsch) [#895]
 - Let TimeSource deliver current Instant [#884]
 - Make PatternType.CLDR_DATE being applicable on PlainDate [#889]
 
+### Deprecated
+- `HijriCalendar.VARIANT_ICU4J` scheduled for future removal [#905]
+
 ### Fixed
+- NPE in deserializing of SolarTime and LunarTime [#901]
 - Build problem: More tolerant double comparisons in astro tests [#886]
 - Incorrect sign in last term of calculation of mean lunar anomaly [#891]
+- Documentation example in SolarTime outdated [#902]
 
 ## [v5.5] published on 2019-11-04
 ### Added

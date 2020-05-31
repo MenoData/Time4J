@@ -48,17 +48,6 @@ public class HijriMiscellaneousTest {
     }
 
     @Test
-    public void executeICU() throws ParseException {
-        ChronoFormatter<HijriCalendar> formatter =
-            ChronoFormatter.ofPattern(
-                "y-MM-dd", PatternType.CLDR_DATE, Locale.ENGLISH, HijriCalendar.family())
-            .withCalendarVariant(HijriCalendar.VARIANT_ICU4J);
-        HijriCalendar hijri = formatter.parse("1-01-01");
-        PlainDate date = hijri.transform(PlainDate.class);
-        assertThat(date, is(PlainDate.of(622, 7, 18)));
-    }
-
-    @Test
     public void defaultFirstDayOfWeek() {
         assertThat(HijriCalendar.DAY_OF_WEEK.getDefaultMinimum(), is(Weekday.SUNDAY));
     }
@@ -409,5 +398,32 @@ public class HijriMiscellaneousTest {
 //        }
 //        System.out.println("Finished.");
 //    }
+
+    @Test
+    public void registerExampleData() {
+        HijriData data = new ExampleHijriData();
+        HijriCalendar.register(data);
+
+        for (int i = data.minimumYear(); i <= data.maximumYear(); i++) {
+            for (int m = 1; m <= 12; m++) {
+                HijriCalendar cal = HijriCalendar.of("islamic-" + data.name(), i, m, 1);
+                assertThat(cal.getDayOfMonth(), is(1));
+                assertThat(cal.lengthOfMonth(), is(data.lengthOfMonth(i, m)));
+            }
+        }
+
+        HijriCalendar cal1 = HijriCalendar.of("islamic-" + data.name(), 1449, 7, 1);
+        assertThat(cal1.lengthOfMonth(), is(32));
+        HijriCalendar cal2 = HijriCalendar.of("islamic-" + data.name(), 1451, 5, 1);
+        assertThat(cal2.lengthOfMonth(), is(28));
+
+        assertThat(HijriCalendar.getVersion(cal1.getVariant()), is(""));
+        assertThat(cal1.getMinimum(HijriCalendar.YEAR_OF_ERA), is(1449));
+        assertThat(cal1.getMaximum(HijriCalendar.YEAR_OF_ERA), is(1451));
+
+        assertThat(
+            cal1.with(HijriCalendar.YEAR_OF_ERA.atFloor()).transform(PlainDate.axis()),
+            is(PlainDate.of(2028, 5, 20)));
+    }
 
 }

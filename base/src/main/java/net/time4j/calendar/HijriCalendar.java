@@ -432,6 +432,7 @@ public final class HijriCalendar
      * <p>The supported range of islamic years is 1-1600. </p>
      *
      * @since   3.6/4.4
+     * @deprecated  scheduled for future removal, as workaround, users might directly use ICU4J
      */
     /*[deutsch]
      * Der Name der astronomischen ICU4J-Variante.
@@ -439,7 +440,9 @@ public final class HijriCalendar
      * <p>Der unterst&uuml;tze Wertebereich der islamischen Jahre ist 1-1600. </p>
      *
      * @since   3.6/4.4
+     * @deprecated  scheduled for future removal, as workaround, users might directly use ICU4J
      */
+    @Deprecated
     public static final String VARIANT_ICU4J = "islamic-icu4j";
 
     /**
@@ -1377,6 +1380,41 @@ public final class HijriCalendar
     public static CalendarFamily<HijriCalendar> family() {
 
         return ENGINE;
+
+    }
+
+    /**
+     * <p>Registers a regional variant of the Hijri calendar. </p>
+     *
+     * <p>Repeated calls with the same variant will effectively update the existing registered variant. </p>
+     *
+     * @param   hijriData   interface for regional Hijri variant
+     * @throws  IllegalStateException if the initialization of Hijri data fails
+     * @throws  IllegalArgumentException if the data are wrong
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Registriert eine regionale Variante des Hijri-Kalenders. </p>
+     *
+     * <p>Wiederholte Aufrufe dieser Methode mit derselben Variante werden effektiv die vorhandene
+     * registrierte Variante aktualisieren. </p>
+     *
+     * @param   hijriData   interface for regional Hijri variant
+     * @throws  IllegalStateException if the initialization of Hijri data fails
+     * @throws  IllegalArgumentException if the data are wrong
+     * @since   5.6
+     */
+    public static void register(HijriData hijriData) {
+
+        String variant = "islamic-" + hijriData.name(); // with NPE-check
+        hijriData.prepare();
+
+        try {
+            EraYearMonthDaySystem<HijriCalendar> calsys = new AstronomicalHijriData(hijriData);
+            CALSYS.put(variant, calsys);
+        } catch (RuntimeException re) {
+            throw new IllegalArgumentException("Invalid Hijri data.", re);
+        }
 
     }
 

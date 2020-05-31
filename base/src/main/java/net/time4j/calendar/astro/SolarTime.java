@@ -72,11 +72,11 @@ import java.util.concurrent.TimeUnit;
  *          .build();
  *
  *     assertThat(
- *       date.get(kibo5895.sunrise(tzid)).get(),
- *       is(PlainTime.of(6, 10, 34)));
+ *       date.get(kibo5895.sunrise()).get().toZonalTimestamp(tzid).toTime(),
+ *       is(PlainTime.of(6, 10, 35)));
  *     assertThat(
- *       date.get(kibo5895.sunset(tzid)).get(),
- *       is(PlainTime.of(18, 47, 48)));
+ *       date.get(kibo5895.sunset()).get().toZonalTimestamp(tzid).toTime(),
+ *       is(PlainTime.of(18, 47, 47)));
  * </pre>
  *
  * <p><strong>About limitations of accuracy:</strong></p>
@@ -146,11 +146,11 @@ import java.util.concurrent.TimeUnit;
  *          .build();
  *
  *     assertThat(
- *       date.get(kibo5895.sunrise(tzid)).get(),
- *       is(PlainTime.of(6, 10, 34)));
+ *       date.get(kibo5895.sunrise()).get().toZonalTimestamp(tzid).toTime(),
+ *       is(PlainTime.of(6, 10, 35)));
  *     assertThat(
- *       date.get(kibo5895.sunset(tzid)).get(),
- *       is(PlainTime.of(18, 47, 48)));
+ *       date.get(kibo5895.sunset()).get().toZonalTimestamp(tzid).toTime(),
+ *       is(PlainTime.of(18, 47, 47)));
  * </pre>
  *
  * <p><strong>&Uuml;ber die Grenzen der Genauigkeit:</strong></p>
@@ -523,13 +523,13 @@ public final class SolarTime
     }
 
     /**
-     * <p>Obtains the name of the underlying calculator. </p>
+     * <p>Obtains the underlying calculator. </p>
      *
      * @return  String
      * @since   3.34/4.29
      */
     /*[deutsch]
-     * <p>Liefert den Namen der zugrundeliegenden Berechnungsmethode. </p>
+     * <p>Liefert die zugrundeliegende Berechnungsmethode. </p>
      *
      * @return  String
      * @since   3.34/4.29
@@ -537,6 +537,36 @@ public final class SolarTime
     public Calculator getCalculator() {
 
         return CALCULATORS.get(this.calculator);
+
+    }
+
+    /**
+     * <p>Obtains the optional observer timezone which might be associated with any calendar date input. </p>
+     *
+     * <p>Usually, this setting is not relevant for most regions of Earth but can be specified via the
+     * builder approach to handle some special cases. </p>
+     *
+     * @return  optional zone identifier associated with this geographical position
+     * @see     #ofLocation()
+     * @see     Builder#inTimezone(TZID)
+     * @since   5.6
+     */
+    /*[deutsch]
+     * <p>Liefert die optionale Beobachterzeitzone, die mit einer beliebigen Kalenderdatumseingabe
+     * verkn&uuml;pft ist. </p>
+     *
+     * <p>Gew&ouml;hnlich ist diese Einstellung f&uuml;r die meisten Gebiete der Erde nicht von Bedeutung,
+     * kann aber &uuml;ber den {@code Builder}-Ansatz konfiguriert werden, um einige Spezialf&auml;lle
+     * abzuhandeln. </p>
+     *
+     * @return  optional zone identifier associated with this geographical position
+     * @see     #ofLocation()
+     * @see     Builder#inTimezone(TZID)
+     * @since   5.6
+     */
+    public Optional<TZID> getObserverZoneID() {
+
+        return (this.observerZoneID == null) ? Optional.empty() : Optional.of(this.observerZoneID);
 
     }
 
@@ -1189,6 +1219,8 @@ public final class SolarTime
             throw new IllegalArgumentException("Degrees out of range -90.0 <= latitude <= +90.0: " + latitude);
         } else if ((Double.compare(longitude, 180.0) >= 0) || (Double.compare(longitude, -180.0) < 0)) {
             throw new IllegalArgumentException("Degrees out of range -180.0 <= longitude < +180.0: " + longitude);
+        } else if (!Double.isFinite(altitude)) {
+            throw new IllegalArgumentException("Altitude must be finite: " + altitude);
         } else if ((altitude < 0) || (altitude >= 11_000)) {
             throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
         } else if (calculator.isEmpty()) {
@@ -1443,12 +1475,13 @@ public final class SolarTime
          * <p>The altitude is used to model a geodetic correction as well as a refraction correction based
          * on the simple assumption of a standard atmosphere. Users should keep in mind that the local
          * topology with mountains breaking the horizon line and special weather conditions cannot be taken
-         * into account. </p>
+         * into account. If this method is not called then a default altitude of zero is assumed. </p>
          *
          * <p>Attention: Users should also apply a calculator which is capable of altitude corrections. </p>
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is not finite or out of range
          * @see     #usingCalculator(SolarTime.Calculator)
          * @see     StdSolarCalculator#CC
          * @see     StdSolarCalculator#TIME4J
@@ -1460,20 +1493,23 @@ public final class SolarTime
          * Korrektur der atmosph&auml;rischen Lichtbeugung basierend auf der einfachen Annahme einer
          * Standardatmosph&auml;re. Anwender m&uuml;ssen im Auge behalten, da&szlig; die lokale Topologie
          * mit Bergen, die die Horizontlinie unterbrechen und spezielle Wetterbedingungen nicht berechenbar
-         * sind. </p>
+         * sind. Wenn diese Methode nicht aufgerufen wird, wird eine H&ouml;he von 0 Metern angenommen. </p>
          *
          * <p>Achtung: Anwender sollten auch einen {@code Calculator} nehmen, der in der Lage ist,
          * H&ouml;henkorrekturen vorzunehmen. </p>
          *
          * @param   altitude    geographical altitude relative to sea level in meters ({@code 0 <= x < 11,0000})
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is not finite or out of range
          * @see     #usingCalculator(SolarTime.Calculator)
          * @see     StdSolarCalculator#CC
          * @see     StdSolarCalculator#TIME4J
          */
         public Builder atAltitude(int altitude) {
 
-            if ((altitude < 0) || (altitude >= 11_000)) {
+            if (!Double.isFinite(altitude)) {
+                throw new IllegalArgumentException("Altitude must be finite: " + altitude);
+            } else if ((altitude < 0) || (altitude >= 11_000)) {
                 throw new IllegalArgumentException("Meters out of range 0 <= altitude < +11,000: " + altitude);
             }
 
@@ -1487,12 +1523,14 @@ public final class SolarTime
          *
          * @param   calculator  name of solar time calculator
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is not valid
          */
         /*[deutsch]
          * <p>Setzt die Referenz auf das zugrundeliegende Berechnungsverfahren. </p>
          *
          * @param   calculator  name of solar time calculator
          * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if the argument is not valid
          */
         public Builder usingCalculator(String calculator) {
 

@@ -836,6 +836,12 @@ public class AstroTest {
         assertThat(
             PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is one day later than LMT-date
+        assertThat(
+            PlainDate.of(2012, 1, 1).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2012, 1, 2, 7, 2, 47))); // civil date is one day later than LMT-date
+        assertThat(
+            apia.getObserverZoneID().isPresent(),
+            is(false));
     }
 
     @Test
@@ -848,8 +854,14 @@ public class AstroTest {
                 .inTimezone(tzid)
                 .build();
         assertThat(
+            PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2011, 12, 31, 7, 1, 39))); // civil date is same as input date
+        assertThat(
             PlainDate.of(2012, 1, 1).get(apia.sunrise()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is same as input date
+        assertThat(
+            apia.getObserverZoneID().get().canonical(),
+            is("Pacific/Apia"));
     }
 
     @Test
