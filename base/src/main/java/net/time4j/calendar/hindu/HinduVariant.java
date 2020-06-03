@@ -712,8 +712,14 @@ public final class HinduVariant
 
     //~ Innere Klassen ----------------------------------------------------
 
-    private static class ModernHinduCS // TODO: implement
+    private static class ModernHinduCS
         extends HinduCS {
+
+        //~ Statische Felder/Initialisierungen ----------------------------
+
+        private static final double SIDEREAL_YEAR = 365d + (279457.0 / 1080000.0);
+        private static final double SIDEREAL_MONTH = 27d + (4644439.0 / 14438334.0);
+        private static final double SYNODIC_MONTH = 29d + (7087771.0 / 13358334.0);
 
         //~ Konstruktoren -------------------------------------------------
 

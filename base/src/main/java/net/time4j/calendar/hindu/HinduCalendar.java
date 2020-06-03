@@ -273,9 +273,9 @@ public final class HinduCalendar
 
     static {
         VariantMap calsys = new VariantMap();
-//        for (HinduRule rule : HinduRule.values()) {
-//            calsys.accept(rule.variant()); // TODO: implementieren und aktivieren
-//        }
+        for (HinduRule rule : HinduRule.values()) {
+            calsys.accept(rule.variant());
+        }
         calsys.accept(HinduVariant.VAR_OLD_SOLAR);
         calsys.accept(HinduVariant.VAR_OLD_LUNAR);
         CALSYS = calsys;
@@ -506,8 +506,7 @@ public final class HinduCalendar
      * @return  HinduCalendar
      * @throws  IllegalArgumentException in case of any inconsistencies
      */
-    // TODO: make public
-    static HinduCalendar of(
+    public static HinduCalendar of(
         HinduVariant variant,
         HinduEra era,
         int yearOfEra,
@@ -551,6 +550,8 @@ public final class HinduCalendar
      * @param   month           the Hindu month (in lunisolar case possibly as leap month)
      * @param   dayOfMonth      the day of given month (in lunisolar case possibly in leap state)
      * @return  {@code true} if valid else  {@code false}
+     * @see     #of(HinduVariant, HinduEra, int, HinduMonth, HinduDay)
+     * @see     HinduRule#variant()
      * @see     AryaSiddhanta#variant()
      */
     /*[deutsch]
@@ -580,9 +581,6 @@ public final class HinduCalendar
      * @see     HinduRule#variant()
      * @see     AryaSiddhanta#variant()
      */
-//     * @see     #of(HinduVariant, HinduEra, int, HinduMonth, HinduDay)
-//     * @see     HinduRule#variant()
-    // TODO: javadoc aktivieren für allgemeine HinduRule
     public static boolean isValid(
         HinduVariant variant,
         HinduEra era,
