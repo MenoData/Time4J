@@ -43,6 +43,10 @@ import java.util.List;
 abstract class HinduCS
     implements CalendarSystem<HinduCalendar> {
 
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    static final long KALI_YUGA_EPOCH = -1132959L; // julian-BCE-3102-02-18 (as rata die)
+
     //~ Instanzvariablen --------------------------------------------------
 
     final HinduVariant variant;

@@ -1000,6 +1000,11 @@ public final class HinduCalendar
         return this.kyYear;
     }
 
+    // used by HinduRule-based calendar systems
+    HinduVariant getInternalVariant() {
+        return this.variant;
+    }
+
     private HinduCalendar withNewYear() {
         HinduMonth first = (
             this.variant.isSolar()

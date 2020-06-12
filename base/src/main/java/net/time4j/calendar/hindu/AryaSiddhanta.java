@@ -118,8 +118,6 @@ public enum AryaSiddhanta {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        private static final long KALI_YUGA_EPOCH = -1132959L; // julian-BCE-3102-02-18 (as rata die)
-
         private static final double ARYA_SOLAR_YEAR = 15779175.0 / 43200.0;
         private static final double ARYA_SOLAR_MONTH = ARYA_SOLAR_YEAR / 12.0;
         private static final double ARYA_LUNAR_MONTH = 1577917500.0 / 53433336.0;
