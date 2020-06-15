@@ -12,6 +12,8 @@ import org.junit.runners.Suite.SuiteClasses;
         HinduEraTest.class,
         HinduFormatTest.class,
         HinduVariantTest.class,
+        ModernHinduSolarCalendarTest.class,
+        ModernHinduLunarCalendarTest.class,
         OldHinduSolarCalendarTest.class,
         OldHinduLunarCalendarTest.class,
         SerializationTest.class

@@ -930,6 +930,7 @@ public final class HinduCalendar
                     && (this.kyYear == that.kyYear)
                     && this.month.equals(that.month)
                     && this.dayOfMonth.equals(that.dayOfMonth)
+                    && (this.utcDays == that.utcDays)
             );
         } else {
             return false;

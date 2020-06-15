@@ -31,7 +31,6 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.util.StringTokenizer;
-import java.util.function.DoubleFunction;
 import java.util.function.LongFunction;
 
 
@@ -723,10 +722,24 @@ public final class HinduVariant
         private static final double SIDEREAL_YEAR = 365d + (279457.0 / 1080000.0);
         private static final double SIDEREAL_MONTH = 27d + (4644439.0 / 14438334.0);
         private static final double SYNODIC_MONTH = 29d + (7087771.0 / 13358334.0);
+        private static final double EPSILON = Math.pow(2, -1000); // max recursion depth: 1000
 
         private static final double CREATION = KALI_YUGA_EPOCH - 1955880000d * SIDEREAL_YEAR;
         private static final double ANOMALISTIC_YEAR = 1577917828000d / (4320000000L - 387);
         private static final double ANOMALISTIC_MONTH = 1577917828d / (57753336 - 488199);
+
+        private static final double[] RISING_SIGN_FACTORS;
+
+        static {
+            double[] f = new double[6];
+            f[0] = 1670d / 1800d;
+            f[1] = 1795d / 1800d;
+            f[2] = 1935d / 1800d;
+            f[3] = 1935d / 1800d;
+            f[4] = 1795d / 1800d;
+            f[5] = 1670d / 1800d;
+            RISING_SIGN_FACTORS = f;
+        }
 
         //~ Konstruktoren -------------------------------------------------
 
@@ -740,11 +753,14 @@ public final class HinduVariant
         HinduCalendar create(long utcDays) {
             HinduVariant hv = super.variant;
 
-            if (hv.isSolar()) {
-                return hSolarFromFixed(utcDays, hv);
-            }
-
             switch (this.getRule()) {
+                case ORISSA:
+                case TAMIL:
+                case MALAYALI:
+                case MADRAS:
+                    return hSolarFromFixed(utcDays, hv);
+                case AMANTA:
+                    return hLunarFromFixed(utcDays, hv);
                 case AMANTA_ASHADHA:
                 case AMANTA_KARTIKA:
                     HinduCalendar cal = hv.toAmanta().create(utcDays);
@@ -759,36 +775,56 @@ public final class HinduVariant
                             );
                     }
                     return cal;
+                default:
+                    throw new UnsupportedOperationException(this.getRule().name());
             }
-
-            return null; // TODO: impl
         }
 
         @Override
         HinduCalendar create(int kyYear, HinduMonth month, HinduDay dom) {
             HinduVariant hv = super.variant;
-
-            if (hv.isSolar()) {
-                long rataDie = hFixedFromSolar(kyYear, month, dom, hv);
-                long utcDays = EpochDays.UTC.transform(rataDie, EpochDays.RATA_DIE);
-                return new HinduCalendar(hv, kyYear, month, dom, utcDays);
-            }
+            long utcDays;
 
             switch (this.getRule()) {
+                case ORISSA:
+                case TAMIL:
+                case MALAYALI:
+                case MADRAS:
+                    utcDays = hFixedFromSolar(kyYear, month, dom, hv);
+                    break;
+                case AMANTA:
+                    utcDays = hFixedFromLunar(kyYear, month, dom, hv);
+                    break;
                 case AMANTA_ASHADHA:
                 case AMANTA_KARTIKA:
                     if (month.getValue().getValue() < hv.getFirstMonthOfYear()) {
                         kyYear++;
                     }
                     return hv.toAmanta().create(kyYear, month, dom);
+                default:
+                    throw new UnsupportedOperationException(this.getRule().name());
             }
 
-            return null; // TODO: impl
+            return new HinduCalendar(hv, kyYear, month, dom, utcDays);
         }
 
         @Override
         boolean isValid(int kyYear, HinduMonth month, HinduDay dom) {
+            if ((kyYear < 0) || (kyYear > 5999) || (month == null) || (dom == null)) {
+                return false;
+            }
+
+            if (super.variant.isSolar() && (month.isLeap() || dom.isLeap())) {
+                return false;
+            }
+
             switch (this.getRule()) {
+                case AMANTA:
+                case PURNIMANTA:
+                    if (dom.getValue() > 30) {
+                        return false;
+                    }
+                    break;
                 case AMANTA_ASHADHA:
                 case AMANTA_KARTIKA:
                     if (month.getValue().getValue() < super.variant.getFirstMonthOfYear()) {
@@ -796,17 +832,18 @@ public final class HinduVariant
                     }
                     return super.variant.toAmanta().isValid(kyYear, month, dom);
             }
-            return false;
+
+            return !this.isExpunged(kyYear, month, dom);
         }
 
         @Override
         public long getMinimumSinceUTC() {
-            return 0;
+            return Long.MIN_VALUE; // TODO: impl
         }
 
         @Override
         public long getMaximumSinceUTC() {
-            return 0;
+            return Long.MAX_VALUE; // TODO: impl
         }
 
         private HinduRule getRule() {
@@ -877,31 +914,29 @@ public final class HinduVariant
             return modulo(hLunarLongitude(t) - hSolarLongitude(t), 360d);
         }
 
-        private static double hLunarDayFromMoment(double t) {
-            return Math.floor(hLunarPhase(t) / 12d) + 1;
+        private static int hLunarDayFromMoment(double t) {
+            return (int) (Math.floor(hLunarPhase(t) / 12d) + 1);
         }
 
         private static double hNewMoonBefore(double t) {
-            double epsilon = Math.pow(2, -1000); // max recursion depth: 1000
             double tau = t - ((hLunarPhase(t) * SYNODIC_MONTH) / 360d);
-            return binarySearch(tau - 1, Math.min(t, tau + 1), epsilon);
+            return binarySearch(tau - 1, Math.min(t, tau + 1));
         }
 
         private static double binarySearch(
             double low,
-            double high,
-            double epsilon
+            double high
         ) {
             double x = (low + high) / 2;
 
-            if ((hZodiac(low) == hZodiac(high)) || (high - low < epsilon)) {
+            if ((hZodiac(low) == hZodiac(high)) || (high - low < EPSILON)) {
                 return x;
             }
 
             if (hLunarPhase((low + high) / 2) < 180) {
-                return binarySearch(low, x, epsilon);
+                return binarySearch(low, x);
             } else {
-                return binarySearch(x, high, epsilon);
+                return binarySearch(x, high);
             }
         }
 
@@ -920,7 +955,7 @@ public final class HinduVariant
             double critical = function.apply(rataDie);
             int kyYear = hCalendarYear(critical);
             int m = hZodiac(critical);
-            long start = rataDie - 3 - (int) modulo(Math.floor(hSolarLongitude(critical)), 30d);
+            long start = rataDie - 3 - (int) modulo(Math.floor(hSolarLongitude(critical)), 30);
 
             while (hZodiac(function.apply(start)) != m) {
                 start++;
@@ -943,21 +978,21 @@ public final class HinduVariant
         ) {
             int m = month.getRasi();
             LongFunction<Double> function = hCritical(variant);
-            long start = KALI_YUGA_EPOCH - 3 + (long) Math.floor(SIDEREAL_YEAR * ((kyYear + (m - 1) / 12)));
+            long start = KALI_YUGA_EPOCH - 3 + (long) Math.floor(SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d)));
 
             while (hZodiac(function.apply(start)) != m) {
                 start++;
             }
 
-            return dom.getValue() - 1 + start;
+            return EpochDays.UTC.transform(dom.getValue() - 1 + start, EpochDays.RATA_DIE);
         }
 
-        private static LongFunction<Double> hCritical(HinduVariant variant) {
+        private static LongFunction<Double> hCritical(final HinduVariant variant) {
             switch (variant.getRule()) {
                 case ORISSA:
-                    return (rataDie) -> Double.NaN; // TODO: hSunrise(rataDie + 1);
+                    return (rataDie) -> hSunrise(rataDie + 1, variant);
                 case TAMIL:
-                    return (rataDie) -> Double.NaN; // TODO: hSunset(rataDie);
+                    return (rataDie) -> hSunset(rataDie, variant);
                 case MALAYALI:
                     return (rataDie) -> Double.NaN; // TODO: implement
                 case MADRAS:
@@ -965,6 +1000,153 @@ public final class HinduVariant
                 default:
                     throw new UnsupportedOperationException("Not yet implemented.");
             }
+        }
+
+        private static HinduCalendar hLunarFromFixed(
+            long utcDays,
+            HinduVariant variant
+        ) {
+            assert variant.isLunisolar();
+
+            long rataDie = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC);
+            double critical = hSunrise(rataDie, variant);
+            int dom = hLunarDayFromMoment(critical);
+            HinduDay dayOfMonth = HinduDay.valueOf(dom);
+
+            if (hLunarDayFromMoment(hSunrise(rataDie - 1, variant)) == dom) {
+                dayOfMonth = dayOfMonth.withLeap();
+            }
+
+            double lastNewMoon = hNewMoonBefore(critical);
+            double nextNewMoon = hNewMoonBefore(Math.floor(lastNewMoon) + 35d);
+            int solarMonth = hZodiac(lastNewMoon);
+            int lunarMonth = ((solarMonth == 12) ? 1 : solarMonth + 1);
+            HinduMonth month = HinduMonth.ofLunisolar(lunarMonth);
+
+            if (hZodiac(nextNewMoon) == solarMonth) {
+                month = month.withLeap();
+            }
+
+            int kyYear = hCalendarYear((lunarMonth <= 2) ? rataDie + 180d : rataDie);
+
+            return new HinduCalendar(
+                variant,
+                kyYear,
+                month,
+                dayOfMonth,
+                utcDays
+            );
+        }
+
+        private static long hFixedFromLunar(
+            int kyYear,
+            HinduMonth month,
+            HinduDay dom,
+            HinduVariant variant
+        ) {
+            int m = month.getValue().getValue();
+            double approx = KALI_YUGA_EPOCH + SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d));
+            double x = (hSolarLongitude(approx) / 360d) - ((m - 1) / 12d);
+            long s = (long) Math.floor(approx - SIDEREAL_YEAR * (-0.5 + modulo(x + 0.5, 1d)));
+            int k = hLunarDayFromMoment(s + 0.25);
+            int day = dom.getValue();
+            int temp;
+
+            if ((k > 3) && (k < 27)) {
+                temp = k;
+            } else  {
+                HinduCalendar mid = hLunarFromFixed(EpochDays.UTC.transform(s - 15, EpochDays.RATA_DIE), variant);
+                if (
+                    (mid.getMonth().getValue() != month.getValue())
+                    || (mid.getMonth().isLeap() && !month.isLeap())
+                ) {
+                    temp = -15 + (int) modulo(k + 15, 30);
+                } else {
+                    temp = 15 + (int) modulo(k - 15, 30);
+                }
+            }
+
+            long est = s + day - temp;
+            long d = est + 14 - (int) modulo(hLunarDayFromMoment(est + 0.25) - day + 15, 30);
+
+            while (true) {
+                int ld = hLunarDayFromMoment(hSunrise(d, variant));
+                int mm = (int) modulo(day + 1, 30);
+                int day2 = (mm == 0) ? 30 : mm;
+
+                if ((ld == day) || (ld == day2)) {
+                    break;
+                } else {
+                    d++;
+                }
+            }
+
+            if (dom.isLeap()) {
+                d++;
+            }
+
+            return EpochDays.UTC.transform(d, EpochDays.RATA_DIE);
+        }
+
+        private static double hAscensionalDifference(
+            double rataDie,
+            GeoLocation location
+        ) {
+            double sinDelta = (1397d / 3438d) * hSine(hTropicalLongitude(rataDie));
+            double latitude = location.getLatitude();
+            double diurnalRadius = hSine(90 + hArcSin(sinDelta));
+            double earthSine = sinDelta * (hSine(latitude) / hSine(90 + latitude));
+            return hArcSin(-1 * earthSine / diurnalRadius);
+        }
+
+        private static double hSolarSiderealDifference(double rataDie) {
+            return hDailyMotion(rataDie) * hRisingSign(rataDie);
+        }
+
+        private static double hEquationOfTime(double rataDie) {
+            double offset = hSine(hMeanPosition(rataDie, ANOMALISTIC_YEAR));
+            double equationSun = offset * (57 + 18d / 60d) * ((14d / 360d) - (Math.abs(offset) / 1080d));
+            return (hDailyMotion(rataDie) / 360d) * (equationSun / 360d) * SIDEREAL_YEAR;
+        }
+
+        private static double hTropicalLongitude(double rataDie) {
+            double x = (600d / 1577917828d) * (rataDie - KALI_YUGA_EPOCH) - 0.25;
+            double precession = 27 - Math.abs(108 * (-0.5 + modulo(x + 0.5, 1d)));
+            return modulo(hSolarLongitude(rataDie) - precession, 360d);
+        }
+
+        private static double hDailyMotion(double rataDie) {
+            double anomaly = hMeanPosition(rataDie, ANOMALISTIC_YEAR);
+            double epicycle = (14d / 360d) - (1d / 1080d) * Math.abs(hSine(anomaly));
+            double entry = Math.floor(anomaly / 3.75d);
+            double sineTableStep = hSineTable(entry + 1) - hSineTable(entry);
+            double factor = 1d - (3438d / 225d) * sineTableStep * epicycle;
+            return (360d / SIDEREAL_YEAR) * factor;
+        }
+
+        private static double hRisingSign(double rataDie) {
+            int index = (int) Math.floor(hTropicalLongitude(rataDie) / 30d);
+            return RISING_SIGN_FACTORS[(int) modulo(index, 6)];
+        }
+
+        private static double hSunrise(
+            double rataDie,
+            HinduVariant variant
+        ) {
+            double od = rataDie + 0.25 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
+            double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
+            double f = 0.25 * hSolarSiderealDifference(rataDie) + ascDiff;
+            return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
+        }
+
+        private static double hSunset(
+            double rataDie,
+            HinduVariant variant
+        ) {
+            double od = rataDie + 0.75 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
+            double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
+            double f = 0.75 * hSolarSiderealDifference(rataDie) - ascDiff;
+            return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
         }
 
     }
