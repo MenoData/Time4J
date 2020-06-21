@@ -1012,6 +1012,29 @@ public class AstroTest {
     }
 
     @Test
+    public void fairbanks() {
+        TZID tzid = () -> "America/Anchorage";
+        SolarTime fairbanks =
+            SolarTime.ofLocation()
+                .northernLatitude(64, 50, 0.0)
+                .westernLongitude(147, 43, 0.0)
+                .build();
+        System.out.println(fairbanks.getLongitude());
+        System.out.println(fairbanks.getLatitude());
+        PlainDate date = PlainDate.of(2020, 6, 18);
+        assertThat(
+            date.minus(1, CalendarUnit.DAYS)
+                .get(fairbanks.sunset()).get().with(Moment.PRECISION, TimeUnit.MINUTES).toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2020, 6, 18, 0, 46)));
+        assertThat(
+            date.get(fairbanks.sunrise()).get().with(Moment.PRECISION, TimeUnit.MINUTES).toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2020, 6, 18, 2, 58)));
+        assertThat(
+            date.get(fairbanks.sunset()).get().with(Moment.PRECISION, TimeUnit.MINUTES).toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2020, 6, 19, 0, 46)));
+    }
+
+    @Test
     public void longyearbyen() {
         TZID tzid = () -> "Arctic/Longyearbyen";
         List<SolarTime> stList = new ArrayList<>();
