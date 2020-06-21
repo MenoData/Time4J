@@ -7,6 +7,7 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.CalendarDays;
+import net.time4j.engine.ChronoException;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
@@ -16,6 +17,8 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.concurrent.TimeUnit;
 
 import static net.time4j.calendar.astro.AstronomicalSeason.*;
@@ -834,6 +837,15 @@ public class AstroTest {
         SolarTime apia =
             SolarTime.ofLocation().southernLatitude(13, 50, 0).westernLongitude(171, 45, 0).build();
         assertThat(
+            PlainDate.of(2011, 12, 28).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2011, 12, 28, 7, 0, 33))); // before zone change
+        assertThat(
+            PlainDate.of(2011, 12, 29).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2011, 12, 29, 7, 1, 6))); // before zone change
+        assertThat(
+            PlainDate.of(2011, 12, 30).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2011, 12, 31, 7, 1, 39))); // invalid date
+        assertThat(
             PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2012, 1, 1, 7, 2, 13))); // civil date is one day later than LMT-date
         assertThat(
@@ -853,6 +865,15 @@ public class AstroTest {
                 .westernLongitude(171, 45, 0)
                 .inTimezone(tzid)
                 .build();
+        assertThat(
+            PlainDate.of(2011, 12, 29).get(apia.sunrise()).get().toZonalTimestamp(tzid),
+            is(PlainTimestamp.of(2011, 12, 29, 7, 1, 6))); // before zone change
+        try {
+            PlainDate.of(2011, 12, 30).get(apia.sunrise()).get().toZonalTimestamp(tzid);
+            fail("Invalid date should throw an exception, but passed.");
+        } catch (ChronoException ex) {
+            // ok, invalid date is expected
+        }
         assertThat(
             PlainDate.of(2011, 12, 31).get(apia.sunrise()).get().toZonalTimestamp(tzid),
             is(PlainTimestamp.of(2011, 12, 31, 7, 1, 39))); // civil date is same as input date
@@ -988,6 +1009,41 @@ public class AstroTest {
     @Test(expected=IllegalArgumentException.class)
     public void seasonBeyondMaxYear() {
         AstronomicalSeason.of(Moment.axis().getMaximum());
+    }
+
+    @Test
+    public void longyearbyen() {
+        TZID tzid = () -> "Arctic/Longyearbyen";
+        List<SolarTime> stList = new ArrayList<>();
+        stList.add(svalbard(null));
+        stList.add(svalbard(tzid));
+
+        for (SolarTime svalbard : stList) {
+            PlainDate date = PlainDate.of(2020, 8, 25); // civil date has TWO sunsets
+            assertThat(
+                date.minus(1, CalendarUnit.DAYS)
+                    .get(svalbard.sunset()).get().with(Moment.PRECISION, TimeUnit.MINUTES).toZonalTimestamp(tzid),
+                is(PlainTimestamp.of(2020, 8, 25, 0, 10)));
+            assertThat(
+                date.get(svalbard.sunrise()).get().with(Moment.PRECISION, TimeUnit.MINUTES).toZonalTimestamp(tzid),
+                is(PlainTimestamp.of(2020, 8, 25, 1, 50)));
+            assertThat(
+                date.get(svalbard.sunset()).get().with(Moment.PRECISION, TimeUnit.MINUTES).toZonalTimestamp(tzid),
+                is(PlainTimestamp.of(2020, 8, 25, 23, 45)));
+        }
+    }
+
+    private static SolarTime svalbard(TZID tzid) {
+        SolarTime.Builder builder =
+            SolarTime.ofLocation()
+            .easternLongitude(15, 38, 0.0)
+            .northernLatitude(78, 13, 0.0);
+
+        if (tzid != null) {
+            builder = builder.inTimezone(tzid); // test shows no effect far away from date border line
+        }
+
+        return builder.build();
     }
 
 }
