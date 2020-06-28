@@ -29,7 +29,7 @@ public class SerializationTest {
             roundtrip(rule.variant().with(HinduEra.KALI_YUGA));
             roundtrip(rule.variant().withElapsedYears());
             roundtrip(rule.variant().withCurrentYears());
-            roundtrip(rule.variant().withAlternativeHinduSunrise());
+            roundtrip(rule.variant().withModernHinduSunriseSunset(0.0));
             roundtrip(rule.variant().withAlternativeLocation(SolarTime.ofMecca()));
         }
     }

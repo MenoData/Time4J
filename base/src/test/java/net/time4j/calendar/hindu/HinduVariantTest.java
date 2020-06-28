@@ -1,7 +1,9 @@
 package net.time4j.calendar.hindu;
 
+import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
+import net.time4j.calendar.astro.GeoLocation;
 import net.time4j.calendar.astro.SolarTime;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
@@ -195,7 +197,7 @@ public class HinduVariantTest {
         HinduVariant v6 = HinduRule.AMANTA_KARTIKA.variant();
         HinduVariant v7 = AryaSiddhanta.SOLAR.variant();
         HinduVariant v8 = AryaSiddhanta.LUNAR.variant();
-        HinduVariant v9 = HinduRule.MALAYALI.variant().withAlternativeHinduSunrise();
+        HinduVariant v9 = HinduRule.MALAYALI.variant().withModernAstronomy(0.0);
         HinduVariant v10 = HinduRule.MALAYALI.variant().withAlternativeLocation(SolarTime.ofMecca());
         assertThat(
             HinduVariant.from(v1.getVariant()),
@@ -304,6 +306,67 @@ public class HinduVariantTest {
         assertThat(
             cs.isValid(0, m, HinduDay.valueOf(16)),
             is(true));
+    }
+
+    @Test // https://www.prokerala.com/general/calendar/tamilcalendar.php?year=2020&mon=chithirai#calendar
+    public void chennai() {
+        HinduCalendar cal =
+            HinduCalendar.of(
+                HinduRule.MADRAS.variant()
+                    .withModernAstronomy(5.0)
+                    .withCurrentYears()
+                    .withAlternativeLocation(GeoLocation.of(13 + 5d / 60, 80 + 17d / 60)),
+                HinduEra.SAKA,
+                1943,
+                HinduMonth.ofSolar(1),
+                HinduDay.valueOf(1));
+
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_YEAR, 1),
+            is(cal));
+        //for (int i = 0; i < 50; i++) {
+            //System.out.println(cal.with(HinduCalendar.DAY_OF_YEAR, 1).transform(PlainDate.axis()));
+            //cal = cal.nextYear();
+        //}
+
+        System.out.println(cal.transform(PlainDate.axis()));
+
+        int[] lengthOfMonths = {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31};
+        //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
+        // tamil:               31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30
+        // tamil-ujjain:        31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30
+        // madras-ujjain:       31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
+        // madras:              31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31
+        //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
+        //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
+
+        // 2019: 2019-04-14
+        //       31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30,
+        PlainDate[] gregorian = {
+            PlainDate.of(2020, 4, 14),
+            PlainDate.of(2020, 5, 14),
+            PlainDate.of(2020, 6, 15),
+            PlainDate.of(2020, 7, 16),
+            PlainDate.of(2020, 8, 17),
+            PlainDate.of(2020, 9, 17),
+            PlainDate.of(2020, 10, 17),
+            PlainDate.of(2020, 11, 16),
+            PlainDate.of(2020, 12, 16),
+            PlainDate.of(2021, 1, 14),
+            PlainDate.of(2021, 2, 13),
+            PlainDate.of(2021, 3, 14),
+        };
+
+        for (int i = 0; i < 12; i++) {
+            System.out.print(cal.getMaximum(HinduCalendar.DAY_OF_MONTH) + ", ");
+//            assertThat(
+//                cal.transform(PlainDate.axis()),
+//                is(gregorian[i]));
+//            assertThat(
+//                cal.getMaximum(HinduCalendar.DAY_OF_MONTH),
+//                is(lengthOfMonths[i]));
+            cal = cal.nextMonth();
+        }
     }
 
 }

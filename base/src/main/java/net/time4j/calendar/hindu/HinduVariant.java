@@ -21,8 +21,12 @@
 
 package net.time4j.calendar.hindu;
 
+import net.time4j.Moment;
+import net.time4j.PlainDate;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.GeoLocation;
+import net.time4j.calendar.astro.StdSolarCalculator;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
 
@@ -58,6 +62,8 @@ public final class HinduVariant
             23.0 + 9.0 / 60.0,
             75.0 + 46.0 / 60.0 + 6.0 / 3600.0);
 
+    private static final double U_OFFSET = 5 * 3600 + 184.4;
+
     private static final HinduRule[] RULES = HinduRule.values();
 
     private static final int TYPE_OLD_SOLAR = -1;
@@ -71,7 +77,7 @@ public final class HinduVariant
     private transient final int type;
     private transient final HinduEra defaultEra;
     private transient final boolean elapsedMode;
-    private transient final boolean altHinduSunrise;
+    private transient final double depressionAngle;
     private transient final GeoLocation location;
 
     //~ Konstruktoren -----------------------------------------------------
@@ -84,7 +90,7 @@ public final class HinduVariant
             rule.ordinal(),
             defaultEra,
             useStandardElapsedMode(defaultEra, rule),
-            false,
+            Double.NaN,
             UJJAIN
         );
 
@@ -95,7 +101,7 @@ public final class HinduVariant
             (aryaSiddhanta == AryaSiddhanta.SOLAR) ? TYPE_OLD_SOLAR : TYPE_OLD_LUNAR,
             HinduEra.KALI_YUGA,
             true,
-            false,
+            Double.NaN,
             UJJAIN
         );
 
@@ -105,7 +111,7 @@ public final class HinduVariant
         int type,
         HinduEra defaultEra,
         boolean elapsedMode,
-        boolean altHinduSunrise,
+        double depressionAngle,
         GeoLocation location
     ) {
         super();
@@ -116,12 +122,16 @@ public final class HinduVariant
             throw new NullPointerException("Missing default Hindu era.");
         } else if (location == null) {
             throw new NullPointerException("Missing geographical location.");
+        } else if (Double.isInfinite(depressionAngle)) {
+            throw new IllegalArgumentException("Infinite depression angle.");
+        } else if (!Double.isNaN(depressionAngle) && Math.abs(depressionAngle) > 10.0) {
+            throw new IllegalArgumentException("Depression angle is too big: " + depressionAngle);
         }
 
         this.type = type;
         this.defaultEra = defaultEra;
         this.elapsedMode = elapsedMode;
-        this.altHinduSunrise = altHinduSunrise;
+        this.depressionAngle = depressionAngle;
         this.location = location;
 
     }
@@ -167,7 +177,7 @@ public final class HinduVariant
         int type = Integer.MIN_VALUE;
         HinduEra defaultEra = null;
         boolean elapsedMode = true;
-        boolean altHinduSunrise = false;
+        double depressionAngle = Double.NaN;
         double latitude = UJJAIN.getLatitude();
         double longitude = UJJAIN.getLongitude();
         int altitude = UJJAIN.getAltitude();
@@ -187,7 +197,9 @@ public final class HinduVariant
                     elapsedMode = token.equals("elapsed");
                     break;
                 case 4:
-                    altHinduSunrise = token.equals("alt");
+                    if (!token.equals("oldstyle") && !token.equals("alt") && !token.equals("std")) {
+                        depressionAngle = Double.valueOf(token).doubleValue();
+                    }
                     break;
                 case 5:
                     latitude = Double.valueOf(token).doubleValue();
@@ -215,7 +227,7 @@ public final class HinduVariant
                 type,
                 defaultEra,
                 elapsedMode,
-                altHinduSunrise,
+                depressionAngle,
                 ujjain ? UJJAIN : GeoLocation.of(latitude, longitude, altitude)
             );
         } catch (Exception e) {
@@ -382,7 +394,7 @@ public final class HinduVariant
                 (this.type == that.type)
                     && (this.defaultEra == that.defaultEra)
                     && (this.elapsedMode == that.elapsedMode)
-                    && (this.altHinduSunrise == that.altHinduSunrise)
+                    && equals(this.depressionAngle, that.depressionAngle)
                     && (this.location.getLatitude() == that.location.getLatitude())
                     && (this.location.getLongitude() == that.location.getLongitude())
                     && (this.location.getAltitude() == that.location.getAltitude()));
@@ -396,7 +408,7 @@ public final class HinduVariant
         return this.type
             + 17 * this.defaultEra.hashCode()
             + (this.elapsedMode ? 1 : 0)
-            + (this.altHinduSunrise ? 100 : 99);
+            + (Double.isNaN(this.depressionAngle) ? 100 : (int) this.depressionAngle * 100);
     }
 
     @Override
@@ -420,8 +432,9 @@ public final class HinduVariant
             sb.append(this.defaultEra.name());
             sb.append('|');
             sb.append(this.elapsedMode ? "elapsed-year-mode" : "current-year-mode");
-            if (this.altHinduSunrise) {
-                sb.append("|alt-hindu-sunrise");
+            if (!Double.isNaN(this.depressionAngle)) {
+                sb.append("|depression-angle=");
+                sb.append(this.depressionAngle);
             }
             if (this.location != UJJAIN) {
                 sb.append("|lat=");
@@ -454,7 +467,7 @@ public final class HinduVariant
         sb.append('|');
         sb.append(this.elapsedMode ? "elapsed" : "current");
         sb.append('|');
-        sb.append(this.altHinduSunrise ? "alt" : "std");
+        sb.append(Double.isNaN(this.depressionAngle) ? "oldstyle" : this.depressionAngle);
         if (this.location != UJJAIN) {
             sb.append('|');
             sb.append(this.location.getLatitude());
@@ -490,7 +503,7 @@ public final class HinduVariant
             return this;
         }
 
-        return new HinduVariant(this.type, defaultEra, this.elapsedMode, this.altHinduSunrise, this.location);
+        return new HinduVariant(this.type, defaultEra, this.elapsedMode, this.depressionAngle, this.location);
     }
 
     /**
@@ -516,7 +529,7 @@ public final class HinduVariant
             return this;
         }
 
-        return new HinduVariant(this.type, this.defaultEra, true, this.altHinduSunrise, this.location);
+        return new HinduVariant(this.type, this.defaultEra, true, this.depressionAngle, this.location);
     }
 
     /**
@@ -543,30 +556,58 @@ public final class HinduVariant
             return this;
         }
 
-        return new HinduVariant(this.type, this.defaultEra, false, this.altHinduSunrise, this.location);
+        return new HinduVariant(this.type, this.defaultEra, false, this.depressionAngle, this.location);
     }
 
     /**
-     * <p>Creates a copy of this variant with an alternative internal calculation for the sunrise. </p>
+     * <p>Outdated method. </p>
      *
-     * <p>Note: The old Hindu calendar is not customizable. </p>
+     * @return      this variant (unchanged)
+     * @deprecated  Use {@link #withModernAstronomy(double)} instead
+     */
+    /*[deutsch]
+     * <p>Veraltete Methode. </p>
      *
-     * @return  modified copy or this variant if the alternative calculation mode was already set
+     * @return      this variant (unchanged)
+     * @deprecated  Use {@link #withModernAstronomy(double)} instead
+     */
+    @Deprecated
+    public HinduVariant withAlternativeHinduSunrise() {
+        return this;
+    }
+
+    /**
+     * <p>Creates a copy of this variant with an alternative internal calculation for the sunrise or sunset. </p>
+     *
+     * <p>Note: The old Hindu calendar is not customizable. Most calendar makers in India use geometric sunrise
+     * without refraction for the modern Hindu calendar, i.e. they use {@code 0.0} as depression angle. Another
+     * author, Lahiri, uses the angle of 47' corresponding to (47 / 60) degrees. </p>
+     *
+     * @param   depressionAngle     the depression angle of sun used in sunrise/sunset-calculations
+     * @return  modified copy or this variant if in old style (Arya-Siddhanta)
+     * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 <= x <= 10.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen internen Berechnung f&uuml;r
-     * den Sonnenaufgang. </p>
+     * den Sonnenaufgang oder Untergang. </p>
      *
-     * <p>Hinweis: Der alte Hindu-Kalender erlaubt keine Anpassung. </p>
+     * <p>Hinweis: Der alte Hindu-Kalender erlaubt keine Anpassung. Die meisten Kalendermacher in Indien
+     * verwenden heutzutage den geometrischen Sonnenaufgang ohne Beugungskorrektur im modernen Hindukalender,
+     * d.h., sie verwenden {@code 0.0} als Winkelkorrektur. Ein anderer Autor, Lahiri, benutzt den Winkel
+     * von 47 Bogenminuten entsprechend ~ (47 / 60) Grad. </p>
      *
-     * @return  modified copy or this variant if the alternative calculation mode was already set
+     * @param   depressionAngle     the depression angle of sun used in sunrise/sunset-calculations
+     * @return  modified copy or this variant if in old style (Arya-Siddhanta)
+     * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 <= x <= 10.0
      */
-    public HinduVariant withAlternativeHinduSunrise() {
-        if (this.isOld() || this.altHinduSunrise) {
+    public HinduVariant withModernAstronomy(double depressionAngle) {
+        if (Double.isNaN(depressionAngle) || Double.isInfinite(depressionAngle)) {
+            throw new IllegalArgumentException("Depression angle must be a finite number.");
+        } else if (this.isOld()) {
             return this;
         }
 
-        return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, true, this.location);
+        return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, depressionAngle, this.location);
     }
 
     /**
@@ -578,6 +619,7 @@ public final class HinduVariant
      *
      * @param   location    alternative geographical location
      * @return  modified copy or this variant if the location does not change
+     * @throws  IllegalArgumentException    if the absolute latitude is beyond 60 degrees
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen geographischen Bezugsangabe. </p>
@@ -588,9 +630,12 @@ public final class HinduVariant
      *
      * @param   location    alternative geographical location
      * @return  modified copy or this variant if the location does not change
+     * @throws  IllegalArgumentException    if the absolute latitude is beyond 60 degrees
      */
     public HinduVariant withAlternativeLocation(GeoLocation location) {
-        if (this.isOld()) {
+        if (Math.abs(location.getLatitude()) > 60.0) {
+            throw new IllegalArgumentException("Latitudes beyond 60° degrees not supported.");
+        } else if (this.isOld()) {
             return this;
         }
 
@@ -602,7 +647,7 @@ public final class HinduVariant
             return this;
         }
 
-        return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, this.altHinduSunrise, location);
+        return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, this.depressionAngle, location);
     }
 
     /**
@@ -678,6 +723,19 @@ public final class HinduVariant
         }
     }
 
+    private static boolean equals(
+        double d1,
+        double d2
+    ) {
+        if (Double.isNaN(d1)) {
+            return Double.isNaN(d2);
+        } else if (Double.isNaN(d2)) {
+            return false;
+        } else {
+            return (d1 == d2);
+        }
+    }
+
     private HinduRule getRule() {
         return RULES[this.type];
     }
@@ -687,7 +745,7 @@ public final class HinduVariant
             HinduRule.AMANTA.ordinal(),
             this.defaultEra,
             this.elapsedMode,
-            this.altHinduSunrise,
+            this.depressionAngle,
             this.location
         ).getCalendarSystem();
     }
@@ -714,6 +772,7 @@ public final class HinduVariant
 
     //~ Innere Klassen ----------------------------------------------------
 
+    @SuppressWarnings("ConstantConditions")
     private static class ModernHinduCS
         extends HinduCS {
 
@@ -775,6 +834,25 @@ public final class HinduVariant
                             );
                     }
                     return cal;
+                case PURNIMANTA:
+                    HinduCS amantaCS = hv.toAmanta();
+                    HinduCalendar amantaCal = amantaCS.create(utcDays);
+                    HinduMonth m =
+                        HinduMonth.ofLunisolar(
+                            (amantaCal.getDayOfMonth().getValue() >= 16)
+                                ? amantaCS.create(utcDays + 20).getMonth().getValue().getValue()
+                                : amantaCal.getMonth().getValue().getValue()
+                        );
+                    if (amantaCal.getMonth().isLeap()) {
+                        m = m.withLeap();
+                    }
+                    return new HinduCalendar(
+                        hv,
+                        amantaCal.getExpiredYearOfKaliYuga(),
+                        m,
+                        amantaCal.getDayOfMonth(),
+                        utcDays
+                    );
                 default:
                     throw new UnsupportedOperationException(this.getRule().name());
             }
@@ -801,6 +879,17 @@ public final class HinduVariant
                         kyYear++;
                     }
                     return hv.toAmanta().create(kyYear, month, dom);
+                case PURNIMANTA:
+                    HinduMonth m;
+                    if (month.isLeap() || (dom.getValue() <= 15)) {
+                        m = month;
+                    } else if (this.isExpunged(kyYear, previousMonth(month, 1), HinduDay.valueOf(15))) {
+                        m = previousMonth(month, 2);
+                    } else {
+                        m = previousMonth(month, 1);
+                    }
+                    utcDays = hFixedFromLunar(kyYear, m, dom, hv);
+                    break;
                 default:
                     throw new UnsupportedOperationException(this.getRule().name());
             }
@@ -848,6 +937,14 @@ public final class HinduVariant
 
         private HinduRule getRule() {
             return super.variant.getRule();
+        }
+
+        private static HinduMonth previousMonth(
+            HinduMonth month,
+            int steps
+        ) {
+            int m = month.getValue().getValue() - steps;
+            return HinduMonth.ofLunisolar((m == 0) ? 12 : m);
         }
 
         //~ Hindu astronomy taken from Dershowitz/Reingold ----------------
@@ -994,9 +1091,9 @@ public final class HinduVariant
                 case TAMIL:
                     return (rataDie) -> hSunset(rataDie, variant);
                 case MALAYALI:
-                    return (rataDie) -> Double.NaN; // TODO: implement
+                    return (rataDie) -> hStandardFromSundial(rataDie + (13 * 60 + 12) / 1440d, variant);
                 case MADRAS:
-                    return (rataDie) -> Double.NaN; // TODO: implement
+                    return (rataDie) -> hStandardFromSundial(rataDie + 1, variant);
                 default:
                     throw new UnsupportedOperationException("Not yet implemented.");
             }
@@ -1133,20 +1230,76 @@ public final class HinduVariant
             double rataDie,
             HinduVariant variant
         ) {
-            double od = rataDie + 0.25 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
-            double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
-            double f = 0.25 * hSolarSiderealDifference(rataDie) + ascDiff;
-            return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
+            if (Double.isNaN(variant.depressionAngle)) {
+                double od = rataDie + 0.25 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
+                double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
+                double f = 0.25 * hSolarSiderealDifference(rataDie) + ascDiff;
+                return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
+            } else {
+                GeoLocation location = variant.getLocation();
+                PlainDate date = PlainDate.of((long) Math.floor(rataDie), EpochDays.RATA_DIE);
+                Moment astroSunrise = // CC: page 357, citation of Purewal (14)
+                    StdSolarCalculator.NOAA.sunrise(
+                        date,
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        90.0 + variant.depressionAngle
+                    ).get();
+                double unixDays = (astroSunrise.getPosixTime() + U_OFFSET) / 86400d;
+                long fixed = EpochDays.RATA_DIE.transform((long) Math.floor(unixDays), EpochDays.UNIX);
+                return fixed + unixDays - Math.floor(unixDays);
+            }
         }
 
         private static double hSunset(
             double rataDie,
             HinduVariant variant
         ) {
-            double od = rataDie + 0.75 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
-            double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
-            double f = 0.75 * hSolarSiderealDifference(rataDie) - ascDiff;
-            return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
+            if (Double.isNaN(variant.depressionAngle)) {
+                double od = rataDie + 0.75 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
+                double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
+                double f = 0.75 * hSolarSiderealDifference(rataDie) - ascDiff;
+                return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
+            } else {
+                GeoLocation location = variant.getLocation();
+                PlainDate date = PlainDate.of((long) Math.floor(rataDie), EpochDays.RATA_DIE);
+                Moment astroSunset = // CC: page 357, citation of Purewal (14)
+                    StdSolarCalculator.NOAA.sunset(
+                        date,
+                        location.getLatitude(),
+                        location.getLongitude(),
+                        90.0 + variant.depressionAngle
+                    ).get();
+                double unixDays = (astroSunset.getPosixTime() + U_OFFSET) / 86400d;
+                long fixed = EpochDays.RATA_DIE.transform((long) Math.floor(unixDays), EpochDays.UNIX);
+                return fixed + unixDays - Math.floor(unixDays);
+            }
+        }
+
+        private static double hStandardFromSundial(
+            double t,
+            HinduVariant variant
+        ) {
+            double date = Math.floor(t);
+            double time = t - date;
+            int q = (int) Math.floor(4 * time);
+            double a, b, c;
+
+            if (q == 0) {
+                a = hSunset(date - 1, variant);
+                b = hSunrise(date, variant);
+                c = -0.25;
+            } else if (q == 3) {
+                a = hSunset(date, variant);
+                b = hSunrise(date + 1, variant);
+                c = 0.75;
+            } else {
+                a = hSunrise(date, variant);
+                b = hSunset(date, variant);
+                c = 0.25;
+            }
+
+            return a + 2 * (b - a) * (time - c);
         }
 
     }
