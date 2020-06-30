@@ -25,10 +25,11 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.GeoLocation;
+import net.time4j.calendar.astro.JulianDay;
 import net.time4j.calendar.astro.StdSolarCalculator;
-import net.time4j.engine.CalendarDays;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
+import net.time4j.scale.TimeScale;
 
 import java.io.IOException;
 import java.io.InvalidObjectException;
@@ -773,12 +774,14 @@ public final class HinduVariant
     //~ Innere Klassen ----------------------------------------------------
 
     @SuppressWarnings("ConstantConditions")
-    private static class ModernHinduCS
+    static class ModernHinduCS
         extends HinduCS {
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
-        private static final double SIDEREAL_YEAR = 365d + (279457.0 / 1080000.0);
+        static final double SIDEREAL_YEAR = 365d + (279457.0 / 1080000.0);
+        static final double SIDEREAL_START = 336.13606783930777;
+
         private static final double SIDEREAL_MONTH = 27d + (4644439.0 / 14438334.0);
         private static final double SYNODIC_MONTH = 29d + (7087771.0 / 13358334.0);
         private static final double EPSILON = Math.pow(2, -1000); // max recursion depth: 1000
@@ -995,8 +998,29 @@ public final class HinduVariant
             return modulo(lambda - equation, 360d);
         }
 
-        private static double hSolarLongitude(double t) {
+        private static double hSiderealLongitude(double t) {
+            return modulo(hSolarLongitude(t) - hPrecession(t) + SIDEREAL_START, 360);
+        }
+
+        static double hSolarLongitude(double t) {
             return hTruePosition(t, SIDEREAL_YEAR, 14d / 360d, ANOMALISTIC_YEAR, 1d / 42d);
+        }
+
+        // verified with Meeus example 21.c
+        static double hPrecession(double t) {
+            long unix = (long) (t + 1721424L - 2440587L) * 86400;
+            double jct = JulianDay.ofEphemerisTime(Moment.of(unix, TimeScale.POSIX)).getCenturyJ2000();
+
+            // using Meeus (21.6)
+            double eta = modulo(((47.0029 / 3600) + ((-0.03302 / 3600) + (0.00006 / 3600) * jct) * jct) * jct, 360);
+            double P = modulo(174.876384 + ((-869.8089 / 3600) + (0.03536 / 3600) * jct) * jct, 360);
+            double p = modulo(((5029.0966 / 3600) + ((1.11113 / 3600) + (-0.000006 / 3600) * jct) * jct) * jct, 360);
+
+            // use solar latitude = 0 and solar longitude (at mesha samkranti) = 0 in Meeus (21.7)
+            double A = Math.cos(Math.toRadians(eta)) * Math.sin(Math.toRadians(P));
+            double B = Math.cos(Math.toRadians(P));
+            double arg = Math.toDegrees(Math.atan2(A, B));
+            return modulo(p + P - arg, 360);
         }
 
         private static int hZodiac(double t) {
@@ -1017,10 +1041,10 @@ public final class HinduVariant
 
         private static double hNewMoonBefore(double t) {
             double tau = t - ((hLunarPhase(t) * SYNODIC_MONTH) / 360d);
-            return binarySearch(tau - 1, Math.min(t, tau + 1));
+            return binarySearchLunarPhase(tau - 1, Math.min(t, tau + 1));
         }
 
-        private static double binarySearch(
+        private static double binarySearchLunarPhase(
             double low,
             double high
         ) {
@@ -1031,9 +1055,9 @@ public final class HinduVariant
             }
 
             if (hLunarPhase((low + high) / 2) < 180) {
-                return binarySearch(low, x);
+                return binarySearchLunarPhase(low, x);
             } else {
-                return binarySearch(x, high);
+                return binarySearchLunarPhase(x, high);
             }
         }
 

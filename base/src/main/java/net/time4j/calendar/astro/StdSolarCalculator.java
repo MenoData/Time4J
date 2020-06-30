@@ -496,9 +496,9 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
      * </ul>
      */
@@ -514,9 +514,9 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
      * </ul>
      */
@@ -593,12 +593,12 @@ public enum StdSolarCalculator
                     double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
                     return AstroUtils.toRange_0_360(ra);
+                case "mean-anomaly":
+                    return meanAnomaly(jct);
                 case "nutation":
                     return nutation(jct);
                 case "obliquity":
                     return obliquity(jct);
-                case "mean-anomaly":
-                    return meanAnomaly(jct);
                 case "solar-longitude":
                     return apparentSolarLongitude(jct, nutation(jct));
                 case "solar-latitude":
@@ -700,9 +700,9 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
      * </ul>
      */
@@ -724,9 +724,9 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
      * </ul>
      */
@@ -783,6 +783,8 @@ public enum StdSolarCalculator
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
                     return AstroUtils.toRange_0_360(ra);
                 }
+                case "mean-anomaly":
+                    return meanAnomaly(jct);
                 case "nutation": {
                     double[] result = new double[2];
                     nutations(jct, result);
@@ -793,8 +795,6 @@ public enum StdSolarCalculator
                     nutations(jct, result);
                     return meanObliquity(jct) + result[1];
                 }
-                case "mean-anomaly":
-                    return meanAnomaly(jct);
                 case "solar-longitude": {
                     double[] result = new double[2];
                     nutations(jct, result);

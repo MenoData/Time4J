@@ -1,20 +1,29 @@
 package net.time4j.calendar.hindu;
 
+import net.time4j.Moment;
 import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.GeoLocation;
+import net.time4j.calendar.astro.JulianDay;
 import net.time4j.calendar.astro.SolarTime;
+import net.time4j.calendar.astro.StdSolarCalculator;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
+import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.math.BigDecimal;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
+import static net.time4j.calendar.hindu.HinduVariant.ModernHinduCS.*;
 
 
 @RunWith(JUnit4.class)
@@ -331,7 +340,15 @@ public class HinduVariantTest {
 
         System.out.println(cal.transform(PlainDate.axis()));
 
-        int[] lengthOfMonths = {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31};
+        int[][] lengthOfMonths = {
+            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31}, // 2020
+            {31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30},
+            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
+            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 31},
+            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
+            // {31, 31, 31, 32, 31, 30, 30, 30, 29, }, // 2025
+        };
+
         //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
         // tamil:               31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30
         // tamil-ujjain:        31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30
@@ -366,6 +383,52 @@ public class HinduVariantTest {
 //                cal.getMaximum(HinduCalendar.DAY_OF_MONTH),
 //                is(lengthOfMonths[i]));
             cal = cal.nextMonth();
+        }
+    }
+
+    @Test
+    public void meshaSamkranti285() { // CC, 20.41
+        long offset = ZonalOffset.atLongitude(new BigDecimal(HinduVariant.UJJAIN.getLongitude())).getIntegralAmount();
+        double fixed = ((meshaSamkranti(285) * 86400d) - offset) / 86400d;
+        Moment m = Moment.of(86400 * ((long) fixed + 1721424L - 2440587L), TimeScale.POSIX);
+        assertThat(
+            m.get(PlainDate.YEAR.atUTC()),
+            is(285));
+        assertThat(
+            Math.abs(SIDEREAL_START - hPrecession(fixed)) < 0.001,
+            is(true));
+    }
+
+    @Test
+    public void meshaSamkranti2000() { // CC-example, page 364
+        long fixed = (long) (meshaSamkranti(2000) * 86400d);
+        long unix = fixed + (1721424L - 2440587L) * 86400;
+        Moment s = Moment.of(unix, TimeScale.POSIX).with(Moment.PRECISION, TimeUnit.MINUTES);
+        assertThat(s, is(PlainTimestamp.of(2000, 4, 13, 17, 55).atUTC()));
+    }
+
+    private static double meshaSamkranti(int gyear) {
+        long t = PlainDate.of(gyear, 1, 1).get(EpochDays.RATA_DIE);
+        double tau = t + ((SIDEREAL_YEAR / 360d) * HinduCS.modulo(-hSolarLongitude(t), 360));
+        double a = Math.max(t, tau - 5);
+        double b = tau + 5;
+        return binarySearchSolarLongitude(a, b);
+    }
+
+    private static double binarySearchSolarLongitude(
+        double low,
+        double high
+    ) {
+        double x = (low + high) / 2;
+
+        if (high - low < 0.00001) {
+            return x;
+        }
+
+        if (HinduCS.modulo(hSolarLongitude((low + high) / 2), 360) < 180) {
+            return binarySearchSolarLongitude(low, x);
+        } else {
+            return binarySearchSolarLongitude(x, high);
         }
     }
 
