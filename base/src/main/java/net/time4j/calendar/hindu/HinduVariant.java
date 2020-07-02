@@ -561,13 +561,13 @@ public final class HinduVariant
     }
 
     /**
-     * <p>Outdated method. </p>
+     * <p>Outdated method without any effect. </p>
      *
      * @return      this variant (unchanged)
      * @deprecated  Use {@link #withModernAstronomy(double)} instead
      */
     /*[deutsch]
-     * <p>Veraltete Methode. </p>
+     * <p>Veraltete Methode ohne Wirkung. </p>
      *
      * @return      this variant (unchanged)
      * @deprecated  Use {@link #withModernAstronomy(double)} instead
@@ -578,7 +578,8 @@ public final class HinduVariant
     }
 
     /**
-     * <p>Creates a copy of this variant with an alternative internal calculation for the sunrise or sunset. </p>
+     * <p>Creates a copy of this variant based on modern astronomy which also deploys an alternative
+     * internal calculation for the sunrise or sunset. </p>
      *
      * <p>Note: The old Hindu calendar is not customizable. Most calendar makers in India use geometric sunrise
      * without refraction for the modern Hindu calendar, i.e. they use {@code 0.0} as depression angle. Another
@@ -589,8 +590,8 @@ public final class HinduVariant
      * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 <= x <= 10.0
      */
     /*[deutsch]
-     * <p>Erzeugt eine Kopie dieser Variante mit einer alternativen internen Berechnung f&uuml;r
-     * den Sonnenaufgang oder Untergang. </p>
+     * <p>Erzeugt eine Kopie dieser Variante basierend auf moderner Astronomie, die auch mit einer alternativen
+     * internen Berechnung f&uuml;r den Sonnenaufgang oder Untergang aufwartet. </p>
      *
      * <p>Hinweis: Der alte Hindu-Kalender erlaubt keine Anpassung. Die meisten Kalendermacher in Indien
      * verwenden heutzutage den geometrischen Sonnenaufgang ohne Beugungskorrektur im modernen Hindukalender,
@@ -635,7 +636,7 @@ public final class HinduVariant
      */
     public HinduVariant withAlternativeLocation(GeoLocation location) {
         if (Math.abs(location.getLatitude()) > 60.0) {
-            throw new IllegalArgumentException("Latitudes beyond 60° degrees not supported.");
+            throw new IllegalArgumentException("Latitudes beyond +/-60° degrees not supported.");
         } else if (this.isOld()) {
             return this;
         }
@@ -701,6 +702,10 @@ public final class HinduVariant
         }
 
         return month.getValue();
+    }
+
+    private boolean useModernAstronomy() {
+        return !Double.isNaN(this.depressionAngle);
     }
 
     private static boolean useStandardElapsedMode(
@@ -779,8 +784,9 @@ public final class HinduVariant
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
+        private static final boolean CC = false; // handling of CC sign error in calculating of precession
         static final double SIDEREAL_YEAR = 365d + (279457.0 / 1080000.0);
-        static final double SIDEREAL_START = 336.13606783930777;
+        static final double SIDEREAL_START = CC ? 336.1360597836302 : 336.1360765905204;
 
         private static final double SIDEREAL_MONTH = 27d + (4644439.0 / 14438334.0);
         private static final double SYNODIC_MONTH = 29d + (7087771.0 / 13358334.0);
@@ -789,6 +795,7 @@ public final class HinduVariant
         private static final double CREATION = KALI_YUGA_EPOCH - 1955880000d * SIDEREAL_YEAR;
         private static final double ANOMALISTIC_YEAR = 1577917828000d / (4320000000L - 387);
         private static final double ANOMALISTIC_MONTH = 1577917828d / (57753336 - 488199);
+        private static final double MEAN_SIDEREAL_YEAR = 365.25636;
 
         private static final double[] RISING_SIGN_FACTORS;
 
@@ -998,8 +1005,12 @@ public final class HinduVariant
             return modulo(lambda - equation, 360d);
         }
 
-        private static double hSiderealLongitude(double t) {
-            return modulo(hSolarLongitude(t) - hPrecession(t) + SIDEREAL_START, 360);
+        private static double hSiderealSolarLongitude(double t) {
+            return modulo(
+                StdSolarCalculator.CC.getFeature(toJDE(t).getValue(), "solar-longitude")
+                    - hPrecession(t)
+                    + SIDEREAL_START,
+                360d);
         }
 
         static double hSolarLongitude(double t) {
@@ -1008,23 +1019,38 @@ public final class HinduVariant
 
         // verified with Meeus example 21.c
         static double hPrecession(double t) {
-            long unix = (long) (t + 1721424L - 2440587L) * 86400;
-            double jct = JulianDay.ofEphemerisTime(Moment.of(unix, TimeScale.POSIX)).getCenturyJ2000();
+            double jct = toJDE(t).getCenturyJ2000();
+            int sign = CC ? 1 : -1;
 
             // using Meeus (21.6)
-            double eta = modulo(((47.0029 / 3600) + ((-0.03302 / 3600) + (0.00006 / 3600) * jct) * jct) * jct, 360);
-            double P = modulo(174.876384 + ((-869.8089 / 3600) + (0.03536 / 3600) * jct) * jct, 360);
-            double p = modulo(((5029.0966 / 3600) + ((1.11113 / 3600) + (-0.000006 / 3600) * jct) * jct) * jct, 360);
+            double eta = modulo(
+                ((47.0029 / 3600) + ((-0.03302 / 3600) + (0.00006 / 3600) * jct) * jct) * jct,
+                360);
+            double P = modulo(
+                174.876384 + ((-869.8089 / 3600) + (0.03536 / 3600) * jct) * jct,
+                360);
+            double p = modulo(
+                ((5029.0966 / 3600) + ((1.11113 / 3600) + (sign * 0.000006 / 3600) * jct) * jct) * jct,
+                360);
 
             // use solar latitude = 0 and solar longitude (at mesha samkranti) = 0 in Meeus (21.7)
             double A = Math.cos(Math.toRadians(eta)) * Math.sin(Math.toRadians(P));
             double B = Math.cos(Math.toRadians(P));
             double arg = Math.toDegrees(Math.atan2(A, B));
-            return modulo(p + P - arg, 360);
+            return modulo(p + P - arg, 360d);
+        }
+
+        private static JulianDay toJDE(double t) { // argument as rata die
+            long unix = Math.round((t + 1721424L - 2440587L) * 86400);
+            return JulianDay.ofEphemerisTime(Moment.of(unix, TimeScale.POSIX));
         }
 
         private static int hZodiac(double t) {
             return (int) (Math.floor(hSolarLongitude(t) / 30d) + 1);
+        }
+
+        private static int hSiderealZodiac(double t) {
+            return (int) (Math.floor(hSiderealSolarLongitude(t) / 30d) + 1);
         }
 
         private static double hLunarLongitude(double t) {
@@ -1065,6 +1091,11 @@ public final class HinduVariant
             return (int) Math.floor(0.5 + ((t - KALI_YUGA_EPOCH) / SIDEREAL_YEAR) - (hSolarLongitude(t) / 360d));
         }
 
+        private static int hAstroCalendarYear(double t) {
+            return (int) Math.floor(
+                0.5 + ((t - KALI_YUGA_EPOCH) / MEAN_SIDEREAL_YEAR) - (hSiderealSolarLongitude(t) / 360d));
+        }
+
         private static HinduCalendar hSolarFromFixed(
             long utcDays,
             HinduVariant variant
@@ -1074,12 +1105,26 @@ public final class HinduVariant
             LongFunction<Double> function = hCritical(variant);
             long rataDie = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC);
             double critical = function.apply(rataDie);
-            int kyYear = hCalendarYear(critical);
-            int m = hZodiac(critical);
-            long start = rataDie - 3 - (int) modulo(Math.floor(hSolarLongitude(critical)), 30);
 
-            while (hZodiac(function.apply(start)) != m) {
-                start++;
+            int kyYear, m;
+            long start;
+
+            if (variant.useModernAstronomy()) {
+                kyYear = hAstroCalendarYear(critical);
+                m = hSiderealZodiac(critical);
+                start = rataDie - 3 - (int) modulo(Math.floor(hSiderealSolarLongitude(critical)), 30);
+
+                while (hSiderealZodiac(function.apply(start)) != m) {
+                    start++;
+                }
+            } else {
+                kyYear = hCalendarYear(critical);
+                m = hZodiac(critical);
+                start = rataDie - 3 - (int) modulo(Math.floor(hSolarLongitude(critical)), 30);
+
+                while (hZodiac(function.apply(start)) != m) {
+                    start++;
+                }
             }
 
             return new HinduCalendar(
@@ -1097,12 +1142,21 @@ public final class HinduVariant
             HinduDay dom,
             HinduVariant variant
         ) {
+            assert variant.isSolar();
+
             int m = month.getRasi();
             LongFunction<Double> function = hCritical(variant);
-            long start = KALI_YUGA_EPOCH - 3 + (long) Math.floor(SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d)));
+            double siderealYear = (variant.useModernAstronomy() ? MEAN_SIDEREAL_YEAR : SIDEREAL_YEAR);
+            long start = KALI_YUGA_EPOCH - 3 + (long) Math.floor(siderealYear * (kyYear + ((m - 1) / 12d)));
 
-            while (hZodiac(function.apply(start)) != m) {
-                start++;
+            if (variant.useModernAstronomy()) {
+                while (hSiderealZodiac(function.apply(start)) != m) {
+                    start++;
+                }
+            } else {
+                while (hZodiac(function.apply(start)) != m) {
+                    start++;
+                }
             }
 
             return EpochDays.UTC.transform(dom.getValue() - 1 + start, EpochDays.RATA_DIE);
@@ -1165,6 +1219,8 @@ public final class HinduVariant
             HinduDay dom,
             HinduVariant variant
         ) {
+            assert variant.isLunisolar();
+
             int m = month.getValue().getValue();
             double approx = KALI_YUGA_EPOCH + SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d));
             double x = (hSolarLongitude(approx) / 360d) - ((m - 1) / 12d);
@@ -1263,7 +1319,7 @@ public final class HinduVariant
                 GeoLocation location = variant.getLocation();
                 PlainDate date = PlainDate.of((long) Math.floor(rataDie), EpochDays.RATA_DIE);
                 Moment astroSunrise = // CC: page 357, citation of Purewal (14)
-                    StdSolarCalculator.NOAA.sunrise(
+                    StdSolarCalculator.CC.sunrise(
                         date,
                         location.getLatitude(),
                         location.getLongitude(),
@@ -1288,7 +1344,7 @@ public final class HinduVariant
                 GeoLocation location = variant.getLocation();
                 PlainDate date = PlainDate.of((long) Math.floor(rataDie), EpochDays.RATA_DIE);
                 Moment astroSunset = // CC: page 357, citation of Purewal (14)
-                    StdSolarCalculator.NOAA.sunset(
+                    StdSolarCalculator.CC.sunset(
                         date,
                         location.getLatitude(),
                         location.getLongitude(),

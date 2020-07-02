@@ -6,9 +6,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.GeoLocation;
-import net.time4j.calendar.astro.JulianDay;
 import net.time4j.calendar.astro.SolarTime;
-import net.time4j.calendar.astro.StdSolarCalculator;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
 import net.time4j.scale.TimeScale;
@@ -21,9 +19,9 @@ import java.math.BigDecimal;
 import java.util.Locale;
 import java.util.concurrent.TimeUnit;
 
+import static net.time4j.calendar.hindu.HinduVariant.ModernHinduCS.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
-import static net.time4j.calendar.hindu.HinduVariant.ModernHinduCS.*;
 
 
 @RunWith(JUnit4.class)
@@ -321,10 +319,9 @@ public class HinduVariantTest {
     public void chennai() {
         HinduCalendar cal =
             HinduCalendar.of(
-                HinduRule.MADRAS.variant()
-                    .withModernAstronomy(5.0)
-                    .withCurrentYears()
-                    .withAlternativeLocation(GeoLocation.of(13 + 5d / 60, 80 + 17d / 60)),
+                HinduRule.MALAYALI.variant() // website data originate from Kerala region!!!
+                    .withModernAstronomy(47 / 60d)
+                    ,//.withAlternativeLocation(GeoLocation.of(13 + 5d / 60, 80 + 17d / 60)),
                 HinduEra.SAKA,
                 1943,
                 HinduMonth.ofSolar(1),
@@ -333,12 +330,9 @@ public class HinduVariantTest {
         assertThat(
             cal.with(HinduCalendar.DAY_OF_YEAR, 1),
             is(cal));
-        //for (int i = 0; i < 50; i++) {
-            //System.out.println(cal.with(HinduCalendar.DAY_OF_YEAR, 1).transform(PlainDate.axis()));
-            //cal = cal.nextYear();
-        //}
-
-        System.out.println(cal.transform(PlainDate.axis()));
+        assertThat(
+            cal.transform(PlainDate.axis()),
+            is(PlainDate.of(2020, 4, 14)));
 
         int[][] lengthOfMonths = {
             {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31}, // 2020
@@ -349,41 +343,25 @@ public class HinduVariantTest {
             // {31, 31, 31, 32, 31, 30, 30, 30, 29, }, // 2025
         };
 
-        //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
-        // tamil:               31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30
-        // tamil-ujjain:        31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30
-        // madras-ujjain:       31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
-        // madras:              31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31
-        //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
-        //                      31, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31,
+        int deviations = 0;
 
-        // 2019: 2019-04-14
-        //       31, 32, 31, 32, 31, 30, 30, 29, 30, 29, 30, 30,
-        PlainDate[] gregorian = {
-            PlainDate.of(2020, 4, 14),
-            PlainDate.of(2020, 5, 14),
-            PlainDate.of(2020, 6, 15),
-            PlainDate.of(2020, 7, 16),
-            PlainDate.of(2020, 8, 17),
-            PlainDate.of(2020, 9, 17),
-            PlainDate.of(2020, 10, 17),
-            PlainDate.of(2020, 11, 16),
-            PlainDate.of(2020, 12, 16),
-            PlainDate.of(2021, 1, 14),
-            PlainDate.of(2021, 2, 13),
-            PlainDate.of(2021, 3, 14),
-        };
-
-        for (int i = 0; i < 12; i++) {
-            System.out.print(cal.getMaximum(HinduCalendar.DAY_OF_MONTH) + ", ");
-//            assertThat(
-//                cal.transform(PlainDate.axis()),
-//                is(gregorian[i]));
-//            assertThat(
-//                cal.getMaximum(HinduCalendar.DAY_OF_MONTH),
-//                is(lengthOfMonths[i]));
-            cal = cal.nextMonth();
+        for (int y = 2020; y < 2025; y++) {
+            for (int i = 0; i < 12; i++) {
+                int len = cal.getMaximum(HinduCalendar.DAY_OF_MONTH).getValue();
+                int expected = lengthOfMonths[y - 2020][i];
+                if (len == expected) {
+                    System.out.print(cal.getMaximum(HinduCalendar.DAY_OF_MONTH) + ", ");
+                } else {
+                    deviations++;
+                    System.out.print("??, ");
+                }
+                //assertThat(len, is(expected));
+                cal = cal.nextMonth();
+            }
+            System.out.println();
         }
+
+        System.out.println("Deviations: " + deviations);
     }
 
     @Test
@@ -395,7 +373,7 @@ public class HinduVariantTest {
             m.get(PlainDate.YEAR.atUTC()),
             is(285));
         assertThat(
-            Math.abs(SIDEREAL_START - hPrecession(fixed)) < 0.001,
+            Math.abs(SIDEREAL_START - hPrecession(fixed)) < 0.0001,
             is(true));
     }
 
