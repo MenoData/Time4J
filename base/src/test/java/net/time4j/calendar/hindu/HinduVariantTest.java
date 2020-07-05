@@ -315,13 +315,35 @@ public class HinduVariantTest {
             is(true));
     }
 
+    @Test
+    public void amantaKartika() {
+        HinduVariant vk = HinduRule.AMANTA_KARTIKA.variant();
+        HinduVariant va = HinduRule.AMANTA.variant();
+
+        HinduCalendar cal1 =
+            HinduCalendar.of(vk, HinduEra.VIKRAMA, 1850, HinduMonth.of(IndianMonth.KARTIKA), HinduDay.valueOf(1));
+        HinduCalendar cal2 =
+            HinduCalendar.of(vk, HinduEra.VIKRAMA, 1849, HinduMonth.of(IndianMonth.ASHWIN), HinduDay.valueOf(30));
+        HinduCalendar cal3 =
+            HinduCalendar.of(va, HinduEra.VIKRAMA, 1850, HinduMonth.of(IndianMonth.KARTIKA), HinduDay.valueOf(1));
+        HinduCalendar cal4 =
+            HinduCalendar.of(va, HinduEra.VIKRAMA, 1850, HinduMonth.of(IndianMonth.ASHWIN), HinduDay.valueOf(30));
+
+        assertThat(cal1.previousDay(), is(cal2));
+        assertThat(cal1.isSimultaneous(cal3), is(true));
+        assertThat(cal3.previousDay(), is(cal4));
+        assertThat(cal2.isSimultaneous(cal4), is(true));
+    }
+
     @Test // https://www.prokerala.com/general/calendar/tamilcalendar.php?year=2020&mon=chithirai#calendar
-    public void chennai() {
+    public void kerala() {
         HinduCalendar cal =
             HinduCalendar.of(
                 HinduRule.MALAYALI.variant() // website data originate from Kerala region!!!
-                    .withModernAstronomy(47 / 60d)
-                    ,//.withAlternativeLocation(GeoLocation.of(13 + 5d / 60, 80 + 17d / 60)),
+                    .withModernAstronomy(0.0)
+                    // .withAlternativeLocation(GeoLocation.of(9 + 58d / 60, 76 + 17d / 60)), // Kochi in Kerala
+                    //,//.withAlternativeLocation(GeoLocation.of(13 + 5d / 60, 80 + 17d / 60)) // Chennai/Madras
+                ,
                 HinduEra.SAKA,
                 1943,
                 HinduMonth.ofSolar(1),
@@ -335,11 +357,11 @@ public class HinduVariantTest {
             is(PlainDate.of(2020, 4, 14)));
 
         int[][] lengthOfMonths = {
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31}, // 2020
-            {31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30},
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30},
-            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 31},
-            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30},
+            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31}, // 2020: ok
+            {31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30}, // four deviations in year 2021!!!
+            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30}, // 2022: ok
+            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 31}, // 2023: ok
+            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30}, // 2024: ok
             // {31, 31, 31, 32, 31, 30, 30, 30, 29, }, // 2025
         };
 
@@ -361,7 +383,7 @@ public class HinduVariantTest {
             System.out.println();
         }
 
-        System.out.println("Deviations: " + deviations);
+        assertThat(deviations <= 4, is(true));
     }
 
     @Test

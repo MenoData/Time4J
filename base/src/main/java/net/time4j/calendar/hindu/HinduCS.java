@@ -110,8 +110,14 @@ abstract class HinduCS
         HinduMonth month,
         HinduDay dom
     ) {
-        HinduCalendar cal = this.create(kyYear, month, dom);
-        return !cal.equals(this.create(cal.getDaysSinceEpochUTC()));
+        long utcDays = this.create(kyYear, month, dom).getDaysSinceEpochUTC();
+        HinduCalendar cal = this.create(utcDays);
+
+        return (
+            (cal.getExpiredYearOfKaliYuga() != kyYear)
+            || !cal.getMonth().equals(month)
+            || !cal.getDayOfMonth().equals(dom)
+        );
     }
 
     // used in subclasses

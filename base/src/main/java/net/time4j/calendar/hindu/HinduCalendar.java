@@ -143,6 +143,7 @@ public final class HinduCalendar
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    private static final int MIN_YEAR = 1200;
     private static final int MAX_YEAR = 5999;
     private static final int YEAR_INDEX = 0;
     private static final int DAY_OF_YEAR_INDEX = 1;
@@ -170,14 +171,16 @@ public final class HinduCalendar
      * <p>Represents the Hindu year. </p>
      *
      * <p>The range is for the era Kali Yuga defined by {@code 0-5999} (elapsed year) resprective {@code 1-6000}
-     * (current year) and will be adjusted accordingly for other eras. </p>
+     * (current year) and will be adjusted accordingly for other eras. However, the modern Hindu calendar will
+     * use the year {@code 1200} as minimum elapsed year. </p>
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert das Hindu-Jahr. </p>
      *
      * <p>Der Wertebereich ist f&uuml;r die &Auml;ra Kali Yuga durch {@code 0-5999} (abgelaufenes Jahr)
-     * beziehungsweilse durch {@code 1-6000} (laufendes Jahr) definiert und wird f&uuml;r andere &Auml;ras
-     * entsprechend angepasst. </p>
+     * beziehungsweise durch {@code 1-6000} (laufendes Jahr) definiert und wird f&uuml;r andere &Auml;ras
+     * entsprechend angepasst. Allerdings wird der moderne Hindukalender das Jahr {@code 1200} als minimales
+     * abgelaufendes Jahr verwenden. </p>
      */
     @FormattableElement(format = "y")
     public static final StdCalendarElement<Integer, HinduCalendar> YEAR_OF_ERA =
@@ -340,8 +343,6 @@ public final class HinduCalendar
             throw new NullPointerException("Missing month.");
         } else if (dayOfMonth == null) {
             throw new NullPointerException("Missing day of month.");
-        } else if (kyYear < 0) {
-            throw new IllegalArgumentException("Kali yuga year must not be smaller than 0: " + kyYear);
         }
 
         this.variant = variant;
@@ -487,6 +488,8 @@ public final class HinduCalendar
     /**
      * <p>Creates an Hindu calendar with given components. </p>
      *
+     * <p>Note: The modern variants of Hindu calendar use the year {@code 1200} as miminum elapsed year. </p>
+     *
      * @param   variant         the variant of Hindu calendar
      * @param   era             the desired era
      * @param   yearOfEra       the year of given era (expired or current according to variant configuration)
@@ -497,6 +500,9 @@ public final class HinduCalendar
      */
     /*[deutsch]
      * <p>Erzeugt ein Datum des Hindu-Kalenders mit den angegebenen Komponenten. </p>
+     *
+     * <p>Hinweis: Die modernen Varianten des Hindu-Kalenders verwenden das Jahr {@code 1200} als
+     * minimales abgelaufenes Jahr. </p>
      *
      * @param   variant         the variant of Hindu calendar
      * @param   era             the desired era
@@ -518,6 +524,12 @@ public final class HinduCalendar
 
         if (!variant.isUsingElapsedYears()) {
             kyYear--;
+        }
+
+        if (kyYear < 0) {
+            throw new IllegalArgumentException("Kali yuga year must not be smaller than 0: " + kyYear);
+        } else if (!variant.isOld() && (kyYear < MIN_YEAR)) {
+            throw new IllegalArgumentException("Year out of range in modern Hindu calendar: " + kyYear);
         }
 
         if (calsys.isValid(kyYear, month, dayOfMonth)) {
@@ -593,6 +605,10 @@ public final class HinduCalendar
 
         if (!variant.isUsingElapsedYears()) {
             kyYear--;
+        }
+
+        if ((kyYear < 0) || (!variant.isOld() && (kyYear < MIN_YEAR))) {
+            return false;
         }
 
         return calsys.isValid(kyYear, month, dayOfMonth);
@@ -1006,7 +1022,8 @@ public final class HinduCalendar
         return this.variant;
     }
 
-    private HinduCalendar withNewYear() {
+    // used by HinduRule-based calendar systems
+    HinduCalendar withNewYear() {
         HinduMonth first = (
             this.variant.isSolar()
                 ? HinduMonth.ofSolar(1)
@@ -1461,7 +1478,8 @@ public final class HinduCalendar
         private int getMin(HinduCalendar context) {
             switch (this.index) {
                 case YEAR_INDEX:
-                    return context.variant.isUsingElapsedYears() ? 0 : 1;
+                    int y = context.variant.isOld() ? 0 : MIN_YEAR;
+                    return context.variant.isUsingElapsedYears() ? y : y + 1;
                 case DAY_OF_YEAR_INDEX:
                     return 1;
                 default:

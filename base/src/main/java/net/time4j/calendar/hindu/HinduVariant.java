@@ -784,6 +784,9 @@ public final class HinduVariant
 
         //~ Statische Felder/Initialisierungen ----------------------------
 
+        private static final int MIN_YEAR = 1200;
+        private static final int MAX_YEAR = 5999;
+
         private static final boolean CC = false; // handling of CC sign error in calculating of precession
         static final double SIDEREAL_YEAR = 365d + (279457.0 / 1080000.0);
         static final double SIDEREAL_START = CC ? 336.1360597836302 : 336.1360765905204;
@@ -810,6 +813,11 @@ public final class HinduVariant
             RISING_SIGN_FACTORS = f;
         }
 
+        //~ Instanzvariablen ----------------------------------------------
+
+        private volatile long min = Long.MIN_VALUE;
+        private volatile long max = Long.MAX_VALUE;
+
         //~ Konstruktoren -------------------------------------------------
 
         ModernHinduCS(HinduVariant variant) {
@@ -833,17 +841,11 @@ public final class HinduVariant
                 case AMANTA_ASHADHA:
                 case AMANTA_KARTIKA:
                     HinduCalendar cal = hv.toAmanta().create(utcDays);
+                    int kyYear = cal.getExpiredYearOfKaliYuga();
                     if (cal.getMonth().getValue().getValue() < hv.getFirstMonthOfYear()) {
-                        cal =
-                            new HinduCalendar(
-                                hv,
-                                cal.getExpiredYearOfKaliYuga() - 1,
-                                cal.getMonth(),
-                                cal.getDayOfMonth(),
-                                utcDays
-                            );
+                        kyYear--;
                     }
-                    return cal;
+                    return new HinduCalendar(hv, kyYear, cal.getMonth(), cal.getDayOfMonth(), utcDays);
                 case PURNIMANTA:
                     HinduCS amantaCS = hv.toAmanta();
                     HinduCalendar amantaCal = amantaCS.create(utcDays);
@@ -885,10 +887,12 @@ public final class HinduVariant
                     break;
                 case AMANTA_ASHADHA:
                 case AMANTA_KARTIKA:
+                    int amantaYear = kyYear;
                     if (month.getValue().getValue() < hv.getFirstMonthOfYear()) {
-                        kyYear++;
+                        amantaYear++;
                     }
-                    return hv.toAmanta().create(kyYear, month, dom);
+                    HinduCalendar cal = hv.toAmanta().create(amantaYear, month, dom);
+                    return new HinduCalendar(hv, kyYear, month, dom, cal.getDaysSinceEpochUTC());
                 case PURNIMANTA:
                     HinduMonth m;
                     if (month.isLeap() || (dom.getValue() <= 15)) {
@@ -909,40 +913,48 @@ public final class HinduVariant
 
         @Override
         boolean isValid(int kyYear, HinduMonth month, HinduDay dom) {
-            if ((kyYear < 0) || (kyYear > 5999) || (month == null) || (dom == null)) {
+
+            if ((kyYear < MIN_YEAR) || (kyYear > MAX_YEAR) || (month == null) || (dom == null)) {
                 return false;
             }
 
             if (super.variant.isSolar() && (month.isLeap() || dom.isLeap())) {
                 return false;
+            } else if (super.variant.isLunisolar() && (dom.getValue() > 30)) {
+                return false;
             }
 
-            switch (this.getRule()) {
-                case AMANTA:
-                case PURNIMANTA:
-                    if (dom.getValue() > 30) {
-                        return false;
-                    }
-                    break;
-                case AMANTA_ASHADHA:
-                case AMANTA_KARTIKA:
-                    if (month.getValue().getValue() < super.variant.getFirstMonthOfYear()) {
-                        kyYear++;
-                    }
-                    return super.variant.toAmanta().isValid(kyYear, month, dom);
+            HinduCS calsys = this;
+            HinduRule rule = this.getRule();
+
+            if ((rule == HinduRule.AMANTA_ASHADHA) || (rule == HinduRule.AMANTA_KARTIKA)) {
+                if (month.getValue().getValue() < super.variant.getFirstMonthOfYear()) {
+                    kyYear++;
+                }
+                calsys = super.variant.toAmanta();
             }
 
-            return !this.isExpunged(kyYear, month, dom);
+            return !calsys.isExpunged(kyYear, month, dom);
         }
 
         @Override
         public long getMinimumSinceUTC() {
-            return Long.MIN_VALUE; // TODO: impl
+            if (this.min == Long.MIN_VALUE) {
+                HinduCalendar cal =
+                    this.create(MIN_YEAR, HinduMonth.of(IndianMonth.AGRAHAYANA), HinduDay.valueOf(1));
+                this.min = cal.withNewYear().getDaysSinceEpochUTC();
+            }
+            return this.min;
         }
 
         @Override
         public long getMaximumSinceUTC() {
-            return Long.MAX_VALUE; // TODO: impl
+            if (this.max == Long.MAX_VALUE) {
+                HinduCalendar cal =
+                    this.create(MAX_YEAR + 1, HinduMonth.of(IndianMonth.AGRAHAYANA), HinduDay.valueOf(1));
+                this.max = (cal.withNewYear().getDaysSinceEpochUTC() - 1);
+            }
+            return this.max;
         }
 
         private HinduRule getRule() {
