@@ -1,6 +1,7 @@
 package net.time4j.calendar.hindu;
 
 import net.time4j.calendar.IndianMonth;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarSystem;
 import org.junit.Test;
 
@@ -55,7 +56,14 @@ public class HinduMiscellaneousTest {
             is(false));
 
         try {
-            max.nextDay();
+            min.previousMonth();
+            fail("Expected exception due to out-of-range condition did not happen.");
+        } catch (IllegalArgumentException ex) {
+            // expected error
+        }
+
+        try {
+            max.nextMonth();
             fail("Expected exception due to out-of-range condition did not happen.");
         } catch (IllegalArgumentException ex) {
             // expected error
@@ -77,6 +85,13 @@ public class HinduMiscellaneousTest {
         assertThat(min.getDayOfMonth(), is(min.getMinimum(HinduCalendar.DAY_OF_MONTH)));
         assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(30)));
         assertThat(max.getDayOfMonth(), is(max.getMaximum(HinduCalendar.DAY_OF_MONTH)));
+
+        try {
+            min.previousDay();
+            fail("Expected exception due to out-of-range condition did not happen.");
+        } catch (IllegalArgumentException ex) {
+            // expected error
+        }
 
         try {
             max.nextDay();
@@ -112,10 +127,79 @@ public class HinduMiscellaneousTest {
             is(max));
 
         try {
+            min.previousDay();
+            fail("Expected exception due to out-of-range condition did not happen.");
+        } catch (IllegalArgumentException ex) {
+            // expected error
+        }
+
+        try {
             max.nextDay();
             fail("Expected exception due to out-of-range condition did not happen.");
         } catch (IllegalArgumentException ex) {
             // expected error
+        }
+    }
+
+    @Test
+    public void dayOfMonthRangeInPurnimanta() {
+        HinduCalendar cal =
+            HinduCalendar.of(
+                HinduRule.PURNIMANTA.variant(),
+                HinduEra.VIKRAMA,
+                1850,
+                HinduMonth.of(IndianMonth.JYESHTHA),
+                HinduDay.valueOf(18)
+            );
+
+        assertThat(cal.getMinimum(HinduCalendar.DAY_OF_MONTH), is(HinduDay.valueOf(16)));
+        assertThat(cal.getMaximum(HinduCalendar.DAY_OF_MONTH), is(HinduDay.valueOf(15)));
+        assertThat(cal.lengthOfMonth(), is(30));
+        assertThat(cal.with(HinduCalendar.DAY_OF_MONTH.minimized()), is(cal.minus(CalendarDays.of(2))));
+
+        HinduCalendar amanta1 =
+            HinduCalendar.of(
+                HinduRule.AMANTA.variant(),
+                HinduEra.VIKRAMA,
+                1850,
+                HinduMonth.of(IndianMonth.JYESHTHA),
+                HinduDay.valueOf(1)
+            );
+        HinduCalendar amanta2 =
+            HinduCalendar.of(
+                HinduRule.AMANTA.variant(),
+                HinduEra.VIKRAMA,
+                1850,
+                HinduMonth.of(IndianMonth.VAISHAKHA),
+                HinduDay.valueOf(18)
+            );
+
+        // shift of month between purnimanta and amanta for days >= 16
+        assertThat(cal.isSimultaneous(amanta2), is(true));
+        // start-day = 18, gap = 23, end-of-month = 30, final-day = 1 => 12 days later
+        assertThat(cal.plus(CalendarDays.of(12)).isSimultaneous(amanta1), is(true));
+
+        cal = cal.minus(CalendarDays.of(2)); // start of month
+
+        for (int i = 0; i < 30; i++) {
+            HinduDay current = cal.getDayOfMonth();
+            HinduDay next;
+
+            if (current.equals(HinduDay.valueOf(7))) {
+                next = HinduDay.valueOf(7).withLeap();
+            } else if (current.getValue() == 22) {
+                next = HinduDay.valueOf(24);
+            } else if (current.getValue() == 30) {
+                next = HinduDay.valueOf(1);
+            } else {
+                next = HinduDay.valueOf(current.getValue() + 1);
+            }
+
+            cal = cal.nextDay();
+
+            if (cal.getMonth().getValue().equals(IndianMonth.JYESHTHA)) {
+                assertThat(next.equals(cal.getDayOfMonth()), is(true));
+            }
         }
     }
 
