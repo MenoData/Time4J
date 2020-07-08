@@ -704,6 +704,17 @@ public final class HinduVariant
         return month.getValue();
     }
 
+    // also used by purnimanta new year
+    HinduCS toAmanta() {
+        return new HinduVariant(
+            HinduRule.AMANTA.ordinal(),
+            this.defaultEra,
+            this.elapsedMode,
+            this.depressionAngle,
+            this.location
+        ).getCalendarSystem();
+    }
+
     private boolean useModernAstronomy() {
         return !Double.isNaN(this.depressionAngle);
     }
@@ -744,16 +755,6 @@ public final class HinduVariant
 
     private HinduRule getRule() {
         return RULES[this.type];
-    }
-
-    private HinduCS toAmanta() {
-        return new HinduVariant(
-            HinduRule.AMANTA.ordinal(),
-            this.defaultEra,
-            this.elapsedMode,
-            this.depressionAngle,
-            this.location
-        ).getCalendarSystem();
     }
 
     /**
@@ -897,10 +898,10 @@ public final class HinduVariant
                     HinduMonth m;
                     if (month.isLeap() || (dom.getValue() <= 15)) {
                         m = month;
-                    } else if (this.isExpunged(kyYear, previousMonth(month, 1), HinduDay.valueOf(15))) {
-                        m = previousMonth(month, 2);
+                    } else if (super.variant.toAmanta().isExpunged(kyYear, prevMonth(month, 1))) {
+                        m = prevMonth(month, 2);
                     } else {
-                        m = previousMonth(month, 1);
+                        m = prevMonth(month, 1);
                     }
                     utcDays = hFixedFromLunar(kyYear, m, dom, hv);
                     break;
@@ -940,9 +941,13 @@ public final class HinduVariant
         @Override
         public long getMinimumSinceUTC() {
             if (this.min == Long.MIN_VALUE) {
-                HinduCalendar cal =
-                    this.create(MIN_YEAR, HinduMonth.of(IndianMonth.AGRAHAYANA), HinduDay.valueOf(1));
-                this.min = cal.withNewYear().getDaysSinceEpochUTC();
+                HinduCalendar cal;
+                if (super.variant.isPurnimanta()) {
+                    cal = this.createNewYear(MIN_YEAR + 1).withFirstDayOfMonth();
+                } else {
+                    cal = this.createNewYear(MIN_YEAR);
+                }
+                this.min = cal.getDaysSinceEpochUTC();
             }
             return this.min;
         }
@@ -950,23 +955,35 @@ public final class HinduVariant
         @Override
         public long getMaximumSinceUTC() {
             if (this.max == Long.MAX_VALUE) {
-                HinduCalendar cal =
-                    this.create(MAX_YEAR + 1, HinduMonth.of(IndianMonth.AGRAHAYANA), HinduDay.valueOf(1));
-                this.max = (cal.withNewYear().getDaysSinceEpochUTC() - 1);
+                HinduCalendar cal = this.createNewYear(MAX_YEAR + 1);
+                if (super.variant.isPurnimanta()) {
+                    cal = cal.withFirstDayOfMonth();
+                }
+                this.max = cal.getDaysSinceEpochUTC() - 1;
             }
             return this.max;
+        }
+
+        private HinduCalendar createNewYear(int year) {
+            // AGRAHAYANA is chosen as intermediate value to satisfy AMANTA_ASHADHA and AMANTA_KARTIKA, too
+            return this.create(year, HinduMonth.of(IndianMonth.AGRAHAYANA), HinduDay.valueOf(1)).withNewYear();
         }
 
         private HinduRule getRule() {
             return super.variant.getRule();
         }
 
-        private static HinduMonth previousMonth(
+        private static HinduMonth prevMonth(
             HinduMonth month,
             int steps
         ) {
             int m = month.getValue().getValue() - steps;
-            return HinduMonth.ofLunisolar((m == 0) ? 12 : m);
+
+            if (m <= 0) {
+                m += 12;
+            }
+
+            return HinduMonth.ofLunisolar(m);
         }
 
         //~ Hindu astronomy taken from Dershowitz/Reingold ----------------

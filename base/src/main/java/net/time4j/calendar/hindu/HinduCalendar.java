@@ -1018,42 +1018,54 @@ public final class HinduCalendar
     }
 
     // used by HinduRule-based calendar systems
-    HinduVariant getInternalVariant() {
-        return this.variant;
+    HinduCalendar withNewYear() {
+        if (this.variant.isPurnimanta()) {
+            HinduCalendar amanta =
+                this.variant.toAmanta().create(
+                    this.kyYear,
+                    HinduMonth.ofLunisolar(1),
+                    HinduDay.valueOf(15)
+                ).withNewYear();
+            return this.variant.getCalendarSystem().create(amanta.getDaysSinceEpochUTC());
+        } else {
+            HinduMonth first = (
+                this.variant.isSolar()
+                    ? HinduMonth.ofSolar(1)
+                    : HinduMonth.ofLunisolar(this.variant.getFirstMonthOfYear()));
+            HinduCS calsys = this.variant.getCalendarSystem();
+            HinduCalendar date = calsys.create(this.kyYear, first, HinduDay.valueOf(15));
+
+            if (this.variant.isLunisolar()) {
+                HinduCalendar previousMonth = calsys.create(date.utcDays - 30);
+                if (previousMonth.getMonth().isLeap() && (previousMonth.kyYear == this.kyYear)) {
+                    date = previousMonth;
+                }
+            }
+
+            return date.withFirstDayOfMonth();
+        }
     }
 
     // used by HinduRule-based calendar systems
-    HinduCalendar withNewYear() {
-        HinduMonth first = (
-            this.variant.isSolar()
-                ? HinduMonth.ofSolar(1)
-                : HinduMonth.ofLunisolar(this.variant.getFirstMonthOfYear()));
-        HinduCS calsys = this.variant.getCalendarSystem();
-        int midOfMonth = this.variant.isPurnimanta() ? 1 : 15; // estimation
-        HinduCalendar date = calsys.create(this.kyYear, first, HinduDay.valueOf(midOfMonth));
-
-        if (this.variant.isLunisolar()) {
-            HinduCalendar previousMonth = calsys.create(date.utcDays - 30);
-            if (previousMonth.getMonth().isLeap() && (previousMonth.kyYear == this.kyYear)) {
-                date = previousMonth;
-            }
-        }
-
-        return date.withFirstDayOfMonth();
-    }
-
-    private HinduCalendar withFirstDayOfMonth() {
+    HinduCalendar withFirstDayOfMonth() {
         HinduDay dom = HinduDay.valueOf(1); // always valid in solar calendar
         HinduCS calsys = this.variant.getCalendarSystem();
+        int year = this.kyYear;
 
         if (this.variant.isLunisolar()) {
             int count = 3;
 
             if (this.variant.isPurnimanta()) {
                 dom = HinduDay.valueOf(16);
+                if (this.isChaitra() && (this.dayOfMonth.getValue() < 16)) {
+                    HinduCalendar newYear = this.withNewYear(); // handling for possible leap Chaitra
+                    if (this.month.equals(newYear.month)) {
+                        year--; // before New Year
+                    }
+                }
             }
 
-            while (calsys.isExpunged(this.kyYear, this.month, dom)) {
+            while (calsys.isExpunged(year, this.month, dom)) {
                 if (count == 0) {
                     throw new IllegalArgumentException("Cannot determine first day of month: " + this);
                 } else if (dom.isLeap()) {
@@ -1065,7 +1077,7 @@ public final class HinduCalendar
             }
         }
 
-        return calsys.create(this.kyYear, this.month, dom);
+        return calsys.create(year, this.month, dom);
     }
 
     // estimation
@@ -1080,7 +1092,7 @@ public final class HinduCalendar
             }
         }
 
-        long utc = this.utcDays + monthUnits * 30 + 15 - dom;
+        long utc = this.utcDays + Math.round(monthUnits * (this.variant.isSolar() ? 30.4 : 29.5)) + 15 - dom;
         return this.variant.getCalendarSystem().create(utc);
     }
 
@@ -1093,8 +1105,9 @@ public final class HinduCalendar
         HinduCS calsys = this.variant.getCalendarSystem();
         int count = 5;
         boolean purnimanta = this.variant.isPurnimanta();
+        boolean aroundNewYear = (purnimanta && this.isChaitra() && this.withNewYear().month.equals(this.month));
 
-        while (calsys.isExpunged(this.kyYear, this.month, dom)) {
+        while (calsys.isExpunged(this.criticalYear(aroundNewYear, dom), this.month, dom)) {
             if ((dom.getValue() == (purnimanta ? 16 : 1)) && !dom.isLeap()) {
                 return this.withFirstDayOfMonth();
             } else if (count == 0) {
@@ -1114,7 +1127,26 @@ public final class HinduCalendar
             count--;
         }
 
-        return calsys.create(this.kyYear, this.month, dom);
+        return calsys.create(this.criticalYear(aroundNewYear, dom), this.month, dom);
+    }
+
+    private int criticalYear(
+        boolean aroundNewYear,
+        HinduDay dom
+    ) {
+        if (aroundNewYear) {
+            if ((this.dayOfMonth.getValue() >= 16) && (dom.getValue() < 16)) {
+                return this.kyYear + 1;
+            } else if ((this.dayOfMonth.getValue() < 16) && (dom.getValue() >= 16)) {
+                return this.kyYear - 1;
+            }
+        }
+
+        return this.kyYear;
+    }
+
+    private boolean isChaitra() {
+        return this.month.getValue().equals(IndianMonth.CHAITRA);
     }
 
     private static int parseLeadingLeapInfo(
@@ -1402,7 +1434,12 @@ public final class HinduCalendar
                         y--;
                     }
 
-                    int midOfMonth = (context.variant.isPurnimanta() ? 1 : 15);
+                    int midOfMonth = 15;
+
+                    if (context.variant.isPurnimanta()) {
+                        midOfMonth = (context.dayOfMonth.getValue() >= 16) ? 29 : 2; // preserving fortnight
+                    }
+
                     HinduCalendar date = calsys.create(y, context.month, HinduDay.valueOf(midOfMonth));
 
                     if (context.month.isLeap()) {
@@ -1895,7 +1932,13 @@ public final class HinduCalendar
                 return false;
             }
 
-            return context.variant.getCalendarSystem().isValid(context.kyYear, context.month, value);
+            boolean aroundNewYear =
+                (context.variant.isPurnimanta()
+                    && context.isChaitra()
+                    && context.withNewYear().month.equals(context.month));
+
+            int year = context.criticalYear(aroundNewYear, value);
+            return context.variant.getCalendarSystem().isValid(year, context.month, value);
         }
 
         @Override
@@ -1904,11 +1947,21 @@ public final class HinduCalendar
             HinduDay value,
             boolean lenient
         ) {
-            if (this.isValid(context, value)) {
-                return context.variant.getCalendarSystem().create(context.kyYear, context.month, value);
-            } else {
-                throw new IllegalArgumentException("Invalid day of month: " + value);
+            if ((value != null) && (!value.isLeap() || !context.variant.isSolar())) {
+                boolean aroundNewYear =
+                    (context.variant.isPurnimanta()
+                        && context.isChaitra()
+                        && context.withNewYear().month.equals(context.month));
+
+                int year = context.criticalYear(aroundNewYear, value);
+                HinduCS calsys = context.variant.getCalendarSystem();
+
+                if (calsys.isValid(year, context.month, value)) {
+                    return calsys.create(year, context.month, value);
+                }
             }
+
+            throw new IllegalArgumentException("Invalid day of month: " + value);
         }
 
         @Override
@@ -2161,7 +2214,7 @@ public final class HinduCalendar
                         location.getLatitude(),
                         location.getLongitude(),
                         location.getAltitude(),
-                        StdSolarCalculator.TIME4J // sensible for altitude parameter
+                        StdSolarCalculator.CC // sensible for altitude parameter
                     ).sunrise()
                 );
 

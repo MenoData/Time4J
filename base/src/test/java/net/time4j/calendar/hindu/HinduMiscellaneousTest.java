@@ -142,6 +142,35 @@ public class HinduMiscellaneousTest {
     }
 
     @Test
+    public void minmaxPurnimanta() {
+        HinduVariant hv = HinduRule.PURNIMANTA.variant().with(HinduEra.KALI_YUGA);
+        CalendarSystem<HinduCalendar> calsys = HinduCalendar.family().getCalendarSystem(hv);
+        HinduCalendar min = calsys.transform(calsys.getMinimumSinceUTC()); // 1200-Chaitra-16
+        HinduCalendar max = calsys.transform(calsys.getMaximumSinceUTC()); // 5999-Phalguna-15
+
+        assertThat(min.getYear(), is(1200));
+        assertThat(max.getYear(), is(5999));
+        assertThat(min.getMonth(), is(HinduMonth.ofLunisolar(1)));
+        assertThat(max.getMonth(), is(HinduMonth.ofLunisolar(12)));
+        assertThat(min.getDayOfMonth(), is(HinduDay.valueOf(16)));
+        assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(15)));
+
+        try {
+            min.previousDay();
+            fail("Expected exception due to out-of-range condition did not happen.");
+        } catch (IllegalArgumentException ex) {
+            // expected error
+        }
+
+        try {
+            max.nextDay();
+            fail("Expected exception due to out-of-range condition did not happen.");
+        } catch (IllegalArgumentException ex) {
+            // expected error
+        }
+    }
+
+    @Test
     public void dayOfMonthRangeInPurnimanta() {
         HinduCalendar cal =
             HinduCalendar.of(
@@ -201,6 +230,34 @@ public class HinduMiscellaneousTest {
                 assertThat(next.equals(cal.getDayOfMonth()), is(true));
             }
         }
+    }
+
+    @Test
+    public void dayOfMonthChangeInPurnimanta() {
+        HinduCalendar cal =
+            HinduCalendar.of(
+                HinduRule.PURNIMANTA.variant(),
+                HinduEra.VIKRAMA,
+                1850,
+                HinduMonth.of(IndianMonth.CHAITRA),
+                HinduDay.valueOf(18)
+            );
+
+        HinduCalendar expectedMin = cal.minus(CalendarDays.of(2));
+        HinduCalendar expectedVal = cal.plus(CalendarDays.of(14));
+
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()),
+            is(expectedMin));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH, HinduDay.valueOf(2)),
+            is(expectedVal));
+        assertThat(
+            expectedMin.getYear(),
+            is(1850));
+        assertThat(
+            expectedVal.getYear(),
+            is(1851));
     }
 
 }

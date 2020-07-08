@@ -104,6 +104,16 @@ abstract class HinduCS
         HinduDay dom
     );
 
+    // expunged months are called "kshaya"
+    final boolean isExpunged(
+        int kyYear,
+        HinduMonth month
+    ) {
+        long utcDays = this.create(kyYear, month, HinduDay.valueOf(15)).getDaysSinceEpochUTC();
+        HinduCalendar cal = this.create(utcDays);
+        return (cal.getExpiredYearOfKaliYuga() != kyYear) || !cal.getMonth().equals(month);
+    }
+
     // expunged days are gaps
     final boolean isExpunged(
         int kyYear,
@@ -115,8 +125,8 @@ abstract class HinduCS
 
         return (
             (cal.getExpiredYearOfKaliYuga() != kyYear)
-            || !cal.getMonth().equals(month)
-            || !cal.getDayOfMonth().equals(dom)
+                || !cal.getMonth().equals(month)
+                || !cal.getDayOfMonth().equals(dom)
         );
     }
 
