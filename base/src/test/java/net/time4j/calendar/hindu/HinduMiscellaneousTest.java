@@ -1,5 +1,6 @@
 package net.time4j.calendar.hindu;
 
+import net.time4j.PlainDate;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarSystem;
@@ -258,6 +259,137 @@ public class HinduMiscellaneousTest {
         assertThat(
             expectedVal.getYear(),
             is(1851));
+    }
+
+    @Test
+    public void amantaMonthSequence1982() { // CC: page 341, with two leap months and a lost month
+        HinduCalendar cal = PlainDate.of(1982, 3, 14).transform(HinduCalendar.family(), HinduRule.AMANTA.variant());
+        assertThat(cal.getEra(), is(HinduEra.VIKRAMA));
+        assertThat(cal.getYear(), is(2038));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(12)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(1)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 3, 26)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(2)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 4, 24)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(3)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 5, 24)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(4)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 6, 22)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(5)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 7, 21)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(6)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 8, 20)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(7).withLeap()));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 9, 18)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(7)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 10, 17)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(8)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(20)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 11, 16)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(9)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
+        assertThat(
+            HinduCalendar.isValid(
+                HinduRule.AMANTA.variant(), HinduEra.VIKRAMA, 2039, HinduMonth.ofLunisolar(9), HinduDay.valueOf(20)),
+            is(false));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1982, 12, 16)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(10)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1983, 1, 15)));
+
+        assertThat(
+            HinduRule.AMANTA.variant().getCalendarSystem().isExpunged(
+                HinduEra.KALI_YUGA.yearOfEra(HinduEra.VIKRAMA, 2039),
+                HinduMonth.ofLunisolar(11)), // kshaia month (lost month)
+            is(true));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(12).withLeap()));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1983, 2, 13)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2039));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(12)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1983, 3, 15)));
+
+        cal = cal.nextMonth();
+        assertThat(cal.getYear(), is(2040));
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(1)));
+        assertThat(cal.getDayOfMonth(), is(HinduDay.valueOf(19)));
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_MONTH.minimized()).transform(PlainDate.axis()),
+            is(PlainDate.of(1983, 4, 14)));
     }
 
 }
