@@ -262,6 +262,48 @@ public class HinduMiscellaneousTest {
     }
 
     @Test
+    public void kshaia1() {
+        HinduCalendar cal = PlainDate.of(1982, 2, 14).transform(HinduCalendar.family(), HinduRule.AMANTA.variant());
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(11)));
+
+        HinduCalendar expected =
+            HinduCalendar.of(
+                HinduRule.AMANTA.variant(),
+                HinduEra.VIKRAMA,
+                2039,
+                HinduMonth.ofLunisolar(10),
+                cal.getDayOfMonth());
+
+        assertThat(
+            cal.with(HinduCalendar.YEAR_OF_ERA, 2039),
+            is(expected));
+        assertThat(
+            cal.nextYear(),
+            is(expected));
+    }
+
+    @Test
+    public void kshaia2() {
+        HinduCalendar cal = PlainDate.of(1984, 2, 14).transform(HinduCalendar.family(), HinduRule.AMANTA.variant());
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(11)));
+
+        HinduCalendar expected =
+            HinduCalendar.of(
+                HinduRule.AMANTA.variant(),
+                HinduEra.VIKRAMA,
+                2039,
+                HinduMonth.ofLunisolar(12).withLeap(),
+                cal.getDayOfMonth());
+
+        assertThat(
+            cal.with(HinduCalendar.YEAR_OF_ERA, 2039),
+            is(expected));
+        assertThat(
+            cal.previousYear(),
+            is(expected));
+    }
+
+    @Test
     public void amantaMonthSequence1982() { // CC: page 341, with two leap months and a lost month
         HinduCalendar cal = PlainDate.of(1982, 3, 14).transform(HinduCalendar.family(), HinduRule.AMANTA.variant());
         assertThat(cal.getEra(), is(HinduEra.VIKRAMA));

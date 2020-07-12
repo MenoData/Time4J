@@ -968,8 +968,10 @@ public final class HinduCalendar
         StringBuilder sb = new StringBuilder();
         sb.append('[');
         sb.append(this.variant);
-        sb.append(",kali-yuga-year=");
-        sb.append(this.kyYear);
+        sb.append(",era=");
+        sb.append(this.getEra());
+        sb.append(",year-of-era=");
+        sb.append(this.getYear());
         sb.append(",month=");
         sb.append(this.month);
         sb.append(",day-of-month=");
@@ -1106,12 +1108,19 @@ public final class HinduCalendar
         int count = 5;
         boolean purnimanta = this.variant.isPurnimanta();
         boolean aroundNewYear = (purnimanta && this.isChaitra() && this.withNewYear().month.equals(this.month));
+        int y;
 
-        while (calsys.isExpunged(this.criticalYear(aroundNewYear, dom), this.month, dom)) {
+        while (calsys.isExpunged(y = this.criticalYear(aroundNewYear, dom), this.month, dom)) {
             if ((dom.getValue() == (purnimanta ? 16 : 1)) && !dom.isLeap()) {
                 return this.withFirstDayOfMonth();
             } else if (count == 0) {
-                throw new IllegalArgumentException("No valid day found: " + this + " => (day=" + desired + ")");
+                if (calsys.isExpunged(y, this.month)) {
+                    throw new IllegalArgumentException(
+                        "Kshaia (lost) month is never valid: kali-yuga-year=" + y + ", month=" + this.month);
+                } else {
+                    throw new IllegalArgumentException(
+                        "No valid day found for: " + this + " => (desired day=" + desired + ")");
+                }
             } else if (dom.isLeap()) {
                 dom = HinduDay.valueOf(dom.getValue());
             } else {
@@ -1127,7 +1136,7 @@ public final class HinduCalendar
             count--;
         }
 
-        return calsys.create(this.criticalYear(aroundNewYear, dom), this.month, dom);
+        return calsys.create(y, this.month, dom);
     }
 
     private int criticalYear(
@@ -1427,11 +1436,14 @@ public final class HinduCalendar
 
             switch (this.index) {
                 case YEAR_INDEX:
-                    HinduCS calsys = context.variant.getCalendarSystem();
                     int y = HinduEra.KALI_YUGA.yearOfEra(context.getEra(), value);
 
                     if (!context.variant.isUsingElapsedYears()) {
                         y--;
+                    }
+
+                    if (y == context.kyYear) {
+                        return context;
                     }
 
                     int midOfMonth = 15;
@@ -1440,11 +1452,26 @@ public final class HinduCalendar
                         midOfMonth = (context.dayOfMonth.getValue() >= 16) ? 29 : 2; // preserving fortnight
                     }
 
-                    HinduCalendar date = calsys.create(y, context.month, HinduDay.valueOf(midOfMonth));
+                    HinduCS calsys = context.variant.getCalendarSystem();
+                    HinduMonth m = context.month;
+                    boolean kshaia = calsys.isExpunged(y, m);
 
-                    if (context.month.isLeap()) {
+                    if (kshaia) {
+                        m = HinduMonth.of(context.month.getValue().roll((y > context.kyYear) ? -1 : 1));
+                        if (y < context.kyYear){
+                            long u = calsys.create(y, m, HinduDay.valueOf(midOfMonth)).getDaysSinceEpochUTC() - 30;
+                            HinduMonth ml = calsys.create(u).month;
+                            if (ml.equals(m.withLeap())) {
+                                m = ml;
+                            }
+                        }
+                    }
+
+                    HinduCalendar date = calsys.create(y, m, HinduDay.valueOf(midOfMonth));
+
+                    if (!kshaia && m.isLeap()) {
                         date = calsys.transform(date.utcDays);
-                        if (date.month.getValue().getValue() > context.month.getValue().getValue()) {
+                        if (date.month.getValue().getValue() > m.getValue().getValue()) {
                             date = calsys.create(date.utcDays - 30);
                         }
                     }

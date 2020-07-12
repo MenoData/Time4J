@@ -111,7 +111,7 @@ abstract class HinduCS
     ) {
         long utcDays = this.create(kyYear, month, HinduDay.valueOf(15)).getDaysSinceEpochUTC();
         HinduCalendar cal = this.create(utcDays);
-        return (cal.getExpiredYearOfKaliYuga() != kyYear) || !cal.getMonth().equals(month);
+        return !cal.getMonth().getValue().equals(month.getValue());
     }
 
     // expunged days are gaps
