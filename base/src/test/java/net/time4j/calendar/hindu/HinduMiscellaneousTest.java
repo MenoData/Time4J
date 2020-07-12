@@ -81,7 +81,9 @@ public class HinduMiscellaneousTest {
         assertThat(min.getYear(), is(1200));
         assertThat(max.getYear(), is(5999));
         assertThat(min.getMonth(), is(HinduMonth.of(IndianMonth.ASHADHA)));
+        assertThat(min.getMonth(), is(min.getMinimum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(max.getMonth(), is(HinduMonth.ofLunisolar(3)));
+        assertThat(max.getMonth(), is(max.getMaximum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(min.getDayOfMonth(), is(HinduDay.valueOf(1)));
         assertThat(min.getDayOfMonth(), is(min.getMinimum(HinduCalendar.DAY_OF_MONTH)));
         assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(30)));
@@ -112,7 +114,9 @@ public class HinduMiscellaneousTest {
         assertThat(min.getYear(), is(1200));
         assertThat(max.getYear(), is(5999));
         assertThat(min.getMonth(), is(HinduMonth.of(IndianMonth.KARTIKA)));
+        assertThat(min.getMonth(), is(min.getMinimum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(max.getMonth(), is(HinduMonth.ofLunisolar(7)));
+        assertThat(max.getMonth(), is(max.getMaximum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(min.getDayOfMonth(), is(HinduDay.valueOf(2)));
         assertThat(min.getDayOfMonth(), is(min.getMinimum(HinduCalendar.DAY_OF_MONTH)));
         assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(30)));
@@ -301,6 +305,20 @@ public class HinduMiscellaneousTest {
         assertThat(
             cal.previousYear(),
             is(expected));
+    }
+
+    @Test
+    public void kshaia3() {
+        HinduCalendar cal = PlainDate.of(1983, 1, 20).transform(HinduCalendar.family(), HinduRule.AMANTA.variant());
+        assertThat(cal.getMonth(), is(HinduMonth.ofLunisolar(10)));
+        assertThat(cal.isValid(HinduCalendar.MONTH_OF_YEAR, HinduMonth.ofLunisolar(11)), is(false));
+
+        try {
+            cal.with(HinduCalendar.MONTH_OF_YEAR, HinduMonth.ofLunisolar(11));
+            fail("Setting a kshaia month should fail but succeeded.");
+        } catch (IllegalArgumentException iae) {
+            assertThat(iae.getMessage(), is("Invalid month: MAGHA"));
+        }
     }
 
     @Test

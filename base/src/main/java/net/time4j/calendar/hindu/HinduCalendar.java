@@ -1631,7 +1631,11 @@ public final class HinduCalendar
                 }
             }
 
-            return true;
+            if (context.variant.isLunisolar() && !context.variant.isOld()) {
+                return !context.variant.getCalendarSystem().isExpunged(context.kyYear, value);
+            } else {
+                return true;
+            }
         }
 
         @Override
