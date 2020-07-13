@@ -500,6 +500,7 @@ public enum StdSolarCalculator
      *     <li>nutation</li>
      *     <li>obliquity</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     /*[deutsch]
@@ -518,6 +519,7 @@ public enum StdSolarCalculator
      *     <li>nutation</li>
      *     <li>obliquity</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     CC() {
@@ -603,6 +605,9 @@ public enum StdSolarCalculator
                     return apparentSolarLongitude(jct, nutation(jct));
                 case "solar-latitude":
                     return 0.0; // approximation used in this algorithm
+                case "lunar-longitude": {
+                    return MoonPosition.lunarLongitude(jde, nutation(jct));
+                }
                 default:
                     return Double.NaN;
             }
@@ -704,6 +709,7 @@ public enum StdSolarCalculator
      *     <li>nutation</li>
      *     <li>obliquity</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     /*[deutsch]
@@ -728,6 +734,7 @@ public enum StdSolarCalculator
      *     <li>nutation</li>
      *     <li>obliquity</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     TIME4J() {
@@ -802,6 +809,11 @@ public enum StdSolarCalculator
                 }
                 case "solar-latitude":
                     return 0.0; // approximation used in this algorithm
+                case "lunar-longitude": {
+                    double[] result = new double[2];
+                    nutations(jct, result);
+                    return MoonPosition.lunarLongitude(jde, result[0]);
+                }
                 default:
                     return Double.NaN;
             }

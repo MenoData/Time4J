@@ -26,6 +26,7 @@ import net.time4j.PlainDate;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.GeoLocation;
 import net.time4j.calendar.astro.JulianDay;
+import net.time4j.calendar.astro.MoonPhase;
 import net.time4j.calendar.astro.StdSolarCalculator;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.VariantSource;
@@ -800,6 +801,7 @@ public final class HinduVariant
         private static final double ANOMALISTIC_YEAR = 1577917828000d / (4320000000L - 387);
         private static final double ANOMALISTIC_MONTH = 1577917828d / (57753336 - 488199);
         private static final double MEAN_SIDEREAL_YEAR = 365.25636;
+        private static final double MEAN_SYNODIC_MONTH = 29.530588861;
 
         private static final double[] RISING_SIGN_FACTORS;
 
@@ -1074,6 +1076,10 @@ public final class HinduVariant
             return JulianDay.ofEphemerisTime(Moment.of(unix, TimeScale.POSIX));
         }
 
+        private static double toRataDie(Moment m) {
+            return (m.getPosixTime() / 86400d) + 2440587L - 1721424L;
+        }
+
         private static int hZodiac(double t) {
             return (int) (Math.floor(hSolarLongitude(t) / 30d) + 1);
         }
@@ -1090,8 +1096,29 @@ public final class HinduVariant
             return modulo(hLunarLongitude(t) - hSolarLongitude(t), 360d);
         }
 
-        private static int hLunarDayFromMoment(double t) {
-            return (int) (Math.floor(hLunarPhase(t) / 12d) + 1);
+        private static int hLunarDayFromMoment(
+            double t,
+            HinduVariant variant
+        ) {
+            double lunarPhase;
+
+            if (variant.useModernAstronomy()) {
+                double jde = toJDE(t).getValue();
+                double solarLongitude = StdSolarCalculator.CC.getFeature(jde, "solar-longitude");
+                double lunarLongitude = StdSolarCalculator.CC.getFeature(jde, "lunar-longitude");
+                double phi = modulo(lunarLongitude - solarLongitude, 360d);
+                int n = (int) Math.round((t - nthNewMoon(0)) / MEAN_SYNODIC_MONTH);
+                double phi2 = 360 * modulo((t - nthNewMoon(n)) / MEAN_SYNODIC_MONTH, 1d);
+                lunarPhase = (Math.abs(phi - phi2) > 180) ? phi2 : phi;
+            } else {
+                lunarPhase = hLunarPhase(t);
+            }
+
+            return (int) (Math.floor(lunarPhase / 12d) + 1);
+        }
+
+        private static double nthNewMoon(int n) {
+            return toRataDie(MoonPhase.NEW_MOON.atLunation(n - 24724));
         }
 
         private static double hNewMoonBefore(double t) {
@@ -1116,13 +1143,17 @@ public final class HinduVariant
             }
         }
 
-        private static int hCalendarYear(double t) {
-            return (int) Math.floor(0.5 + ((t - KALI_YUGA_EPOCH) / SIDEREAL_YEAR) - (hSolarLongitude(t) / 360d));
-        }
-
-        private static int hAstroCalendarYear(double t) {
-            return (int) Math.floor(
-                0.5 + ((t - KALI_YUGA_EPOCH) / MEAN_SIDEREAL_YEAR) - (hSiderealSolarLongitude(t) / 360d));
+        private static int hCalendarYear(
+            double t,
+            HinduVariant variant
+        ) {
+            if (variant.useModernAstronomy()) {
+                return (int) Math.floor(
+                    0.5 + ((t - KALI_YUGA_EPOCH) / MEAN_SIDEREAL_YEAR) - (hSiderealSolarLongitude(t) / 360d));
+            } else {
+                return (int) Math.floor(
+                    0.5 + ((t - KALI_YUGA_EPOCH) / SIDEREAL_YEAR) - (hSolarLongitude(t) / 360d));
+            }
         }
 
         private static HinduCalendar hSolarFromFixed(
@@ -1134,12 +1165,12 @@ public final class HinduVariant
             LongFunction<Double> function = hCritical(variant);
             long rataDie = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC);
             double critical = function.apply(rataDie);
+            int kyYear = hCalendarYear(critical, variant);
 
-            int kyYear, m;
+            int m;
             long start;
 
             if (variant.useModernAstronomy()) {
-                kyYear = hAstroCalendarYear(critical);
                 m = hSiderealZodiac(critical);
                 start = rataDie - 3 - (int) modulo(Math.floor(hSiderealSolarLongitude(critical)), 30);
 
@@ -1147,7 +1178,6 @@ public final class HinduVariant
                     start++;
                 }
             } else {
-                kyYear = hCalendarYear(critical);
                 m = hZodiac(critical);
                 start = rataDie - 3 - (int) modulo(Math.floor(hSolarLongitude(critical)), 30);
 
@@ -1214,24 +1244,39 @@ public final class HinduVariant
 
             long rataDie = EpochDays.RATA_DIE.transform(utcDays, EpochDays.UTC);
             double critical = hSunrise(rataDie, variant);
-            int dom = hLunarDayFromMoment(critical);
+            int dom = hLunarDayFromMoment(critical, variant);
             HinduDay dayOfMonth = HinduDay.valueOf(dom);
 
-            if (hLunarDayFromMoment(hSunrise(rataDie - 1, variant)) == dom) {
+            if (hLunarDayFromMoment(hSunrise(rataDie - 1, variant), variant) == dom) {
                 dayOfMonth = dayOfMonth.withLeap();
             }
 
-            double lastNewMoon = hNewMoonBefore(critical);
-            double nextNewMoon = hNewMoonBefore(Math.floor(lastNewMoon) + 35d);
-            int solarMonth = hZodiac(lastNewMoon);
+            double lastNewMoon;
+            double nextNewMoon;
+            int solarMonth;
+            int nextSolarMonth;
+
+            if (variant.useModernAstronomy()) {
+                Moment m = toJDE(critical).toMoment();
+                lastNewMoon = toRataDie(MoonPhase.NEW_MOON.before(m));
+                nextNewMoon = toRataDie(MoonPhase.NEW_MOON.atOrAfter(m));
+                solarMonth = hSiderealZodiac(lastNewMoon);
+                nextSolarMonth = hSiderealZodiac(nextNewMoon);
+            } else {
+                lastNewMoon = hNewMoonBefore(critical);
+                nextNewMoon = hNewMoonBefore(Math.floor(lastNewMoon) + 35d);
+                solarMonth = hZodiac(lastNewMoon);
+                nextSolarMonth = hZodiac(nextNewMoon);
+            }
+
             int lunarMonth = ((solarMonth == 12) ? 1 : solarMonth + 1);
             HinduMonth month = HinduMonth.ofLunisolar(lunarMonth);
 
-            if (hZodiac(nextNewMoon) == solarMonth) {
+            if (nextSolarMonth == solarMonth) {
                 month = month.withLeap();
             }
 
-            int kyYear = hCalendarYear((lunarMonth <= 2) ? rataDie + 180d : rataDie);
+            int kyYear = hCalendarYear((lunarMonth <= 2) ? rataDie + 180d : rataDie, variant);
 
             return new HinduCalendar(
                 variant,
@@ -1251,10 +1296,19 @@ public final class HinduVariant
             assert variant.isLunisolar();
 
             int m = month.getValue().getValue();
-            double approx = KALI_YUGA_EPOCH + SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d));
-            double x = (hSolarLongitude(approx) / 360d) - ((m - 1) / 12d);
+            double approx, x;
+
+            if (variant.useModernAstronomy()) {
+                approx = KALI_YUGA_EPOCH + MEAN_SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d));
+                x = hSiderealSolarLongitude(approx);
+            } else {
+                approx = KALI_YUGA_EPOCH + SIDEREAL_YEAR * (kyYear + ((m - 1) / 12d));
+                x = hSolarLongitude(approx);
+            }
+
+            x = (x / 360d) - ((m - 1) / 12d);
             long s = (long) Math.floor(approx - SIDEREAL_YEAR * (-0.5 + modulo(x + 0.5, 1d)));
-            int k = hLunarDayFromMoment(s + 0.25);
+            int k = hLunarDayFromMoment(s + 0.25, variant);
             int day = dom.getValue();
             int temp;
 
@@ -1273,10 +1327,10 @@ public final class HinduVariant
             }
 
             long est = s + day - temp;
-            long d = est + 14 - (int) modulo(hLunarDayFromMoment(est + 0.25) - day + 15, 30);
+            long d = est + 14 - (int) modulo(hLunarDayFromMoment(est + 0.25, variant) - day + 15, 30);
 
             while (true) {
-                int ld = hLunarDayFromMoment(hSunrise(d, variant));
+                int ld = hLunarDayFromMoment(hSunrise(d, variant), variant);
                 int mm = (int) modulo(day + 1, 30);
                 int day2 = (mm == 0) ? 30 : mm;
 
@@ -1339,12 +1393,7 @@ public final class HinduVariant
             double rataDie,
             HinduVariant variant
         ) {
-            if (Double.isNaN(variant.depressionAngle)) {
-                double od = rataDie + 0.25 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
-                double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
-                double f = 0.25 * hSolarSiderealDifference(rataDie) + ascDiff;
-                return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
-            } else {
+            if (variant.useModernAstronomy()) {
                 GeoLocation location = variant.getLocation();
                 PlainDate date = PlainDate.of((long) Math.floor(rataDie), EpochDays.RATA_DIE);
                 Moment astroSunrise = // CC: page 357, citation of Purewal (14)
@@ -1357,6 +1406,11 @@ public final class HinduVariant
                 double unixDays = (astroSunrise.getPosixTime() + U_OFFSET) / 86400d;
                 long fixed = EpochDays.RATA_DIE.transform((long) Math.floor(unixDays), EpochDays.UNIX);
                 return fixed + unixDays - Math.floor(unixDays);
+            } else {
+                double od = rataDie + 0.25 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
+                double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
+                double f = 0.25 * hSolarSiderealDifference(rataDie) + ascDiff;
+                return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
             }
         }
 
@@ -1364,12 +1418,7 @@ public final class HinduVariant
             double rataDie,
             HinduVariant variant
         ) {
-            if (Double.isNaN(variant.depressionAngle)) {
-                double od = rataDie + 0.75 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
-                double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
-                double f = 0.75 * hSolarSiderealDifference(rataDie) - ascDiff;
-                return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
-            } else {
+            if (variant.useModernAstronomy()) {
                 GeoLocation location = variant.getLocation();
                 PlainDate date = PlainDate.of((long) Math.floor(rataDie), EpochDays.RATA_DIE);
                 Moment astroSunset = // CC: page 357, citation of Purewal (14)
@@ -1382,6 +1431,11 @@ public final class HinduVariant
                 double unixDays = (astroSunset.getPosixTime() + U_OFFSET) / 86400d;
                 long fixed = EpochDays.RATA_DIE.transform((long) Math.floor(unixDays), EpochDays.UNIX);
                 return fixed + unixDays - Math.floor(unixDays);
+            } else {
+                double od = rataDie + 0.75 + (UJJAIN.getLongitude() - variant.getLocation().getLongitude()) / 360d;
+                double ascDiff = hAscensionalDifference(rataDie, variant.getLocation());
+                double f = 0.75 * hSolarSiderealDifference(rataDie) - ascDiff;
+                return od - hEquationOfTime(rataDie) + (1577917828d / (1582237828d * 360d)) * f;
             }
         }
 

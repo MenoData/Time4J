@@ -8,16 +8,17 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
+        AstroHinduLunarCalendarTest.class,
         AstroHinduSolarCalendarTest.class,
         HinduElementTest.class,
         HinduEraTest.class,
         HinduFormatTest.class,
         HinduMiscellaneousTest.class,
         HinduVariantTest.class,
-        ModernHinduSolarCalendarTest.class,
         ModernHinduLunarCalendarTest.class,
-        OldHinduSolarCalendarTest.class,
+        ModernHinduSolarCalendarTest.class,
         OldHinduLunarCalendarTest.class,
+        OldHinduSolarCalendarTest.class,
         SerializationTest.class
     }
 )

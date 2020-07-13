@@ -23,8 +23,11 @@ public class HinduMiscellaneousTest {
         assertThat(min.getYear(), is(1200));
         assertThat(max.getYear(), is(5999));
         assertThat(min.getMonth(), is(HinduMonth.ofSolar(1)));
+        assertThat(min.getMonth(), is(min.getMinimum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(max.getMonth(), is(HinduMonth.ofSolar(12)));
+        assertThat(max.getMonth(), is(max.getMaximum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(min.getDayOfMonth(), is(HinduDay.valueOf(1)));
+        assertThat(min.getDayOfMonth(), is(min.getMinimum(HinduCalendar.DAY_OF_MONTH)));
         assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(31)));
         assertThat(max.getDayOfMonth(), is(max.getMaximum(HinduCalendar.DAY_OF_MONTH)));
 
@@ -46,7 +49,9 @@ public class HinduMiscellaneousTest {
         assertThat(min.getYear(), is(1200));
         assertThat(max.getYear(), is(5999));
         assertThat(min.getMonth(), is(HinduMonth.ofLunisolar(1)));
+        assertThat(min.getMonth(), is(min.getMinimum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(max.getMonth(), is(HinduMonth.ofLunisolar(12)));
+        assertThat(max.getMonth(), is(max.getMaximum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(min.getDayOfMonth(), is(HinduDay.valueOf(1)));
         assertThat(min.getDayOfMonth(), is(min.getMinimum(HinduCalendar.DAY_OF_MONTH)));
         assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(30)));
@@ -156,9 +161,13 @@ public class HinduMiscellaneousTest {
         assertThat(min.getYear(), is(1200));
         assertThat(max.getYear(), is(5999));
         assertThat(min.getMonth(), is(HinduMonth.ofLunisolar(1)));
+        assertThat(min.getMonth(), is(min.getMinimum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(max.getMonth(), is(HinduMonth.ofLunisolar(12)));
+        assertThat(max.getMonth(), is(max.getMaximum(HinduCalendar.MONTH_OF_YEAR)));
         assertThat(min.getDayOfMonth(), is(HinduDay.valueOf(16)));
+        assertThat(min.getDayOfMonth(), is(min.getMinimum(HinduCalendar.DAY_OF_MONTH)));
         assertThat(max.getDayOfMonth(), is(HinduDay.valueOf(15)));
+        assertThat(max.getDayOfMonth(), is(max.getMaximum(HinduCalendar.DAY_OF_MONTH)));
 
         try {
             min.previousDay();

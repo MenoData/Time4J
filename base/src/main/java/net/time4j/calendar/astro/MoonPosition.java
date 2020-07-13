@@ -588,7 +588,10 @@ public class MoonPosition
     }
 
     // max error given by J. Meeus: 10'' in longitude
-    static double lunarLongitude(double jde) { // apparent moon longitude in degrees
+    static double lunarLongitude(
+        double jde,
+        double nutation
+    ) { // apparent moon longitude in degrees
 
         double jct = (jde - 2451545.0) / 36525; // julian centuries (J2000)
 
@@ -641,14 +644,11 @@ public class MoonPosition
                 + 318 * Math.sin(Math.toRadians(a2))
         );
 
-        double[] result = new double[5];
-        StdSolarCalculator.nutations(jct, result);
-        return AstroUtils.toRange_0_360(meanLongitude + (sumL / MIO) + result[0]);
-
+        return AstroUtils.toRange_0_360(meanLongitude + (sumL / MIO) + nutation);
     }
 
     // Meeus (47.1)
-    static double getMeanLongitude(double jct) {
+    private static double getMeanLongitude(double jct) {
         return normalize(
             218.3164477
                 + (481267.88123421 + (-0.0015786 + (1.0 / 538841 + (-1.0 / 65194000) * jct) * jct) * jct) * jct);
@@ -673,7 +673,7 @@ public class MoonPosition
     }
 
     // Meeus (47.5)
-    static double getMeanDistanceOfMoon(double jct) {
+    private static double getMeanDistanceOfMoon(double jct) {
         return normalize(
             93.272095
                 + (483202.0175233 + (-0.0036539 + (-1.0 / 3526000 + (1.0 / 863310000) * jct) * jct) * jct) * jct);

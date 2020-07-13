@@ -1602,7 +1602,7 @@ public final class HinduCalendar
                 return HinduMonth.ofSolar(12);
             } else {
                 HinduCalendar previous =
-                    context.variant.getCalendarSystem().create(context.withNewYear().utcDays - 1);
+                    context.variant.getCalendarSystem().create(context.withNewYear().utcDays - 20);
                 return previous.month; // same as last month of current year, cannot be a leap month
             }
         }

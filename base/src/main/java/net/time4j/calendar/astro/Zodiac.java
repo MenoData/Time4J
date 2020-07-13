@@ -363,7 +363,7 @@ public enum Zodiac {
 	}
 
 	private static double getLunarLongitude(double jde) {
-		return MoonPosition.lunarLongitude(jde);
+        return StdSolarCalculator.TIME4J.getFeature(jde, "lunar-longitude");
 	}
 
 	private static double toEclipticAngle(
