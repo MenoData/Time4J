@@ -5,7 +5,6 @@ import net.time4j.PlainDate;
 import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
-import net.time4j.calendar.astro.GeoLocation;
 import net.time4j.calendar.astro.SolarTime;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
@@ -35,7 +34,6 @@ public class HinduVariantTest {
                 case TAMIL:
                 case MALAYALI:
                 case MADRAS:
-                case BENGAL:
                     assertThat(
                         rule.variant().isSolar(),
                         is(true));

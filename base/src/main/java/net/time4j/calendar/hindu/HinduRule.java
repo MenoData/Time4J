@@ -126,29 +126,6 @@ public enum HinduRule {
     },
 
     /**
-     * <p>A solar calendar which is used in West Bengal, Assam and Tripura. </p>
-     *
-     * <p>We follow the details given by Vinod K. Mishra in his script &quot;The calendars of India&quot;
-     * which say: When the samkranti occurs between the sunrise and the following midnight then the
-     * month begins on the next day. If samkranti occurs after midnight then the month begins on the
-     * day following the next day, i.e. on the third day. </p>
-     */
-    /*[deutsch]
-     * <p>Ein Sonnenkalender, der in West Bengal, Assam and Tripura verwendet wird. </p>
-     *
-     * <p>Wir folgen den Details gegeben durch Vinod K. Mishra in seinem Buch &quot;The calendars of India&quot;,
-     * die besagen: Wenn Samkranti zwischen Sonnenaufgang und der folgenden Mitternacht eintritt, dann f&auml;ngt
-     * der Monat am n&auml;chsten Tag an. Wenn Samkranti nach Mitternacht eintritt, dann f&auml;ngt der Monat am
-     * Tag nach dem n&auml;chsten Tag an, also am dritten Tag. </p>
-     */
-    BENGAL() { // TODO: improve javadoc (tabular data with other range!)
-        @Override
-        HinduEra getDefaultEra() {
-            return HinduEra.BENGAL;
-        }
-    },
-
-    /**
      * <p>The amanta scheme is a lunisolar calendar based on the new moon cycle
      * and starting the year with the month Chaitra. </p>
      *
@@ -226,20 +203,50 @@ public enum HinduRule {
     /**
      * <p>The purnimanta scheme is a lunisolar calendar based on the full moon cycle. </p>
      *
-     * <p>It is shifted for about two weeks compared with the amanta scheme. </p>
+     * <p>It is shifted for about two weeks compared with the amanta scheme. The first days (in the
+     * waning fortnight) from full moon to new moon have the numbers 16, 17, ..., 30 and then
+     * the numbers 1, 2, ..., 15 (waxing fortnight). Lost days and leap days are possible so users
+     * cannot expect continuous numbering sequences. </p>
      */
     /*[deutsch]
      * <p>Das Purnimanta-Schema ist ein lunisolarer Kalender, der auf dem Vollmondzyklus
      * basiert. </p>
      *
-     * <p>Es ist im Vergleich zum Amanta-Schema um ungef&auml;hr zwei Wochen versetzt. </p>
+     * <p>Es ist im Vergleich zum Amanta-Schema um ungef&auml;hr zwei Wochen versetzt. Die ersten Tage
+     * (dunkle Monatsh&auml;lfte) von Vollmond zu Neumond haben die Nummern 16, 17, ..., 30 und dann
+     * die Zahlen 1, 2, ..., 15 (helle Monatsh&auml;lfte). Verlorene Tage und Schalttage sind weiterhin
+     * m&ouml;glich, so da&szlig; Anwender keine kontinuierliche Z&auml;hlung erwarten k&ouml;nnen. </p>
      */
     PURNIMANTA() {
         @Override
         HinduEra getDefaultEra() {
             return HinduEra.VIKRAMA;
         }
-    };
+    }
+
+//    /**
+//     * <p>A solar calendar which is used in West Bengal, Assam and Tripura. </p>
+//     *
+//     * <p>We follow the details given by Vinod K. Mishra in his script &quot;The calendars of India&quot;
+//     * which say: When the samkranti occurs between the sunrise and the following midnight then the
+//     * month begins on the next day. If samkranti occurs after midnight then the month begins on the
+//     * day following the next day, i.e. on the third day. </p>
+//     */
+//    /*[deutsch]
+//     * <p>Ein Sonnenkalender, der in West Bengal, Assam and Tripura verwendet wird. </p>
+//     *
+//     * <p>Wir folgen den Details gegeben durch Vinod K. Mishra in seinem Buch &quot;The calendars of India&quot;,
+//     * die besagen: Wenn Samkranti zwischen Sonnenaufgang und der folgenden Mitternacht eintritt, dann f&auml;ngt
+//     * der Monat am n&auml;chsten Tag an. Wenn Samkranti nach Mitternacht eintritt, dann f&auml;ngt der Monat am
+//     * Tag nach dem n&auml;chsten Tag an, also am dritten Tag. </p>
+//     */
+//    BENGAL() { // TODO: improve javadoc (tabular data with other range!)
+//        @Override
+//        HinduEra getDefaultEra() {
+//            return HinduEra.BENGAL;
+//        }
+//    }
+    ;
 
     //~ Methoden ----------------------------------------------------------
 

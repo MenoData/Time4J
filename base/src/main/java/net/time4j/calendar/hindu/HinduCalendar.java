@@ -86,8 +86,16 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>The traditional Hindu calendar which exists in many regional variants throughout the Indian
  * subcontinent. </p>
  *
- * <p>This version actually supports the {@link AryaSiddhanta old Hindu calendar} only. Following elements
- * which are declared as constants are registered by this class: </p>
+ * <p>This version actually supports all algorithmic variants including the {@link AryaSiddhanta old Hindu calendar}.
+ * These variants are described in the book &quot;Calendrical Calculations&quot; by Dershowitz/Reingold. Real
+ * Hindu calendars published on websites can nevertheless deviate in detail. Users who wish to support modern
+ * Hindu calendars can start with the enum {@link HinduRule} in order to construct a suitable variant. For example,
+ * it is possible to set the default era for all calendar objects by {@link HinduVariant#with(HinduEra) setting
+ * the desired era} on the variant. </p>
+ *
+ * <h4>Supported elements</h4>
+ *
+ * <p>Following elements which are declared as constants are registered by this class: </p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -101,9 +109,37 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@code CommonElements.RELATED_GREGORIAN_YEAR}
  * are supported. </p>
  *
+ * <h4>Calendar arithmetic and time units</h4>
+ *
  * <p>A date arithmetic using units beyond the class {@link net.time4j.engine.CalendarDays} is not offered.
  * But there are methods like {@code previousMonth()} or {@code nextYear()}. About years, user can also use
  * expressions like {@code with(YEAR_OF_ERA, getYear() + amount)}. </p>
+ *
+ * <h4>Formatting and parsing</h4>
+ *
+ * <p>This calendar can deploy the same localized resources like the Indian national calendar. Example: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;HinduCalendar&gt; f =
+ *          ChronoFormatter.ofPattern(
+ *              &quot;G, d. MMMM yyyy&quot;,
+ *              PatternType.CLDR,
+ *              Locale.ENGLISH,
+ *              HinduCalendar.family());
+ *     HinduCalendar cal = HinduCalendar.ofOldSolar(3101, HinduMonth.of(IndianMonth.MAGHA).getRasi(), 19);
+ *     assertThat(
+ *          f.print(cal),
+ *          is(&quot;K.Y, 19. Magha 3101&quot;));
+ * </pre>
+ *
+ * <h4>Oddities</h4>
+ *
+ * <p>The Hindu calendar knows <i>lost days</i> and leap days. And the lunisolar variants also know <i>lost months</i>
+ * (rare) and leap months. This is the main reason why days and months are not modelled as integers.  So users cannot
+ * rely on simple home grown integer arithmetic to look for example for the next valid day but must use the existing
+ * element queries, element manipulations and expressions based on the available methods like {@code nextDay()} or
+ * {@code nextMonth()}. Any date input in doubt should also be validated using
+ * {@link #isValid(HinduVariant, HinduEra, int, HinduMonth, HinduDay)}. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6
@@ -113,8 +149,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Der traditionelle Hindukalender, der in vielen verschiedenen regionalen Varianten auf dem indischen
  * Subkontinent existiert. </p>
  *
- * <p>Aktuell wird nur der {@link AryaSiddhanta alte Hindukalender} unterst&uuml;tzt. Folgende als Konstanten
- * deklarierte Elemente werden von dieser Klasse registriert: </p>
+ * <p>Aktuell werden alle algorithmischen Varianten einschlie&szlig;lich des {@link AryaSiddhanta alten Hindukalender}
+ * unterst&uuml;tzt. Diese Varianten sind im Buch &quot;Calendrical Calculations&quot; von Dershowitz/Reingold
+ * beschrieben. Reale Hindukalender, die auf Webseiten ver&ouml;ffentlicht sind, k&ouml;nnen dennoch im Detail
+ * abweichen. Anwender, die moderne Hindu-Kalender verwenden m&ouml;chten, k&ouml;nnen das Enum {@link HinduRule}
+ * als Ausgangspunkt zum Konstruieren einer geeigneten Kalendervariante benutzen. Zum Beispiel ist es m&ouml;glich,
+ * die Standard&auml;ra f&uuml;r alle Kalenderobjekte zu setzen, indem die gew&uuml;nschte &Auml;ra mittels
+ * {@link HinduVariant#with(HinduEra) auf der Variante gesetzt} wird. </p>
+ *
+ * <h4>Unterst&uuml;tzte Elemente</h4>
+ *
+ * <p>Folgende als Konstanten deklarierte Elemente werden von dieser Klasse registriert: </p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -128,9 +173,39 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@code CommonElements.RELATED_GREGORIAN_YEAR}
  * unterst&uuml;tzt. </p>
  *
+ * <h4>Kalenderarithmetik mit Zeiteinheiten</h4>
+ *
  * <p>Eine Datumsarithmetik mittels Zeiteinheiten wird au&szlig;er der Klasse {@link net.time4j.engine.CalendarDays}
  * nicht angeboten. Aber es gibt Methoden wie {@code previousMonth()} oder {@code nextYear()}. Was Jahre angeht,
  * k&ouml;nnen Anwender auch Ausdr&uuml;cke wie {@code with(YEAR_OF_ERA, getYear() + amount)} verwenden. </p>
+ *
+ * <h4>Formatierung</h4>
+ *
+ * <p>Dieser Kalender kann die gleichen sprachabh&auml;ngigen Textressourcen wie der indische Nationalkalender
+ * aussch&ouml;pfen. Beispiel: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;HinduCalendar&gt; f =
+ *          ChronoFormatter.ofPattern(
+ *              &quot;G, d. MMMM yyyy&quot;,
+ *              PatternType.CLDR,
+ *              Locale.ENGLISH,
+ *              HinduCalendar.family());
+ *     HinduCalendar cal = HinduCalendar.ofOldSolar(3101, HinduMonth.of(IndianMonth.MAGHA).getRasi(), 19);
+ *     assertThat(
+ *          f.print(cal),
+ *          is(&quot;K.Y, 19. Magha 3101&quot;));
+ * </pre>
+ *
+ * <h4>Besonderheiten</h4>
+ *
+ * <p>Der Hindukalender kennt <i>verlorene Tage</i> und Schalttage. Und die lunisolaren Varianten kennen
+ * entsprechend <i>verlorene Monate</i> (selten) und Schaltmonate. Das ist der Hauptgrund, warum Tage und
+ * Monate nicht als einfache Zahlen modelliert werden k&ouml;nnen. Somit k&ouml;nnen Anwender sich nicht
+ * auf einfache selbst gestrickte Integerarithmetik verlassen, um etwa den n&auml;chsten Tag zu suchen,
+ * sondern m&uuml;ssen sich auf die vorhandenen Elementabfragen, Elementmanipulationen und Ausdr&uuml;cke
+ * wie {@code nextDay()} oder {@code nextMonth()} st&uuml;tzen. Zweifelhafte Eingaben sind dabei mittels
+ * {@link #isValid(HinduVariant, HinduEra, int, HinduMonth, HinduDay)} zu pr&uuml;fen. </p>
  *
  * @author  Meno Hochschild
  * @since   5.6

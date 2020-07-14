@@ -357,11 +357,6 @@ public final class HinduVariant
         return (this.type < 0);
     }
 
-    // Kerala region only
-    boolean prefersRasiNames() {
-        return (this.type == HinduRule.MADRAS.ordinal()) || (this.type == HinduRule.MALAYALI.ordinal());
-    }
-
     /**
      * <p>Does this variant use elapsed years? </p>
      *
@@ -653,16 +648,12 @@ public final class HinduVariant
         return new HinduVariant(this.type, this.defaultEra, this.elapsedMode, this.depressionAngle, location);
     }
 
-    /**
-     * <p>Obtains the associated calendar system. </p>
-     *
-     * @return  calendar system for this variant of Hindu calendar
-     */
-    /*[deutsch]
-     * <p>Liefert das zu dieser Variante passende Kalendersystem. </p>
-     *
-     * @return  calendar system for this variant of Hindu calendar
-     */
+    // Kerala region only
+    boolean prefersRasiNames() {
+        return (this.type == HinduRule.MADRAS.ordinal()) || (this.type == HinduRule.MALAYALI.ordinal());
+    }
+
+    // obtains the associated calendar system
     HinduCS getCalendarSystem() {
         switch (this.type) {
             case TYPE_OLD_SOLAR:
@@ -674,16 +665,7 @@ public final class HinduVariant
         }
     }
 
-    /**
-     * <p>Obtains the number of the first month of Hindu year. </p>
-     *
-     * @return  int
-     */
-    /*[deutsch]
-     * <p>Liefert die Nummer des ersten Monats des Hindu-Jahres. </p>
-     *
-     * @return  int
-     */
+    // obtains the number of the first month of Hindu year
     int getFirstMonthOfYear() {
         if (this.isOld()) {
             return 1;
