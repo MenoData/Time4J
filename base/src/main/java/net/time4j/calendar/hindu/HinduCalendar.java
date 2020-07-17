@@ -91,7 +91,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * Hindu calendars published on websites can nevertheless deviate in detail. Users who wish to support modern
  * Hindu calendars can start with the enum {@link HinduRule} in order to construct a suitable variant. For example,
  * it is possible to set the default era for all calendar objects by {@link HinduVariant#with(HinduEra) setting
- * the desired era} on the variant. </p>
+ * the desired era} on the variant. Users can also configure astronomic calculations to be applied instead of
+ * the traditional ways to calculate Hindu calendar dates. </p>
  *
  * <h4>Supported elements</h4>
  *
@@ -132,6 +133,31 @@ import java.util.concurrent.ConcurrentHashMap;
  *          is(&quot;K.Y, 19. Magha 3101&quot;));
  * </pre>
  *
+ * <p>Possible leap months or leap days can be printed and parsed, too. If no special format attribute is
+ * specified and the text width to be used is wide then the localized word for &quot;adhika&quot; will be
+ * printed in front of leap months or days. Example for a short display using format attributes for handling
+ * leap indicators and the orientation of leap indicator: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;HinduCalendar&gt; f =
+ *          ChronoFormatter.ofPattern(&quot;M yyyy, d&quot;, PatternType.CLDR, Locale.ENGLISH, HinduCalendar.family())
+ *              .with(HinduPrimitive.ADHIKA_INDICATOR, &#39;*&#39;)
+ *              .with(HinduPrimitive.ADHIKA_IS_TRAILING, true);
+ *     HinduCalendar cal =
+ *          HinduCalendar.of(
+ *              HinduRule.AMANTA.variant(),
+ *              HinduEra.VIKRAMA,
+ *              1549,
+ *              HinduMonth.of(IndianMonth.VAISHAKHA).withLeap(),
+ *              HinduDay.valueOf(3));
+ *     assertThat(
+ *          f.print(cal),
+ *          is(&quot;2* 1549, 3&quot;));
+ * </pre>
+ *
+ * <p>Other number systems can be used in the usual way by obtaining a modified copy of the formatter
+ * with an expression like {@code f.with(Attributes.NUMBER_SYSTEM, NumberSystem.DEVANAGARI)}. </p>
+ *
  * <h4>Oddities</h4>
  *
  * <p>The Hindu calendar knows <i>lost days</i> and leap days. And the lunisolar variants also know <i>lost months</i>
@@ -139,10 +165,17 @@ import java.util.concurrent.ConcurrentHashMap;
  * rely on simple home grown integer arithmetic to look for example for the next valid day but must use the existing
  * element queries, element manipulations and expressions based on the available methods like {@code nextDay()} or
  * {@code nextMonth()}. Any date input in doubt should also be validated using
- * {@link #isValid(HinduVariant, HinduEra, int, HinduMonth, HinduDay)}. </p>
+ * {@link #isValid(HinduVariant, HinduEra, int, HinduMonth, HinduDay)} when creating a calendar date. </p>
  *
  * @author  Meno Hochschild
- * @since   5.6
+ * @since   5.7
+ * @see     IndianCalendar
+ * @see     HinduVariant
+ * @see     HinduRule
+ * @see     AryaSiddhanta
+ * @see     NumberSystem
+ * @see     HinduPrimitive#ADHIKA_INDICATOR
+ * @see     HinduPrimitive#ADHIKA_IS_TRAILING
  * @doctags.concurrency {immutable}
  */
 /*[deutsch]
@@ -155,7 +188,8 @@ import java.util.concurrent.ConcurrentHashMap;
  * abweichen. Anwender, die moderne Hindu-Kalender verwenden m&ouml;chten, k&ouml;nnen das Enum {@link HinduRule}
  * als Ausgangspunkt zum Konstruieren einer geeigneten Kalendervariante benutzen. Zum Beispiel ist es m&ouml;glich,
  * die Standard&auml;ra f&uuml;r alle Kalenderobjekte zu setzen, indem die gew&uuml;nschte &Auml;ra mittels
- * {@link HinduVariant#with(HinduEra) auf der Variante gesetzt} wird. </p>
+ * {@link HinduVariant#with(HinduEra) auf der Variante gesetzt} wird. Auch kann konfiguriert werden, da&szlig;
+ * moderne astronomische Berechnungen anstelle der traditionellen Berechnungen angewandt werden sollen. </p>
  *
  * <h4>Unterst&uuml;tzte Elemente</h4>
  *
@@ -197,6 +231,33 @@ import java.util.concurrent.ConcurrentHashMap;
  *          is(&quot;K.Y, 19. Magha 3101&quot;));
  * </pre>
  *
+ * <p>M&ouml;gliche Schaltmonate oder Schalttage k&ouml;nnen sowohl geschrieben wie auch gelesen werden. Falls
+ * keine speziellen Formatattribute angegeben sind und die zu verwendende Textbreite {@code WIDE} ist, wird
+ * eine lokalisierte Textressource f&uuml;r das Wort &quot;adhika&quot; vor einem Schaltmonat oder Schalttag
+ * verwendet werden. Beispiel f&uuml;r eine Kurzanzeige unter Verwendung spezieller Formatattribute zur Ausgabe
+ * von Schaltzustandsanzeigen und deren Orientierung: </p>
+ *
+ * <pre>
+ *     ChronoFormatter&lt;HinduCalendar&gt; f =
+ *          ChronoFormatter.ofPattern(&quot;M yyyy, d&quot;, PatternType.CLDR, Locale.ENGLISH, HinduCalendar.family())
+ *              .with(HinduPrimitive.ADHIKA_INDICATOR, &#39;*&#39;)
+ *              .with(HinduPrimitive.ADHIKA_IS_TRAILING, true);
+ *     HinduCalendar cal =
+ *          HinduCalendar.of(
+ *              HinduRule.AMANTA.variant(),
+ *              HinduEra.VIKRAMA,
+ *              1549,
+ *              HinduMonth.of(IndianMonth.VAISHAKHA).withLeap(),
+ *              HinduDay.valueOf(3));
+ *     assertThat(
+ *          f.print(cal),
+ *          is(&quot;2* 1549, 3&quot;));
+ * </pre>
+ *
+ * <p>Andere Ziffernsysteme k&ouml;nnen in der &uuml;blichen Weise verwendet werden, indem eine modifizierte Kopie
+ * des Formatierers mittels Ausdr&uuml;cken wie {@code f.with(Attributes.NUMBER_SYSTEM, NumberSystem.DEVANAGARI)}
+ * erzeugt und angewandt wird. </p>
+ *
  * <h4>Besonderheiten</h4>
  *
  * <p>Der Hindukalender kennt <i>verlorene Tage</i> und Schalttage. Und die lunisolaren Varianten kennen
@@ -205,10 +266,18 @@ import java.util.concurrent.ConcurrentHashMap;
  * auf einfache selbst gestrickte Integerarithmetik verlassen, um etwa den n&auml;chsten Tag zu suchen,
  * sondern m&uuml;ssen sich auf die vorhandenen Elementabfragen, Elementmanipulationen und Ausdr&uuml;cke
  * wie {@code nextDay()} oder {@code nextMonth()} st&uuml;tzen. Zweifelhafte Eingaben sind dabei mittels
- * {@link #isValid(HinduVariant, HinduEra, int, HinduMonth, HinduDay)} zu pr&uuml;fen. </p>
+ * {@link #isValid(HinduVariant, HinduEra, int, HinduMonth, HinduDay)} zu pr&uuml;fen, wenn es um die
+ * Erzeugung eines Kalenderdatums geht. </p>
  *
  * @author  Meno Hochschild
- * @since   5.6
+ * @since   5.7
+ * @see     IndianCalendar
+ * @see     HinduVariant
+ * @see     HinduRule
+ * @see     AryaSiddhanta
+ * @see     NumberSystem
+ * @see     HinduPrimitive#ADHIKA_INDICATOR
+ * @see     HinduPrimitive#ADHIKA_IS_TRAILING
  * @doctags.concurrency {immutable}
  */
 @CalendarType("extra/hindu")
