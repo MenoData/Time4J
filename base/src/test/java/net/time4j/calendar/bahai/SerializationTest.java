@@ -1,7 +1,5 @@
 package net.time4j.calendar.bahai;
 
-import net.time4j.calendar.frenchrev.FrenchRepublicanCalendar;
-import net.time4j.calendar.frenchrev.Sansculottides;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
