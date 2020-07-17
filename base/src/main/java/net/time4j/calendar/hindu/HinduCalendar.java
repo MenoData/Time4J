@@ -454,7 +454,7 @@ public final class HinduCalendar
                 DAY_OF_WEEK,
                 new WeekdayRule<>(
                     IndianCalendar.getDefaultWeekmodel(),
-                    (context) -> context.getChronology().getCalendarSystem(context.getVariant())
+                    HinduCalendar::getCalendarSystem
                 )
             );
         ENGINE = builder.build();
@@ -1602,7 +1602,7 @@ public final class HinduCalendar
 
                     if (kshaia) {
                         m = HinduMonth.of(context.month.getValue().roll((y > context.kyYear) ? -1 : 1));
-                        if (y < context.kyYear){
+                        if (y < context.kyYear) {
                             long u = calsys.create(y, m, HinduDay.valueOf(midOfMonth)).getDaysSinceEpochUTC() - 30;
                             HinduMonth ml = calsys.create(u).month;
                             if (ml.equals(m.withLeap())) {
@@ -2380,7 +2380,7 @@ public final class HinduCalendar
             if (attributes.contains(Attributes.TIMEZONE_ID)) {
                 tzid = attributes.get(Attributes.TIMEZONE_ID);
             } else {
-                tzid = ZonalOffset.atLongitude(new BigDecimal(variant.getLocation().getLongitude()));
+                tzid = ZonalOffset.atLongitude(BigDecimal.valueOf(variant.getLocation().getLongitude()));
             }
 
             defaultStartOfDay =
