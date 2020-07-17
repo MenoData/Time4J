@@ -496,10 +496,11 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     /*[deutsch]
@@ -514,10 +515,11 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     CC() {
@@ -593,16 +595,19 @@ public enum StdSolarCalculator
                     double y = Math.cos(Math.toRadians(obliquity(jct))) * Math.sin(lRad);
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
                     return AstroUtils.toRange_0_360(ra);
+                case "mean-anomaly":
+                    return meanAnomaly(jct);
                 case "nutation":
                     return nutation(jct);
                 case "obliquity":
                     return obliquity(jct);
-                case "mean-anomaly":
-                    return meanAnomaly(jct);
                 case "solar-longitude":
                     return apparentSolarLongitude(jct, nutation(jct));
                 case "solar-latitude":
                     return 0.0; // approximation used in this algorithm
+                case "lunar-longitude": {
+                    return MoonPosition.lunarLongitude(jde, nutation(jct));
+                }
                 default:
                     return Double.NaN;
             }
@@ -700,10 +705,11 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     /*[deutsch]
@@ -724,10 +730,11 @@ public enum StdSolarCalculator
      * <ul>
      *     <li>right-ascension</li>
      *     <li>declination</li>
+     *     <li>mean-anomaly</li>
      *     <li>nutation</li>
      *     <li>obliquity</li>
-     *     <li>mean-anomaly</li>
      *     <li>solar-longitude</li>
+     *     <li>lunar-longitude</li>
      * </ul>
      */
     TIME4J() {
@@ -783,6 +790,8 @@ public enum StdSolarCalculator
                     double ra = Math.toDegrees(Math.atan2(y, Math.cos(lRad)));
                     return AstroUtils.toRange_0_360(ra);
                 }
+                case "mean-anomaly":
+                    return meanAnomaly(jct);
                 case "nutation": {
                     double[] result = new double[2];
                     nutations(jct, result);
@@ -793,8 +802,6 @@ public enum StdSolarCalculator
                     nutations(jct, result);
                     return meanObliquity(jct) + result[1];
                 }
-                case "mean-anomaly":
-                    return meanAnomaly(jct);
                 case "solar-longitude": {
                     double[] result = new double[2];
                     nutations(jct, result);
@@ -802,6 +809,11 @@ public enum StdSolarCalculator
                 }
                 case "solar-latitude":
                     return 0.0; // approximation used in this algorithm
+                case "lunar-longitude": {
+                    double[] result = new double[2];
+                    nutations(jct, result);
+                    return MoonPosition.lunarLongitude(jde, result[0]);
+                }
                 default:
                     return Double.NaN;
             }

@@ -43,6 +43,10 @@ import java.util.List;
 abstract class HinduCS
     implements CalendarSystem<HinduCalendar> {
 
+    //~ Statische Felder/Initialisierungen --------------------------------
+
+    static final long KALI_YUGA_EPOCH = -1132959L; // julian-BCE-3102-02-18 (as rata die)
+
     //~ Instanzvariablen --------------------------------------------------
 
     final HinduVariant variant;
@@ -100,14 +104,30 @@ abstract class HinduCS
         HinduDay dom
     );
 
+    // expunged months are called "kshaya"
+    final boolean isExpunged(
+        int kyYear,
+        HinduMonth month
+    ) {
+        long utcDays = this.create(kyYear, month, HinduDay.valueOf(15)).getDaysSinceEpochUTC();
+        HinduCalendar cal = this.create(utcDays);
+        return !cal.getMonth().getValue().equals(month.getValue());
+    }
+
     // expunged days are gaps
     final boolean isExpunged(
         int kyYear,
         HinduMonth month,
         HinduDay dom
     ) {
-        HinduCalendar cal = this.create(kyYear, month, dom);
-        return !cal.equals(this.create(cal.getDaysSinceEpochUTC()));
+        long utcDays = this.create(kyYear, month, dom).getDaysSinceEpochUTC();
+        HinduCalendar cal = this.create(utcDays);
+
+        return (
+            (cal.getExpiredYearOfKaliYuga() != kyYear)
+                || !cal.getMonth().equals(month)
+                || !cal.getDayOfMonth().equals(dom)
+        );
     }
 
     // used in subclasses

@@ -31,6 +31,7 @@ import net.time4j.format.TextElement;
  *
  * @param   <V> generic type of element values, either month or day-of-month
  * @author  Meno Hochschild
+ * @since   5.6
  */
 /*[deutsch]
  * <p>Erweitert ein chronologisches Element um diverse
@@ -38,6 +39,7 @@ import net.time4j.format.TextElement;
  *
  * @param   <V> generic type of element values, either month or day-of-month
  * @author  Meno Hochschild
+ * @since   5.6
  */
 public interface AdjustableTextElement<V extends HinduPrimitive>
     extends TextElement<V> {

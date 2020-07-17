@@ -283,4 +283,24 @@ public enum IndianMonth
 
     }
 
+    /**
+     * <p>Rolls this month by given amount of months. </p>
+     *
+     * @param   months      count of months (maybe negative)
+     * @return  result of rolling operation
+     * @since   5.7
+     */
+    /*[deutsch]
+     * <p>Rollt um die angegebene Anzahl von Monaten vor oder zur&uuml;ck. </p>
+     *
+     * @param   months      count of months (maybe negative)
+     * @return  result of rolling operation
+     * @since   5.7
+     */
+    public IndianMonth roll(int months) {
+
+        return IndianMonth.valueOf((this.ordinal() + (months % 12 + 12)) % 12 + 1);
+
+    }
+
 }

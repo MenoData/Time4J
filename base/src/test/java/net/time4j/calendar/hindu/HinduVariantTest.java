@@ -1,16 +1,24 @@
 package net.time4j.calendar.hindu;
 
+import net.time4j.Moment;
+import net.time4j.PlainDate;
+import net.time4j.PlainTimestamp;
 import net.time4j.Weekday;
 import net.time4j.calendar.IndianMonth;
 import net.time4j.calendar.astro.SolarTime;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.EpochDays;
+import net.time4j.scale.TimeScale;
+import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
+import java.math.BigDecimal;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
+import static net.time4j.calendar.hindu.HinduVariant.ModernHinduCS.*;
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
 
@@ -26,7 +34,6 @@ public class HinduVariantTest {
                 case TAMIL:
                 case MALAYALI:
                 case MADRAS:
-                case BENGAL:
                     assertThat(
                         rule.variant().isSolar(),
                         is(true));
@@ -195,7 +202,7 @@ public class HinduVariantTest {
         HinduVariant v6 = HinduRule.AMANTA_KARTIKA.variant();
         HinduVariant v7 = AryaSiddhanta.SOLAR.variant();
         HinduVariant v8 = AryaSiddhanta.LUNAR.variant();
-        HinduVariant v9 = HinduRule.MALAYALI.variant().withAlternativeHinduSunrise();
+        HinduVariant v9 = HinduRule.MALAYALI.variant().withModernAstronomy(0.0);
         HinduVariant v10 = HinduRule.MALAYALI.variant().withAlternativeLocation(SolarTime.ofMecca());
         assertThat(
             HinduVariant.from(v1.getVariant()),
@@ -304,6 +311,123 @@ public class HinduVariantTest {
         assertThat(
             cs.isValid(0, m, HinduDay.valueOf(16)),
             is(true));
+    }
+
+    @Test
+    public void amantaKartika() {
+        HinduVariant vk = HinduRule.AMANTA_KARTIKA.variant();
+        HinduVariant va = HinduRule.AMANTA.variant();
+
+        HinduCalendar cal1 =
+            HinduCalendar.of(vk, HinduEra.VIKRAMA, 1850, HinduMonth.of(IndianMonth.KARTIKA), HinduDay.valueOf(1));
+        HinduCalendar cal2 =
+            HinduCalendar.of(vk, HinduEra.VIKRAMA, 1849, HinduMonth.of(IndianMonth.ASHWIN), HinduDay.valueOf(30));
+        HinduCalendar cal3 =
+            HinduCalendar.of(va, HinduEra.VIKRAMA, 1850, HinduMonth.of(IndianMonth.KARTIKA), HinduDay.valueOf(1));
+        HinduCalendar cal4 =
+            HinduCalendar.of(va, HinduEra.VIKRAMA, 1850, HinduMonth.of(IndianMonth.ASHWIN), HinduDay.valueOf(30));
+
+        assertThat(cal1.previousDay(), is(cal2));
+        assertThat(cal1.isSimultaneous(cal3), is(true));
+        assertThat(cal3.previousDay(), is(cal4));
+        assertThat(cal2.isSimultaneous(cal4), is(true));
+    }
+
+    @Test // https://www.prokerala.com/general/calendar/tamilcalendar.php?year=2020&mon=chithirai#calendar
+    public void kerala() {
+        HinduCalendar cal =
+            HinduCalendar.of(
+                HinduRule.MALAYALI.variant() // website data originate from Kerala region!!!
+                    .withModernAstronomy(0.0)
+                    // .withAlternativeLocation(GeoLocation.of(9 + 58d / 60, 76 + 17d / 60)), // Kochi in Kerala
+                    //,//.withAlternativeLocation(GeoLocation.of(13 + 5d / 60, 80 + 17d / 60)) // Chennai/Madras
+                ,
+                HinduEra.SAKA,
+                1943,
+                HinduMonth.ofSolar(1),
+                HinduDay.valueOf(1));
+
+        assertThat(
+            cal.with(HinduCalendar.DAY_OF_YEAR, 1),
+            is(cal));
+        assertThat(
+            cal.transform(PlainDate.axis()),
+            is(PlainDate.of(2020, 4, 14)));
+
+        int[][] lengthOfMonths = {
+            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 29, 31}, // 2020: ok
+            {31, 31, 32, 31, 31, 31, 30, 29, 29, 30, 30, 30}, // four deviations in year 2021!!!
+            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 30}, // 2022: ok
+            {31, 31, 32, 31, 31, 31, 30, 29, 30, 29, 30, 31}, // 2023: ok
+            {30, 32, 31, 32, 31, 30, 30, 30, 29, 30, 30, 30}, // 2024: ok
+            // {31, 31, 31, 32, 31, 30, 30, 30, 29, }, // 2025
+        };
+
+        int deviations = 0;
+
+        for (int y = 2020; y < 2025; y++) {
+            for (int i = 0; i < 12; i++) {
+                int len = cal.getMaximum(HinduCalendar.DAY_OF_MONTH).getValue();
+                int expected = lengthOfMonths[y - 2020][i];
+                if (len == expected) {
+                    System.out.print(cal.getMaximum(HinduCalendar.DAY_OF_MONTH) + ", ");
+                } else {
+                    deviations++;
+                    System.out.print("??, ");
+                }
+                //assertThat(len, is(expected));
+                cal = cal.nextMonth();
+            }
+            System.out.println();
+        }
+
+        assertThat(deviations <= 4, is(true));
+    }
+
+    @Test
+    public void meshaSamkranti285() { // CC, 20.41
+        long offset = ZonalOffset.atLongitude(new BigDecimal(HinduVariant.UJJAIN.getLongitude())).getIntegralAmount();
+        double fixed = ((meshaSamkranti(285) * 86400d) - offset) / 86400d;
+        Moment m = Moment.of(86400 * ((long) fixed + 1721424L - 2440587L), TimeScale.POSIX);
+        assertThat(
+            m.get(PlainDate.YEAR.atUTC()),
+            is(285));
+        assertThat(
+            Math.abs(SIDEREAL_START - hPrecession(fixed)) < 0.0001,
+            is(true));
+    }
+
+    @Test
+    public void meshaSamkranti2000() { // CC-example, page 364
+        long fixed = (long) (meshaSamkranti(2000) * 86400d);
+        long unix = fixed + (1721424L - 2440587L) * 86400;
+        Moment s = Moment.of(unix, TimeScale.POSIX).with(Moment.PRECISION, TimeUnit.MINUTES);
+        assertThat(s, is(PlainTimestamp.of(2000, 4, 13, 17, 55).atUTC()));
+    }
+
+    private static double meshaSamkranti(int gyear) {
+        long t = PlainDate.of(gyear, 1, 1).get(EpochDays.RATA_DIE);
+        double tau = t + ((SIDEREAL_YEAR / 360d) * HinduCS.modulo(-hSolarLongitude(t), 360));
+        double a = Math.max(t, tau - 5);
+        double b = tau + 5;
+        return binarySearchSolarLongitude(a, b);
+    }
+
+    private static double binarySearchSolarLongitude(
+        double low,
+        double high
+    ) {
+        double x = (low + high) / 2;
+
+        if (high - low < 0.00001) {
+            return x;
+        }
+
+        if (HinduCS.modulo(hSolarLongitude((low + high) / 2), 360) < 180) {
+            return binarySearchSolarLongitude(low, x);
+        } else {
+            return binarySearchSolarLongitude(x, high);
+        }
     }
 
 }
