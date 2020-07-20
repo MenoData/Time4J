@@ -324,4 +324,146 @@ public class ChineseMiscellaneousTest {
         assertThat(dragonBoatFestival.plus(1, ChineseCalendar.Unit.MONTHS).getMonth().isLeap(), is(true));
     }
 
+    @Test
+    public void sexagesimalMonth() {
+        PlainDate gregorian = PlainDate.of(2020, 7, 14);
+        ChineseCalendar calendar = gregorian.transform(ChineseCalendar.class);
+        SexagesimalName sn = calendar.getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.GUI_10_WATER_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.WEI_8_SHEEP));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("癸未"));
+
+        sn = PlainDate.of(2020, 8, 6).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.GUI_10_WATER_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.WEI_8_SHEEP));
+
+        sn = PlainDate.of(2020, 8, 7).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.JIA_1_WOOD_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.SHEN_9_MONKEY));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("甲申"));
+
+        sn = PlainDate.of(2020, 9, 6).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.JIA_1_WOOD_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.SHEN_9_MONKEY));
+
+        sn = PlainDate.of(2020, 9, 7).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.YI_2_WOOD_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.YOU_10_FOWL));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("乙酉"));
+
+        sn = PlainDate.of(2020, 2, 4).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.WU_5_EARTH_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.YIN_3_TIGER));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("戊寅"));
+
+        sn = PlainDate.of(2020, 2, 3).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.DING_4_FIRE_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.CHOU_2_OX));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("丁丑"));
+
+        ChineseCalendar newYear = ChineseCalendar.ofNewYear(2020); // 2020-01-25
+        sn = newYear.getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.DING_4_FIRE_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.CHOU_2_OX));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("丁丑"));
+
+        sn = PlainDate.of(2020, 1, 6).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.DING_4_FIRE_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.CHOU_2_OX));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("丁丑"));
+
+        sn = PlainDate.of(2020, 1, 5).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.BING_3_FIRE_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.ZI_1_RAT));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("丙子"));
+
+        sn = PlainDate.of(2019, 12, 7).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.BING_3_FIRE_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.ZI_1_RAT));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("丙子"));
+
+        sn = PlainDate.of(2019, 12, 6).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.YI_2_WOOD_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.HAI_12_PIG));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("乙亥"));
+
+        ChineseCalendar newYear2 = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+        System.out.println(newYear2.transform(PlainDate.axis()));
+        sn = newYear2.getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.GENG_7_METAL_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.YIN_3_TIGER));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("庚寅"));
+
+        sn = PlainDate.of(2021, 3, 4).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.GENG_7_METAL_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.YIN_3_TIGER));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("庚寅"));
+
+        sn = PlainDate.of(2021, 3, 5).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.XIN_8_METAL_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.MAO_4_HARE));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("辛卯"));
+
+        sn = PlainDate.of(2021, 2, 11).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.GENG_7_METAL_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.YIN_3_TIGER));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("庚寅"));
+
+        sn = PlainDate.of(2021, 2, 3).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.GENG_7_METAL_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.YIN_3_TIGER));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("庚寅"));
+
+        sn = PlainDate.of(2021, 2, 2).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.JI_6_EARTH_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.CHOU_2_OX));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("己丑"));
+
+        sn = PlainDate.of(2020, 12, 7).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.WU_5_EARTH_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.ZI_1_RAT));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("戊子"));
+
+        // in contradiction to https://www.yourchineseastrology.com
+        // but in agreement with data from Hongkong observatory,
+        sn = PlainDate.of(2020, 12, 6).transform(ChineseCalendar.axis()).getSexagesimalMonth();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.DING_4_FIRE_YIN));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.HAI_12_PIG));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("丁亥"));
+    }
+
+    @Test
+    public void sexagesimalMonthSanity() {
+        ChineseCalendar min = ChineseCalendar.axis().getMinimum();
+        ChineseCalendar max = ChineseCalendar.axis().getMaximum();
+        ChineseCalendar cal = min;
+
+        while (cal.getDaysSinceEpochUTC() <= max.getDaysSinceEpochUTC() - 30) {
+            int num = cal.getSexagesimalMonth().getNumber();
+            cal = cal.plus(1, ChineseCalendar.Unit.MONTHS);
+            assertThat(num >= 1 && num <= 60, is(true));
+        }
+    }
+
+    @Test
+    public void sexagesimalDay() {
+        PlainDate gregorian = PlainDate.of(1900, 2, 20);
+        ChineseCalendar calendar = gregorian.transform(ChineseCalendar.class);
+        SexagesimalName sn = calendar.getSexagesimalDay();
+        assertThat(sn.getStem(), is(SexagesimalName.Stem.JIA_1_WOOD_YANG));
+        assertThat(sn.getBranch(), is(SexagesimalName.Branch.ZI_1_RAT));
+        assertThat(sn.getDisplayName(Locale.CHINESE), is("甲子"));
+
+        ChineseCalendar next = calendar.plus(1, ChineseCalendar.Unit.DAYS);
+        assertThat(next.getSexagesimalDay(), is(sn.roll(1)));
+
+        ChineseCalendar later = calendar.plus(60, ChineseCalendar.Unit.DAYS);
+        assertThat(later.transform(PlainDate.axis()), is(PlainDate.of(1900, 4, 21)));
+        assertThat(later.getSexagesimalDay().getDisplayName(Locale.CHINESE), is("甲子"));
+
+        // https://www.yourchineseastrology.com/calendar/2020/8.htm
+        ChineseCalendar latest = PlainDate.of(2020, 8, 6).transform(ChineseCalendar.axis());
+        assertThat(latest.getSexagesimalDay().getDisplayName(Locale.CHINESE), is("辛巳"));
+    }
+
 }

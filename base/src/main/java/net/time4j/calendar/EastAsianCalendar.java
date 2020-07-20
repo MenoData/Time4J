@@ -25,10 +25,12 @@ import net.time4j.GeneralTimestamp;
 import net.time4j.PlainTime;
 import net.time4j.Weekday;
 import net.time4j.base.MathUtils;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ElementRule;
+import net.time4j.engine.EpochDays;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.UnitRule;
 import net.time4j.format.CalendarType;
@@ -203,6 +205,68 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     public int getDayOfYear() {
 
         return (int) (this.utcDays - this.getCalendarSystem().newYear(this.cycle, this.yearOfCycle) + 1);
+
+    }
+
+    /**
+     * <p>Obtains the sexagesimal name of solar month component which repeats every 60th solar term. </p>
+     *
+     * @return  SexagesimalName
+     * @see     #getSolarTerm()
+     * @since   5.7
+     */
+    /*[deutsch]
+     * <p>Liefert den sexagesimalen Namen der Sonnenmonatskomponente, der sich alle 60 Sonnenmonate wiederholt. </p>
+     *
+     * @return  SexagesimalName
+     * @see     #getSolarTerm()
+     * @since   5.7
+     */
+    public SexagesimalName getSexagesimalMonth() {
+
+        SolarTerm st = this.getSolarTerm();
+        int solarMonth = MathUtils.floorModulo(st.getIndex() + 1, 12);
+        SexagesimalName.Branch branch = SexagesimalName.Branch.values()[solarMonth];
+        int y = EastAsianYear.forGregorian(this.get(CommonElements.RELATED_GREGORIAN_YEAR)).getElapsedCyclicYears();
+
+        if (solarMonth <= 2) {
+            long daxue =
+                SolarTerm.MINOR_11_DAXUE_255.onOrAfter(
+                    this.minus(CalendarDays.of(this.utcDays - this.newYearUTC(0)))
+                ).getDaysSinceEpochUTC();
+
+            if ((this.utcDays >= daxue) && (this.utcDays < this.newYearUTC(1))) {
+                y++;
+            }
+        }
+
+        int elapsedMonths = MathUtils.floorModulo(12 * (y - 1) + solarMonth + 2, 10);
+        SexagesimalName.Stem stem = SexagesimalName.Stem.values()[elapsedMonths];
+        return SexagesimalName.of(stem, branch);
+
+    }
+
+    /**
+     * <p>Obtains the sexagesimal name of day component which repeats every 60th day. </p>
+     *
+     * @return  SexagesimalName
+     * @since   5.7
+     */
+    /*[deutsch]
+     * <p>Liefert den sexagesimalen Namen der Tageskomponente, der sich alle 60 Tage wiederholt. </p>
+     *
+     * @return  SexagesimalName
+     * @since   5.7
+     */
+    public SexagesimalName getSexagesimalDay() {
+
+        int elapsedDays = MathUtils.floorModulo(EpochDays.RATA_DIE.transform(this.utcDays, EpochDays.UTC) - 45, 60);
+
+        if (elapsedDays == 0) {
+            elapsedDays = 60;
+        }
+
+        return SexagesimalName.of(elapsedDays);
 
     }
 
@@ -425,8 +489,13 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
     // needs to be overridden due to calendar specific zone offsets and epochs
     abstract EastAsianCS<D> getCalendarSystem();
 
+    private long newYearUTC(int delta) {
+        return this.getCalendarSystem().newYear(this.cycle, this.yearOfCycle + delta);
+    }
+
     //~ Innere Klassen ----------------------------------------------------
 
+    @SuppressWarnings("unchecked")
     private static class IntegerElementRule<D extends EastAsianCalendar<?, D>>
         implements IntElementRule<D> {
 
@@ -624,6 +693,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
     }
 
+    @SuppressWarnings("unchecked")
     private static class CyclicYearRule<D extends EastAsianCalendar<?, D>>
         implements ElementRule<D, CyclicYear> {
 
@@ -715,6 +785,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
         }
     }
 
+    @SuppressWarnings("unchecked")
     private static class MonthRule<D extends EastAsianCalendar<?, D>>
         implements ElementRule<D, EastAsianMonth> {
 
@@ -798,6 +869,7 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
 
     }
 
+    @SuppressWarnings("unchecked")
     private static class EastAsianUnitRule<D extends EastAsianCalendar<?, D>>
         implements UnitRule<D> {
 
