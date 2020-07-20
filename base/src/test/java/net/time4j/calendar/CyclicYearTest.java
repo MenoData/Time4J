@@ -22,6 +22,28 @@ public class CyclicYearTest {
     }
 
     @Test
+    public void nonEquals() {
+        assertThat(
+            CyclicYear.of(29).equals(SexagesimalName.of(29)),
+            is(false));
+    }
+
+    @Test
+    public void ofStemAndBranch() {
+        for (int i = 1; i <= 60; i++) {
+            CyclicYear cy = CyclicYear.of(i);
+            assertThat(
+                CyclicYear.of(cy.getStem(), cy.getBranch()),
+                is(cy));
+        }
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void ofStemAndBranchInvalid() {
+        CyclicYear.of(SexagesimalName.Stem.GENG_7_METAL_YANG, SexagesimalName.Branch.CHOU_2_OX);
+    }
+
+    @Test
     public void getNumber() {
         assertThat(
             CyclicYear.of(29).getNumber(),

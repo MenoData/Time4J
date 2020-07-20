@@ -105,6 +105,16 @@ public class SerializationTest {
         roundtrip(JucheCalendar.of(105, 1, 7));
     }
 
+    @Test
+    public void serializeSexagesimalName() throws IOException, ClassNotFoundException {
+        roundtrip(SexagesimalName.of(11));
+    }
+
+    @Test
+    public void serializeCyclicYear() throws IOException, ClassNotFoundException {
+        roundtrip(CyclicYear.of(11));
+    }
+
     private static int roundtrip(Object obj)
         throws IOException, ClassNotFoundException {
 
