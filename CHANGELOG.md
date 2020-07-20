@@ -1,8 +1,10 @@
 ## [v5.7] not yet released
 ### Added
 - Modern Hindu calendar (algorithmic) [#851]
+- Stems and branches of month and day in Chinese calendar [#910]
 
 ### Fixed
+- Invalid combination of stems and branches not documented [#912]
 - United Kingdom date format [#908]
 - Package `net.time4j.calendar.hindu` not exported for jigsaw [#906]
 
