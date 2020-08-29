@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ResourceLoader.java) is part of project Time4J.
  *
@@ -433,13 +433,13 @@ public abstract class ResourceLoader {
                 } else {
                     return url.openStream();
                 }
-            } catch (IOException ioe) {
+            } catch (IOException | RuntimeException ex) {
                 if (uri.toString().contains(".repository")) { // print warning for tzdata-repository only
                     System.err.println(
-                        "Warning: Loading of resource " + uri + " failed (" + ioe.getMessage() + "). "
+                        "Warning: Loading of resource " + uri + " failed (" + ex.getMessage() + "). "
                         + "Consider setting the system property \""
                         + USE_OF_CLASSLOADER_ONLY + "\" for reducing overhead.");
-                    ioe.printStackTrace(System.err);
+                    ex.printStackTrace(System.err);
                 }
                 return null;
             }
