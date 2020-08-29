@@ -5242,7 +5242,9 @@ public final class ChronoFormatter<T>
         /**
          * <p>Skips all characters from input as unparseable until at least given count of characters is left. </p>
          *
-         * <p>Note: This method is only relevant for parsing. During printing, this method does nothing. </p>
+         * <p>Note: This method is only relevant for parsing. If the argument is zero then the method is equivalent
+         * to setting the format attribute {@code Attributes.TRAILING_CHARACTERS}. During printing, this method does
+         * nothing. </p>
          *
          * @param   keepRemainingChars      minimum count of characters which should be reserved for following steps
          * @return  this instance for method chaining
@@ -5255,7 +5257,9 @@ public final class ChronoFormatter<T>
          * <p>Ignoriert alle Zeichen als nicht-interpretierbar, bis wenigstens die angegebene Anzahl von Zeichen
          * &uuml;brigbleibt. </p>
          *
-         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. </p>
+         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant. Wenn das Argument den Wert 0 hat, dann ist diese
+         * Methode &auml;quivalent zum Setzen des Formatattributs {@code Attributes.TRAILING_CHARACTERS}.  In der
+         * Textausgabe macht die Methode nichts. </p>
          *
          * @param   keepRemainingChars      minimum count of characters which should be reserved for following steps
          * @return  this instance for method chaining
