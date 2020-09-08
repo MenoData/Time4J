@@ -97,7 +97,8 @@ public abstract class ResourceLoader {
      * of trying an URI-construction first. </p>
      *
      * <p>The value is either &quot;true&quot; or &quot;false&quot; (default). This property will be
-     * ignored on Android platforms. </p>
+     * ignored on Android platforms. Applications in an OSGi-environment should set the property value
+     * to {@code true}. </p>
      *
      * @since   3.16/4.13
      */
@@ -106,7 +107,8 @@ public abstract class ResourceLoader {
      * URI-Konstruktion verwendet werden soll. </p>
      *
      * <p>Der Wert ist entweder &quot;true&quot; oder &quot;false&quot; (Vorgabe). Auf Android wird
-     * diese Eigenschaft ignoriert. </p>
+     * diese Eigenschaft ignoriert. Anwendungen in einer OSGi-Umgebung sollten den Wert auf <code>true</code>
+     * setzen. </p>
      *
      * @since   3.16/4.13
      */
