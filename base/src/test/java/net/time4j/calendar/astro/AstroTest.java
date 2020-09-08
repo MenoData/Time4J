@@ -19,6 +19,7 @@ import org.junit.runners.JUnit4;
 import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.concurrent.TimeUnit;
 
 import static net.time4j.calendar.astro.AstronomicalSeason.*;
@@ -910,6 +911,56 @@ public class AstroTest {
             is(true)); // usno => 20.0
     }
 
+    @Test(expected=UnsupportedOperationException.class)
+    public void invalidShadowInPolarRegion() {
+        SolarTime svalbard = svalbard(null);
+        svalbard.timeOfShadowBeforeNoon(2.0, 100);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void invalidObjectHeightIsInfinite() {
+        SolarTime shanghai =
+            SolarTime.ofLocation()
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        shanghai.timeOfShadowBeforeNoon(Double.POSITIVE_INFINITY, 10);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void invalidObjectHeightIsZero() {
+        SolarTime shanghai =
+            SolarTime.ofLocation()
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        shanghai.timeOfShadowBeforeNoon(0.0, 10);
+    }
+
+    @Test(expected=IllegalArgumentException.class)
+    public void invalidShadowIsNegative() {
+        SolarTime shanghai =
+            SolarTime.ofLocation()
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        shanghai.timeOfShadowBeforeNoon(1.8, -10);
+    }
+
+    @Test
+    public void invalidShadowTooShort() {
+        SolarTime shanghai =
+            SolarTime.ofLocation()
+                .northernLatitude(31, 14, 0.0)
+                .easternLongitude(121, 28, 0.0)
+                .build();
+        Optional<Moment> timeOfShadow =
+            shanghai.timeOfShadowBeforeNoon(1.8, 0.5).apply(PlainDate.of(2017, 12, 13));
+        assertThat(
+            timeOfShadow.isPresent(),
+            is(false));
+    }
+
     @Test
     public void sunPositionShanghai() {
         Timezone tz = Timezone.of("Asia/Shanghai");
@@ -939,6 +990,12 @@ public class AstroTest {
         assertThat(
             Math.round(position.getShadowLength(1.8) * 100) / 100.0,
             is(6.87));
+
+        Optional<Moment> timeOfShadow =
+            shanghai.timeOfShadowBeforeNoon(1.8, 6.87).apply(PlainDate.of(2017, 12, 13));
+        assertThat(
+            timeOfShadow.isPresent() && Math.abs(timeOfShadow.get().getPosixTime() - moment.getPosixTime()) < 30,
+            is(true));
     }
 
     @Test
@@ -950,7 +1007,7 @@ public class AstroTest {
                 .build();
         Moment moment = lakeNasser.transitAtNoon().apply(PlainDate.of(2018, 6, 21)); // summer solstice
         SunPosition position = SunPosition.at(moment, lakeNasser);
-        System.out.println(StdSolarCalculator.TIME4J.getGeodeticAngle(53.0, 11000));
+
         assertThat(
             Math.abs(position.getRightAscension() - 90.01069057923154) < TOLERANCE,
             is(true));
@@ -965,6 +1022,17 @@ public class AstroTest {
             is(true)); // ~ zenith = 90°
         assertThat(
             position.getShadowLength(1.8) < TOLERANCE,
+            is(true));
+
+        Optional<Moment> timeOfShadow1 =
+            lakeNasser.timeOfShadowBeforeNoon(1.8, 0.0).apply(PlainDate.of(2018, 6, 21));
+        assertThat(
+            timeOfShadow1.isPresent() && Math.abs(timeOfShadow1.get().getPosixTime() - moment.getPosixTime()) < 30,
+            is(true));
+        Optional<Moment> timeOfShadow2 =
+            lakeNasser.timeOfShadowAfterNoon(1.8, 0.0).apply(PlainDate.of(2018, 6, 21));
+        assertThat(
+            timeOfShadow2.isPresent() && Math.abs(timeOfShadow2.get().getPosixTime() - moment.getPosixTime()) < 30,
             is(true));
     }
 

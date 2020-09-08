@@ -286,7 +286,8 @@ public class SunPosition
             } else if (e == 90.0) {
                 return 0.0;
             } else {
-                return objectHeight / Math.tan(Math.toRadians(e));
+                double len = objectHeight / Math.tan(Math.toRadians(e));
+                return (len < SolarTime.ARC_MIN) ? 0.0 : len;
             }
         } else {
             throw new IllegalArgumentException("Object height must be finite and positive: " + objectHeight);
