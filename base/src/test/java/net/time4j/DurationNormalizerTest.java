@@ -9,7 +9,7 @@ import static net.time4j.CalendarUnit.*;
 import static net.time4j.ClockUnit.*;
 import static net.time4j.Duration.approximateHours;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)

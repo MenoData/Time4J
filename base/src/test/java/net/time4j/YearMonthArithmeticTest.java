@@ -13,7 +13,7 @@ import static net.time4j.CalendarUnit.MONTHS;
 import static net.time4j.CalendarUnit.QUARTERS;
 import static net.time4j.CalendarUnit.YEARS;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)

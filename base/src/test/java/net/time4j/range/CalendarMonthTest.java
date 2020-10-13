@@ -18,7 +18,7 @@ import java.time.YearMonth;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)

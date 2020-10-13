@@ -22,7 +22,7 @@ import java.util.NoSuchElementException;
 import static net.time4j.ClockUnit.NANOS;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.CoreMatchers.nullValue;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)

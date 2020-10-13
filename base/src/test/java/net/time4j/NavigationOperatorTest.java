@@ -8,7 +8,7 @@ import static net.time4j.PlainDate.DAY_OF_WEEK;
 import static net.time4j.PlainDate.MONTH_OF_YEAR;
 import static net.time4j.PlainDate.QUARTER_OF_YEAR;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)

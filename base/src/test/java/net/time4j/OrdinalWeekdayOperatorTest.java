@@ -8,7 +8,7 @@ import org.junit.runners.Parameterized.Parameters;
 import java.util.Arrays;
 
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(Parameterized.class)

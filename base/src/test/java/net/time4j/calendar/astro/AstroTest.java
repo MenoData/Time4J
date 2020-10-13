@@ -24,7 +24,7 @@ import java.util.concurrent.TimeUnit;
 
 import static net.time4j.calendar.astro.AstronomicalSeason.*;
 import static org.hamcrest.CoreMatchers.is;
-import static org.junit.Assert.assertThat;
+import static org.hamcrest.MatcherAssert.assertThat;
 import static org.junit.Assert.fail;
 
 
