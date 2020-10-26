@@ -82,6 +82,19 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void printRelativeNL() {
+        TimeSource<?> clock = () -> PlainDate.of(2020, 10, 26).atStartOfDay().atUTC();
+
+        assertThat(
+            PrettyTime.of(Locale.forLanguageTag("nl"))
+                .withReferenceClock(clock)
+                .printRelative(
+                    PlainTimestamp.of(2020, 10, 28, 12, 45).atUTC(), ZonalOffset.UTC
+                ),
+            is("komende woensdag"));
+    }
+
+    @Test
     public void printDurationPT() {
         assertThat(
             PrettyTime.of(new Locale("pt", "PT")).withShortStyle().print(Duration.of(5, ClockUnit.SECONDS)),
@@ -246,6 +259,7 @@ public class PrettyTimeTest {
             is("0 min"));
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Test(expected=NullPointerException.class)
     public void withEmptyNullUnit() {
         CalendarUnit unit = null;
