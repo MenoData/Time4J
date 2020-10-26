@@ -1,4 +1,6 @@
 ## [v5.8] not yet released
+### Fixed
+- Imprecise translations for relative days in Dutch [#922]
 
 ## [v5.7] published on 2020-09-13
 ### Added
