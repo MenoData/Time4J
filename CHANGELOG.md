@@ -1,5 +1,6 @@
 ## [v5.8] not yet released
 ### Fixed
+- New Japanese nengo defined in system property not correctly checked [#929]
 - Imprecise translations for relative days in Dutch [#922]
 
 ## [v5.7] published on 2020-09-13
