@@ -418,6 +418,7 @@ public enum SolarTerm {
      * is generally different from the lunar calendar cycle. </p>
      *
      * @param   gregorianYear   the gregorian year in which the first solar term Lichun occurs
+     * @param   chronology      chronology for generating the calendar dates of the list
      * @return  list of calendar dates of all solar terms starting with Lichun in spring of given gregorian year
      * @see     #MINOR_01_LICHUN_315
      * @see     #onOrAfter(EastAsianCalendar) onOrAfter(D)
@@ -431,6 +432,7 @@ public enum SolarTerm {
      * solare Zyklus beginnend mit Lichun im allgemeinen sich vom lunaren Kalenderzyklus unterscheidet. </p>
      *
      * @param   gregorianYear   the gregorian year in which the first solar term Lichun occurs
+     * @param   chronology      chronology for generating the calendar dates of the list
      * @return  list of calendar dates of all solar terms starting with Lichun in spring of given gregorian year
      * @see     #MINOR_01_LICHUN_315
      * @see     #onOrAfter(EastAsianCalendar) onOrAfter(D)
