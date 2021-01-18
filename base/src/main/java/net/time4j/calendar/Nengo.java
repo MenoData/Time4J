@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Nengo.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.PlainDate;
 import net.time4j.base.ResourceLoader;
 import net.time4j.engine.AttributeKey;
 import net.time4j.engine.AttributeQuery;
+import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoCondition;
 import net.time4j.engine.ChronoDisplay;
@@ -230,8 +231,10 @@ public final class Nengo
                 }
             }
             if ((name != null) && (kanji != null) && (since != null)) {
-                if (since.isBefore(PlainDate.of(1989, 1, 9))) {
-                    throw new IllegalStateException("New Japanese era must be after Heisei.");
+                Nengo lastDefined = official.get(official.size() - 1);
+                if (since.isBeforeOrEqual(lastDefined.getStart())) {
+                    throw new IllegalStateException(
+                        "New Japanese era must be after last defined nengo: " + lastDefined.romaji);
                 } else {
                     if (chinese == null) {
                         chinese = kanji;
