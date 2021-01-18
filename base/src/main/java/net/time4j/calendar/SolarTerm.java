@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SolarTerm.java) is part of project Time4J.
  *
@@ -22,12 +22,16 @@
 package net.time4j.calendar;
 
 import net.time4j.Moment;
+import net.time4j.PlainDate;
 import net.time4j.calendar.astro.JulianDay;
 import net.time4j.calendar.astro.StdSolarCalculator;
+import net.time4j.engine.Chronology;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 
 
@@ -404,6 +408,51 @@ public enum SolarTerm {
         ZonalOffset offset = calsys.getOffset(utcDays);
         Moment m = calsys.midnight(utcDays);
         return calsys.transform(this.atOrAfter(m).toZonalTimestamp(offset).toDate().getDaysSinceEpochUTC());
+
+    }
+
+    /**
+     * <p>Obtains a list of dates of all solar terms beginning with Lichun in spring of given gregorian year. </p>
+     *
+     * <p>Note: The returned list of solar terms might cover different calendar years because the solar cycle
+     * is generally different from the lunar calendar cycle. </p>
+     *
+     * @param   gregorianYear   the gregorian year in which the first solar term Lichun occurs
+     * @return  list of calendar dates of all solar terms starting with Lichun in spring of given gregorian year
+     * @see     #MINOR_01_LICHUN_315
+     * @see     #onOrAfter(EastAsianCalendar) onOrAfter(D)
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert eine Datumsliste f&uuml;r alle {@code SolarTerm}-Werte, wobei der erste Wert Lichun
+     * im angegebenen gregorianischen Jahr liegt. </p>
+     *
+     * <p>Hinweis: Die zur&uuml;ckgegebene Datumsliste kann verschiedene Kalenderjahre abdecken, weil der
+     * solare Zyklus beginnend mit Lichun im allgemeinen sich vom lunaren Kalenderzyklus unterscheidet. </p>
+     *
+     * @param   gregorianYear   the gregorian year in which the first solar term Lichun occurs
+     * @return  list of calendar dates of all solar terms starting with Lichun in spring of given gregorian year
+     * @see     #MINOR_01_LICHUN_315
+     * @see     #onOrAfter(EastAsianCalendar) onOrAfter(D)
+     * @since   5.8
+     */
+    public static <D extends EastAsianCalendar<?, D>> List<D> list(
+        int gregorianYear,
+        Chronology<D> chronology
+    ) {
+
+        List<D> dates = new ArrayList<>(24);
+        D ref = PlainDate.of(gregorianYear, 1, 1).transform(chronology);
+        D date = SolarTerm.MINOR_01_LICHUN_315.onOrAfter(ref);
+        dates.add(date);
+        SolarTerm[] terms = SolarTerm.values();
+
+        for (int i = 1; i < 24; i++) {
+            date = terms[i].onOrAfter(date);
+            dates.add(date);
+        }
+
+        return dates;
 
     }
 

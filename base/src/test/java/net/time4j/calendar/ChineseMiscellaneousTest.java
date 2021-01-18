@@ -21,7 +21,10 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.util.Arrays;
+import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -322,6 +325,50 @@ public class ChineseMiscellaneousTest {
                 5);
         assertThat(dragonBoatFestival.transform(PlainDate.axis()), is(PlainDate.of(2009, 5, 28)));
         assertThat(dragonBoatFestival.plus(1, ChineseCalendar.Unit.MONTHS).getMonth().isLeap(), is(true));
+    }
+
+    @Test
+    public void query_MINOR_01_LICHUN_315() {
+        ChineseCalendar gregorianNewYear = PlainDate.of(2021, 1, 1).transform(ChineseCalendar.class);
+        assertThat(
+            SolarTerm.MINOR_01_LICHUN_315.onOrAfter(gregorianNewYear).transform(PlainDate.class),
+            is(PlainDate.of(2021, 2, 3)));
+    }
+
+    @Test
+    public void listSolarTerms() {
+        List<PlainDate> list =
+            SolarTerm.list(2021, ChineseCalendar.axis())
+                .stream()
+                .map((d) -> d.transform(PlainDate.axis()))
+                .collect(Collectors.toList());
+        List<PlainDate> expected =
+            Arrays.asList(
+                PlainDate.of(2021, 2, 3),
+                PlainDate.of(2021, 2, 18),
+                PlainDate.of(2021, 3, 5),
+                PlainDate.of(2021, 3, 20),
+                PlainDate.of(2021, 4, 4),
+                PlainDate.of(2021, 4, 20),
+                PlainDate.of(2021, 5, 5),
+                PlainDate.of(2021, 5, 21),
+                PlainDate.of(2021, 6, 5),
+                PlainDate.of(2021, 6, 21),
+                PlainDate.of(2021, 7, 7),
+                PlainDate.of(2021, 7, 22),
+                PlainDate.of(2021, 8, 7),
+                PlainDate.of(2021, 8, 23),
+                PlainDate.of(2021, 9, 7),
+                PlainDate.of(2021, 9, 23),
+                PlainDate.of(2021, 10, 8),
+                PlainDate.of(2021, 10, 23),
+                PlainDate.of(2021, 11, 7),
+                PlainDate.of(2021, 11, 22),
+                PlainDate.of(2021, 12, 7),
+                PlainDate.of(2021, 12, 21),
+                PlainDate.of(2022, 1, 5),
+                PlainDate.of(2022, 1, 20));
+        assertThat(list, is(expected));
     }
 
     @Test
