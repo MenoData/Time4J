@@ -1,5 +1,9 @@
 ## [v5.8] not yet released
+### Added
+- New methods for solar terms in East Asian calendars creating lists and operators [#928]
+
 ### Fixed
+- Documentation of solar term handling in East Asian calendars improved [#928]
 - New Japanese nengo defined in system property not correctly checked [#929]
 - Imprecise translations for relative days in Dutch [#922]
 
