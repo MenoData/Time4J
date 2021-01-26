@@ -685,7 +685,7 @@ public final class ChineseCalendar
     public static ChineseCalendar ofQingMing(int gregorianYear) {
 
         ChineseCalendar newyear = ChineseCalendar.ofNewYear(gregorianYear);
-        return newyear.with(ChineseCalendar.SOLAR_TERM, SolarTerm.MINOR_03_QINGMING_015);
+        return newyear.with(SolarTerm.MINOR_03_QINGMING_015.sinceLichun());
 
     }
 
