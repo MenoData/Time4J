@@ -25,6 +25,7 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.calendar.astro.JulianDay;
 import net.time4j.calendar.astro.StdSolarCalculator;
+import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.tz.ZonalOffset;
 
@@ -392,19 +393,21 @@ public enum SolarTerm {
     /**
      * <p>Determines the date when this solar term will happen on or after given date. </p>
      *
+     * @param   <D>     type of the East Asian chronology to be applied
      * @param   date    the starting date of the search for this solar term
      * @return  resulting date when this solar term will happen first
      */
     /*[deutsch]
      * <p>Ermittelt das Datum, wann diese Jahreseinteilung zum oder nach dem angegebenen Datum auftreten wird. </p>
      *
+     * @param   <D>     type of the East Asian chronology to be applied
      * @param   date    the starting date of the search for this solar term
      * @return  resulting date when this solar term will happen first
      */
     public <D extends EastAsianCalendar<?, D>> D onOrAfter(D date) {
 
-        EastAsianCS<D> calsys = date.getCalendarSystem();
-        long utcDays = date.getDaysSinceEpochUTC();
+        EastAsianCS<D> calsys = calendarSystem(date);
+        long utcDays = calsys.transform(date);
         ZonalOffset offset = calsys.getOffset(utcDays);
         Moment m = calsys.midnight(utcDays);
         return calsys.transform(this.atOrAfter(m).toZonalTimestamp(offset).toDate().getDaysSinceEpochUTC());
@@ -417,6 +420,7 @@ public enum SolarTerm {
      * <p>Note: The returned list of solar terms might cover different calendar years because the solar cycle
      * is generally different from the lunar calendar cycle. </p>
      *
+     * @param   <D>             type of the East Asian chronology to be applied
      * @param   gregorianYear   the gregorian year in which the first solar term Lichun occurs
      * @param   chronology      chronology for generating the calendar dates of the list
      * @return  list of calendar dates of all solar terms starting with Lichun in spring of given gregorian year
@@ -431,6 +435,7 @@ public enum SolarTerm {
      * <p>Hinweis: Die zur&uuml;ckgegebene Datumsliste kann verschiedene Kalenderjahre abdecken, weil der
      * solare Zyklus beginnend mit Lichun im allgemeinen sich vom lunaren Kalenderzyklus unterscheidet. </p>
      *
+     * @param   <D>             type of the East Asian chronology to be applied
      * @param   gregorianYear   the gregorian year in which the first solar term Lichun occurs
      * @param   chronology      chronology for generating the calendar dates of the list
      * @return  list of calendar dates of all solar terms starting with Lichun in spring of given gregorian year
@@ -455,6 +460,110 @@ public enum SolarTerm {
         }
 
         return dates;
+
+    }
+
+    /**
+     * <p>Obtains an operator which searches for this solar term on or after Lichun event in the gregorian year
+     * corresponding to the East Asian calendar date in question. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     ChineseCalendar chineseNewYear = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+     *     assertThat(
+     *          chineseNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+     *          is(PlainDate.of(2021, 2, 3)));
+     * </pre>
+     *
+     * @param   <D>     type of the East Asian chronology to be applied
+     * @return  ChronoOperator applicable on all dates of given chronological type
+     * @see     #sinceNewYear()
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert einen Operator, der den ersten {@code SolarTerm}-Wert zum Lichun-Ereignis (oder danach)
+     * im gregorianischen Jahr entsprechend dem fraglichen ostasiatischen Kalenderdatum bestimmt. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     ChineseCalendar chineseNewYear = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+     *     assertThat(
+     *          chineseNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+     *          is(PlainDate.of(2021, 2, 3)));
+     * </pre>
+     *
+     * @param   <D>     type of the East Asian chronology to be applied
+     * @return  ChronoOperator applicable on all dates of given chronological type
+     * @see     #sinceNewYear()
+     * @since   5.8
+     */
+    public <D extends EastAsianCalendar<?, D>> ChronoOperator<D> sinceLichun() {
+
+        return (D date) -> {
+            long newYearGregorian =
+                PlainDate.of(date.transform(PlainDate.axis()).getYear(), 1, 1).getDaysSinceEpochUTC();
+            D lichun =
+                SolarTerm.MINOR_01_LICHUN_315.onOrAfter(calendarSystem(date).transform(newYearGregorian));
+            return SolarTerm.this.onOrAfter(lichun);
+        };
+
+    }
+
+    /**
+     * <p>Obtains an operator which searches for this solar term on or after New Year
+     * of the East Asian calendar date in question. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     ChineseCalendar chineseNewYear = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+     *     assertThat(
+     *          chineseNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceNewYear()).transform(PlainDate.class),
+     *          is(PlainDate.of(2022, 2, 4)));
+     * </pre>
+     *
+     * <p>This operator is related to East Asian calendar years and not to the usually different solar term
+     * cycles starting at Lichun. Some East Asian calendar years might contain the given solar term even twice
+     * or not at all. In first case (if the given solar term occurs twice in corresponding East Asian calendar
+     * year), the operator will determine the first and not the second occurence of solar term. If the East
+     * Asian calendar year does not contain given solar term then the operator will yield the solar term of
+     * next calendar year (see code example above). </p>
+     *
+     * @param   <D>     type of the East Asian chronology to be applied
+     * @return  ChronoOperator applicable on all dates of given chronological type
+     * @see     #sinceLichun()
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert einen Operator, der den ersten {@code SolarTerm}-Wert zu Neujahr (oder danach)
+     * entsprechend dem fraglichen ostasiatischen Kalenderdatum bestimmt. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     ChineseCalendar chineseNewYear = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+     *     assertThat(
+     *          chineseNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceNewYear()).transform(PlainDate.class),
+     *          is(PlainDate.of(2022, 2, 4)));
+     * </pre>
+     *
+     * <p>Dieser Operator bezieht sich auf ostasiatische Kalenderjahre und nicht auf den davon verschiedenen
+     * {@code SolarTerm}-Zyklus, der mit Lichun beginnt. Einige ostasiatische Kalenderjahre k&ouml;nnen den
+     * angegebenen {@code SolarTerm}-Wert sogar zweimal oder gar nicht enthalten. Im ersten Fall (wenn zweimal)
+     * wird der Operator das erste und nicht das zweite Vorkommen des {@code SolarTerm}-Werts im entsprechenden
+     * ostasiatischen Kalenderjahr bestimmen. Existiert der fragliche {@code SolarTerm}-Wert hingegen gar nicht,
+     * wird er stattdessen im folgenden ostasiatischen Kalenderjahr bestimmt (siehe Beispiel). </p>
+     *
+     * @param   <D>     type of the East Asian chronology to be applied
+     * @return  ChronoOperator applicable on all dates of given chronological type
+     * @see     #sinceLichun()
+     * @since   5.8
+     */
+    public <D extends EastAsianCalendar<?, D>> ChronoOperator<D> sinceNewYear() {
+
+        return (D date) -> SolarTerm.this.onOrAfter(calendarSystem(date).transform(newYear(date)));
 
     }
 
@@ -589,6 +698,15 @@ public enum SolarTerm {
             }
         }
 
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <D extends EastAsianCalendar<?, D>> EastAsianCS<D> calendarSystem(D date) {
+        return date.getCalendarSystem();
+    }
+
+    private static <D extends EastAsianCalendar<?, ?>> long newYear(D date) {
+        return date.getCalendarSystem().newYear(date.getCycle(), date.getYear().getNumber());
     }
 
 }

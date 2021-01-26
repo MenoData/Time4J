@@ -328,7 +328,7 @@ public class ChineseMiscellaneousTest {
     }
 
     @Test
-    public void query_MINOR_01_LICHUN_315() {
+    public void solarTermOnOrAfter_MINOR_01_LICHUN_315() {
         ChineseCalendar gregorianNewYear = PlainDate.of(2021, 1, 1).transform(ChineseCalendar.class);
         assertThat(
             SolarTerm.MINOR_01_LICHUN_315.onOrAfter(gregorianNewYear).transform(PlainDate.class),
@@ -336,7 +336,7 @@ public class ChineseMiscellaneousTest {
     }
 
     @Test
-    public void listSolarTerms() {
+    public void solarTermList() {
         List<PlainDate> list =
             SolarTerm.list(2021, ChineseCalendar.axis())
                 .stream()
@@ -370,6 +370,39 @@ public class ChineseMiscellaneousTest {
                 PlainDate.of(2022, 1, 20));
         assertThat(list, is(expected));
     }
+
+    @Test
+    public void solarTermSinceLichun() {
+        ChineseCalendar gregorianNewYear = PlainDate.of(2021, 1, 1).transform(ChineseCalendar.axis());
+        ChineseCalendar chineseNewYear = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+        ChineseCalendar beforeLichun21 = PlainDate.of(2021, 2, 2).transform(ChineseCalendar.axis());
+        ChineseCalendar onLichun21 = PlainDate.of(2021, 2, 3).transform(ChineseCalendar.axis());
+        assertThat(
+            chineseNewYear.transform(PlainDate.axis()),
+            is(PlainDate.of(2021, 2, 12)));
+        assertThat(
+            gregorianNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+            is(PlainDate.of(2021, 2, 3)));
+        assertThat(
+            chineseNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+            is(PlainDate.of(2021, 2, 3)));
+        assertThat(
+            beforeLichun21.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+            is(PlainDate.of(2021, 2, 3)));
+        assertThat(
+            onLichun21.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+            is(PlainDate.of(2021, 2, 3)));
+        assertThat(
+            onLichun21.with(SolarTerm.MINOR_01_LICHUN_315.sinceLichun()).transform(PlainDate.class),
+            is(PlainDate.of(2021, 2, 3)));
+    }
+
+    @Test
+    public void solarTermSinceNewYear() {
+        ChineseCalendar chineseNewYear = ChineseCalendar.ofNewYear(2021); // 2021-02-12
+        assertThat(
+            chineseNewYear.with(SolarTerm.MINOR_01_LICHUN_315.sinceNewYear()).transform(PlainDate.class),
+            is(PlainDate.of(2022, 2, 4)));    }
 
     @Test
     public void sexagesimalMonth() {

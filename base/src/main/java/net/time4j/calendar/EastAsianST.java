@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EastAsianST.java) is part of project Time4J.
  *
@@ -193,8 +193,7 @@ class EastAsianST<D extends EastAsianCalendar<?, D>>
         if (value == null) {
             throw new IllegalArgumentException("Missing solar term.");
         } else {
-            long newYear = context.getCalendarSystem().newYear(context.getCycle(), context.getYear().getNumber());
-            return value.onOrAfter(context.minus(CalendarDays.of(context.getDaysSinceEpochUTC() - newYear)));
+            return context.with(value.sinceNewYear());
         }
     }
 
