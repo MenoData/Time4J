@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EastAsianCalendar.java) is part of project Time4J.
  *
@@ -36,6 +36,7 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.CalendarType;
 
 import java.util.Locale;
+import java.util.Optional;
 
 
 /**
@@ -274,15 +275,109 @@ public abstract class EastAsianCalendar<U, D extends EastAsianCalendar<U, D>>
      * <p>Is the year of this date a leap year such that it contains a leap month? </p>
      *
      * @return  boolean
+     * @see     #findLeapMonth()
+     * @see     #withBeginOfNextLeapMonth()
      */
     /*[deutsch]
      * <p>Liegt dieses Datum in einem Schaltjahr, das per Definition also einen Schaltmonat enth&auml;lt? </p>
      *
      * @return  boolean
+     * @see     #findLeapMonth()
+     * @see     #withBeginOfNextLeapMonth()
      */
     public boolean isLeapYear() {
 
         return (this.leapMonth > 0);
+
+    }
+
+    /**
+     * <p>Tries to obtain the leap month of the calendar year associated with this calendar date. </p>
+     *
+     * <p>Note: If the current year is a leap year then it is possible that the found leap month is before
+     * the current calendar date. </p>
+     *
+     * @return  optional East Asian month as leap month of current calendar year
+     * @since   5.8
+     * @see     #isLeapYear()
+     * @see     #withBeginOfNextLeapMonth()
+     */
+    /*[deutsch]
+     * <p>Versucht, den Schaltmonat des mit diesem Kalenderdatum verkn&uuml;pften Jahr zu finden. </p>
+     *
+     * <p>Hinweis: Falls das aktuelle Jahr ein Schaltjahr ist, ist es m&ouml;glich, da&szlig; der gefundene
+     * Schaltmonat vor dem aktuellen Kalenderdatum liegt. </p>
+     *
+     * @return  optional East Asian month as leap month of current calendar year
+     * @since   5.8
+     * @see     #isLeapYear()
+     * @see     #withBeginOfNextLeapMonth()
+     */
+    public Optional<EastAsianMonth> findLeapMonth() {
+
+        int lm = this.getCalendarSystem().getLeapMonth(this.getCycle(), this.getYear().getNumber());
+        return (lm == 0) ? Optional.empty() : Optional.of(EastAsianMonth.valueOf(lm).withLeap());
+
+    }
+
+    /**
+     * <p>Obtains the calendar date of the begin of next leap month. </p>
+     *
+     * <p>Example: </p>
+     *
+     * <pre>
+     *     ChineseCalendar cc = ChineseCalendar.ofNewYear(2018);
+     *     cc = cc.withBeginOfNextLeapMonth();
+     *     System.out.println(cc); // chinese[geng-zi(2020)-*4-01]
+     * </pre>
+     *
+     * @return  the calendar date when the next leap month starts
+     * @throws  IllegalArgumentException if the next leap month is out of range of supported calendar dates
+     * @see     #isLeapYear()
+     * @see     #findLeapMonth()
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das Kalenderdatums des Beginns des n&auml;chsten Schaltmonats. </p>
+     *
+     * <p>Beispiel: </p>
+     *
+     * <pre>
+     *     ChineseCalendar cc = ChineseCalendar.ofNewYear(2018);
+     *     cc = cc.withBeginOfNextLeapMonth();
+     *     System.out.println(cc); // chinese[geng-zi(2020)-*4-01]
+     * </pre>
+     *
+     * @return  the calendar date when the next leap month starts
+     * @throws  IllegalArgumentException if the next leap month is out of range of supported calendar dates
+     * @see     #isLeapYear()
+     * @see     #findLeapMonth()
+     * @since   5.8
+     */
+    public D withBeginOfNextLeapMonth() {
+
+        D date = this.getContext();
+        EastAsianCS<D> calsys = date.getCalendarSystem();
+        int cycle = date.getCycle();
+        int yoc = date.getYear().getNumber();
+
+        while (true) {
+            Optional<EastAsianMonth> om = date.findLeapMonth();
+
+            if (om.isPresent() && date.getMonth().compareTo(om.get()) < 0) {
+                long utcDays = calsys.transform(cycle, yoc, om.get(), 1);
+                return calsys.transform(utcDays);
+            }
+
+            yoc++;
+
+            if (yoc > 60) {
+                yoc = 1;
+                cycle++;
+            }
+
+            date = calsys.transform(calsys.transform(cycle, yoc, EastAsianMonth.valueOf(1), 1));
+        }
 
     }
 

@@ -24,6 +24,7 @@ import java.text.ParseException;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
+import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -60,6 +61,7 @@ public class ChineseMiscellaneousTest {
             }
             if (cal.getMonth().isLeap()) {
                 leapYear = true;
+                assertThat(cal.isLeapYear(), is(true));
                 assertThat(cal.getMonth().getNumber(), is(cal.getLeapMonth()));
                 assertThat(hasNoMajorSolarTerm, is(false));
                 assertThat(calsys.hasNoMajorSolarTerm(utcDays), is(true)); // first time of no major solar term
@@ -226,6 +228,35 @@ public class ChineseMiscellaneousTest {
         PlainDate d = cc.transform(PlainDate.axis());
         assertThat(d, is(PlainDate.of(1998, 1, 28)));
         assertThat(f.format(cc), is("Huángdì 4696, Mo1/1"));
+    }
+
+    @Test
+    public void findLeapMonth() {
+        for (int y = 2015; y < 2022; y++) {
+            Optional<EastAsianMonth> m = ChineseCalendar.ofNewYear(y).findLeapMonth();
+            if ((y == 2017) || (y == 2020)) {
+                assertThat(m.isPresent() && m.get().isLeap(), is(true));
+                int num = (y == 2017) ? 6 : 4;
+                assertThat(m.get().getNumber(), is(num));
+            } else {
+                assertThat(m.isPresent(), is(false));
+            }
+        }
+    }
+
+    @Test
+    public void withBeginOfNextLeapMonth() {
+        ChineseCalendar cc1 = ChineseCalendar.ofNewYear(2017);
+        cc1 = cc1.withBeginOfNextLeapMonth();
+        assertThat(cc1.get(CommonElements.RELATED_GREGORIAN_YEAR), is(2017));
+        assertThat(cc1.getMonth(), is(EastAsianMonth.valueOf(6).withLeap()));
+        assertThat(cc1.getDayOfMonth(), is(1));
+
+        ChineseCalendar cc2 = ChineseCalendar.ofNewYear(2018);
+        cc2 = cc2.withBeginOfNextLeapMonth();
+        assertThat(cc2.get(CommonElements.RELATED_GREGORIAN_YEAR), is(2020));
+        assertThat(cc2.getMonth(), is(EastAsianMonth.valueOf(4).withLeap()));
+        assertThat(cc2.getDayOfMonth(), is(1));
     }
 
     @Test
