@@ -1,5 +1,6 @@
 ## [v5.8] not yet released
 ### Added
+- Specific leap month queries in East Asian calendars [#913]
 - New methods for solar terms in East Asian calendars creating lists and operators [#928]
 
 ### Fixed
