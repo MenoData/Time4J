@@ -341,11 +341,11 @@ public class IsoRecurrenceTest {
         assertThat(IsoRecurrence.parseTimestampIntervals("R87/2016-07-01T10:15:59/02T16:45:00.123"), is(expected));
         expected =
             IsoRecurrence.of(
-                2,
+                9,
                 PlainTimestamp.of(2016, 7, 1, 10, 15, 59),
                 PlainTimestamp.of(2016, 7, 1, 16, 45, 0).plus(123, ClockUnit.MILLIS));
-        assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/T16:45:00.123"), is(expected));
-        assertThat(IsoRecurrence.parseTimestampIntervals("R2/2016-07-01T10:15:59/16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R9/2016-07-01T10:15:59/T16:45:00.123"), is(expected));
+        assertThat(IsoRecurrence.parseTimestampIntervals("R9/2016-07-01T10:15:59/16:45:00.123"), is(expected));
     }
 
     @Test

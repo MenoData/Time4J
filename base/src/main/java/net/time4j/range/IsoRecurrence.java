@@ -876,7 +876,7 @@ public class IsoRecurrence<I>
                 total = 0;
             }
             int digit = (parts[0].charAt(i) - '0');
-            if (digit >= 0 && digit < 9) {
+            if (digit >= 0 && digit <= 9) {
                 total = total * 10 + digit;
             } else {
                 throw new ParseException("Digit 0-9 is missing.", i);
