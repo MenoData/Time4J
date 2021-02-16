@@ -4,6 +4,7 @@
 - New methods for solar terms in East Asian calendars creating lists and operators [#928]
 
 ### Fixed
+- Include digit 9 while parsing ISO8601 recurrence [#934]
 - Documentation of solar term handling in East Asian calendars improved [#928]
 - New Japanese nengo defined in system property not correctly checked [#929]
 - Imprecise translations for relative days in Dutch [#922]
