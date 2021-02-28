@@ -202,7 +202,22 @@ public enum HourCycle {
      * <p>Determines the best hour cycle for given locale. </p>
      *
      * <p>This method first evaluates if the locale might contain the unicode extension key &quot;hc&quot;.
-     * If not present then the region and sometimes the language determine the preferred hour cycle. </p>
+     * If not present then the region and sometimes the language determine the preferred hour cycle. In addition,
+     * the extension key &quot;rg&quot; is also recognized as pointer to the country. Example: </p>
+     *
+     * <pre>
+     *     HourCycle hc = HourCycle.of(Locale.forLanguageTag(&quot;fr-CA-u-hc-h11&quot;));
+     *     assertThat(hc, is(HourCycle.H11));
+     *     assertThat(hc.isHalfdayCycle(), is(true));
+     *     assertThat(hc.isZeroBased(), is(true));
+     *     assertThat(hc.isUsingFlexibleDayperiods(), is(false));
+     *
+     *     // alternative with rg-extension instead of country-code
+     *     assertThat(HourCycle.of(Locale.forLanguageTag(&quot;fr-u-hc-h11-rg-CAZZZZ&quot;)), is(hc));
+     * </pre>
+     *
+     * <p>Valid hc-values are only: &quot;h11&quot;, &quot;h12&quot;, &quot;h23&quot;, &quot;h24&quot;.
+     * So the hc-value can enforce another hour cycle than given by language and region. </p>
      *
      * @param   locale      localization with possible hc-extension
      * @return  preferred hour cycle
@@ -213,7 +228,23 @@ public enum HourCycle {
      *
      * <p>Diese Methode untersucht zuerst, ob die Lokalisation die Unicode-Erweiterung &quot;hc&quot; definiert.
      * Wenn nicht vorhanden, werden die Region und manchmal die Sprache zur Festlegung des bevorzugten Stundenzyklus
-     * herangezogen. </p>
+     * herangezogen. &Auml;u&szlig;erdem wird die Unicode-Erweiterung &quot;rg&quot; als Zeiger auf das Land
+     * erkannt. Beispiel: </p>
+     *
+     * <pre>
+     *     HourCycle hc = HourCycle.of(Locale.forLanguageTag(&quot;fr-CA-u-hc-h11&quot;));
+     *     assertThat(hc, is(HourCycle.H11));
+     *     assertThat(hc.isHalfdayCycle(), is(true));
+     *     assertThat(hc.isZeroBased(), is(true));
+     *     assertThat(hc.isUsingFlexibleDayperiods(), is(false));
+     *
+     *     // alternative with rg-extension instead of country-code
+     *     assertThat(HourCycle.of(Locale.forLanguageTag(&quot;fr-u-hc-h11-rg-CAZZZZ&quot;)), is(hc));
+     * </pre>
+     *
+     * <p>G&uuml;ltige hc-Werte sind nur: &quot;h11&quot;, &quot;h12&quot;, &quot;h23&quot;, &quot;h24&quot;.
+     * Der hc-Wert kann somit einen anderen Stundenzyklus erzwingen, als das mit Sprache und Region sonst
+     * m&ouml;glich w&auml;re. </p>
      *
      * @param   locale      localization with possible hc-extension
      * @return  preferred hour cycle
@@ -277,15 +308,23 @@ public enum HourCycle {
      * Is this hour cycle based on 12 hours (half day)?
      *
      * @return  boolean
+     * @see     #H12
+     * @see     #H12_B
+     * @see     #H11
+     * @see     #H11_B
      */
     /*[deutsch]
      * Beruht dieser Stundenzyklus auf 12 Stunden (Halbtag)?
      *
      * @return  boolean
+     * @see     #H12
+     * @see     #H12_B
+     * @see     #H11
+     * @see     #H11_B
      */
     public boolean isHalfdayCycle() {
 
-        return (this == H12) || (this == H11);
+        return (this.formatChar == 'h') || (this.formatChar == 'K');
 
     }
 
@@ -293,11 +332,17 @@ public enum HourCycle {
      * Is this hour cycle based on zero for midnight or noon?
      *
      * @return  boolean
+     * @see     #H23
+     * @see     #H11
+     * @see     #H11_B
      */
     /*[deutsch]
      * Beruht dieser Stundenzyklus auf der Nulldarstellung f&uuml;r Mitternacht oder Mittag?
      *
      * @return  boolean
+     * @see     #H23
+     * @see     #H11
+     * @see     #H11_B
      */
     public boolean isZeroBased() {
 
