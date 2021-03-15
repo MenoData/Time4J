@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BadiCalendar.java) is part of project Time4J.
  *
@@ -2470,7 +2470,6 @@ public final class BadiCalendar
             Locale lang,
             AttributeQuery attributes
         ) {
-
 
             FormattedContent fc = attributes.get(TEXT_CONTENT_ATTRIBUTE, FormattedContent.TRANSCRIPTION);
             CalendarText ct = CalendarText.getInstance("extra/bahai", lang);
