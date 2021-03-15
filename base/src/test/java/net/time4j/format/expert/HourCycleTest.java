@@ -1,5 +1,6 @@
-package net.time4j.format;
+package net.time4j.format.expert;
 
+import net.time4j.format.internal.HourCycle;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;

@@ -19,9 +19,9 @@
  * -----------------------------------------------------------------------
  */
 
-package net.time4j.format;
+package net.time4j.format.internal;
 
-import net.time4j.format.internal.FormatUtils;
+import net.time4j.format.DisplayMode;
 
 import java.util.Arrays;
 import java.util.Collections;
@@ -367,26 +367,37 @@ public enum HourCycle {
     }
 
     /**
-     * <p>Generates a suitable clock time pattern. </p>
+     * <p>Generates a resource key for a suitable clock time pattern in CLDR-style. </p>
      *
      * @param   mode    display style
-     * @return  CLDR format pattern
+     * @return  key for CLDR format pattern
      */
     /*[deutsch]
-     * <p>Erzeugt ein geeignetes Formatmuster f&uuml;r Uhrzeiten im CLDR-Stil. </p>
+     * <p>Erzeugt einen Ressourcenschl&uuml;ssel f&uuml;r ein geeignetes Formatmuster,
+     * das reine Uhrzeiten im CLDR-Stil repr&auml;sentiert. </p>
      *
      * @param   mode    display style
-     * @return  CLDR format pattern
+     * @return  key for CLDR format pattern
      */
-    public String getTimePattern(DisplayMode mode) {
+    String getTimePatternKey(DisplayMode mode) {
+
+        StringBuilder key = new StringBuilder();
+        key.append("F_");
 
         if (this.isHalfdayCycle()) {
-
+            if (this.isUsingFlexibleDayperiods()) {
+                key.append('B');
+            }
+            key.append("hm");
         } else {
-
+            key.append("Hm");
         }
 
-        return ""; // TODO: implement
+        if (mode != DisplayMode.SHORT) {
+            key.append('s');
+        }
+
+        return key.toString();
 
     }
 
