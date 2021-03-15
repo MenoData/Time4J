@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -315,8 +315,16 @@ public final class CalendarText {
         MissingResourceException tmpMre = null;
 
         try {
-            PropertyBundle rb =
-                PropertyBundle.load("names/" + calendarType, locale);
+            StringBuilder path = new StringBuilder("names/");
+            path.append(calendarType);
+
+            if (!calendarType.startsWith("extra/")) {
+                path.append("/");
+                path.append(calendarType);
+            }
+
+            PropertyBundle rb = PropertyBundle.load(path.toString(), locale);
+
             for (String key : rb.keySet()) {
                 map.put(key, rb.getString(key));
             }

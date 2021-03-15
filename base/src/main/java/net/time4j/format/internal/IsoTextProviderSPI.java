@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IsoTextProviderSPI.java) is part of project Time4J.
  *
@@ -55,8 +55,10 @@ public class IsoTextProviderSPI
     private static final Set<String> LANGUAGES;
     private static final Set<Locale> LOCALES;
 
+    private static final String ISO_PATH = "names/" + ISO_CALENDAR_TYPE + "/" + ISO_CALENDAR_TYPE;
+
     static {
-        PropertyBundle rb = PropertyBundle.load("names/" + ISO_CALENDAR_TYPE, Locale.ROOT);
+        PropertyBundle rb = PropertyBundle.load(ISO_PATH, Locale.ROOT);
         String[] languages = rb.getString("languages").split(" ");
         Set<String> tmp = new HashSet<>();
         Collections.addAll(tmp, languages);
@@ -481,7 +483,7 @@ public class IsoTextProviderSPI
     private static PropertyBundle getBundle(Locale desired)
         throws MissingResourceException {
 
-        return PropertyBundle.load("names/" + ISO_CALENDAR_TYPE, desired);
+        return PropertyBundle.load(ISO_PATH, desired);
 
     }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GenericTextProviderSPI.java) is part of project Time4J.
  *
@@ -58,7 +58,7 @@ public final class GenericTextProviderSPI
     private static final Set<Locale> LOCALES;
 
     static {
-        PropertyBundle rb = PropertyBundle.load("names/generic", Locale.ROOT);
+        PropertyBundle rb = PropertyBundle.load("names/generic/generic", Locale.ROOT);
         String[] languages = rb.getString("languages").split(" ");
         Set<String> tmp = new HashSet<>();
         Collections.addAll(tmp, languages);
@@ -268,7 +268,7 @@ public final class GenericTextProviderSPI
                 0);
 
         if ((names == null) && (tw != TextWidth.ABBREVIATED)) {
-            names = eras(calendarType, locale, TextWidth.ABBREVIATED);
+            names = this.eras(calendarType, locale, TextWidth.ABBREVIATED);
         }
 
         if (names == null) {
@@ -314,8 +314,16 @@ public final class GenericTextProviderSPI
         Locale desired
     ) {
 
+        StringBuilder path = new StringBuilder("names/");
+        path.append(calendarType);
+
+        if (!calendarType.startsWith("extra/")) {
+            path.append("/");
+            path.append(calendarType);
+        }
+
         return PropertyBundle.load(
-            "names/" + calendarType,
+            path.toString(),
             LANGUAGES.contains(LanguageMatch.getAlias(desired)) ? desired : Locale.ROOT);
 
     }

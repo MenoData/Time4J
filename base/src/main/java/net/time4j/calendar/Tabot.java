@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Tabot.java) is part of project Time4J.
  *
@@ -59,8 +59,8 @@ public final class Tabot
     private static final Tabot[] INSTANCES;
 
     static {
-        PropertyBundle rbRoot = PropertyBundle.load("names/ethiopic", Locale.ROOT);
-        PropertyBundle rbAmharic = PropertyBundle.load("names/ethiopic", new Locale("am"));
+        PropertyBundle rbRoot = PropertyBundle.load("names/ethiopic/ethiopic", Locale.ROOT);
+        PropertyBundle rbAmharic = PropertyBundle.load("names/ethiopic/ethiopic", new Locale("am"));
 
         String[] transscription = new String[30];
         String[] amharic = new String[30];
