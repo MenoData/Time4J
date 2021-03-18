@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Moment.java) is part of project Time4J.
  *
@@ -530,6 +530,8 @@ public final class Moment
 
     private transient final long posixTime;
     private transient final int fraction;
+
+    private transient String iso8601;
 
     //~ Konstruktoren -----------------------------------------------------
 
@@ -1661,7 +1663,8 @@ public final class Moment
     @Override
     public String toString() {
 
-        return this.toStringUTC(true);
+        String s; // racy single-check idiom
+        return (s = this.iso8601) != null ? s : (this.iso8601 = this.toStringUTC(true));
 
     }
 
