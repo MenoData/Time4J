@@ -3,7 +3,11 @@
 - Specific leap month queries in East Asian calendars [#913]
 - New methods for solar terms in East Asian calendars creating lists and operators [#928]
 
+### Deprecated
+-  Replace DisplayStyle and DisplayMode by FormatStyle [#938]
+
 ### Fixed
+- Crash in OldApiTimezone when Saturday is hit [#939]
 - Include digit 9 while parsing ISO8601 recurrence [#934]
 - Documentation of solar term handling in East Asian calendars improved [#928]
 - New Japanese nengo defined in system property not correctly checked [#929]
