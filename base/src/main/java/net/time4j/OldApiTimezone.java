@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OldApiTimezone.java) is part of project Time4J.
  *
@@ -85,7 +85,7 @@ final class OldApiTimezone
             year = 1 - year;
         } else if (era != java.util.GregorianCalendar.AD) {
             throw new IllegalArgumentException("Unknown era: " + era);
-        } else if (dayOfWeek < 1 || dayOfWeek >= 7) {
+        } else if (dayOfWeek < 1 || dayOfWeek > 7) {
             throw new IllegalArgumentException("Day-of-week out of range: " + dayOfWeek);
         }
 

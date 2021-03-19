@@ -69,6 +69,15 @@ public class TemporalTypeTest {
     }
 
     @Test
+    public void oldApiTimezone() {
+        Timezone tz = Timezone.of("Europe/Rome");
+        assertThat(
+            TemporalType.JAVA_UTIL_TIMEZONE.from(tz).getOffset(
+                GregorianCalendar.AD, 2020, Calendar.JULY, 4, Calendar.SATURDAY, 0),
+            is(2 * 3600 * 1000));
+    }
+
+    @Test
     public void javaUtilCalendarToTime4J() {
         TimeZone jut = TimeZone.getTimeZone("Europe/Rome");
         Timezone tz = TemporalType.JAVA_UTIL_TIMEZONE.translate(jut);
