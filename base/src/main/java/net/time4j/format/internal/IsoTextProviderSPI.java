@@ -21,11 +21,12 @@
 
 package net.time4j.format.internal;
 
-import net.time4j.format.DisplayMode;
+import net.time4j.format.FormatPatternProvider;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextProvider;
 import net.time4j.format.TextWidth;
 
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.HashSet;
 import java.util.Locale;
@@ -46,7 +47,7 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @author  Meno Hochschild
  */
 public class IsoTextProviderSPI
-    implements TextProvider, ExtendedPatterns {
+    implements TextProvider, FormatPatternProvider {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
@@ -177,13 +178,13 @@ public class IsoTextProviderSPI
 
     @Override
     public String getDatePattern(
-        DisplayMode mode,
+        FormatStyle style,
         Locale locale
     ) {
 
         StringBuilder sb = new StringBuilder();
         sb.append("F(");
-        sb.append(toChar(mode));
+        sb.append(toChar(style));
         sb.append(")_d");
         String key = sb.toString();
         return getBundle(locale).getString(key);
@@ -192,48 +193,30 @@ public class IsoTextProviderSPI
 
     @Override
     public String getTimePattern(
-        DisplayMode mode,
+        FormatStyle style,
         Locale locale
     ) {
 
-        return this.getTimePattern(mode, locale, false);
-
-    }
-
-    @Override
-    public String getTimePattern(
-        DisplayMode mode,
-        Locale locale,
-        boolean alt
-    ) {
-
-        String key;
-
-        if (alt && (mode == DisplayMode.FULL)) {
-            key = "F(alt)";
-        } else {
-            StringBuilder sb = new StringBuilder();
-            sb.append("F(");
-            sb.append(toChar(mode));
-            sb.append(")_t");
-            key = sb.toString();
-        }
-
+        StringBuilder sb = new StringBuilder();
+        sb.append("F(");
+        sb.append(toChar(style));
+        sb.append(")_t");
+        String key = sb.toString();
         return getBundle(locale).getString(key);
 
     }
 
     @Override
     public String getDateTimePattern(
-        DisplayMode dateMode,
-        DisplayMode timeMode,
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
         Locale locale
     ) {
 
-        DisplayMode total = dateMode;
+        FormatStyle total = dateStyle;
 
-        if (dateMode.compareTo(timeMode) < 0) {
-            total = timeMode;
+        if (dateStyle.compareTo(timeStyle) < 0) {
+            total = timeStyle;
         }
 
         StringBuilder sb = new StringBuilder();
@@ -487,9 +470,9 @@ public class IsoTextProviderSPI
 
     }
 
-    private static char toChar(DisplayMode mode) {
+    private static char toChar(FormatStyle style) {
 
-        return Character.toLowerCase(mode.name().charAt(0));
+        return Character.toLowerCase(style.name().charAt(0));
 
     }
 

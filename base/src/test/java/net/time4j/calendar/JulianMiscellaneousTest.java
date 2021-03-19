@@ -5,15 +5,15 @@ import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.Weekmodel;
 import net.time4j.engine.CalendarDate;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
+import net.time4j.history.HistoricDate;
 import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -42,6 +42,10 @@ public class JulianMiscellaneousTest {
             date.lengthOfYear(),
             is(366)
         );
+        assertThat(
+            date.get(JulianCalendar.DATE),
+            is(HistoricDate.of(HistoricEra.AD, 1752, 2, 29))
+        );
     }
 
     @Test
@@ -57,7 +61,7 @@ public class JulianMiscellaneousTest {
     @Test
     public void formatJulianCalendar() {
         ChronoFormatter<JulianCalendar> f =
-            ChronoFormatter.ofStyle(DisplayMode.FULL, Locale.GERMAN, JulianCalendar.axis());
+            ChronoFormatter.ofStyle(FormatStyle.FULL, Locale.GERMAN, JulianCalendar.axis());
         assertThat(
             f.format(JulianCalendar.of(HistoricEra.AD, 1752, 9, 14)),
             is("Montag, 14. September 1752 n. Chr.")
@@ -70,9 +74,9 @@ public class JulianMiscellaneousTest {
     }
 
     @Test
-    public void caSupport() throws ParseException {
+    public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-julian");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, September 18, 2017 AD"));

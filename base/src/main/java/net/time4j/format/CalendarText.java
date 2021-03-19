@@ -26,10 +26,9 @@ import net.time4j.engine.BridgeChronology;
 import net.time4j.engine.CalendarEra;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
-import net.time4j.format.internal.ExtendedPatterns;
 import net.time4j.format.internal.FormatUtils;
-import net.time4j.format.internal.PropertyBundle;
 import net.time4j.format.internal.IsoTextProviderSPI;
+import net.time4j.format.internal.PropertyBundle;
 
 import java.text.DateFormat;
 import java.text.DateFormatSymbols;
@@ -40,6 +39,7 @@ import java.time.LocalTime;
 import java.time.Month;
 import java.time.chrono.IsoEra;
 import java.time.format.DateTimeFormatterBuilder;
+import java.time.format.FormatStyle;
 import java.time.format.TextStyle;
 import java.time.temporal.ChronoField;
 import java.time.temporal.IsoFields;
@@ -48,6 +48,7 @@ import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.HashSet;
+import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
 import java.util.MissingResourceException;
@@ -188,14 +189,17 @@ public final class CalendarText {
     private static final FormatPatternProvider FORMAT_PATTERN_PROVIDER;
 
     static {
-        FormatPatternProvider provider = new FormatPatterns(IsoTextProviderSPI.SINGLETON);
+        Iterator<FormatPatternProvider> iter =
+            ResourceLoader.getInstance().services(FormatPatternProvider.class).iterator();
+        FormatPatternProvider provider;
 
-        for (FormatPatternProvider fpp : ResourceLoader.getInstance().services(FormatPatternProvider.class)) {
-            provider = new FormatPatterns(fpp);
-            break; // use first
+        if (iter.hasNext()) {
+            provider = iter.next();
+        } else {
+            provider = IsoTextProviderSPI.SINGLETON;
         }
 
-        FORMAT_PATTERN_PROVIDER = provider;
+        FORMAT_PATTERN_PROVIDER = new FormatPatterns(provider);
     }
 
     /**
@@ -901,6 +905,7 @@ public final class CalendarText {
      * @return  localized date pattern
      * @see     net.time4j.PlainDate
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForDate(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datumsmuster geeignet f&uuml;r
@@ -911,13 +916,15 @@ public final class CalendarText {
      * @return  localized date pattern
      * @see     net.time4j.PlainDate
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForDate(FormatStyle, Locale)}
      */
+    @Deprecated
     public static String patternForDate(
         DisplayMode mode,
         Locale locale
     ) {
 
-        return FORMAT_PATTERN_PROVIDER.getDatePattern(mode, locale);
+        return patternForDate(mode.toThreeten(), locale);
 
     }
 
@@ -930,6 +937,7 @@ public final class CalendarText {
      * @return  localized time pattern
      * @see     net.time4j.PlainTime
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForTime(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Uhrzeitmuster geeignet f&uuml;r die
@@ -940,13 +948,15 @@ public final class CalendarText {
      * @return  localized time pattern
      * @see     net.time4j.PlainTime
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForTime(FormatStyle, Locale)}
      */
+    @Deprecated
     public static String patternForTime(
         DisplayMode mode,
         Locale locale
     ) {
 
-        return FORMAT_PATTERN_PROVIDER.getTimePattern(mode, locale);
+        return patternForTime(mode.toThreeten(), locale);
 
     }
 
@@ -959,6 +969,7 @@ public final class CalendarText {
      * @return  format pattern for plain timestamps without timezone symbols
      * @see     net.time4j.PlainTimestamp
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForTimestamp(FormatStyle, FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert ein Formatmuster ohne Zeitzonensymbole f&uuml;r reine Zeitstempel. </p>
@@ -969,15 +980,16 @@ public final class CalendarText {
      * @return  format pattern for plain timestamps without timezone symbols
      * @see     net.time4j.PlainTimestamp
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForTimestamp(FormatStyle, FormatStyle, Locale)}
      */
+    @Deprecated
     public static String patternForTimestamp(
         DisplayMode dateMode,
         DisplayMode timeMode,
         Locale locale
     ) {
 
-        String pattern = FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
-        return FormatUtils.removeZones(pattern);
+        return patternForTimestamp(dateMode.toThreeten(), timeMode.toThreeten(), locale);
 
     }
 
@@ -991,6 +1003,7 @@ public final class CalendarText {
      * @return  localized date-time pattern including timezone symbols
      * @see     net.time4j.Moment
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForMoment(FormatStyle, FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet
@@ -1002,14 +1015,137 @@ public final class CalendarText {
      * @return  localized date-time pattern including timezone symbols
      * @see     net.time4j.Moment
      * @since   3.13/4.10
+     * @deprecated  Use {@link #patternForMoment(FormatStyle, FormatStyle, Locale)}
      */
+    @Deprecated
     public static String patternForMoment(
         DisplayMode dateMode,
         DisplayMode timeMode,
         Locale locale
     ) {
 
-        return FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateMode, timeMode, locale);
+        return patternForMoment(dateMode.toThreeten(), timeMode.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Returns the localized date pattern suitable for formatting of objects
+     * of type {@code PlainDate}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized date pattern
+     * @see     net.time4j.PlainDate
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Datumsmuster geeignet f&uuml;r
+     * die Formatierung von Instanzen des Typs{@code PlainDate}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized date pattern
+     * @see     net.time4j.PlainDate
+     * @since   5.8
+     */
+    public static String patternForDate(
+        FormatStyle style,
+        Locale locale
+    ) {
+
+        return FORMAT_PATTERN_PROVIDER.getDatePattern(style, locale);
+
+    }
+
+    /**
+     * <p>Returns the localized time pattern suitable for formatting of objects
+     * of type {@code PlainTime}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized time pattern
+     * @see     net.time4j.PlainTime
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Uhrzeitmuster geeignet f&uuml;r die
+     * Formatierung von Instanzen des Typs {@code PlainTime}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized time pattern
+     * @see     net.time4j.PlainTime
+     * @since   5.8
+     */
+    public static String patternForTime(
+        FormatStyle style,
+        Locale locale
+    ) {
+
+        return FORMAT_PATTERN_PROVIDER.getTimePattern(style, locale);
+
+    }
+
+    /**
+     * <p>Yields a format pattern without any timezone symbols for plain timestamps. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      language and country setting
+     * @return  format pattern for plain timestamps without timezone symbols
+     * @see     net.time4j.PlainTimestamp
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert ein Formatmuster ohne Zeitzonensymbole f&uuml;r reine Zeitstempel. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      language and country setting
+     * @return  format pattern for plain timestamps without timezone symbols
+     * @see     net.time4j.PlainTimestamp
+     * @since   5.8
+     */
+    public static String patternForTimestamp(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
+        Locale locale
+    ) {
+
+        String pattern = patternForMoment(dateStyle, timeStyle, locale);
+        return FormatUtils.removeZones(pattern);
+
+    }
+
+    /**
+     * <p>Returns the localized date-time pattern suitable for formatting of objects
+     * of type {@code Moment}. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      language and country setting
+     * @return  localized date-time pattern including timezone symbols
+     * @see     net.time4j.Moment
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet
+     * f&uuml;r die Formatierung von Instanzen des Typs {@code Moment}. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      language and country setting
+     * @return  localized date-time pattern including timezone symbols
+     * @see     net.time4j.Moment
+     * @since   5.8
+     */
+    public static String patternForMoment(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
+        Locale locale
+    ) {
+
+        return FORMAT_PATTERN_PROVIDER.getDateTimePattern(dateStyle, timeStyle, locale);
 
     }
 
@@ -1557,15 +1693,15 @@ public final class CalendarText {
 
         @Override
         public String getDatePattern(
-            DisplayMode mode,
+            FormatStyle style,
             Locale locale
         ) {
 
             try {
-                return this.delegate.getDatePattern(mode, locale);
+                return this.delegate.getDatePattern(style, locale);
             } catch (MissingResourceException mre) {
-                int style = getFormatStyle(mode);
-                DateFormat df = DateFormat.getDateInstance(style, locale);
+                int s = toOldStyle(style);
+                DateFormat df = DateFormat.getDateInstance(s, locale);
                 return getFormatPattern(df);
             }
 
@@ -1573,21 +1709,17 @@ public final class CalendarText {
 
         @Override
         public String getTimePattern(
-            DisplayMode mode,
+            FormatStyle style,
             Locale locale
         ) {
 
             String pattern;
 
             try {
-                if (this.delegate instanceof ExtendedPatterns) {
-                    pattern = ExtendedPatterns.class.cast(this.delegate).getTimePattern(mode, locale, true);
-                } else {
-                    pattern = this.delegate.getTimePattern(mode, locale);
-                }
+                pattern = this.delegate.getTimePattern(style, locale);
             } catch (MissingResourceException mre) {
-                int style = getFormatStyle(mode);
-                DateFormat df = DateFormat.getTimeInstance(style, locale);
+                int s = toOldStyle(style);
+                DateFormat df = DateFormat.getTimeInstance(s, locale);
                 pattern = getFormatPattern(df);
             }
 
@@ -1597,20 +1729,20 @@ public final class CalendarText {
 
         @Override
         public String getDateTimePattern(
-            DisplayMode dateMode,
-            DisplayMode timeMode,
+            FormatStyle dateStyle,
+            FormatStyle timeStyle,
             Locale locale
         ) {
 
             try {
-                String time = this.delegate.getTimePattern(timeMode, locale);
-                String date = this.delegate.getDatePattern(dateMode, locale);
-                String pattern = this.delegate.getDateTimePattern(dateMode, timeMode, locale);
+                String date = this.delegate.getDatePattern(dateStyle, locale);
+                String time = this.delegate.getTimePattern(timeStyle, locale);
+                String pattern = this.delegate.getDateTimePattern(dateStyle, timeStyle, locale);
                 return pattern.replace("{1}", date).replace("{0}", time);
             } catch (MissingResourceException mre) {
-                int dateStyle = getFormatStyle(dateMode);
-                int timeStyle = getFormatStyle(timeMode);
-                DateFormat df = DateFormat.getDateTimeInstance(dateStyle, timeStyle, locale);
+                int ds = toOldStyle(dateStyle);
+                int ts = toOldStyle(timeStyle);
+                DateFormat df = DateFormat.getDateTimeInstance(ds, ts, locale);
                 return getFormatPattern(df);
             }
 
@@ -1633,9 +1765,9 @@ public final class CalendarText {
 
         }
 
-        private static int getFormatStyle(DisplayMode mode) {
+        private static int toOldStyle(FormatStyle style) {
 
-            switch (mode) {
+            switch (style) {
                 case FULL:
                     return DateFormat.FULL;
                 case LONG:
@@ -1645,7 +1777,7 @@ public final class CalendarText {
                 case SHORT:
                     return DateFormat.SHORT;
                 default:
-                    throw new UnsupportedOperationException("Unknown: " + mode);
+                    throw new UnsupportedOperationException("Unknown: " + style);
             }
 
         }

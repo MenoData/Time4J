@@ -12,7 +12,6 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoException;
 import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.PluralCategory;
@@ -35,6 +34,7 @@ import java.text.DateFormatSymbols;
 import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -211,7 +211,7 @@ public class MiscellaneousTest {
         PlainTime time = PlainTime.of(22, 40);
         for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
             try {
-                ChronoFormatter.ofTimeStyle(DisplayMode.FULL, loc).print(time);
+                ChronoFormatter.ofTimeStyle(FormatStyle.FULL, loc).print(time);
             } catch (RuntimeException re){
                 DateFormat df = DateFormat.getTimeInstance(DateFormat.FULL, loc);
                 String pattern = SimpleDateFormat.class.cast(df).toPattern();
@@ -225,7 +225,7 @@ public class MiscellaneousTest {
         PlainTime time = PlainTime.of(22, 40);
         for (Locale loc : DateFormatSymbols.getAvailableLocales()) {
             try {
-                ChronoFormatter.ofTimeStyle(DisplayMode.LONG, loc).print(time);
+                ChronoFormatter.ofTimeStyle(FormatStyle.LONG, loc).print(time);
             } catch (RuntimeException re){
                 DateFormat df = DateFormat.getTimeInstance(DateFormat.LONG, loc);
                 String pattern = SimpleDateFormat.class.cast(df).toPattern();
@@ -419,7 +419,7 @@ public class MiscellaneousTest {
 
     @Test(expected=NullPointerException.class)
     public void momentFormatterWithoutTimezone1() {
-        ChronoFormatter.ofMomentStyle(DisplayMode.FULL, DisplayMode.FULL, Locale.FRENCH, null);
+        ChronoFormatter.ofMomentStyle(FormatStyle.FULL, FormatStyle.FULL, Locale.FRENCH, null);
     }
 
     @Test(expected=NullPointerException.class)

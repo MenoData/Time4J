@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StyleProcessor.java) is part of project Time4J.
  *
@@ -33,13 +33,13 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.Chronology;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.TransitionStrategy;
 
 import java.io.IOException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.Set;
 
@@ -57,14 +57,14 @@ final class StyleProcessor<T>
     //~ Instanzvariablen ----------------------------------------------
 
     private final ChronoFormatter<T> formatter;
-    private final DisplayMode dateStyle;
-    private final DisplayMode timeStyle;
+    private final FormatStyle dateStyle;
+    private final FormatStyle timeStyle;
 
     //~ Konstruktoren -----------------------------------------------------
 
     StyleProcessor(
-        DisplayMode dateStyle,
-        DisplayMode timeStyle
+        FormatStyle dateStyle,
+        FormatStyle timeStyle
     ) {
         this(
             null, // will be later set in quickPath()-method
@@ -76,8 +76,8 @@ final class StyleProcessor<T>
 
     private StyleProcessor(
         ChronoFormatter<T> formatter,
-        DisplayMode dateStyle,
-        DisplayMode timeStyle
+        FormatStyle dateStyle,
+        FormatStyle timeStyle
     ) {
         super();
 
@@ -139,7 +139,7 @@ final class StyleProcessor<T>
             return true;
         } else if (obj instanceof StyleProcessor) {
             StyleProcessor<?> that = (StyleProcessor) obj;
-            if (this.dateStyle.equals(that.dateStyle) && this.timeStyle.equals(that.timeStyle)) {
+            if ((this.dateStyle == that.dateStyle) && (this.timeStyle == that.timeStyle)) {
                 if (this.formatter == null) {
                     return (that.formatter == null);
                 } else {
@@ -226,9 +226,9 @@ final class StyleProcessor<T>
      * <p>Supports changing the locale. </p>
      *
      * @return  date style
-     * @since   4.27
+     * @since   5.8
      */
-    DisplayMode getDateStyle() {
+    FormatStyle getDateStyle() {
 
         return this.dateStyle;
 
@@ -276,8 +276,8 @@ final class StyleProcessor<T>
     @SuppressWarnings("unchecked")
     private static <T> ChronoFormatter<T> createFormatter(
         Chronology<?> chronology,
-        DisplayMode dateStyle,
-        DisplayMode timeStyle,
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
         Locale locale,
         boolean fourDigitYear,
         Timezone tz, // optional

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewCalendar.java) is part of project Time4J.
  *
@@ -48,7 +48,6 @@ import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
@@ -67,6 +66,7 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -1840,7 +1840,7 @@ public final class HebrewCalendar
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 

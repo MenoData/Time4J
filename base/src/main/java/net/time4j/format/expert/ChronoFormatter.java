@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoFormatter.java) is part of project Time4J.
  *
@@ -81,6 +81,7 @@ import java.text.FieldPosition;
 import java.text.Format;
 import java.text.ParseException;
 import java.text.ParsePosition;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
@@ -1286,9 +1287,7 @@ public final class ChronoFormatter<T>
             if (pattern.isEmpty()) {
                 FormatProcessor<?> processor = this.steps.get(0).getProcessor();
                 if (processor instanceof StyleProcessor) {
-                    DisplayMode style =
-                        DisplayMode.ofStyle(
-                            StyleProcessor.class.cast(processor).getDateStyle().getStyleValue());
+                    FormatStyle style = StyleProcessor.class.cast(processor).getDateStyle();
                     return (ChronoFormatter<T>) ChronoFormatter.ofGenericCalendarStyle(style, locale);
                 }
             } else {
@@ -2494,6 +2493,7 @@ public final class ChronoFormatter<T>
      * @return  new {@code ChronoFormatter}-instance
      * @see     CalendarText#patternForDate(DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofDateStyle(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
@@ -2504,9 +2504,39 @@ public final class ChronoFormatter<T>
      * @see     CalendarText#getFormatPatterns()
      * @see     CalendarText#patternForDate(DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofDateStyle(FormatStyle, Locale)}
      */
+    @Deprecated
     public static ChronoFormatter<PlainDate> ofDateStyle(
         DisplayMode style,
+        Locale locale
+    ) {
+
+        return ofDateStyle(style.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain date objects. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#patternForDate(FormatStyle, Locale)
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#getFormatPatterns()
+     * @see     CalendarText#patternForDate(FormatStyle, Locale)
+     * @since   5.8
+     */
+    public static ChronoFormatter<PlainDate> ofDateStyle(
+        FormatStyle style,
         Locale locale
     ) {
 
@@ -2517,25 +2547,55 @@ public final class ChronoFormatter<T>
     }
 
     /**
-     * <p>Constructs a style-based formatter for plain date objects. </p>
+     * <p>Constructs a style-based formatter for plain time objects. </p>
      *
      * @param   style       format style
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @see     CalendarText#patternForTime(DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofTimeStyle(FormatStyle, Locale)}
      */
     /*[deutsch]
-     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Uhrzeitobjekte. </p>
      *
      * @param   style       format style
      * @param   locale      format locale
      * @return  new {@code ChronoFormatter}-instance
      * @see     CalendarText#patternForTime(DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofTimeStyle(FormatStyle, Locale)}
      */
+    @Deprecated
     public static ChronoFormatter<PlainTime> ofTimeStyle(
         DisplayMode style,
+        Locale locale
+    ) {
+
+        return ofTimeStyle(style.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain time objects. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#patternForTime(FormatStyle, Locale)
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Uhrzeitobjekte. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#patternForTime(FormatStyle, Locale)
+     * @since   5.8
+     */
+    public static ChronoFormatter<PlainTime> ofTimeStyle(
+        FormatStyle style,
         Locale locale
     ) {
 
@@ -2554,6 +2614,7 @@ public final class ChronoFormatter<T>
      * @return  new {@code ChronoFormatter}-instance
      * @see     CalendarText#patternForTimestamp(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofTimestampStyle(FormatStyle, FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempel des Typs {@code PlainTimestamp}. </p>
@@ -2564,10 +2625,42 @@ public final class ChronoFormatter<T>
      * @return  new {@code ChronoFormatter}-instance
      * @see     CalendarText#patternForTimestamp(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofTimestampStyle(FormatStyle, FormatStyle, Locale)}
      */
+    @Deprecated
     public static ChronoFormatter<PlainTimestamp> ofTimestampStyle(
         DisplayMode dateStyle,
         DisplayMode timeStyle,
+        Locale locale
+    ) {
+
+        return ofTimestampStyle(dateStyle.toThreeten(), timeStyle.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain timestamps. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#patternForTimestamp(FormatStyle, FormatStyle, Locale)
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempel des Typs {@code PlainTimestamp}. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     CalendarText#patternForTimestamp(FormatStyle, FormatStyle, Locale)
+     * @since   5.8
+     */
+    public static ChronoFormatter<PlainTimestamp> ofTimestampStyle(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
         Locale locale
     ) {
 
@@ -2588,6 +2681,7 @@ public final class ChronoFormatter<T>
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofMomentStyle(FormatStyle, FormatStyle, Locale, TZID)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempel des Typs {@code Moment}. </p>
@@ -2600,10 +2694,47 @@ public final class ChronoFormatter<T>
      * @throws  IllegalArgumentException if given timezone cannot be loaded
      * @see     CalendarText#patternForMoment(DisplayMode, DisplayMode, Locale)
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofMomentStyle(FormatStyle, FormatStyle, Locale, TZID)}
      */
+    @Deprecated
     public static ChronoFormatter<Moment> ofMomentStyle(
         DisplayMode dateStyle,
         DisplayMode timeStyle,
+        Locale locale,
+        TZID tzid
+    ) {
+
+        return ofMomentStyle(dateStyle.toThreeten(), timeStyle.toThreeten(), locale, tzid);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for moments. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @param   tzid        timezone identifier
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     CalendarText#patternForMoment(FormatStyle, FormatStyle, Locale)
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempel des Typs {@code Moment}. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      format locale
+     * @param   tzid        timezone identifier
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  IllegalArgumentException if given timezone cannot be loaded
+     * @see     CalendarText#patternForMoment(FormatStyle, FormatStyle, Locale)
+     * @since   5.8
+     */
+    public static ChronoFormatter<Moment> ofMomentStyle(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
         Locale locale,
         TZID tzid
     ) {
@@ -2623,8 +2754,8 @@ public final class ChronoFormatter<T>
      * @param   chronology  chronology with format pattern support
      * @return  new {@code ChronoFormatter}-instance
      * @throws  UnsupportedOperationException if given style is not supported
-     * @see     DisplayMode
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofStyle(FormatStyle, Locale, Chronology)}
      */
     /*[deutsch]
      * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
@@ -2635,11 +2766,44 @@ public final class ChronoFormatter<T>
      * @param   chronology  chronology with format pattern support
      * @return  new {@code ChronoFormatter}-instance
      * @throws  UnsupportedOperationException if given style is not supported
-     * @see     DisplayMode
      * @since   3.10/4.7
+     * @deprecated  Use {@link #ofStyle(FormatStyle, Locale, Chronology)}
      */
+    @Deprecated
     public static <T extends LocalizedPatternSupport> ChronoFormatter<T> ofStyle(
         DisplayMode style,
+        Locale locale,
+        Chronology<T> chronology
+    ) {
+
+        return ofStyle(style.toThreeten(), locale, chronology);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for general chronologies. </p>
+     *
+     * @param   <T> generic chronological type with {@code LocalizedPatternSupport} as upper bound
+     * @param   style       format style
+     * @param   locale      format locale
+     * @param   chronology  chronology with format pattern support
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  UnsupportedOperationException if given style is not supported
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien. </p>
+     *
+     * @param   <T> generic chronological type with {@code LocalizedPatternSupport} as upper bound
+     * @param   style       format style
+     * @param   locale      format locale
+     * @param   chronology  chronology with format pattern support
+     * @return  new {@code ChronoFormatter}-instance
+     * @throws  UnsupportedOperationException if given style is not supported
+     * @since   5.8
+     */
+    public static <T extends LocalizedPatternSupport> ChronoFormatter<T> ofStyle(
+        FormatStyle style,
         Locale locale,
         Chronology<T> chronology
     ) {
@@ -2648,9 +2812,6 @@ public final class ChronoFormatter<T>
             Builder<T> builder = new Builder<>(chronology, locale);
             builder.addProcessor(new StyleProcessor<>(style, style));
             return builder.build();
-// Compiler will not accept the Moment-chronology!
-//        } else if (chronology.equals(Moment.axis())) {
-//            throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
         } else {
             throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
         }
@@ -2751,6 +2912,7 @@ public final class ChronoFormatter<T>
      * @see     #with(Locale)
      * @see     Locale#forLanguageTag(String)
      * @since   4.27
+     * @deprecated  Use {@link #ofGenericCalendarStyle(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien,
@@ -2767,9 +2929,51 @@ public final class ChronoFormatter<T>
      * @see     #with(Locale)
      * @see     Locale#forLanguageTag(String)
      * @since   4.27
+     * @deprecated  Use {@link #ofGenericCalendarStyle(FormatStyle, Locale)}
      */
+    @Deprecated
     public static ChronoFormatter<CalendarDate> ofGenericCalendarStyle(
         DisplayMode style,
+        Locale locale
+    ) {
+
+        return ofGenericCalendarStyle(style.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for general calendar chronologies which are compatible to CLDR. </p>
+     *
+     * <p>If the locale contains an unicode-ca-extension then Time4J will try to load a suitable calendar
+     * chronology if available. Otherwise ISO-8601 will be used with the exception of a few countries which
+     * prefer other calendars. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     #ofGenericCalendarPattern(String, Locale)
+     * @see     #with(Locale)
+     * @see     Locale#forLanguageTag(String)
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen stilbasierten Formatierer f&uuml;r allgemeine Chronologien,
+     * die zu CLDR kompatibel sind. </p>
+     *
+     * <p>Wenn die angegebene {@code locale} eine Unicode-ca-Erweiterung hat, dann wird Time4J versuchen,
+     * eine geeignete Kalenderchronologie zu laden, falls vorhanden. Sonst wird ISO-8601 verwendet bis
+     * auf wenige L&auml;nder, die andere Kalender bevorzugen. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code ChronoFormatter}-instance
+     * @see     #ofGenericCalendarPattern(String, Locale)
+     * @see     #with(Locale)
+     * @see     Locale#forLanguageTag(String)
+     * @since   5.8
+     */
+    public static ChronoFormatter<CalendarDate> ofGenericCalendarStyle(
+        FormatStyle style,
         Locale locale
     ) {
 
@@ -3127,7 +3331,7 @@ public final class ChronoFormatter<T>
         ChronoFormatter.Builder<Moment> builder = ChronoFormatter.setUp(Moment.class, Locale.ENGLISH);
         rfc1123DateTime(builder);
         builder.addTimezoneOffset(
-            DisplayMode.MEDIUM,
+            FormatStyle.MEDIUM,
             false,
             Arrays.asList("GMT", "UT", "Z"));
 
@@ -6168,7 +6372,43 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
         public Builder<T> addTimezoneOffset() {
 
             return this.addTimezoneOffset(
-                DisplayMode.MEDIUM, true, Collections.singletonList("Z"));
+                FormatStyle.MEDIUM, true, Collections.singletonList("Z"));
+
+        }
+
+        /**
+         * <p>Adds a timezone offset in canonical notation. </p>
+         *
+         * @param   precision       display mode of offset format
+         * @param   extended        extended or basic ISO-8601-mode
+         * @param   zeroOffsets     list of replacement texts if offset is zero
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any replacement text consists
+         *          of white-space only or if given replacement list is empty
+         * @see     ChronoEntity#getTimezone()
+         * @deprecated  Use {@link #addTimezoneOffset(FormatStyle, boolean, List)}
+         */
+        /*[deutsch]
+         * <p>F&uuml;gt einen Zeitzonen-Offset in kanonischer Notation
+         * hinzu. </p>
+         *
+         * @param   precision       display mode of offset format
+         * @param   extended        extended or basic ISO-8601-mode
+         * @param   zeroOffsets     list of replacement texts if offset is zero
+         * @return  this instance for method chaining
+         * @throws  IllegalArgumentException if any replacement text consists
+         *          of white-space only or if given replacement list is empty
+         * @see     ChronoEntity#getTimezone()
+         * @deprecated  Use {@link #addTimezoneOffset(FormatStyle, boolean, List)}
+         */
+        @Deprecated
+        public Builder<T> addTimezoneOffset(
+            DisplayMode precision,
+            boolean extended,
+            List<String> zeroOffsets
+        ) {
+
+            return this.addTimezoneOffset(precision.toThreeten(), extended, zeroOffsets);
 
         }
 
@@ -6221,13 +6461,14 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
          * interpreted as zero offset. The formatted output always uses
          * the first list entry while parsing expects any list entries. </p>
          *
-         * @param   precision       display mode of offset format
+         * @param   precision       style of offset format
          * @param   extended        extended or basic ISO-8601-mode
          * @param   zeroOffsets     list of replacement texts if offset is zero
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any replacement text consists
          *          of white-space only or if given replacement list is empty
          * @see     ChronoEntity#getTimezone()
+         * @since   5.8
          */
         /*[deutsch]
          * <p>F&uuml;gt einen Zeitzonen-Offset in kanonischer Notation
@@ -6279,16 +6520,17 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
          * werden soll. Die formatierte Ausgabe benutzt immer den ersten
          * Listeneintrag. </p>
          *
-         * @param   precision       display mode of offset format
+         * @param   precision       style of offset format
          * @param   extended        extended or basic ISO-8601-mode
          * @param   zeroOffsets     list of replacement texts if offset is zero
          * @return  this instance for method chaining
          * @throws  IllegalArgumentException if any replacement text consists
          *          of white-space only or if given replacement list is empty
          * @see     ChronoEntity#getTimezone()
+         * @since   5.8
          */
         public Builder<T> addTimezoneOffset(
-            DisplayMode precision,
+            FormatStyle precision,
             boolean extended,
             List<String> zeroOffsets
         ) {

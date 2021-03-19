@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainTimestamp.java) is part of project Time4J.
  *
@@ -34,7 +34,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FlagElement;
@@ -50,7 +49,6 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TemporalFormatter;
@@ -66,6 +64,7 @@ import java.io.ObjectInputStream;
 import java.math.BigDecimal;
 import java.text.ParseException;
 import java.time.LocalDateTime;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.EnumSet;
@@ -1592,12 +1591,11 @@ public final class PlainTimestamp
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 
-            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.patternForTimestamp(mode, mode, locale);
+            return CalendarText.patternForTimestamp(style, style, locale);
 
         }
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractMergerEA.java) is part of project Time4J.
  *
@@ -30,13 +30,13 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.StartOfDay;
 import net.time4j.format.Attributes;
 import net.time4j.format.Leniency;
 import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 
@@ -66,7 +66,7 @@ abstract class AbstractMergerEA<C extends EastAsianCalendar<?, C>>
 
     @Override
     public String getFormatPattern(
-        DisplayStyle style,
+        FormatStyle style,
         Locale locale
     ) {
 

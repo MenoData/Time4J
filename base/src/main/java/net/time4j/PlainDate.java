@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PlainDate.java) is part of project Time4J.
  *
@@ -39,7 +39,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
@@ -52,7 +51,6 @@ import net.time4j.engine.ValidationElement;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.TemporalFormatter;
@@ -68,6 +66,7 @@ import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.text.ParseException;
 import java.time.LocalDate;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.HashMap;
@@ -2355,12 +2354,11 @@ public final class PlainDate
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 
-            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.patternForDate(mode, locale);
+            return CalendarText.patternForDate(style, locale);
 
         }
 

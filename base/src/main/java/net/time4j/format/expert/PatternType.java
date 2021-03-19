@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PatternType.java) is part of project Time4J.
  *
@@ -36,7 +36,6 @@ import net.time4j.engine.EpochDays;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.NumberSystem;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextElement;
@@ -45,6 +44,7 @@ import net.time4j.format.internal.DualFormatElement;
 import net.time4j.history.ChronoHistory;
 import net.time4j.tz.NameStyle;
 
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Locale;
@@ -1879,14 +1879,14 @@ public enum PatternType {
             case 'Z':
                 if (count < 4) {
                     builder.addTimezoneOffset(
-                        DisplayMode.LONG,
+                        FormatStyle.LONG,
                         false,
                         Collections.singletonList("+0000"));
                 } else if (count == 4) {
                     builder.addLongLocalizedOffset();
                 } else if (count == 5) {
                     builder.addTimezoneOffset(
-                        DisplayMode.LONG,
+                        FormatStyle.LONG,
                         true,
                         Collections.singletonList("Z"));
                 } else {
@@ -2158,14 +2158,14 @@ public enum PatternType {
             case 'Z':
                 if (count < 4) {
                     builder.addTimezoneOffset(
-                        DisplayMode.MEDIUM,
+                        FormatStyle.MEDIUM,
                         false,
                         Collections.singletonList("+0000"));
                 } else if (count == 4) {
                     builder.addLongLocalizedOffset();
                 } else if (count == 5) {
                     builder.addTimezoneOffset(
-                        DisplayMode.LONG,
+                        FormatStyle.LONG,
                         true,
                         Collections.singletonList("Z"));
                 } else {
@@ -2217,31 +2217,31 @@ public enum PatternType {
         switch (count) {
             case 1:
                 builder.addTimezoneOffset(
-                    DisplayMode.SHORT,
+                    FormatStyle.SHORT,
                     false,
                     Collections.singletonList(zulu ? "Z" : "+00"));
                 break;
             case 2:
                 builder.addTimezoneOffset(
-                    DisplayMode.MEDIUM,
+                    FormatStyle.MEDIUM,
                     false,
                     Collections.singletonList(zulu ? "Z" : "+0000"));
                 break;
             case 3:
                 builder.addTimezoneOffset(
-                    DisplayMode.MEDIUM,
+                    FormatStyle.MEDIUM,
                     true,
                     Collections.singletonList(zulu ? "Z" : "+00:00"));
                 break;
             case 4:
                 builder.addTimezoneOffset(
-                    DisplayMode.LONG,
+                    FormatStyle.LONG,
                     false,
                     Collections.singletonList(zulu ? "Z" : "+0000"));
                 break;
             case 5:
                 builder.addTimezoneOffset(
-                    DisplayMode.LONG,
+                    FormatStyle.LONG,
                     true,
                     Collections.singletonList(zulu ? "Z" : "+00:00"));
                 break;

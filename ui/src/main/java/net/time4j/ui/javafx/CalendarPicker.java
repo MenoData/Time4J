@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarPicker.java) is part of project Time4J.
  *
@@ -67,12 +67,12 @@ import net.time4j.engine.StartOfDay;
 import net.time4j.engine.TimeAxis;
 import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ParseLog;
 import net.time4j.format.expert.PatternType;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.function.Supplier;
 
@@ -1201,7 +1201,7 @@ public class CalendarPicker<T extends CalendarDate>
 
     private String getStdFormatPattern(Locale locale) {
 
-        String pattern = this.control.chronology().getFormatPattern(DisplayMode.SHORT, locale);
+        String pattern = this.control.chronology().getFormatPattern(FormatStyle.SHORT, locale);
 
         if (pattern.contains("yy") && !pattern.contains("yyy")) {
             pattern = pattern.replace("yy", "yyyy"); // avoid two-digit-years if possible anyway

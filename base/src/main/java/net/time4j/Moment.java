@@ -37,7 +37,6 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.Converter;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FlagElement;
@@ -51,7 +50,6 @@ import net.time4j.engine.UnitRule;
 import net.time4j.format.Attributes;
 import net.time4j.format.CalendarText;
 import net.time4j.format.CalendarType;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.TemporalFormatter;
 import net.time4j.scale.LeapSecondEvent;
 import net.time4j.scale.LeapSeconds;
@@ -72,6 +70,7 @@ import java.math.BigDecimal;
 import java.math.RoundingMode;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -3001,12 +3000,11 @@ public final class Moment
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 
-            DisplayMode mode = DisplayMode.ofStyle(style.getStyleValue());
-            return CalendarText.patternForMoment(mode, mode, locale);
+            return CalendarText.patternForMoment(style, style, locale);
 
         }
 

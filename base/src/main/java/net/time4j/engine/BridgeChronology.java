@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BridgeChronology.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j.engine;
 
 import net.time4j.base.TimeSource;
 
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
@@ -167,7 +168,7 @@ public final class BridgeChronology<S, T extends ChronoEntity<T>>
      */
     @Override
     public String getFormatPattern(
-        DisplayStyle style,
+        FormatStyle style,
         Locale locale
     ) {
 

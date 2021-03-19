@@ -4,13 +4,12 @@ import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -66,9 +65,9 @@ public class CopticMiscellaneousTest {
     }
 
     @Test
-    public void caSupport() throws ParseException {
+    public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-coptic");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, Tout 21, 1734 A.M."));

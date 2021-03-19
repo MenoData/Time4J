@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystemBase.java) is part of project Time4J.
  *
@@ -24,10 +24,10 @@ package net.time4j.ui.javafx;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.Calendrical;
 import net.time4j.engine.TimeAxis;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.LocalizedPatternSupport;
 import net.time4j.format.expert.ChronoFormatter;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 
@@ -81,7 +81,7 @@ abstract class FXCalendarSystemBase<U, D extends Calendrical<U, D> & LocalizedPa
 
     @Override
     public ChronoFormatter<D> createTooltipFormat(Locale locale) {
-        return ChronoFormatter.ofStyle(DisplayMode.LONG, locale, this.getChronology());
+        return ChronoFormatter.ofStyle(FormatStyle.LONG, locale, this.getChronology());
     }
 
     @Override

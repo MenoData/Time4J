@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimezoneOffsetProcessor.java) is part of project Time4J.
  *
@@ -26,7 +26,6 @@ import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.TZID;
@@ -34,15 +33,13 @@ import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 
 import java.io.IOException;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 
-import static net.time4j.format.DisplayMode.FULL;
-import static net.time4j.format.DisplayMode.LONG;
-import static net.time4j.format.DisplayMode.MEDIUM;
-import static net.time4j.format.DisplayMode.SHORT;
+import static java.time.format.FormatStyle.*;
 import static net.time4j.tz.OffsetSign.AHEAD_OF_UTC;
 import static net.time4j.tz.OffsetSign.BEHIND_UTC;
 
@@ -67,7 +64,7 @@ final class TimezoneOffsetProcessor
 
     //~ Instanzvariablen --------------------------------------------------
 
-    private final DisplayMode precision;
+    private final FormatStyle precision;
     private final boolean extended;
     private final List<String> zeroOffsets;
 
@@ -80,13 +77,13 @@ final class TimezoneOffsetProcessor
     /**
      * <p>Erzeugt eine neue Instanz. </p>
      *
-     * @param   precision       display mode of offset format
+     * @param   precision       style of offset format
      * @param   extended        extended or basic ISO-8601-mode
      * @param   zeroOffsets     list of replacement texts if offset is zero
      * @throws  IllegalArgumentException if replacement text is white-space-only
      */
     TimezoneOffsetProcessor(
-        DisplayMode precision,
+        FormatStyle precision,
         boolean extended,
         List<String> zeroOffsets
     ) {
@@ -129,7 +126,7 @@ final class TimezoneOffsetProcessor
     }
 
     private TimezoneOffsetProcessor(
-        DisplayMode precision,
+        FormatStyle precision,
         boolean extended,
         List<String> zeroOffsets,
         boolean caseInsensitive,

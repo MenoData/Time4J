@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MonthView.java) is part of project Time4J.
  *
@@ -37,7 +37,6 @@ import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.EpochDays;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.OutputContext;
 import net.time4j.format.TextWidth;
 import net.time4j.format.expert.ChronoFormatter;
@@ -46,6 +45,7 @@ import net.time4j.format.internal.FormatUtils;
 import net.time4j.range.CalendarMonth;
 import net.time4j.range.DateInterval;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -340,7 +340,7 @@ class MonthView<T extends CalendarDate>
                 }
 
                 if (cellCustomizer != null) {
-                    Optional<T> dateRef = (disabled ? Optional.<T>empty() : Optional.of(current));
+                    Optional<T> dateRef = (disabled ? Optional.empty() : Optional.of(current));
                     cellCustomizer.customize(button, colIndex, rowIndex, model, dateRef);
 
                     if (disabled && !button.isDisabled()) {
@@ -394,10 +394,10 @@ class MonthView<T extends CalendarDate>
         T date
     ) {
 
-        String pattern = CalendarMonth.chronology().getFormatPattern(DisplayMode.FULL, locale);
+        String pattern = CalendarMonth.chronology().getFormatPattern(FormatStyle.FULL, locale);
 
         if (!(date instanceof PlainDate)) {
-            if (this.getControl().chronology().getFormatPattern(DisplayMode.MEDIUM, locale).endsWith("G")) {
+            if (this.getControl().chronology().getFormatPattern(FormatStyle.MEDIUM, locale).endsWith("G")) {
                 pattern = pattern + " G";
             } else {
                 pattern = "G " + pattern;

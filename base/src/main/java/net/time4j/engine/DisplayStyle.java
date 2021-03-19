@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DisplayStyle.java) is part of project Time4J.
  *
@@ -21,6 +21,9 @@
 
 package net.time4j.engine;
 
+import java.text.DateFormat;
+import java.time.format.FormatStyle;
+
 
 /**
  * <p>Describes a generic format style. </p>
@@ -28,8 +31,9 @@ package net.time4j.engine;
  * <p>Users have usually no need to apply directly this low-level-interface
  * but should work with the enum {@code net.time4j.format.DisplayMode}. </p>
  *
- * @author  Meno Hochschild
- * @since   3.10/4.7
+ * @author      Meno Hochschild
+ * @deprecated  Use {@code java.time.format.FormatStyle} instead
+ * @since       3.10/4.7
  */
 /*[deutsch]
  * <p>Beschreibt einen allgemeinen Formatstil. </p>
@@ -38,9 +42,11 @@ package net.time4j.engine;
  * anzuwenden und sollten stattdess mit dem Enum-Type {@code net.time4j.format.DisplayMode}
  * arbeiten. </p>
  *
- * @author  Meno Hochschild
- * @since   3.10/4.7
+ * @author      Meno Hochschild
+ * @deprecated  Use {@code java.time.format.FormatStyle} instead
+ * @since       3.10/4.7
  */
+@Deprecated
 public interface DisplayStyle {
 
     //~ Methoden ----------------------------------------------------------
@@ -66,5 +72,34 @@ public interface DisplayStyle {
      * @since   3.10/4.7
      */
     int getStyleValue();
+
+    /**
+     * <p>Determines the appropriate {@code FormatStyle}-constant. </p>
+     *
+     * @return  FormatStyle
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Ermittelt die assoziierte {@code FormatStyle}-Konstante. </p>
+     *
+     * @return  FormatStyle
+     * @since   5.8
+     */
+    default FormatStyle toThreeten() {
+
+        switch (this.getStyleValue()) {
+            case DateFormat.FULL:
+                return FormatStyle.FULL;
+            case DateFormat.LONG:
+                return FormatStyle.LONG;
+            case DateFormat.MEDIUM:
+                return FormatStyle.MEDIUM;
+            case DateFormat.SHORT:
+                return FormatStyle.SHORT;
+                default:
+                    throw new IllegalStateException("Not supported style value: " + this.getStyleValue());
+        }
+
+    }
 
 }

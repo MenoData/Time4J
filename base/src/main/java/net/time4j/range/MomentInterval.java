@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentInterval.java) is part of project Time4J.
  *
@@ -37,7 +37,6 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.TimeSpan;
 import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.ChronoParser;
 import net.time4j.format.expert.ChronoPrinter;
@@ -58,6 +57,7 @@ import java.io.ObjectInputStream;
 import java.io.Serializable;
 import java.text.ParseException;
 import java.time.Instant;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Locale;
@@ -1964,7 +1964,7 @@ public final class MomentInterval
 
             builder.startOptionalSection();
             builder.addTimezoneOffset(
-                DisplayMode.SHORT,
+                FormatStyle.SHORT,
                 this.extended,
                 Collections.singletonList("Z"));
             builder.endSection();

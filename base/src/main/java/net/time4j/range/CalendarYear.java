@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarYear.java) is part of project Time4J.
  *
@@ -38,7 +38,6 @@ import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.Converter;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
 import net.time4j.engine.ThreetenAdapter;
@@ -55,6 +54,7 @@ import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
 import java.time.Year;
+import java.time.format.FormatStyle;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -733,7 +733,7 @@ public final class CalendarYear
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 

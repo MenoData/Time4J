@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatPatternProvider.java) is part of project Time4J.
  *
@@ -21,6 +21,7 @@
 
 package net.time4j.format;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 
@@ -69,6 +70,7 @@ public interface FormatPatternProvider {
      * @param   locale      language and country setting
      * @return  localized date pattern
      * @see     net.time4j.PlainDate
+     * @deprecated  Use {@link #getDatePattern(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datumsmuster geeignet f&uuml;r
@@ -78,11 +80,15 @@ public interface FormatPatternProvider {
      * @param   locale      language and country setting
      * @return  localized date pattern
      * @see     net.time4j.PlainDate
+     * @deprecated  Use {@link #getDatePattern(FormatStyle, Locale)}
      */
-    String getDatePattern(
+    @Deprecated
+    default String getDatePattern(
         DisplayMode mode,
         Locale locale
-    );
+    ) {
+        return getDatePattern(mode.toThreeten(), locale);
+    }
 
     /**
      * <p>Returns the localized time pattern suitable for formatting of objects
@@ -92,6 +98,7 @@ public interface FormatPatternProvider {
      * @param   locale      language and country setting
      * @return  localized time pattern
      * @see     net.time4j.PlainTime
+     * @deprecated  Use {@link #getTimePattern(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Uhrzeitmuster geeignet f&uuml;r die
@@ -101,11 +108,15 @@ public interface FormatPatternProvider {
      * @param   locale      language and country setting
      * @return  localized time pattern
      * @see     net.time4j.PlainTime
+     * @deprecated  Use {@link #getTimePattern(FormatStyle, Locale)}
      */
-    String getTimePattern(
+    @Deprecated
+    default String getTimePattern(
         DisplayMode mode,
         Locale locale
-    );
+    ) {
+        return getTimePattern(mode.toThreeten(), locale);
+    }
 
     /**
      * <p>Returns the localized date-time pattern suitable for formatting of objects
@@ -121,6 +132,7 @@ public interface FormatPatternProvider {
      * @return  localized date-time pattern
      * @see     net.time4j.Moment
      * @see     net.time4j.PlainTimestamp
+     * @deprecated  Use {@link #getDateTimePattern(FormatStyle, FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet f&uuml;r die Formatierung
@@ -136,10 +148,102 @@ public interface FormatPatternProvider {
      * @return  localized date-time pattern
      * @see     net.time4j.Moment
      * @see     net.time4j.PlainTimestamp
+     * @deprecated  Use {@link #getDateTimePattern(FormatStyle, FormatStyle, Locale)}
      */
-    String getDateTimePattern(
+    @Deprecated
+    default String getDateTimePattern(
         DisplayMode dateMode,
         DisplayMode timeMode,
+        Locale locale
+    ) {
+        return getDateTimePattern(dateMode.toThreeten(), timeMode.toThreeten(), locale);
+    }
+
+    /**
+     * <p>Returns the localized date pattern suitable for formatting of objects
+     * of type {@code PlainDate}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized date pattern
+     * @see     net.time4j.PlainDate
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Datumsmuster geeignet f&uuml;r
+     * die Formatierung von Instanzen des Typs{@code PlainDate}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized date pattern
+     * @see     net.time4j.PlainDate
+     * @since   5.8
+     */
+    String getDatePattern(
+        FormatStyle style,
+        Locale locale
+    );
+
+    /**
+     * <p>Returns the localized time pattern suitable for formatting of objects
+     * of type {@code PlainTime}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized time pattern
+     * @see     net.time4j.PlainTime
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Uhrzeitmuster geeignet f&uuml;r die
+     * Formatierung von Instanzen des Typs {@code PlainTime}. </p>
+     *
+     * @param   style       format style
+     * @param   locale      language and country setting
+     * @return  localized time pattern
+     * @see     net.time4j.PlainTime
+     * @since   5.8
+     */
+    String getTimePattern(
+        FormatStyle style,
+        Locale locale
+    );
+
+    /**
+     * <p>Returns the localized date-time pattern suitable for formatting of objects
+     * of type {@code Moment} or {@code PlainTimestamp}. </p>
+     *
+     * <p>Expressions of the form &quot;{0}&quot; will be interpreted as the time component
+     * and expressions of the form &quot;{1}&quot; will be interpreted as the date component.
+     * All other chars of the pattern will be treated as literals. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      language and country setting
+     * @return  localized date-time pattern
+     * @see     net.time4j.Moment
+     * @see     net.time4j.PlainTimestamp
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Liefert das lokalisierte Datums- und Uhrzeitmuster geeignet f&uuml;r die Formatierung
+     * von Instanzen des Typs {@code Moment} oder {@code PlainTimestamp}. </p>
+     *
+     * <p>Die Ausdr&uuml;cke &quot;{0}&quot; und &quot;{1}&quot; werden als Formathalter f&uuml;r die
+     * Uhrzeit- und Datumskomponenten interpretiert. Alle anderen Zeichen des Musters werden wie
+     * Literale behandelt. </p>
+     *
+     * @param   dateStyle   format style of date part
+     * @param   timeStyle   format style of time part
+     * @param   locale      language and country setting
+     * @return  localized date-time pattern
+     * @see     net.time4j.Moment
+     * @see     net.time4j.PlainTimestamp
+     * @since   5.8
+     */
+    String getDateTimePattern(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
         Locale locale
     );
 

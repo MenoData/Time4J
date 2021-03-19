@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DecadeView.java) is part of project Time4J.
  *
@@ -32,12 +32,12 @@ import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarVariant;
 import net.time4j.engine.EpochDays;
 import net.time4j.format.CalendarText;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.range.CalendarYear;
 import net.time4j.range.DateInterval;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 
@@ -161,10 +161,10 @@ class DecadeView<T extends CalendarDate>
         T min = this.getControl().minDateProperty().get();
         T max = this.getControl().maxDateProperty().get();
 
-        String pattern = CalendarYear.chronology().getFormatPattern(DisplayMode.FULL, locale);
+        String pattern = CalendarYear.chronology().getFormatPattern(FormatStyle.FULL, locale);
 
         if (!(date instanceof PlainDate)) {
-            if (this.getControl().chronology().getFormatPattern(DisplayMode.MEDIUM, locale).endsWith("G")) {
+            if (this.getControl().chronology().getFormatPattern(FormatStyle.MEDIUM, locale).endsWith("G")) {
                 pattern = pattern + " G";
             } else {
                 pattern = "G " + pattern;

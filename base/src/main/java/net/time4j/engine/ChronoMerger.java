@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoMerger.java) is part of project Time4J.
  *
@@ -23,6 +23,7 @@ package net.time4j.engine;
 
 import net.time4j.base.TimeSource;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 
@@ -220,6 +221,7 @@ public interface ChronoMerger<T> {
      * @throws  UnsupportedOperationException if given style is not supported
      *          or if no localized format pattern support is available
      * @see     net.time4j.format.LocalizedPatternSupport
+     * @deprecated  Use {@link #getFormatPattern(FormatStyle, Locale)}
      * @since   3.10/4.7
      */
     /*[deutsch]
@@ -231,10 +233,47 @@ public interface ChronoMerger<T> {
      * @throws  UnsupportedOperationException if given style is not supported
      *          or if no localized format pattern support is available
      * @see     net.time4j.format.LocalizedPatternSupport
+     * @deprecated  Use {@link #getFormatPattern(FormatStyle, Locale)}
      * @since   3.10/4.7
      */
+    @Deprecated
     default String getFormatPattern(
         DisplayStyle style,
+        Locale locale
+    ) {
+
+        return this.getFormatPattern(style.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Defines a CLDR-compatible localized format pattern. </p>
+     *
+     * <p>The default implementation always throws an {@code UnsupportedOperationException}. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  localized format pattern
+     * @throws  UnsupportedOperationException if given style is not supported
+     *          or if no localized format pattern support is available
+     * @see     net.time4j.format.LocalizedPatternSupport
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Definiert ein CLDR-kompatibles lokalisiertes Formatmuster. </p>
+     *
+     * <p>Die Standardimplementierung wirft immer eine {@code UnsupportedOperationException}. </p>
+     *
+     * @param   style   format style
+     * @param   locale  language and country setting
+     * @return  localized format pattern
+     * @throws  UnsupportedOperationException if given style is not supported
+     *          or if no localized format pattern support is available
+     * @see     net.time4j.format.LocalizedPatternSupport
+     * @since   5.8
+     */
+    default String getFormatPattern(
+        FormatStyle style,
         Locale locale
     ) {
 

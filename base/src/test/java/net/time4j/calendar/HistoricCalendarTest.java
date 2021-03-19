@@ -6,7 +6,6 @@ import net.time4j.Weekday;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarSystem;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.HistoricDate;
@@ -17,6 +16,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -29,11 +29,11 @@ public class HistoricCalendarTest {
 
     @Test
     public void formatPattern() {
-        String pattern = HistoricCalendar.family().getFormatPattern(DisplayMode.FULL, Locale.GERMAN);
+        String pattern = HistoricCalendar.family().getFormatPattern(FormatStyle.FULL, Locale.GERMAN);
         assertThat(pattern, is("EEEE, d. MMMM y G"));
-        pattern = HistoricCalendar.family().getFormatPattern(DisplayMode.FULL, Locale.FRENCH);
+        pattern = HistoricCalendar.family().getFormatPattern(FormatStyle.FULL, Locale.FRENCH);
         assertThat(pattern, is("EEEE d MMMM y G"));
-        pattern = HistoricCalendar.family().getFormatPattern(DisplayMode.FULL, Locale.ENGLISH);
+        pattern = HistoricCalendar.family().getFormatPattern(FormatStyle.FULL, Locale.ENGLISH);
         assertThat(pattern, is("EEEE, MMMM d, y G"));
     }
 
@@ -183,7 +183,7 @@ public class HistoricCalendarTest {
 
         ChronoFormatter<HistoricCalendar> f =
             ChronoFormatter
-                .ofStyle(DisplayMode.FULL, Locale.ENGLISH, HistoricCalendar.family())
+                .ofStyle(FormatStyle.FULL, Locale.ENGLISH, HistoricCalendar.family())
                 .with(history);
         String text = "Thursday, March 24, 1602/03 AD";
         try {
@@ -446,7 +446,7 @@ public class HistoricCalendarTest {
     @Test
     public void caSupport() {
         Locale locale = Locale.forLanguageTag("de-DE-PREUSSEN-u-ca-historic");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(1610, 9, 1)),
             is("Mittwoch, 22. August 1610 n. Chr."));

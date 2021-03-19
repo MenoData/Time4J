@@ -11,7 +11,6 @@ import net.time4j.calendar.astro.MoonPhase;
 import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.EpochDays;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.tz.OffsetSign;
@@ -21,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Locale;
@@ -273,7 +273,7 @@ public class ChineseMiscellaneousTest {
     @Test
     public void caSupport1() {
         Locale locale = Locale.forLanguageTag("en-u-ca-chinese");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2020, 5, 24)),
             is("Sunday, (leap) Fourth Month 2, 2020(gēng-zǐ)"));
@@ -282,7 +282,7 @@ public class ChineseMiscellaneousTest {
     @Test
     public void caSupport2() {
         Locale locale = Locale.forLanguageTag("ast-u-ca-chinese"); // r(U) MMMM d, EEEE
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2020, 5, 24)),
             is("2020(gēng-zǐ) *mes 4 2, domingu"));

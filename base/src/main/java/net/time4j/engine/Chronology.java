@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Chronology.java) is part of project Time4J.
  *
@@ -25,6 +25,7 @@ import net.time4j.base.TimeSource;
 
 import java.lang.ref.ReferenceQueue;
 import java.lang.ref.WeakReference;
+import java.time.format.FormatStyle;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
@@ -266,7 +267,7 @@ public class Chronology<T>
 
     @Override
     public String getFormatPattern(
-        DisplayStyle style,
+        FormatStyle style,
         Locale locale
     ) {
 

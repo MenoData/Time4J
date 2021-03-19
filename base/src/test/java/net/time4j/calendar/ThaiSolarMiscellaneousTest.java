@@ -5,13 +5,12 @@ import net.time4j.Month;
 import net.time4j.PlainDate;
 import net.time4j.Weekday;
 import net.time4j.engine.CalendarDate;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
-import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -71,7 +70,7 @@ public class ThaiSolarMiscellaneousTest {
     @Test
     public void formatThaiSolarCalendar() {
         ChronoFormatter<ThaiSolarCalendar> f =
-            ChronoFormatter.ofStyle(DisplayMode.FULL, Locale.GERMAN, ThaiSolarCalendar.axis());
+            ChronoFormatter.ofStyle(FormatStyle.FULL, Locale.GERMAN, ThaiSolarCalendar.axis());
         assertThat(
             f.format(ThaiSolarCalendar.ofBuddhist(2482, 2, 10)),
             is("Samstag, 10. Februar 2482 BE")
@@ -86,7 +85,7 @@ public class ThaiSolarMiscellaneousTest {
     @Test
     public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-buddhist");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, October 1, 2560 BE"));
@@ -95,7 +94,7 @@ public class ThaiSolarMiscellaneousTest {
     @Test
     public void buddhistPreference() {
         Locale locale = Locale.forLanguageTag("en-TH");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         assertThat(
             f.format(PlainDate.of(2017, 10, 1)),
             is("Sunday, October 1, 2560 BE"));

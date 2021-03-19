@@ -6,7 +6,6 @@ import net.time4j.Quarter;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -14,6 +13,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -216,10 +216,10 @@ public class CalendarQuarterTest {
     @Test
     public void pattern() {
         assertThat(
-            CalendarQuarter.chronology().getFormatPattern(DisplayMode.LONG, Locale.JAPANESE),
+            CalendarQuarter.chronology().getFormatPattern(FormatStyle.LONG, Locale.JAPANESE),
             is("y/QQQ"));
         assertThat(
-            CalendarQuarter.chronology().getFormatPattern(DisplayMode.FULL, Locale.ROOT),
+            CalendarQuarter.chronology().getFormatPattern(FormatStyle.FULL, Locale.ROOT),
             is("uuuu-'Q'Q"));
     }
 

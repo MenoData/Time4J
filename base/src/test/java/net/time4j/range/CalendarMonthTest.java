@@ -1,12 +1,11 @@
 package net.time4j.range;
 
 import net.time4j.CalendarUnit;
-import net.time4j.PlainDate;
 import net.time4j.Month;
+import net.time4j.PlainDate;
 import net.time4j.SystemClock;
 import net.time4j.ZonalClock;
 import net.time4j.base.GregorianDate;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -15,6 +14,7 @@ import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
 import java.time.YearMonth;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -255,10 +255,10 @@ public class CalendarMonthTest {
     @Test
     public void pattern() {
         assertThat(
-            CalendarMonth.chronology().getFormatPattern(DisplayMode.LONG, Locale.JAPANESE),
+            CalendarMonth.chronology().getFormatPattern(FormatStyle.LONG, Locale.JAPANESE),
             is("y年M月"));
         assertThat(
-            CalendarMonth.chronology().getFormatPattern(DisplayMode.FULL, Locale.ROOT),
+            CalendarMonth.chronology().getFormatPattern(FormatStyle.FULL, Locale.ROOT),
             is("uuuu-MM"));
     }
 

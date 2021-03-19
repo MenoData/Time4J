@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianTime.java) is part of project Time4J.
  *
@@ -35,7 +35,6 @@ import net.time4j.engine.ChronoExtension;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
@@ -50,7 +49,7 @@ import net.time4j.format.LocalizedPatternSupport;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.text.DateFormat;
+import java.time.format.FormatStyle;
 import java.util.EnumSet;
 import java.util.Locale;
 import java.util.Set;
@@ -1564,10 +1563,10 @@ public final class EthiopianTime
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
-            return ((style.getStyleValue() == DateFormat.SHORT) ? "h:mm a" : "h:mm:ss a");
+            return ((style == FormatStyle.SHORT) ? "h:mm a" : "h:mm:ss a");
         }
 
         @Override

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AnnualDate.java) is part of project Time4J.
  *
@@ -32,7 +32,6 @@ import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoOperator;
 import net.time4j.engine.Chronology;
 import net.time4j.engine.Converter;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
@@ -48,9 +47,9 @@ import net.time4j.tz.Timezone;
 
 import java.io.InvalidObjectException;
 import java.io.Serializable;
-import java.text.DateFormat;
 import java.text.ParseException;
 import java.time.MonthDay;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.Map;
 
@@ -828,21 +827,21 @@ public final class AnnualDate
         }
 
         @Override
-        public String getFormatPattern(DisplayStyle style, Locale locale) {
+        public String getFormatPattern(FormatStyle style, Locale locale) {
 
             Map<String, String> map = CalendarText.getIsoInstance(locale).getTextForms();
             String key = null;
-            switch (style.getStyleValue()) {
-                case DateFormat.FULL:
+            switch (style) {
+                case FULL:
                     key = "F_MMMMd";
                     break;
-                case DateFormat.LONG:
+                case LONG:
                     key = "F_MMMd";
                     break;
-                case DateFormat.MEDIUM:
+                case MEDIUM:
                     key = "F_MMd";
                     break;
-                case DateFormat.SHORT:
+                case SHORT:
                     key = "F_Md";
                     break;
             }

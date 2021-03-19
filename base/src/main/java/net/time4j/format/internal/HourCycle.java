@@ -21,8 +21,7 @@
 
 package net.time4j.format.internal;
 
-import net.time4j.format.DisplayMode;
-
+import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -379,7 +378,7 @@ public enum HourCycle {
      * @param   mode    display style
      * @return  key for CLDR format pattern
      */
-    String getTimePatternKey(DisplayMode mode) {
+    String getTimePatternKey(FormatStyle style) {
 
         StringBuilder key = new StringBuilder();
         key.append("F_");
@@ -393,7 +392,7 @@ public enum HourCycle {
             key.append("Hm");
         }
 
-        if (mode != DisplayMode.SHORT) {
+        if (style != FormatStyle.SHORT) {
             key.append('s');
         }
 

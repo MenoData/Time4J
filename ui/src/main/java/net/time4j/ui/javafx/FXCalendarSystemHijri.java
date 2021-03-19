@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FXCalendarSystemHijri.java) is part of project Time4J.
  *
@@ -27,9 +27,9 @@ import net.time4j.calendar.HijriMonth;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.VariantSource;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 
+import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.Optional;
 
@@ -110,7 +110,7 @@ class FXCalendarSystemHijri
 
     @Override
     public ChronoFormatter<HijriCalendar> createTooltipFormat(Locale locale) {
-        return ChronoFormatter.ofStyle(DisplayMode.LONG, locale, HijriCalendar.family());
+        return ChronoFormatter.ofStyle(FormatStyle.LONG, locale, HijriCalendar.family());
     }
 
     @Override

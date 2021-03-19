@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DisplayMode.java) is part of project Time4J.
  *
@@ -30,13 +30,16 @@ import java.text.DateFormat;
  * <p>Defines how many details will be displayed in chronological texts. </p>
  *
  * @author  Meno Hochschild
+ * @deprecated  Use {@code java.time.format.FormatStyle} instead
  */
 /*[deutsch]
  * <p>Definiert Anzeigestile, wie detailliert chronologische Informationen
  * dargestellt werden. </p>
  *
  * @author  Meno Hochschild
+ * @deprecated  Use {@code java.time.format.FormatStyle} instead
  */
+@Deprecated
 public enum DisplayMode
     implements DisplayStyle {
 

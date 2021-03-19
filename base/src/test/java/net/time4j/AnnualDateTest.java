@@ -2,7 +2,6 @@ package net.time4j;
 
 import net.time4j.base.GregorianDate;
 import net.time4j.engine.ChronoOperator;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -16,6 +15,7 @@ import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.text.ParseException;
 import java.time.MonthDay;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -138,12 +138,12 @@ public class AnnualDateTest {
     @Test
     public void format() {
         ChronoFormatter<AnnualDate> usStyle =
-            ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.US, AnnualDate.chronology());
+            ChronoFormatter.ofStyle(FormatStyle.SHORT, Locale.US, AnnualDate.chronology());
         assertThat(
             usStyle.format(AnnualDate.of(9, 11)),
             is("9/11"));
         ChronoFormatter<AnnualDate> germanStyle =
-            ChronoFormatter.ofStyle(DisplayMode.SHORT, Locale.GERMANY, AnnualDate.chronology());
+            ChronoFormatter.ofStyle(FormatStyle.SHORT, Locale.GERMANY, AnnualDate.chronology());
         assertThat(
             germanStyle.format(AnnualDate.of(9, 11)),
             is("11.9."));

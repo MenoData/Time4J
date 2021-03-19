@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarWeek.java) is part of project Time4J.
  *
@@ -37,7 +37,6 @@ import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.Chronology;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.EpochDays;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.IntElementRule;
@@ -58,8 +57,8 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
-import java.text.DateFormat;
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Iterator;
 import java.util.Locale;
 import java.util.Map;
@@ -752,7 +751,7 @@ public final class CalendarWeek
 
     @Override
     public String getFormatPattern(
-        DisplayStyle style,
+        FormatStyle style,
         Locale locale
     ) {
 
@@ -764,7 +763,7 @@ public final class CalendarWeek
         if (pattern == null) {
             pattern = textForms.get(ywKey);
             if (pattern == null) {
-                pattern = (style.getStyleValue() == DateFormat.SHORT) ? "YYYY'W'ww" : "YYYY-'W'ww";
+                pattern = getIsoPattern(style);
             }
         }
 
@@ -810,6 +809,12 @@ public final class CalendarWeek
     private static int maximumOfWeek(int yearOfWeekdate) {
 
         return PlainDate.of(yearOfWeekdate, 7, 1).getMaximum(WEEK_OF_YEAR).intValue();
+
+    }
+
+    private static String getIsoPattern(FormatStyle style) {
+
+        return (style == FormatStyle.SHORT) ? "YYYY'W'ww" : "YYYY-'W'ww";
 
     }
 
@@ -908,7 +913,7 @@ public final class CalendarWeek
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 
@@ -929,12 +934,11 @@ public final class CalendarWeek
                         }
                         sb.append(pattern);
                     }
-
                 }
             }
 
             if (sb.length() == 0) {
-                sb.append((style.getStyleValue() == DateFormat.SHORT) ? "YYYY'W'ww" : "YYYY-'W'ww");
+                sb.append(getIsoPattern(style));
             }
 
             return sb.toString();

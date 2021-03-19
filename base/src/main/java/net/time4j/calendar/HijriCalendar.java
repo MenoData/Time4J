@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriCalendar.java) is part of project Time4J.
  *
@@ -46,7 +46,6 @@ import net.time4j.engine.ChronoException;
 import net.time4j.engine.ChronoFunction;
 import net.time4j.engine.ChronoMerger;
 import net.time4j.engine.ChronoUnit;
-import net.time4j.engine.DisplayStyle;
 import net.time4j.engine.ElementRule;
 import net.time4j.engine.FormattableElement;
 import net.time4j.engine.StartOfDay;
@@ -62,6 +61,7 @@ import net.time4j.tz.Timezone;
 import java.io.IOException;
 import java.io.InvalidObjectException;
 import java.io.ObjectInputStream;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
@@ -2004,7 +2004,7 @@ public final class HijriCalendar
 
         @Override
         public String getFormatPattern(
-            DisplayStyle style,
+            FormatStyle style,
             Locale locale
         ) {
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Iso8601Format.java) is part of project Time4J.
  *
@@ -32,12 +32,12 @@ import net.time4j.engine.ChronoDisplay;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoEntity;
 import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.Leniency;
 import net.time4j.format.NumberSystem;
 import net.time4j.tz.ZonalOffset;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -545,7 +545,7 @@ public class Iso8601Format {
             (text, status, attributes) -> null);
         builder.addLiteral('T');
         addWallTime(builder, dateStyle.isExtended(), decimalStyle, precision);
-        builder.addTimezoneOffset(DisplayMode.MEDIUM, dateStyle.isExtended(), Collections.singletonList("Z"));
+        builder.addTimezoneOffset(FormatStyle.MEDIUM, dateStyle.isExtended(), Collections.singletonList("Z"));
         return builder.build().with(Leniency.STRICT).withTimezone(offset);
 
     }
@@ -769,8 +769,8 @@ LOOP:
 
         builder.addCustomized(
             Moment.axis().element(),
-            momentFormat(DisplayMode.MEDIUM, extended, decimalStyle),
-            momentFormat(DisplayMode.SHORT, extended, decimalStyle)
+            momentFormat(FormatStyle.MEDIUM, extended, decimalStyle),
+            momentFormat(FormatStyle.SHORT, extended, decimalStyle)
         );
 
         // here timezone offset is needed for changing Moment to ZonalDateTime when printing
@@ -779,7 +779,7 @@ LOOP:
     }
 
     private static ChronoFormatter<Moment> momentFormat(
-        DisplayMode mode,
+        FormatStyle style,
         boolean extended,
         IsoDecimalStyle decimalStyle
 
@@ -797,7 +797,7 @@ LOOP:
 
         // not optional, offset must be present during parsing
         builder.addTimezoneOffset(
-            mode,
+            style,
             extended,
             Collections.singletonList("Z"));
 

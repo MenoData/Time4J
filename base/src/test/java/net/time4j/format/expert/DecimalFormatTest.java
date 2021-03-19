@@ -4,13 +4,13 @@ import net.time4j.Moment;
 import net.time4j.PlainDate;
 import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
-import net.time4j.format.DisplayMode;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Collections;
 import java.util.Locale;
 
@@ -33,12 +33,12 @@ public class DecimalFormatTest {
             ChronoFormatter.setUp(Moment.axis(), Locale.US) // US for preference of dot in decimal elements
                 .addCustomized(PlainDate.COMPONENT, df)
                 .addFixedDecimal(PlainTime.DECIMAL_HOUR)
-                .addTimezoneOffset(DisplayMode.SHORT, false, Collections.singletonList("Z"))
+                .addTimezoneOffset(FormatStyle.SHORT, false, Collections.singletonList("Z"))
                 .or()
                 .addCustomized(PlainDate.COMPONENT, df)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
                 .addFixedDecimal(PlainTime.DECIMAL_MINUTE)
-                .addTimezoneOffset(DisplayMode.SHORT, false, Collections.singletonList("Z"))
+                .addTimezoneOffset(FormatStyle.SHORT, false, Collections.singletonList("Z"))
                 .or()
                 .addCustomized(PlainDate.COMPONENT, df)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
@@ -52,7 +52,7 @@ public class DecimalFormatTest {
                 .endSection()
                 .endSection()
                 .endSection()
-                .addTimezoneOffset(DisplayMode.SHORT, false, Collections.singletonList("Z"))
+                .addTimezoneOffset(FormatStyle.SHORT, false, Collections.singletonList("Z"))
                 .build();
         assertThat(
             mf.parse("199412160532-0500").toString(),
@@ -96,16 +96,16 @@ public class DecimalFormatTest {
                 .endSection()
                 .endSection()
                 .endSection()
-                .addTimezoneOffset(DisplayMode.SHORT, false, Collections.singletonList("Z"))
+                .addTimezoneOffset(FormatStyle.SHORT, false, Collections.singletonList("Z"))
                 .or()
                 .addCustomized(PlainDate.COMPONENT, df)
                 .addFixedInteger(PlainTime.DIGITAL_HOUR_OF_DAY, 2)
                 .addFixedDecimal(PlainTime.DECIMAL_MINUTE)
-                .addTimezoneOffset(DisplayMode.SHORT, false, Collections.singletonList("Z"))
+                .addTimezoneOffset(FormatStyle.SHORT, false, Collections.singletonList("Z"))
                 .or()
                 .addCustomized(PlainDate.COMPONENT, df)
                 .addFixedDecimal(PlainTime.DECIMAL_HOUR)
-                .addTimezoneOffset(DisplayMode.SHORT, false, Collections.singletonList("Z"))
+                .addTimezoneOffset(FormatStyle.SHORT, false, Collections.singletonList("Z"))
                 .build();
         assertThat(
             mf.parse("199412160532-0500").toString(),
@@ -165,8 +165,7 @@ public class DecimalFormatTest {
     }
 
     @Test
-    public void printVariableHourDecimalMinute()
-        throws ParseException {
+    public void printVariableHourDecimalMinute() {
 
         ChronoFormatter<PlainTime> formatter =
             ChronoFormatter

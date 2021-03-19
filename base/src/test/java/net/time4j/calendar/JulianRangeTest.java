@@ -1,20 +1,9 @@
 package net.time4j.calendar;
 
-import net.time4j.CalendarUnit;
-import net.time4j.Month;
-import net.time4j.PlainDate;
-import net.time4j.Weekday;
-import net.time4j.engine.CalendarDate;
-import net.time4j.engine.CalendarDays;
-import net.time4j.format.DisplayMode;
-import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.history.HistoricEra;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
-
-import java.text.ParseException;
-import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;

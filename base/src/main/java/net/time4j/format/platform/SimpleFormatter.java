@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SimpleFormatter.java) is part of project Time4J.
  *
@@ -50,6 +50,7 @@ import java.text.FieldPosition;
 import java.text.ParseException;
 import java.text.ParsePosition;
 import java.text.SimpleDateFormat;
+import java.time.format.FormatStyle;
 import java.util.Calendar;
 import java.util.Collections;
 import java.util.Date;
@@ -238,6 +239,7 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofDateStyle(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
@@ -247,13 +249,42 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofDateStyle(FormatStyle, Locale)}
      */
+    @Deprecated
     public static SimpleFormatter<PlainDate> ofDateStyle(
         DisplayMode style,
         Locale locale
     ) {
 
-        DateFormat df = DateFormat.getDateInstance(style.getStyleValue(), locale);
+        return ofDateStyle(style.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain date objects. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Datumsobjekte. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    public static SimpleFormatter<PlainDate> ofDateStyle(
+        FormatStyle style,
+        Locale locale
+    ) {
+
+        DateFormat df = DateFormat.getDateInstance(toOldApiValue(style), locale);
         String pattern = getFormatPattern(df);
         return SimpleFormatter.ofDatePattern(pattern, locale);
 
@@ -304,6 +335,7 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofTimeStyle(FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r reine Uhrzeitobjekte. </p>
@@ -313,13 +345,42 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofTimeStyle(FormatStyle, Locale)}
      */
+    @Deprecated
     public static SimpleFormatter<PlainTime> ofTimeStyle(
         DisplayMode style,
         Locale locale
     ) {
 
-        DateFormat df = DateFormat.getTimeInstance(style.getStyleValue(), locale);
+        return ofTimeStyle(style.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain time objects. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r reine Uhrzeitobjekte. </p>
+     *
+     * @param   style       format style
+     * @param   locale      format locale
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    public static SimpleFormatter<PlainTime> ofTimeStyle(
+        FormatStyle style,
+        Locale locale
+    ) {
+
+        DateFormat df = DateFormat.getTimeInstance(toOldApiValue(style), locale);
         String pattern = FormatUtils.removeZones(getFormatPattern(df));
         return SimpleFormatter.ofTimePattern(pattern, locale);
 
@@ -371,6 +432,7 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofTimestampStyle(FormatStyle, FormatStyle, Locale)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r einfache Zeitstempelobjekte. </p>
@@ -381,14 +443,50 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofTimestampStyle(FormatStyle, FormatStyle, Locale)}
      */
+    @Deprecated
     public static SimpleFormatter<PlainTimestamp> ofTimestampStyle(
         DisplayMode dateStyle,
         DisplayMode timeStyle,
         Locale locale
     ) {
 
-        DateFormat df = DateFormat.getDateTimeInstance(dateStyle.getStyleValue(), timeStyle.getStyleValue(), locale);
+        return ofTimestampStyle(dateStyle.toThreeten(), timeStyle.toThreeten(), locale);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for plain timestamp objects. </p>
+     *
+     * @param   dateStyle   format style for the date component
+     * @param   timeStyle   format style for the time component
+     * @param   locale      format locale
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r einfache Zeitstempelobjekte. </p>
+     *
+     * @param   dateStyle   format style for the date component
+     * @param   timeStyle   format style for the time component
+     * @param   locale      format locale
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    public static SimpleFormatter<PlainTimestamp> ofTimestampStyle(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
+        Locale locale
+    ) {
+
+        DateFormat df =
+            DateFormat.getDateTimeInstance(
+                toOldApiValue(dateStyle),
+                toOldApiValue(timeStyle),
+                locale);
         String pattern = FormatUtils.removeZones(getFormatPattern(df));
         return SimpleFormatter.ofTimestampPattern(pattern, locale);
 
@@ -446,6 +544,7 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofMomentStyle(FormatStyle, FormatStyle, Locale, TZID)}
      */
     /*[deutsch]
      * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempelobjekte (Momente). </p>
@@ -457,7 +556,9 @@ public final class SimpleFormatter<T>
      * @return  new {@code SimpleFormatter}-instance
      * @throws  IllegalStateException if no localized format pattern can be retrieved
      * @since   5.0
+     * @deprecated  Use {@link #ofMomentStyle(FormatStyle, FormatStyle, Locale, TZID)}
      */
+    @Deprecated
     public static SimpleFormatter<Moment> ofMomentStyle(
         DisplayMode dateStyle,
         DisplayMode timeStyle,
@@ -465,7 +566,44 @@ public final class SimpleFormatter<T>
         TZID tzid
     ) {
 
-        DateFormat df = DateFormat.getDateTimeInstance(dateStyle.getStyleValue(), timeStyle.getStyleValue(), locale);
+        return ofMomentStyle(dateStyle.toThreeten(), timeStyle.toThreeten(), locale, tzid);
+
+    }
+
+    /**
+     * <p>Constructs a style-based formatter for global timestamp objects (moments). </p>
+     *
+     * @param   dateStyle   format style for the date component
+     * @param   timeStyle   format style for the time component
+     * @param   locale      format locale
+     * @param   tzid        timezone id
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konstruiert einen Formatierer f&uuml;r globale Zeitstempelobjekte (Momente). </p>
+     *
+     * @param   dateStyle   format style for the date component
+     * @param   timeStyle   format style for the time component
+     * @param   locale      format locale
+     * @param   tzid        timezone id
+     * @return  new {@code SimpleFormatter}-instance
+     * @throws  IllegalStateException if no localized format pattern can be retrieved
+     * @since   5.8
+     */
+    public static SimpleFormatter<Moment> ofMomentStyle(
+        FormatStyle dateStyle,
+        FormatStyle timeStyle,
+        Locale locale,
+        TZID tzid
+    ) {
+
+        DateFormat df =
+            DateFormat.getDateTimeInstance(
+                toOldApiValue(dateStyle),
+                toOldApiValue(timeStyle),
+                locale);
         String pattern = getFormatPattern(df);
         return SimpleFormatter.ofMomentPattern(pattern, locale, tzid);
 
@@ -708,6 +846,23 @@ public final class SimpleFormatter<T>
         }
 
         return false;
+
+    }
+
+    private static int toOldApiValue(FormatStyle style) {
+
+        switch (style) {
+            case FULL:
+                return DateFormat.FULL;
+            case LONG:
+                return DateFormat.LONG;
+            case MEDIUM:
+                return DateFormat.MEDIUM;
+            case SHORT:
+                return DateFormat.SHORT;
+            default:
+                throw new IllegalArgumentException("Not supported: " + style);
+        }
 
     }
 

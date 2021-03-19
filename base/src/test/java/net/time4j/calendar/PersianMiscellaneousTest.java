@@ -11,7 +11,6 @@ import net.time4j.engine.CalendarDate;
 import net.time4j.engine.CalendarDays;
 import net.time4j.engine.ChronoElement;
 import net.time4j.engine.ChronoException;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import net.time4j.scale.TimeScale;
@@ -21,6 +20,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -273,7 +273,7 @@ public class PersianMiscellaneousTest {
     @Test
     public void formatPersianCalendar() throws ParseException {
         ChronoFormatter<PersianCalendar> formatter = // y MMMM d, EEEE
-            ChronoFormatter.ofStyle(DisplayMode.FULL, new Locale("fa"), PersianCalendar.axis());
+            ChronoFormatter.ofStyle(FormatStyle.FULL, new Locale("fa"), PersianCalendar.axis());
         PersianCalendar jalali = PersianCalendar.of(1393, 2, 10);
 
         // String expected = "ه\u200D.ش." + " "; // era - removed in CLDR v32
@@ -308,7 +308,7 @@ public class PersianMiscellaneousTest {
     @Test
     public void formatGenericCalendarByStyle1() {
         Locale loc = Locale.forLanguageTag("de-IR-u-ca-persian");
-        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.MEDIUM, loc);
+        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.MEDIUM, loc);
         PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
         PlainDate gregorian = jalali.transform(PlainDate.class);
         assertThat(formatter.format(jalali), is("10.01.1393 AP"));
@@ -319,7 +319,7 @@ public class PersianMiscellaneousTest {
     @Test
     public void formatGenericCalendarByStyle2() {
         Locale loc = Locale.forLanguageTag("de-IR");
-        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.MEDIUM, loc);
+        ChronoFormatter<CalendarDate> formatter = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.MEDIUM, loc);
         PersianCalendar jalali = PersianCalendar.of(1393, 1, 10);
         PlainDate gregorian = jalali.transform(PlainDate.class);
         assertThat(formatter.format(jalali), is("10.01.1393 AP"));

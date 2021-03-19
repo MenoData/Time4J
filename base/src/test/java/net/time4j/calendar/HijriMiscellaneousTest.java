@@ -10,7 +10,6 @@ import net.time4j.engine.CalendarSystem;
 import net.time4j.engine.ChronoException;
 import net.time4j.engine.VariantSource;
 import net.time4j.format.Attributes;
-import net.time4j.format.DisplayMode;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.format.expert.PatternType;
 import org.junit.Test;
@@ -18,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.format.FormatStyle;
 import java.util.Locale;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -29,9 +29,9 @@ public class HijriMiscellaneousTest {
 
     @Test
     public void genericIslamicPattern() {
-        String pattern = GenericDatePatterns.get("islamic", DisplayMode.FULL, new Locale("ar"));
+        String pattern = GenericDatePatterns.get("islamic", FormatStyle.FULL, new Locale("ar"));
         assertThat(pattern, is("EEEE، d MMMM y G"));
-        pattern = GenericDatePatterns.get("islamic", DisplayMode.FULL, Locale.GERMANY);
+        pattern = GenericDatePatterns.get("islamic", FormatStyle.FULL, Locale.GERMANY);
         assertThat(pattern, is("EEEE, d. MMMM y G"));
     }
 
@@ -275,7 +275,7 @@ public class HijriMiscellaneousTest {
     @Test
     public void caSupport() {
         Locale locale = Locale.forLanguageTag("en-u-ca-islamic-umalqura");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         String today = f.format(SystemClock.inLocalView().today());
         System.out.println(today);
     }
@@ -283,7 +283,7 @@ public class HijriMiscellaneousTest {
     @Test
     public void umalquraPreference() {
         Locale locale = Locale.forLanguageTag("en-SA");
-        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(DisplayMode.FULL, locale);
+        ChronoFormatter<CalendarDate> f = ChronoFormatter.ofGenericCalendarStyle(FormatStyle.FULL, locale);
         String today = f.format(SystemClock.inLocalView().today());
         System.out.println(today);
     }
