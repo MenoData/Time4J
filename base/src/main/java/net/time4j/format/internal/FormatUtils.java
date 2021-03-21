@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatUtils.java) is part of project Time4J.
  *
@@ -100,6 +100,9 @@ public class FormatUtils {
 
     /**
      * Strips off any timezone symbols in clock time patterns.
+     *
+     * @param   pattern     the CLDR pattern to be processed
+     * @return  possibly changed pattern
      */
     public static String removeZones(String pattern) {
 
@@ -145,6 +148,48 @@ public class FormatUtils {
         }
 
         return result;
+
+    }
+
+    /**
+     * Replaces any occurence of given old char by new char in clock time patterns.
+     *
+     * @param   pattern     the CLDR pattern to be processed
+     * @param   oldChar     the old char to be replaced
+     * @param   newChar     the replacement for the old char
+     * @return  possibly changed pattern
+     * @since   5.8
+     */
+    public static String replaceSymbol(
+        String pattern,
+        char oldChar,
+        char newChar
+    ) {
+
+        boolean literal = false;
+        StringBuilder sb = new StringBuilder();
+
+        for (int i = 0, n = pattern.length(); i < n; i++) {
+            char c = pattern.charAt(i);
+
+            if (c == '\'') {
+                if (i + 1 < n && pattern.charAt(i + 1) == '\'') {
+                    sb.append(c);
+                    i++;
+                } else {
+                    literal = !literal;
+                }
+                sb.append(c);
+            } else if (literal) {
+                sb.append(c);
+            } else if (c == oldChar) {
+                sb.append(newChar);
+            } else {
+                sb.append(c);
+            }
+        }
+
+        return sb.toString().trim();
 
     }
 

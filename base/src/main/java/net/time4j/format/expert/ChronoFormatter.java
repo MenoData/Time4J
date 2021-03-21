@@ -2848,7 +2848,7 @@ public final class ChronoFormatter<T>
      * @return  new {@code ChronoFormatter}-instance
      * @throws  IllegalArgumentException if resolving of pattern fails or a requested calendar cannot be found
      * @see     #ofPattern(String, PatternType, Locale, Chronology)
-     * @see     #ofGenericCalendarStyle(DisplayMode, Locale)
+     * @see     #ofGenericCalendarStyle(FormatStyle, Locale)
      * @see     #with(Locale)
      * @see     PatternType#CLDR
      * @see     Locale#forLanguageTag(String)

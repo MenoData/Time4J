@@ -7,6 +7,7 @@ import net.time4j.PlainTimestamp;
 import net.time4j.format.CalendarText;
 import net.time4j.format.expert.ChronoFormatter;
 import net.time4j.tz.OffsetSign;
+import net.time4j.tz.TZID;
 import net.time4j.tz.Timezone;
 import net.time4j.tz.ZonalOffset;
 import org.junit.Test;
@@ -15,6 +16,7 @@ import org.junit.runners.JUnit4;
 
 import java.time.format.FormatStyle;
 import java.util.Locale;
+import java.util.concurrent.TimeUnit;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -103,6 +105,87 @@ public class FormatPatternTest {
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.SHORT, FormatStyle.SHORT, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
             is("01.01.70, 01:00"));
+    }
+
+    @Test
+    public void dateTimePatternH11() {
+        Moment m = Moment.UNIX_EPOCH.minus(1, TimeUnit.HOURS);
+        Locale locale = Locale.forLanguageTag("de-DE-u-hc-h11");
+        TZID berlin = () -> "Europe/Berlin";
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.FULL, FormatStyle.FULL, locale, berlin).print(m),
+            is("Donnerstag, 1. Januar 1970 um 0:00:00 Mitternacht Mitteleuropäische Zeit"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.LONG, FormatStyle.LONG, locale, berlin).print(m),
+            is("1. Januar 1970 um 0:00:00 Mitternacht MEZ"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).print(m),
+            is("01.01.1970, 0:00:00 Mitternacht"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.SHORT, FormatStyle.SHORT, locale, berlin).print(m),
+            is("01.01.70, 0:00 Mitternacht"));
+//        assertThat(
+//            ChronoFormatter.ofMomentStyle(
+//                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
+//            is("dd.MM.yyyy, K:mm:ss B"));
+    }
+
+    @Test
+    public void dateTimePatternH12() {
+        Moment m = Moment.UNIX_EPOCH.plus(14, TimeUnit.HOURS);
+        Locale locale = Locale.forLanguageTag("de-DE-u-hc-h12");
+        TZID berlin = () -> "Europe/Berlin";
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.FULL, FormatStyle.FULL, locale, berlin).print(m),
+            is("Donnerstag, 1. Januar 1970 um 3:00:00 nachm. Mitteleuropäische Zeit"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.LONG, FormatStyle.LONG, locale, berlin).print(m),
+            is("1. Januar 1970 um 3:00:00 nachm. MEZ"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).print(m),
+            is("01.01.1970, 3:00:00 nachm."));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.SHORT, FormatStyle.SHORT, locale, berlin).print(m),
+            is("01.01.70, 3:00 nachm."));
+//        assertThat(
+//            ChronoFormatter.ofMomentStyle(
+//                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
+//            is("dd.MM.yyyy, h:mm:ss B"));
+    }
+
+    @Test
+    public void dateTimePatternH23() {
+        Moment m = Moment.UNIX_EPOCH.plus(38, TimeUnit.HOURS);
+        Locale locale = Locale.forLanguageTag("en-US-u-hc-h23");
+        TZID berlin = () -> "Europe/Berlin";
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.FULL, FormatStyle.FULL, locale, berlin).print(m),
+            is("Friday, January 2, 1970 at 15:00:00 Central European Time"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.LONG, FormatStyle.LONG, locale, berlin).print(m),
+            is("January 2, 1970 at 15:00:00 CET"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).print(m),
+            is("Jan 2, 1970, 15:00:00"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.SHORT, FormatStyle.SHORT, locale, berlin).print(m),
+            is("1/2/70, 15:00"));
+//        assertThat(
+//            ChronoFormatter.ofMomentStyle(
+//                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
+//            is("MMM d, y, HH:mm:ss"));
     }
 
 }

@@ -198,11 +198,53 @@ public class IsoTextProviderSPI
     ) {
 
         StringBuilder sb = new StringBuilder();
-        sb.append("F(");
-        sb.append(toChar(style));
-        sb.append(")_t");
-        String key = sb.toString();
-        return getBundle(locale).getString(key);
+
+        if (locale.getUnicodeLocaleType("hc") == null) {
+            sb.append("F(");
+            sb.append(toChar(style));
+            sb.append(")_t");
+            String key = sb.toString();
+            return getBundle(locale).getString(key);
+        } else {
+            HourCycle hc = HourCycle.of(locale);
+            StringBuilder key = new StringBuilder();
+            key.append("F_");
+
+            if (hc.isHalfdayCycle()) {
+                if (hc.isUsingFlexibleDayperiods()) {
+                    key.append('B');
+                }
+                key.append('h');
+            } else {
+                key.append("H");
+            }
+
+            key.append('m');
+
+            if (style != FormatStyle.SHORT) {
+                key.append('s');
+            }
+
+            String pattern = getBundle(locale).getString(key.toString());
+
+            if (hc.isHalfdayCycle()) {
+                if (hc.isZeroBased()) {
+                    pattern = FormatUtils.replaceSymbol(pattern, 'h', 'K');
+                }
+            } else if (!hc.isZeroBased()) {
+                pattern = FormatUtils.replaceSymbol(pattern, 'H', 'k');
+            }
+
+            switch (style) {
+                case FULL:
+                    return pattern + " zzzz";
+                case LONG:
+                    return pattern + " z";
+                default:
+                    return pattern;
+            }
+
+        }
 
     }
 

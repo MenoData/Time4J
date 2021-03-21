@@ -21,7 +21,6 @@
 
 package net.time4j.format.internal;
 
-import java.time.format.FormatStyle;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashSet;
@@ -362,41 +361,6 @@ public enum HourCycle {
     public boolean isUsingFlexibleDayperiods() {
 
         return this.usingFlexDP;
-
-    }
-
-    /**
-     * <p>Generates a resource key for a suitable clock time pattern in CLDR-style. </p>
-     *
-     * @param   mode    display style
-     * @return  key for CLDR format pattern
-     */
-    /*[deutsch]
-     * <p>Erzeugt einen Ressourcenschl&uuml;ssel f&uuml;r ein geeignetes Formatmuster,
-     * das reine Uhrzeiten im CLDR-Stil repr&auml;sentiert. </p>
-     *
-     * @param   mode    display style
-     * @return  key for CLDR format pattern
-     */
-    String getTimePatternKey(FormatStyle style) {
-
-        StringBuilder key = new StringBuilder();
-        key.append("F_");
-
-        if (this.isHalfdayCycle()) {
-            if (this.isUsingFlexibleDayperiods()) {
-                key.append('B');
-            }
-            key.append("hm");
-        } else {
-            key.append("Hm");
-        }
-
-        if (style != FormatStyle.SHORT) {
-            key.append('s');
-        }
-
-        return key.toString();
 
     }
 

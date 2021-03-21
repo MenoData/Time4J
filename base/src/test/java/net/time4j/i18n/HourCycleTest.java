@@ -1,4 +1,4 @@
-package net.time4j.format.expert;
+package net.time4j.i18n;
 
 import net.time4j.format.internal.HourCycle;
 import org.junit.Test;
