@@ -2,6 +2,8 @@
 ### Added
 - Specific leap month queries in East Asian calendars [#913]
 - New methods for solar terms in East Asian calendars creating lists and operators [#928]
+- Style-based formatters should give an pattern info [#941]
+- Support unicode extension hc [#933]
 
 ### Deprecated
 -  Replace DisplayStyle and DisplayMode by FormatStyle [#938]
