@@ -128,10 +128,10 @@ public class FormatPatternTest {
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.SHORT, FormatStyle.SHORT, locale, berlin).print(m),
             is("01.01.70, 0:00 Mitternacht"));
-//        assertThat(
-//            ChronoFormatter.ofMomentStyle(
-//                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
-//            is("dd.MM.yyyy, K:mm:ss B"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
+            is("dd.MM.y, K:mm:ss B"));
     }
 
     @Test
@@ -155,10 +155,10 @@ public class FormatPatternTest {
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.SHORT, FormatStyle.SHORT, locale, berlin).print(m),
             is("01.01.70, 3:00 nachm."));
-//        assertThat(
-//            ChronoFormatter.ofMomentStyle(
-//                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
-//            is("dd.MM.yyyy, h:mm:ss B"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
+            is("dd.MM.y, h:mm:ss B"));
     }
 
     @Test
@@ -182,10 +182,10 @@ public class FormatPatternTest {
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.SHORT, FormatStyle.SHORT, locale, berlin).print(m),
             is("1/2/70, 15:00"));
-//        assertThat(
-//            ChronoFormatter.ofMomentStyle(
-//                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
-//            is("MMM d, y, HH:mm:ss"));
+        assertThat(
+            ChronoFormatter.ofMomentStyle(
+                FormatStyle.MEDIUM, FormatStyle.MEDIUM, locale, berlin).getPattern(),
+            is("MMM d, y, HH:mm:ss"));
     }
 
 }

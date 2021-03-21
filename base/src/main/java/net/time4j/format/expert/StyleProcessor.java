@@ -232,6 +232,17 @@ final class StyleProcessor<T>
 
     }
 
+    /**
+     * <p>Obtains the generated pattern. </p>
+     *
+     * @return  pattern maybe empty
+     */
+    String getGeneratedPattern() {
+
+        return (this.formatter == null) ? "" : this.formatter.getPattern();
+
+    }
+
     private ChronoFormatter<T> getFormatter(
         AttributeQuery attributes,
         boolean quickPath,

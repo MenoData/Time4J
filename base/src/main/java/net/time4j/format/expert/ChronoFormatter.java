@@ -542,8 +542,12 @@ public final class ChronoFormatter<T>
      * also true if more than one pattern was used via the builder so that there is no longer
      * a unique pattern. </p>
      *
+     * <p>If this formatter is style-based then this method can find the generated format pattern
+     * although the format attribute for patterns is not filled for style-based formatters. </p>
+     *
      * @return  pattern string, maybe empty
-     * @since   3.33/4.28
+     * @see     Attributes#FORMAT_PATTERN
+     * @since   5.8
      */
     /*[deutsch]
      * <p>Ermittelt das bei der Konstruktion dieses Formatierers verwendete Formatmuster. </p>
@@ -552,12 +556,25 @@ public final class ChronoFormatter<T>
      * Das ist auch der Fall, wenn &uuml;ber den <i>Builder</i> mehr als ein Formatmuster verwendet wird
      * und daher kein eindeutiges Formatmuster vorliegt. </p>
      *
+     * <p>Wenn dieser Formatierer stilbasiert ist, kann diese Methode das erzeugte Formatmuster finden,
+     * obwohl das Formatattribut f&uuml;r Formatmuster dann nicht gesetzt ist. </p>
+     *
      * @return  pattern string, maybe empty
-     * @since   3.33/4.28
+     * @see     Attributes#FORMAT_PATTERN
+     * @since   5.8
      */
     public String getPattern() {
 
-        return this.globalAttributes.get(Attributes.FORMAT_PATTERN, "");
+        String defaultPattern = "";
+
+        if (this.isSingleStepOptimizationPossible()) {
+            FormatProcessor<?> processor = this.steps.get(0).getProcessor();
+            if (processor instanceof StyleProcessor) {
+                defaultPattern = StyleProcessor.class.cast(processor).getGeneratedPattern();
+            }
+        }
+
+        return this.getPattern0(defaultPattern);
 
     }
 
@@ -1284,7 +1301,7 @@ public final class ChronoFormatter<T>
         if (locale.equals(this.globalAttributes.getLocale())) {
             return this;
         } else if (this.chronology.getChronoType() == CalendarDate.class) {
-            String pattern = this.getPattern();
+            String pattern = this.getPattern0("");
             if (pattern.isEmpty()) {
                 FormatProcessor<?> processor = this.steps.get(0).getProcessor();
                 if (processor instanceof StyleProcessor) {
@@ -1295,7 +1312,7 @@ public final class ChronoFormatter<T>
                 return (ChronoFormatter<T>) ChronoFormatter.ofGenericCalendarPattern(pattern, locale);
             }
         } else if ((this.overrideHandler != null) && this.overrideHandler.isGeneric()) {
-            String pattern = this.getPattern();
+            String pattern = this.getPattern0("");
             if (!pattern.isEmpty()) {
                 return (ChronoFormatter<T>) ChronoFormatter.ofGenericMomentPattern(pattern, locale);
             }
@@ -2542,8 +2559,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<PlainDate> builder = new Builder<>(PlainDate.axis(), locale);
-        builder.addProcessor(new StyleProcessor<>(style, style));
-        return builder.build();
+        return builder.addStyle(style, style).build();
 
     }
 
@@ -2601,8 +2617,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<PlainTime> builder = new Builder<>(PlainTime.axis(), locale);
-        builder.addProcessor(new StyleProcessor<>(style, style));
-        return builder.build();
+        return builder.addStyle(style, style).build();
 
     }
 
@@ -2666,8 +2681,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<PlainTimestamp> builder = new Builder<>(PlainTimestamp.axis(), locale);
-        builder.addProcessor(new StyleProcessor<>(dateStyle, timeStyle));
-        return builder.build();
+        return builder.addStyle(dateStyle, timeStyle).build();
 
     }
 
@@ -2741,8 +2755,7 @@ public final class ChronoFormatter<T>
     ) {
 
         Builder<Moment> builder = new Builder<>(Moment.axis(), locale);
-        builder.addProcessor(new StyleProcessor<>(dateStyle, timeStyle));
-        return builder.build().withTimezone(tzid);
+        return builder.addStyle(dateStyle, timeStyle).build().withTimezone(tzid);
 
     }
 
@@ -2811,8 +2824,7 @@ public final class ChronoFormatter<T>
 
         if (LocalizedPatternSupport.class.isAssignableFrom(chronology.getChronoType())) {
             Builder<T> builder = new Builder<>(chronology, locale);
-            builder.addProcessor(new StyleProcessor<>(style, style));
-            return builder.build();
+            return builder.addStyle(style, style).build();
         } else if (UniversalTime.class.isAssignableFrom(chronology.getChronoType())) {
             throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
         } else {
@@ -2982,8 +2994,7 @@ public final class ChronoFormatter<T>
 
         Chronology<CalendarDate> chronology = CalendarConverter.getChronology(locale);
         Builder<CalendarDate> builder = new Builder<>(chronology, locale);
-        builder.addProcessor(new StyleProcessor<>(style, style));
-        return builder.build();
+        return builder.addStyle(style, style).build();
 
     }
 
@@ -3312,6 +3323,12 @@ public final class ChronoFormatter<T>
         }
 
         return optSingleStep;
+
+    }
+
+    private String getPattern0(String defaultPattern) {
+
+        return this.globalAttributes.get(Attributes.FORMAT_PATTERN, defaultPattern);
 
     }
 
@@ -7318,10 +7335,12 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
                 formatter = formatter.with(ChronoHistory.PROLEPTIC_GREGORIAN);
             }
 
-            if ((this.dayPeriod != null) || (this.pattern != null && !this.pattern.isEmpty())) {
+            String cldrPattern = (this.pattern == null) ? "" : this.pattern;
+
+            if ((this.dayPeriod != null) || !cldrPattern.isEmpty()) {
                 AttributeSet as = formatter.globalAttributes;
-                if ((this.pattern != null) && !this.pattern.isEmpty()) {
-                    as = as.withInternal(Attributes.FORMAT_PATTERN, this.pattern);
+                if (!cldrPattern.isEmpty()) {
+                    as = as.withInternal(Attributes.FORMAT_PATTERN, cldrPattern);
                 }
                 if (this.dayPeriod != null) {
                     as = as.withInternal(CUSTOM_DAY_PERIOD, this.dayPeriod);
@@ -7370,6 +7389,16 @@ s         * <p>Definiert ein Textformat f&uuml;r das angegebene Element mit
         void setProlepticGregorian() {
 
             this.prolepticGregorian = true;
+
+        }
+
+        private Builder<T> addStyle(
+            FormatStyle dateStyle,
+            FormatStyle timeStyle
+        ) {
+
+            this.addProcessor(new StyleProcessor<>(dateStyle, timeStyle));
+            return this;
 
         }
 
