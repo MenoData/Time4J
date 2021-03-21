@@ -1584,6 +1584,16 @@ public final class PlainDate
 
     }
 
+    @Override
+    public String getFormatPattern(
+        FormatStyle style,
+        Locale locale
+    ) {
+
+        return ENGINE.getFormatPattern(style, locale);
+
+    }
+
     /**
      * <p>Provides a static access to the associated chronology on base of
      * epoch days which contains the chronological rules. </p>

@@ -64,6 +64,7 @@ import net.time4j.format.TextElement;
 import net.time4j.format.TextWidth;
 import net.time4j.history.ChronoHistory;
 import net.time4j.history.internal.HistoricAttribute;
+import net.time4j.scale.UniversalTime;
 import net.time4j.tz.NameStyle;
 import net.time4j.tz.OffsetSign;
 import net.time4j.tz.OverlapResolver;
@@ -2812,6 +2813,8 @@ public final class ChronoFormatter<T>
             Builder<T> builder = new Builder<>(chronology, locale);
             builder.addProcessor(new StyleProcessor<>(style, style));
             return builder.build();
+        } else if (UniversalTime.class.isAssignableFrom(chronology.getChronoType())) {
+            throw new UnsupportedOperationException("Timezone required, use 'ofMomentStyle()' instead.");
         } else {
             throw new UnsupportedOperationException("Localized format patterns not available: " + chronology);
         }

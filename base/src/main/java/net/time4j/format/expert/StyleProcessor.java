@@ -22,8 +22,6 @@
 package net.time4j.format.expert;
 
 import net.time4j.Moment;
-import net.time4j.PlainDate;
-import net.time4j.PlainTime;
 import net.time4j.PlainTimestamp;
 import net.time4j.engine.AttributeQuery;
 import net.time4j.engine.BridgeChronology;
@@ -286,11 +284,7 @@ final class StyleProcessor<T>
 
         String pattern;
 
-        if (chronology.equals(PlainDate.axis())) {
-            pattern = CalendarText.patternForDate(dateStyle, locale);
-        } else if (chronology.equals(PlainTime.axis())) {
-            pattern = CalendarText.patternForTime(timeStyle, locale);
-        } else if (chronology.equals(PlainTimestamp.axis())) {
+        if (chronology.equals(PlainTimestamp.axis())) {
             pattern = CalendarText.patternForTimestamp(dateStyle, timeStyle, locale);
         } else if (chronology.equals(Moment.axis())) {
             pattern = CalendarText.patternForMoment(dateStyle, timeStyle, locale);

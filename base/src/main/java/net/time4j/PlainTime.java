@@ -1710,6 +1710,16 @@ public final class PlainTime
 
     }
 
+    @Override
+    public String getFormatPattern(
+        FormatStyle style,
+        Locale locale
+    ) {
+
+        return ENGINE.getFormatPattern(style, locale);
+
+    }
+
     /**
      * <p>Provides a static access to the associated time axis respective
      * chronology which contains the chronological rules. </p>
