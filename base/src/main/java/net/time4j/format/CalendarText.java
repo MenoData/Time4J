@@ -321,12 +321,8 @@ public final class CalendarText {
         try {
             StringBuilder path = new StringBuilder("names/");
             path.append(calendarType);
-
-            if (!calendarType.startsWith("extra/")) {
-                path.append("/");
-                path.append(calendarType);
-            }
-
+            path.append("/");
+            path.append(calendarType);
             PropertyBundle rb = PropertyBundle.load(path.toString(), locale);
 
             for (String key : rb.keySet()) {

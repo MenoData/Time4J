@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class OldHinduLunarCalendarTest {
 
     // sample data taken from Dershovitz/Reingold
-    @Parameterized.Parameters(name= "{index}: extra/hindu-AryaSiddhanta@LUNAR({0}-{1}-{2}-{3})={4})")
+    @Parameterized.Parameters(name= "{index}: hindu-AryaSiddhanta@LUNAR({0}-{1}-{2}-{3})={4})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
             new Object[][] {

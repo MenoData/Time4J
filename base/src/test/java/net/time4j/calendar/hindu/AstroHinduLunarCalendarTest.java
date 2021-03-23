@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class AstroHinduLunarCalendarTest {
 
     // sample data taken from Dershovitz/Reingold for the Amanta-rule
-    @Parameterized.Parameters(name= "{index}: extra/hindu-amanta({0}-{1}-{2}-{3}-{4})={5})")
+    @Parameterized.Parameters(name= "{index}: hindu-amanta({0}-{1}-{2}-{3}-{4})={5})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
             new Object[][] {

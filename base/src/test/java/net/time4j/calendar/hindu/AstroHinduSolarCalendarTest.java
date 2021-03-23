@@ -16,7 +16,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 public class AstroHinduSolarCalendarTest {
 
     // sample data taken from Dershovitz/Reingold for the Tamil-rule based on modern astronomy
-    @Parameterized.Parameters(name= "{index}: extra/hindu-astro-tamil({0}-{1}-{2})={3})")
+    @Parameterized.Parameters(name= "{index}: hindu-astro-tamil({0}-{1}-{2})={3})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
             new Object[][] {
