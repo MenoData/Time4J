@@ -18,7 +18,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(Parameterized.class)
 public class BadiCalendarTest {
 
-    @Parameterized.Parameters(name= "{index}: extra/bahai({0}-{1}-{2}-{3}-{4})={5})")
+    @Parameterized.Parameters(name= "{index}: bahai({0}-{1}-{2}-{3}-{4})={5})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
             new Object[][] {

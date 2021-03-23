@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BadiEra.java) is part of project Time4J.
  *
@@ -104,7 +104,7 @@ public enum BadiEra
                 throw new UnsupportedOperationException(width.name());
         }
 
-        CalendarText ct = CalendarText.getInstance("extra/bahai", locale);
+        CalendarText ct = CalendarText.getInstance("bahai", locale);
         return ct.getTextForms("E", BadiEra.class, variant);
 
     }

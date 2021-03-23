@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Sansculottides.java) is part of project Time4J.
  *
@@ -161,7 +161,7 @@ public enum Sansculottides {
         OutputContext oc
     ) {
 
-        CalendarText names = CalendarText.getInstance("extra/frenchrev", locale);
+        CalendarText names = CalendarText.getInstance("frenchrev", locale);
         String key = "S(" + (oc == OutputContext.STANDALONE ? "W" : "w") + ")_" + this.getValue();
         String desc = names.getTextForms().get(key);
 

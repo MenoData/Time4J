@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FrenchRepublicanMonth.java) is part of project Time4J.
  *
@@ -626,7 +626,7 @@ public enum FrenchRepublicanMonth {
         OutputContext oc
     ) {
 
-        CalendarText names = CalendarText.getInstance("extra/frenchrev", locale);
+        CalendarText names = CalendarText.getInstance("frenchrev", locale);
         return names.getStdMonths(width, oc).print(this);
 
     }

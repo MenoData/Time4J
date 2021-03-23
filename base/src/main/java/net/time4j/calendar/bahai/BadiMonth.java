@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (BadiMonth.java) is part of project Time4J.
  *
@@ -287,7 +287,7 @@ public enum BadiMonth
         FormattedContent fc
     ) {
 
-        CalendarText ct = CalendarText.getInstance("extra/bahai", lang);
+        CalendarText ct = CalendarText.getInstance("bahai", lang);
         return ct.getTextForms("M", BadiMonth.class, fc.variant());
 
     }

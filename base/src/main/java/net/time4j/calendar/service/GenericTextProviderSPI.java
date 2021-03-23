@@ -83,10 +83,10 @@ public final class GenericTextProviderSPI
         types.add("coptic");
         types.add("dangi");
         types.add("ethiopic");
-        types.add("extra/frenchrev");
-        types.add("extra/hindu");
+        types.add("frenchrev");
         types.add("generic");
         types.add("hebrew");
+        types.add("hindu");
         types.add("indian");
         types.add("islamic");
         types.add("japanese");
@@ -156,7 +156,7 @@ public final class GenericTextProviderSPI
             case "vietnam":
                 calendarType = "chinese"; // Umleitung
                 break;
-            case "extra/hindu":
+            case "hindu":
                 calendarType = "indian"; // Umleitung
                 break;
         }
@@ -316,11 +316,8 @@ public final class GenericTextProviderSPI
 
         StringBuilder path = new StringBuilder("names/");
         path.append(calendarType);
-
-        if (!calendarType.startsWith("extra/")) {
-            path.append("/");
-            path.append(calendarType);
-        }
+        path.append("/");
+        path.append(calendarType);
 
         return PropertyBundle.load(
             path.toString(),
@@ -471,7 +468,7 @@ public final class GenericTextProviderSPI
 
     private static int countOfEras(String ct) {
 
-        if (ct.equals("extra/hindu")) {
+        if (ct.equals("hindu")) {
             return 6;
         }
 

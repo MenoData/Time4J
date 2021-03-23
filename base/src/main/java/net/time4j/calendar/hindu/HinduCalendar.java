@@ -280,7 +280,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     HinduPrimitive#ADHIKA_IS_TRAILING
  * @doctags.concurrency {immutable}
  */
-@CalendarType("extra/hindu")
+@CalendarType("hindu")
 public final class HinduCalendar
     extends CalendarVariant<HinduCalendar>
     implements LocalizedPatternSupport {
@@ -1881,7 +1881,7 @@ public final class HinduCalendar
                     attributes.get(HinduPrimitive.ADHIKA_IS_TRAILING, "R".equals(textForms.get("leap-alignment")));
                 indicator =
                     attributes.get(HinduPrimitive.ADHIKA_INDICATOR, textForms.get("leap-indicator").charAt(0));
-                adhika = CalendarText.getInstance("extra/hindu", loc).getTextForms().get("adhika");
+                adhika = CalendarText.getInstance("hindu", loc).getTextForms().get("adhika");
             }
 
             if (count == 0) {
@@ -1969,7 +1969,7 @@ public final class HinduCalendar
                 trailing =
                     attributes.get(HinduPrimitive.ADHIKA_IS_TRAILING, "R".equals(textForms.get("leap-alignment")));
                 indicator = attributes.get(HinduPrimitive.ADHIKA_INDICATOR, textForms.get("leap-indicator").charAt(0));
-                adhika = CalendarText.getInstance("extra/hindu", loc).getTextForms().get("adhika");
+                adhika = CalendarText.getInstance("hindu", loc).getTextForms().get("adhika");
 
                 if (!trailing) {
                     int leapStatus = parseLeadingLeapInfo(text, pos, len, caseInsensitive, adhika, indicator, loc);
@@ -1999,7 +1999,7 @@ public final class HinduCalendar
                     // let's try with rasi names as alternative before giving up
                     status.setIndex(pos);
                     status.setErrorIndex(-1);
-                    TextAccessor ta = CalendarText.getInstance("extra/hindu", loc).getTextForms("R", IndianMonth.class);
+                    TextAccessor ta = CalendarText.getInstance("hindu", loc).getTextForms("R", IndianMonth.class);
                     int rasi = ta.parse(text, status, IndianMonth.class, attributes).getValue();
                     im = HinduMonth.ofSolar(rasi).getValue(); // rebase
                 }
@@ -2212,7 +2212,7 @@ public final class HinduCalendar
                     attributes.get(HinduPrimitive.ADHIKA_IS_TRAILING, "R".equals(textForms.get("leap-alignment")));
                 indicator =
                     attributes.get(HinduPrimitive.ADHIKA_INDICATOR, textForms.get("leap-indicator").charAt(0));
-                adhika = CalendarText.getInstance("extra/hindu", loc).getTextForms().get("adhika");
+                adhika = CalendarText.getInstance("hindu", loc).getTextForms().get("adhika");
             }
 
             if (dayOfMonth.isLeap() && !trailing) {
@@ -2278,7 +2278,7 @@ public final class HinduCalendar
                 trailing =
                     attributes.get(HinduPrimitive.ADHIKA_IS_TRAILING, "R".equals(textForms.get("leap-alignment")));
                 indicator = attributes.get(HinduPrimitive.ADHIKA_INDICATOR, textForms.get("leap-indicator").charAt(0));
-                adhika = CalendarText.getInstance("extra/hindu", loc).getTextForms().get("adhika");
+                adhika = CalendarText.getInstance("hindu", loc).getTextForms().get("adhika");
 
                 if (!trailing) {
                     int leapStatus = parseLeadingLeapInfo(text, pos, len, caseInsensitive, adhika, indicator, loc);

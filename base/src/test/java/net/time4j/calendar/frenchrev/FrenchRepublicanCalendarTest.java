@@ -20,7 +20,7 @@ import static org.junit.Assert.fail;
 @RunWith(Parameterized.class)
 public class FrenchRepublicanCalendarTest {
 
-    @Parameterized.Parameters(name= "{index}: extra/frenchrev({0}-{1}-{2})={3} (leap:{4}, next-leap-day:{5})")
+    @Parameterized.Parameters(name= "{index}: frenchrev({0}-{1}-{2})={3} (leap:{4}, next-leap-day:{5})")
     public static Iterable<Object[]> data() {
         return Arrays.asList(
             new Object[][] {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HinduMonth.java) is part of project Time4J.
  *
@@ -242,7 +242,7 @@ public final class HinduMonth
      * @see     #getDisplayName(Locale)
      */
     public String getRasi(Locale locale) {
-        CalendarText names = CalendarText.getInstance("extra/hindu", locale);
+        CalendarText names = CalendarText.getInstance("hindu", locale);
         String rasi = names.getTextForms("R", IndianMonth.class).print(IndianMonth.valueOf(this.getRasi()));
 
         if (this.leap) { // should not happen because rasi is for solar calendars without leap months
@@ -430,7 +430,7 @@ public final class HinduMonth
     }
 
     private static String getAdhika(Locale locale) {
-        return CalendarText.getInstance("extra/hindu", locale).getTextForms().get("adhika") + " ";
+        return CalendarText.getInstance("hindu", locale).getTextForms().get("adhika") + " ";
     }
 
 }

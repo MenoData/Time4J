@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayOfDecade.java) is part of project Time4J.
  *
@@ -218,7 +218,7 @@ public enum DayOfDecade {
         OutputContext oc
     ) {
 
-        CalendarText names = CalendarText.getInstance("extra/frenchrev", locale);
+        CalendarText names = CalendarText.getInstance("frenchrev", locale);
         String key = ((width == TextWidth.NARROW) ? "N" : (oc == OutputContext.FORMAT ? "w" : "W"));
         return names.getTextForms().get("D(" + key + ")_" + this.getValue());
 
