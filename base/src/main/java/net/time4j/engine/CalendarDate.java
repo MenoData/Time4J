@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarDate.java) is part of project Time4J.
  *
@@ -20,6 +20,8 @@
  */
 
 package net.time4j.engine;
+
+import java.time.chrono.ChronoLocalDate;
 
 
 /**
@@ -88,12 +90,7 @@ public interface CalendarDate
 
         long utcDays = this.getDaysSinceEpochUTC();
         CalendarSystem<T> calsys = target.getCalendarSystem();
-
-        if ((calsys.getMinimumSinceUTC() > utcDays) || (calsys.getMaximumSinceUTC() < utcDays)) {
-            throw new ArithmeticException("Cannot transform <" + utcDays + "> to: " + target.getChronoType().getName());
-        } else {
-            return calsys.transform(utcDays);
-        }
+        return DateTools.convert(utcDays, calsys, target);
 
     }
 
@@ -137,12 +134,7 @@ public interface CalendarDate
 
         long utcDays = this.getDaysSinceEpochUTC();
         CalendarSystem<T> calsys = target.getCalendarSystem(variant);
-
-        if ((calsys.getMinimumSinceUTC() > utcDays) || (calsys.getMaximumSinceUTC() < utcDays)) {
-            throw new ArithmeticException("Cannot transform <" + utcDays + "> to: " + target.getChronoType().getName());
-        } else {
-            return calsys.transform(utcDays);
-        }
+        return DateTools.convert(utcDays, calsys, target);
 
     }
 
@@ -232,12 +224,7 @@ public interface CalendarDate
 
         long utcDays = this.getDaysSinceEpochUTC();
         CalendarSystem<T> calsys = chronology.getCalendarSystem();
-
-        if ((calsys.getMinimumSinceUTC() > utcDays) || (calsys.getMaximumSinceUTC() < utcDays)) {
-            throw new ArithmeticException("Cannot transform <" + utcDays + "> to: " + ref);
-        } else {
-            return calsys.transform(utcDays);
-        }
+        return DateTools.convert(utcDays, calsys, chronology);
 
     }
 
@@ -292,12 +279,7 @@ public interface CalendarDate
 
         long utcDays = this.getDaysSinceEpochUTC();
         CalendarSystem<T> calsys = chronology.getCalendarSystem(variant);
-
-        if ((calsys.getMinimumSinceUTC() > utcDays) || (calsys.getMaximumSinceUTC() < utcDays)) {
-            throw new ArithmeticException("Cannot transform <" + utcDays + "> to: " + ref);
-        } else {
-            return calsys.transform(utcDays);
-        }
+        return DateTools.convert(utcDays, calsys, chronology);
 
     }
 
@@ -342,6 +324,112 @@ public interface CalendarDate
     ) {
 
         return this.transform(target, variantSource.getVariant());
+
+    }
+
+    /**
+     * <p>Converts the calendar date corresponding to {@code ChronoLocalDate}
+     * in given target chronology and variant. </p>
+     *
+     * @param   <T>             type of target chronology
+     * @param   threeten        the {@code ChronoLocalDate} to be converted
+     * @param   target          chronology given date shall be converted to
+     * @param   variantSource   source of desired calendar variant
+     * @return  converted date of target type T
+     * @throws  ChronoException if the variant of given source is not recognized
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konvertiert das gegebene Kalenderdatum entsprechend {@code ChronoLocalDate}
+     * zur angegebenen Zielchronologie und Variante. </p>
+     *
+     * @param   <T>             type of target chronology
+     * @param   threeten        the {@code ChronoLocalDate} to be converted
+     * @param   target          chronology given date shall be converted to
+     * @param   variantSource   source of desired calendar variant
+     * @return  converted date of target type T
+     * @throws  ChronoException if the variant of given source is not recognized
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.8
+     */
+    static <T extends CalendarVariant<T>> T from(
+        ChronoLocalDate threeten,
+        CalendarFamily<T> target,
+        VariantSource variantSource
+    ) {
+
+        return from(threeten, target, variantSource.getVariant());
+
+    }
+
+    /**
+     * <p>Converts the calendar date corresponding to {@code ChronoLocalDate}
+     * in given target chronology and variant. </p>
+     *
+     * @param   <T>             type of target chronology
+     * @param   threeten        the {@code ChronoLocalDate} to be converted
+     * @param   target          chronology given date shall be converted to
+     * @param   variant         desired calendar variant
+     * @return  converted date of target type T
+     * @throws  ChronoException if the variant of given source is not recognized
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konvertiert das gegebene Kalenderdatum entsprechend {@code ChronoLocalDate}
+     * zur angegebenen Zielchronologie und Variante. </p>
+     *
+     * @param   <T>             type of target chronology
+     * @param   threeten        the {@code ChronoLocalDate} to be converted
+     * @param   target          chronology given date shall be converted to
+     * @param   variant         desired calendar variant
+     * @return  converted date of target type T
+     * @throws  ChronoException if the variant of given source is not recognized
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.8
+     */
+    static <T extends CalendarVariant<T>> T from(
+        ChronoLocalDate threeten,
+        CalendarFamily<T> target,
+        String variant
+    ) {
+
+        long utcDays = EpochDays.UTC.transform(threeten.toEpochDay(), EpochDays.UNIX);
+        CalendarSystem<T> calsys = target.getCalendarSystem(variant);
+        return DateTools.convert(utcDays, calsys, target);
+
+    }
+
+    /**
+     * <p>Converts the calendar date corresponding to {@code ChronoLocalDate} in given target chronology. </p>
+     *
+     * @param   <T>             type of target chronology
+     * @param   threeten        the {@code ChronoLocalDate} to be converted
+     * @param   target          chronology given date shall be converted to
+     * @return  converted date of target type T
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.8
+     */
+    /*[deutsch]
+     * <p>Konvertiert das gegebene Kalenderdatum entsprechend {@code ChronoLocalDate}
+     * zur angegebenen Zielchronologie. </p>
+     *
+     * @param   <T>             type of target chronology
+     * @param   threeten        the {@code ChronoLocalDate} to be converted
+     * @param   target          chronology given date shall be converted to
+     * @return  converted date of target type T
+     * @throws  ArithmeticException in case of numerical overflow
+     * @since   5.8
+     */
+    static <T extends Calendrical<?, T>> T from(
+        ChronoLocalDate threeten,
+        Chronology<T> target
+    ) {
+
+        long utcDays = EpochDays.UTC.transform(threeten.toEpochDay(), EpochDays.UNIX);
+        CalendarSystem<T> calsys = target.getCalendarSystem();
+        return DateTools.convert(utcDays, calsys, target);
 
     }
 

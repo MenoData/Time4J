@@ -17,6 +17,7 @@ import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
 
 import java.text.ParseException;
+import java.time.chrono.HijrahDate;
 import java.time.format.FormatStyle;
 import java.util.Locale;
 
@@ -424,6 +425,24 @@ public class HijriMiscellaneousTest {
         assertThat(
             cal1.with(HijriCalendar.YEAR_OF_ERA.atFloor()).transform(PlainDate.axis()),
             is(PlainDate.of(2028, 5, 20)));
+    }
+
+    @Test
+    public void genericDateConversion(){
+        HijrahDate hijri = HijrahDate.of(1436, 9, 29);
+        assertThat(
+            CalendarDate.from(
+                hijri,
+                HijriCalendar.family(),
+                () -> HijriCalendar.VARIANT_UMALQURA
+            ),
+            is(HijriCalendar.ofUmalqura(1436, HijriMonth.RAMADAN, 29)));
+        assertThat(
+            CalendarDate.from(
+                hijri,
+                PlainDate.axis()
+            ),
+            is(PlainDate.of(2015, 7, 16)));
     }
 
 }
