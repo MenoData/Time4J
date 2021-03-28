@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriMonth.java) is part of project Time4J.
  *
@@ -47,28 +47,100 @@ public enum HijriMonth
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /**
+     * The first month of Hijri year.
+     */
+    /*[deutsch]
+     * Der erste Monat des Hijri-Jahres.
+     */
     MUHARRAM,
 
+    /**
+     * The second month of Hijri year.
+     */
+    /*[deutsch]
+     * Der zweite Monat des Hijri-Jahres.
+     */
     SAFAR,
 
+    /**
+     * The third month of Hijri year.
+     */
+    /*[deutsch]
+     * Der dritte Monat des Hijri-Jahres.
+     */
     RABI_I,
 
+    /**
+     * The fourth month of Hijri year.
+     */
+    /*[deutsch]
+     * Der vierte Monat des Hijri-Jahres.
+     */
     RABI_II,
 
+    /**
+     * The fifth month of Hijri year.
+     */
+    /*[deutsch]
+     * Der f&uuml;nfte Monat des Hijri-Jahres.
+     */
     JUMADA_I,
 
+    /**
+     * The sixth month of Hijri year.
+     */
+    /*[deutsch]
+     * Der sechste Monat des Hijri-Jahres.
+     */
     JUMADA_II,
 
+    /**
+     * The seventh month of Hijri year.
+     */
+    /*[deutsch]
+     * Der siebente Monat des Hijri-Jahres.
+     */
     RAJAB,
 
+    /**
+     * The eigth month of Hijri year.
+     */
+    /*[deutsch]
+     * Der achte Monat des Hijri-Jahres.
+     */
     SHABAN,
 
+    /**
+     * The nineth month of Hijri year.
+     */
+    /*[deutsch]
+     * Der neunte Monat des Hijri-Jahres.
+     */
     RAMADAN,
 
+    /**
+     * The tenth month of Hijri year.
+     */
+    /*[deutsch]
+     * Der zehnte Monat des Hijri-Jahres.
+     */
     SHAWWAL,
 
+    /**
+     * The eleventh month of Hijri year.
+     */
+    /*[deutsch]
+     * Der elfte Monat des Hijri-Jahres.
+     */
     DHU_AL_QIDAH,
 
+    /**
+     * The twelfth and last month of Hijri year.
+     */
+    /*[deutsch]
+     * Der zw&ouml;lfte und letzte Monat des Hijri-Jahres.
+     */
     DHU_AL_HIJJAH;
 
     private static final HijriMonth[] ENUMS = HijriMonth.values(); // Cache
