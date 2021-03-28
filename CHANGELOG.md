@@ -1,4 +1,6 @@
-## [v5.8] not yet released
+## [v5.9] not yet released
+
+## [v5.8] published on 2021-03-28
 ### Added
 - General static conversion from ChronoLocalDate to CalendarDate [#885]
 - Specific leap month queries in East Asian calendars [#913]
