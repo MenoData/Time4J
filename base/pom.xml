@@ -6,7 +6,7 @@
     <parent>
         <groupId>net.time4j</groupId>
         <artifactId>time4j-parent</artifactId>
-        <version>5.8</version>
+        <version>5.9</version>
         <relativePath>../pom.xml</relativePath>
     </parent>
     
@@ -83,12 +83,14 @@
                             net.time4j.base,
                             net.time4j.calendar,
                             net.time4j.calendar.astro,
+                            net.time4j.calendar.bahai,
                             net.time4j.calendar.frenchrev,
                             net.time4j.calendar.hindu,
                             net.time4j.clock,
                             net.time4j.engine,
                             net.time4j.format,
                             net.time4j.format.expert,
+                            net.time4j.format.platform,
                             net.time4j.history,
                             net.time4j.range,
                             net.time4j.scale,
