@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LanguageMatch.java) is part of project Time4J.
  *
@@ -34,7 +34,7 @@ public enum LanguageMatch {
     //~ Statische Felder/Initialisierungen --------------------------------
 
     tl("fil"), // tagalog
-    no("nb"), // norsk bokmål
+    nb("no"), // norsk bokmål
     in("id"), // indonesian (old code)
     iw("he"); // hebrew (old code)
 
