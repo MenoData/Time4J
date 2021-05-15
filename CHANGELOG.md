@@ -1,4 +1,6 @@
-## [v5.9] not yet released
+## [v5.8.1] not yet released
+### Changed
+- Updated Danish eras naming [#944]
 
 ## [v5.8] published on 2021-03-28
 ### Added
