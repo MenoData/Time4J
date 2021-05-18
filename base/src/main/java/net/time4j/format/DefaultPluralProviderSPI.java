@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DefaultPluralProviderSPI.java) is part of project Time4J.
  *
@@ -48,19 +48,19 @@ final class DefaultPluralProviderSPI
     static {
         Map<String, PluralRules> cmap = new HashMap<>();
         fillC(cmap, "bm bo dz id ig ii in ja jbo jv jw kde kea km ko lkt", -1);
-        fillC(cmap, "lo ms my nqo root sah ses sg th to vi wo yo zh", -1);
+        fillC(cmap, "lo ms my nqo osa root sah ses sg su th to vi wo yo zh", -1);
         fillC(cmap, "pt_PT", 0);
-        fillC(cmap, "am as bn fa gu hi kn zu", 1);
+        fillC(cmap, "am as bn doi fa gu hi kn pcm zu", 1);
         fillC(cmap, "ff fr hy kab pt", 1);
         fillC(cmap, "si", 1);
-        fillC(cmap, "ak bh guw ln mg nso pa ti wa", 1);
+        fillC(cmap, "ak bh bho guw ln mg nso pa ti wa", 1);
         fillC(cmap, "tzm", 2);
         fillC(cmap, "is", 3);
         fillC(cmap, "mk", 4);
         fillC(cmap, "ceb fil tl", 5);
         fillC(cmap, "lv prg", 6);
         fillC(cmap, "lag ksh", 7);
-        fillC(cmap, "iu naq se sma smi smj smn sms", 8);
+        fillC(cmap, "iu naq sat se sma smi smj smn sms", 8);
         fillC(cmap, "shi", 9);
         fillC(cmap, "mo ro", 10);
         fillC(cmap, "bs hr sh sr", 11);
