@@ -1332,7 +1332,9 @@ public final class ChronoFormatter<T>
     /**
      * <p>Creates a copy of this formatter with alternative era names. </p>
      *
-     * <p>Note: Sectional attributes cannot be overridden. </p>
+     * <p>Notes: Sectional attributes cannot be overridden. This method is only applicable for the
+     * gregorian calendar and its ancestors but not for other calendars which use eras different
+     * from {@code HistoricEra}. </p>
      *
      * @return  changed copy with alternative era names while this instance remains unaffected
      * @see     net.time4j.history.HistoricEra#getAlternativeName(Locale, TextWidth)
@@ -1342,7 +1344,9 @@ public final class ChronoFormatter<T>
      * <p>Erzeugt eine Kopie, die statt der Standard-&Auml;ra-Bezeichnungen
      * alternative Namen verwendet. </p>
      *
-     * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. </p>
+     * <p>Hinweis: Sektionale Attribute werden nicht &uuml;bersteuert. Diese Methode ist nur auf den
+     * gregorianischen Kalender und seine Vorl&auml;ufer anwendbar, aber nicht auf Kalender, die
+     * &Auml;ras abweichend von {@code HistoricEra} verwenden. </p>
      *
      * @return  changed copy with alternative era names while this instance remains unaffected
      * @see     net.time4j.history.HistoricEra#getAlternativeName(Locale, TextWidth)
