@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ResourceLoader.java) is part of project Time4J.
  *
@@ -129,7 +129,8 @@ public abstract class ResourceLoader {
             INSTANCE = new StdResourceLoader();
         } else {
             try {
-                INSTANCE = (ResourceLoader) Class.forName(rl).newInstance();
+                INSTANCE = 
+                    (ResourceLoader) Class.forName(rl).getDeclaredConstructor().newInstance();
             } catch (Exception e) {
                 throw new AssertionError(
                     "Wrong configuration of external resource loader: " + e.getMessage());
