@@ -444,11 +444,6 @@ public final class DayPeriod {
     ) {
 
         String lang = locale.getLanguage(); // NPE-check
-
-        if (lang.equals("nn")) {
-            locale = new Locale("nb"); // CLDR 29 contains no data for language nn
-        }
-
         Map<String, String> resourceMap = loadTextForms(locale, calendarType);
         SortedMap<PlainTime, String> codeMap = Collections.emptySortedMap();
 

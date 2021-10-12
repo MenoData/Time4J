@@ -371,7 +371,7 @@ public final class PropertyBundle {
         if (!language.isEmpty()) {
             list.add(new Locale(language, "", ""));
             if (language.equals("nn")) {
-                list.add(new Locale("nb", "", ""));
+                list.add(new Locale("no", "", ""));
             }
         }
 
