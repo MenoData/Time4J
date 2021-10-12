@@ -57,9 +57,12 @@ $RECYCLE.BIN/
 
 # Windows Installer files
 *.cab
+*.bat
 *.msi
 *.msm
 *.msp
 
 # Windows shortcuts
 *.lnk
+/base/target/
+/sqlxml/target/
