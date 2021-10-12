@@ -271,7 +271,7 @@ public class PlatformTimezoneTest {
         Timezone tz = loadFromPlatform("Europe/Berlin");
         assertThat(
             tz.getDisplayName(NameStyle.LONG_STANDARD_TIME, Locale.GERMAN),
-            is("Mitteleuropäische Zeit"));
+            is("Mitteleuropäische Normalzeit"));
     }
 
     @Test

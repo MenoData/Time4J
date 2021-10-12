@@ -92,7 +92,7 @@ public class FormatPatternTest {
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.FULL, FormatStyle.FULL, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
-            is("Donnerstag, 1. Januar 1970 um 01:00:00 Mitteleuropäische Zeit"));
+            is("Donnerstag, 1. Januar 1970 um 01:00:00 Mitteleuropäische Normalzeit"));
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.LONG, FormatStyle.LONG, Locale.GERMANY, Timezone.of("Europe/Berlin").getID()).print(m),
@@ -115,7 +115,7 @@ public class FormatPatternTest {
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.FULL, FormatStyle.FULL, locale, berlin).print(m),
-            is("Donnerstag, 1. Januar 1970 um 0:00:00 Mitternacht Mitteleuropäische Zeit"));
+            is("Donnerstag, 1. Januar 1970 um 0:00:00 Mitternacht Mitteleuropäische Normalzeit"));
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.LONG, FormatStyle.LONG, locale, berlin).print(m),
@@ -142,7 +142,7 @@ public class FormatPatternTest {
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.FULL, FormatStyle.FULL, locale, berlin).print(m),
-            is("Donnerstag, 1. Januar 1970 um 3:00:00 nachm. Mitteleuropäische Zeit"));
+            is("Donnerstag, 1. Januar 1970 um 3:00:00 nachm. Mitteleuropäische Normalzeit"));
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.LONG, FormatStyle.LONG, locale, berlin).print(m),
@@ -169,7 +169,7 @@ public class FormatPatternTest {
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.FULL, FormatStyle.FULL, locale, berlin).print(m),
-            is("Friday, January 2, 1970 at 15:00:00 Central European Time"));
+            is("Friday, January 2, 1970 at 15:00:00 Central European Standard Time"));
         assertThat(
             ChronoFormatter.ofMomentStyle(
                 FormatStyle.LONG, FormatStyle.LONG, locale, berlin).print(m),

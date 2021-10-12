@@ -66,7 +66,7 @@ public class PlatformFormatTest {
         Timezone timezone = Timezone.of("Europe/London");
         TZID tzid = timezone.getID();
         String name = (timezone.isDaylightSaving(Moment.UNIX_EPOCH) ? "BST" : "GMT");
-        String expected = "01.01.1970 01:00 AM " + name;
+        String expected = "01.01.1970 01:00 am " + name;
         assertThat(
             SimpleFormatter.ofMomentPattern("dd.MM.yyyy hh:mm a z", Locale.UK, tzid).format(Moment.UNIX_EPOCH),
             is(expected)

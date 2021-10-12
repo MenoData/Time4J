@@ -31,12 +31,21 @@ import java.util.concurrent.TimeUnit;
 
 import static net.time4j.CalendarUnit.*;
 import static net.time4j.ClockUnit.*;
+import net.time4j.Moment;
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)
 public class PrettyTimeTest {
+    
+    private static final String MINUS_AR = "\u061C-";
+    private static final String LISTSEP_AR = "و";
+    private static final String UPATTERN_AR_MS2 = "شهران";
+    private static final String UPATTERN_AR_MS3 = "أشهر";    
+    private static final String UPATTERN_AR_YS4 = "سنة";
+    private static final String UPATTERN_AR_WS1 = "أسبوع";
+    private static final String UPATTERN_AR_DS2 = "يومان";
 
     @Test
     public void printRelativeThreeten() {
@@ -236,11 +245,12 @@ public class PrettyTimeTest {
     @Test
     public void withMinusSign() {
         String minus = "_";
-        assertThat(
+        String result = 
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withMinusSign(minus)
-                .print(-3, MONTHS, TextWidth.SHORT),
-            is(minus + "3 شهر"));
+                .print(-3, MONTHS, TextWidth.SHORT);
+        String expected = minus + "3 " + UPATTERN_AR_MS3;
+        assertThat(result, is(expected));
     }
 
     @Test
@@ -604,7 +614,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 2, MONTHS, TextWidth.SHORT),
-            is("2 شهر"));
+            is(UPATTERN_AR_MS2));
     }
 
     @Test
@@ -612,7 +622,7 @@ public class PrettyTimeTest {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ")).print(
                 3, MONTHS, TextWidth.SHORT),
-            is("3 شهر"));
+            is("3 " + UPATTERN_AR_MS3));
     }
 
     @Test
@@ -621,7 +631,7 @@ public class PrettyTimeTest {
             PrettyTime.of(new Locale("ar", "DZ"))
                 .withZeroDigit(NumberSystem.ARABIC_INDIC)
                 .print(3, MONTHS, TextWidth.SHORT),
-            is('\u0663' + " شهر"));
+            is('\u0663' + " " + UPATTERN_AR_MS3));
     }
 
     @Test
@@ -800,48 +810,58 @@ public class PrettyTimeTest {
     public void print15Years3Months1Week2DaysArabic() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
-        assertThat(
+        String result =
             PrettyTime.of(new Locale("ar"))
                 .withZeroDigit('0')
-                .print(duration, TextWidth.WIDE),
-            is("15 سنة، 3 أشهر، أسبوع، ويومان"));
+                .print(duration, TextWidth.WIDE);
+        String expected =
+            "15 " + UPATTERN_AR_YS4 + " " + LISTSEP_AR
+                + "3 " + UPATTERN_AR_MS3 + " " + LISTSEP_AR
+                + UPATTERN_AR_WS1 + " " + LISTSEP_AR
+                + UPATTERN_AR_DS2; 
+        assertThat(result, is(expected));
     }
-
+    
     @Test
     public void print15Years3Months1Week2DaysArabicU0660() {
         Duration<?> duration =
             Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS);
-        assertThat(
-            PrettyTime.of(new Locale("ar"))
-                .print(duration, TextWidth.WIDE),
-            is("١٥ سنة، ٣ أشهر، أسبوع، ويومان"));
+        String result =
+            PrettyTime.of(new Locale("ar")).print(duration, TextWidth.WIDE);
+        String expected =
+            "١٥ " + UPATTERN_AR_YS4 + " " + LISTSEP_AR
+                + "٣ " + UPATTERN_AR_MS3 + " " + LISTSEP_AR
+                + UPATTERN_AR_WS1 + " " + LISTSEP_AR
+                + UPATTERN_AR_DS2; 
+        assertThat(result, is(expected));
     }
 
     @Test
     public void print15Years3Months1Week2DaysArabicMinus() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-            .inverse();
-        String actual = PrettyTime.of(new Locale("ar", "DZ")).print(duration, TextWidth.WIDE);
-        String expected = "\u061C-15 سنة، \u061C-3 أشهر، \u061C-أسبوع، و\u061C-يومان";
-//        assertThat(actual.length(), is(expected.length()));
-//        for (int i = 0; i < actual.length(); i++) {
-//            int codepoint1 = actual.charAt(i);
-//            int codepoint2 = expected.charAt(i);
-//            System.out.println(codepoint1 + " / " + codepoint2);
-//        }
-        assertThat(actual, is(expected));
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS).inverse();
+        String result = 
+            PrettyTime.of(new Locale("ar", "DZ")).print(duration, TextWidth.WIDE);
+        String expected =
+            MINUS_AR + "15 " + UPATTERN_AR_YS4 + " " + LISTSEP_AR
+                + MINUS_AR + "3 " + UPATTERN_AR_MS3 + " " + LISTSEP_AR
+                + MINUS_AR + UPATTERN_AR_WS1 + " " + LISTSEP_AR
+                + MINUS_AR + UPATTERN_AR_DS2;    
+        assertThat(result, is(expected));
     }
 
     @Test
     public void print15Years3Months1Week2DaysArabicU0660Minus() {
         Duration<?> duration =
-            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS)
-            .inverse();
-        assertThat(
-            PrettyTime.of(new Locale("ar"))
-                .print(duration, TextWidth.WIDE),
-            is("\u061C-١٥ سنة، \u061C-٣ أشهر، \u061C-أسبوع، و\u061C-يومان"));
+            Duration.ofCalendarUnits(15, 3, 2).plus(1, WEEKS).inverse();
+        String result = 
+            PrettyTime.of(new Locale("ar")).print(duration, TextWidth.WIDE);
+        String expected =
+            MINUS_AR + "١٥ " + UPATTERN_AR_YS4 + " " + LISTSEP_AR
+                + MINUS_AR + "٣ " + UPATTERN_AR_MS3 + " " + LISTSEP_AR
+                + MINUS_AR + UPATTERN_AR_WS1 + " " + LISTSEP_AR
+                + MINUS_AR + UPATTERN_AR_DS2;    
+        assertThat(result, is(expected));
     }
 
     @Test
@@ -1004,14 +1024,20 @@ public class PrettyTimeTest {
     @Test
     public void print3WeeksLaterNorsk() {
         TimeSource<?> clock = () -> PlainTimestamp.of(2014, 9, 1, 14, 30).atUTC();
+        Moment moment = PlainTimestamp.of(2014, 9, 25, 12, 0).atUTC();
+        String expected = "om 3 uker";
 
         assertThat(
-            PrettyTime.of(new Locale("no")) // language match no => nb
+            PrettyTime.of(new Locale("nb")) // language match nb => no
                 .withReferenceClock(clock)
-                .printRelative(
-                    PlainTimestamp.of(2014, 9, 25, 12, 0).atUTC(),
-                    ZonalOffset.UTC),
-            is("om 3 uker"));
+                .printRelative(moment, ZonalOffset.UTC),
+            is(expected));
+
+        assertThat(
+            PrettyTime.of(new Locale("no"))
+                .withReferenceClock(clock)
+                .printRelative(moment, ZonalOffset.UTC),
+            is(expected));
     }
 
     @Test
@@ -1065,7 +1091,7 @@ public class PrettyTimeTest {
         String formattedDuration = PrettyTime.of(new Locale("en", "AU")).print(dur, TextWidth.SHORT);
         assertThat(
             formattedDuration,
-            is("2 m., 5 days"));
+            is("2 mths, 5 days"));
     }
 
     @Test
