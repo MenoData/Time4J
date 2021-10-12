@@ -13,7 +13,6 @@
     <modules>
         <module>base</module>
         <module>sqlxml</module>
-        <module>ui</module>
     </modules>
     
     <licenses>
