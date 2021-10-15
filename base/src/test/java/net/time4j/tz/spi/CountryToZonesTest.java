@@ -17,7 +17,7 @@ public class CountryToZonesTest {
         String name = "data/zone1970.tab";
         Map<String, Set<String>> map = new TreeMap<>();
         ZoneNameProviderSPI.loadTerritories(map, name);
-        assertThat(map.size(), is(247)); // tzdb-2017c
+        assertThat(map.size(), is(247)); // tzdb-2021c
     }
 
 }
