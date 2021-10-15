@@ -100,7 +100,7 @@ public class PrettyTimeTest {
                 .printRelative(
                     PlainTimestamp.of(2020, 10, 28, 12, 45).atUTC(), ZonalOffset.UTC
                 ),
-            is("komende woensdag"));
+            is("volgende week woensdag"));
     }
 
     @Test
