@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarConverter.java) is part of project Time4J.
  *
@@ -81,6 +81,9 @@ final class CalendarConverter<T extends ChronoEntity<T> & CalendarDate>
      * <p>First the unicode-ca-extension of given locale is queried. If not available then ISO-8601 will be
      * chosen. Otherwise, all available implementations of {@link CalendarProvider} will be queried if they
      * can deliver a suitable chronology. </p>
+     * 
+     * <p>The implementation also deploys the section &quot;calendarPreferenceData&quot; 
+     * in the CLDR-file &quot;supplementalData.xml&quot;. </p>
      *
      * @param   locale      the locale to be queried
      * @return  new bridge chronology for general calendar dates
