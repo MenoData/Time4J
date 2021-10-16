@@ -1,6 +1,12 @@
-## [v5.8.1] not yet released
+## [v5.9] not yet released
 ### Changed
+- Windows zones with better version info [#954]
+- Update to CLDR v39 [#945]
+- No leap second on 2021-12-31 [#951]
 - Updated Danish eras naming [#944]
+
+### Fixed
+-  Documentation link of Ethiopian calendar broken [#952]
 
 ## [v5.8] published on 2021-03-28
 ### Added
