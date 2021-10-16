@@ -212,7 +212,7 @@
                             </execution>
                         </executions>
                         <configuration>
-                            <executable>gpg2.exe</executable>
+                            <executable>gpg.exe</executable>
                         </configuration>
                     </plugin>
                 </plugins>
