@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSystem.java) is part of project Time4J.
  *
@@ -147,7 +147,7 @@ public enum NumberSystem {
      * @since   3.23/4.19
      */
     /*[deutsch]
-     * Die Bengalii-Ziffern (in Teilen von Indien verwendet).
+     * Die Bengali-Ziffern (in Teilen von Indien verwendet).
      *
      * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;beng&quot;. </p>
      *
@@ -823,13 +823,15 @@ public enum NumberSystem {
     public String toNumeral(int number) {
 
         if (this.isDecimal() && (number >= 0)) {
-            int delta = this.getDigits().charAt(0) - '0';
+            String digits = this.getDigits();
             String standard = Integer.toString(number);
             StringBuilder numeral = new StringBuilder();
+            
             for (int i = 0, n = standard.length(); i < n; i++) {
-                int codepoint = standard.charAt(i) + delta;
-                numeral.append((char) codepoint);
+                int digit = standard.charAt(i) - '0';
+                numeral.append(digits.charAt(digit));
             }
+            
             return numeral.toString();
         } else {
             throw new IllegalArgumentException("Cannot convert: " + number);
@@ -927,16 +929,31 @@ public enum NumberSystem {
     ) {
 
         if (this.isDecimal()) {
-            int delta = this.getDigits().charAt(0) - '0';
+            String digits = this.getDigits();
             StringBuilder standard = new StringBuilder();
+            
             for (int i = 0, n = numeral.length(); i < n; i++) {
-                int codepoint = numeral.charAt(i) - delta;
-                standard.append((char) codepoint);
+                char c = numeral.charAt(i);
+                boolean found = false;
+                for (int j = digits.length() - 1; j >= 0; j--) {
+                    if (digits.charAt(j) == c) {
+                        char digit = (char) (j + '0');
+                        standard.append(digit);
+                        found = true;
+                        break;
+                    }
+                }
+                if (!found) {
+                    throw new NumberFormatException("Invalid numeral: " + numeral);
+                }
             }
+            
             int result = Integer.parseInt(standard.toString());
+            
             if (result < 0) {
                 throw new NumberFormatException("Cannot convert negative number: " + numeral);
             }
+            
             return result;
         } else {
             throw new NumberFormatException("Cannot convert: " + numeral);
@@ -975,7 +992,9 @@ public enum NumberSystem {
     /**
      * <p>Defines all digit characters from the smallest to the largest one. </p>
      *
-     * <p>Note: If letters are used as digits then the upper case will be used. </p>
+     * <p>Note: If letters are used as digits then the upper case will be used. 
+     * Decimal systems always use 10 digits here from zero to nine in ascending
+     * order. </p>
      *
      * @return  String containing all valid digit characters in ascending order
      * @since   3.23/4.19
@@ -985,7 +1004,8 @@ public enum NumberSystem {
      * gr&ouml;&szlig;ten Ziffer. </p>
      *
      * <p>Hinweis: Wenn Buchstaben als Ziffern verwendet werden, dann wird
-     * die Gro&szlig;schreibung angewandt. </p>
+     * die Gro&szlig;schreibung angewandt. Dezimalsysteme verwenden hier immer
+     * genau 10 Ziffern von 0 bis 9 in aufsteigender Ordnung. </p>
      *
      * @return  String containing all valid digit characters in ascending order
      * @since   3.23/4.19
