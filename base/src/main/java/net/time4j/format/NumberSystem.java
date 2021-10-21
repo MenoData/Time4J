@@ -165,6 +165,48 @@ public enum NumberSystem {
     },
 
     /**
+     * The Chinese decimal system mainly used for years.
+     * 
+     * <p>Whole numbers will be read as digit by digit. When parsing, the special
+     * zero char &quot;〇&quot; will be handled like the default zero char &quot;零&quot;.
+     * However, the method {@code getDigits()} only contains the default zero char. </p>
+     *
+     * <p>Note: Must not be negative. 
+     * {@link #getCode() Code}: &quot;hanyear&quot; (no CLDR-equivalent). </p>
+     *
+     * @since   5.9
+     */
+    /*[deutsch]
+     * Das vorwiegend f&uuml;r Jahresangaben verwendete chinesische Dezimalsystem.
+     *
+     * <p>Ganze Zahlen werden Ziffer f&uuml;r Ziffer gelesen. Beim Interpretieren
+     * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
+     * Standard-Nullzeichen &quot;零&quot; behandelt. Die Methode {@code getDigits()}
+     * enth&auml;lt aber nur das Standard-Nullzeichen. </p>
+     *
+     * <p>Hinweis: Darf nicht negativ sein. 
+     * {@link #getCode() Code}: &quot;hanyear&quot; (kein CLDR-&Auml;quivalent). </p>
+     *
+     * @since   5.9
+     */
+    CHINESE_DECIMAL("hanyear") {
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            return super.toInteger(
+                numeral.replace(CHINESE_ZERO_ALT, CHINESE_ZERO_STD),
+                leniency);
+        }
+        @Override
+        public String getDigits() {
+            return "\u96F6\u4E00\u4E8C\u4E09\u56DB\u4E94\u516D\u4E03\u516B\u4E5D";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
      * The Devanagari digits used in parts of India.
      *
      * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;deva&quot;. </p>
@@ -786,6 +828,9 @@ public enum NumberSystem {
     private static final char ETHIOPIC_TEN          = 0x1372; // 10, 20, ..., 80, 90
     private static final char ETHIOPIC_HUNDRED      = 0x137B;
     private static final char ETHIOPIC_TEN_THOUSAND = 0x137C;
+    
+    private static final char CHINESE_ZERO_ALT = '\u3007';
+    private static final char CHINESE_ZERO_STD = '\u96F6';
 
     private static final int[] NUMBERS = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     private static final String[] LETTERS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};

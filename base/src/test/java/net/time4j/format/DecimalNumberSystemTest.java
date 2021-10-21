@@ -78,6 +78,34 @@ public class DecimalNumberSystemTest {
     }
 
     @Test
+    public void chineseDecimal() {
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.toNumeral(1234567890),
+            is("一二三四五六七八九零"));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.toInteger("一二三四五六七八九零"),
+            is(1234567890));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.toNumeral(2009),
+            is("二零零九"));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.toInteger("二零零九"),
+            is(2009));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.toInteger("二〇〇九"),
+            is(2009));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.isDecimal(),
+            is(true));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.getDigits().charAt(0),
+            is('零'));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.getCode(),
+            is("hanyear"));
+    }
+
+    @Test
     public void khmer() {
         assertThat(
             NumberSystem.KHMER.toNumeral(1234567890),
