@@ -169,7 +169,9 @@ public enum NumberSystem {
      * 
      * <p>Whole numbers will be read as digit by digit. When parsing, the special
      * zero char &quot;〇&quot; will be handled like the default zero char &quot;零&quot;.
-     * However, the method {@code getDigits()} only contains the default zero char. </p>
+     * However, the method {@code getDigits()} only contains the default zero char. Example:
+     * The output of {@code NumberSystem.CHINESE_DECIMAL.toInteger(&quot;二零零九&quot;)}
+     * will be {@code 2009}, the same with the input {@code 二〇〇九}. </p>
      *
      * <p>Note: Must not be negative. 
      * {@link #getCode() Code}: &quot;hanyear&quot; (no CLDR-equivalent). </p>
@@ -182,7 +184,9 @@ public enum NumberSystem {
      * <p>Ganze Zahlen werden Ziffer f&uuml;r Ziffer gelesen. Beim Interpretieren
      * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
      * Standard-Nullzeichen &quot;零&quot; behandelt. Die Methode {@code getDigits()}
-     * enth&auml;lt aber nur das Standard-Nullzeichen. </p>
+     * enth&auml;lt aber nur das Standard-Nullzeichen. Beispiel: Das Ergebnis von
+     * {@code NumberSystem.CHINESE_DECIMAL.toInteger(&quot;二零零九&quot;)} wird
+     * {@code 2009} sein, dito mit der Eingabe {@code 二〇〇九}. </p>
      *
      * <p>Hinweis: Darf nicht negativ sein. 
      * {@link #getCode() Code}: &quot;hanyear&quot; (kein CLDR-&Auml;quivalent). </p>
