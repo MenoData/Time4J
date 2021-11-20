@@ -102,7 +102,7 @@ public class DecimalNumberSystemTest {
             is('零'));
         assertThat(
             NumberSystem.CHINESE_DECIMAL.getCode(),
-            is("hanyear"));
+            is("hanidec"));
     }
 
     @Test

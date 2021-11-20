@@ -11,6 +11,7 @@ import org.junit.runners.Suite.SuiteClasses;
         DecimalNumberSystemTest.class,
         EthiopicNumberTest.class,
         JapaneseNumberTest.class,
+        MandarinNumberSystemTest.class,
         RomanNumberTestForModernUsage.class,
         RomanNumberTestForOtherFormats.class
     }

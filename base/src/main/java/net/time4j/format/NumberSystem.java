@@ -174,7 +174,7 @@ public enum NumberSystem {
      * will be {@code 2009}, the same with the input {@code 二〇〇九}. </p>
      *
      * <p>Note: Must not be negative. 
-     * {@link #getCode() Code}: &quot;hanyear&quot; (no CLDR-equivalent). </p>
+     * {@link #getCode() Code}: &quot;hanidec&quot;. </p>
      *
      * @since   5.9
      */
@@ -189,11 +189,11 @@ public enum NumberSystem {
      * {@code 2009} sein, dito mit der Eingabe {@code 二〇〇九}. </p>
      *
      * <p>Hinweis: Darf nicht negativ sein. 
-     * {@link #getCode() Code}: &quot;hanyear&quot; (kein CLDR-&Auml;quivalent). </p>
+     * {@link #getCode() Code}: &quot;hanidec&quot;. </p>
      *
      * @since   5.9
      */
-    CHINESE_DECIMAL("hanyear") {
+    CHINESE_DECIMAL("hanidec") {
         @Override
         public int toInteger(String numeral, Leniency leniency) {
             return super.toInteger(
@@ -207,6 +207,159 @@ public enum NumberSystem {
         @Override
         public boolean isDecimal() {
             return true;
+        }
+    },
+
+    /**
+     * The Chinese numbers in the Mandarin dialect limited to the range 0-9999.
+     * 
+     * <p>The sign &quot;兩&quot; will replace the sign &quot;二&quot; (=2) for
+     * all numbers 200 or greater. When parsing, the special zero char &quot;〇&quot;
+     * will be handled like the default zero char &quot;零&quot;. </p>
+     *
+     * <p>See also <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
+     * The {@link #getCode() code} is: &quot;hans&quot;. </p>
+     *
+     * @since   5.9
+     */
+    /*[deutsch]
+     * Die chinesischen Zahlen im Mandarin-Dialekt begrenzt auf den Bereich 0-9999.
+     *
+     * <p>Das Zeichen &quot;兩&quot; ersetzt das Zeichen &quot;二&quot; (=2)
+     * f&uuml;r alle Zahlen 200 oder gr&ouml;&szlig;er. Beim Interpretieren
+     * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
+     * Standard-Nullzeichen &quot;零&quot; behandelt. </p>
+     *
+     * <p>Siehe auch <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
+     * Der {@link #getCode() Code} lautet: &quot;hans&quot;. </p>
+     *
+     * @since   5.9
+     */
+    CHINESE_MANDARIN("hans") {
+        @Override
+        public String toNumeral(int number) {
+            if (number == 0) {
+                return "" + CHINESE_ZERO_STD;
+            } else if ((number < 1) || (number > 9999)) {
+                throw new IllegalArgumentException("Cannot convert: " + number);
+            }
+            String digits = CHINESE_DECIMAL.getDigits();
+            int qian = number / 1000;
+            int r = number % 1000;
+            int bai = r / 100;
+            r = r % 100;
+            int shi = r / 10;
+            int n = r % 10;
+            StringBuilder numeral = new StringBuilder();
+            if (qian >= 1) {
+                numeral.append((qian == 2) ? CHINESE_TWO_ALT : digits.charAt(qian));
+                numeral.append(CHINESE_THOUSAND);
+                if ((bai == 0) && ((shi > 0) || (n > 0))) {
+                    numeral.append(CHINESE_ZERO_STD);
+                }
+            }
+            if (bai >= 1) {
+                numeral.append((bai == 2) ? CHINESE_TWO_ALT : digits.charAt(bai));
+                numeral.append(CHINESE_HUNDRED);
+            }
+            if ((shi == 0) && !numeral.isEmpty() && (n > 0)) {
+                if (numeral.charAt(numeral.length() - 1) != CHINESE_ZERO_STD) {
+                    numeral.append(CHINESE_ZERO_STD); // don't repeat zero char
+                }
+            } else if ((shi == 1) && (bai == 0) && (qian == 0)) {
+                numeral.append(CHINESE_TEN);
+            } else if (shi >= 1) {
+                numeral.append(digits.charAt(shi));
+                numeral.append(CHINESE_TEN);
+            }
+            if (n > 0) {
+                numeral.append(digits.charAt(n));
+            }
+            return numeral.toString();
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            String num = 
+                numeral
+                    .replace(CHINESE_ZERO_ALT, CHINESE_ZERO_STD)
+                    .replace(CHINESE_TWO_ALT, CHINESE_TWO_STD);
+            if ((num.length() == 1) && (num.charAt(0) == CHINESE_ZERO_STD)) {
+                return 0;
+            }
+            int total = 0;
+            int shi = 0;
+            int bai = 0;
+            int qian = 0;
+            String digits = CHINESE_DECIMAL.getDigits();
+            for (int i = num.length() - 1; i >= 0; i--) {
+                char c = num.charAt(i);
+                switch (c) {
+                    case CHINESE_ZERO_STD:
+                        break;
+                    case CHINESE_TEN:
+                        if ((shi == 0) && (bai == 0) && (qian == 0)) {
+                            shi++;
+                        } else {
+                            throw new IllegalArgumentException("Invalid Chinese numeral: " + numeral);
+                        }
+                        break;
+                    case CHINESE_HUNDRED:
+                        if ((bai == 0) && (qian == 0)) {
+                            bai++;
+                        } else {
+                            throw new IllegalArgumentException("Invalid Chinese numeral: " + numeral);
+                        }
+                        break;
+                    case CHINESE_THOUSAND:
+                        if (qian == 0) {
+                            qian++;
+                        } else {
+                            throw new IllegalArgumentException("Invalid Chinese numeral: " + numeral);
+                        }
+                        break;
+                    default:
+                        boolean ok = false;
+                        for (int k = 1; k <= 9; k++) {
+                            if (digits.charAt(k) == c) {
+                                if (qian == 1) {
+                                    total += (k * 1000);
+                                    qian = -1;
+                                } else if (bai == 1) {
+                                    total += (k * 100);
+                                    bai = -1;
+                                } else if (shi == 1) {
+                                    total += (k * 10);
+                                    shi = -1;
+                                } else {
+                                    total += k;
+                                }
+                                ok = true;
+                                break;
+                            }
+                        }
+                        if (!ok) { // unknown digit
+                            throw new IllegalArgumentException("Invalid Chinese numeral: " + numeral);
+                        }
+                }
+            }
+            if (shi == 1) {
+                total += 10;
+            }
+            if (bai == 1) {
+                total += 100;
+            }
+            if (qian == 1) {
+                total += 1000;
+            }
+            return total;
+        }
+        @Override
+        public String getDigits() {
+            return "零〇一二兩三四五六七八九十百千";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
         }
     },
 
@@ -833,8 +986,13 @@ public enum NumberSystem {
     private static final char ETHIOPIC_HUNDRED      = 0x137B;
     private static final char ETHIOPIC_TEN_THOUSAND = 0x137C;
     
+    private static final char CHINESE_TWO_ALT = '\u5169';
+    private static final char CHINESE_TWO_STD = '\u4E8C';
     private static final char CHINESE_ZERO_ALT = '\u3007';
     private static final char CHINESE_ZERO_STD = '\u96F6';
+    private static final char CHINESE_TEN = '\u5341';
+    private static final char CHINESE_HUNDRED = '\u767E';
+    private static final char CHINESE_THOUSAND = '\u5343';
 
     private static final int[] NUMBERS = {1000, 900, 500, 400, 100, 90, 50, 40, 10, 9, 5, 4, 1};
     private static final String[] LETTERS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
