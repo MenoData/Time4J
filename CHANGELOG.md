@@ -1,4 +1,7 @@
 ## [v5.9] not yet released
+### Added
+-  Support for Chinese numerals [#955]
+
 ### Changed
 - Windows zones with better version info [#954]
 - Update to CLDR v39 [#945]
