@@ -96,7 +96,7 @@ public class DecimalNumberSystemTest {
             is(2009));
         assertThat(
             NumberSystem.CHINESE_DECIMAL.isDecimal(),
-            is(true));
+            is(false));
         assertThat(
             NumberSystem.CHINESE_DECIMAL.getDigits().charAt(0),
             is('零'));

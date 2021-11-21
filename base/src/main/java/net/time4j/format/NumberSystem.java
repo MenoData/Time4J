@@ -23,6 +23,7 @@ package net.time4j.format;
 
 import java.io.IOException;
 import java.util.Locale;
+import net.time4j.base.MathUtils;
 
 
 /**
@@ -169,13 +170,36 @@ public enum NumberSystem {
      * 
      * <p>Whole numbers will be read as digit by digit. When parsing, the special
      * zero char &quot;〇&quot; will be handled like the default zero char &quot;零&quot;.
-     * However, the method {@code getDigits()} only contains the default zero char. Example:
+     * The method {@code getDigits()} contains both zero char variants. Example:
      * The output of {@code NumberSystem.CHINESE_DECIMAL.toInteger(&quot;二零零九&quot;)}
      * will be {@code 2009}, the same with the input {@code 二〇〇九}. </p>
+     * 
+     * <p>Important note: Although this number system can be almost handled like
+     * other decimal systems, it is not such one. Its method {@code isDecimal()}
+     * will always yield the result {@code false}, because a) the codepoints
+     * of all digits are not mappable to the range 0-9 and b) an alternative
+     * zero character exists. </p>
+     * 
+     * <p>Example of usage: </p>
+     * 
+     * <pre>
+     *  ChronoFormatter&lt;PlainDate&gt; f = 
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.CHINA)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_DECIMAL)
+                .addPattern(&quot;yyyy年M月&quot;, PatternType.CLDR)
+                .endSection()
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_MANDARIN)
+                .addPattern(&quot;d日&quot;, PatternType.CLDR)
+                .endSection()
+                .build();
+        PlainDate date = f.parse(&quot;二零零九年零一月十三日&quot;); 
+        System.out.println(date); // 2009-01-13
+     * </pre>
      *
      * <p>Note: Must not be negative. 
      * {@link #getCode() Code}: &quot;hanidec&quot;. </p>
      *
+     * @see     #CHINESE_MANDARIN
      * @since   5.9
      */
     /*[deutsch]
@@ -184,29 +208,89 @@ public enum NumberSystem {
      * <p>Ganze Zahlen werden Ziffer f&uuml;r Ziffer gelesen. Beim Interpretieren
      * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
      * Standard-Nullzeichen &quot;零&quot; behandelt. Die Methode {@code getDigits()}
-     * enth&auml;lt aber nur das Standard-Nullzeichen. Beispiel: Das Ergebnis von
+     * enth&auml;lt beide Nullzeichen. Beispiel: Das Ergebnis von
      * {@code NumberSystem.CHINESE_DECIMAL.toInteger(&quot;二零零九&quot;)} wird
      * {@code 2009} sein, dito mit der Eingabe {@code 二〇〇九}. </p>
+     *
+     * <p>Wichtiger Hinweis: Obwohl sich dieses Zahlsystem fast wie ein
+     * Dezimalsystem anf&uuml;hlt, ist es nicht wirklich eins. Seine Methode
+     * {@code isDecimal()} wird immer {@code false} liefern, weil erstens die
+     * Unicode-Codepoints aller Ziffern sich nicht auf den Bereich 0-9
+     * abbilden lassen und zweitens ein alternatives Nullzeichen existiert. </p>
+     *
+     * <p>Anwendungsbeispiel: </p>
+     * 
+     * <pre>
+     *  ChronoFormatter&lt;PlainDate&gt; f = 
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.CHINA)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_DECIMAL)
+                .addPattern(&quot;yyyy年M月&quot;, PatternType.CLDR)
+                .endSection()
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_MANDARIN)
+                .addPattern(&quot;d日&quot;, PatternType.CLDR)
+                .endSection()
+                .build();
+        PlainDate date = f.parse(&quot;二零零九年零一月十三日&quot;); 
+        System.out.println(date); // 2009-01-13
+     * </pre>
      *
      * <p>Hinweis: Darf nicht negativ sein. 
      * {@link #getCode() Code}: &quot;hanidec&quot;. </p>
      *
+     * @see     #CHINESE_MANDARIN
      * @since   5.9
      */
     CHINESE_DECIMAL("hanidec") {
         @Override
+        public String toNumeral(int number) {
+            String digits = this.getDigits();
+            String standard = Integer.toString(number);
+            StringBuilder numeral = new StringBuilder();
+            
+            for (int i = 0, n = standard.length(); i < n; i++) {
+                int digit = standard.charAt(i) - '0';
+                int index = ((digit == 0) ? 0 : digit + 1);
+                numeral.append(digits.charAt(index));
+            }
+            
+            return numeral.toString();
+        }
+        @Override
         public int toInteger(String numeral, Leniency leniency) {
-            return super.toInteger(
-                numeral.replace(CHINESE_ZERO_ALT, CHINESE_ZERO_STD),
-                leniency);
+            String digits = this.getDigits();
+            int factor = 1;
+            long total = 0L;
+            
+            for (int i = numeral.length() - 1; i >= 0; i--) {
+                char c = numeral.charAt(i);
+                if ((c == CHINESE_ZERO_STD) || (c == CHINESE_ZERO_ALT)) {
+                    factor *= 10;
+                    continue;
+                }
+                boolean found = false;
+                for (int j = digits.length() - 1; j >= 2; j--) {
+                    if (digits.charAt(j) == c) {
+                        total += ((j - 1) * factor);
+                        found = true;
+                        break;
+                    }
+                }
+                if (found) {
+                    factor *= 10;
+                } else {
+                    throw new NumberFormatException("Invalid numeral: " + numeral);
+                }
+            }
+            
+            return MathUtils.safeCast(total);
         }
         @Override
         public String getDigits() {
-            return "\u96F6\u4E00\u4E8C\u4E09\u56DB\u4E94\u516D\u4E03\u516B\u4E5D";
+            return "\u96F6\u3007\u4E00\u4E8C\u4E09\u56DB\u4E94\u516D\u4E03\u516B\u4E5D";
         }
         @Override
         public boolean isDecimal() {
-            return true;
+            return false;
         }
     },
 
@@ -220,6 +304,7 @@ public enum NumberSystem {
      * <p>See also <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
      * The {@link #getCode() code} is: &quot;hans&quot;. </p>
      *
+     * @see     #CHINESE_DECIMAL
      * @since   5.9
      */
     /*[deutsch]
@@ -233,6 +318,7 @@ public enum NumberSystem {
      * <p>Siehe auch <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
      * Der {@link #getCode() Code} lautet: &quot;hans&quot;. </p>
      *
+     * @see     #CHINESE_DECIMAL
      * @since   5.9
      */
     CHINESE_MANDARIN("hans") {
@@ -252,14 +338,14 @@ public enum NumberSystem {
             int n = r % 10;
             StringBuilder numeral = new StringBuilder();
             if (qian >= 1) {
-                numeral.append((qian == 2) ? CHINESE_TWO_ALT : digits.charAt(qian));
+                numeral.append((qian == 2) ? CHINESE_TWO_ALT : digits.charAt(qian + 1));
                 numeral.append(CHINESE_THOUSAND);
                 if ((bai == 0) && ((shi > 0) || (n > 0))) {
                     numeral.append(CHINESE_ZERO_STD);
                 }
             }
             if (bai >= 1) {
-                numeral.append((bai == 2) ? CHINESE_TWO_ALT : digits.charAt(bai));
+                numeral.append((bai == 2) ? CHINESE_TWO_ALT : digits.charAt(bai + 1));
                 numeral.append(CHINESE_HUNDRED);
             }
             if ((shi == 0) && !numeral.isEmpty() && (n > 0)) {
@@ -269,11 +355,11 @@ public enum NumberSystem {
             } else if ((shi == 1) && (bai == 0) && (qian == 0)) {
                 numeral.append(CHINESE_TEN);
             } else if (shi >= 1) {
-                numeral.append(digits.charAt(shi));
+                numeral.append(digits.charAt(shi + 1));
                 numeral.append(CHINESE_TEN);
             }
             if (n > 0) {
-                numeral.append(digits.charAt(n));
+                numeral.append(digits.charAt(n + 1));
             }
             return numeral.toString();
         }
@@ -320,7 +406,7 @@ public enum NumberSystem {
                     default:
                         boolean ok = false;
                         for (int k = 1; k <= 9; k++) {
-                            if (digits.charAt(k) == c) {
+                            if (digits.charAt(k + 1) == c) {
                                 if (qian == 1) {
                                     total += (k * 1000);
                                     qian = -1;
@@ -1224,14 +1310,21 @@ public enum NumberSystem {
     }
 
     /**
-     * <p>Does this number system describe a decimal system where the digits can be mapped to the range 0-9? </p>
+     * <p>Does this number system describe a decimal system where the digits 
+     * and associated code points can be mapped to the range 0-9? </p>
+     * 
+     * <p>There must be exactly 10 digit characters whose code points are 
+     * in same numerical order from 0 to 9, each with step width 1. </p>
      *
      * @return  boolean
      * @since   3.23/4.19
      */
     /*[deutsch]
-     * <p>Beschreibt dieses Zahlensystem ein Dezimalsystem, dessen Ziffern sich auf den Bereich 0-9 abbilden
-     * lassen? </p>
+     * <p>Beschreibt dieses Zahlensystem ein Dezimalsystem, dessen Ziffern und 
+     * Codepoints sich auf den Bereich 0-9 abbilden lassen? </p>
+     *
+     * <p>Es m&uuml;ssen genau 10 Zahlzeichen vorhanden sein, deren Unicode-
+     * Codepoints mit der Schrittweite von 1 aufsteigend sortiert sind. </p>
      *
      * @return  boolean
      * @since   3.23/4.19

@@ -1,5 +1,10 @@
 package net.time4j.format;
 
+import java.text.ParseException;
+import java.util.Locale;
+import net.time4j.PlainDate;
+import net.time4j.format.expert.ChronoFormatter;
+import net.time4j.format.expert.PatternType;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.junit.runners.JUnit4;
@@ -139,7 +144,7 @@ public class MandarinNumberSystemTest {
     public void mandarin_1_9() {
         for (int i = 1; i <= 9; i++) {
             String numeral =
-                "" + NumberSystem.CHINESE_DECIMAL.getDigits().charAt(i);
+                "" + NumberSystem.CHINESE_DECIMAL.getDigits().charAt(i + 1);
             assertThat(
                 NumberSystem.CHINESE_MANDARIN.toNumeral(i),
                 is(numeral));
@@ -165,6 +170,21 @@ public class MandarinNumberSystemTest {
     @Test(expected=IllegalArgumentException.class)
     public void negativeIntegerToNumber() {
         NumberSystem.CHINESE_MANDARIN.toNumeral(-123);
+    }
+
+    @Test
+    public void chineseNumerals() throws ParseException {
+        ChronoFormatter<PlainDate> f = 
+            ChronoFormatter.setUp(PlainDate.axis(), Locale.CHINA)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_DECIMAL)
+                .addPattern("yyyy年M月", PatternType.CLDR)
+                .endSection()
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_MANDARIN)
+                .addPattern("d日", PatternType.CLDR)
+                .endSection()
+                .build();
+        PlainDate date = f.parse("二零零九年零一月十三日"); 
+        System.out.println(date); // 2009-01-13
     }
 
 }
