@@ -1,12 +1,16 @@
 ## [v5.9] not yet released
 ### Added
--  Support for Chinese numerals [#955]
+- Enable PrettyTime with non-decimal numerals [#958] 
+- Support for Chinese numerals [#955]
 
 ### Changed
 - Windows zones with better version info [#954]
 - Update to CLDR v39 [#945]
 - No leap second on 2021-12-31 [#951]
 - Updated naming of Danish eras [#944]
+
+### Deprecated
+-  PrettyTime.withZeroDigit(NumberSystem) [#958]
 
 ### Fixed
 - Documentation link of Ethiopian calendar broken [#952]
