@@ -282,6 +282,17 @@ public class PrettyTimeTest {
     }
 
     @Test
+    public void withRomanNumerals() {
+        Duration<?> duration =
+            Duration.ofCalendarUnits(15, 3, 2);
+        assertThat(
+            PrettyTime.of(Locale.ENGLISH)
+                .withNumerals(NumberSystem.ROMAN)
+                .print(duration, TextWidth.WIDE),
+            is("XV years, III months, and II days"));
+    }
+
+    @Test
     public void print0DaysEnglish() {
         assertThat(
             PrettyTime.of(Locale.ENGLISH).print(0, DAYS, TextWidth.WIDE),
@@ -629,7 +640,7 @@ public class PrettyTimeTest {
     public void print3MonthsArabicU0660() {
         assertThat(
             PrettyTime.of(new Locale("ar", "DZ"))
-                .withZeroDigit(NumberSystem.ARABIC_INDIC)
+                .withNumerals(NumberSystem.ARABIC_INDIC)
                 .print(3, MONTHS, TextWidth.SHORT),
             is('\u0663' + " " + UPATTERN_AR_MS3));
     }

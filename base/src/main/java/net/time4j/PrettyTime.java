@@ -132,6 +132,7 @@ public final class PrettyTime {
     private final PluralRules rules;
     private final Locale locale;
     private final TimeSource<?> refClock;
+    private final NumberSystem numsys;
     private final char zeroDigit;
     private final String minusSign;
     private final IsoUnit emptyUnit;
@@ -145,6 +146,7 @@ public final class PrettyTime {
     private PrettyTime(
         Locale loc,
         TimeSource<?> refClock,
+        NumberSystem numsys,
         char zeroDigit,
         String minusSign,
         IsoUnit emptyUnit,
@@ -163,8 +165,10 @@ public final class PrettyTime {
 
         // throws NPE if language == null
         this.rules = PluralRules.of(loc, NumberType.CARDINALS);
+        
         this.locale = loc;
         this.refClock = refClock;
+        this.numsys = numsys; // maybe null
         this.zeroDigit = zeroDigit;
         this.emptyUnit = emptyUnit;
         this.minusSign = minusSign;
@@ -172,7 +176,6 @@ public final class PrettyTime {
         this.shortStyle = shortStyle;
         this.stdListSeparator = stdListSeparator;
         this.endListSeparator = endListSeparator;
-
     }
 
     //~ Methoden ----------------------------------------------------------
@@ -194,7 +197,6 @@ public final class PrettyTime {
      * @since   1.2
      */
     public static PrettyTime of(Locale locale) {
-
         PrettyTime ptime = LANGUAGE_MAP.get(locale);
 
         if (ptime == null) {
@@ -202,6 +204,7 @@ public final class PrettyTime {
                 new PrettyTime(
                     locale,
                     SystemClock.INSTANCE,
+                    NUMBER_SYMBOLS.getDefaultNumberSystem(locale),
                     NUMBER_SYMBOLS.getZeroDigit(locale),
                     NUMBER_SYMBOLS.getMinusSign(locale),
                     SECONDS,
@@ -217,7 +220,6 @@ public final class PrettyTime {
         }
 
         return ptime;
-
     }
 
     /**
@@ -233,9 +235,7 @@ public final class PrettyTime {
      * @since   1.2
      */
     public Locale getLocale() {
-
         return this.locale;
-
     }
 
     /**
@@ -258,9 +258,7 @@ public final class PrettyTime {
      * @see     #printRelative(UnixTime, String)
      */
     public TimeSource<?> getReferenceClock() {
-
         return this.refClock;
-
     }
 
     /**
@@ -285,10 +283,10 @@ public final class PrettyTime {
      * @see     #printRelative(UnixTime, String)
      */
     public PrettyTime withReferenceClock(TimeSource<?> clock) {
-
         return new PrettyTime(
             this.locale,
             clock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
@@ -296,7 +294,41 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             this.endListSeparator);
+    }
 
+    /**
+     * <p>Defines the given number system for representing amounts. </p>
+     * 
+     * <p>If decimal then the zero digit will also be adjusted appropriately. </p>
+     *
+     * @param   numsys      number system
+     * @return  changed copy of this instance
+     * @see     #withZeroDigit(char)
+     * @since   5.9
+     */
+    /*[deutsch]
+     * <p>Definiert das Zahlsystem zur Darstellung von Betr&auml;gen. </p>
+     *
+     * <p>Wenn dezimal, dann wird passend auch die Nullziffer festgelegt. </p>
+     *
+     * @param   numsys      number system
+     * @return  changed copy of this instance
+     * @see     #withZeroDigit(char)
+     * @since   5.9
+     */
+    public PrettyTime withNumerals(NumberSystem numsys) {
+        return
+            new PrettyTime(
+                this.locale,
+                this.refClock,
+                numsys,
+                numsys.isDecimal() ? numsys.getDigits().charAt(0) : this.zeroDigit,
+                this.minusSign,
+                this.emptyUnit,
+                this.weekToDays,
+                this.shortStyle,
+                this.stdListSeparator,
+                this.endListSeparator);
     }
 
     /**
@@ -307,6 +339,7 @@ public final class PrettyTime {
      * @throws  IllegalArgumentException if the number system is not decimal
      * @see     #withZeroDigit(char)
      * @since   3.24/4.20
+     * @deprecated Use either {@link #withZeroDigit(char)} or {@link #withNumerals(NumberSystem)}
      */
     /*[deutsch]
      * <p>Definiert die lokalisierte Nullziffer, indem das angegebene Dezimalzahlsystem ausgewertet wird. </p>
@@ -316,15 +349,15 @@ public final class PrettyTime {
      * @throws  IllegalArgumentException if the number system is not decimal
      * @see     #withZeroDigit(char)
      * @since   3.24/4.20
+     * @deprecated Use either {@link #withZeroDigit(char)} or {@link #withNumerals(NumberSystem)}
      */
+    @Deprecated
     public PrettyTime withZeroDigit(NumberSystem numberSystem) {
-
         if (numberSystem.isDecimal()) {
             return this.withZeroDigit(numberSystem.getDigits().charAt(0));
         } else {
             throw new IllegalArgumentException("Number system is not decimal: " + numberSystem);
         }
-
     }
 
     /**
@@ -335,6 +368,9 @@ public final class PrettyTime {
      * {@code U+0660}. By default Time4J will try to use the configuration
      * of the module i18n or else the JDK-setting. This method can override
      * it however. </p>
+     * 
+     * <p>Note: This method can only produce sensible results if all digits
+     * 0-9 can be mapped to code points starting with given zero digit char. </p>
      *
      * @param   zeroDigit   localized zero digit
      * @return  changed copy of this instance
@@ -351,6 +387,10 @@ public final class PrettyTime {
      * i18n-Moduls oder sonst die JDK-Einstellung zu verwenden. Diese
      * Methode &uuml;berschreibt jedoch den Standard. </p>
      *
+     * <p>Hinweis: Diese Methode ist nur dann sinnvoll, wenn sich alle Ziffern
+     * 0-9 auf <i>code points</p> beginnend mit dem angegebenen Nullzeichen
+     * abbilden lassen. </p>
+     *
      * @param   zeroDigit   localized zero digit
      * @return  changed copy of this instance
      * @since   1.2
@@ -358,7 +398,6 @@ public final class PrettyTime {
      * @see     net.time4j.format.NumberSymbolProvider#getZeroDigit(Locale)
      */
     public PrettyTime withZeroDigit(char zeroDigit) {
-
         if (this.zeroDigit == zeroDigit) {
             return this;
         }
@@ -366,6 +405,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            null, // now we have an undefined number system
             zeroDigit,
             this.minusSign,
             this.emptyUnit,
@@ -373,7 +413,6 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             this.endListSeparator);
-
     }
 
     /**
@@ -412,7 +451,6 @@ public final class PrettyTime {
      * @see     net.time4j.format.NumberSymbolProvider#getMinusSign(Locale)
      */
     public PrettyTime withMinusSign(String minusSign) {
-
         if (minusSign.equals(this.minusSign)) { // NPE-check
             return this;
         }
@@ -420,6 +458,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             minusSign,
             this.emptyUnit,
@@ -427,7 +466,6 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             this.endListSeparator);
-
     }
 
     /**
@@ -454,7 +492,6 @@ public final class PrettyTime {
      * @see     #print(Duration, TextWidth)
      */
     public PrettyTime withEmptyUnit(CalendarUnit emptyUnit) {
-
         if (this.emptyUnit.equals(emptyUnit)) {
             return this;
         }
@@ -462,6 +499,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             emptyUnit,
@@ -469,7 +507,6 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             this.endListSeparator);
-
     }
 
     /**
@@ -496,7 +533,6 @@ public final class PrettyTime {
      * @see     #print(Duration, TextWidth)
      */
     public PrettyTime withEmptyUnit(ClockUnit emptyUnit) {
-
         if (this.emptyUnit.equals(emptyUnit)) {
             return this;
         }
@@ -504,6 +540,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             emptyUnit,
@@ -511,7 +548,6 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             this.endListSeparator);
-
     }
 
     /**
@@ -527,7 +563,6 @@ public final class PrettyTime {
      * @since   2.0
      */
     public PrettyTime withWeeksToDays() {
-
         if (this.weekToDays) {
             return this;
         }
@@ -535,6 +570,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
@@ -542,7 +578,6 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             this.endListSeparator);
-
     }
 
     /**
@@ -565,7 +600,6 @@ public final class PrettyTime {
      * @since   3.6/4.4
      */
     public PrettyTime withShortStyle() {
-
         if (this.shortStyle) {
             return this;
         }
@@ -573,6 +607,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
@@ -580,7 +615,6 @@ public final class PrettyTime {
             true,
             this.stdListSeparator,
             this.endListSeparator);
-
     }
 
     /**
@@ -624,7 +658,6 @@ public final class PrettyTime {
      * @since   5.2
      */
     public PrettyTime withDefaultListSeparator(String separator) {
-
         if (separator.equals(this.stdListSeparator)) { // includes NPE-check
             return this;
         }
@@ -632,6 +665,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
@@ -639,7 +673,6 @@ public final class PrettyTime {
             this.shortStyle,
             separator,
             this.endListSeparator);
-
     }
 
     /**
@@ -665,7 +698,6 @@ public final class PrettyTime {
      * @since   5.2
      */
     public PrettyTime withLastListSeparator(String separator) {
-
         if (separator.equals(this.endListSeparator)) { // includes NPE-check
             return this;
         }
@@ -673,6 +705,7 @@ public final class PrettyTime {
         return new PrettyTime(
             this.locale,
             this.refClock,
+            this.numsys,
             this.zeroDigit,
             this.minusSign,
             this.emptyUnit,
@@ -680,7 +713,6 @@ public final class PrettyTime {
             this.shortStyle,
             this.stdListSeparator,
             separator);
-
     }
 
     /**
@@ -696,9 +728,7 @@ public final class PrettyTime {
      * @since   3.43/4.38
      */
     public String printYesterday() {
-
         return UnitPatterns.of(this.getLocale()).getYesterdayWord();
-
     }
 
     /**
@@ -714,9 +744,7 @@ public final class PrettyTime {
      * @since   3.24/4.20
      */
     public String printToday() {
-
         return UnitPatterns.of(this.getLocale()).getTodayWord();
-
     }
 
     /**
@@ -732,9 +760,7 @@ public final class PrettyTime {
      * @since   3.43/4.38
      */
     public String printTomorrow() {
-
         return UnitPatterns.of(this.getLocale()).getTomorrowWord();
-
     }
 
     /**
@@ -752,9 +778,7 @@ public final class PrettyTime {
      * @since   5.1
      */
     public String printLast(Weekday weekday) {
-
         return UnitPatterns.of(this.getLocale()).labelForLast(weekday);
-
     }
 
     /**
@@ -772,9 +796,7 @@ public final class PrettyTime {
      * @since   5.1
      */
     public String printNext(Weekday weekday) {
-
         return UnitPatterns.of(this.getLocale()).labelForNext(weekday);
-
     }
 
     /**
@@ -809,7 +831,6 @@ public final class PrettyTime {
         CalendarUnit unit,
         TextWidth width
     ) {
-
         UnitPatterns p = UnitPatterns.of(this.locale);
         CalendarUnit u;
 
@@ -853,7 +874,6 @@ public final class PrettyTime {
 
         String pattern = p.getPattern(width, this.getCategory(amount), u);
         return this.format(pattern, amount);
-
     }
 
     /**
@@ -881,10 +901,8 @@ public final class PrettyTime {
         ClockUnit unit,
         TextWidth width
     ) {
-
         String pattern = UnitPatterns.of(this.locale).getPattern(width, this.getCategory(amount), unit);
         return this.format(pattern, amount);
-
     }
 
     /**
@@ -921,10 +939,8 @@ public final class PrettyTime {
      * @since   3.6/4.4
      */
     public String print(Duration<?> duration) {
-
         TextWidth width = (this.shortStyle ? TextWidth.ABBREVIATED : TextWidth.WIDE);
         return this.print(duration, width, false, Integer.MAX_VALUE);
-
     }
 
     /**
@@ -946,9 +962,7 @@ public final class PrettyTime {
      * @see     #print(Duration)
      */
     public String print(TemporalAmount threeten) {
-
         return this.print(Duration.from(threeten));
-
     }
 
     /**
@@ -985,9 +999,7 @@ public final class PrettyTime {
         Duration<?> duration,
         TextWidth width
     ) {
-
         return this.print(duration, width, false, Integer.MAX_VALUE);
-
     }
 
     /**
@@ -1014,9 +1026,7 @@ public final class PrettyTime {
         TemporalAmount threeten,
         TextWidth width
     ) {
-
         return this.print(Duration.from(threeten), width);
-
     }
 
     /**
@@ -1075,7 +1085,6 @@ public final class PrettyTime {
         boolean printZero,
         int maxLength
     ) {
-
         if (maxLength < 1) {
             throw new IllegalArgumentException(
                 "Max length is invalid: " + maxLength);
@@ -1150,7 +1159,6 @@ public final class PrettyTime {
         return MessageFormat.format(
             listPattern,
             parts.toArray(new Object[count]));
-
     }
 
     /**
@@ -1183,9 +1191,7 @@ public final class PrettyTime {
         boolean printZero,
         int maxLength
     ) {
-
         return this.print(Duration.from(threeten), width, printZero, maxLength);
-
     }
 
     /**
@@ -1209,9 +1215,7 @@ public final class PrettyTime {
      * @since   3.4/4.3
      */
     public String printRelativeInStdTimezone(UnixTime moment) {
-
         return this.printRelative(moment, Timezone.ofSystem(), TimeUnit.SECONDS);
-
     }
 
     /**
@@ -1262,9 +1266,7 @@ public final class PrettyTime {
         UnixTime moment,
         TZID tzid
     ) {
-
         return this.printRelative(moment, Timezone.of(tzid), TimeUnit.SECONDS);
-
     }
 
     /**
@@ -1293,9 +1295,7 @@ public final class PrettyTime {
         UnixTime moment,
         String tzid
     ) {
-
         return this.printRelative(moment, Timezone.of(tzid), TimeUnit.SECONDS);
-
     }
 
     /**
@@ -1319,9 +1319,7 @@ public final class PrettyTime {
      * @since   4.8
      */
     public String printRelative(ZonedDateTime zdt) {
-
         return this.printRelative(zdt.toInstant(), zdt.getZone());
-
     }
 
     /**
@@ -1350,9 +1348,7 @@ public final class PrettyTime {
         Instant instant,
         ZoneId zoneId
     ) {
-
         return this.printRelative(Moment.from(instant), Timezone.of(zoneId.getId()), TimeUnit.SECONDS);
-
     }
 
     /**
@@ -1407,7 +1403,6 @@ public final class PrettyTime {
         Timezone tz,
         TimeUnit precision
     ) {
-
         UnixTime ref = this.getReferenceClock().currentTime();
         Moment t1 = Moment.from(ref);
         Moment t2 = Moment.from(moment);
@@ -1421,7 +1416,6 @@ public final class PrettyTime {
         }
 
         return this.printRelativeTime(t1, t2, tz, precision, null, null);
-
     }
 
     /**
@@ -1462,7 +1456,6 @@ public final class PrettyTime {
         long maxdelta,
         TemporalFormatter<Moment> formatter
     ) {
-
         UnixTime ref = this.getReferenceClock().currentTime();
         Moment t1 = Moment.from(ref);
         Moment t2 = Moment.from(moment);
@@ -1478,7 +1471,6 @@ public final class PrettyTime {
         }
 
         return this.printRelativeTime(t1, t2, tz, precision, null, null);
-
     }
 
     /**
@@ -1513,7 +1505,6 @@ public final class PrettyTime {
         CalendarUnit maxRelativeUnit,
         TemporalFormatter<Moment> formatter
     ) {
-
         if (maxRelativeUnit == null) {
             throw new NullPointerException("Missing max relative unit.");
         }
@@ -1531,7 +1522,6 @@ public final class PrettyTime {
         }
 
         return this.printRelativeTime(t1, t2, tz, precision, maxRelativeUnit, formatter);
-
     }
 
     /**
@@ -1562,7 +1552,6 @@ public final class PrettyTime {
         CalendarUnit maxRelativeUnit,
         TemporalFormatter<PlainDate> formatter
     ) {
-
         if (maxRelativeUnit == null) {
             throw new NullPointerException("Missing max relative unit.");
         }
@@ -1601,7 +1590,6 @@ public final class PrettyTime {
             ? this.getPastPattern(amount, unit)
             : this.getFuturePattern(amount, unit));
         return this.format(pattern, amount);
-
     }
 
     private String printRelativeSeconds(
@@ -1609,7 +1597,6 @@ public final class PrettyTime {
         Moment t2,
         long delta
     ) {
-
         if (t1.getPosixTime() >= START_1972 && t2.getPosixTime() >= START_1972) {
             delta = SI.SECONDS.between(t1, t2); // leap second correction
         }
@@ -1622,7 +1609,6 @@ public final class PrettyTime {
             ? this.getPastPattern(amount, ClockUnit.SECONDS)
             : this.getFuturePattern(amount, ClockUnit.SECONDS));
         return this.format(pattern, amount);
-
     }
 
     private String printRelativeTime(
@@ -1633,7 +1619,6 @@ public final class PrettyTime {
         CalendarUnit maxRelativeUnit,
         TemporalFormatter<Moment> formatter
     ) {
-
         PlainTimestamp start =
             PlainTimestamp.from(
                 ref,
@@ -1692,7 +1677,6 @@ public final class PrettyTime {
         }
 
         return this.format(pattern, amount);
-
     }
 
     private String getRelativeReplacement(
@@ -1700,7 +1684,6 @@ public final class PrettyTime {
         boolean negative,
         long amount
     ) {
-
         if ((amount >= 1L) && (amount <= 7L)) {
             UnitPatterns patterns = UnitPatterns.of(this.locale);
 
@@ -1713,11 +1696,9 @@ public final class PrettyTime {
         }
 
         return "";
-
     }
 
     private String getEmptyRelativeString(TimeUnit precision) {
-
         UnitPatterns patterns = UnitPatterns.of(this.locale);
 
         if (precision.equals(TimeUnit.DAYS)) {
@@ -1729,57 +1710,46 @@ public final class PrettyTime {
         }
 
         return patterns.getNowWord();
-
     }
 
     private String getPastPattern(
         long amount,
         CalendarUnit unit
     ) {
-
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
         return patterns.getPatternInPast(category, this.shortStyle, unit);
-
     }
 
     private String getFuturePattern(
         long amount,
         CalendarUnit unit
     ) {
-
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
         return patterns.getPatternInFuture(category, this.shortStyle, unit);
-
     }
 
     private String getPastPattern(
         long amount,
         ClockUnit unit
     ) {
-
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
         return patterns.getPatternInPast(category, this.shortStyle, unit);
-
     }
 
     private String getFuturePattern(
         long amount,
         ClockUnit unit
     ) {
-
         UnitPatterns patterns = UnitPatterns.of(this.locale);
         PluralCategory category = this.getCategory(amount);
         return patterns.getPatternInFuture(category, this.shortStyle, unit);
-
     }
 
     private PluralCategory getCategory(long amount) {
-
         return this.rules.getCategory(Math.abs(amount));
-
     }
 
     private static void pushDuration(
@@ -1788,7 +1758,6 @@ public final class PrettyTime {
         TimeSource<?> refClock,
         boolean weekToDays
     ) {
-
         int len = duration.getTotalLength().size();
 
         for (int i = 0; i < len; i++) {
@@ -1818,7 +1787,6 @@ public final class PrettyTime {
                 pushDuration(values, part, refClock, weekToDays);
             }
         }
-
     }
 
     private static void push(
@@ -1827,7 +1795,6 @@ public final class PrettyTime {
         long amount,
         boolean weekToDays
     ) {
-
         int index;
 
         switch (unit) {
@@ -1869,7 +1836,6 @@ public final class PrettyTime {
         }
 
         values[index] = MathUtils.safeAdd(amount, values[index]);
-
     }
 
     private static void push(
@@ -1877,7 +1843,6 @@ public final class PrettyTime {
         ClockUnit unit,
         long amount
     ) {
-
         int index;
 
         switch (unit) {
@@ -1906,7 +1871,6 @@ public final class PrettyTime {
         }
 
         values[index] = MathUtils.safeAdd(amount, values[index]);
-
     }
 
     private String format(
@@ -1915,7 +1879,6 @@ public final class PrettyTime {
         boolean negative,
         TextWidth width
     ) {
-
         long value = amount;
 
         if (negative) {
@@ -1942,14 +1905,12 @@ public final class PrettyTime {
         }
 
         throw new UnsupportedOperationException("Unknown unit: " + unit);
-
     }
 
     private String format(
         String pattern,
         long amount
     ) {
-
         for (int i = 0, n = pattern.length(); i < n; i++) {
             if (
                 (i < n - 2)
@@ -1968,29 +1929,31 @@ public final class PrettyTime {
         }
 
         return pattern;
-
     }
 
     private String format(long amount) {
-
-        String num = String.valueOf(Math.abs(amount));
-        char zero = this.zeroDigit;
         StringBuilder sb = new StringBuilder();
 
         if (amount < 0) {
             sb.append(this.minusSign);
         }
 
-        for (int i = 0, n = num.length(); i < n; i++) {
-            char c = num.charAt(i);
-            if (zero != '0') {
-                c = (char) (c + zero - '0');
+        if ((this.numsys == null) || this.numsys.hasDecimalCodepoints()) {
+            String num = String.valueOf(Math.abs(amount));
+            char zero = this.zeroDigit;
+            
+            for (int i = 0, n = num.length(); i < n; i++) {
+                char c = num.charAt(i);
+                if (zero != '0') {
+                    c = (char) (c + zero - '0');
+                }
+                sb.append(c);
             }
-            sb.append(c);
+        } else {
+            sb.append(this.numsys.toNumeral(Math.toIntExact(amount)));
         }
 
         return sb.toString();
-
     }
 
 }
