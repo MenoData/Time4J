@@ -1950,7 +1950,7 @@ public final class PrettyTime {
                 sb.append(c);
             }
         } else {
-            sb.append(this.numsys.toNumeral(Math.toIntExact(amount)));
+            sb.append(this.numsys.toNumeral(Math.toIntExact(Math.abs(amount))));
         }
 
         return sb.toString();
