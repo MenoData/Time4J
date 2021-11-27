@@ -2534,11 +2534,9 @@ public final class JapaneseCalendar
                 attributes.contains(Attributes.ZERO_DIGIT)
                     ? attributes.get(Attributes.ZERO_DIGIT).charValue()
                     : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
-            Leniency leniency =
-                (numsys.isDecimal() ? Leniency.SMART : attributes.get(Attributes.LENIENCY, Leniency.SMART));
             int value = 0;
 
-            if (numsys.isDecimal()) {
+            if (numsys.hasDecimalCodepoints()) {
                 for (int i = pos, n = Math.min(pos + 9, text.length()); i < n; i++) {
                     int digit = text.charAt(i) - zeroChar;
                     if ((digit >= 0) && (digit <= 9)) {
@@ -2560,7 +2558,10 @@ public final class JapaneseCalendar
                 }
 
                 if (len > 0) {
-                    value = numsys.toInteger(text.subSequence(pos, pos + len).toString(), leniency);
+                    value = 
+                        numsys.toInteger(
+                            text.subSequence(pos, pos + len).toString(), 
+                            attributes.get(Attributes.LENIENCY, Leniency.SMART));
                     pos += len;
                 }
             }

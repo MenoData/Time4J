@@ -14,7 +14,8 @@ public class DecimalNumberSystemTest {
     @Test
     public void consistency() {
         for (NumberSystem ns : NumberSystem.values()) {
-            if (ns.isDecimal()) {
+            if (ns.hasDecimalCodepoints()) {
+                assertThat(ns.isDecimal(), is(true));
                 assertThat(ns.getDigits().length(), is(10));
             }
         }
@@ -96,6 +97,9 @@ public class DecimalNumberSystemTest {
             is(2009));
         assertThat(
             NumberSystem.CHINESE_DECIMAL.isDecimal(),
+            is(true));
+        assertThat(
+            NumberSystem.CHINESE_DECIMAL.hasDecimalCodepoints(),
             is(false));
         assertThat(
             NumberSystem.CHINESE_DECIMAL.getDigits().charAt(0),

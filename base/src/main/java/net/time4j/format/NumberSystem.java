@@ -87,6 +87,10 @@ public enum NumberSystem {
         public boolean isDecimal() {
             return true;
         }
+        @Override
+        public boolean hasDecimalCodepoints() {
+            return true;
+        }
     },
 
     /**
@@ -290,6 +294,10 @@ public enum NumberSystem {
         }
         @Override
         public boolean isDecimal() {
+            return true;
+        }
+        @Override
+        public boolean hasDecimalCodepoints() {
             return false;
         }
     },
@@ -297,7 +305,8 @@ public enum NumberSystem {
     /**
      * The Chinese numbers in the Mandarin dialect limited to the range 0-9999.
      * 
-     * <p>The sign &quot;兩&quot; will replace the sign &quot;二&quot; (=2) for
+     * <p>It is not a decimal system but simulates the spoken numbers.
+     * The sign &quot;兩&quot; will replace the sign &quot;二&quot; (=2) for
      * all numbers 200 or greater. When parsing, the special zero char &quot;〇&quot;
      * will be handled like the default zero char &quot;零&quot;. </p>
      *
@@ -310,7 +319,8 @@ public enum NumberSystem {
     /*[deutsch]
      * Die chinesischen Zahlen im Mandarin-Dialekt begrenzt auf den Bereich 0-9999.
      *
-     * <p>Das Zeichen &quot;兩&quot; ersetzt das Zeichen &quot;二&quot; (=2)
+     * <p>Es ist kein Dezimalsystem, simuliert aber die gesprochenen Zahlen.
+     * Das Zeichen &quot;兩&quot; ersetzt das Zeichen &quot;二&quot; (=2)
      * f&uuml;r alle Zahlen 200 oder gr&ouml;&szlig;er. Beim Interpretieren
      * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
      * Standard-Nullzeichen &quot;零&quot; behandelt. </p>
@@ -703,7 +713,8 @@ public enum NumberSystem {
     /**
      * The Japanese numbers limited to the range 1-9999.
      *
-     * <p>See also <a href="https://en.wikipedia.org/wiki/Japanese_numerals">Wikipedia</a>.
+     * <p>It is not a decimal system but simulates the spoken numbers. See also
+     * <a href="https://en.wikipedia.org/wiki/Japanese_numerals">Wikipedia</a>.
      * The {@link #getCode() code} is: &quot;jpan&quot;. </p>
      *
      * @since   3.32/4.27
@@ -711,7 +722,8 @@ public enum NumberSystem {
     /*[deutsch]
      * Die japanischen Zahlen begrenzt auf den Bereich 1-9999.
      *
-     * <p>Siehe auch <a href="https://de.wikipedia.org/wiki/Japanische_Zahlschrift">Wikipedia</a>.
+     * <p>Es ist kein Dezimalsystem und ahmt die gesprochenen Zahlen nach. Siehe
+     * auch <a href="https://de.wikipedia.org/wiki/Japanische_Zahlschrift">Wikipedia</a>.
      * Der {@link #getCode() Code} lautet: &quot;jpan&quot;. </p>
      *
      * @since   3.32/4.27
@@ -1286,8 +1298,8 @@ public enum NumberSystem {
      * <p>Defines all digit characters from the smallest to the largest one. </p>
      *
      * <p>Note: If letters are used as digits then the upper case will be used. 
-     * Decimal systems always use 10 digits here from zero to nine in ascending
-     * order. </p>
+     * Pure decimal systems always use 10 digits here from zero to nine in
+     * ascending order. </p>
      *
      * @return  String containing all valid digit characters in ascending order
      * @since   3.23/4.19
@@ -1297,8 +1309,8 @@ public enum NumberSystem {
      * gr&ouml;&szlig;ten Ziffer. </p>
      *
      * <p>Hinweis: Wenn Buchstaben als Ziffern verwendet werden, dann wird
-     * die Gro&szlig;schreibung angewandt. Dezimalsysteme verwenden hier immer
-     * genau 10 Ziffern von 0 bis 9 in aufsteigender Ordnung. </p>
+     * die Gro&szlig;schreibung angewandt. Reine Dezimalsysteme verwenden hier
+     * immer genau 10 Ziffern von 0 bis 9 in aufsteigender Ordnung. </p>
      *
      * @return  String containing all valid digit characters in ascending order
      * @since   3.23/4.19
@@ -1311,20 +1323,20 @@ public enum NumberSystem {
 
     /**
      * <p>Does this number system describe a decimal system where the digits 
-     * and associated code points can be mapped to the range 0-9? </p>
+     * can be mapped to the range 0-9? </p>
      * 
-     * <p>There must be exactly 10 digit characters whose code points are 
-     * in same numerical order from 0 to 9, each with step width 1. </p>
+     * <p>Every decimal system defines the first character of the result of
+     * {@link #getDigits()} as zero character. </p>
      *
      * @return  boolean
      * @since   3.23/4.19
      */
     /*[deutsch]
-     * <p>Beschreibt dieses Zahlensystem ein Dezimalsystem, dessen Ziffern und 
-     * Codepoints sich auf den Bereich 0-9 abbilden lassen? </p>
+     * <p>Beschreibt dieses Zahlensystem ein Dezimalsystem, dessen Ziffern
+     * sich auf den Bereich 0-9 abbilden lassen? </p>
      *
-     * <p>Es m&uuml;ssen genau 10 Zahlzeichen vorhanden sein, deren Unicode-
-     * Codepoints mit der Schrittweite von 1 aufsteigend sortiert sind. </p>
+     * <p>Jedes Dezimalsystem definiert das erste Zeichen des Ergebnisses
+     * von {@link #getDigits()} als Nullzeichen. </p>
      *
      * @return  boolean
      * @since   3.23/4.19
@@ -1332,6 +1344,34 @@ public enum NumberSystem {
     public boolean isDecimal() {
 
         throw new AbstractMethodError();
+
+    }
+
+    /**
+     * <p>Does this number system describe a decimal system where all 
+     * associated code points can be mapped to the range 0-9? </p>
+     * 
+     * <p>There must be exactly 10 digit characters whose code points are 
+     * in same numerical order from 0 to 9, each with step width 1. The
+     * default implementation just delegates to {@link #isDecimal()}. </p>
+     *
+     * @return  boolean
+     * @since   5.9
+     */
+    /*[deutsch]
+     * <p>Beschreibt dieses Zahlensystem ein Dezimalsystem, dessen Ziffern und 
+     * Codepoints sich auf den Bereich 0-9 abbilden lassen? </p>
+     *
+     * <p>Es m&uuml;ssen genau 10 Zahlzeichen vorhanden sein, deren Unicode-
+     * Codepoints mit der Schrittweite von 1 aufsteigend sortiert sind. Die
+     * Standardimplementierung delegiert an {@link #isDecimal()}. </p>
+     *
+     * @return  boolean
+     * @since   5.9
+     */
+    public boolean hasDecimalCodepoints() {
+
+        return this.isDecimal();
 
     }
 

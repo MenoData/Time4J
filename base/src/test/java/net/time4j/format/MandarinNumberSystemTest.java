@@ -177,14 +177,18 @@ public class MandarinNumberSystemTest {
         ChronoFormatter<PlainDate> f = 
             ChronoFormatter.setUp(PlainDate.axis(), Locale.CHINA)
                 .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_DECIMAL)
-                .addPattern("yyyy年M月", PatternType.CLDR)
+                .addPattern("yyyy年MM月", PatternType.CLDR) // two MM for padding
                 .endSection()
                 .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_MANDARIN)
                 .addPattern("d日", PatternType.CLDR)
                 .endSection()
                 .build();
-        PlainDate date = f.parse("二零零九年零一月十三日"); 
-        System.out.println(date); // 2009-01-13
+        assertThat(
+            f.parse("二零零九年零一月十三日"), 
+            is(PlainDate.of(2009, 1, 13)));
+        assertThat(
+            f.print(PlainDate.of(2009, 1, 13)), 
+            is("二零零九年零一月十三日"));
     }
 
 }

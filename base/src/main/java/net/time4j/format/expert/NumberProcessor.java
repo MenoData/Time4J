@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberProcessor.java) is part of project Time4J.
  *
@@ -236,7 +236,6 @@ class NumberProcessor<V>
             char defaultZeroChar = numsys.getDigits().charAt(0);
             Class<V> type = this.element.getType();
             boolean negative = false;
-            boolean decimal = numsys.isDecimal();
             String digits = null;
             int x;
             int count;
@@ -276,7 +275,7 @@ class NumberProcessor<V>
                 throw new IllegalArgumentException("Not formattable: " + this.element);
             }
 
-            if (decimal) {
+            if (numsys.hasDecimalCodepoints()) {
                 if (zeroChar != defaultZeroChar) { // rare case
                     int diff = zeroChar - defaultZeroChar;
                     if (digits == null) {
@@ -314,7 +313,7 @@ class NumberProcessor<V>
                         printed++;
                         break;
                     case SHOW_WHEN_BIG_NUMBER:
-                        if (decimal && (count > this.minDigits)) {
+                        if (numsys.isDecimal() && (count > this.minDigits)) {
                             buffer.append('+');
                             printed++;
                         }
@@ -324,7 +323,7 @@ class NumberProcessor<V>
                 }
             }
 
-            if (decimal) {
+            if (numsys.isDecimal()) {
                 for (int i = 0, n = this.minDigits - count; i < n; i++) {
                     buffer.append(zeroChar);
                     printed++;
@@ -332,7 +331,7 @@ class NumberProcessor<V>
             }
 
             if (digits == null) {
-                if (decimal) {
+                if (numsys.hasDecimalCodepoints()) {
                     if (count == 2) {
                         appendTwoDigits(x, buffer, zeroChar);
                     } else if (count == 1) {
@@ -456,26 +455,23 @@ class NumberProcessor<V>
         char zeroChar;
         int effectiveMin = 1;
         int effectiveMax;
-        boolean decimal;
 
         if (quickPath) {
             numsys = this.numberSystem;
             effectiveMax = this.scaleOfNumsys;
             zeroChar = this.zeroDigit;
-            decimal = numsys.isDecimal();
         } else {
             numsys = attributes.get(Attributes.NUMBER_SYSTEM, NumberSystem.ARABIC);
-            decimal = numsys.isDecimal();
             effectiveMax = this.getScale(numsys);
             zeroChar = (
                 attributes.contains(Attributes.ZERO_DIGIT)
                     ? attributes.get(Attributes.ZERO_DIGIT).charValue()
-                    : (decimal ? numsys.getDigits().charAt(0) : '0'));
+                    : (numsys.isDecimal() ? numsys.getDigits().charAt(0) : '0'));
         }
 
         Leniency leniency = (quickPath ? this.lenientMode : attributes.get(Attributes.LENIENCY, Leniency.SMART));
 
-        if (decimal && (this.fixedWidth || !leniency.isLax())) {
+        if (numsys.isDecimal() && (this.fixedWidth || !leniency.isLax())) {
             effectiveMin = this.minDigits;
             effectiveMax = this.maxDigits;
         }
@@ -529,7 +525,7 @@ class NumberProcessor<V>
             int digitCount = 0;
 
             // Wieviele Ziffern hat der ganze Ziffernblock?
-            if (decimal) {
+            if (numsys.hasDecimalCodepoints()) {
                 for (int i = pos; i < len; i++) {
                     int digit = text.charAt(i) - zeroChar;
 
@@ -556,7 +552,7 @@ class NumberProcessor<V>
         int maxPos = Math.min(len, pos + effectiveMax);
         long total = 0;
 
-        if (decimal) {
+        if (numsys.hasDecimalCodepoints()) {
             while (pos < maxPos) {
                 int digit = text.charAt(pos) - zeroChar;
 
@@ -615,7 +611,7 @@ class NumberProcessor<V>
         } else if (
             (this.signPolicy == SignPolicy.SHOW_WHEN_BIG_NUMBER)
             && leniency.isStrict()
-            && decimal
+            && numsys.isDecimal()
         ) {
             if ((sign == '+') && (pos <= minPos)) {
                 status.setError(

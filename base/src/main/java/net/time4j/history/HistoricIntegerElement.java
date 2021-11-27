@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricIntegerElement.java) is part of project Time4J.
  *
@@ -166,7 +166,7 @@ final class HistoricIntegerElement
                         text = numsys.toNumeral(yearOfEra);
                     }
                 }
-                if (numsys.isDecimal()) {
+                if (numsys.hasDecimalCodepoints()) {
                     char defaultZeroChar = numsys.getDigits().charAt(0);
                     if (zeroChar != defaultZeroChar) {
                         StringBuilder sb = new StringBuilder();
@@ -450,7 +450,7 @@ final class HistoricIntegerElement
         long value = 0;
         int pos = offset;
 
-        if (numsys.isDecimal()) {
+        if (numsys.hasDecimalCodepoints()) {
             boolean negative = false;
 
             if ((numsys == NumberSystem.ARABIC) && (text.charAt(pos) == '-')) {

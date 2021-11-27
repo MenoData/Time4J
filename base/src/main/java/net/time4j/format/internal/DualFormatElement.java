@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DualFormatElement.java) is part of project Time4J.
  *
@@ -153,7 +153,7 @@ public interface DualFormatElement // ehemals: net.time4j.history.internal.Histo
         char zeroDigit,
         int number
     ) {
-        if (numsys.isDecimal()) {
+        if (numsys.hasDecimalCodepoints()) {
             int delta = zeroDigit - '0';
             String standard = Integer.toString(number);
 
