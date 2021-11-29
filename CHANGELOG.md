@@ -1,5 +1,6 @@
 ## [v5.9] not yet released
 ### Added
+- Numeral support for Gurmukhi, Korean and Lao [#959]
 - Enable PrettyTime with non-decimal numerals [#958] 
 - Support for Chinese numerals [#955]
 
