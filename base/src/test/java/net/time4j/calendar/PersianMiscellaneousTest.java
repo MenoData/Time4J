@@ -29,6 +29,30 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 @RunWith(JUnit4.class)
 public class PersianMiscellaneousTest {
+    
+    @Test
+    public void persianLeapYears() {
+        int[] leapYears = { // according to Ebraminio: https://github.com/catull/calendariale/issues/633
+            1210, 1214, 1218, 1222, 1226, 1230, 1234, 1238, 1243, 1247, 1251, 1255, 1259, 1263,
+            1267, 1271, 1276, 1280, 1284, 1288, 1292, 1296, 1300, 1304, 1309, 1313, 1317, 1321,
+            1325, 1329, 1333, 1337, 1342, 1346, 1350, 1354, 1358, 1362, 1366, 1370, 1375, 1379,
+            1383, 1387, 1391, 1395, 1399, 1403, 1408, 1412, 1416, 1420, 1424, 1428, 1432, 1436,
+            1441, 1445, 1449, 1453, 1457, 1461, 1465, 1469, 1474, 1478, 1482, 1486, 1490, 1494,
+            1498
+        };
+        
+        PersianCalendar date = 
+            PersianCalendar.of(1209, PersianMonth.FARVARDIN, 1);
+        
+        for (int i = 0; i < leapYears.length; i++) {
+            while (date.getYear() != leapYears[i]) {
+                assertThat(date.isLeapYear(), is(false));
+                date = date.plus(1, PersianCalendar.Unit.YEARS);
+            }
+            assertThat(date.isLeapYear(), is(true));
+            date = date.plus(1, PersianCalendar.Unit.YEARS);
+        }
+    }
 
     @Test
     public void persianCalendarProperties() {
