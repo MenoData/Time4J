@@ -15,9 +15,9 @@ import static org.hamcrest.MatcherAssert.assertThat;
 @RunWith(Parameterized.class)
 public class JapaneseNumberTest {
 
- 	@Parameters(name= "{index}: [value={0} / numeral={1}")
- 	public static Iterable<Object[]> data() {
- 		return Arrays.asList(
+    @Parameters(name= "{index}: [value={0} / numeral={1}")
+    public static Iterable<Object[]> data() {
+        return Arrays.asList(
             new Object[][] {
                 {1, "一"},
                 {2, "二"},
@@ -74,8 +74,8 @@ public class JapaneseNumberTest {
         );
     }
 
-    private int value;
-    private String numeral;
+    private final int value;
+    private final String numeral;
 
     public JapaneseNumberTest(
         int value,

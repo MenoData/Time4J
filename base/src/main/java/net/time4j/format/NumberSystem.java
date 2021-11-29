@@ -23,7 +23,6 @@ package net.time4j.format;
 
 import java.io.IOException;
 import java.util.Locale;
-import net.time4j.base.MathUtils;
 
 
 /**
@@ -69,7 +68,8 @@ public enum NumberSystem {
         }
         @Override
         public int toInteger(String numeral, Leniency leniency) {
-            int result = Integer.parseInt(numeral);
+            int result = 
+                Math.toIntExact(Long.parseLong(numeral));
             if (result < 0) {
                 throw new NumberFormatException("Cannot convert negative number: " + numeral);
             }
@@ -286,7 +286,7 @@ public enum NumberSystem {
                 }
             }
             
-            return MathUtils.safeCast(total);
+            return Math.toIntExact(total);
         }
         @Override
         public String getDigits() {
@@ -711,6 +711,31 @@ public enum NumberSystem {
     },
 
     /**
+     * The Gurmukhi digits used mainly by Sikhs in parts of India.
+     *
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;guru&quot;. </p>
+     *
+     * @since   5.9
+     */
+    /*[deutsch]
+     * Die Gurmukhi-Ziffern (besonders von Sikhs in Teilen von Indien verwendet).
+     *
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;guru&quot;. </p>
+     *
+     * @since   5.9
+     */
+    GURMUKHI("guru") {
+        @Override
+        public String getDigits() {
+            return "\u0A66\u0A67\u0A68\u0A69\u0A6A\u0A6B\u0A6C\u0A6D\u0A6E\u0A6F";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
      * The Japanese numbers limited to the range 1-9999.
      *
      * <p>It is not a decimal system but simulates the spoken numbers. See also
@@ -731,107 +756,11 @@ public enum NumberSystem {
     JAPANESE("jpan") {
         @Override
         public String toNumeral(int number) {
-            if ((number < 1) || (number > 9999)) {
-                throw new IllegalArgumentException("Cannot convert: " + number);
-            }
-            String digits = this.getDigits();
-            int sen = number / 1000;
-            int r = number % 1000;
-            int hyaku = r / 100;
-            r = r % 100;
-            int ju = r / 10;
-            int n = r % 10;
-            StringBuilder numeral = new StringBuilder();
-            if (sen >= 1) {
-                if (sen > 1) {
-                    numeral.append(digits.charAt(sen - 1));
-                }
-                numeral.append('\u5343');
-            }
-            if (hyaku >= 1) {
-                if (hyaku > 1) {
-                    numeral.append(digits.charAt(hyaku - 1));
-                }
-                numeral.append('\u767e');
-            }
-            if (ju >= 1) {
-                if (ju > 1) {
-                    numeral.append(digits.charAt(ju - 1));
-                }
-                numeral.append('\u5341');
-            }
-            if (n > 0) {
-                numeral.append(digits.charAt(n - 1));
-            }
-            return numeral.toString();
+            return japkorToNumeral(number, this.getDigits(), false);
         }
         @Override
         public int toInteger(String numeral, Leniency leniency) {
-            int total = 0;
-            int ju = 0;
-            int hyaku = 0;
-            int sen = 0;
-            String digits = this.getDigits();
-            for (int i = numeral.length() - 1; i >= 0; i--) {
-                char c = numeral.charAt(i);
-                switch (c) {
-                    case '十':
-                        if ((ju == 0) && (hyaku == 0) && (sen == 0)) {
-                            ju++;
-                        } else {
-                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
-                        }
-                        break;
-                    case '百':
-                        if ((hyaku == 0) && (sen == 0)) {
-                            hyaku++;
-                        } else {
-                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
-                        }
-                        break;
-                    case '千':
-                        if (sen == 0) {
-                            sen++;
-                        } else {
-                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
-                        }
-                        break;
-                    default:
-                        boolean ok = false;
-                        for (int k = 0; k < 9; k++) {
-                            if (digits.charAt(k) == c) {
-                                int n = k + 1;
-                                if (sen == 1) {
-                                    total += (n * 1000);
-                                    sen = -1;
-                                } else if (hyaku == 1) {
-                                    total += (n * 100);
-                                    hyaku = -1;
-                                } else if (ju == 1) {
-                                    total += (n * 10);
-                                    ju = -1;
-                                } else {
-                                    total += n;
-                                }
-                                ok = true;
-                                break;
-                            }
-                        }
-                        if (!ok) { // unknown digit
-                            throw new IllegalArgumentException("Invalid Japanese numeral: " + numeral);
-                        }
-                }
-            }
-            if (ju == 1) {
-                total += 10;
-            }
-            if (hyaku == 1) {
-                total += 100;
-            }
-            if (sen == 1) {
-                total += 1000;
-            }
-            return total;
+            return japKorToInteger(numeral, this.getDigits(), leniency, false);
         }
         @Override
         public String getDigits() {
@@ -861,6 +790,159 @@ public enum NumberSystem {
         @Override
         public String getDigits() {
             return "\u17E0\u17E1\u17E2\u17E3\u17E4\u17E5\u17E6\u17E7\u17E8\u17E9";
+        }
+        @Override
+        public boolean isDecimal() {
+            return true;
+        }
+    },
+
+    /**
+     * The pure Korean numbers in Hangul script limited to the range 1-99.
+     *
+     * <p>It is not a decimal system and is often used for hour values. See also
+     * <a href="https://en.wikipedia.org/wiki/Korean_numerals">Wikipedia</a>.
+     * The {@link #getCode() code} is: &quot;korean&quot; (no CLDR-equivalent). </p>
+     *
+     * @see     #KOREAN_SINO
+     * @since   5.9
+     */
+    /*[deutsch]
+     * Die rein koreanischen Zahlen im Hangul-Skript begrenzt auf den Bereich 1-99.
+     *
+     * <p>Es ist kein Dezimalsystem und wird z.B. f&uuml;r Stundenangaben verwendet. Siehe
+     * auch <a href="https://en.wikipedia.org/wiki/Korean_numerals">Wikipedia</a>.
+     * Der {@link #getCode() Code} lautet: &quot;korean&quot; (kein CLDR-&Auml;quivalent). </p>
+     *
+     * @see     #KOREAN_SINO
+     * @since   5.9
+     */
+    KOREAN_NATIVE("korean") {
+        @Override
+        public String toNumeral(int number) {
+            if ((number < 1) || (number > 99)) {
+                throw new IllegalArgumentException("Cannot convert: " + number);
+            }
+            int ten = number / 10;
+            int r = number % 10;
+            StringBuilder numeral = new StringBuilder();
+            if (ten >= 1) {
+                numeral.append(KOREAN_NATIVE_NUMBERS[ten + 8]);
+            }
+            if (r > 0) {
+                numeral.append(KOREAN_NATIVE_NUMBERS[r - 1]);
+            }
+            return numeral.toString();
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            int total = 0;
+            String test = numeral;
+            for (int i = 0; i < 9; i++) {
+                String digit = KOREAN_NATIVE_NUMBERS[i];
+                if (test.endsWith(digit)) {
+                    int k = test.length() - digit.length();
+                    total = i + 1;
+                    if (k == 0) {
+                        return total;
+                    } else {
+                        test = test.substring(0, k);
+                        break;
+                    }
+                }
+            }
+            for (int i = 9; i < 18; i++) {
+                String digit = KOREAN_NATIVE_NUMBERS[i];
+                if (test.endsWith(digit)) {
+                    int k = test.length() - digit.length();
+                    test = test.substring(0, k);
+                    total += (10 * (i - 8));
+                    break;
+                }
+            }
+            if (test.isEmpty()) {
+                return total;
+            } else {
+                throw new IllegalArgumentException("Cannot convert: " + numeral);
+            }
+        }
+        @Override
+        public String getDigits() {
+            StringBuilder sb = new StringBuilder(18);
+            for (String num : KOREAN_NATIVE_NUMBERS) {
+                sb.append(num);
+            }
+            return sb.toString();
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
+        }
+    },
+
+    /**
+     * The Sino-Korean numbers in Hangul script limited to the range 0-9999.
+     *
+     * <p>It is not really a decimal system but similar to the Japanese system. See
+     * also <a href="https://en.wikipedia.org/wiki/Korean_numerals">Wikipedia</a>.
+     * Alternative characters like {@code &#xB839;} and {@code &#xACF5;}  for zero or
+     * {@code &#xB959;} for the digit six are accepted in parsing, too, if {@code leniency}
+     * is not strict. The {@link #getCode() code} is: &quot;koreansino&quot;
+     * (no CLDR-equivalent). </p>
+     *
+     * @see     #KOREAN_NATIVE
+     * @since   5.9
+     */
+    /*[deutsch]
+     * Die sino-koreanischen Zahlen im Hangul-Skript begrenzt auf den Bereich 0-9999.
+     *
+     * <p>Es ist nicht wirklich ein Dezimalsystem, aber &auml;hnlich zu den japanischen Zahlen.
+     * Siehe auch <a href="https://en.wikipedia.org/wiki/Korean_numerals">Wikipedia</a>.
+     * Alternative Zeichen wie {@code &#xB839;} und {@code &#xACF5;}  f&uuml;r null oder
+     * {@code &#xB959;} f&uuml;r die Ziffer sechs werden ebenfalls interpretiert, wenn {@code leniency}
+     * nicht strikt ist. Der {@link #getCode() Code} lautet: &quot;koreansino&quot;
+     * (kein CLDR-&Auml;quivalent). </p>
+     *
+     * @see     #KOREAN_NATIVE
+     * @since   5.9
+     */
+    KOREAN_SINO("koreansino") {
+        @Override
+        public String toNumeral(int number) {
+            return japkorToNumeral(number, this.getDigits(), true);
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            return japKorToInteger(numeral, this.getDigits(), leniency, true);
+        }
+        @Override
+        public String getDigits() {
+            return "영일이삼사오육칠팔구십백천";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
+        }
+    },
+
+    /**
+     * Traditional number system used in Laos.
+     *
+     * <p>Note: Must not be negative. {@link #getCode() Code}: &quot;laoo&quot;. </p>
+     *
+     * @since   5.9
+     */
+    /*[deutsch]
+     * Traditionelles Zahlsystem in Laos verwendet.
+     *
+     * <p>Hinweis: Darf nicht negativ sein. {@link #getCode() Code}: &quot;laoo&quot;. </p>
+     *
+     * @since   5.9
+     */
+    LAO("laoo") {
+        @Override
+        public String getDigits() {
+            return "\u0ED0\u0ED1\u0ED2\u0ED3\u0ED4\u0ED5\u0ED6\u0ED7\u0ED8\u0ED9";
         }
         @Override
         public boolean isDecimal() {
@@ -1096,6 +1178,11 @@ public enum NumberSystem {
     private static final String[] LETTERS = {"M", "CM", "D", "CD", "C", "XC", "L", "XL", "X", "IX", "V", "IV", "I"};
 
     private static final int[] D_FACTORS = {1, 12, 144, 1728, 20736};
+    
+    private static final String[] KOREAN_NATIVE_NUMBERS = {
+        "하나", "둘", "셋", "넷", "다섯", "여섯", "일곱", "여덟", "아홉",
+        "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"
+    };
 
     //~ Instanzvariablen --------------------------------------------------
 
@@ -1129,19 +1216,22 @@ public enum NumberSystem {
 
         if (this.isDecimal() && (number >= 0)) {
             String digits = this.getDigits();
-            String standard = Integer.toString(number);
-            StringBuilder numeral = new StringBuilder();
             
-            for (int i = 0, n = standard.length(); i < n; i++) {
-                int digit = standard.charAt(i) - '0';
-                numeral.append(digits.charAt(digit));
+            if (digits.length() == 10) {
+                String standard = Integer.toString(number);
+                StringBuilder numeral = new StringBuilder();
+                
+                for (int i = 0, n = standard.length(); i < n; i++) {
+                    int digit = standard.charAt(i) - '0';
+                    numeral.append(digits.charAt(digit));
+                }
+                
+                return numeral.toString();
             }
-            
-            return numeral.toString();
-        } else {
-            throw new IllegalArgumentException("Cannot convert: " + number);
         }
 
+        throw new IllegalArgumentException("Cannot convert: " + number);
+        
     }
 
     /**
@@ -1253,7 +1343,8 @@ public enum NumberSystem {
                 }
             }
             
-            int result = Integer.parseInt(standard.toString());
+            int result = 
+                Math.toIntExact(Long.parseLong(standard.toString()));
             
             if (result < 0) {
                 throw new NumberFormatException("Cannot convert negative number: " + numeral);
@@ -1450,6 +1541,158 @@ public enum NumberSystem {
                 return false;
         }
 
+    }
+
+    public static String japkorToNumeral(
+        int number,
+        String digits,
+        boolean hasZero
+    ) {
+        
+        if (hasZero && (number == 0)) {
+            return String.valueOf(digits.charAt(0));
+        } else if ((number < 1) || (number > 9999)) {
+            throw new IllegalArgumentException("Cannot convert: " + number);
+        }
+
+        int thousand = number / 1000;
+        int r = number % 1000;
+        int hundred = r / 100;
+        r = r % 100;
+        int ten = r / 10;
+        int n = r % 10;
+        int len = digits.length();
+        StringBuilder numeral = new StringBuilder();
+        int offset = (hasZero ? 0 : 1);
+
+        if (thousand >= 1) {
+            if (thousand > 1) {
+                numeral.append(digits.charAt(thousand - offset));
+            }
+            numeral.append(digits.charAt(len - 1)); // 千
+        }
+        
+        if (hundred >= 1) {
+            if (hundred > 1) {
+                numeral.append(digits.charAt(hundred - offset));
+            }
+            numeral.append(digits.charAt(len - 2)); // 百
+        }
+        
+        if (ten >= 1) {
+            if (ten > 1) {
+                numeral.append(digits.charAt(ten - offset));
+            }
+            numeral.append(digits.charAt(len - 3)); // 十
+        }
+        
+        if (n > 0) {
+            numeral.append(digits.charAt(n - offset));
+        }
+        
+        return numeral.toString();
+        
+    }
+
+    public static int japKorToInteger(
+        String numeral, 
+        String digits,
+        Leniency leniency,
+        boolean korean
+    ) {
+        
+        int total = 0;
+        int ten = 0;
+        int hundred = 0;
+        int thousand = 0;
+        int len = digits.length();
+        boolean error = false;
+        
+        for (int i = numeral.length() - 1; i >= 0; i--) {
+            char c = numeral.charAt(i);
+            
+            if (!leniency.isStrict() && (c == '\uB959')) {
+                c = '\uC721'; // tolerant parsing of alternative Hangul char 육 (=6)
+            }
+            
+            if (c == digits.charAt(len - 3)) { // 十
+                if ((ten == 0) && (hundred == 0) && (thousand == 0)) {
+                    ten++;
+                } else {
+                    error = true;
+                }
+            } else if (c == digits.charAt(len - 2)) { // 百
+                if ((hundred == 0) && (thousand == 0)) {
+                    hundred++;
+                } else {
+                    error = true;
+                }
+            } else if (c == digits.charAt(len - 1)) { // 千
+                if (thousand == 0) {
+                    thousand++;
+                } else {
+                    error = true;
+                }
+            } else if (korean && (c == '\uC601')) {
+                if (numeral.length() == 1) {
+                    return 0;
+                } else {
+                    error = true;
+                }
+            } else if (
+                korean 
+                && !leniency.isStrict() 
+                && ((c == '\uB839') || (c == '\uACF5')) // zero alternatives: 령 or 공
+            ) {
+                if (numeral.length() == 1) {
+                    return 0;
+                } else {
+                    error = true;
+                }
+            } else {
+                error = true;
+                int offset = (korean ? 1 : 0);
+                
+                for (int k = 0; k < 9; k++) {
+                    if (digits.charAt(k + offset) == c) {
+                        int n = k + 1;
+                        if (thousand == 1) {
+                            total += (n * 1000);
+                            thousand = -1;
+                        } else if (hundred == 1) {
+                            total += (n * 100);
+                            hundred = -1;
+                        } else if (ten == 1) {
+                            total += (n * 10);
+                            ten = -1;
+                        } else {
+                            total += n;
+                        }
+                        error = false;
+                        break;
+                    }
+                }
+            }
+            
+            if (error) {
+                throw new IllegalArgumentException("Invalid numeral: " + numeral);
+            }
+        }
+        
+        if (ten == 1) {
+            total += 10;
+        }
+        
+        if (hundred == 1) {
+            total += 100;
+        }
+        
+        if (thousand == 1) {
+            total += 1000;
+        }
+        
+        return total;
+        
     }
 
 }

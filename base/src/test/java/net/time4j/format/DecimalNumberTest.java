@@ -9,7 +9,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class DecimalNumberSystemTest {
+public class DecimalNumberTest {
     
     @Test
     public void consistency() {
@@ -110,6 +110,25 @@ public class DecimalNumberSystemTest {
     }
 
     @Test
+    public void gurmukhi() {
+        assertThat(
+            NumberSystem.GURMUKHI.toNumeral(1234567890),
+            is("੧੨੩੪੫੬੭੮੯੦"));
+        assertThat(
+            NumberSystem.GURMUKHI.toInteger("੧੨੩੪੫੬੭੮੯੦"),
+            is(1234567890));
+        assertThat(
+            NumberSystem.GURMUKHI.isDecimal(),
+            is(true));
+        assertThat(
+            NumberSystem.GURMUKHI.getDigits().charAt(0),
+            is('\u0A66'));
+        assertThat(
+            NumberSystem.GURMUKHI.getCode(),
+            is("guru"));
+    }
+
+    @Test
     public void khmer() {
         assertThat(
             NumberSystem.KHMER.toNumeral(1234567890),
@@ -126,6 +145,25 @@ public class DecimalNumberSystemTest {
         assertThat(
             NumberSystem.KHMER.getCode(),
             is("khmr"));
+    }
+
+    @Test
+    public void laoo() {
+        assertThat(
+            NumberSystem.LAO.toNumeral(1234567890),
+            is("໑໒໓໔໕໖໗໘໙໐"));
+        assertThat(
+            NumberSystem.LAO.toInteger("໑໒໓໔໕໖໗໘໙໐"),
+            is(1234567890));
+        assertThat(
+            NumberSystem.LAO.isDecimal(),
+            is(true));
+        assertThat(
+            NumberSystem.LAO.getDigits().charAt(0),
+            is('\u0ED0'));
+        assertThat(
+            NumberSystem.LAO.getCode(),
+            is("laoo"));
     }
 
     @Test

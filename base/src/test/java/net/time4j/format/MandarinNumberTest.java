@@ -14,7 +14,7 @@ import static org.hamcrest.MatcherAssert.assertThat;
 
 
 @RunWith(JUnit4.class)
-public class MandarinNumberSystemTest {
+public class MandarinNumberTest {
 
     @Test
     public void mandarin() {

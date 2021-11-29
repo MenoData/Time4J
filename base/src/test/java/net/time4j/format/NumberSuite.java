@@ -8,10 +8,12 @@ import org.junit.runners.Suite.SuiteClasses;
 @RunWith(Suite.class)
 @SuiteClasses(
     {
-        DecimalNumberSystemTest.class,
+        DecimalNumberTest.class,
         EthiopicNumberTest.class,
         JapaneseNumberTest.class,
-        MandarinNumberSystemTest.class,
+        KoreanNumberTest1.class,
+        KoreanNumberTest2.class,
+        MandarinNumberTest.class,
         RomanNumberTestForModernUsage.class,
         RomanNumberTestForOtherFormats.class
     }
