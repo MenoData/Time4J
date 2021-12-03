@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SexagesimalName.java) is part of project Time4J.
  *
@@ -43,7 +43,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   5.7
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den zyklischen sexagesimalen Namen, der in ostasiatischen Kalendern verwendet wird
@@ -54,7 +53,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   5.7
- * @doctags.concurrency {immutable}
  */
 public class SexagesimalName
     implements Comparable<SexagesimalName>, Serializable {

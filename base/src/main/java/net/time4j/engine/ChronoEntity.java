@@ -42,9 +42,10 @@ import java.util.Set;
  * enables read- and write-access. If no element rule can be found a
  * {@code RuleNotFoundException} will be thrown. </p>
  *
+ * <p><strong>Note:</strong> All public implementations must be <i>immutable</i>. </p>
+ *
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
- * @doctags.spec    All public implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitwertobjekt, das einzelne Werte mit
@@ -63,9 +64,11 @@ import java.util.Set;
  * Lese- bzw. Schreibzugriff erm&ouml;glicht. Ist die Regel nicht vorhanden,
  * wird eine {@code RuleNotFoundException} geworfen. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle &ouml;ffentlichen Implementierungen
+ * muuml;ssen <i>immutable</i> sein. </p>
+ *
  * @param   <T> generic type of self reference
  * @author  Meno Hochschild
- * @doctags.spec    All public implementations must be immutable.
  */
 public abstract class ChronoEntity<T extends ChronoEntity<T>>
     implements ChronoDisplay {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekcycle.java) is part of project Time4J.
  *
@@ -38,7 +38,6 @@ import static net.time4j.PlainDate.CALENDAR_DATE;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Spezialeinheit f&uuml;r wochenbasierte Jahre, die von ISO-8601
@@ -46,7 +45,6 @@ import static net.time4j.PlainDate.CALENDAR_DATE;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 public final class Weekcycle
     extends BasicUnit

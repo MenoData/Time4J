@@ -76,7 +76,6 @@ import java.util.NoSuchElementException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein volles gregorianisches Kalenderjahr als Intervall vom ersten Januar bis Ende Dezember. </p>
@@ -93,7 +92,6 @@ import java.util.NoSuchElementException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class CalendarYear

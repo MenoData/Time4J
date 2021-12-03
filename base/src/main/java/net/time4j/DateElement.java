@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateElement.java) is part of project Time4J.
  *
@@ -34,7 +34,6 @@ import java.io.ObjectStreamException;
  * <p>Repr&auml;sentiert eine Datumskomponente. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class DateElement
     extends BasicElement<PlainDate>

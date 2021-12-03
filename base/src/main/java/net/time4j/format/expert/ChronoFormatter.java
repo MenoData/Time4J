@@ -150,7 +150,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein Zeitformat zur Konversion zwischen einem
@@ -202,7 +201,6 @@ import static net.time4j.format.CalendarText.ISO_CALENDAR_TYPE;
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 public final class ChronoFormatter<T>
     implements ChronoPrinter<T>, ChronoParser<T>, TemporalFormatter<T> {
@@ -4235,26 +4233,24 @@ public final class ChronoFormatter<T>
     /**
      * <p>Builder for creating a new {@code ChronoFormatter}. </p>
      *
-     * <p>This class is not <i>thread-safe</i> so a new instance is
+     * <p>This class is not <i>threadsafe</i> so a new instance is
      * necessary per thread. A new instance can be created by
      * {@link ChronoFormatter#setUp(Class, Locale)}. </p>
      *
      * @param       <T> generic type of chronological entity
      *              (subtype of {@code ChronoEntity})
      * @author      Meno Hochschild
-     * @doctags.concurrency {mutable}
      */
     /*[deutsch]
      * <p>Erzeugt ein neues Formatobjekt. </p>
      *
      * <p>Je Thread wird eine neue {@code Builder}-Instanz ben&ouml;tigt,
-     * weil diese Klasse nicht <i>thread-safe</i> ist. Eine neue Instanz
+     * weil diese Klasse nicht <i>threadsafe</i> ist. Eine neue Instanz
      * wird mittels {@link ChronoFormatter#setUp(Class, Locale)} erzeugt. </p>
      *
      * @param       <T> generic type of chronological entity
      *              (subtype of {@code ChronoEntity})
      * @author      Meno Hochschild
-     * @doctags.concurrency {mutable}
      */
     public static final class Builder<T> {
 
@@ -5510,7 +5506,8 @@ public final class ChronoFormatter<T>
          * always returns {@code true} then {@code maxIterations} effectively models a fixed width of
          * characters to be skipped. </p>
          *
-         * <p>Note: This method is only relevant for parsing. During printing, this method does nothing. </p>
+         * <p>Notes: This method is only relevant for parsing. During printing, this method does nothing. 
+         * The first condition argument must be immutable or even stateless (for example a lambda expression). </p>
          *
          * @param   unparseableCondition    condition which marks accepted characters as unparseable
          * @param   maxIterations           maximum count of invocations on given condition
@@ -5518,7 +5515,6 @@ public final class ChronoFormatter<T>
          * @throws  IllegalArgumentException if {@code maxIterations < 1}
          * @see     #skipUnknown(int)
          * @since   4.14
-         * @doctags.spec The first condition argument must be immutable or stateless (for example a lambda expression).
          */
         /*[deutsch]
          * <p>Ignoriert alle Zeichen als nicht-interpretierbar, die von der angegebenen Bedingung akzeptiert
@@ -5528,7 +5524,9 @@ public final class ChronoFormatter<T>
          * die Bedingung immer {@code true} liefert, dann stellt {@code maxIterations} effektiv eine feste
          * Breite von zu entfernenden Zeichen dar. </p>
          *
-         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. </p>
+         * <p>Hinweis: Diese Methode ist nur beim Parsen relevant, in der Textausgabe macht die Methode nichts. 
+         * Das erste Bedingungsargument mu&szlig; <i>immutable</i> oder sogar zustandslos sein (zum Beispiel 
+         * ein Lambda-Ausdruck). </p>
          *
          * @param   unparseableCondition    condition which marks accepted characters as unparseable
          * @param   maxIterations           maximum count of invocations on given condition
@@ -5536,7 +5534,6 @@ public final class ChronoFormatter<T>
          * @throws  IllegalArgumentException if {@code maxIterations < 1}
          * @see     #skipUnknown(int)
          * @since   4.14
-         * @doctags.spec The first condition argument must be immutable or stateless (for example a lambda expression).
          */
         public Builder<T> skipUnknown(
             IntPredicate unparseableCondition,

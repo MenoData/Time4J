@@ -172,7 +172,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     StartOfDay#definedBy(ChronoFunction)
  * @see     SolarTime#sunset()
  * @since   3.5/4.3
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Hijri-Kalender, der in vielen islamischen L&auml;ndern vorwiegend f&uuml;r
@@ -282,7 +281,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     StartOfDay#definedBy(ChronoFunction)
  * @see     SolarTime#sunset()
  * @since   3.5/4.3
- * @doctags.concurrency {immutable}
  */
 @CalendarType("islamic")
 public final class HijriCalendar

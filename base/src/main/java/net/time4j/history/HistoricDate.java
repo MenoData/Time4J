@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HistoricDate.java) is part of project Time4J.
  *
@@ -34,7 +34,6 @@ package net.time4j.history;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein historisches Datum, das aus &Auml;ra, Jahr der &Auml;ra, Monat und Tag
@@ -49,7 +48,6 @@ package net.time4j.history;
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {immutable}
  */
 public final class HistoricDate
     implements Comparable<HistoricDate> {

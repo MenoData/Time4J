@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeAxis.java) is part of project Time4J.
  *
@@ -607,7 +607,6 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      * @author      Meno Hochschild
      * @see         #setUp(Class,Class,ChronoMerger,TimePoint,TimePoint)
      * @see         #setUp(Class,Class,ChronoMerger,CalendarSystem)
-     * @doctags.concurrency {mutable}
      */
     /*[deutsch]
      * <p>Erzeugt einen Builder f&uuml;r eine neue Zeitachse respektive
@@ -623,7 +622,6 @@ public final class TimeAxis<U, T extends TimePoint<U, T>>
      * @author      Meno Hochschild
      * @see         #setUp(Class,Class,ChronoMerger,TimePoint,TimePoint)
      * @see         #setUp(Class,Class,ChronoMerger,CalendarSystem)
-     * @doctags.concurrency {mutable}
      */
     public static final class Builder<U, T extends TimePoint<U, T>>
         extends Chronology.Builder<T> {

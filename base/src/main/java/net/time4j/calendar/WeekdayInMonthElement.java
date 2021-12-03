@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdayInMonthElement.java) is part of project Time4J.
  *
@@ -37,7 +37,6 @@ import net.time4j.engine.IntElementRule;
  *
  * @author  Meno Hochschild
  * @since   3.33/4.28
- * @doctags.concurrency {immutable}
  */
 final class WeekdayInMonthElement<T extends ChronoEntity<T> & CalendarDate>
     extends StdIntegerDateElement<T>

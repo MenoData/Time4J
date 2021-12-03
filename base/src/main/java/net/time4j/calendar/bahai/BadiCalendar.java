@@ -170,7 +170,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   5.3
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den von der Baha'i-Gemeinde verwendeten Kalender. </p>
@@ -263,7 +262,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   5.3
- * @doctags.concurrency {immutable}
  */
 @CalendarType("bahai")
 public final class BadiCalendar

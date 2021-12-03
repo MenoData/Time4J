@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapSeconds.java) is part of project Time4J.
  *
@@ -69,8 +69,9 @@ import java.util.stream.Stream;
  * registered at runtime using the methods {@code registerXYZ()}.
  * Setting one of both properties can improve the performance. </p>
  *
+ * <p>Note: This implementation is <i>threadsafe</i>. </p>
+ *
  * @author      Meno Hochschild
- * @doctags.concurrency {threadsafe}
  */
 /*[deutsch]
  * <p>Ermittelt alle seit dem offiziellen Start von UTC 1972 aufgetretenen
@@ -100,8 +101,10 @@ import java.util.stream.Stream;
  * Laufzeit mittels {@code registerXYZ()} registriert werden k&ouml;nnen. Das
  * Setzen einer der beiden Properties kann die Performance verbessern. </p>
  *
+ * <p>Hinweis: Diese Implementierung ist <i>threadsafe</i>, also gegen
+ * konkurrierende Zugriffe gesch&uuml;tzt. </p>
+ *
  * @author      Meno Hochschild
- * @doctags.concurrency {threadsafe}
  */
 public final class LeapSeconds
     implements Iterable<LeapSecondEvent>, Comparator<LeapSecondEvent> {

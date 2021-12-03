@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPeriod.java) is part of project Time4J.
  *
@@ -73,7 +73,6 @@ import java.util.TreeMap;
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert einen &uuml;blicherweise minutengenauen Tagesabschnitt
@@ -94,7 +93,6 @@ import java.util.TreeMap;
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
- * @doctags.concurrency {immutable}
  */
 public final class DayPeriod {
 

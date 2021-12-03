@@ -146,7 +146,6 @@ import java.util.Locale;
  * @see     EthiopianTime
  * @see     net.time4j.format.NumberSystem#ETHIOPIC
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der in &Auml;thiopien als offizieller Kalender verwendet wird. </p>
@@ -221,7 +220,6 @@ import java.util.Locale;
  * @see     EthiopianTime
  * @see     net.time4j.format.NumberSystem#ETHIOPIC
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 @CalendarType("ethiopic")
 public final class EthiopianCalendar

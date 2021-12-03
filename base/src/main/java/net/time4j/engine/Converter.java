@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Converter.java) is part of project Time4J.
  *
@@ -25,20 +25,23 @@ package net.time4j.engine;
 /**
  * <p>Serves as bridge to temporal types of JDK or other date and time libraries.</p>
  *
- * @param   <S>  source type in other library
- * @param   <T>  target type in Time4J
- * @author  Meno Hochschild
- * @since   3.24/4.20
- * @doctags.spec All implementations must be ideally stateless or at least be immutable
- */
-/*[deutsch]
- * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus dem JDK oder anderen Bibliotheken. </p>
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>, ideally stateless. </p>
  *
  * @param   <S>  source type in other library
  * @param   <T>  target type in Time4J
  * @author  Meno Hochschild
  * @since   3.24/4.20
- * @doctags.spec All implementations must be ideally stateless or at least be immutable
+ */
+/*[deutsch]
+ * <p>Dient als Br&uuml;cke zu Datums- und Zeittypen aus dem JDK oder anderen Bibliotheken. </p>
+ *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen wenigstens 
+ * <i>immutable</i>, idealerweise zustandslos sein. </p>
+ *
+ * @param   <S>  source type in other library
+ * @param   <T>  target type in Time4J
+ * @author  Meno Hochschild
+ * @since   3.24/4.20
  */
 public interface Converter<S, T> {
 

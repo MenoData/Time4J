@@ -40,14 +40,12 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * Wird im &auml;thiopischen Kalender verwendet, um den Tag des Monats mit einem Namen zu verbinden.
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 public final class Tabot
     implements Comparable<Tabot> {

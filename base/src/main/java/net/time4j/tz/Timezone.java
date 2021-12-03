@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Timezone.java) is part of project Time4J.
  *
@@ -71,11 +71,12 @@ import java.util.concurrent.ConcurrentMap;
  * {@link ZonalOffset#atLongitude(java.math.BigDecimal) fractional offsets}
  * based on the geographical longitude, its {@code Timezone}-API will
  * always ignore any fractional parts. </p>
+ * 
+ * <p><strong>Note:</strong> All static methods are <i>threadsafe</i> while
+ * this class is <i>immutable</i> as long as the underlying timezone data are. </p>
  *
  * @author      Meno Hochschild
  * @serial      exclude
- * @doctags.concurrency All static methods are thread-safe while this class is
- *                      immutable as long as the underlying timezone data are.
  */
 /*[deutsch]
  * <p>L&auml;dt und h&auml;lt Zeitzonendaten mitsamt ihren Regeln. </p>
@@ -105,10 +106,12 @@ import java.util.concurrent.ConcurrentMap;
  * basierend auf der geographischen L&auml;nge kennt, wird das
  * {@code Timezone}-API immer fraktionale Subsekunden ignorieren. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle statischen Methoden sind <i>threadsafe</i>
+ * w&auml;hrend diese Klasse genau dann <i>immutable</i> ist, wenn die
+ * zugrundeliegenden Zeitzonendaten es auch sind. </p>
+ *
  * @author      Meno Hochschild
  * @serial      exclude
- * @doctags.concurrency All static methods are thread-safe while this class is
- *                      immutable as long as the underlying timezone data are.
  */
 public abstract class Timezone
     implements Serializable {

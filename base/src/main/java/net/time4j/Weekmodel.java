@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Weekmodel.java) is part of project Time4J.
  *
@@ -78,7 +78,6 @@ import static net.time4j.PlainDate.WEEKDAY_IN_MONTH;
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert Regeln f&uuml;r den lokalisierten Umgang mit Wochentagen
@@ -96,7 +95,6 @@ import static net.time4j.PlainDate.WEEKDAY_IN_MONTH;
  *
  * @author      Meno Hochschild
  * @see         WeekdataProvider
- * @doctags.concurrency {immutable}
  */
 public final class Weekmodel
     implements Serializable {

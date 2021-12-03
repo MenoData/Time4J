@@ -173,7 +173,6 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * @see     EastAsianMonth
  * @see     NumberSystem#JAPANESE
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den japanischen Kalender von 701 AD (julianisch) bis heute. </p>
@@ -262,7 +261,6 @@ import static net.time4j.calendar.Nengo.Selector.*;
  * @see     EastAsianMonth
  * @see     NumberSystem#JAPANESE
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 @CalendarType("japanese")
 public final class JapaneseCalendar

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ParseLog.java) is part of project Time4J.
  *
@@ -30,23 +30,21 @@ import java.text.ParsePosition;
  * <p>Represents a log for the current status and error informations during
  * parsing. </p>
  *
- * <p>Note: This class is not <i>thread-safe</i>. Therefore a new instance
+ * <p>Note: This class is not <i>threadsafe</i>. Therefore a new instance
  * is to be created per thread (usually per parsing process). </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {mutable}
  */
 /*[deutsch]
  * <p>Zeichnet den Status und Fehlermeldungen beim Parsen auf. </p>
  *
- * <p>Hinweis: Diese Klasse ist nicht <i>thread-safe</i>, deshalb ist
+ * <p>Hinweis: Diese Klasse ist nicht <i>threadsafe</i>, deshalb ist
  * pro Thread jeweils eine neue Instanz zu erzeugen (in der Regel pro
  * Parse-Vorgang). </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {mutable}
  */
 public class ParseLog {
 

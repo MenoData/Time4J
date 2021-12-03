@@ -106,7 +106,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * Der Minguo-Kalender wird in Taiwan (Republik von China) verwendet und hat als einzige Differenz
@@ -141,7 +140,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.13/4.10
- * @doctags.concurrency {immutable}
  */
 @CalendarType("roc")
 public final class MinguoCalendar

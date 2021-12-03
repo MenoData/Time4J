@@ -145,7 +145,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.36/4.31
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den historischen christlichen Kalender, der in vielen europ&auml;ischen L&auml;ndern
@@ -205,7 +204,6 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * @author  Meno Hochschild
  * @since   3.36/4.31
- * @doctags.concurrency {immutable}
  */
 @CalendarType("historic")
 public final class HistoricCalendar

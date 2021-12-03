@@ -133,7 +133,6 @@ import java.util.Locale;
  * @see     HebrewMonth
  * @see     HebrewTime
  * @since   3.37/4.32
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der von der weltweitenj&uuml;dischen Gemeinschaft,
@@ -200,7 +199,6 @@ import java.util.Locale;
  * @see     HebrewMonth
  * @see     HebrewTime
  * @since   3.37/4.32
- * @doctags.concurrency {immutable}
  */
 @CalendarType("hebrew")
 public final class HebrewCalendar

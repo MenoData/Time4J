@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UnitPatternProvider.java) is part of project Time4J.
  *
@@ -32,10 +32,12 @@ import java.util.Locale;
  * an internal implementation which just offers unit patterns either in
  * english or in scientific notation. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public
+ * no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -46,10 +48,12 @@ import java.util.Locale;
  * eine Instanz erzeugt, die lediglich Zeiteinheitsmuster auf Englisch
  * oder in wissenschaftlicher Notation anbietet. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface UnitPatternProvider {
 

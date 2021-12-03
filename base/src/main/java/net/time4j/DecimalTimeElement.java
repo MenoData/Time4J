@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DecimalTimeElement.java) is part of project Time4J.
  *
@@ -36,7 +36,6 @@ import java.math.BigDecimal;
  * <p>Ein dezimales Uhrzeitelement. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class DecimalTimeElement
     extends BasicElement<BigDecimal>

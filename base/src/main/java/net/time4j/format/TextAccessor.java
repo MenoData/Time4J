@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TextAccessor.java) is part of project Time4J.
  *
@@ -36,7 +36,6 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.0
  * @see     CalendarText
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Stellt einen Zugriff auf die enthaltenen Namen per Elementwert-Enum
@@ -45,7 +44,6 @@ import java.util.List;
  * @author  Meno Hochschild
  * @since   2.0
  * @see     CalendarText
- * @doctags.concurrency {immutable}
  */
 public final class TextAccessor {
 

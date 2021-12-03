@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalCollection.java) is part of project Time4J.
  *
@@ -54,7 +54,6 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   2.0
- * @doctags.concurrency {immutable}
  * @see     DateInterval#comparator()
  * @see     ClockInterval#comparator()
  * @see     TimestampInterval#comparator()
@@ -76,7 +75,6 @@ import java.util.NoSuchElementException;
  * @author  Meno Hochschild
  * @serial  exclude
  * @since   2.0
- * @doctags.concurrency {immutable}
  * @see     DateInterval#comparator()
  * @see     ClockInterval#comparator()
  * @see     TimestampInterval#comparator()

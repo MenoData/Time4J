@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (KoreanCalendar.java) is part of project Time4J.
  *
@@ -106,7 +106,6 @@ import java.util.Map;
  * @see     ChineseCalendar
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den koreanischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
@@ -160,7 +159,6 @@ import java.util.Map;
  * @see     ChineseCalendar
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 @CalendarType("dangi")
 public final class KoreanCalendar

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CyclicYear.java) is part of project Time4J.
  *
@@ -32,14 +32,12 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert das zyklische Jahr, das in ostasiatischen Kalendern verwendet wird. </p>
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 public final class CyclicYear
     extends SexagesimalName {

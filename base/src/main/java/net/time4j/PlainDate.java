@@ -117,7 +117,6 @@ import java.util.Set;
  * {@code ChronoHistory} are supported. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein reines Kalenderdatum im ISO-8601-Standard. </p>
@@ -158,7 +157,6 @@ import java.util.Set;
  * und {@code ChronoHistory} nutzbar. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class PlainDate

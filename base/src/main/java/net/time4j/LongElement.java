@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LongElement.java) is part of project Time4J.
  *
@@ -35,7 +35,6 @@ import java.math.BigDecimal;
  * <p>Repr&auml;sentiert ein Uhrzeitelement vom long-Typ. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class LongElement
     extends AbstractTimeElement<Long>

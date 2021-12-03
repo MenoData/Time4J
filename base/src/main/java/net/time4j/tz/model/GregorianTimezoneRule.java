@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (GregorianTimezoneRule.java) is part of project Time4J.
  *
@@ -40,7 +40,6 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Standardregel f&uuml;r Zeitumstellungen im
@@ -48,7 +47,6 @@ import java.io.Serializable;
  *
  * @author  Meno Hochschild
  * @since   2.2
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public class GregorianTimezoneRule

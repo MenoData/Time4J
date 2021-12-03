@@ -122,7 +122,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.19/4.15
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * Der Thai-Kalender wird in Thailand verwendet und hat als einzige Differenz
@@ -175,7 +174,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.19/4.15
- * @doctags.concurrency {immutable}
  */
 @CalendarType("buddhist")
 public final class ThaiSolarCalendar

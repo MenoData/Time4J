@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Boundary.java) is part of project Time4J.
  *
@@ -36,7 +36,6 @@ import java.io.Serializable;
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Intervallgrenze, die entweder die untere
@@ -45,7 +44,6 @@ import java.io.Serializable;
  * @param   <T> generic temporal type
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  */
 public final class Boundary<T>
     implements Serializable {

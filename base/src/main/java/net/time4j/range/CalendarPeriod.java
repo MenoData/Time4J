@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarPeriod.java) is part of project Time4J.
  *
@@ -54,7 +54,6 @@ import java.util.stream.Stream;
  * @param   <T> generic type of incomplete calendar date (without day part) or dates in other calendar systems
  * @author  Meno Hochschild
  * @since   5.0
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert ein geschlossenes Intervall zwischen zwei unvollst&auml;ndigen Datumsangaben wie
@@ -65,7 +64,6 @@ import java.util.stream.Stream;
  * @param   <T> generic type of incomplete calendar date (without day part) or dates in other calendar systems
  * @author  Meno Hochschild
  * @since   5.0
- * @doctags.concurrency {immutable}
  */
 public class CalendarPeriod<T>
     implements ChronoInterval<T>, Serializable {

@@ -67,7 +67,6 @@ import static net.time4j.ClockUnit.*;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Erm&ouml;glicht formatierte Ausgaben einer Dauer f&uuml;r soziale Medien
@@ -80,7 +79,6 @@ import static net.time4j.ClockUnit.*;
  *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.concurrency {immutable}
  */
 public final class PrettyTime {
 

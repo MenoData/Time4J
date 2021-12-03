@@ -76,7 +76,6 @@ import java.util.TimeZone;
  *
  * @author  Meno Hochschild
  * @since   5.0
- * @doctags.concurrency <immutable>
  */
 /*[deutsch]
  * <p>Ein Zeitformatierer, der die plattformspezifischen Ressourcen auf Basis von {@code SimpleDateFormat} nutzt. </p>
@@ -92,7 +91,6 @@ import java.util.TimeZone;
  *
  * @author  Meno Hochschild
  * @since   5.0
- * @doctags.concurrency <immutable>
  */
 public final class SimpleFormatter<T>
     implements TemporalFormatter<T> {

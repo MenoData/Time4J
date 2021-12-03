@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SystemClock.java) is part of project Time4J.
  *
@@ -37,13 +37,11 @@ import java.time.Instant;
  * <p>Represents a clock which is based on the clock of the underlying operating system. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Uhr, die auf dem Taktgeber des Betriebssystems basiert. </p>
  *
  * @author  Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 public final class SystemClock
     implements TimeSource<Moment> {

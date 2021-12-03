@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DateInterval.java) is part of project Time4J.
  *
@@ -80,14 +80,12 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein Datumsintervall. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  */
 public final class DateInterval
     extends IsoInterval<PlainDate, DateInterval>

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HttpClock.java) is part of project Time4J.
  *
@@ -37,17 +37,20 @@ import static net.time4j.TemporalType.JAVA_UTIL_DATE;
  * <p>Represents a connection to a web server via the HTTP-protocol in
  * order to evaluate the DATE-header of the HTTP-response. </p>
  *
+ * <p>Note: This implementation is <i>threadsafe</i>. </p>
+ *
  * @author      Meno Hochschild
  * @since       2.1
- * @doctags.concurrency {threadsafe}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Verbindung zu einem Web-Server &uuml;ber
  * das HTTP-Protokoll, um den DATE-Header der HTTP-Antwort auszuwerten. </p>
  *
+ * <p>Hinweis: Diese Implementierung ist <i>threadsafe</i>, also gegen
+ * konkurrierende Zugriffe gesch&uuml;tzt. </p>
+ *
  * @author      Meno Hochschild
  * @since       2.1
- * @doctags.concurrency {threadsafe}
  */
 public class HttpClock
     extends NetTimeConnector<NetTimeConfiguration> {

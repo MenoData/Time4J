@@ -104,7 +104,6 @@ import java.util.Set;
  * </ul>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine reine Uhrzeit ohne Zeitzonen- oder Datumsteil
@@ -142,7 +141,6 @@ import java.util.Set;
  * </ul>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class PlainTime

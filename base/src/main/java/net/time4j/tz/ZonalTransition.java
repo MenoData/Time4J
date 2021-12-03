@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalTransition.java) is part of project Time4J.
  *
@@ -50,7 +50,6 @@ import java.io.Serializable;
  * gaps and ambivalent in overlapping regions. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Beschreibt einen Wechsel der Verschiebung der lokalen Zeit relativ
@@ -79,7 +78,6 @@ import java.io.Serializable;
  * nicht definiert und auf &Uuml;berlappungen zweideutig. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 public final class ZonalTransition
     implements Comparable<ZonalTransition>, Serializable {

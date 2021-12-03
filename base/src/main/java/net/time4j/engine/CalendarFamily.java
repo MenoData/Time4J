@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarFamily.java) is part of project Time4J.
  *
@@ -172,7 +172,6 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
      * @author      Meno Hochschild
      * @see         #setUp(Class,ChronoMerger,Map)
      * @since       3.4/4.3
-     * @doctags.concurrency {mutable}
      */
     /*[deutsch]
      * <p>Erzeugt einen Builder f&uuml;r eine neue Kalenderfamilie und wird ausschlie&szlig;lich beim Laden einer
@@ -184,7 +183,6 @@ public final class CalendarFamily<T extends CalendarVariant<T>>
      * @author      Meno Hochschild
      * @see         #setUp(Class,ChronoMerger,Map)
      * @since       3.4/4.3
-     * @doctags.concurrency {mutable}
      */
     public static final class Builder<T extends CalendarVariant<T>>
         extends Chronology.Builder<T> {

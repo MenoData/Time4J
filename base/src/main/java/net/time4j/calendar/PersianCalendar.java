@@ -128,7 +128,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.9/4.6
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den persischen Kalender, der offiziell in Iran und Afghanistan benutzt wird. </p>
@@ -188,7 +187,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.9/4.6
- * @doctags.concurrency {immutable}
  */
 @CalendarType("persian")
 public final class PersianCalendar

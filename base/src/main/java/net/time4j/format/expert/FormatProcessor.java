@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (FormatProcessor.java) is part of project Time4J.
  *
@@ -33,9 +33,10 @@ import java.util.Set;
 /**
  * <p>F&uuml;hrt das elementweise Parsen und Formatieren aus. </p>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec    All implementations must be immutable.
  */
 interface FormatProcessor<V> {
 

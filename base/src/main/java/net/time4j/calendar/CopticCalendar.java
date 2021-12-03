@@ -123,7 +123,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der von der koptischen Kirche in &Auml;gypten verwendet wird. </p>
@@ -178,7 +177,6 @@ import java.util.Locale;
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 @CalendarType("coptic")
 public final class CopticCalendar

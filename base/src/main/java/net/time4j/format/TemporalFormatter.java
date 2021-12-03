@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TemporalFormatter.java) is part of project Time4J.
  *
@@ -32,19 +32,21 @@ import java.util.Locale;
  * <p>Generic facade for any temporal/chronological format object which can print temporal objects to text
  * or parse texts to temporal objects. </p>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>. </p>
+ *
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Allgemeine Fassade von Zeitformatobjekten, die temporale Objekte zu Text formatieren oder umgekehrt Text als
  * temporale Objekte interpretieren. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen <i>immutable</i> sein. </p>
+ *
  * @param   <T> generic type of applicable chronological types
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.spec All implementations must be immutable.
  */
 public interface TemporalFormatter<T> {
 

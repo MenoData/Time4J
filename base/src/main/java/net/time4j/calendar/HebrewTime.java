@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewTime.java) is part of project Time4J.
  *
@@ -106,7 +106,6 @@ import java.util.concurrent.TimeUnit;
  * @see     HebrewCalendar
  * @see     net.time4j.format.expert.PatternType#DYNAMIC
  * @since   3.37/4.32
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die 12-Stunden-Uhr, die im j&uuml;dischen Kalender verwendet wird
@@ -147,7 +146,6 @@ import java.util.concurrent.TimeUnit;
  * @see     HebrewCalendar
  * @see     net.time4j.format.expert.PatternType#DYNAMIC
  * @since   3.37/4.32
- * @doctags.concurrency {immutable}
  */
 @CalendarType("hebrew")
 public final class HebrewTime

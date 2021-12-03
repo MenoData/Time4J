@@ -75,7 +75,6 @@ import java.util.stream.Stream;
  *
  * @author  Meno Hochschild
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * Das System japanischer &Auml;ra-Bezeichnungen vom Jahr AD 701 bis heute.
@@ -92,7 +91,6 @@ import java.util.stream.Stream;
  *
  * @author  Meno Hochschild
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 public final class Nengo
     implements CalendarEra, Serializable {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimestampInterval.java) is part of project Time4J.
  *
@@ -75,14 +75,12 @@ import static net.time4j.range.IntervalEdge.OPEN;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert ein Zeitstempelintervall auf dem lokalen Zeitstrahl. </p>
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  */
 public final class TimestampInterval
     extends IsoInterval<PlainTimestamp, TimestampInterval>

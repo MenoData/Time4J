@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PluralRules.java) is part of project Time4J.
  *
@@ -39,9 +39,10 @@ import java.util.concurrent.ConcurrentHashMap;
  * &quot;common/supplemental/plurals.xml&quot; for cardinal numbers and
  * &quot;common/supplemental/ordinals.xml&quot; for ordinal numbers. </p>
  *
+ * <p><strong>Note:</strong> All concrete subclasses must be <i>immutable</i>. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.spec    All concrete classes must be immutable.
  */
 /*[deutsch]
  * <p>Hilfsklasse zur Bestimmung der Pluralkategorie f&uuml;r eine gegebene
@@ -55,9 +56,11 @@ import java.util.concurrent.ConcurrentHashMap;
  * (f&uuml;r Grundzahlen) gefunden werden. Ordinalzahlregeln sind in der
  * Datei &quot;common/supplemental/ordinals.xml&quot; zu finden. </p>
  *
+ * <p><strong>Hinweis:</strong> All konkreten Subklassen m&uuml;ssen
+ * <i>immutable</i> sein. </p>
+ *
  * @author  Meno Hochschild
  * @since   1.2
- * @doctags.spec    All concrete classes must be immutable.
  */
 public abstract class PluralRules {
 

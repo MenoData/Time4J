@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (OverflowUnit.java) is part of project Time4J.
  *
@@ -33,7 +33,6 @@ import java.io.Serializable;
  * <p>Specialized calendar unit for handling day overflow. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class OverflowUnit
     extends BasicUnit

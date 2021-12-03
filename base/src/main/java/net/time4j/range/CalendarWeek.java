@@ -91,7 +91,6 @@ import java.util.NoSuchElementException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Kalenderwoche entsprechend der ISO-8601-Norm. </p>
@@ -119,7 +118,6 @@ import java.util.NoSuchElementException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class CalendarWeek

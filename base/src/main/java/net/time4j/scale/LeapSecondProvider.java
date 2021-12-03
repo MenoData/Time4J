@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (LeapSecondProvider.java) is part of project Time4J.
  *
@@ -35,8 +35,10 @@ import java.util.Map;
  * that leapseconds will generally not be active, effectively resulting
  * in POSIX-time instead of UTC. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public
+ * no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must have a public no-arg constructor.
  * @since   2.3
  */
 /*[deutsch]
@@ -49,8 +51,10 @@ import java.util.Map;
  * keine Schaltsekunden verwendet werden sollen, also die POSIX-Zeit
  * statt UTC. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must have a public no-arg constructor.
  * @since   2.3
  */
 public interface LeapSecondProvider {

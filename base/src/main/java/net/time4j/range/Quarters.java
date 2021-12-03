@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Quarters.java) is part of project Time4J.
  *
@@ -34,14 +34,12 @@ import java.text.ParseException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Zeitspanne in gregorianischen Quartalen. </p>
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 public final class Quarters
     extends SingleUnitTimeSpan<CalendarUnit, Quarters> {

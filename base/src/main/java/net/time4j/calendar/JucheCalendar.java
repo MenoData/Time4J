@@ -105,7 +105,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * Der Juche-Kalender wird in Nordkorea verwendet und hat als einzige Differenz
@@ -140,7 +139,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 @CalendarType("juche")
 public final class JucheCalendar

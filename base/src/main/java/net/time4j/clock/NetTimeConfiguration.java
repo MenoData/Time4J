@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NetTimeConfiguration.java) is part of project Time4J.
  *
@@ -30,11 +30,12 @@ package net.time4j.clock;
  * <i>immutable</i> or at least <i>threadsafe</i>. Instances can be
  * created manually or via a {@code ServiceLoader}. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
  * @see     NetTimeConnector
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public constructor without any arguments.
  */
 /*[deutsch]
  * <p>Enth&auml;lt die Konfiguration einer Verbindung zu einem
@@ -44,11 +45,13 @@ package net.time4j.clock;
  * <i>immutable</i> oder wenigstens <i>threadsafe</i> sein. Instanzen werden
  * manuell oder &uuml;ber einen {@code ServiceLoader}-Mechanismus erzeugt. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
  * @see     NetTimeConnector
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public constructor without any arguments.
  */
 public interface NetTimeConfiguration {
 

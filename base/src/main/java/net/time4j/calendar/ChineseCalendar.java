@@ -163,7 +163,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den chinesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
@@ -269,7 +268,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 @CalendarType("chinese")
 public final class ChineseCalendar

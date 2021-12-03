@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (VietnameseCalendar.java) is part of project Time4J.
  *
@@ -115,7 +115,6 @@ import java.util.Map;
  * @see     ChineseCalendar
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den vietnamesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
@@ -180,7 +179,6 @@ import java.util.Map;
  * @see     ChineseCalendar
  * @author  Meno Hochschild
  * @since   3.40/4.35
- * @doctags.concurrency {immutable}
  */
 @CalendarType("vietnam")
 public final class VietnameseCalendar

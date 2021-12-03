@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntegerTimeElement.java) is part of project Time4J.
  *
@@ -34,7 +34,6 @@ import java.math.BigDecimal;
  * <p>Allgemeines verstellbares Uhrzeitelement auf Integer-Basis. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class IntegerTimeElement
     extends AbstractTimeElement<Integer>

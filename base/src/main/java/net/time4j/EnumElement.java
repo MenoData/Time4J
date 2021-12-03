@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EnumElement.java) is part of project Time4J.
  *
@@ -46,7 +46,6 @@ import java.util.Locale;
  *
  * @param       <V> generic enum type of element values
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class EnumElement<V extends Enum<V>>
     extends AbstractDateElement<V>

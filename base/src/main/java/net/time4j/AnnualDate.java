@@ -87,7 +87,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.22/4.18
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Kombination aus Monat und Tag-des-Monats (Jahrestag) als
@@ -122,7 +121,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.22/4.18
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class AnnualDate

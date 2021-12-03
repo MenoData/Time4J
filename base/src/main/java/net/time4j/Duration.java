@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Duration.java) is part of project Time4J.
  *
@@ -94,7 +94,6 @@ import static net.time4j.ClockUnit.*;
  *
  * @param       <U> generic type of time units
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>ISO-konforme Zeitspanne zwischen zwei Zeitpunkten. </p>
@@ -135,7 +134,6 @@ import static net.time4j.ClockUnit.*;
  *
  * @param       <U> generic type of time units
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 public final class Duration<U extends IsoUnit>
     extends AbstractDuration<U>
@@ -4439,7 +4437,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *  Duration.Formatter&lt;IsoUnit&gt; f = Duration.Formatter.ofJodaStyle();
-     *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
+     *  Duration&lt;?&gt; dur = f.parse(&quot;P-2Y-15DT-30H-5M&quot;);
      *  System.out.println(dur); // output: -P2Y15DT30H5M
      * </pre>
      *
@@ -4447,7 +4445,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *  Duration.Formatter&lt;ClockUnit&gt; f =
-     *      Duration.Formatter.ofPattern(ClockUnit.class, "+hh:mm:ss");
+     *      Duration.Formatter.ofPattern(ClockUnit.class, &quot;+hh:mm:ss&quot;);
      *  String s = f.print(Duration.ofClockUnits(27, 30, 5));
      *  System.out.println(s); // output: +27:30:05
      * </pre>
@@ -4457,7 +4455,6 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#toString()
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
-     * @doctags.concurrency {immutable}
      */
     /*[deutsch]
      * <p>Nicht-lokalisiertes benutzerdefiniertes Dauerformat, das auf
@@ -4474,7 +4471,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *  Duration.Formatter&lt;IsoUnit&gt; f = Duration.Formatter.ofJodaStyle();
-     *  Duration&lt;?&gt; dur = f.parse("P-2Y-15DT-30H-5M");
+     *  Duration&lt;?&gt; dur = f.parse(&quot;P-2Y-15DT-30H-5M&quot;);
      *  System.out.println(dur); // Ausgabe: -P2Y15DT30H5M
      * </pre>
      *
@@ -4482,7 +4479,7 @@ public final class Duration<U extends IsoUnit>
      *
      * <pre>
      *  Duration.Formatter&lt;ClockUnit&gt; f =
-     *      Duration.Formatter.ofPattern(ClockUnit.class, "+hh:mm:ss");
+     *      Duration.Formatter.ofPattern(ClockUnit.class, &quot;+hh:mm:ss&quot;);
      *  String s = f.print(Duration.ofClockUnits(27, 30, 5));
      *  System.out.println(s); // Ausgabe: +27:30:05
      * </pre>
@@ -4492,7 +4489,6 @@ public final class Duration<U extends IsoUnit>
      * @see     Duration#toString()
      * @see     Duration#parsePeriod(String)
      * @see     #ofPattern(Class, String)
-     * @doctags.concurrency {immutable}
      */
     public static final class Formatter<U extends IsoUnit>
         extends TimeSpanFormatter<U, Duration<U>> {

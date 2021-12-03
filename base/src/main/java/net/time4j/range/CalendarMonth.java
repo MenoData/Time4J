@@ -93,7 +93,6 @@ import java.util.NoSuchElementException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den Monat eines Kalenderjahres als Intervall
@@ -124,7 +123,6 @@ import java.util.NoSuchElementException;
  *
  * @author  Meno Hochschild
  * @since   3.21/4.17
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class CalendarMonth

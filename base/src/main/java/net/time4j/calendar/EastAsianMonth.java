@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EastAsianMonth.java) is part of project Time4J.
  *
@@ -49,7 +49,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den ostasiatischen Kalendermonat, der in den L&auml;ndern China, Japan, Korea und Vietnam
@@ -65,7 +64,6 @@ import java.util.Map;
  *
  * @author  Meno Hochschild
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 public final class EastAsianMonth
     implements Comparable<EastAsianMonth>, Serializable {

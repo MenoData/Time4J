@@ -105,26 +105,10 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-javadoc-plugin</artifactId>
-                <version>2.10.2</version>
+                <version>3.3.1</version>
                 <configuration>
                     <!-- see https://bugs.openjdk.java.net/browse/JDK-8148480 -->
                     <additionalparam>-Xdoclint:-syntax</additionalparam>
-                    <taglets>
-                        <taglet>
-                            <tagletClass>de.menodata.taglets.ConcurrencyTaglet</tagletClass>
-                        </taglet>
-                        <taglet>
-                            <tagletClass>de.menodata.taglets.ExperimentalTaglet</tagletClass>
-                        </taglet>
-                        <taglet>
-                            <tagletClass>de.menodata.taglets.SpecificationTaglet</tagletClass>
-                        </taglet>
-                    </taglets>
-                    <tagletArtifact>
-                        <groupId>de.menodata</groupId>
-                        <artifactId>doctags</artifactId>
-                        <version>2.0</version>
-                    </tagletArtifact>
                     <show>public</show>
                     <excludePackageNames>net.time4j.tz.spi:net.time4j.scale.spi:net.time4j.format.internal:net.time4j.history.internal:net.time4j.tz.threeten:net.time4j.calendar.service</excludePackageNames>
                 </configuration>

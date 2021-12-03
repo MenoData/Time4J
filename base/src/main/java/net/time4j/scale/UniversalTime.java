@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (UniversalTime.java) is part of project Time4J.
  *
@@ -193,9 +193,10 @@ import net.time4j.base.UnixTime;
  * Actual announcements of leapseconds</a></li>
  * </ul>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>. </p>
+ *
  * @author  Meno Hochschild
  * @see     LeapSeconds
- * @doctags.spec    Implementations are required to be immutable.
  */
 /*[deutsch]
  * <p>Definiert einen Zeitstempel als Koordinate/Punkt auf der Weltzeitlinie mit
@@ -376,9 +377,10 @@ import net.time4j.base.UnixTime;
  * Aktuelle Ank&uuml;ndigung von Schaltsekunden</a></li>
  * </ul>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen <i>immutable</i> sein. </p>
+ *
  * @author  Meno Hochschild
  * @see     LeapSeconds
- * @doctags.spec    Implementations are required to be immutable.
  */
 public interface UniversalTime
     extends UnixTime {

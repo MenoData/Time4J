@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RelativeTimeProvider.java) is part of project Time4J.
  *
@@ -38,10 +38,12 @@ import java.util.Locale;
  * new methods for short/abbreviated relative times and extra words for
  * &quot;yesterday-today-tomorrow&quot;. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public
+ * no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.6/4.4
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -56,10 +58,12 @@ import java.util.Locale;
  * neue Methoden f&uuml;r abgek&uuml;rzte relative Zeiten und extra W&ouml;rter f&uuml;r
  * &quot;gestern-heute-morgen&quot;. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.6/4.4
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface RelativeTimeProvider
     extends UnitPatternProvider {

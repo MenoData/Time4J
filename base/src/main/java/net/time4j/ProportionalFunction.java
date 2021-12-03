@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ProportionalFunction.java) is part of project Time4J.
  *
@@ -33,7 +33,6 @@ import java.math.RoundingMode;
  * <p>Ermittelt eine Verh&auml;ltniszahl. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency <immutable>
  */
 final class ProportionalFunction
     implements ChronoFunction<ChronoEntity<?>, BigDecimal> {

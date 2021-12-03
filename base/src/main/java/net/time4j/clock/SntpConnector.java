@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SntpConnector.java) is part of project Time4J.
  *
@@ -41,9 +41,10 @@ import java.util.ServiceLoader;
  * or near a leap second because the NTP-protocol only repeats such a
  * timestamp causing ambivalences. </p>
  *
+ * <p>Note: This implementation is <i>threadsafe</i>. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
- * @doctags.concurrency {threadsafe}
  */
 /*[deutsch]
  * <p>Nimmt die Verbindung zu einem modernen Uhrzeit-Server gem&auml;&szlig;
@@ -61,9 +62,11 @@ import java.util.ServiceLoader;
  * &quot;ptbtime1.ptb.de&quot; und das Protokoll NTP4. Eine Alternative
  * ist die Adresse &quot;ptbtime2.ptb.de&quot;. </p>
  *
+ * <p>Hinweis: Diese Implementierung ist <i>threadsafe</i>, also gegen
+ * konkurrierende Zugriffe gesch&uuml;tzt. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
- * @doctags.concurrency {threadsafe}
  */
 public class SntpConnector
     extends NetTimeConnector<SntpConfiguration> {

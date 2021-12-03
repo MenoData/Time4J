@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionStrategy.java) is part of project Time4J.
  *
@@ -30,16 +30,20 @@ import net.time4j.base.WallTime;
  * escpecially if there are conflicts due to gaps or overlaps on the local
  * timeline. </p>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>
+ * and <i>serializable</i>. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>Dient der Aufl&ouml;sung von lokalen Zeitangaben zu einer UTC-Weltzeit,
  * wenn wegen L&uuml;cken oder &Uuml;berlappungen auf dem lokalen Zeitstrahl
  * Konflikte auftreten. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen <i>immutable</i> 
+ * und serialisierbar sein. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionStrategy {
 

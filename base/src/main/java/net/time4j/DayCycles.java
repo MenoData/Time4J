@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayCycles.java) is part of project Time4J.
  *
@@ -29,7 +29,6 @@ import java.io.Serializable;
  * is to be taken into account. </p>
  *
  * @author              Meno Hochschild
- * @doctags.concurrency {immutable}
  * @see                 PlainTime#roll(long,ClockUnit)
  */
 /*[deutsch]
@@ -37,7 +36,6 @@ import java.io.Serializable;
  * tageweiser &Uuml;berlauf gez&auml;hlt werden soll. </p>
  *
  * @author              Meno Hochschild
- * @doctags.concurrency {immutable}
  * @see                 PlainTime#roll(long,ClockUnit)
  */
 public final class DayCycles implements Serializable {

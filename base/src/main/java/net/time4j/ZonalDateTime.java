@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ZonalDateTime.java) is part of project Time4J.
  *
@@ -69,7 +69,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)
@@ -101,7 +100,6 @@ import static net.time4j.format.Attributes.TIMEZONE_ID;
  *
  * @author  Meno Hochschild
  * @since   2.0
- * @doctags.concurrency {immutable}
  * @see     Moment#inLocalView()
  * @see     Moment#inZonalView(TZID)
  * @see     Moment#inZonalView(String)

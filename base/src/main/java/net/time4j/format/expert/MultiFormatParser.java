@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MultiFormatParser.java) is part of project Time4J.
  *
@@ -51,7 +51,6 @@ import java.util.List;
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.14/4.11
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Dient der Interpretation von Texteingaben, deren Format zur Kompilierzeit noch unbekannt ist. </p>
@@ -76,7 +75,6 @@ import java.util.List;
  * @param   <T> generic type of chronological entity
  * @author  Meno Hochschild
  * @since   3.14/4.11
- * @doctags.concurrency {immutable}
  */
 public final class MultiFormatParser<T extends ChronoEntity<T>>
     implements ChronoParser<T> {

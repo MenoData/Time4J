@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayPartitionBuilder.java) is part of project Time4J.
  *
@@ -63,7 +63,6 @@ import java.util.function.Predicate;
  * @see     DayPartitionRule
  * @see     DateInterval#streamPartitioned(DayPartitionRule)
  * @since   4.18
- * @doctags.concurrency {mutable}
  */
 /*[deutsch]
  * <p>Dient der Erzeugung einer {@code DayPartitionRule}. </p>
@@ -91,7 +90,6 @@ import java.util.function.Predicate;
  * @see     DayPartitionRule
  * @see     DateInterval#streamPartitioned(DayPartitionRule)
  * @since   4.18
- * @doctags.concurrency {mutable}
  */
 public class DayPartitionBuilder {
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TimeSpan.java) is part of project Time4J.
  *
@@ -260,14 +260,12 @@ public interface TimeSpan<U> {
      * time unit and has a non-negative amount. </p>
      *
      * @param   <U> type of time unit
-     * @doctags.concurrency {immutable}
      */
     /*[deutsch]
      * <p>Repr&auml;sentiert ein atomares Element einer Zeitspanne, das auf nur
      * einer Zeiteinheit beruht und einen nicht-negativen Betrag hat. </p>
      *
      * @param   <U> type of time unit
-     * @doctags.concurrency {immutable}
      */
     class Item<U>
         implements Serializable {

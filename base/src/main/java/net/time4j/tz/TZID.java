@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TZID.java) is part of project Time4J.
  *
@@ -52,7 +52,7 @@ package net.time4j.tz;
  * correct. </p>
  *
  * <p><strong>Specification:</strong>
- * All implementations must be immutable, thread-safe and serializable. </p>
+ * All implementations must be immutable and serializable. </p>
  *
  * @author  Meno Hochschild
  */
@@ -86,8 +86,8 @@ package net.time4j.tz;
  * vor den Enum-Konstanten zu geben, weil die mit den Enums verkn&uuml;pften
  * historischen Zeitzonendaten nicht notwendig korrekt sein m&uuml;ssen. </p>
  *
- * <p><strong>Specification:</strong>
- * All implementations must be immutable, thread-safe and serializable. </p>
+ * <p><strong>Spezifikation:</strong>
+ * Alle Implementierungen m&uuml;ssen <i>immutable</i> und serialisierbar sein. </p>
  *
  * @author  Meno Hochschild
  */

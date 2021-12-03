@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RawValues.java) is part of project Time4J.
  *
@@ -32,17 +32,19 @@ import java.util.function.Supplier;
 
 /**
  * <p>Stores any kind of raw values as {@code ChronoDisplay}. </p>
+ * 
+ * <p><strong>Note:</strong> This class is <i>mutable</i>. </p>
  *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {mutable}
  */
 /*[deutsch]
  * <p>Speichert einen beliebigen Satz von chronologischen Rohwerten. </p>
  *
+ * <p><strong>Hinweis:</strong> Diese Klasse ist <i>mutable</i>. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.0
- * @doctags.concurrency {mutable}
  */
 public class RawValues
     implements Consumer<ChronoDisplay>, Supplier<ChronoDisplay> {

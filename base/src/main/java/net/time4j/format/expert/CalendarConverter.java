@@ -43,14 +43,12 @@ import java.util.Optional;
  *
  * @author  Meno Hochschild
  * @since   4.27
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Hilft eine Chronologie zum Konvertieren von allgemeinen Kalenderobjekten zu konstruieren. </p>
  *
  * @author  Meno Hochschild
  * @since   4.27
- * @doctags.concurrency {immutable}
  */
 final class CalendarConverter<T extends ChronoEntity<T> & CalendarDate>
     implements Converter<CalendarDate, T> {

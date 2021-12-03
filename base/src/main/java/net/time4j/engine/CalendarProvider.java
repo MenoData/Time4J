@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarProvider.java) is part of project Time4J.
  *
@@ -27,16 +27,20 @@ import java.util.Optional;
 /**
  * <p>SPI-interface for the generic access to calendar chronologies. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public
+ * no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    Implementations must have a public no-arg constructor.
  * @see     java.util.ServiceLoader
  * @since   4.27
  */
 /*[deutsch]
  * <p>SPI-Interface, das einen generischen Zugriff auf Kalenderchronologien erm&ouml;glicht. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    Implementations must have a public no-arg constructor.
  * @see     java.util.ServiceLoader
  * @since   4.27
  */

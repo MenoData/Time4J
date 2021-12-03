@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (TransitionHistory.java) is part of project Time4J.
  *
@@ -37,8 +37,10 @@ import java.util.Optional;
  * Preliminary experimental versions of this interface existed since v1.0
  * but there was originally not any useable implementation. </p>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>
+ * and <i>serializable</i>. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 /*[deutsch]
  * <p>H&auml;lt alle &Uuml;berg&auml;nge und Regeln einer Zeitzone. </p>
@@ -47,8 +49,10 @@ import java.util.Optional;
  * Davor existierten experimentelle Versionen des Interface schon seit v1.0,
  * aber es gab urspr&uuml;nglich keine nutzbare Implementierung. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen <i>immutable</i> 
+ * und serialisierbar sein. </p>
+ *
  * @author  Meno Hochschild
- * @doctags.spec    All implementations must be immutable, thread-safe and serializable.
  */
 public interface TransitionHistory {
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2014 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ElementOperator.java) is part of project Time4J.
  *
@@ -34,7 +34,6 @@ import net.time4j.tz.ZonalOffset;
  *
  * @param       <T> generic target type this operator is applied to
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Definiert eine Manipulation von Datums- oder Uhrzeitobjekten nach
@@ -42,7 +41,6 @@ import net.time4j.tz.ZonalOffset;
  *
  * @param       <T> generic target type this operator is applied to
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 public abstract class ElementOperator<T>
     implements ChronoOperator<T> {

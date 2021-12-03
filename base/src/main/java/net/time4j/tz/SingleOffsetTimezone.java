@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SingleOffsetTimezone.java) is part of project Time4J.
  *
@@ -40,7 +40,6 @@ import java.util.Optional;
  *
  * @author      Meno Hochschild
  * @serial      include
- * @doctags.concurrency {immutable}
  */
 final class SingleOffsetTimezone
     extends Timezone

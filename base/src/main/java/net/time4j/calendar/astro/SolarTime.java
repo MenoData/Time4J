@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SolarTime.java) is part of project Time4J.
  *
@@ -1816,18 +1816,21 @@ public final class SolarTime
 
     /**
      * <p>An SPI-interface representing a facade for the calculation engine regarding sunrise or sunset. </p>
+     * 
+     * <p><strong>Note:</strong> All implementations must have a public no-arg constructor. </p>
      *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     /*[deutsch]
      * <p>Ein SPI-Interface, das eine Fassade f&uuml;r die Berechnung von Sonnenaufgang oder Sonnenuntergang
      * darstellt. </p>
      *
+     * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+     * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+     *
      * @see     java.util.ServiceLoader
      * @since   3.34/4.29
-     * @doctags.spec    All implementations must have a public no-arg constructor.
      */
     public interface Calculator {
 

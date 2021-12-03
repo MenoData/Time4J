@@ -176,7 +176,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     NumberSystem
  * @see     HinduPrimitive#ADHIKA_INDICATOR
  * @see     HinduPrimitive#ADHIKA_IS_TRAILING
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Der traditionelle Hindukalender, der in vielen verschiedenen regionalen Varianten auf dem indischen
@@ -278,7 +277,6 @@ import java.util.concurrent.ConcurrentHashMap;
  * @see     NumberSystem
  * @see     HinduPrimitive#ADHIKA_INDICATOR
  * @see     HinduPrimitive#ADHIKA_IS_TRAILING
- * @doctags.concurrency {immutable}
  */
 @CalendarType("hindu")
 public final class HinduCalendar

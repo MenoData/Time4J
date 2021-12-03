@@ -221,7 +221,6 @@ import static net.time4j.scale.TimeScale.*;
  * </div>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert einen Zeitpunkt auf der Weltzeitlinie mit Bezug
@@ -361,7 +360,6 @@ import static net.time4j.scale.TimeScale.*;
  * </div>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 @CalendarType("iso8601")
 public final class Moment
@@ -2365,10 +2363,8 @@ public final class Moment
     /**
      * <p>Delegiert Anpassungen von {@code Moment}-Instanzen an einen
      * {@code ChronoOperator<PlainTimestamp>} mit Hilfe einer Zeitzone. </p>
-     *
-     * @doctags.concurrency {immutable}
      */
-    static final class Operator
+    static final class Operator // immutable
         implements ChronoOperator<Moment> {
 
         //~ Instanzvariablen ----------------------------------------------

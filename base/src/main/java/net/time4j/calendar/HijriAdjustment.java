@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriAdjustment.java) is part of project Time4J.
  *
@@ -33,7 +33,6 @@ import net.time4j.engine.VariantSource;
  *
  * @author 	Meno Hochschild
  * @since 	3.32/4.27
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine kleine Verstellung einer beliebigen islamischen Kalendervariante in Tagen. </p>
@@ -44,7 +43,6 @@ import net.time4j.engine.VariantSource;
  *
  * @author 	Meno Hochschild
  * @since 	3.32/4.27
- * @doctags.concurrency {immutable}
  */
 public final class HijriAdjustment
     implements VariantSource {

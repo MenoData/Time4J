@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ElementRule.java) is part of project Time4J.
  *
@@ -40,12 +40,13 @@ package net.time4j.engine;
  * <li>If the search did not yield any result then a
  * {@link RuleNotFoundException} will be thrown. </li></ol>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>. </p>
+ *
  * @param   <T> generic type of time context compatible to {@code ChronoEntity}
  * @param   <V> generic type of elment value
  * @author  Meno Hochschild
  * @see     Chronology.Builder#appendElement(ChronoElement,ElementRule)
  * @see     BasicElement#derive(Chronology)
- * @doctags.spec    All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die Regel eines chronologischen Elements, indem
@@ -68,12 +69,13 @@ package net.time4j.engine;
  * <li>Wenn die Suche letztlich nichts ergeben hat, wird eine
  * {@link RuleNotFoundException} geworfen. </li></ol>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen <i>immutable</i> sein. </p>
+ *
  * @param   <T> generic type of time context compatible to {@code ChronoEntity}
  * @param   <V> generic type of elment value
  * @author  Meno Hochschild
  * @see     Chronology.Builder#appendElement(ChronoElement,ElementRule)
  * @see     BasicElement#derive(Chronology)
- * @doctags.spec    All implementations must be immutable.
  */
 public interface ElementRule<T, V> {
 

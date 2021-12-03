@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (DayOfWeekInMonthPattern.java) is part of project Time4J.
  *
@@ -40,7 +40,6 @@ import static net.time4j.CalendarUnit.DAYS;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @doctags.concurrency {immutable}
  */
 final class DayOfWeekInMonthPattern
     extends GregorianTimezoneRule {

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NewYearStrategy.java) is part of project Time4J.
  *
@@ -37,7 +37,6 @@ import java.util.List;
  * @author  Meno Hochschild
  * @see     NewYearRule#until(int)
  * @since   3.14/4.11
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Bestimmt den Beginn eines historischen Jahres. </p>
@@ -45,7 +44,6 @@ import java.util.List;
  * @author  Meno Hochschild
  * @see     NewYearRule#until(int)
  * @since   3.14/4.11
- * @doctags.concurrency {immutable}
  */
 public final class NewYearStrategy {
 

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (WeekdataProvider.java) is part of project Time4J.
  *
@@ -34,9 +34,11 @@ import java.util.Locale;
  * the data which define a weekend will be preferably read from the resource
  * file &quot;data/weekend.data&quot;. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public
+ * no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -49,9 +51,11 @@ import java.util.Locale;
  * Wochenende definierenden Daten werden bevorzugt aus der Textdatei
  * &quot;data/weekend.data&quot; geladen. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
  * @see     java.util.ServiceLoader
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface WeekdataProvider {
 

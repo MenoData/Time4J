@@ -226,7 +226,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert die 12-Stunden-Uhr in Sekundengenauigkeit, die in &Auml;thiopien verwendet wird
@@ -399,7 +398,6 @@ import java.util.Set;
  *
  * @author  Meno Hochschild
  * @since   3.11/4.8
- * @doctags.concurrency {immutable}
  */
 @CalendarType("ethiopic")
 public final class EthiopianTime

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2017 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (YOWElement.java) is part of project Time4J.
  *
@@ -41,7 +41,6 @@ import static net.time4j.PlainTime.WALL_TIME;
  * <p>Repr&auml;sentiert das Jahr in einem ISO-Wochendatum. </p>
  *
  * @author      Meno Hochschild
- * @doctags.concurrency {immutable}
  */
 final class YOWElement
     extends AbstractDateElement<Integer> {

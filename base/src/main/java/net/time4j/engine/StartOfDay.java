@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (StartOfDay.java) is part of project Time4J.
  *
@@ -32,16 +32,18 @@ import java.util.Optional;
 /**
  * <p>Defines the start of a given calendar day relative to midnight in seconds. </p>
  *
+ * <p><strong>Note:</strong> All subclasses must be <i>immutable</i>. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.spec    All subclasses must be immutable.
  */
 /*[deutsch]
  * <p>Definiert den Start eines Kalendertages relativ zu Mitternacht in Sekunden. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Subklassen muuml;ssen <i>immutable</i> sein. </p>
+ *
  * @author  Meno Hochschild
  * @since   3.5/4.3
- * @doctags.spec    All subclasses must be immutable.
  */
 public abstract class StartOfDay {
 

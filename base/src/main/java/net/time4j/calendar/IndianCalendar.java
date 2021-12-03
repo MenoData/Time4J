@@ -126,7 +126,6 @@ import java.util.Locale;
  * @see     net.time4j.format.NumberSystem#GUJARATI
  * @see     net.time4j.format.NumberSystem#TELUGU
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert den indischen Nationalkalender. </p>
@@ -185,7 +184,6 @@ import java.util.Locale;
  * @see     net.time4j.format.NumberSystem#GUJARATI
  * @see     net.time4j.format.NumberSystem#TELUGU
  * @since   3.32/4.27
- * @doctags.concurrency {immutable}
  */
 @CalendarType("indian")
 public final class IndianCalendar

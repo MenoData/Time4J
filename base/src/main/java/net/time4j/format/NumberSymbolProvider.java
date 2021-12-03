@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSymbolProvider.java) is part of project Time4J.
  *
@@ -33,11 +33,13 @@ import java.util.Locale;
  * <p>If there is no external {@code NumberSymbolProvider} then Time4J will
  * just delegate to the internal resources or to the JDK. </p>
  *
+ * <p><strong>Note:</strong> All implementations must have a public
+ * no-arg constructor. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
  * @see     java.util.ServiceLoader
  * @see     java.text.DecimalFormatSymbols#getZeroDigit
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 /*[deutsch]
  * <p>Dieses <strong>SPI-Interface</strong> erm&ouml;glicht den Zugriff
@@ -47,11 +49,13 @@ import java.util.Locale;
  * <p>Wird kein externer {@code NumberSymbolProvider} gefunden, wird intern
  * eine Instanz erzeugt, die an die internen Ressourcen oder das JDK delegiert. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen m&uuml;ssen einen
+ * &ouml;ffentlichen und parameterlosen Konstruktor haben. </p>
+ *
  * @author  Meno Hochschild
  * @since   2.1
  * @see     java.util.ServiceLoader
  * @see     java.text.DecimalFormatSymbols#getZeroDigit
- * @doctags.spec    Implementations must have a public no-arg constructor.
  */
 public interface NumberSymbolProvider {
 

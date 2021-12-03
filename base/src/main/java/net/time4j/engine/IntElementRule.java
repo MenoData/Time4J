@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntElementRule.java) is part of project Time4J.
  *
@@ -25,19 +25,21 @@ package net.time4j.engine;
 /**
  * <p>Element rule with support for int-primitives. </p>
  *
+ * <p><strong>Note:</strong> All implementations must be <i>immutable</i>. </p>
+ *
  * @param   <T> generic type of time context compatible to {@code ChronoEntity}
  * @author  Meno Hochschild
  * @since   3.15/4.12
- * @doctags.spec    All implementations must be immutable.
  */
 /*[deutsch]
  * <p>Repr&auml;sentiert eine Elementregel mit Unterst&uuml;tzung
  * f&uuml;r java-int-primitives. </p>
  *
+ * <p><strong>Hinweis:</strong> Alle Implementierungen muuml;ssen <i>immutable</i> sein. </p>
+ *
  * @param   <T> generic type of time context compatible to {@code ChronoEntity}
  * @author  Meno Hochschild
  * @since   3.15/4.12
- * @doctags.spec    All implementations must be immutable.
  */
 public interface IntElementRule<T>
     extends ElementRule<T, Integer> {

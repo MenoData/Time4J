@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (RuleBasedTransitionModel.java) is part of project Time4J.
  *
@@ -50,7 +50,6 @@ import java.util.concurrent.ConcurrentMap;
  * @author      Meno Hochschild
  * @since       2.2
  * @serial      include
- * @doctags.concurrency {immutable}
  */
 final class RuleBasedTransitionModel
     extends TransitionModel {
