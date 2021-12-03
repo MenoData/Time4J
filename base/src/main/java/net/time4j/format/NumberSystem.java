@@ -1543,7 +1543,7 @@ public enum NumberSystem {
 
     }
 
-    public static String japkorToNumeral(
+    private static String japkorToNumeral(
         int number,
         String digits,
         boolean hasZero
@@ -1594,7 +1594,7 @@ public enum NumberSystem {
         
     }
 
-    public static int japKorToInteger(
+    private static int japKorToInteger(
         String numeral, 
         String digits,
         Leniency leniency,
