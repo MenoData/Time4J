@@ -15,6 +15,7 @@
 
 ### Fixed
 - Documentation link of Ethiopian calendar broken [#952]
+- Build problem: Remove doctags-dependency [#960] 
 
 ## [v5.8] published on 2021-03-28
 ### Added
