@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (Zodiac.java) is part of project Time4J.
  *
@@ -92,58 +92,58 @@ public enum Zodiac {
 	private static final Map<String, String[]> LANG_TO_NAMES;
 
 	static {
-		Map<String, String[]> lang2names = new HashMap<>();
-		lang2names.put(
-			"",
-			new String[]
-				{"Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
-					"Scorpius", "Ophiuchus", "Sagittarius", "Capricornus", "Aquarius", "Pisces"});
-		lang2names.put(
-			"da",
-			new String[]
-				{"Vædderen", "Tyren", "Tvillingerne", "Krebsen", "Løven", "Jomfruen", "Vægten",
-					"Skorpionen", "Slangebæreren", "Skytten", "Stenbukken", "Vandmanden", "Fiskene"});
-		lang2names.put(
-			"de",
-			new String[]
-				{"Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", "Waage",
-					"Skorpion", "Schlangenträger", "Schütze", "Steinbock", "Wassermann", "Fische"});
-		lang2names.put(
-			"en",
-			new String[]
-				{"Ram", "Bull", "Twins", "Crab", "Lion", "Maiden", "Scales",
-					"Scorpion", "Serpent-bearer", "Archer", "Capricorn", "Water-bearer", "Fish"});
-		lang2names.put(
-			"es",
-			new String[]
-				{"Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra",
-					"Escorpio", "Ofiuco", "Sagitario", "Capricornio", "Acuario", "Piscis"});
-		lang2names.put(
-			"fr",
-			new String[]
-				{"Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge", "Balance",
-					"Scorpion", "Serpentaire", "Sagittaire", "Capricorne", "Verseau", "Poissons"});
-		lang2names.put(
-			"it",
-			new String[]
-				{"Ariete", "Toro", "Gemelli", "Cancro", "Leone", "Vergine", "Bilancia",
-					"Scorpione", "Ofiuco", "Sagittario", "Capricorno", "Acquario", "Pesci"});
-		lang2names.put(
-			"nl",
-			new String[]
-				{"Ram", "Stier", "Tweelingen", "Kreeft", "Leeuw", "Maagd", "Weegschaal",
-					"Schorpioen", "Slangendrager", "Schutter", "Steenbok", "Waterman", "Vissen"});
-		lang2names.put(
-			"ru",
-			new String[]
-				{"Овен", "Телец", "Близнецы", "Рак", "Лев", "Дева", "Весы",
-					"Скорпион", "Змееносец", "Стрелец", "Козерог", "Водолей", "Рыбы"});
-		lang2names.put(
-			"tr",
-			new String[]
-				{"Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi",
-					"Akrep", "Ophiuchus", "Yay", "Oğlak", "Kova", "Balık"});
-		LANG_TO_NAMES = Collections.unmodifiableMap(lang2names);
+            Map<String, String[]> lang2names = new HashMap<>();
+            lang2names.put(
+                "",
+                new String[]
+                    {"Aries", "Taurus", "Gemini", "Cancer", "Leo", "Virgo", "Libra",
+                        "Scorpius", "Ophiuchus", "Sagittarius", "Capricornus", "Aquarius", "Pisces"});
+            lang2names.put(
+                "da",
+                new String[]
+                    {"Vædderen", "Tyren", "Tvillingerne", "Krebsen", "Løven", "Jomfruen", "Vægten",
+                        "Skorpionen", "Slangebæreren", "Skytten", "Stenbukken", "Vandmanden", "Fiskene"});
+            lang2names.put(
+                "de",
+                new String[]
+                    {"Widder", "Stier", "Zwillinge", "Krebs", "Löwe", "Jungfrau", "Waage",
+                        "Skorpion", "Schlangenträger", "Schütze", "Steinbock", "Wassermann", "Fische"});
+            lang2names.put(
+                "en",
+                new String[]
+                    {"Ram", "Bull", "Twins", "Crab", "Lion", "Maiden", "Scales",
+                        "Scorpion", "Serpent-bearer", "Archer", "Capricorn", "Water-bearer", "Fish"});
+            lang2names.put(
+                "es",
+                new String[]
+                    {"Aries", "Tauro", "Géminis", "Cáncer", "Leo", "Virgo", "Libra",
+                        "Escorpio", "Ofiuco", "Sagitario", "Capricornio", "Acuario", "Piscis"});
+            lang2names.put(
+                "fr",
+                new String[]
+                    {"Bélier", "Taureau", "Gémeaux", "Cancer", "Lion", "Vierge", "Balance",
+                        "Scorpion", "Serpentaire", "Sagittaire", "Capricorne", "Verseau", "Poissons"});
+            lang2names.put(
+                "it",
+                new String[]
+                    {"Ariete", "Toro", "Gemelli", "Cancro", "Leone", "Vergine", "Bilancia",
+                        "Scorpione", "Ofiuco", "Sagittario", "Capricorno", "Acquario", "Pesci"});
+            lang2names.put(
+                "nl",
+                new String[]
+                    {"Ram", "Stier", "Tweelingen", "Kreeft", "Leeuw", "Maagd", "Weegschaal",
+                        "Schorpioen", "Slangendrager", "Schutter", "Steenbok", "Waterman", "Vissen"});
+            lang2names.put(
+                "ru",
+                new String[]
+                    {"Овен", "Телец", "Близнецы", "Рак", "Лев", "Дева", "Весы",
+                        "Скорпион", "Змееносец", "Стрелец", "Козерог", "Водолей", "Рыбы"});
+            lang2names.put(
+                "tr",
+                new String[]
+                    {"Koç", "Boğa", "İkizler", "Yengeç", "Aslan", "Başak", "Terazi",
+                        "Akrep", "Ophiuchus", "Yay", "Oğlak", "Kova", "Balık"});
+            LANG_TO_NAMES = Collections.unmodifiableMap(lang2names);
 	}
 
 	private static final double MEAN_TROPICAL_YEAR = 365.242189;
@@ -157,12 +157,12 @@ public enum Zodiac {
 	//~ Konstruktoren -----------------------------------------------------
 
 	private Zodiac(
-		char symbol,
-		double ra,
-		double dec
+            char symbol,
+            double ra,
+            double dec
 	) {
-		this.symbol = symbol;
-		this.entry = new SkyPosition(ra, dec); // using J2000
+            this.symbol = symbol;
+            this.entry = new SkyPosition(ra, dec); // using J2000
 	}
 
 	//~ Methoden ----------------------------------------------------------
@@ -181,7 +181,7 @@ public enum Zodiac {
 	 */
 	public static Zodiac constellationPassedBySun(Moment moment) {
 
-		return Zodiac.of('S', moment, false);
+            return Zodiac.of('S', moment, false);
 
 	}
 
@@ -199,7 +199,7 @@ public enum Zodiac {
 	 */
 	public static Zodiac constellationPassedByMoon(Moment moment) {
 
-		return Zodiac.of('L', moment, false);
+            return Zodiac.of('L', moment, false);
 
 	}
 
@@ -217,7 +217,7 @@ public enum Zodiac {
 	 */
 	public static Zodiac signPassedBySun(Moment moment) {
 
-		return Zodiac.of('S', moment, true);
+            return Zodiac.of('S', moment, true);
 
 	}
 
@@ -235,7 +235,7 @@ public enum Zodiac {
 	 */
 	public static Zodiac signPassedByMoon(Moment moment) {
 
-		return Zodiac.of('L', moment, true);
+            return Zodiac.of('L', moment, true);
 
 	}
 
@@ -251,7 +251,7 @@ public enum Zodiac {
 	 */
 	public char getSymbol() {
 
-		return this.symbol;
+            return this.symbol;
 
 	}
 
@@ -269,13 +269,13 @@ public enum Zodiac {
 	 */
 	public String getDisplayName(Locale locale) {
 
-		String[] names = LANG_TO_NAMES.get(locale.getLanguage());
+            String[] names = LANG_TO_NAMES.get(locale.getLanguage());
 
-		if (names == null) {
-			names = LANG_TO_NAMES.get("");
-		}
+            if (names == null) {
+                names = LANG_TO_NAMES.get("");
+            }
 
-		return names[this.ordinal()];
+            return names[this.ordinal()];
 
 	}
 
@@ -292,7 +292,7 @@ public enum Zodiac {
 	 */
 	public Zodiac previous() {
 
-		return Zodiac.values()[(this.ordinal() + 12) % 13];
+            return Zodiac.values()[(this.ordinal() + 12) % 13];
 
 	}
 
@@ -309,7 +309,7 @@ public enum Zodiac {
 	 */
 	public Zodiac next() {
 
-		return Zodiac.values()[(this.ordinal() + 1) % 13];
+            return Zodiac.values()[(this.ordinal() + 1) % 13];
 
 	}
 
@@ -318,44 +318,44 @@ public enum Zodiac {
 		Moment moment,
 		boolean horoscope
 	) {
-		Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
-		double jde = JulianDay.ofEphemerisTime(time).getValue();
-		double lng = (body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
+            Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
+            double jde = JulianDay.ofEphemerisTime(time).getValue();
+            double lng = (body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
 
-		double start;
-		double end;
+            double start;
+            double end;
 
-		for (Zodiac zodiac : Zodiac.values()) {
-			Zodiac next = zodiac.next();
+            for (Zodiac zodiac : Zodiac.values()) {
+                Zodiac next = zodiac.next();
 
-			if (horoscope) {
-				if (zodiac == OPHIUCHUS) {
-					continue;
-				} else if (next == OPHIUCHUS) {
-					next = SAGITTARIUS;
-				}
-				int offset1 = (zodiac.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
-				int offset2 = (next.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
-				start = (zodiac.ordinal() + offset1) * 30;
-				end = (next.ordinal() + offset2) * 30;
-			} else {
-				start = toEclipticAngle(time, zodiac.entry.getRightAscension(), zodiac.entry.getDeclination());
-				end = toEclipticAngle(time, next.entry.getRightAscension(), next.entry.getDeclination());
-			}
+                if (horoscope) {
+                    if (zodiac == OPHIUCHUS) {
+                        continue;
+                    } else if (next == OPHIUCHUS) {
+                        next = SAGITTARIUS;
+                    }
+                    int offset1 = (zodiac.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
+                    int offset2 = (next.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
+                    start = (zodiac.ordinal() + offset1) * 30;
+                    end = (next.ordinal() + offset2) * 30;
+                } else {
+                    start = toEclipticAngle(time, zodiac.entry.getRightAscension(), zodiac.entry.getDeclination());
+                    end = toEclipticAngle(time, next.entry.getRightAscension(), next.entry.getDeclination());
+                }
 
-			if (end < start) {
-				end += 360;
-				if (lng < 180) {
-					lng += 360;
-				}
-			}
+                if (end < start) {
+                    end += 360;
+                    if (lng < 180) {
+                        lng += 360;
+                    }
+                }
 
-			if ((lng >= start) && (lng < end)) {
-				return zodiac;
-			}
-		}
+                if ((lng >= start) && (lng < end)) {
+                    return zodiac;
+                }
+            }
 
-		throw new NoSuchElementException("Unable to determine zodiac."); // should never happen
+            throw new NoSuchElementException("Unable to determine zodiac."); // should never happen
 	}
 
 	private static double getSolarLongitude(double jde) {
@@ -363,48 +363,48 @@ public enum Zodiac {
 	}
 
 	private static double getLunarLongitude(double jde) {
-        return StdSolarCalculator.TIME4J.getFeature(jde, "lunar-longitude");
+            return StdSolarCalculator.TIME4J.getFeature(jde, "lunar-longitude");
 	}
 
 	private static double toEclipticAngle(
-		Moment moment,
-		double raJ2000,
-		double decJ2000
+            Moment moment,
+            double raJ2000,
+            double decJ2000
 	) {
-		// approximation, see also Meeus (p. 92) about obliquity
-		double jct = JulianDay.ofSimplifiedTime(moment).getCenturyJ2000();
-		double meanObliquity = Math.toRadians(StdSolarCalculator.meanObliquity(jct));
+            // approximation, see also Meeus (p. 92) about obliquity
+            double jct = JulianDay.ofSimplifiedTime(moment).getCenturyJ2000();
+            double meanObliquity = Math.toRadians(StdSolarCalculator.meanObliquity(jct));
 
-		// apply precession (Meeus 21.3 + 21.4, verified with example 21.b)
-		double eta = (2306.2181 + (0.30188 + 0.017998 * jct) * jct) * jct / 3600;
-		double zeta = (2306.2181 + (1.09468 + 0.018203 * jct) * jct) * jct / 3600;
-		double theta = (2004.3109 - (0.42665 + 0.041833 * jct) * jct) * jct / 3600;
+            // apply precession (Meeus 21.3 + 21.4, verified with example 21.b)
+            double eta = (2306.2181 + (0.30188 + 0.017998 * jct) * jct) * jct / 3600;
+            double zeta = (2306.2181 + (1.09468 + 0.018203 * jct) * jct) * jct / 3600;
+            double theta = (2004.3109 - (0.42665 + 0.041833 * jct) * jct) * jct / 3600;
 
-		double aeRad = Math.toRadians(raJ2000 + eta);
-		double cosAE = Math.cos(aeRad);
-		double cosTheta = Math.cos(Math.toRadians(theta));
-		double sinTheta = Math.sin(Math.toRadians(theta));
-		double cosD0 = Math.cos(Math.toRadians(decJ2000));
-		double sinD0 = Math.sin(Math.toRadians(decJ2000));
+            double aeRad = Math.toRadians(raJ2000 + eta);
+            double cosAE = Math.cos(aeRad);
+            double cosTheta = Math.cos(Math.toRadians(theta));
+            double sinTheta = Math.sin(Math.toRadians(theta));
+            double cosD0 = Math.cos(Math.toRadians(decJ2000));
+            double sinD0 = Math.sin(Math.toRadians(decJ2000));
 
-		double a = cosD0 * Math.sin(aeRad);
-		double b = cosTheta * cosD0 * cosAE - sinTheta * sinD0;
-		double c = sinTheta * cosD0 * cosAE + cosTheta * sinD0;
+            double a = cosD0 * Math.sin(aeRad);
+            double b = cosTheta * cosD0 * cosAE - sinTheta * sinD0;
+            double c = sinTheta * cosD0 * cosAE + cosTheta * sinD0;
 
-		double ra = Math.toRadians(Math.toDegrees(Math.atan2(a, b)) + zeta); // in rad
-		double dec = Math.asin(c); // in rad
+            double ra = Math.toRadians(Math.toDegrees(Math.atan2(a, b)) + zeta); // in rad
+            double dec = Math.asin(c); // in rad
 
-		// transformation to ecliptic longitude (degrees in range 0-360)
-		double lng =
-			Math.toDegrees(
-				Math.atan2(
-					Math.sin(ra) * Math.cos(meanObliquity) + Math.tan(dec) * Math.sin(meanObliquity),
-					Math.cos(ra))
-			);
-		if (lng < 0.0) {
-			lng += 360;
-		}
-		return lng;
+            // transformation to ecliptic longitude (degrees in range 0-360)
+            double lng =
+                Math.toDegrees(
+                    Math.atan2(
+                        Math.sin(ra) * Math.cos(meanObliquity) + Math.tan(dec) * Math.sin(meanObliquity),
+                        Math.cos(ra))
+                );
+            if (lng < 0.0) {
+                lng += 360;
+            }
+            return lng;
 	}
 
 	//~ Innere Klassen ----------------------------------------------------
@@ -431,241 +431,241 @@ public enum Zodiac {
 	 * @since	4.37
 	 */
 	public static class Event
-		implements ChronoCondition<Moment> {
+            implements ChronoCondition<Moment> {
 
-		//~ Instanzvariablen ----------------------------------------------
+            //~ Instanzvariablen ----------------------------------------------
 
-		private final char body;
-		private final Zodiac zodiac;
-		private final boolean horoscope;
+            private final char body;
+            private final Zodiac zodiac;
+            private final boolean horoscope;
 
-		//~ Konstruktoren -------------------------------------------------
+            //~ Konstruktoren -------------------------------------------------
 
-		private Event(
-			char body,
-			Zodiac zodiac,
-			boolean horoscope
-		) {
-			super();
+            private Event(
+                char body,
+                Zodiac zodiac,
+                boolean horoscope
+            ) {
+                super();
 
-			if ((body != 'S') && (body != 'L')) {
-				throw new IllegalArgumentException("Unsupported celestial body: " + body);
-			} else if (zodiac == null) {
-				throw new IllegalArgumentException("Celestial coordinates must be finite.");
-			} else if (horoscope && (zodiac == OPHIUCHUS)) {
-				throw new IllegalArgumentException("Ophiuchus is not an astrological zodiac sign.");
-			}
+                if ((body != 'S') && (body != 'L')) {
+                    throw new IllegalArgumentException("Unsupported celestial body: " + body);
+                } else if (zodiac == null) {
+                    throw new IllegalArgumentException("Celestial coordinates must be finite.");
+                } else if (horoscope && (zodiac == OPHIUCHUS)) {
+                    throw new IllegalArgumentException("Ophiuchus is not an astrological zodiac sign.");
+                }
 
-			this.body = body;
-			this.zodiac = zodiac;
-			this.horoscope = horoscope;
-		}
+                this.body = body;
+                this.zodiac = zodiac;
+                this.horoscope = horoscope;
+        }
 
-		//~ Methoden ------------------------------------------------------
+        //~ Methoden ------------------------------------------------------
 
-		/**
-		 * <p>Calculates the moment when the celestial body enters the associated zodiac. </p>
-		 *
-		 * <p>The accuracy is limited to roughly minute precision. </p>
-		 *
-		 * @param 	start		the moment when to start the search
-		 * @return	moment of this event at or after given start
-		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-		 */
-		/*[deutsch]
-		 * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol erreicht. </p>
-		 *
-		 * <p>Die Rechengenauigkeit ist ungef&auml;hr auf eine Minute beschr&auml;nkt. </p>
-		 *
-		 * @param 	start		the moment when to start the search
-		 * @return	moment of this event at or after given start
-		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-		 */
-		public Moment atMomentOfEntry(Moment start) {
+        /**
+         * <p>Calculates the moment when the celestial body enters the associated zodiac. </p>
+         *
+         * <p>The accuracy is limited to roughly minute precision. </p>
+         *
+         * @param 	start		the moment when to start the search
+         * @return	moment of this event at or after given start
+         * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+         */
+        /*[deutsch]
+         * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol erreicht. </p>
+         *
+         * <p>Die Rechengenauigkeit ist ungef&auml;hr auf eine Minute beschr&auml;nkt. </p>
+         *
+         * @param 	start		the moment when to start the search
+         * @return	moment of this event at or after given start
+         * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+         */
+        public Moment atMomentOfEntry(Moment start) {
 
-			Moment estimate = this.atTime(start, false, true);
-			return this.atTime(estimate, false, false); // two-step-approximation
+            Moment estimate = this.atTime(start, false, true);
+            return this.atTime(estimate, false, false); // two-step-approximation
 
-		}
+        }
 
-		/**
-		 * <p>Calculates the moment when the celestial body leaves the associated zodiac. </p>
-		 *
-		 * <p>The accuracy is limited to roughly minute precision. </p>
-		 *
-		 * @param 	start		the moment when to start the search
-		 * @return	moment of this event at or after given start
-		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-		 */
-		/*[deutsch]
-		 * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol verl&auml;sst. </p>
-		 *
-		 * <p>Die Rechengenauigkeit ist ungef&auml;hr auf eine Minute beschr&auml;nkt. </p>
-		 *
-		 * @param 	start		the moment when to start the search
-		 * @return	moment of this event at or after given start
-		 * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
-		 */
-		public Moment atMomentOfExit(Moment start) {
+        /**
+         * <p>Calculates the moment when the celestial body leaves the associated zodiac. </p>
+         *
+         * <p>The accuracy is limited to roughly minute precision. </p>
+         *
+         * @param 	start		the moment when to start the search
+         * @return	moment of this event at or after given start
+         * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+         */
+        /*[deutsch]
+         * <p>Berechnet den Moment, wann der Himmelsk&ouml;rper das verkn&uuml;pfte Tierkreissymbol verl&auml;sst. </p>
+         *
+         * <p>Die Rechengenauigkeit ist ungef&auml;hr auf eine Minute beschr&auml;nkt. </p>
+         *
+         * @param 	start		the moment when to start the search
+         * @return	moment of this event at or after given start
+         * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
+         */
+        public Moment atMomentOfExit(Moment start) {
 
-			Moment estimate = this.atTime(start, true, true);
-			return this.atTime(estimate, true, false); // two-step-approximation
+            Moment estimate = this.atTime(start, true, true);
+            return this.atTime(estimate, true, false); // two-step-approximation
 
-		}
+        }
 
-		/**
-		 * <p>Tests if this event happens at given moment. </p>
-		 *
-		 * <p>Example of usage: </p>
-		 *
-		 * <pre>
-		 *     Moment moment = PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC();
-		 *     System.out.println(moment.matches(SunPosition.inConstellationOf(Zodiac.ARIES))); // true
-		 * </pre>
-		 *
-		 * <p>Note: Due to precessional effects, Aries is nowadays passed by sun in April and not around
-		 * vernal equinox as 2000 years ago. </p>
-		 *
-		 * @param 	moment		the moment to be tested
-		 * @return	boolean
-		 */
-		/*[deutsch]
-		 * <p>Testet, ob dieses Ereignis zum angegebenen Moment auftritt. </p>
-		 *
-		 * <p>Anwendungsbeispiel: </p>
-		 *
-		 * <pre>
-		 *     Moment moment = PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC();
-		 *     System.out.println(moment.matches(SunPosition.inConstellationOf(Zodiac.ARIES))); // true
-		 * </pre>
-		 *
-		 * <p>Hinweis: Wegen des Effekts der Pr&auml;zession passiert die Sonne heutzutage das Sternbild Aries
-		 * im April statt um den Fr&uuml;hlingszeitpunkt (wie 2000 Jahre fr&uuml;her). </p>
-		 *
-		 * @param 	moment		the moment to be tested
-		 * @return	boolean
-		 */
-		@Override
-		public boolean test(Moment moment) {
+        /**
+         * <p>Tests if this event happens at given moment. </p>
+         *
+         * <p>Example of usage: </p>
+         *
+         * <pre>
+         *     Moment moment = PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC();
+         *     System.out.println(moment.matches(SunPosition.inConstellationOf(Zodiac.ARIES))); // true
+         * </pre>
+         *
+         * <p>Note: Due to precessional effects, Aries is nowadays passed by sun in April and not around
+         * vernal equinox as 2000 years ago. </p>
+         *
+         * @param 	moment		the moment to be tested
+         * @return	boolean
+         */
+        /*[deutsch]
+         * <p>Testet, ob dieses Ereignis zum angegebenen Moment auftritt. </p>
+         *
+         * <p>Anwendungsbeispiel: </p>
+         *
+         * <pre>
+         *     Moment moment = PlainTimestamp.of(2000, 4, 18, 13, 16).atUTC();
+         *     System.out.println(moment.matches(SunPosition.inConstellationOf(Zodiac.ARIES))); // true
+         * </pre>
+         *
+         * <p>Hinweis: Wegen des Effekts der Pr&auml;zession passiert die Sonne heutzutage das Sternbild Aries
+         * im April statt um den Fr&uuml;hlingszeitpunkt (wie 2000 Jahre fr&uuml;her). </p>
+         *
+         * @param 	moment		the moment to be tested
+         * @return	boolean
+         */
+        @Override
+        public boolean test(Moment moment) {
 
-			Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
-			double jde = JulianDay.ofEphemerisTime(time).getValue();
-			double lng = (this.body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
+            Moment time = moment.with(Moment.PRECISION, TimeUnit.MINUTES);
+            double jde = JulianDay.ofEphemerisTime(time).getValue();
+            double lng = (this.body == 'S') ? getSolarLongitude(jde) : getLunarLongitude(jde);
 
-			double start;
-			double end;
+            double start;
+            double end;
 
-			if (this.horoscope) {
-				start = this.getHoroscopeLongitude(false);
-				end = this.getHoroscopeLongitude(true);
-			} else {
-				Zodiac z1 = this.zodiac;
-				Zodiac z2 = z1.next();
-				start = toEclipticAngle(time, z1.entry.getRightAscension(), z1.entry.getDeclination());
-				end = toEclipticAngle(time, z2.entry.getRightAscension(), z2.entry.getDeclination());
-			}
+            if (this.horoscope) {
+                start = this.getHoroscopeLongitude(false);
+                end = this.getHoroscopeLongitude(true);
+            } else {
+                Zodiac z1 = this.zodiac;
+                Zodiac z2 = z1.next();
+                start = toEclipticAngle(time, z1.entry.getRightAscension(), z1.entry.getDeclination());
+                end = toEclipticAngle(time, z2.entry.getRightAscension(), z2.entry.getDeclination());
+            }
 
-			if (end < start) {
-				end += 360;
-				if (lng < 180) {
-					lng += 360;
-				}
-			}
+            if (end < start) {
+                end += 360;
+                if (lng < 180) {
+                    lng += 360;
+                }
+            }
 
-			return (lng >= start) && (lng < end);
+            return (lng >= start) && (lng < end);
 
-		}
+        }
 
-		static Event ofSign(
-			char body,
-			Zodiac zodiac
-		) {
-			return new Event(body, zodiac, true);
-		}
+        static Event ofSign(
+            char body,
+            Zodiac zodiac
+        ) {
+            return new Event(body, zodiac, true);
+        }
 
-		static Event ofConstellation(
-			char body,
-			Zodiac zodiac
-		) {
-			return new Event(body, zodiac, false);
-		}
+        static Event ofConstellation(
+            char body,
+            Zodiac zodiac
+        ) {
+            return new Event(body, zodiac, false);
+        }
 
-		private Zodiac getZodiac(boolean exiting) {
-			Zodiac z = this.zodiac;
-			if (exiting) {
-				z = z.next();
-			}
-			if (this.horoscope && (z == OPHIUCHUS)) {
-				z = SAGITTARIUS;
-			}
-			return z;
-		}
+        private Zodiac getZodiac(boolean exiting) {
+            Zodiac z = this.zodiac;
+            if (exiting) {
+                z = z.next();
+            }
+            if (this.horoscope && (z == OPHIUCHUS)) {
+                z = SAGITTARIUS;
+            }
+            return z;
+        }
 
-		private int getHoroscopeLongitude(boolean exiting) {
-			Zodiac z = this.getZodiac(exiting);
-			int offset = (z.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
-			return (z.ordinal() + offset) * 30;
-		}
+        private int getHoroscopeLongitude(boolean exiting) {
+            Zodiac z = this.getZodiac(exiting);
+            int offset = (z.compareTo(OPHIUCHUS) < 0) ? 0 : -1;
+            return (z.ordinal() + offset) * 30;
+        }
 
-		private Moment atTime(
-			Moment moment,
-			boolean exiting,
-			boolean after
-		) {
-			final double angle;
+        private Moment atTime(
+            Moment moment,
+            boolean exiting,
+            boolean after
+        ) {
+            final double angle;
 
-			if (this.horoscope) {
-				if (after) {
-					angle = this.getHoroscopeLongitude(exiting);
-				} else {
-					return moment; // no precession => reduce to one-step-calculation
-				}
-			} else {
-				Zodiac z = this.getZodiac(exiting);
-				angle = toEclipticAngle(moment, z.entry.getRightAscension(), z.entry.getDeclination());
-			}
+            if (this.horoscope) {
+                if (after) {
+                    angle = this.getHoroscopeLongitude(exiting);
+                } else {
+                    return moment; // no precession => reduce to one-step-calculation
+                }
+            } else {
+                Zodiac z = this.getZodiac(exiting);
+                angle = toEclipticAngle(moment, z.entry.getRightAscension(), z.entry.getDeclination());
+            }
 
-			double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
-			double estimate = jd0;
+            double jd0 = JulianDay.ofEphemerisTime(moment).getValue();
+            double estimate = jd0;
 
-			if (this.body == 'S') {
-				double delta = angle - getSolarLongitude(jd0);
-				if (after) {
-					delta = modulo360(delta);
-				}
-				estimate += (delta * MEAN_TROPICAL_YEAR / 360.0);
-			} else {
-				double delta = angle - getLunarLongitude(jd0);
-				if (after) {
-					delta = modulo360(delta);
-				}
-				estimate += (delta * MEAN_SYNODIC_MONTH / 360.0);
-			}
+            if (this.body == 'S') {
+                double delta = angle - getSolarLongitude(jd0);
+                if (after) {
+                    delta = modulo360(delta);
+                }
+                estimate += (delta * MEAN_TROPICAL_YEAR / 360.0);
+            } else {
+                double delta = angle - getLunarLongitude(jd0);
+                if (after) {
+                    delta = modulo360(delta);
+                }
+                estimate += (delta * MEAN_SYNODIC_MONTH / 360.0);
+            }
 
-			double low = Math.max(jd0, estimate - 5);
-			double high = estimate + 5;
+            double low = Math.max(jd0, estimate - 5);
+            double high = estimate + 5;
 
-			while (true) {
-				double x = (low + high) / 2;
+            while (true) {
+                double x = (low + high) / 2;
 
-				if (high - low < 0.0001) { // < 9 seconds
-					return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.SECONDS);
-				}
+                if (high - low < 0.0001) { // < 9 seconds
+                    return JulianDay.ofEphemerisTime(x).toMoment().with(Moment.PRECISION, TimeUnit.SECONDS);
+                }
 
-				double delta = ((this.body == 'S') ? getSolarLongitude(x) : getLunarLongitude(x)) - angle;
+                double delta = ((this.body == 'S') ? getSolarLongitude(x) : getLunarLongitude(x)) - angle;
 
-				if (modulo360(delta) < 180.0) {
-					high = x;
-				} else {
-					low = x;
-				}
-			}
-		}
+                if (modulo360(delta) < 180.0) {
+                    high = x;
+                } else {
+                    low = x;
+                }
+            }
+        }
 
-		private static double modulo360(double angle) {
-			return angle - 360.0 * Math.floor(angle / 360.0); // always >= 0.0
-		}
+        private static double modulo360(double angle) {
+            return angle - 360.0 * Math.floor(angle / 360.0); // always >= 0.0
+        }
 
-	}
+    }
 
 }
