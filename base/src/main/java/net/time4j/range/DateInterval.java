@@ -1282,7 +1282,7 @@ public final class DateInterval
     }
 
     /**
-     * Obtains a random date within this interval. </p>
+     * <p>Obtains a random date within this interval. </p>
      *
      * @return  random date within this interval
      * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
@@ -1290,7 +1290,7 @@ public final class DateInterval
      * @since   5.0
      */
     /*[deutsch]
-     * Liefert ein Zufallsdatum innerhalb dieses Intervalls. </p>
+     * <p>Liefert ein Zufallsdatum innerhalb dieses Intervalls. </p>
      *
      * @return  random date within this interval
      * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form

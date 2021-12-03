@@ -70,7 +70,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * <p>Represents the Hijri calendar used in many islamic countries. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is a lunar calendar which exists in several variants and is mainly for religious purposes.
  * The variant used in Saudi-Arabia is named &quot;islamic-umalqura&quot; and is based on data partially
@@ -85,7 +85,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * data-subdirectory of resource class path (where hyphens are replaced by underscores). Format details see
  * the file &quot;islamic_umalqura.data&quot;. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -99,7 +99,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Formatting and simple transformations</h4>
+ * <p><strong>Formatting and simple transformations</strong></p>
  *
  * <pre>
  *     // parse a Hijri-string and convert to a gregorian date
@@ -118,7 +118,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *       SystemClock.inLocalView().today().transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA);
  * </pre>
  *
- * <h4>Exact handling of start of islamic day in the evening</h4>
+ * <p><strong>Exact handling of start of islamic day in the evening</strong></p>
  *
  * <pre>
  *     SolarTime meccaTime = SolarTime.ofLocation(21.4225, 39.826111);
@@ -132,7 +132,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *       ).toDate();
  * </pre>
  *
- * <h4>How to determine the valid calendar range</h4>
+ * <p><strong>How to determine the valid calendar range</strong></p>
  *
  * <p>Note that the supported range of this class is limited compared with the gregorian counter-example. Users
  * can apply following code to determine the exact variant-dependent range: </p>
@@ -152,7 +152,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     PlainDate maxGregorian = PlainDate.of(max, EpochDays.UTC); // 2077-11-16
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *     Locale locale = Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;);
@@ -177,7 +177,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Repr&auml;sentiert den Hijri-Kalender, der in vielen islamischen L&auml;ndern vorwiegend f&uuml;r
  * religi&ouml;se Zwecke benutzt wird. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen lunaren Kalender, der in verschiedenen Varianten existiert. Die Variante
  * in Saudi-Arabien hei&szlig;t &quot;islamic-umalqura&quot; und basiert teilweise auf Daten gewonnen
@@ -193,7 +193,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * liegt (wobei Bindestriche durch Unterstriche ersetzt werden). Formatdetails siehe die vorhandene Datei
  * &quot;islamic_umalqura.data&quot;. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -207,7 +207,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiele</h4>
+ * <p><strong>Anwendungsbeispiele</strong></p>
  *
  * <pre>
  *     // Hijri-Text interpretieren und in ein gregorianisches Datum umwandeln
@@ -226,7 +226,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *       SystemClock.inLocalView().today().transform(HijriCalendar.class, HijriCalendar.VARIANT_UMALQURA);
  * </pre>
  *
- * <h4>Exakte Behandlung des Beginns des islamischen Tags am Abend</h4>
+ * <p><strong>Exakte Behandlung des Beginns des islamischen Tags am Abend</strong></p>
  *
  * <pre>
  *     SolarTime meccaTime = SolarTime.ofLocation(21.4225, 39.826111);
@@ -240,7 +240,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *       ).toDate();
  * </pre>
  *
- * <h4>Ermittlung des g&uuml;ltigen Wertbereichs</h4>
+ * <p><strong>Ermittlung des g&uuml;ltigen Wertbereichs</strong></p>
  *
  * <p>Hinweis: Der unterst&uuml;tze variantenabh&auml;ngige Wertbereich dieser Klasse ist verglichen mit
  * dem gregorianischen Standardfall begrenzt. Anwender k&ouml;nnen folgenden Code nutzen, um den genauen
@@ -261,7 +261,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     PlainDate maxGregorian = PlainDate.of(max, EpochDays.UTC); // 2077-11-16
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *     Locale locale = Locale.forLanguageTag(&quot;ar-SA-u-ca-islamic-umalqura&quot;);

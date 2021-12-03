@@ -78,8 +78,8 @@ import java.util.Set;
  * <p>The Thai solar calendar calendar used in Thailand uses as only difference to western gregorian
  * calendar a different year numbering with the Buddhist era mainly. </p>
  *
- * <h4>Following elements which are declared as constants are registered by
- * this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by
+ * this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -93,7 +93,7 @@ import java.util.Set;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Anomaly in year 1940</h4>
+ * <p><strong>Anomaly in year 1940</strong></p>
  *
  * <p style="text-align:center;"><img src="doc-files/thai-anomaly.png" alt="Anomaly of 1940/41"></p>
  *
@@ -110,7 +110,7 @@ import java.util.Set;
  * corresponds to the addition of apparently three buddhist years in this edge case. If translated to
  * its ISO-equivalent the reason is clear: [1940-02-01] + 2 years = [1942-02-01]. </p>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-buddhist&quot;);
@@ -128,7 +128,7 @@ import java.util.Set;
  * zum gregorianischen Kalender eine andere Jahresz&auml;hlung, indem als Ausgangspunkt gew&ouml;hnlich
  * die buddhistische &Auml;ra benutzt wird. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -142,7 +142,7 @@ import java.util.Set;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anomalie im Jahr 1940</h4>
+ * <p><strong>Anomalie im Jahr 1940</strong></p>
  *
  * <p style="text-align:center;"><img src="doc-files/thai-anomaly.png" alt="Anomalie von 1940/41"></p>
  *
@@ -162,7 +162,7 @@ import java.util.Set;
  * buddhistischen Jahren. Wenn die Datumsangaben zu ISO &uuml;bersetzt werden, ist der
  * Grund sofort klar: [1940-02-01] + 2 years = [1942-02-01] </p>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-buddhist&quot;);

@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2020 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HinduVariant.java) is part of project Time4J.
  *
@@ -583,7 +583,7 @@ public final class HinduVariant
      *
      * @param   depressionAngle     the depression angle of sun used in sunrise/sunset-calculations
      * @return  modified copy or this variant if in old style (Arya-Siddhanta)
-     * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 <= x <= 10.0
+     * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 &lt;= x &lt;= 10.0
      */
     /*[deutsch]
      * <p>Erzeugt eine Kopie dieser Variante basierend auf moderner Astronomie, die auch mit einer alternativen
@@ -596,7 +596,7 @@ public final class HinduVariant
      *
      * @param   depressionAngle     the depression angle of sun used in sunrise/sunset-calculations
      * @return  modified copy or this variant if in old style (Arya-Siddhanta)
-     * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 <= x <= 10.0
+     * @throws  IllegalArgumentException if the depression angle is not a rational number in range -10.0 &lt;= x &lt;= 10.0
      */
     public HinduVariant withModernAstronomy(double depressionAngle) {
         if (Double.isNaN(depressionAngle) || Double.isInfinite(depressionAngle)) {

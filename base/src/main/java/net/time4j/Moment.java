@@ -112,7 +112,7 @@ import static net.time4j.scale.TimeScale.*;
  * are defined by any elements then manipulations of related data are
  * possible in any timezone. </p>
  *
- * <h3>Time arithmetic</h3>
+ * <p><strong>Time arithmetic</strong></p>
  *
  * <p>The main time units are defined by {@link SI} (counting possible
  * UTC-leapseconds) and {@link TimeUnit}. Latter unit type can be used
@@ -121,7 +121,7 @@ import static net.time4j.scale.TimeScale.*;
  * {@code plus(long, unit)}, {@code minus(long, unit)} and
  * {@code until(Moment, unit)}. </p>
  *
- * <h3>Time scales</h3>
+ * <p><strong>Time scales</strong></p>
  *
  * <p>Following table illustrates how a time scale affects values and representations
  * before, during and after a leap second event. Two views exist, either interpreting
@@ -250,7 +250,7 @@ import static net.time4j.scale.TimeScale.*;
  * Manipulationen der zugeh&ouml;rigen Daten in einer beliebigen Zeitzone
  * m&ouml;glich. </p>
  *
- * <h3>Zeitarithmetik</h3>
+ * <p><strong>Zeitarithmetik</strong></p>
  *
  * <p>Als Zeiteinheiten kommen {@link SI} (mit Z&auml;hlung von Schaltsekunden)
  * und {@link TimeUnit} in Betracht. Letztere Einheit kann verwendet werden,
@@ -259,7 +259,7 @@ import static net.time4j.scale.TimeScale.*;
  * den Methoden {@code plus(long, unit)}, {@code minus(long, unit)} und
  * {@code until(Moment, unit)} verwendet. </p>
  *
- * <h3>Zeitskalen</h3>
+ * <p><strong>Zeitskalen</strong></p>
  *
  * <p>Folgende Tabelle illustriert, wie eine Zeitskala Werte und Darstellungen
  * von <code>Moment</code>-Objekten vor, w&auml;hrend und nach einer Schaltsekunde

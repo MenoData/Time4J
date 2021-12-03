@@ -74,7 +74,7 @@ import java.util.Locale;
 /**
  * <p>Represents the Solar Hijri calendar which is officially used in Iran and Afghanistan. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is a solar calendar which is in close agreement with the astronomical seasons. The vernal equinox
  * serves as the first day of the Persian year (Farvardin 1st). If it is observed before noon at local time
@@ -90,7 +90,7 @@ import java.util.Locale;
  * However, dates calculated in far future beyond 2123 can still be wrong due to the uncertainty of astronomical
  * term delta-T and should be considered as approximation. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -104,7 +104,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p><strong>Example of usage</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
@@ -115,7 +115,7 @@ import java.util.Locale;
  *     System.out.println(formatter.format(jalali));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);
@@ -132,7 +132,7 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den persischen Kalender, der offiziell in Iran und Afghanistan benutzt wird. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen solaren Kalender, der in enger &Uuml;bereinstimmung mit den astronomischen
  * Saisons existiert. Als Startpunkt dient die astronomische Fr&uuml;hlingstagundnachtgleiche. Wird sie vor
@@ -149,7 +149,7 @@ import java.util.Locale;
  * astronomische Term delta-T sich nicht beliebig genau in die Zukunft prognostizieren l&auml;sst. Solche Datumswerte
  * weit in der Zukunft sind daher als N&auml;herung anzusehen. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -163,7 +163,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <p><strong>Anwendungsbeispiel</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;PersianCalendar&gt; formatter =
@@ -174,7 +174,7 @@ import java.util.Locale;
  *     System.out.println(formatter.format(jalali));
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale loc = Locale.forLanguageTag(&quot;de-IR-u-ca-persian&quot;);

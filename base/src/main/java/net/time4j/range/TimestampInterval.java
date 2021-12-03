@@ -854,7 +854,7 @@ public final class TimestampInterval
     }
 
     /**
-     * Obtains a random timestamp within this interval. </p>
+     * <p>Obtains a random timestamp within this interval. </p>
      *
      * @return  random timestamp within this interval
      * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form
@@ -862,7 +862,7 @@ public final class TimestampInterval
      * @since   5.0
      */
     /*[deutsch]
-     * Liefert einen Zufallszeitstempel innerhalb dieses Intervalls. </p>
+     * <p>Liefert einen Zufallszeitstempel innerhalb dieses Intervalls. </p>
      *
      * @return  random timestamp within this interval
      * @throws  IllegalStateException if this interval is infinite or empty or if there is no canonical form

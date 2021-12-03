@@ -75,7 +75,7 @@ import java.util.Locale;
 /**
  * <p>Represents the calendar used by the worldwide Jewish community, but mainly in Israel for religious purposes. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is a lunisolar calendar which defines years consisting of 12 or 13 months. The month cycle
  * generally follows the lunar cycle of synodic moon. However, every two or three years, an extra
@@ -88,7 +88,7 @@ import java.util.Locale;
  * 18:00 o&#39;clock is used - especially in case of missing geographic location. However, Time4J
  * enables users to use the exact astronomical sunset as begin of day for religious purposes. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -102,7 +102,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Formatting of the month Adar-II</h4>
+ * <p><strong>Formatting of the month Adar-II</strong></p>
  *
  * <p>The month Adar-II is printed in different ways dependent on if the associated year is a leap year or not. </p>
  *
@@ -118,7 +118,7 @@ import java.util.Locale;
  *     assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is(&quot;Adar II, 29 (5779)&quot;));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-hebrew&quot;);
@@ -138,7 +138,7 @@ import java.util.Locale;
  * <p>Repr&auml;sentiert den Kalender, der von der weltweitenj&uuml;dischen Gemeinschaft,
  * haupts&auml;chlich aber in Israel f&uuml;r religi&ouml;se Zwecke, verwendet wird. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen kombinierten Sonnen- und Mondkalender, dessen Jahre aus 12 oder 13
  * Monaten bestehen. Grunds&auml;tzlich folgt der Monatszyklus dem Mondzyklus basierend auf dem
@@ -153,7 +153,7 @@ import java.util.Locale;
  * Zwecke ist es im Rahmen von Time4J aber m&ouml;glich, den exakten astronomischen Sonnenuntergang des
  * Vortags als Tagesbeginn zu berechnen. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -167,7 +167,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Formatting of the month Adar-II</h4>
+ * <p><strong>Formatting of the month Adar-II</strong></p>
  *
  * <p>Der Monat Adar-II wird je nachdem, ob das assoziierte Jahr ein Schaltjahr ist oder nicht, verschieden
  * formatiert: </p>
@@ -184,7 +184,7 @@ import java.util.Locale;
  *     assertThat(f.format(date.plus(1, HebrewCalendar.Unit.YEARS)), is(&quot;Adar II, 29 (5779)&quot;));
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-hebrew&quot;);

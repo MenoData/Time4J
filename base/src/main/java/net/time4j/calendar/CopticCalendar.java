@@ -74,7 +74,7 @@ import java.util.Locale;
 /**
  * <p>Represents the calendar used by the Coptic church in Egypt. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is a solar calendar which defines years consisting of 13 months. The first 12 months are always 30 days long.
  * The last month has 5 or 6 days depending if a Coptic year is a leap year or not. The leap year rule is the same
@@ -86,7 +86,7 @@ import java.util.Locale;
  * calendar (the historic ancestor of the Coptic calendar) started the day at sunrise. We assume
  * here an adaptation of the Coptic calendar to the habits of Islamic calendar in Egypt. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -100,7 +100,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p><strong>Example of usage</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
@@ -111,7 +111,7 @@ import java.util.Locale;
  *     System.out.println(formatter.format(copticDate));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);
@@ -127,7 +127,7 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der von der koptischen Kirche in &Auml;gypten verwendet wird. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen Sonnenkalender, dessen Jahre aus 13 Monaten bestehen. Die ersten 12 Monate
  * sind immer 30 Tage lang, w&auml;hrend der letzte Monat 5 oder 6 Tage lang ist, je nachdem ob ein Schaltjahr
@@ -140,7 +140,7 @@ import java.util.Locale;
  * eine Anpassung des koptischen Kalenders an die Gewohnheiten des islamischen Kalenders in &Auml;gypten
  * angenommen. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -154,7 +154,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <p><strong>Anwendungsbeispiel</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;CopticCalendar&gt; formatter =
@@ -165,7 +165,7 @@ import java.util.Locale;
  *     System.out.println(formatter.format(copticDate));
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-coptic&quot;);

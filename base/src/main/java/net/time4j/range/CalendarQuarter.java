@@ -103,7 +103,7 @@ public final class CalendarQuarter
     /**
      * <p>Element with the proleptic iso-year without any era reference and
      * the value range {@code -999999999} until {@code 999999999}. </p>
-     * <p/>
+     * 
      * <p>The term &quot;proleptic&quot; means that the rules of the gregorian
      * calendar and the associated way of year counting is applied backward
      * even before the introduction of gregorian calendar. The year {@code 0}

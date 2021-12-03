@@ -74,13 +74,13 @@ import java.util.Locale;
 /**
  * <p>Represents the proleptic Julian calendar. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is de facto the ancestor of modern gregorian calendar but does not reflect any historic anomalies
  * and applies its leap year rules even backwards into the far past. The main difference to gregorian
  * calendar is the leap year rule which considers every year as leap year whose number is divisible by four. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -95,7 +95,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p><strong>Example of usage</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;JulianCalendar&gt; formatter =
@@ -106,7 +106,7 @@ import java.util.Locale;
  *     System.out.println(formatter.format(julianDate));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-julian&quot;);
@@ -122,13 +122,13 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den proleptischen julianischen Kalender. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>De facto handelt es sich um den Vorg&auml;nger des modernen gregorianischen Kalenders.
  * Jedoch werden historische Anomalien nicht erfasst. Die Schaltjahresregel, die jedes durch
  * vier teilbare Jahr als Schaltjahr ansieht, wird sogar bis in die ferne Vergangenheit angewandt. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -143,7 +143,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <p><strong>Anwendungsbeispiel</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;JulianCalendar&gt; formatter =
@@ -154,7 +154,7 @@ import java.util.Locale;
  *     System.out.println(formatter.format(julianDate));
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-julian&quot;);

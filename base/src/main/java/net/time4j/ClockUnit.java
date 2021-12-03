@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ClockUnit.java) is part of project Time4J.
  *
@@ -177,9 +177,9 @@ public enum ClockUnit
      *
      * <p>Conversions from more precise to less precise units are usually
      * associated with a loss of information. For example the conversion
-     * of <tt>999</tt> milliseconds results to <tt>0</tt> seconds. In reverse,
-     * the conversion of less precise to more precise units can result in
-     * a numerical overflow. </p>
+     * of <code>999</code> milliseconds results to <code>0</code> seconds.
+     * In reverse, the conversion of less precise to more precise units can
+     * result in a numerical overflow. </p>
      *
      * <p>Example: In order to convert 44 minutes to milliseconds, the
      * expression {@code ClockUnit.MILLIS.convert(44L, ClockUnit.MINUTES)}
@@ -198,9 +198,9 @@ public enum ClockUnit
      *
      * <p>Konversionen von genaueren zu weniger genauen Zeiteinheiten
      * f&uuml;hren im allgemeinen zu Verlusten an Information. Zum Beispiel
-     * wird die Konversion von <tt>999</tt> Millisekunden <tt>0</tt> Sekunden
-     * ergeben. Umgekehrt kann die Konversion von groben zu feinen Einheiten
-     * zu einem &Uuml;berlauf f&uuml;hren. </p>
+     * wird die Konversion von <code>999</code> Millisekunden <code>0</code> 
+     * Sekunden ergeben. Umgekehrt kann die Konversion von groben zu feinen 
+     * Einheiten zu einem &Uuml;berlauf f&uuml;hren. </p>
      *
      * <p>Beispiel: Um 44 Minuten zu Millisekunden zu konvertieren, wird der
      * Ausdruck {@code ClockUnit.MILLIS.convert(44L, ClockUnit.MINUTES)}

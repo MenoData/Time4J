@@ -46,7 +46,7 @@ import net.time4j.tz.TZID;
  * using the method {@code equals()} is not allowed. </strong></p>
  *
  * <p>The predefined enum constants actually mirror the TZ-version
- * <span style="text-decoration:underline;"><tt>2013i</tt></span> and
+ * <span style="text-decoration:underline;"><code>2013i</code></span> and
  * are usually associated wih timezones whose rules have changed or are
  * about to change. The enum constants do <strong>NOT</strong> mean
  * that they are also valid or that there are always well-defined timezone
@@ -79,7 +79,7 @@ import net.time4j.tz.TZID;
  * die Objekt-Methode {@code equals()} ist nicht erlaubt. </strong></p>
  *
  * <p>Die vordefinierten Enum-Konstanten spiegeln aktuell die TZ-Version
- * <span style="text-decoration:underline;"><tt>2013i</tt></span> wider
+ * <span style="text-decoration:underline;"><code>2013i</code></span> wider
  * und sind in der Regel mit Zeitzonen verkn&uuml;pft, deren Regeln sich im
  * Laufe der Zeit ge&auml;ndert haben oder es aktuell tun. Die Enum-Konstanten
  * bedeuten <strong>NICHT</strong>, da&szlig; sie auch g&uuml;ltig

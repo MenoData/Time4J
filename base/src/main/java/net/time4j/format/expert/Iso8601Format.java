@@ -515,6 +515,7 @@ public class Iso8601Format {
      * @param   dateStyle       iso-compatible date style
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
+     * @param   offset          time zone offset
      * @return  ChronoPrinter as new instance
      * @since   4.18
      */
@@ -527,6 +528,7 @@ public class Iso8601Format {
      * @param   dateStyle       iso-compatible date style
      * @param   decimalStyle    iso-compatible decimal style
      * @param   precision       controls the precision of output format with constant length
+     * @param   offset          time zone offset
      * @return  ChronoPrinter as new instance
      * @since   4.18
      */

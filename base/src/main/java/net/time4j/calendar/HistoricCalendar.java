@@ -92,7 +92,7 @@ import java.util.concurrent.ConcurrentHashMap;
 /**
  * <p>Represents the historic christian calendar used in most European countries. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -107,7 +107,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Formatting example</h4>
+ * <p><strong>Formatting example</strong></p>
  *
  * <pre>
  *      ChronoHistory history = ChronoHistory.of(Locale.UK);
@@ -119,7 +119,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *      assertThat(f.parse(text), is(cal));
  * </pre>
  *
- * <h4>Transformation from ISO-8601</h4>
+ * <p><strong>Transformation from ISO-8601</strong></p>
  *
  * <p>Any gregorian date (ISO-8601) can be transformed to {@code HistoricCalendar} this simple way: </p>
  *
@@ -129,7 +129,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     System.out.println(cal); // AD-1582-09-25[...], ten days were cut off by pope Gregor
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *     Locale locale = Locale.forLanguageTag(&quot;de-DE-PREUSSEN-u-ca-historic&quot;);
@@ -150,7 +150,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Repr&auml;sentiert den historischen christlichen Kalender, der in vielen europ&auml;ischen L&auml;ndern
  * benutzt wurde. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -165,7 +165,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Formatierungsbeispiel</h4>
+ * <p><strong>Formatierungsbeispiel</strong></p>
  *
  * <pre>
  *      ChronoHistory history = ChronoHistory.of(Locale.UK);
@@ -177,7 +177,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *      assertThat(f.parse(text), is(cal));
  * </pre>
  *
- * <h4>Transformation von ISO-8601</h4>
+ * <p><strong>Transformation von ISO-8601</strong></p>
  *
  * <p>Jedes gregorianische Datum (ISO-8601) kann zu einem {@code HistoricCalendar} auf folgende einfache
  * Art und Weise transformiert werden: </p>
@@ -188,7 +188,7 @@ import java.util.concurrent.ConcurrentHashMap;
  *     System.out.println(cal); // AD-1582-09-25[...], ten days were cut off by pope Gregor
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *     Locale locale = Locale.forLanguageTag(&quot;de-DE-PREUSSEN-u-ca-historic&quot;);

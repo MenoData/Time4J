@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2015 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (PluralCategory.java) is part of project Time4J.
  *
@@ -40,14 +40,19 @@ public enum PluralCategory {
 
     //~ Statische Felder/Initialisierungen --------------------------------
 
+    /** Category for zero amounts. */
     ZERO,
 
+    /** Category for amount one. */
     ONE,
 
+    /** Category for amount two. */
     TWO,
 
+    /** Category for amount <i>a few</i>. */
     FEW,
 
+    /** Category for amount <i>many</i>. */
     MANY,
 
     /**

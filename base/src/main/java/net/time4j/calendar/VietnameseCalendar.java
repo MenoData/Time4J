@@ -57,7 +57,7 @@ import java.util.Map;
 /**
  * <p>Represents the Vietnamese calendar supported in the gregorian range 1813-02-01/3000-01-27. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is a lunisolar calendar which is supposed to be structurally identical to the Chinese calendar.
  * See also the page of <a href="https://www.informatik.uni-leipzig.de/~duc/amlich/">Ho Ngoc Duc</a>. The
@@ -75,7 +75,7 @@ import java.util.Map;
  *     since reunification in 1975 also in Southern part).</li>
  * </ul>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -91,7 +91,7 @@ import java.util.Map;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p><strong>Example of usage</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
@@ -102,7 +102,7 @@ import java.util.Map;
  *     System.out.println(formatter.format(vietDate));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnam&quot;);
@@ -120,7 +120,7 @@ import java.util.Map;
  * <p>Repr&auml;sentiert den vietnamesischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
  * Bereich 1813-02-01/3000-01-27. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen lunisolaren Kalender, der strukturell mit dem chinesischen Kalender identisch ist.
  * Siehe auch die Webseite von <a href="https://www.informatik.uni-leipzig.de/~duc/amlich/">Ho Ngoc Duc</a>. Die
@@ -139,7 +139,7 @@ import java.util.Map;
  *     auch in S&uuml;dvietnam).</li>
  * </ul>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -155,7 +155,7 @@ import java.util.Map;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <p><strong>Anwendungsbeispiel</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;VietnameseCalendar&gt; formatter =
@@ -166,7 +166,7 @@ import java.util.Map;
  *     System.out.println(formatter.format(vietDate));
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-vietnam&quot;);

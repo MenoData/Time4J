@@ -225,6 +225,7 @@ public final class HinduMonth
      * {@code getDisplayName(locale)}. If this month is in leap status then the localized word
      * for &quot;adhika&quot; will be inserted before the name. </p>
      *
+     * @param   locale  localization parameter
      * @return  String
      * @see     #getRasi()
      * @see     #getDisplayName(Locale)
@@ -237,6 +238,7 @@ public final class HinduMonth
      * (Schaltmonat), dann wird das sprachabh&auml;ngige Wort f&uuml;r &quot;adhika&quot; vor den Namen
      * gesetzt. </p>
      *
+     * @param   locale  localization parameter
      * @return  String
      * @see     #getRasi()
      * @see     #getDisplayName(Locale)

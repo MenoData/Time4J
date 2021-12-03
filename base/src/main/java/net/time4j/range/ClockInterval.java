@@ -615,7 +615,7 @@ public final class ClockInterval
     }
 
     /**
-     * Obtains a random time within this interval. </p>
+     * <p>Obtains a random time within this interval. </p>
      *
      * @return  random time within this interval
      * @throws  IllegalStateException if this interval is empty or if there is no canonical form
@@ -623,7 +623,7 @@ public final class ClockInterval
      * @since   5.0
      */
     /*[deutsch]
-     * Liefert eine Zufallszeit innerhalb dieses Intervalls. </p>
+     * <p>Liefert eine Zufallszeit innerhalb dieses Intervalls. </p>
      *
      * @return  random time within this interval
      * @throws  IllegalStateException if this interval is empty or if there is no canonical form

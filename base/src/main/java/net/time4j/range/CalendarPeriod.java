@@ -316,6 +316,7 @@ public class CalendarPeriod<T>
      *         // [AP-1393-01-05/AP-1393-01-06]
      * </pre>
      *
+     * @param   <U> generic unit type
      * @param   <D> generic type of timepoints on the underlying timeline
      * @param   axis    the calendrical timeline
      * @return  new interval factory
@@ -343,6 +344,7 @@ public class CalendarPeriod<T>
      *         // [AP-1393-01-05/AP-1393-01-06]
      * </pre>
      *
+     * @param   <U> generic unit type
      * @param   <D> generic type of timepoints on the underlying timeline
      * @param   axis    the calendrical timeline
      * @return  new interval factory
@@ -618,7 +620,7 @@ public class CalendarPeriod<T>
 
     /**
      * <p>Obtains a stream for fixed calendar intervals like years, quarters, months or weeks. </p>
-     * <p>
+     * 
      * <p>The produced stream has at least one element and is always finite. If it was produced by mean of
      * {@code on(...).between(...)} then the step width is one calendar day. </p>
      *
@@ -643,7 +645,7 @@ public class CalendarPeriod<T>
 
     /**
      * <p>Obtains the delta between start and end in the smallest defined units. </p>
-     * <p>
+     * 
      * <p>If start and end are equal then the delta is zero. </p>
      *
      * @return difference in smallest defined units
@@ -664,12 +666,12 @@ public class CalendarPeriod<T>
     }
 
     /**
-     * Obtains a random date within this interval. </p>
+     * <p>Obtains a random date within this interval. </p>
      *
      * @return  random date within this interval
      */
     /*[deutsch]
-     * Liefert ein Zufallsdatum innerhalb dieses Intervalls. </p>
+     * <p>Liefert ein Zufallsdatum innerhalb dieses Intervalls. </p>
      *
      * @return  random date within this interval
      */
@@ -960,14 +962,14 @@ public class CalendarPeriod<T>
         //~ Methoden ------------------------------------------------------
 
         /**
-         * Creates a closed interval between given calendrical timepoints. </p>
+         * <p>Creates a closed interval between given calendrical timepoints. </p>
          *
          * @param   start   the start of interval
          * @param   end     the end of interval (inclusive)
          * @return  new calendrical interval
          */
         /*[deutsch]
-         * Erzeugt ein kalendarisches geschlossenes Interval zwischen den angegebenen Grenzen. </p>
+         * <p>Erzeugt ein kalendarisches geschlossenes Interval zwischen den angegebenen Grenzen. </p>
          *
          * @param   start   the start of interval
          * @param   end     the end of interval (inclusive)

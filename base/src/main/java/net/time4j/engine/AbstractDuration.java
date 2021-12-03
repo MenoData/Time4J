@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (AbstractDuration.java) is part of project Time4J.
  *
@@ -29,7 +29,7 @@ import java.util.List;
 /**
  * <p>Defines a timespan using the default algorithm of Time4J. </p>
  *
- * <p><a name="algorithm"></a>Dependent on the sign of the duration
+ * <p><a id="algorithm"></a>Dependent on the sign of the duration
  * there are three cases: </p>
  *
  * <ol>

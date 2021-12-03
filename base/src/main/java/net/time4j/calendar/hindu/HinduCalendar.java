@@ -94,7 +94,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * the desired era} on the variant. Users can also configure astronomic calculations to be applied instead of
  * the traditional ways to calculate Hindu calendar dates. </p>
  *
- * <h4>Supported elements</h4>
+ * <p><strong>Supported elements</strong></p>
  *
  * <p>Following elements which are declared as constants are registered by this class: </p>
  *
@@ -110,13 +110,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@code CommonElements.RELATED_GREGORIAN_YEAR}
  * are supported. </p>
  *
- * <h4>Calendar arithmetic and time units</h4>
+ * <p><strong>Calendar arithmetic and time units</strong></p>
  *
  * <p>A date arithmetic using units beyond the class {@link net.time4j.engine.CalendarDays} is not offered.
  * But there are methods like {@code previousMonth()} or {@code nextYear()}. About years, user can also use
  * expressions like {@code with(YEAR_OF_ERA, getYear() + amount)}. </p>
  *
- * <h4>Formatting and parsing</h4>
+ * <p><strong>Formatting and parsing</strong></p>
  *
  * <p>This calendar can deploy the same localized resources like the Indian national calendar. Example: </p>
  *
@@ -158,7 +158,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Other number systems can be used in the usual way by obtaining a modified copy of the formatter
  * with an expression like {@code f.with(Attributes.NUMBER_SYSTEM, NumberSystem.DEVANAGARI)}. </p>
  *
- * <h4>Oddities</h4>
+ * <p><strong>Oddities</strong></p>
  *
  * <p>The Hindu calendar knows <i>lost days</i> and leap days. And the lunisolar variants also know <i>lost months</i>
  * (rare) and leap months. This is the main reason why days and months are not modelled as integers.  So users cannot
@@ -190,7 +190,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * {@link HinduVariant#with(HinduEra) auf der Variante gesetzt} wird. Auch kann konfiguriert werden, da&szlig;
  * moderne astronomische Berechnungen anstelle der traditionellen Berechnungen angewandt werden sollen. </p>
  *
- * <h4>Unterst&uuml;tzte Elemente</h4>
+ * <p><strong>Unterst&uuml;tzte Elemente</strong></p>
  *
  * <p>Folgende als Konstanten deklarierte Elemente werden von dieser Klasse registriert: </p>
  *
@@ -206,13 +206,13 @@ import java.util.concurrent.ConcurrentHashMap;
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@code CommonElements.RELATED_GREGORIAN_YEAR}
  * unterst&uuml;tzt. </p>
  *
- * <h4>Kalenderarithmetik mit Zeiteinheiten</h4>
+ * <p><strong>Kalenderarithmetik mit Zeiteinheiten</strong></p>
  *
  * <p>Eine Datumsarithmetik mittels Zeiteinheiten wird au&szlig;er der Klasse {@link net.time4j.engine.CalendarDays}
  * nicht angeboten. Aber es gibt Methoden wie {@code previousMonth()} oder {@code nextYear()}. Was Jahre angeht,
  * k&ouml;nnen Anwender auch Ausdr&uuml;cke wie {@code with(YEAR_OF_ERA, getYear() + amount)} verwenden. </p>
  *
- * <h4>Formatierung</h4>
+ * <p><strong>Formatierung</strong></p>
  *
  * <p>Dieser Kalender kann die gleichen sprachabh&auml;ngigen Textressourcen wie der indische Nationalkalender
  * aussch&ouml;pfen. Beispiel: </p>
@@ -257,7 +257,7 @@ import java.util.concurrent.ConcurrentHashMap;
  * des Formatierers mittels Ausdr&uuml;cken wie {@code f.with(Attributes.NUMBER_SYSTEM, NumberSystem.DEVANAGARI)}
  * erzeugt und angewandt wird. </p>
  *
- * <h4>Besonderheiten</h4>
+ * <p><strong>Besonderheiten</strong></p>
  *
  * <p>Der Hindukalender kennt <i>verlorene Tage</i> und Schalttage. Und die lunisolaren Varianten kennen
  * entsprechend <i>verlorene Monate</i> (selten) und Schaltmonate. Das ist der Hauptgrund, warum Tage und

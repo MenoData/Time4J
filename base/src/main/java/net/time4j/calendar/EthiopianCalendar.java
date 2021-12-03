@@ -76,7 +76,7 @@ import java.util.Locale;
 /**
  * <p>Represents the calendar used in Ethiopia. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is built on the base of the <a href="CopticCalendar.html">Coptic calendar</a>
  * but uses two different eras. Another difference to Coptic calendar is the day starting
@@ -84,7 +84,7 @@ import java.util.Locale;
  * <a href="https://www.nahmiasreport.com/news/2011/06/15/ethiopian-calendar">Intro
  * to the Ethiopic Calendar</a>. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -100,7 +100,7 @@ import java.util.Locale;
  *
  * <p>Furthermore, all elements defined in {@code EpochDays} and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p><strong>Example of usage</strong></p>
  *
  * <pre>
  *     // printing to English
@@ -127,7 +127,7 @@ import java.util.Locale;
  *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);
@@ -150,7 +150,7 @@ import java.util.Locale;
 /*[deutsch]
  * <p>Repr&auml;sentiert den Kalender, der in &Auml;thiopien als offizieller Kalender verwendet wird. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Er ist im wesentlichen wie der <a href="CopticCalendar.html">koptische Kalender</a> aufgebaut, verwendet
  * aber zwei andere &Auml;ras. Eine weitere Differenz zum koptischen Kalender ist, da&szlig; der Kalendertag
@@ -158,7 +158,7 @@ import java.util.Locale;
  * <a href="https://www.nahmiasreport.com/news/2011/06/15/ethiopian-calendar">Intro
  * to the Ethiopic Calendar</a>. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -174,7 +174,7 @@ import java.util.Locale;
  *
  * <p>Au&slig;erdem werden alle Elemente von {@code EpochDays} und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiele</h4>
+ * <p><strong>Anwendungsbeispiele</strong></p>
  *
  * <pre>
  *     // Englische Textausgabe
@@ -201,7 +201,7 @@ import java.util.Locale;
  *     System.out.println(ethio); // AMETE_MIHRET-1997-02-11
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      ZonalOffset offset = ZonalOffset.ofHours(OffsetSign.AHEAD_OF_UTC, 3);

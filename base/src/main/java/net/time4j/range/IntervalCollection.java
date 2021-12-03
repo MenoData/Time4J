@@ -225,6 +225,8 @@ public abstract class IntervalCollection<T>
     /**
      * <p>Yields an empty instance for intervals on given timeline. </p>
      *
+     * @param   <T> generic type of time points
+     * @param   timeLine    the associated timeline
      * @return  empty generic {@code IntervalCollection}
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)
@@ -238,6 +240,8 @@ public abstract class IntervalCollection<T>
     /*[deutsch]
      * <p>Liefert eine leere Instanz f&uuml;r Intervalle auf dem angegebenen Zeitstrahl. </p>
      *
+     * @param   <T> generic type of time points
+     * @param   timeLine    the associated timeline
      * @return  empty generic {@code IntervalCollection}
      * @see     net.time4j.engine.TimeAxis
      * @see     net.time4j.engine.CalendarFamily#getTimeLine(String)

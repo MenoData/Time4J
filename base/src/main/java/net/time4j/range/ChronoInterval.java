@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2019 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoInterval.java) is part of project Time4J.
  *
@@ -211,7 +211,7 @@ public interface ChronoInterval<T> {
 
     /**
      * <p>Queries if this interval abuts the other one such that there is neither any overlap nor any gap between. </p>
-     * <p>
+     * 
      * <p>Note: Empty intervals never abut. </p>
      *
      * @param   other       another interval which might abut this interval

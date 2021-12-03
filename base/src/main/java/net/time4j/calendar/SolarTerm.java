@@ -228,6 +228,8 @@ public enum SolarTerm {
      * according to the traditional order in the Chinese calendar. </p>
      *
      * @param   index   an integer in range {@code 1-12}
+     *
+     * @return  SolarTerm
      * @throws  IllegalArgumentException if the index is out of range
      */
     /*[deutsch]
@@ -235,6 +237,7 @@ public enum SolarTerm {
      * entsprechend der traditionellen Reihenfolge im chinesischen Kalender. </p>
      *
      * @param   index   an integer in range {@code 1-12}
+     * @return  SolarTerm
      * @throws  IllegalArgumentException if the index is out of range
      */
     public static SolarTerm ofMajor(int index) {
@@ -252,6 +255,7 @@ public enum SolarTerm {
      * according to the traditional order in the Chinese calendar. </p>
      *
      * @param   index   an integer in range {@code 1-12}
+     * @return  SolarTerm
      * @throws  IllegalArgumentException if the index is out of range
      */
     /*[deutsch]
@@ -259,6 +263,7 @@ public enum SolarTerm {
      * entsprechend der traditionellen Reihenfolge im chinesischen Kalender. </p>
      *
      * @param   index   an integer in range {@code 1-12}
+     * @return  SolarTerm
      * @throws  IllegalArgumentException if the index is out of range
      */
     public static SolarTerm ofMinor(int index) {
@@ -275,6 +280,7 @@ public enum SolarTerm {
      * <p>Obtains an instance of {@code SolarTerm} at given moment. </p>
      *
      * @param   moment      the moment for which the solar term needs to be searched
+     * @return  SolarTerm
      * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
      * @see     JulianDay#MIN
      * @see     JulianDay#MAX
@@ -283,6 +289,7 @@ public enum SolarTerm {
      * <p>Liefert eine Instanz von {@code SolarTerm} zum angegebenen Moment. </p>
      *
      * @param   moment      the moment for which the solar term needs to be searched
+     * @return  SolarTerm
      * @throws  IllegalArgumentException if the Julian day of moment is not in supported range
      * @see     JulianDay#MIN
      * @see     JulianDay#MAX

@@ -58,12 +58,12 @@ import java.util.Map;
 /**
  * <p>Represents the traditional Koran calendar supported in the gregorian range 1645-01-28/3000-01-27. </p>
  *
- * <h4>Introduction</h4>
+ * <p><strong>Introduction</strong></p>
  *
  * <p>It is a lunisolar calendar which defines years consisting of 12 or 13 months. See also
  * <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
  *
- * <h4>Following elements which are declared as constants are registered by this class</h4>
+ * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -82,7 +82,7 @@ import java.util.Map;
  * <p>Furthermore, all elements defined in {@code KoreanEra}, {@code EpochDays}
  * and {@link CommonElements} are supported. </p>
  *
- * <h4>Example of usage</h4>
+ * <p><strong>Example of usage</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;KoreanCalendar&gt; formatter =
@@ -93,7 +93,7 @@ import java.util.Map;
  *     System.out.println(formatter.format(koreanDate));
  * </pre>
  *
- * <h4>Support for unicode ca-extensions</h4>
+ * <p><strong>Support for unicode ca-extensions</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-dangi&quot;);
@@ -111,12 +111,12 @@ import java.util.Map;
  * <p>Repr&auml;sentiert den koreanischen Kalender mit dem unterst&uuml;tzen (gregorianischen)
  * Bereich 1645-01-28/3000-01-27. </p>
  *
- * <h4>Einleitung</h4>
+ * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen lunisolaren Kalender, dessen Jahre aus 12 oder 13 Monaten bestehen.
  * Siehe auch <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
  *
- * <h4>Registriert sind folgende als Konstanten deklarierte Elemente</h4>
+ * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
  * <ul>
  *  <li>{@link #DAY_OF_WEEK}</li>
@@ -135,7 +135,7 @@ import java.util.Map;
  * <p>Au&slig;erdem werden alle Elemente von {@code KoreanEra}, {@code EpochDays}
  * und {@link CommonElements} unterst&uuml;tzt. </p>
  *
- * <h4>Anwendungsbeispiel</h4>
+ * <p><strong>Anwendungsbeispiel</strong></p>
  *
  * <pre>
  *     ChronoFormatter&lt;KoreanCalendar&gt; formatter =
@@ -146,7 +146,7 @@ import java.util.Map;
  *     System.out.println(formatter.format(koreanDate));
  * </pre>
  *
- * <h4>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</h4>
+ * <p><strong>Unterst&uuml;tzung f&uuml;r Unicode-ca-Erweiterungen</strong></p>
  *
  * <pre>
  *      Locale locale = Locale.forLanguageTag(&quot;en-u-ca-dangi&quot;);
