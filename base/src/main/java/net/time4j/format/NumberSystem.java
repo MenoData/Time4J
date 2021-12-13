@@ -358,7 +358,7 @@ public enum NumberSystem {
                 numeral.append((bai == 2) ? CHINESE_TWO_ALT : digits.charAt(bai + 1));
                 numeral.append(CHINESE_HUNDRED);
             }
-            if ((shi == 0) && !numeral.isEmpty() && (n > 0)) {
+            if ((shi == 0) && !(numeral.length() == 0) && (n > 0)) {
                 if (numeral.charAt(numeral.length() - 1) != CHINESE_ZERO_STD) {
                     numeral.append(CHINESE_ZERO_STD); // don't repeat zero char
                 }
