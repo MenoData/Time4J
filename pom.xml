@@ -67,14 +67,14 @@
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>
-                <version>3.2</version>
+                <version>3.8.1</version>
                 <configuration>
                     <verbose>true</verbose>
                     <fork>true</fork>
                     <!-- see issue #103
                     <executable>${JAVA_HOME}/bin/javac</executable>
                     -->
-                    <compilerVersion>${jdk.min.version}</compilerVersion>
+                    <compilerVersion>${jdk.version}</compilerVersion>
                     <source>1.8</source>
                     <target>1.8</target>
                     <encoding>${project.build.sourceEncoding}</encoding>
@@ -107,6 +107,7 @@
                 <artifactId>maven-javadoc-plugin</artifactId>
                 <version>3.3.1</version>
                 <configuration>
+                    <javadocVersion>${jdk.version}</javadocVersion>
                     <!-- see https://bugs.openjdk.java.net/browse/JDK-8148480 -->
                     <additionalparam>-Xdoclint:-syntax</additionalparam>
                     <show>public</show>
@@ -126,8 +127,8 @@
                         <configuration>
                             <rules>
                                 <requireJavaVersion>
-                                    <message>To build this project JDK ${jdk.min.version} (or greater) is required. Please install it.</message>
-                                    <version>${jdk.min.version}</version>
+                                    <message>To build this project JDK ${jdk.version} (or greater) is required. Please install it.</message>
+                                    <version>${jdk.version}</version>
                                 </requireJavaVersion>
                             </rules>
                         </configuration>
@@ -138,6 +139,9 @@
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-surefire-plugin</artifactId>
                 <version>2.22.0</version>
+                <configuration>
+                    <useModulePath>false</useModulePath>
+                </configuration>
             </plugin>
         </plugins>
     </build>
@@ -207,7 +211,7 @@
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
         <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
-        <jdk.min.version>1.8</jdk.min.version>
+        <jdk.version>1.8</jdk.version>
     </properties>
 
 </project>
