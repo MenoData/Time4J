@@ -1,4 +1,6 @@
-## [v5.9] not yet released
+## [v5.10] not yet released
+
+## [v5.9] published on 2021-12-15
 ### Added
 - Numeral support for Gurmukhi, Korean and Lao [#959]
 - Enable PrettyTime with non-decimal numerals [#958] 
