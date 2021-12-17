@@ -1255,7 +1255,7 @@ public class IntervalCollectionTest {
     public void collectionOfInstantIntervals() {
         Instant now = Instant.now();
         SimpleInterval<Instant> i1 =
-            SimpleInterval.between(Instant.EPOCH, Instant.now());
+            SimpleInterval.between(Instant.EPOCH, now);
         SimpleInterval<Instant> i2 =
             SimpleInterval.since(now.plusSeconds(1));
         IntervalCollection<Instant> icoll = IntervalCollection.onInstantTimeLine().plus(i2).plus(i1);

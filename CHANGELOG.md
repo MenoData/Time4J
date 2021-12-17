@@ -1,4 +1,6 @@
-## [v5.10] not yet released
+## [v5.9.1] not yet released
+### Fixed
+-  Test fails during build with microsecond resolution [#961]
 
 ## [v5.9] published on 2021-12-15
 ### Added
@@ -13,7 +15,7 @@
 - Updated naming of Danish eras [#944]
 
 ### Deprecated
--  PrettyTime.withZeroDigit(NumberSystem) [#958]
+- PrettyTime.withZeroDigit(NumberSystem) [#958]
 
 ### Fixed
 - Documentation link of Ethiopian calendar broken [#952]
