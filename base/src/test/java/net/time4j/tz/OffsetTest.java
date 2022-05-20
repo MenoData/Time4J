@@ -61,6 +61,17 @@ public class OffsetTest {
             is(0));
     }
 
+    @Test
+    public void atLongitudeOfAuckland() {
+        ZonalOffset offset = ZonalOffset.atLongitude(new BigDecimal("174.74"));
+        assertThat(
+            offset.getIntegralAmount(),
+            is(41937));
+        assertThat(
+            offset.getFractionalAmount(),
+            is(600_000_000));
+    }
+
     @Test(expected=IllegalArgumentException.class)
     public void atLongitudeBigDecimalPlus180_001() {
         ZonalOffset.atLongitude(new BigDecimal("180.001"));

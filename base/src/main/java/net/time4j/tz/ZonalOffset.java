@@ -106,12 +106,12 @@ public final class ZonalOffset
                 throw new IllegalArgumentException(
                     "Total seconds out of range: " + total);
             }
-        } else if (Math.abs(fraction) > 999999999) {
+        } else if (Math.abs(fraction) > 999_999_999) {
             throw new IllegalArgumentException(
                 "Fraction out of range: " + fraction);
         } else if (
-            (total < -11 * 3600)
-            || (total > 11 * 3600)
+            (total <= -12 * 3600)
+            || (total >= 12 * 3600)
         ) {
             throw new IllegalArgumentException(
                 "Total seconds out of range while fraction is non-zero: "
@@ -315,7 +315,7 @@ public final class ZonalOffset
      * <p>Static factory method for a shift which has the given full
      * hour part. </p>
      *
-     * <p>Is equivalent to {@code ofHoursMinutes(sign, hours, 0}. </p>
+     * <p>Is equivalent to {@code ofHoursMinutes(sign, hours, 0)}. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
      * @param   hours       hour part ({@code 0 <= hours <= 18})
@@ -327,7 +327,7 @@ public final class ZonalOffset
      * <p>Statische Fabrikmethode f&uuml;r eine Zeitverschiebung, die den
      * angegebenen vollen Stundenanteil hat. </p>
      *
-     * <p>Entspricht {@code ofHoursMinutes(sign, hours, 0}. </p>
+     * <p>Entspricht {@code ofHoursMinutes(sign, hours, 0)}. </p>
      *
      * @param   sign        sign of shift relative to zero meridian
      * @param   hours       hour part ({@code 0 <= hours <= 18})
