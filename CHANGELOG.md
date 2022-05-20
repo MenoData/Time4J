@@ -1,6 +1,7 @@
 ## [v5.9.1] not yet released
 ### Fixed
--  Test fails during build with microsecond resolution [#961]
+- Force release flag of maven-compiler-plugin [#964]
+- Test fails during build with microsecond resolution [#961]
 
 ## [v5.9] published on 2021-12-15
 ### Added
