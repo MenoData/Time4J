@@ -1,5 +1,6 @@
 ## [v5.9.1] not yet released
 ### Fixed
+- ZonalOffset atLongitude() does not work for Auckland [#966]
 - Force release flag of maven-compiler-plugin [#964]
 - Test fails during build with microsecond resolution [#961]
 
