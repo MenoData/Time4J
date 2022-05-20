@@ -1,4 +1,7 @@
 ## [v5.9.1] not yet released
+### Changed
+-  No leap second on 2022-06-30 [#967]
+
 ### Fixed
 - ZonalOffset atLongitude() does not work for Auckland [#966]
 - Force release flag of maven-compiler-plugin [#964]
