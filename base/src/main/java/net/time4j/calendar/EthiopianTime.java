@@ -1012,7 +1012,7 @@ public final class EthiopianTime
      */
     private Object writeReplace() {
 
-        return new SPXethio(this, SPXethio.TIME);
+        return new SPXEthio(this, SPXEthio.TIME);
 
     }
 

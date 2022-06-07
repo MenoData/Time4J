@@ -2,7 +2,7 @@
  * -----------------------------------------------------------------------
  * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
- * This file (SPXethio.java) is part of project Time4J.
+ * This file (SPXEthio.java) is part of project Time4J.
  *
  * Time4J is free software: You can redistribute it and/or modify it
  * under the terms of the GNU Lesser General Public License as published
@@ -39,7 +39,7 @@ import java.io.ObjectStreamException;
  * @author  Meno Hochschild
  * @serial  include
  */
-final class SPXethio
+final class SPXEthio
     implements Externalizable {
 
     //~ Statische Felder/Initialisierungen ----------------------------
@@ -63,7 +63,7 @@ final class SPXethio
      * <p>Benutzt in der Deserialisierung gem&auml;&szlig; dem Kontrakt
      * von {@code Externalizable}. </p>
      */
-    public SPXethio() {
+    public SPXEthio() {
         super();
     }
 
@@ -73,7 +73,7 @@ final class SPXethio
      * @param   obj     object to be serialized
      * @param   type    serialization type (corresponds to type of obj)
      */
-    SPXethio(
+    SPXEthio(
         Object obj,
         int type
     ) {
