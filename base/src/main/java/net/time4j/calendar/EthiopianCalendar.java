@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (EthiopianCalendar.java) is part of project Time4J.
  *
@@ -951,7 +951,7 @@ public final class EthiopianCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.ETHIOPIAN_DATE);
+        return new SPXethio(this, SPXethio.DATE);
 
     }
 
