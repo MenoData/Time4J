@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CopticCalendar.java) is part of project Time4J.
  *
@@ -844,8 +844,8 @@ public final class CopticCalendar
      * @return  replacement object in serialization graph
      */
     private Object writeReplace() {
-
-        return new SPX(this, SPX.COPTIC);
+        
+        return new SPX3(this);
 
     }
 
