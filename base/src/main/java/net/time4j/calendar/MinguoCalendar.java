@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MinguoCalendar.java) is part of project Time4J.
  *
@@ -808,7 +808,7 @@ public final class MinguoCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.MINGUO);
+        return new SPX6(this);
 
     }
 
