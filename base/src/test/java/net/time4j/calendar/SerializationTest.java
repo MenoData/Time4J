@@ -50,6 +50,7 @@ public class SerializationTest {
     @Test
     public void serializeJulian() throws IOException, ClassNotFoundException {
         roundtrip(JulianCalendar.of(HistoricEra.AD, 1752, 9, 14));
+        roundtrip(JulianCalendar.of(HistoricEra.BC, 46, 2, 13));
     }
 
     @Test
