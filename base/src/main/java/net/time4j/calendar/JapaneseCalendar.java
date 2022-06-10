@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JapaneseCalendar.java) is part of project Time4J.
  *
@@ -1589,7 +1589,7 @@ public final class JapaneseCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.JAPANESE);
+        return new SPX9(this);
 
     }
 
