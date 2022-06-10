@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ThaiSolarCalendar.java) is part of project Time4J.
  *
@@ -892,7 +892,7 @@ public final class ThaiSolarCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.THAI_SOLAR);
+        return new SPX8(this);
 
     }
 
