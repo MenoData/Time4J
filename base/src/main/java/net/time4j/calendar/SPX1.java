@@ -40,9 +40,7 @@ final class SPX1
 
     //~ Statische Felder/Initialisierungen ----------------------------
 
-    /** Serialisierungstyp. */
-    static final int HIJRI = 1;
-
+    private static final int HIJRI = 1;
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------

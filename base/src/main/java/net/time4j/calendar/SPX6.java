@@ -42,9 +42,7 @@ final class SPX6
 
     //~ Statische Felder/Initialisierungen ----------------------------
 
-    /** Serialisierungstyp. */
-    static final int MINGUO = 6;
-
+    private static final int MINGUO = 6;
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------

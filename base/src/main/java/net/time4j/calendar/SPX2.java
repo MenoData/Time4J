@@ -40,9 +40,7 @@ final class SPX2
 
     //~ Statische Felder/Initialisierungen ----------------------------
 
-    /** Serialisierungstyp. */
-    static final int PERSIAN = 2;
-
+    private static final int PERSIAN = 2;
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------

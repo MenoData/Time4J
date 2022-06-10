@@ -42,9 +42,7 @@ final class SPX7
 
     //~ Statische Felder/Initialisierungen ----------------------------
 
-    /** Serialisierungstyp. */
-    static final int JULIAN = 7;
-
+    private static final int JULIAN = 7;
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------

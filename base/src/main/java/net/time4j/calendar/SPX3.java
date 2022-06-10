@@ -40,9 +40,7 @@ final class SPX3
 
     //~ Statische Felder/Initialisierungen ----------------------------
 
-    /** Serialisierungstyp. */
-    static final int COPTIC = 3;
-
+    private static final int COPTIC = 3;
     private static final long serialVersionUID = 1L;
 
     //~ Instanzvariablen ----------------------------------------------
