@@ -120,14 +120,19 @@ public class SerializationTest {
         throws IOException, ClassNotFoundException {
 
         ByteArrayOutputStream baos = new ByteArrayOutputStream();
-        ObjectOutputStream oos = new ObjectOutputStream(baos);
-        oos.writeObject(obj);
-        byte[] data = baos.toByteArray();
-        oos.close();
+        byte[] data;
+        
+        try (ObjectOutputStream oos = new ObjectOutputStream(baos)) {
+            oos.writeObject(obj);
+            data = baos.toByteArray();
+        }
+        
         ByteArrayInputStream bais = new ByteArrayInputStream(data);
-        ObjectInputStream ois = new ObjectInputStream(bais);
-        assertThat(ois.readObject(), is(obj));
-        ois.close();
+        
+        try (ObjectInputStream ois = new ObjectInputStream(bais)) {
+            assertThat(ois.readObject(), is(obj));
+        }
+        
         return data.length;
     }
 

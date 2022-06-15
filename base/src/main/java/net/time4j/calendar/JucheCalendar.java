@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (JucheCalendar.java) is part of project Time4J.
  *
@@ -762,7 +762,7 @@ public final class JucheCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.JUCHE);
+        return new SPX17(this);
 
     }
 
