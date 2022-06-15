@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewCalendar.java) is part of project Time4J.
  *
@@ -1233,7 +1233,7 @@ public final class HebrewCalendar
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.HEBREW_DATE);
+        return new SPXHebrew(this, SPXHebrew.DATE);
 
     }
 

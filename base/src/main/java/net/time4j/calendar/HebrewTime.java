@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HebrewTime.java) is part of project Time4J.
  *
@@ -883,7 +883,7 @@ public final class HebrewTime
      */
     private Object writeReplace() {
 
-        return new SPX(this, SPX.HEBREW_TIME);
+        return new SPXHebrew(this, SPXHebrew.TIME);
 
     }
 
