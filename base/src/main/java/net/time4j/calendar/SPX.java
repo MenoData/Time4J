@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SPX.java) is part of project Time4J.
  *
@@ -41,7 +41,9 @@ import java.io.ObjectStreamException;
  *
  * @author  Meno Hochschild
  * @serial  include
+ * @deprecated wird in Zukunft in einem Major-Release entfernt
  */
+@Deprecated
 final class SPX
     implements Externalizable {
 
