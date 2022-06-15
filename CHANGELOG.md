@@ -1,6 +1,7 @@
 ## [v5.9.1] not yet released
 ### Changed
--  No leap second on 2022-06-30 [#967]
+- Reduce calendar class loading [#968] 
+- No leap second on 2022-06-30 [#967]
 
 ### Fixed
 - ZonalOffset atLongitude() does not work for Auckland [#966]
