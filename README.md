@@ -13,7 +13,7 @@ Although the new JSR-310 (built in Java 8) is certainly a very useful library fo
 Current state and introduction:
 -------------------------------
 
-On 2022-06-19, the version v5.9.1 of Time4J has been finished and released. It requires at least Java-8. The older version lines v3.x and v4.x have reached end-of-life with the latest versions v3.50 and v4.38 where v3.x is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life, too. Time4J is organized in modules. The module **time4j-base** is always necessary. Other modules are optional and include:
+On 2022-06-20, the version v5.9.1 of Time4J has been finished and released. It requires at least Java-8. The older version lines v3.x and v4.x have reached end-of-life with the latest versions v3.50 and v4.38 where v3.x is based on Java 6+7. The previous version lines v1.x and v2.x are no longer recommended (due to several backward incompatibilities) and have reached end-of-life, too. Time4J is organized in modules. The module **time4j-base** is always necessary. Other modules are optional and include:
 
 - **time4j-sqlxml** contains a simple adapter for the support of SQL-databases. 
 - **time4j-tzdata** encapsulates the time zone repository (independent github-project starting with version 5.0-2018f)
