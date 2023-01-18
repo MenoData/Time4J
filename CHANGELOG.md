@@ -1,5 +1,9 @@
 ## [v5.10] not yet released
 
+## [v5.9.2] not yet released
+### Changed
+- No leap second on 2023-06-30 [#974]
+
 ## [v5.9.1] published on 2022-06-20
 ### Changed
 - Reduce calendar class loading [#968] 
