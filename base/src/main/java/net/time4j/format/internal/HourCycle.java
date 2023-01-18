@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2023 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HourCycle.java) is part of project Time4J.
  *
@@ -49,7 +49,7 @@ import java.util.Set;
  *
  * <ul>
  *     <li>Halbtags- oder Ganztageszyklus</li>
- *     <li>Darstellung von Mitternach und Mittag als Null oder verschieden (12/24)</li>
+ *     <li>Darstellung von Mitternacht und Mittag als Null oder verschieden (12/24)</li>
  *     <li>Verwendung flexibler Tagesabschnitte statt des AM/PM-Systems im Halbtagszyklus</li>
  * </ul>
  *
@@ -125,9 +125,9 @@ public enum HourCycle {
     H11_B('K', true);
 
     // derived from: timeData-node in file supplementalData.xml (Unicode-CLDR-v38)
-    private static Set<String> REGIONS_FLEX_DP; // regions with flexible day periods
-    private static Set<String> REGIONS_12H; // 12-hour-regions
-    private static Set<String> REGIONS_24H; // 24-hour-regions
+    private static final Set<String> REGIONS_FLEX_DP; // regions with flexible day periods
+    private static final Set<String> REGIONS_12H; // 12-hour-regions
+    private static final Set<String> REGIONS_24H; // 24-hour-regions
 
     static {
         Set<String> regionsFlexDP = new HashSet<>();
