@@ -23,7 +23,7 @@ public class DiyanetRangeTest {
 
     @Test
     public void maximum() {
-        HijriCalendar hijri = HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1444, 5, 29);
+        HijriCalendar hijri = HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1449, 8, 29);
         assertThat(
             HijriCalendar.family().getCalendarSystem(hijri.getVariant()).getMaximumSinceUTC(),
             is(hijri.getDaysSinceEpochUTC()));
@@ -31,12 +31,12 @@ public class DiyanetRangeTest {
 
     @Test(expected=ArithmeticException.class)
     public void beyondMaximum() {
-        HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1444, 5, 29).plus(CalendarDays.ONE);
+        HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1449, 8, 29).plus(CalendarDays.ONE);
     }
 
     @Test(expected=ChronoException.class)
     public void incompleteLengthOfYear() {
-        HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1444, 5, 29).lengthOfYear();
+        HijriCalendar.of(HijriCalendar.VARIANT_DIYANET, 1449, 8, 29).lengthOfYear();
     }
 
 }

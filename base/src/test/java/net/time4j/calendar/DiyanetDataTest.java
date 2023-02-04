@@ -27,6 +27,8 @@ public class DiyanetDataTest {
                 {1436, 11, 30, "2015-09-14", 30},
                 {1436, 12, 1, "2015-09-15", 29},
                 {1444, 5, 29, "2022-12-23", 29},
+                {1444, 6, 1, "2022-12-24", 30},
+                {1449, 8, 29, "2028-01-26", 29},
             }
         );
     }
@@ -84,7 +86,7 @@ public class DiyanetDataTest {
     public void yearday() {
         assertThat(
             this.diyanet.getDayOfYear(),
-            is(this.diyanet.get(HijriCalendar.DAY_OF_YEAR).intValue()));
+            is(this.diyanet.get(HijriCalendar.DAY_OF_YEAR)));
     }
 
     @Test

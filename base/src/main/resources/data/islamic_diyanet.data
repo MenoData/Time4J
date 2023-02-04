@@ -1,20 +1,20 @@
 # calendar type (cldr-spec)
 type=islamic-diyanet
 
-# source=http://www.staff.science.uu.nl/~gent0113/islam/diyanetcalendar.htm (viewed at September 2015)
-version=1.0-201509
+# source=http://www.staff.science.uu.nl/~gent0113/islam/diyanetcalendar.htm (viewed at February 2023)
+version=1.0-202302
 
 # minimum hijri year
 min=1318
 
 # maximum hijri year
-max=1444
+max=1449
 
 # ISO-8601-date corresponding to first hijri date
 iso-start=1900-05-01
 
 # ISO-8601-date corresponding to last hijri date
-# iso-end=2022-12-23 (informational)
+# iso-end=2028-01-26 (informational)
 
 # tabular data-------------------------------------------
 # - every row denotes an islamic year in hijri calendar
@@ -146,4 +146,9 @@ iso-start=1900-05-01
 1441=30 29 30 29 30 30 29 30 30 29 30 29
 1442=29 30 29 30 29 30 29 30 30 30 29 30
 1443=29 29 30 29 30 29 30 29 30 30 29 30
-1444=29 30 30 29 29
+1444=29 30 30 29 29 30 29 30 29 30 29 30
+1445=29 30 30 29 30 29 30 29 30 29 29 30
+1446=29 30 30 30 29 30 30 29 29 30 29 29
+1447=30 29 30 30 29 30 30 30 29 29 30 29
+1448=29 30 29 30 29 30 30 30 29 30 29 30
+1449=29 29 30 29 30 29 30 29

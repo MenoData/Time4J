@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2023 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (HijriCalendar.java) is part of project Time4J.
  *
@@ -446,14 +446,14 @@ public final class HijriCalendar
     /**
      * The name of the Turkish Diyanet-variant.
      *
-     * <p>The supported range is 1318-01-01/1444-05-29 (ISO: 1900-05-01/2022-12-23). </p>
+     * <p>The supported range is 1318-01-01/1449-08-29 (ISO: 1900-05-01/2028-01-26). </p>
      *
      * @since   3.9/4.6
      */
     /*[deutsch]
      * Der Name der t&uuml;rkischen Diyanet-Variante.
      *
-     * <p>Der unterst&uuml;tze Wertebereich ist 1318-01-01/1444-05-29 (ISO: 1900-05-01/2022-12-23). </p>
+     * <p>Der unterst&uuml;tze Wertebereich ist 1318-01-01/1449-08-29 (ISO: 1900-05-01/2028-01-26). </p>
      *
      * @since   3.9/4.6
      */
