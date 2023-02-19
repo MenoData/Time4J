@@ -1,7 +1,8 @@
 ## [v5.10] not yet released
 
-## [v5.9.2] not yet released
+## [v5.9.2] published on 2023-02-19
 ### Changed
+- Enhancement of validity range of HijriCalendar.VARIANT_DIYANET [#976] 
 - No leap second on 2023-06-30 [#974]
 
 ## [v5.9.1] published on 2022-06-20
