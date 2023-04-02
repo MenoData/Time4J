@@ -592,5 +592,21 @@ public class MomentIntervalFormatTest {
                 BracketPolicy.SHOW_WHEN_NON_STANDARD),
             is(always));
     }
+    
+    @Test
+    public void parseReducedISO1() throws ParseException {
+        MomentInterval range = 
+            MomentInterval.parseISO("2023-03-28T00:00:00+01:00/06:00");
+        Moment start = PlainTimestamp.of(2023, 3, 27, 23, 0).atUTC();
+        Moment end = PlainTimestamp.of(2023, 3, 28, 5, 0).atUTC();
+        assertThat(
+            range,
+            is(MomentInterval.between(start, end)));
+    }
+
+    @Test(expected=ParseException.class)
+    public void parseReducedISO2() throws ParseException {
+        MomentInterval.parseISO("2023-03-28T00:00:00/06:00"); // missing time zone
+    }
 
 }

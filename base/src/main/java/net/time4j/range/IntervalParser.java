@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2016 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2023 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (IntervalParser.java) is part of project Time4J.
  *
@@ -18,7 +18,6 @@
  * along with Time4J. If not, see <http://www.gnu.org/licenses/>.
  * -----------------------------------------------------------------------
  */
-
 package net.time4j.range;
 
 import net.time4j.engine.AttributeQuery;
@@ -33,89 +32,88 @@ import static net.time4j.format.Attributes.TRAILING_CHARACTERS;
 import static net.time4j.range.IntervalEdge.CLOSED;
 import static net.time4j.range.IntervalEdge.OPEN;
 
-
 /**
- * <p>Interpretiert Intervalle basierend auf Zeitformatierern, die auf die
- * Start- oder Endkomponenten angewandt werden. </p>
+ * <p>
+ * Interpretiert Intervalle basierend auf Zeitformatierern, die auf die Start-
+ * oder Endkomponenten angewandt werden. </p>
  *
- * @author  Meno Hochschild
- * @param   <T> generic temporal type
- * @param   <I> generic interval type
- * @since   2.0
+ * @author Meno Hochschild
+ * @param <T> generic temporal type
+ * @param <I> generic interval type
+ * @since 2.0
  */
 class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     implements ChronoParser<I> {
 
     //~ Instanzvariablen --------------------------------------------------
-
-	private final IntervalFactory<T, I> factory;
-	private final ChronoParser<T> startFormat;
-	private final ChronoParser<T> endFormat;
-	private final BracketPolicy policy;
+    private final IntervalFactory<T, I> factory;
+    private final ChronoParser<T> startFormat;
+    private final ChronoParser<T> endFormat;
+    private final BracketPolicy policy;
     private final Character separator;
 
     //~ Konstruktoren -----------------------------------------------------
-
-	IntervalParser(
-		IntervalFactory<T, I> factory,
-		ChronoParser<T> startFormat,
-		ChronoParser<T> endFormat, // optional
-		BracketPolicy policy,
+    IntervalParser(
+        IntervalFactory<T, I> factory,
+        ChronoParser<T> startFormat,
+        ChronoParser<T> endFormat, // optional
+        BracketPolicy policy,
         Character separator // optional
-	) {
-		super();
+    ) {
+        super();
 
-		if (policy == null) {
-			throw new NullPointerException("Missing bracket policy.");
+        if (policy == null) {
+            throw new NullPointerException("Missing bracket policy.");
         }
 
         this.factory = factory;
-		this.startFormat = startFormat;
-		this.endFormat = endFormat;
-		this.policy = policy;
+        this.startFormat = startFormat;
+        this.endFormat = endFormat;
+        this.policy = policy;
         this.separator = separator;
 
-	}
+    }
 
     //~ Methoden ----------------------------------------------------------
-
     /**
-     * <p>Factory method with either solidus or hyphen as separation char. </p>
+     * <p>
+     * Factory method with either solidus or hyphen as separation char. </p>
      *
-     * @param   <T> generic temporal type
-     * @param   <I> generic interval type
-     * @param   factory         interval factory
-     * @param   parser          boundary parser
-     * @param   policy          bracket policy
-     * @return  new interval parser
-     * @since   2.0
+     * @param <T> generic temporal type
+     * @param <I> generic interval type
+     * @param factory interval factory
+     * @param parser boundary parser
+     * @param policy bracket policy
+     * @return new interval parser
+     * @since 2.0
      */
-	static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
-		IntervalFactory<T, I> factory,
-		ChronoParser<T> parser,
-		BracketPolicy policy
-	) {
+    static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
+        IntervalFactory<T, I> factory,
+        ChronoParser<T> parser,
+        BracketPolicy policy
+    ) {
 
-		if (parser == null) {
-			throw new NullPointerException("Missing boundary parser.");
+        if (parser == null) {
+            throw new NullPointerException("Missing boundary parser.");
         }
 
-		return new IntervalParser<>(factory, parser, parser, policy, null);
+        return new IntervalParser<>(factory, parser, parser, policy, null);
 
-	}
+    }
 
     /**
-     * <p>General factory method. </p>
+     * <p>
+     * General factory method. </p>
      *
-     * @param   <T> generic temporal type
-     * @param   <I> generic interval type
-     * @param   factory         interval factory
-     * @param   startFormat     formatter for lower interval boundary
-     * @param   endFormat       formatter for upper interval boundary
-     * @param   policy          bracket policy
-     * @param   separator       separation char  between start and end component
-     * @return  new interval parser
-     * @since   3.9/4.6
+     * @param <T> generic temporal type
+     * @param <I> generic interval type
+     * @param factory interval factory
+     * @param startFormat formatter for lower interval boundary
+     * @param endFormat formatter for upper interval boundary
+     * @param policy bracket policy
+     * @param separator separation char between start and end component
+     * @return new interval parser
+     * @since 3.9/4.6
      */
     static <T extends Temporal<? super T>, I extends IsoInterval<T, I>> IntervalParser<T, I> of(
         IntervalFactory<T, I> factory,
@@ -132,23 +130,24 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         }
 
         return new IntervalParser<>(
-            factory,
-            startFormat,
-            endFormat,
-            policy,
-            Character.valueOf(separator));
+                factory,
+                startFormat,
+                endFormat,
+                policy,
+                Character.valueOf(separator));
 
     }
 
     /**
-     * <p>Interpretiert den angegebenen Text als chronologisches Intervall. </p>
+     * <p>
+     * Interpretiert den angegebenen Text als chronologisches Intervall. </p>
      *
-     * @param   text        text to be parsed
-     * @return  parse result
-     * @throws  IndexOutOfBoundsException if the text is empty
-     * @throws  ParseException if the text is not parseable
+     * @param text text to be parsed
+     * @return parse result
+     * @throws IndexOutOfBoundsException if the text is empty
+     * @throws ParseException if the text is not parseable
      */
-	I parse(String text) throws ParseException {
+    I parse(String text) throws ParseException {
 
         ParseLog plog = new ParseLog();
         AttributeQuery attrs = this.startFormat.getAttributes();
@@ -160,10 +159,8 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             throw new ParseException(
                 plog.getErrorMessage(),
                 plog.getErrorIndex());
-        } else if (
-            (pos < len)
-            && !attrs.get(TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()
-        ) {
+        } else if ((pos < len)
+                && !attrs.get(TRAILING_CHARACTERS, Boolean.FALSE).booleanValue()) {
             String suffix;
 
             if (len - pos <= 10) {
@@ -329,8 +326,8 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             period = text.subSequence(pos, endIndex).toString();
             pos = endIndex;
         } else if (
-            (c == '-')
-            && ((pos + 1 >= len) || (text.charAt(pos + 1) == ')'))
+                (c == '-')
+                && ((pos + 1 >= len) || (text.charAt(pos + 1) == ')'))
         ) {
             if (symbol == 2) {
                 status.setError(pos, "Mixed infinity symbols not allowed.");
@@ -387,8 +384,8 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
             if ((c == ']') || (c == ')')) {
                 if (this.policy == BracketPolicy.SHOW_NEVER) {
                     status.setError(
-                        pos,
-                        "Illegal end boundary due to bracket policy " + this.policy + ": " + c);
+                    pos,
+                    "Illegal end boundary due to bracket policy " + this.policy + ": " + c);
                 } else {
                     rightVisible = true;
                     right = ((c == ']') ? CLOSED : OPEN);
@@ -470,15 +467,16 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
     }
 
     /**
-     * <p>Custom parsing using any kind of interval pattern (possibly with or-logic). </p>
+     * <p>Custom parsing using any kind of interval pattern (possibly with
+     * or-logic). </p>
      *
-     * @param   text        text to be parsed
-     * @param   factory     interval factory
-     * @param   parser      parser used for parsing either start or end component
-     * @param   pattern     interval pattern containing the placeholders {0} or {1}
-     * @return  parsed interval
-     * @throws  ParseException if parsing fails
-     * @since   4.18
+     * @param text text to be parsed
+     * @param factory interval factory
+     * @param parser parser used for parsing either start or end component
+     * @param pattern interval pattern containing the placeholders {0} or {1}
+     * @return parsed interval
+     * @throws ParseException if parsing fails
+     * @since 4.18
      */
     static <T, I extends ChronoInterval<T>> I parsePattern(
         CharSequence text,
@@ -513,7 +511,7 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
         ChronoParser<T> parser,
         String pattern,
         ParseLog plog
-    ){
+    ) {
 
         int pos = plog.getPosition();
         int len = text.length();
@@ -557,7 +555,11 @@ class IntervalParser<T extends Temporal<? super T>, I extends IsoInterval<T, I>>
                         return null;
                     }
                     plog.setPosition(pos);
-                    if ((pos + 1 < len) && (text.charAt(pos) == '+') && (text.charAt(pos + 1) == '\u221E')) {
+                    if (
+                        (pos + 1 < len) 
+                        && (text.charAt(pos) == '+') 
+                        && (text.charAt(pos + 1) == '\u221E')
+                    ) {
                         // end = null;
                         pos += 2;
                     } else {

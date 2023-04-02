@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2023 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (MomentInterval.java) is part of project Time4J.
  *
@@ -1505,8 +1505,8 @@ public final class MomentInterval
         }
 
         // prescan for format analysis
-		int start = 0;
-		int n = Math.min(text.length(), 117);
+        int start = 0;
+        int n = Math.min(text.length(), 117);
         boolean sameFormat = true;
         int firstDate = 1; // loop starts one index position later
         int secondDate = 0;
@@ -1886,18 +1886,31 @@ public final class MomentInterval
             ParseLog upperLog,
             AttributeQuery attrs
         ) {
-
+            
+            ChronoEntity<?> rawData = 
+                lowerLog.getRawValues();            
+            Set<ChronoElement<?>> stdElements =
+                MomentIntervalFactory.INSTANCE.stdElements(rawData);
+            TZID tzid = 
+                rawData.hasTimezone() 
+                ? rawData.getTimezone() 
+                : attrs.get(Attributes.TIMEZONE_ID, ZonalOffset.UTC);
+            Attributes attributes =
+                new Attributes.Builder().setTimezone(tzid).build();
+            
             ChronoFormatter<Moment> reducedParser =
                 this.createEndFormat(
-                    Moment.axis().preformat(t1, attrs),
-                    lowerLog.getRawValues());
+                    Moment.axis().preformat(t1, attributes),
+                    stdElements,
+                    attributes);
             return reducedParser.parse(text, upperLog);
 
         }
 
         private ChronoFormatter<Moment> createEndFormat(
             ChronoDisplay defaultSupplier,
-            ChronoEntity<?> rawData
+            Set<ChronoElement<?>> stdElements,
+            Attributes attributes
         ) {
 
             ChronoFormatter.Builder<Moment> builder =
@@ -1967,14 +1980,9 @@ public final class MomentInterval
                 Collections.singletonList("Z"));
             builder.endSection();
 
-            for (ChronoElement<?> key : MomentIntervalFactory.INSTANCE.stdElements(rawData)) {
+            for (ChronoElement<?> key : stdElements) {
                 setDefault(builder, key, defaultSupplier);
             }
-
-            Attributes attributes =
-                new Attributes.Builder()
-                    .setTimezone(rawData.getTimezone())
-                    .build();
 
             return builder.build(attributes);
 
