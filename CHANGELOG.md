@@ -1,5 +1,9 @@
 ## [v5.10] not yet released
 
+## [v5.9.3] not yet released
+### Fixed
+- Bug in parsing moment intervals with incomplete parts [#979]
+
 ## [v5.9.2] published on 2023-02-19
 ### Changed
 - Enhancement of validity range of HijriCalendar.VARIANT_DIYANET [#976] 
