@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2023 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SolarTime.java) is part of project Time4J.
  *
@@ -1850,6 +1850,9 @@ public final class SolarTime
 
         /**
          * <p>Calculates the moment of sunrise. </p>
+         * 
+         * <p>The zenith angle can be represented by the result of the method
+         * {@link #getZenithAngle(double, int) getZenithAngle(latitude, altitude)}. </p>
          *
          * @param   date        the local calendar date
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
@@ -1860,6 +1863,10 @@ public final class SolarTime
          */
         /*[deutsch]
          * <p>Berechnet den Zeitpunkt des Sonnenaufgangs. </p>
+         *
+         * <p>Der Zenitwinkel kann mittels des Ergebnisses der Methode
+         * {@link #getZenithAngle(double, int) getZenithAngle(latitude, altitude)}
+         * berechnet werden. </p>
          *
          * @param   date        the local calendar date
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
@@ -1878,6 +1885,9 @@ public final class SolarTime
         /**
          * <p>Calculates the moment of sunset. </p>
          *
+         * <p>The zenith angle can be represented by the result of the method
+         * {@link #getZenithAngle(double, int) getZenithAngle(latitude, altitude)}. </p>
+         *
          * @param   date        the local calendar date
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
          * @param   longitude   geographical longitude in degrees, positive for East, negative for West
@@ -1887,6 +1897,10 @@ public final class SolarTime
          */
         /*[deutsch]
          * <p>Berechnet den Zeitpunkt des Sonnenuntergangs. </p>
+         *
+         * <p>Der Zenitwinkel kann mittels des Ergebnisses der Methode
+         * {@link #getZenithAngle(double, int) getZenithAngle(latitude, altitude)}
+         * berechnet werden. </p>
          *
          * @param   date        the local calendar date
          * @param   latitude    geographical latitude in degrees, positive for North, negative for South
@@ -1949,10 +1963,13 @@ public final class SolarTime
         /**
          * <p>Calculates the additional geodetic angle due to the extra altitude of the observer. </p>
          *
-         * <p>The default implementation just returns {@code 0.0}. </p>
+         * <p>The default implementation just returns {@code 0.0}. Negative altitudes modelling
+         * a valley between hight mountains are not supported but might be approximated by an angle
+         * calculation using the altitude difference between valley and mountain and also using
+         * the distance between valley and mountain resulting in a negative angle. </p>
          *
          * @param   latitude    the geographical latitude in degrees
-         * @param   altitude    the altitude of the observer in meters
+         * @param   altitude    the altitude of the observer in meters, not negative
          * @return  geodetic angle correction in degrees
          * @since   3.36/4.31
          */
@@ -1960,10 +1977,14 @@ public final class SolarTime
          * <p>Berechnet die zus&auml;tzliche geod&auml;tische Winkelkorrektur, die der H&ouml;he
          * des Beobachters auf der Erdoberfl&auml;che geschuldet ist. </p>
          *
-         * <p>Die Standardimplementierung liefert nur {@code 0.0}. </p>
+         * <p>Die Standardimplementierung liefert nur {@code 0.0}. Negative H&ouml;hen, die ein
+         * Tal zwischen hohen Bergen modellieren, werden nicht unterst&uuml;tzt. Eine solche
+         * Ausnahmesituation mu&szlig; durch eine Winkelberechnung mit der H&ouml;hendifferenz
+         * zwischen Berg und Tal sowie der Entfernung Berg-Tal gel&ouml;st werden, resultierend
+         * in einem negativen Winkel. </p>
          *
          * @param   latitude    the geographical latitude in degrees
-         * @param   altitude    the altitude of the observer in meters
+         * @param   altitude    the altitude of the observer in meters, not negative
          * @return  geodetic angle correction in degrees
          * @since   3.36/4.31
          */
@@ -1980,10 +2001,19 @@ public final class SolarTime
          * <p>Calculates the angle of the sun relative to the zenith at sunrise or sunset. </p>
          *
          * <p>The default implementation just uses the standard refraction angle of 34 arc minutes,
-         * adds to it {@code 90°} and the {@link #getGeodeticAngle(double, int) geodetic angle correction}. </p>
+         * adds to it {@code 90°} and the {@link #getGeodeticAngle(double, int) geodetic angle correction}.
+         * In case users do not want to take into account the geodetic angle correction, they might simply
+         * subtract latter one. Example for the situation of Denver in USA which is suited in a valley with
+         * far mountain ranges: </p>
+         * 
+         * <pre>
+         *  double zenith = 
+         *      calculator.getZenithAngle(latitude, altitude) 
+         *      - calculator.getGeodeticAngle(latitude, altitude);
+         * </pre>
          *
          * @param   latitude    the geographical latitude in degrees
-         * @param   altitude    the altitude of the observer in meters
+         * @param   altitude    the altitude of the observer in meters, not negative
          * @return  effective zenith angle in degrees
          * @since   3.36/4.31
          */
@@ -1992,10 +2022,18 @@ public final class SolarTime
          *
          * <p>Die Standardimplementierung verwendet nur den normalen Refraktionswinkel von 34 Bogenminuten und
          * addiert dazu {@code 90°} und die {@link #getGeodeticAngle(double, int) geod&auml;tische Winkelkorrektur}.
-         * </p>
+         * Wird als Zenitwinkel eine Implementierung ohne Ber&uuml;cksichtigung der geod&auml;tischen 
+         * Winkelkorrektur gew&uuml;nscht, darf letztere einfach subtrahiert werden. Beispiel f&uuml;r die
+         * Situation von Denver in den USA, das in einem weiten Tal mit fernen Bergketten gelegen ist: </p>
+         * 
+         * <pre>
+         *  double zenith = 
+         *      calculator.getZenithAngle(latitude, altitude) 
+         *      - calculator.getGeodeticAngle(latitude, altitude);
+         * </pre>
          *
          * @param   latitude    the geographical latitude in degrees
-         * @param   altitude    the altitude of the observer in meters
+         * @param   altitude    the altitude of the observer in meters, not negative
          * @return  effective zenith angle in degrees
          * @since   3.36/4.31
          */
