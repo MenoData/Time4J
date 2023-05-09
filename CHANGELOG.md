@@ -1,6 +1,6 @@
 ## [v5.10] not yet released
 
-## [v5.9.3] not yet released
+## [v5.9.3] published on 2023-05-09
 ### Fixed
 - Bug in parsing moment intervals with incomplete parts [#979]
 - More documentation of the use of altitude in solar calculations [#977]
