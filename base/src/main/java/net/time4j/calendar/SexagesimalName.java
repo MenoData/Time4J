@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2024 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (SexagesimalName.java) is part of project Time4J.
  *

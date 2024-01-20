@@ -22,10 +22,15 @@ import org.junit.runners.JUnit4;
 import java.text.ParseException;
 import java.time.format.FormatStyle;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.List;
 import java.util.Locale;
 import java.util.Optional;
 import java.util.stream.Collectors;
+import net.time4j.engine.AttributeQuery;
+import net.time4j.format.Attributes;
+import net.time4j.format.NumberSystem;
+import net.time4j.format.expert.ChronoParser;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -575,6 +580,32 @@ public class ChineseMiscellaneousTest {
         // https://www.yourchineseastrology.com/calendar/2020/8.htm
         ChineseCalendar latest = PlainDate.of(2020, 8, 6).transform(ChineseCalendar.axis());
         assertThat(latest.getSexagesimalDay().getDisplayName(Locale.CHINESE), is("辛巳"));
+    }
+
+    @Test
+    public void chineseLunarDays() {
+        ChronoFormatter<ChineseCalendar> formatter =
+            ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.CHINA)
+                .addPattern("r(U)MMMM", PatternType.CLDR_DATE)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_LUNAR_DAYS)
+                .addPattern("d日(", PatternType.CLDR)
+                .endSection()
+                .addCustomized( // zodiac printer
+                    ChineseCalendar.YEAR_OF_CYCLE, 
+                    (CyclicYear year, StringBuilder buffer, AttributeQuery attrs) -> {
+                        buffer.append(year.getZodiac(Locale.TRADITIONAL_CHINESE));
+                        return Collections.emptySet();
+                    },
+                    ChronoParser.unsupported())
+                .addLiteral(')')
+                .build();
+        ChineseCalendar chineseDate = ChineseCalendar.ofNewYear(2024);
+        assertThat(
+            formatter.format(chineseDate),
+            is("2024(甲辰)正月初一日(龍)"));
+        assertThat(
+            formatter.format(chineseDate.plus(20, ChineseCalendar.Unit.DAYS)),
+            is("2024(甲辰)正月廿一日(龍)"));
     }
 
 }

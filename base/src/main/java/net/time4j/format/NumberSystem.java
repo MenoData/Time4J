@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2024 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (NumberSystem.java) is part of project Time4J.
  *
@@ -175,7 +175,7 @@ public enum NumberSystem {
      * <p>Whole numbers will be read as digit by digit. When parsing, the special
      * zero char &quot;〇&quot; will be handled like the default zero char &quot;零&quot;.
      * The method {@code getDigits()} contains both zero char variants. Example:
-     * The output of {@code NumberSystem.CHINESE_DECIMAL.toInteger(&quot;二零零九&quot;)}
+     * The output of {@code NumberSystem.CHINESE_DECIMAL.toInteger("二零零九")}
      * will be {@code 2009}, the same with the input {@code 二〇〇九}. </p>
      * 
      * <p>Important note: Although this number system can be almost handled like
@@ -213,7 +213,7 @@ public enum NumberSystem {
      * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
      * Standard-Nullzeichen &quot;零&quot; behandelt. Die Methode {@code getDigits()}
      * enth&auml;lt beide Nullzeichen. Beispiel: Das Ergebnis von
-     * {@code NumberSystem.CHINESE_DECIMAL.toInteger(&quot;二零零九&quot;)} wird
+     * {@code NumberSystem.CHINESE_DECIMAL.toInteger("二零零九")} wird
      * {@code 2009} sein, dito mit der Eingabe {@code 二〇〇九}. </p>
      *
      * <p>Wichtiger Hinweis: Obwohl sich dieses Zahlsystem fast wie ein
@@ -298,6 +298,122 @@ public enum NumberSystem {
         }
         @Override
         public boolean hasDecimalCodepoints() {
+            return false;
+        }
+    },
+
+    /**
+     * The Chinese day counting system used for the day of month in lunar
+     * calendar in the range 1-32.
+     * 
+     * <p>In Chinese the days of the lunar month have special numbering. 
+     * Days 1-10 use 初一, 初二, … 初十. For days 21-29 the number is formed
+     * using 廿 instead of 二十 to indicate 20. <Strong>Attention:</strong> 
+     * It is not usual to apply this numbering style in the context of
+     * gregorian calendar where arabic digits are far more appropriate,
+     * even in Chinese language. </p>
+     * 
+     * <p>Note: The numbers 31 and 32 are not used in the Chinese calendar but
+     * maybe in other lunar calendars. </p>
+     *
+     * <p>Example of usage: </p>
+     * 
+     * <pre>
+        ChronoFormatter&lt;ChineseCalendar&gt; formatter =
+            ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.CHINA)
+                .addPattern(&quot;r(U)MMMM&quot;, PatternType.CLDR_DATE)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_LUNAR_DAYS)
+                .addPattern(&quot;d日(&quot;, PatternType.CLDR)
+                .endSection()
+                .addCustomized( // zodiac printer
+                    ChineseCalendar.YEAR_OF_CYCLE, 
+                    (CyclicYear year, StringBuilder buffer, AttributeQuery attrs) -&gt; {
+                        buffer.append(year.getZodiac(Locale.TRADITIONAL_CHINESE));
+                        return Collections.emptySet();
+                    },
+                    ChronoParser.unsupported())
+                .addLiteral(')')
+                .build();
+        assertThat(
+            formatter.format(ChineseCalendar.ofNewYear(2024)),
+            is(&quot;2024(甲辰)正月初一日(龍)&quot;));
+     * </pre>
+     *
+     * <p>Note: Must not be negative or zero. 
+     * {@link #getCode() Code}: &quot;hanidays&quot;. </p>
+     *
+     * @see     #CHINESE_MANDARIN
+     * @since   5.9.4
+     */
+    /*[deutsch]
+     * Das vorwiegend f&uuml;r Tagesangaben im lunisolaren Kalender verwendete 
+     * chinesische Zahlsystem im Bereich 1-32.
+     *
+     * <p>Die chinesischen Tage des lunaren Monats haben eine besondere
+     * Nummerierung. Die Tage 1-10 verwenden 初一, 初二, … 初十, die Tage 21-29 
+     * benutzen für die Kombination 二十 (=20) die Abk&uuml;rzung 廿.
+     * <Strong>Achtung:</strong> Es ist nicht &uuml;blich, diesen
+     * Nummerierungsstil auf den gregorianischen Kalender anzuwenden,
+     * nicht einmal in der chinesischen Sprache (stattdessen einfach
+     * die arabischen Ziffern 0-9 verwenden). </p>
+     *
+     * <p>Hinweis: Die Zahlen 31 und 32 werden im chinesischen Kalender nicht
+     * gebraucht, aber vielleicht in anderen lunaren Kalendern. </p>
+     *
+     * <p>Anwendungsbeispiel: </p>
+     * 
+     * <pre>
+        ChronoFormatter&lt;ChineseCalendar&gt; formatter =
+            ChronoFormatter.setUp(ChineseCalendar.axis(), Locale.CHINA)
+                .addPattern(&quot;r(U)MMMM&quot;, PatternType.CLDR_DATE)
+                .startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_LUNAR_DAYS)
+                .addPattern(&quot;d日(&quot;, PatternType.CLDR)
+                .endSection()
+                .addCustomized( // zodiac printer
+                    ChineseCalendar.YEAR_OF_CYCLE, 
+                    (CyclicYear year, StringBuilder buffer, AttributeQuery attrs) -&gt; {
+                        buffer.append(year.getZodiac(Locale.TRADITIONAL_CHINESE));
+                        return Collections.emptySet();
+                    },
+                    ChronoParser.unsupported())
+                .addLiteral(')')
+                .build();
+        assertThat(
+            formatter.format(ChineseCalendar.ofNewYear(2024)),
+            is(&quot;2024(甲辰)正月初一日(龍)&quot;));
+     * </pre>
+     *
+     * <p>Hinweis: Darf nicht negativ oder null sein. 
+     * {@link #getCode() Code}: &quot;hanidays&quot;. </p>
+     *
+     * @see     #CHINESE_MANDARIN
+     * @since   5.9.4
+     */
+    CHINESE_LUNAR_DAYS("hanidays") {
+        @Override
+        public String toNumeral(int number) {
+            if (number < 1 || number > 32) {
+                throw new IllegalArgumentException(
+                    "Number must be in supported range 1-32: " + number);
+            }
+            return HANIDAYS[number - 1];
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            for (int i = 0; i < 32; i++) {
+                if (HANIDAYS[i].equals(numeral)) {
+                    return i + 1;
+                }
+            }
+            throw new IllegalArgumentException(
+                "Not a recognized Chinese lunar day number: " + numeral);
+        }
+        @Override
+        public String getDigits() {
+            return "\u521D\u4E00\u4E8C\u4E09\u56DB\u4E94\u516D\u4E03\u516B\u4E5D\u5341\u5EFF\u5345";
+        }
+        @Override
+        public boolean isDecimal() {
             return false;
         }
     },
@@ -1183,6 +1299,16 @@ public enum NumberSystem {
         "하나", "둘", "셋", "넷", "다섯", "여섯", "일곱", "여덟", "아홉",
         "열", "스물", "서른", "마흔", "쉰", "예순", "일흔", "여든", "아흔"
     };
+    
+    private static final String[] HANIDAYS = new String[]{
+        "\u521D\u4E00", "\u521D\u4E8C", "\u521D\u4E09", "\u521D\u56DB", "\u521D\u4E94",
+        "\u521D\u516D", "\u521D\u4E03", "\u521D\u516B", "\u521D\u4E5D", "\u521D\u5341",
+        "\u5341\u4E00", "\u5341\u4E8C", "\u5341\u4E09", "\u5341\u56DB", "\u5341\u4E94",
+        "\u5341\u516D", "\u5341\u4E03", "\u5341\u516B", "\u5341\u4E5D", "\u4E8C\u5341",
+        "\u5EFF\u4E00", "\u5EFF\u4E8C", "\u5EFF\u4E09", "\u5EFF\u56DB", "\u5EFF\u4E94",
+        "\u5EFF\u516D", "\u5EFF\u4E03", "\u5EFF\u516B", "\u5EFF\u4E5D", "\u4E09\u5341",
+        "\u5345\u4E00", "\u5345\u4E8C"
+    };    
 
     //~ Instanzvariablen --------------------------------------------------
 
