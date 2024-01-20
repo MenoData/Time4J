@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2018 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2024 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChronoParser.java) is part of project Time4J.
  *
@@ -170,6 +170,28 @@ public interface ChronoParser<T> {
 
         return Attributes.empty();
 
+    }
+    
+    /**
+     * <p>Creates a simple placeholder in situations where parsing
+     * is not used. </p>
+     * 
+     * @param   <T> generic type of chronological entity to be parsed
+     * @return  dummy parser
+     * @since   5.9.4
+     */
+    /*[deutsch]
+     * <p>Erzeugt einen einfachen Platzhalter in Situationen, in denen
+     * das Parsen nicht gebraucht wird. </p>
+     * 
+     * @param   <T> generic type of chronological entity to be parsed
+     * @return  dummy parser
+     * @since   5.9.4
+     */
+    static <T> ChronoParser<T> unsupported() {
+        return (CharSequence text, ParseLog status, AttributeQuery attrs) -> {
+            throw new UnsupportedOperationException("Parsing not used.");
+        };
     }
 
 }
