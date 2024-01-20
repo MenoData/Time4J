@@ -1,4 +1,10 @@
 ## [v5.10] not yet released
+## [v5.9.4] not yet released
+### Added
+- Simple dummy parser when parsing is unused [#986]
+
+### Changed
+- No leap second on 2024-06-30 [#984]
 
 ## [v5.9.3] published on 2023-05-09
 ### Fixed
