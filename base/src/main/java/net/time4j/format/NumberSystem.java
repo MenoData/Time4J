@@ -423,13 +423,15 @@ public enum NumberSystem {
      * 
      * <p>It is not a decimal system but simulates the spoken numbers.
      * The sign &quot;兩&quot; will replace the sign &quot;二&quot; (=2) for
-     * all numbers 200 or greater. When parsing, the special zero char &quot;〇&quot;
-     * will be handled like the default zero char &quot;零&quot;. </p>
+     * all numbers 200 or greater. When parsing, both 2-versions are supported.
+     * And the special zero char &quot;〇&quot; will be handled like the default
+     * zero char &quot;零&quot;. </p>
      *
      * <p>See also <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
-     * The {@link #getCode() code} is: &quot;hans&quot;. </p>
+     * The {@link #getCode() code} is: &quot;mandarin&quot;. </p>
      *
      * @see     #CHINESE_DECIMAL
+     * @see     #CHINESE_SIMPLIFIED
      * @since   5.9
      */
     /*[deutsch]
@@ -438,16 +440,18 @@ public enum NumberSystem {
      * <p>Es ist kein Dezimalsystem, simuliert aber die gesprochenen Zahlen.
      * Das Zeichen &quot;兩&quot; ersetzt das Zeichen &quot;二&quot; (=2)
      * f&uuml;r alle Zahlen 200 oder gr&ouml;&szlig;er. Beim Interpretieren
-     * von Numeralen wird das spezielle Nullzeichen &quot;〇&quot; wie das
+     * von Numeralen werden beide 2-er Zeiche ebenfalls erkannt. Au&szlig;erdem
+     * wird das spezielle Nullzeichen &quot;〇&quot; wie das
      * Standard-Nullzeichen &quot;零&quot; behandelt. </p>
      *
      * <p>Siehe auch <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
-     * Der {@link #getCode() Code} lautet: &quot;hans&quot;. </p>
+     * Der {@link #getCode() Code} lautet: &quot;mandarin&quot;. </p>
      *
      * @see     #CHINESE_DECIMAL
+     * @see     #CHINESE_SIMPLIFIED
      * @since   5.9
      */
-    CHINESE_MANDARIN("hans") {
+    CHINESE_MANDARIN("mandarin") {
         @Override
         public String toNumeral(int number) {
             if (number == 0) {
@@ -564,6 +568,46 @@ public enum NumberSystem {
                 total += 1000;
             }
             return total;
+        }
+        @Override
+        public String getDigits() {
+            return "零〇一二兩三四五六七八九十百千";
+        }
+        @Override
+        public boolean isDecimal() {
+            return false;
+        }
+    },
+
+    /**
+     * Like {@code CHINESE_MANDARIN} but with the only difference of printing
+     * the 2-char in all numbers greater than 199 using &quot;二&quot;.
+     *
+     * <p>The {@link #getCode() code} is: &quot;hans&quot;. </p>
+     *
+     * @see     #CHINESE_MANDARIN
+     * @since   5.9.4
+     */
+    /*[deutsch]
+     * Wie {@code CHINESE_MANDARIN}, aber mit dem Unterschied, da&szlig;
+     * Zahlen gr&ouml;&szlig;er als 199 f&uuml; das 2-Zeichen immer das 
+     * Zeichen &quot;二&quot; verwenden.
+     *
+     * <p>Der {@link #getCode() Code} lautet: &quot;hans&quot;. </p>
+     *
+     * @see     #CHINESE_MANDARIN
+     * @since   5.9.4
+     */
+    CHINESE_SIMPLIFIED("hans") {
+        @Override
+        public String toNumeral(int number) {
+            return NumberSystem.CHINESE_MANDARIN
+                .toNumeral(number)
+                .replace(CHINESE_TWO_ALT, CHINESE_TWO_STD);
+        }
+        @Override
+        public int toInteger(String numeral, Leniency leniency) {
+            return NumberSystem.CHINESE_MANDARIN.toInteger(numeral, leniency);
         }
         @Override
         public String getDigits() {
