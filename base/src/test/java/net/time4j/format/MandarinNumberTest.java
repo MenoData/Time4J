@@ -36,6 +36,34 @@ public class MandarinNumberTest {
     }
 
     @Test
+    public void simplified() {
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.toInteger("二千〇九"),
+            is(2009));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.toNumeral(2009),
+            is("二千零九"));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.toNumeral(1230),
+            is("一千二百三十"));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.toInteger("一千兩百三十"),
+            is(1230));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.toInteger("一千二百三十"),
+            is(1230));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.isDecimal(),
+            is(false));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.getDigits(),
+            is("零〇一二兩三四五六七八九十百千"));
+        assertThat(
+            NumberSystem.CHINESE_SIMPLIFIED.getCode(),
+            is("hans"));
+    }
+
+    @Test
     public void mandarin_2362() {
         assertThat(
             NumberSystem.CHINESE_MANDARIN.toNumeral(2362),
@@ -66,22 +94,6 @@ public class MandarinNumberTest {
         assertThat(
             NumberSystem.CHINESE_MANDARIN.toInteger("一千二百三十"),
             is(1230));
-    }
-
-    @Test
-    public void simplified_1230() {
-        assertThat(
-            NumberSystem.CHINESE_SIMPLIFIED.toNumeral(1230),
-            is("一千二百三十"));
-        assertThat(
-            NumberSystem.CHINESE_SIMPLIFIED.toInteger("一千兩百三十"),
-            is(1230));
-        assertThat(
-            NumberSystem.CHINESE_SIMPLIFIED.toInteger("一千二百三十"),
-            is(1230));
-        assertThat(
-            NumberSystem.CHINESE_SIMPLIFIED.getCode(),
-            is("hans"));
     }
 
     @Test
