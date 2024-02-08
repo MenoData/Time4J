@@ -426,6 +426,10 @@ public enum NumberSystem {
      * all numbers 200 or greater. When parsing, both 2-versions are supported.
      * And the special zero char &quot;〇&quot; will be handled like the default
      * zero char &quot;零&quot;. </p>
+     * 
+     * <p>Note: This numbering system can also be used in Taiwan because
+     * traditional Chinese differs from this system only for numbers at 10,000
+     * or above. </p>
      *
      * <p>See also <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
      * The {@link #getCode() code} is: &quot;mandarin&quot;. </p>
@@ -443,6 +447,10 @@ public enum NumberSystem {
      * von Numeralen werden beide 2-er Zeiche ebenfalls erkannt. Au&szlig;erdem
      * wird das spezielle Nullzeichen &quot;〇&quot; wie das
      * Standard-Nullzeichen &quot;零&quot; behandelt. </p>
+     *
+     * <p>Hinweis: Dieses System kann auch auf Taiwan verwendet werden, weil
+     * es sich von traditionellem Chinesisch nur für Zahlen von 10.000 oder
+     * h&ouml;her unterscheidet. </p>
      *
      * <p>Siehe auch <a href="https://en.wikibooks.org/wiki/Chinese_(Mandarin)/Numbers">Wikibooks</a>.
      * Der {@link #getCode() Code} lautet: &quot;mandarin&quot;. </p>
@@ -580,8 +588,11 @@ public enum NumberSystem {
     },
 
     /**
-     * Like {@code CHINESE_MANDARIN} but with the only difference of printing
-     * the 2-char in all numbers greater than 199 using &quot;二&quot;.
+     * Like {@code CHINESE_MANDARIN } but with the main difference of printing
+     * the zero character as &quot;〇&quot;.
+     * 
+     * <p>Furthermore, the 2-char in all numbers greater than 199 will always
+     * be printed using &quot;二&quot;. </p>
      *
      * <p>The {@link #getCode() code} is: &quot;hans&quot;. </p>
      *
@@ -589,9 +600,12 @@ public enum NumberSystem {
      * @since   5.9.4
      */
     /*[deutsch]
-     * Wie {@code CHINESE_MANDARIN}, aber mit dem Unterschied, da&szlig;
-     * Zahlen gr&ouml;&szlig;er als 199 f&uuml; das 2-Zeichen immer das 
-     * Zeichen &quot;二&quot; verwenden.
+     * Wie {@code CHINESE_MANDARIN}, aber mit dem Hauptunterschied, da&szlig;
+     * als Standardzeichen f&uuml;r die Null &quot;〇&quot; verwendet wird.
+     *
+     * <p>Au&szlig;erdem werden Zahlen gr&ouml;&szlig;er als 199 f&uuml;r das
+     * 2-Zeichen in Hundertern und Tausendern immer das Zeichen &quot;二&quot;
+     * verwenden. </p>
      *
      * <p>Der {@link #getCode() Code} lautet: &quot;hans&quot;. </p>
      *
@@ -603,6 +617,7 @@ public enum NumberSystem {
         public String toNumeral(int number) {
             return NumberSystem.CHINESE_MANDARIN
                 .toNumeral(number)
+                .replace(CHINESE_ZERO_STD, CHINESE_ZERO_ALT)
                 .replace(CHINESE_TWO_ALT, CHINESE_TWO_STD);
         }
         @Override

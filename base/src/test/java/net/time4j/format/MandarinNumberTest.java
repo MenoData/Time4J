@@ -42,7 +42,7 @@ public class MandarinNumberTest {
             is(2009));
         assertThat(
             NumberSystem.CHINESE_SIMPLIFIED.toNumeral(2009),
-            is("二千零九"));
+            is("二千〇九"));
         assertThat(
             NumberSystem.CHINESE_SIMPLIFIED.toNumeral(1230),
             is("一千二百三十"));
