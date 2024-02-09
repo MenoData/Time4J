@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2021 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2024 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (CalendarText.java) is part of project Time4J.
  *
@@ -471,7 +471,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields an {@code Accessor} for all standard months. </p>
+     * <p>Yields an {@code Accessor } for all standard months. </p>
      *
      * <p>The underlying list is sorted such that it will obey to the
      * typical order of months in given calendar system. ISO-systems
@@ -489,7 +489,7 @@ public final class CalendarText {
      * @see     net.time4j.Month
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * <p>Liefert einen {@code Accessor } f&uuml;r alle
      * Standard-Monatsnamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
@@ -517,7 +517,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields an {@code Accessor} for all months if a leap month
+     * <p>Yields an {@code Accessor } for all months if a leap month
      * is relevant. </p>
      *
      * <p>Note: Leap months are defined in some calendar systems like the
@@ -531,7 +531,7 @@ public final class CalendarText {
      * @see     #getStdMonths(TextWidth, OutputContext)
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * <p>Liefert einen {@code Accessor } f&uuml;r alle
      * Monatsnamen, wenn ein Schaltmonat relevant ist. </p>
      *
      * <p>Hinweis: Schaltmonate sind in einigen Kalendersystemen wie dem
@@ -555,7 +555,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields an {@code Accessor} for all quarter years. </p>
+     * <p>Yields an {@code Accessor } for all quarter years. </p>
      *
      * <p>The underlying list of text forms is sorted in the same order
      * as the enum {@code Quarter} and uses its ordinal index as list
@@ -571,7 +571,7 @@ public final class CalendarText {
      * @see     net.time4j.Quarter
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * <p>Liefert einen {@code Accessor } f&uuml;r alle
      * Quartalsnamen. </p>
      *
      * <p>Die Liste ist wie das Enum {@code Quarter} sortiert und verwendet
@@ -597,7 +597,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields an {@code Accessor} for all weekday names. </p>
+     * <p>Yields an {@code Accessor } for all weekday names. </p>
      *
      * <p>The underlying list of text forms is sorted such that the
      * typical order of weekdays is used in given calendar system.
@@ -613,7 +613,7 @@ public final class CalendarText {
      * @see     net.time4j.Weekday
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * <p>Liefert einen {@code Accessor } f&uuml;r alle
      * Wochentagsnamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
@@ -639,7 +639,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields an {@code Accessor} for all era names. </p>
+     * <p>Yields an {@code Accessor } for all era names. </p>
      *
      * <p>The underlying list of text forms is sorted such that the
      * typical order of eras is used in given calendar system. ISO systems
@@ -655,7 +655,7 @@ public final class CalendarText {
      * @see     net.time4j.engine.CalendarSystem#getEras()
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * <p>Liefert einen {@code Accessor } f&uuml;r alle
      * &Auml;ranamen. </p>
      *
      * <p>Die Liste ist so sortiert, da&szlig; die f&uuml;r das jeweilige
@@ -679,7 +679,7 @@ public final class CalendarText {
     }
 
     /**
-     * <p>Yields an {@code Accessor} for all am/pm-names. </p>
+     * <p>Yields an {@code Accessor } for all am/pm-names. </p>
      *
      * <p>The underlying list of text forms is sorted in AM-PM-order.
      * The order of element value enums must be the same. </p>
@@ -690,7 +690,7 @@ public final class CalendarText {
      * @see     net.time4j.Meridiem
      */
     /*[deutsch]
-     * <p>Liefert einen {@code Accessor} f&uuml;r alle
+     * <p>Liefert einen {@code Accessor } f&uuml;r alle
      * Tagesabschnittsnamen. </p>
      *
      * <p>Die Liste ist in AM/PM-Reihenfolge sortiert. Die Reihenfolge der
