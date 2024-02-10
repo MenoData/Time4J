@@ -7,6 +7,7 @@
 ### Changed
 - No leap second on 2024-06-30 [#984]
 - Number system code "u-nu-hans" slightly changed printing behaviour [#985]
+- Update polish translation of duration in days [#987]
 
 ## [v5.9.3] published on 2023-05-09
 ### Fixed
