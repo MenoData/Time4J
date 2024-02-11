@@ -1,6 +1,6 @@
 /*
  * -----------------------------------------------------------------------
- * Copyright © 2013-2022 Meno Hochschild, <http://www.menodata.de/>
+ * Copyright © 2013-2024 Meno Hochschild, <http://www.menodata.de/>
  * -----------------------------------------------------------------------
  * This file (ChineseCalendar.java) is part of project Time4J.
  *
@@ -67,7 +67,9 @@ import java.util.Map;
  *
  * <p><strong>Introduction</strong></p>
  *
- * <p>It is a lunisolar calendar which defines years consisting of 12 or 13 months. See also
+ * <p>It is a lunisolar calendar which defines years consisting of 12 or 13 months. Modern China now uses
+ * the gregorian calendar and uses this calendar mainly for determining the dates some festivals and the
+ * actual cyclic year and zodiac. See also
  * <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
  *
  * <p><strong>Following elements which are declared as constants are registered by this class</strong></p>
@@ -135,6 +137,36 @@ import java.util.Map;
  *       formatter.format(chineseDate),
  *       is(&quot;Sat, 16. Eleventh Month 2018(wù-xū) dōngzhì&quot;));
  * </pre>
+ * 
+ * <p>Printing gregorian dates together with Chinese cyclic year and zodiac: </p>
+ * 
+ * <pre>
+ *  ChronoPrinter&lt;PlainDate&gt; yearPrinter = // for display of cyclic year
+ *      (PlainDate gregorianDate, StringBuilder buffer, AttributeQuery attributes) -&gt; {
+ *          buffer.append(
+ *              gregorianDate.transform(ChineseCalendar.axis()).getYear().getDisplayName(Locale.TRADITIONAL_CHINESE));
+ *          return Collections.emptySet();
+ *      };
+ *
+ *  ChronoPrinter&lt;PlainDate&gt; zodiacPrinter = 
+ *      (PlainDate gregorianDate, StringBuilder buffer, AttributeQuery attributes) -&gt; {
+ *          buffer.append(gregorianDate.transform(ChineseCalendar.axis()).getYear().getZodiac(Locale.TRADITIONAL_CHINESE));
+ *          return Collections.emptySet();
+ *      };
+ *
+ *  ChronoFormatter&lt;PlainDate&gt; gf = ChronoFormatter.setUp(PlainDate.axis(), Locale.TRADITIONAL_CHINESE)
+ *      .addPattern(&quot;y(&quot;, PatternType.CLDR)
+ *      .addCustomized(PlainDate.COMPONENT, yearPrinter, ChronoParser.unsupported())
+ *      //.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_MANDARIN) // month and day in Chinese?
+ *      .addPattern(&quot;)年M月d日(&quot;, PatternType.CLDR)
+ *      //.endSection()
+ *      .addCustomized(PlainDate.COMPONENT, zodiacPrinter, ChronoParser.unsupported())
+ *      .addLiteral(')')
+ *      .build();
+ *
+ *  String s = gf.print(PlainDate.of(2023, 11, 5));
+ *  System.out.println(s); // 2023(癸卯)年11月5日(兔)
+ * </pre>
  *
  * <p>Leap months can be formatted in various ways. Following example shows how to customize numerical printing
  * when a non-Chinese language is used: </p>
@@ -171,7 +203,10 @@ import java.util.Map;
  * <p><strong>Einleitung</strong></p>
  *
  * <p>Es handelt sich um einen lunisolaren Kalender, dessen Jahre aus 12 oder 13 Monaten bestehen.
- * Siehe auch <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
+ * Das moderne China verwendet den gregorianischen Kalender und braucht diesen alten Bauernkalender
+ * im wesentlichen zur zeitlichen Bestimmung einiger chinesischer Feste und des chinesischen 
+ * zyklischen Jahrs und Tierkreiszeichens (Zodiak). Siehe auch 
+ * <a href="https://en.wikipedia.org/wiki/Chinese_calendar">Wikipedia</a>. </p>
  *
  * <p><strong>Registriert sind folgende als Konstanten deklarierte Elemente</strong></p>
  *
@@ -239,6 +274,37 @@ import java.util.Map;
  *     assertThat(
  *       formatter.format(chineseDate),
  *       is(&quot;Sat, 16. Eleventh Month 2018(wù-xū) dōngzhì&quot;));
+ * </pre>
+ *
+ * <p>Darstellung eines gregorianischen Datums zusammen mit dem chinesischen
+ * zyklischen Jahr und Tierkreiszeichen (Zodiak): </p>
+ * 
+ * <pre>
+ *  ChronoPrinter&lt;PlainDate&gt; yearPrinter = // zur Anzeige des zyklischen Jahres
+ *      (PlainDate gregorianDate, StringBuilder buffer, AttributeQuery attributes) -&gt; {
+ *          buffer.append(
+ *              gregorianDate.transform(ChineseCalendar.axis()).getYear().getDisplayName(Locale.TRADITIONAL_CHINESE));
+ *          return Collections.emptySet();
+ *      };
+ *
+ *  ChronoPrinter&lt;PlainDate&gt; zodiacPrinter = // Tierkreiszeichen
+ *      (PlainDate gregorianDate, StringBuilder buffer, AttributeQuery attributes) -&gt; {
+ *          buffer.append(gregorianDate.transform(ChineseCalendar.axis()).getYear().getZodiac(Locale.TRADITIONAL_CHINESE));
+ *          return Collections.emptySet();
+ *      };
+ *
+ *  ChronoFormatter&lt;PlainDate&gt; gf = ChronoFormatter.setUp(PlainDate.axis(), Locale.TRADITIONAL_CHINESE)
+ *      .addPattern(&quot;y(&quot;, PatternType.CLDR)
+ *      .addCustomized(PlainDate.COMPONENT, yearPrinter, ChronoParser.unsupported())
+ *      //.startSection(Attributes.NUMBER_SYSTEM, NumberSystem.CHINESE_MANDARIN) // Monat und Tag auf Chinesisch?
+ *      .addPattern(&quot;)年M月d日(&quot;, PatternType.CLDR)
+ *      //.endSection()
+ *      .addCustomized(PlainDate.COMPONENT, zodiacPrinter, ChronoParser.unsupported())
+ *      .addLiteral(')')
+ *      .build();
+ *
+ *  String s = gf.print(PlainDate.of(2023, 11, 5));
+ *  System.out.println(s); // 2023(癸卯)年11月5日(兔)
  * </pre>
  *
  * <p>Schaltmonate k&ouml;nnen verschieden formatiert werden. Das folgende Beispiel zeigt, wie man
