@@ -1,5 +1,6 @@
 ## [v5.10] not yet released
-## [v5.9.4] not yet released
+
+## [v5.9.4] published on 2024-02-11
 ### Added
 - Alternative Chinese number systems [#985] 
 - Simple dummy parser when parsing is unused [#986]
